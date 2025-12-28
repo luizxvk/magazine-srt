@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Users, Calendar } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';
 
 
 interface RecommendationsDrawerProps {
     isOpen: boolean;
     onClose: () => void;
-    dailyLoginStatus: any;
+    dailyLoginStatus: DailyLoginStatus | null;
     openDailyLoginModal: () => void;
 }
 
@@ -50,6 +50,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                 <button
                                     onClick={onClose}
                                     className={`p-2 rounded-full hover:bg-white/10 transition-colors ${themeText}`}
+                                    aria-label="Fechar"
                                 >
                                     <X className="w-6 h-6" />
                                 </button>

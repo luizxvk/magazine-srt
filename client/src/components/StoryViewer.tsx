@@ -33,6 +33,9 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
 
     const currentStory = stories[currentIndex];
+
+    if (!currentStory) return null;
+
     const STORY_DURATION = 5000; // 5 seconds per story
     const isLiked = likedStories.has(currentStory.id);
 
@@ -105,6 +108,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
             <button
                 onClick={onClose}
                 className="absolute top-4 right-4 text-white z-50 p-2 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Fechar"
             >
                 <X className="w-6 h-6" />
             </button>
@@ -192,12 +196,13 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                         <button
                             className={`p-2 hover:scale-110 transition-transform ml-auto ${isLiked ? (isSRT ? 'text-red-500' : 'text-gold-500') : 'text-white'}`}
                             onClick={handleLike}
+                            aria-label="Curtir story"
                         >
                             <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
                         </button>
                     )}
                     {currentStory.user.id !== user?.id && user?.role !== 'VISITOR' && (
-                        <button className="text-white p-2 hover:scale-110 transition-transform">
+                        <button className="text-white p-2 hover:scale-110 transition-transform" aria-label="Enviar mensagem">
                             <Send className="w-6 h-6" />
                         </button>
                     )}

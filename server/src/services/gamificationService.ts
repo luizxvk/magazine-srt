@@ -2,6 +2,82 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// XP Table: Level X requires XP_TABLE[X-1] total XP
+// Formula: Base 1000, increasing difficulty
+export const XP_TABLE = Array.from({ length: 30 }, (_, i) => {
+    const level = i + 1;
+    if (level === 1) return 0;
+    // Simple curve: Level 2 = 1000, Level 3 = 2500, etc.
+    // Using a quadratic-ish progression
+    return Math.floor(1000 * Math.pow(level - 1, 1.2));
+});
+
+export const getLevelFromXP = (xp: number): number => {
+    for (let i = XP_TABLE.length - 1; i >= 0; i--) {
+        if (xp >= XP_TABLE[i]) {
+            return i + 1;
+        }
+    }
+    return 1;
+};
+
+export const awardXP = async (userId: string, amount: number, reason: string) => {
+    try {
+        // 1. Get current user data
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, xp: true, level: true }
+        });
+
+        if (!user) throw new Error('User not found');
+
+        const newXP = user.xp + amount;
+        const newLevel = getLevelFromXP(newXP);
+        const levelUp = newLevel > user.level;
+
+        // 2. Update User
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                xp: newXP,
+                level: levelUp ? newLevel : undefined
+            }
+        });
+
+        // 3. Log/Notify if Level Up
+        if (levelUp) {
+            console.log(`User ${userId} leveled up to ${newLevel}!`);
+
+            // Create a system notification for level up
+            await prisma.notification.create({
+                data: {
+                    userId,
+                    type: 'SYSTEM',
+                    content: JSON.stringify({
+                        text: `Parabéns! Você alcançou o Nível ${newLevel}!`,
+                        title: 'Level Up!',
+                        level: newLevel
+                    })
+                }
+            });
+
+            // Optional: Award bonus Zions for leveling up?
+            // await awardZions(userId, newLevel * 10, `Level Up Bonus (Lvl ${newLevel})`);
+        }
+
+        return {
+            user: updatedUser,
+            xpEarned: amount,
+            levelUp,
+            newLevel
+        };
+
+    } catch (error) {
+        console.error('Error awarding XP:', error);
+        throw error;
+    }
+};
+
 export const awardTrophies = async (userId: string, amount: number, reason: string) => {
     try {
         // Update user trophies

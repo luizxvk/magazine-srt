@@ -36,7 +36,7 @@ interface Post {
 }
 
 export default function FeedPage() {
-    const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, theme } = useAuth();
+    const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser, theme } = useAuth();
     const isSRT = user?.membershipType === 'SRT';
     const themeTextGradient = isSRT
         ? (theme === 'light' ? 'from-gray-800 via-gray-600 to-gray-800' : 'from-white via-gray-200 to-gray-100')
@@ -132,6 +132,10 @@ export default function FeedPage() {
             if (response.data.zionsEarned) {
                 showAchievement('Recompensa!', `Você ganhou ${response.data.zionsEarned} Zions!`);
                 updateUserZions(response.data.zionsEarned);
+            }
+
+            if (response.data.user) {
+                updateUser(response.data.user);
             }
 
             setPosts(posts.map(post => {

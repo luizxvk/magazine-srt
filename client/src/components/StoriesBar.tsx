@@ -31,39 +31,23 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
     useEffect(() => {
         const fetchStories = async () => {
             try {
-                const response = await api.get('/feed');
-                const uniqueUsers = new Map();
+                const response = await api.get('/feed/stories');
+                // Response format: { id, user, items, hasUnseen, latestStory }
 
-                response.data.forEach((post: any) => {
-                    if (!uniqueUsers.has(post.user.id) && post.user.id !== user?.id) {
-                        uniqueUsers.set(post.user.id, {
-                            id: post.user.id,
-                            name: post.user.displayName || post.user.name,
-                            avatarUrl: post.user.avatarUrl
-                        });
-                    }
-                });
-
-                const storyImages = [
-                    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=60',
-                    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&auto=format&fit=crop&q=60',
-                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=60',
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60',
-                    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=60'
-                ];
-
-                const generatedStories: Story[] = Array.from(uniqueUsers.values()).map((u: any, index) => ({
-                    id: `story-${u.id}`,
-                    user: u,
-                    imageUrl: storyImages[index % storyImages.length],
-                    timestamp: '2h',
-                    hasUnseen: true
+                const mappedStories: Story[] = response.data.map((group: any) => ({
+                    id: group.id,
+                    user: {
+                        id: group.user.id,
+                        name: group.user.displayName || group.user.name,
+                        avatarUrl: group.user.avatarUrl
+                    },
+                    imageUrl: group.latestStory.imageUrl,
+                    timestamp: new Date(group.latestStory.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    hasUnseen: group.hasUnseen,
+                    items: group.items // Store all items for the viewer
                 }));
 
-                setStories(prev => {
-                    const userStories = prev.filter(s => s.user.id === user?.id);
-                    return [...userStories, ...generatedStories];
-                });
+                setStories(mappedStories);
             } catch (error) {
                 console.error('Failed to fetch stories', error);
             }
@@ -80,7 +64,10 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
         const file = e.target.files?.[0];
         if (file && user) {
             const reader = new FileReader();
-            reader.onloadend = () => {
+            reader.onloadend = async () => {
+                const imageUrl = reader.result as string;
+
+                // Optimistic update
                 const newStory: Story = {
                     id: `story-local-${Date.now()}`,
                     user: {
@@ -88,12 +75,20 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                         name: user.name,
                         avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}`
                     },
-                    imageUrl: reader.result as string,
+                    imageUrl: imageUrl,
                     timestamp: 'Agora',
                     hasUnseen: false
                 };
                 setStories(prev => [newStory, ...prev]);
                 onViewStory(newStory.id);
+
+                // Call API to create story
+                try {
+                    await api.post('/feed/stories', { imageUrl });
+                } catch (error) {
+                    console.error('Failed to create story on backend', error);
+                    // Revert optimistic update if needed, or show error
+                }
             };
             reader.readAsDataURL(file);
         }

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, type ChangeEvent, type FormEvent } from 'react';
 import { Image as ImageIcon, Send, X, Layers, Sparkles } from 'lucide-react';
 import api from '../services/api';
 
@@ -8,7 +8,6 @@ interface AdminCreatePostProps {
 }
 
 export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
-    // const { user } = useAuth(); // user is not used
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -16,7 +15,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
     const [isHighlight, setIsHighlight] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSubmit = async (e?: React.FormEvent) => {
+    const handleSubmit = async (e?: FormEvent) => {
         if (e) e.preventDefault();
         if (!caption.trim() && !mediaUrl) return;
 
@@ -48,7 +47,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
         }
     };
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -85,6 +84,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
                             <button
                                 onClick={() => setMediaUrl('')}
                                 className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover/media:opacity-100 transition-opacity"
+                                aria-label="Remover mídia"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -98,6 +98,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
                             onClick={() => fileInputRef.current?.click()}
                             className="p-2 bg-white/5 hover:bg-white/10 text-gold-400 rounded-lg transition-colors border border-white/5"
                             title="Adicionar Mídia"
+                            aria-label="Adicionar mídia"
                         >
                             <ImageIcon className="w-5 h-5" />
                         </button>

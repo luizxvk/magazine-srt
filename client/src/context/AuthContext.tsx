@@ -17,7 +17,7 @@ interface User {
     bio?: string;
 }
 
-interface DailyLoginStatus {
+export interface DailyLoginStatus {
     claimed: boolean;
     streak: number;
     nextReward: number;
@@ -29,7 +29,7 @@ interface AuthContextType {
     login: (token: string, user: User) => void;
     updateUser: (user: User) => void;
     updateUserZions: (amount: number) => void;
-    loginAsVisitor: () => void;
+    loginAsVisitor: (membershipType?: 'MAGAZINE' | 'SRT') => void;
     logout: () => void;
     isAuthenticated: boolean;
     loading: boolean;
@@ -53,6 +53,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
     const [theme, setTheme] = useState<'dark' | 'light'>(() => {
         if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            if (!token) return 'dark'; // Force dark if not logged in
+
             const saved = localStorage.getItem('theme');
             return (saved === 'light' || saved === 'dark') ? saved : 'dark';
         }
@@ -81,7 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                     // 2. Check Daily Login Status
                     try {
-                        const statusRes = await api.get('/gamification/daily-login/status');
+                        const statusRes = await api.get('/gamification/daily-login/status', {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
                         setDailyLoginStatus(statusRes.data);
 
                         // Auto-open modal if not claimed
@@ -110,9 +115,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const showAchievement = (title: string, description: string) => {
         setAchievement({ title, description });
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
-        audio.volume = 0.3; // 30% volume
-        audio.play().catch(e => console.log('Audio play failed', e));
     };
 
     const clearAchievement = () => {
@@ -136,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const loginAsVisitor = () => {
+    const loginAsVisitor = (membershipType: 'MAGAZINE' | 'SRT' = 'MAGAZINE') => {
         setUser({
             id: 'visitor',
             name: 'Visitante',
@@ -146,11 +148,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             trophies: 0,
             zions: 0,
             level: 0,
-            membershipType: 'SRT',
+            membershipType: membershipType,
             displayName: 'Visitante',
             bio: 'Explorando o Clube Magazine'
         });
-        setTheme('light');
+        setTheme('dark');
+        // Mock Daily Login for Visitor
+        setDailyLoginStatus({
+            claimed: false,
+            streak: 1,
+            nextReward: 100,
+            rewards: [100, 200, 300, 400, 500, 1000, 2000]
+        });
+        setTimeout(() => setIsDailyLoginModalOpen(true), 1500);
     };
 
     const logout = () => {
@@ -164,7 +174,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         localStorage.removeItem('token');
         setUser(null);
+
+        // Force Dark Mode immediately and persist it
         setTheme('dark');
+        localStorage.setItem('theme', 'dark');
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+
         window.location.href = '/login';
     };
 

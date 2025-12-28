@@ -43,11 +43,17 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
 
 export const deleteUser = async (req: AuthRequest, res: Response) => {
     try {
+        const requestingUserId = req.user?.userId;
+        const targetUserId = req.params.id;
+
         const requestUser = await prisma.user.findUnique({
-            where: { id: req.user?.userId }
+            where: { id: requestingUserId }
         });
 
-        if (requestUser?.role !== 'ADMIN') {
+        const isAdmin = requestUser?.role === 'ADMIN';
+        const isSelf = requestingUserId === targetUserId;
+
+        if (!isAdmin && !isSelf) {
             return res.status(403).json({ error: 'Forbidden' });
         }
 
@@ -58,8 +64,11 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
         // For safety, we'll just delete the user and let Prisma error if constraints fail, 
         // or we can wrap in transaction to delete relations first)
 
-        // Simple delete for now
-        await prisma.user.delete({ where: { id } });
+        // Soft delete
+        await prisma.user.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
 
         res.json({ message: 'User deleted successfully' });
     } catch (error) {
@@ -324,6 +333,43 @@ export const updateUserMembership = async (req: AuthRequest, res: Response) => {
         res.json(updatedUser);
     } catch (error) {
         console.error('Error updating user membership:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const updateUserLevel = async (req: AuthRequest, res: Response) => {
+    try {
+        // Check if user is admin
+        const requestUser = await prisma.user.findUnique({
+            where: { id: req.user?.userId }
+        });
+
+        if (requestUser?.role !== 'ADMIN') {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        const { id } = req.params;
+        const { level } = req.body;
+
+        if (typeof level !== 'number' || level < 1 || level > 30) {
+            return res.status(400).json({ error: 'Level must be a number between 1 and 30' });
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id },
+            data: { level },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                level: true
+            }
+        });
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error('Error updating user level:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

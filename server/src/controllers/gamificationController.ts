@@ -89,14 +89,15 @@ export const createReward = async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        const { title, type, costZions, stock, metadata } = req.body;
+        const { title, type, costZions, stock, metadata, backgroundColor } = req.body;
         const reward = await prisma.reward.create({
             data: {
                 title,
                 type,
                 costZions,
                 stock,
-                metadata
+                metadata,
+                backgroundColor
             }
         });
         res.status(201).json(reward);

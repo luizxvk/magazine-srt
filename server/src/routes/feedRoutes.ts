@@ -8,6 +8,8 @@ router.get('/', authenticateTokenOptional, feedController.getFeed);
 router.post('/', authenticateToken, feedController.createPost);
 router.post('/:id/like', authenticateToken, feedController.likePost);
 router.post('/:id/comment', authenticateToken, feedController.commentPost);
+router.get('/stories', authenticateToken, feedController.getStories);
+router.post('/stories', authenticateToken, feedController.createStory);
 router.post('/stories/:storyUserId/like', authenticateToken, feedController.likeStory);
 
 export default router;

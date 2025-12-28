@@ -3,11 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
-import { Plus, Trash2, Gift, Edit2, X, User as UserIcon, Check, Key, Shield } from 'lucide-react';
+import { Trash2, Gift, Edit2, User as UserIcon, Check, X } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import AdminCreatePost from '../components/AdminCreatePost';
 import AdminCreateAnnouncement from '../components/AdminCreateAnnouncement';
+import AdminCreateReward from '../components/AdminCreateReward';
+import AdminEditRewardModal from '../components/AdminEditRewardModal';
 
 interface Reward {
     id: string;
@@ -15,6 +17,9 @@ interface Reward {
     type: 'PRODUCT' | 'COUPON' | 'DIGITAL';
     costZions: number;
     stock: number;
+    metadata?: {
+        imageUrl?: string;
+    };
 }
 
 interface InviteRequest {
@@ -33,6 +38,7 @@ interface User {
     role: 'ADMIN' | 'MEMBER';
     createdAt: string;
     trophies: number;
+    level?: number;
     membershipType?: 'MAGAZINE' | 'SRT';
 }
 
@@ -42,17 +48,19 @@ export default function AdminDashboard() {
     const [requests, setRequests] = useState<InviteRequest[]>([]);
     const [usersList, setUsersList] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
-    const [newReward, setNewReward] = useState<Partial<Reward>>({
-        title: '',
-        type: 'DIGITAL',
-        costZions: 100,
-        stock: 10
-    });
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; rewardId: string | null }>({
         isOpen: false,
         rewardId: null
     });
-    const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' as 'success' | 'error' | 'info' });
+    const [editModal, setEditModal] = useState<{ isOpen: boolean; reward: Reward | null }>({
+        isOpen: false,
+        reward: null
+    });
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
+        message: '',
+        isVisible: false,
+        type: 'success'
+    });
 
     const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
         setToast({ message, isVisible: true, type });
@@ -80,18 +88,6 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleCreateReward = async () => {
-        try {
-            await api.post('/gamification/rewards', newReward);
-            setNewReward({ title: '', type: 'DIGITAL', costZions: 100, stock: 10 });
-            fetchData(); // Refresh all data
-            showToast('Recompensa criada com sucesso!', 'success');
-        } catch (error) {
-            console.error('Failed to create reward', error);
-            showToast('Erro ao criar recompensa', 'error');
-        }
-    };
-
     const handleDeleteReward = async () => {
         if (!deleteModal.rewardId) return;
         try {
@@ -112,7 +108,6 @@ export default function AdminDashboard() {
 
             // Show password to admin
             const password = response.data.generatedPassword;
-            // Use a long duration or sticky toast for the password
             showToast(`Aprovado! Senha gerada: ${password} (Copie agora!)`, 'success');
 
             // Also log to console for backup
@@ -122,7 +117,6 @@ export default function AdminDashboard() {
             navigator.clipboard.writeText(password).then(() => {
                 showToast(`Senha ${password} copiada para a área de transferência!`, 'success');
             }).catch(() => {
-                // If clipboard fails, just show the password
                 alert(`Usuário criado! A senha temporária é: ${password}\n\nPor favor, envie para o usuário.`);
             });
 
@@ -199,7 +193,13 @@ export default function AdminDashboard() {
                 isDestructive={true}
             />
 
-
+            <AdminEditRewardModal
+                isOpen={editModal.isOpen}
+                onClose={() => setEditModal({ isOpen: false, reward: null })}
+                reward={editModal.reward}
+                onUpdate={fetchData}
+                showToast={showToast}
+            />
 
             <div className="max-w-7xl mx-auto pt-32 pb-32 px-4 relative z-10">
                 <h1 className="text-3xl font-serif text-gold-300 mb-8">Painel Administrativo</h1>
@@ -209,67 +209,7 @@ export default function AdminDashboard() {
                     <div className="space-y-8 h-fit">
                         <AdminCreatePost showToast={showToast} />
                         <AdminCreateAnnouncement showToast={showToast} />
-
-                        {/* Create Reward Form */}
-                        <div className="glass-panel p-6 rounded-xl h-fit">
-                            <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-gold-400" /> Nova Recompensa
-                            </h2>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-xs text-gray-400 mb-1">Título</label>
-                                    <input
-                                        type="text"
-                                        value={newReward.title}
-                                        onChange={e => setNewReward({ ...newReward, title: e.target.value })}
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        placeholder="Ex: Cupom 10%"
-                                        aria-label="Título da recompensa"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-400 mb-1">Tipo</label>
-                                    <select
-                                        value={newReward.type}
-                                        onChange={e => setNewReward({ ...newReward, type: e.target.value as any })}
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        aria-label="Tipo de recompensa"
-                                    >
-                                        <option value="DIGITAL">Digital</option>
-                                        <option value="PRODUCT">Produto Físico</option>
-                                        <option value="COUPON">Cupom</option>
-                                    </select>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs text-gray-400 mb-1">Custo (Zions)</label>
-                                        <input
-                                            type="number"
-                                            value={newReward.costZions}
-                                            onChange={e => setNewReward({ ...newReward, costZions: parseInt(e.target.value) })}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                            aria-label="Custo em troféus"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-gray-400 mb-1">Estoque</label>
-                                        <input
-                                            type="number"
-                                            value={newReward.stock}
-                                            onChange={e => setNewReward({ ...newReward, stock: parseInt(e.target.value) })}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                            aria-label="Quantidade em estoque"
-                                        />
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={handleCreateReward}
-                                    className="w-full bg-gold-500 text-black font-medium py-2 rounded-lg hover:bg-gold-400 transition-colors mt-4"
-                                >
-                                    Criar Recompensa
-                                </button>
-                            </div>
-                        </div>
+                        <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
                     </div>
 
                     {/* Rewards List */}
@@ -334,6 +274,13 @@ export default function AdminDashboard() {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <button
+                                                    onClick={() => setEditModal({ isOpen: true, reward })}
+                                                    className="p-2 text-gray-400 hover:text-gold-400 transition-colors"
+                                                    aria-label={`Editar recompensa ${reward.title}`}
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button
                                                     onClick={() => setDeleteModal({ isOpen: true, rewardId: reward.id })}
                                                     className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                                                     aria-label={`Remover recompensa ${reward.title}`}
@@ -348,116 +295,117 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    {/* Member Requests Card */}
+                    {/* Member Requests Card - Moved inside main column */}
                     <div className="glass-panel p-6 rounded-xl h-fit">
                         <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
                             <UserIcon className="w-5 h-5 text-gold-400" /> Solicitações de Membros
                         </h2>
-                        <div className="space-y-4">
-                            {loading ? (
-                                <div className="text-center py-4 text-gray-500">Carregando...</div>
-                            ) : requests.length === 0 ? (
-                                <div className="text-center py-4 text-gray-500">Nenhuma solicitação pendente.</div>
-                            ) : (
-                                <div className="max-h-[400px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                                    {requests.map((request) => (
-                                        <div key={request.id} className="bg-white/5 rounded-lg p-4 border border-white/5">
-                                            <div className="flex justify-between items-start mb-3">
-                                                <div>
-                                                    <h3 className="font-bold text-white text-sm">{request.name}</h3>
-                                                    <p className="text-xs text-gray-400">{request.email}</p>
-                                                    {request.instagram && (
-                                                        <p className="text-xs text-gold-400/80 mt-1">{request.instagram}</p>
-                                                    )}
-                                                    <p className="text-[10px] text-gray-600 mt-1">
-                                                        {new Date(request.createdAt).toLocaleDateString()}
-                                                    </p>
-                                                </div>
+                        {requests.length === 0 ? (
+                            <p className="text-gray-500 text-sm">Nenhuma solicitação pendente.</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {requests.map(req => (
+                                    <div key={req.id} className="p-4 bg-white/5 rounded-lg border border-white/5">
+                                        <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
+                                            <div>
+                                                <h3 className="font-bold text-white">{req.name}</h3>
+                                                <p className="text-xs text-gray-400 break-all">{req.email}</p>
+                                                {req.instagram && <p className="text-xs text-gold-400 mt-1">@{req.instagram}</p>}
                                             </div>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => handleApproveRequest(request.id)}
-                                                    className="flex-1 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 text-xs py-2 rounded transition-colors border border-gold-500/20 flex items-center justify-center gap-1"
-                                                    aria-label={`Aprovar ${request.name}`}
-                                                >
-                                                    <Check className="w-3 h-3" /> Aprovar
-                                                </button>
-                                                <button
-                                                    onClick={() => handleRejectRequest(request.id)}
-                                                    className="px-3 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 text-xs rounded transition-colors flex items-center justify-center"
-                                                    aria-label={`Rejeitar ${request.name}`}
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
+                                            <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full shrink-0">
+                                                Pendente
+                                            </span>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                            <p className="text-center text-xs text-gray-500 pt-2">
-                                Total: {requests.length} solicitações pendentes
-                            </p>
-                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleApproveRequest(req.id)}
+                                                className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <Check className="w-3 h-3" /> Aprovar
+                                            </button>
+                                            <button
+                                                onClick={() => handleRejectRequest(req.id)}
+                                                className="flex-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <X className="w-3 h-3" /> Rejeitar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
+                </div>
 
-                    {/* Registered Users List */}
-                    <div className="glass-panel p-6 rounded-xl h-fit lg:col-span-3">
-                        <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-gold-400" /> Membros Registrados
-                        </h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="text-xs text-gray-400 border-b border-white/10">
-                                        <th className="py-3 px-4">Nome</th>
-                                        <th className="py-3 px-4">Email</th>
-                                        <th className="py-3 px-4">Função</th>
-                                        <th className="py-3 px-4">Membro</th>
-                                        <th className="py-3 px-4">Troféus</th>
-                                        <th className="py-3 px-4">Data Registro</th>
-                                        <th className="py-3 px-4 text-right">Ações</th>
+                {/* Users Management */}
+                <div className="lg:col-span-3 glass-panel p-6 rounded-xl">
+                    <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
+                        <UserIcon className="w-5 h-5 text-gold-400" /> Gerenciar Usuários
+                    </h2>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="text-xs text-gray-400 border-b border-white/10">
+                                    <th className="p-3 font-medium uppercase tracking-wider">Nome</th>
+                                    <th className="p-3 font-medium uppercase tracking-wider">Email</th>
+                                    <th className="p-3 font-medium uppercase tracking-wider">Membro</th>
+                                    <th className="p-3 font-medium uppercase tracking-wider">Nível</th>
+                                    <th className="p-3 font-medium uppercase tracking-wider">Troféus</th>
+                                    <th className="p-3 font-medium uppercase tracking-wider text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-sm divide-y divide-white/5">
+                                {usersList.map(u => (
+                                    <tr key={u.id} className="hover:bg-white/5 transition-colors group">
+                                        <td className="p-3 text-white font-medium">{u.name}</td>
+                                        <td className="p-3 text-gray-400">{u.email}</td>
+                                        <td className="p-3">
+                                            <button
+                                                onClick={() => handleToggleMembership(u.id, u.membershipType)}
+                                                className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${u.membershipType === 'SRT'
+                                                    ? 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'
+                                                    : 'bg-gold-500/20 text-gold-400 border-gold-500/30 hover:bg-gold-500/30'
+                                                    }`}
+                                            >
+                                                {u.membershipType || 'MAGAZINE'}
+                                            </button>
+                                        </td>
+                                        <td className="p-3">
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max="30"
+                                                defaultValue={u.level || 1}
+                                                aria-label={`Editar nível de ${u.name}`}
+                                                className="w-16 bg-black/40 border border-white/10 rounded px-2 py-1 text-white text-xs focus:border-gold-500/50 outline-none"
+                                                onBlur={async (e) => {
+                                                    const newLevel = parseInt(e.target.value);
+                                                    if (!isNaN(newLevel) && newLevel >= 1 && newLevel <= 30) {
+                                                        try {
+                                                            await api.put(`/users/${u.id}/level`, { level: newLevel });
+                                                            showToast(`Nível de ${u.name} atualizado para ${newLevel}`, 'success');
+                                                        } catch (error) {
+                                                            console.error('Failed to update level', error);
+                                                            showToast('Erro ao atualizar nível', 'error');
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </td>
+                                        <td className="p-3 text-gray-400">{u.trophies}</td>
+                                        <td className="p-3 text-right">
+                                            <button
+                                                onClick={() => handleResetPassword(u.id, u.name)}
+                                                className="text-gray-500 hover:text-white transition-colors p-1"
+                                                title="Resetar Senha"
+                                            >
+                                                Resetar Senha
+                                            </button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {usersList.map(u => (
-                                        <tr key={u.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                            <td className="py-3 px-4 font-medium text-white">{u.name}</td>
-                                            <td className="py-3 px-4 text-gray-400 text-sm">{u.email}</td>
-                                            <td className="py-3 px-4">
-                                                <span className={`text-xs px-2 py-1 rounded ${u.role === 'ADMIN' ? 'bg-gold-500/20 text-gold-400' : 'bg-white/10 text-gray-300'}`}>
-                                                    {u.role}
-                                                </span>
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <button
-                                                    onClick={() => handleToggleMembership(u.id, u.membershipType)}
-                                                    className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none ${u.membershipType === 'SRT' ? 'bg-red-600' : 'bg-gold-500'}`}
-                                                    title={`Alternar para ${u.membershipType === 'SRT' ? 'Magazine' : 'SRT'}`}
-                                                >
-                                                    <span
-                                                        className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${u.membershipType === 'SRT' ? 'translate-x-6' : 'translate-x-0'}`}
-                                                    />
-                                                </button>
-                                                <span className="ml-2 text-xs text-gray-400">{u.membershipType || 'MAGAZINE'}</span>
-                                            </td>
-                                            <td className="py-3 px-4 text-gold-400">{u.trophies} 🏆</td>
-                                            <td className="py-3 px-4 text-gray-500 text-xs">
-                                                {new Date(u.createdAt).toLocaleDateString()}
-                                            </td>
-                                            <td className="py-3 px-4 text-right">
-                                                <button
-                                                    onClick={() => handleResetPassword(u.id, u.name)}
-                                                    className="p-2 bg-white/5 hover:bg-gold-500/20 text-gray-400 hover:text-gold-400 rounded transition-colors"
-                                                    title="Gerar Nova Senha"
-                                                >
-                                                    <Key className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

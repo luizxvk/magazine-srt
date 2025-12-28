@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Header from '../components/Header';
 import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
-import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck } from 'lucide-react';
+import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import ToastNotification from '../components/ToastNotification';
 import ConfirmModal from '../components/ConfirmModal';
-
-
+import ChatWindow from '../components/ChatWindow';
+import LevelTimeline from '../components/LevelTimeline';
 
 export default function ProfilePage() {
     const { user: currentUser, theme, toggleTheme } = useAuth();
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const paramId = searchParams.get('id');
 
@@ -26,6 +27,7 @@ export default function ProfilePage() {
 
     const [activeTab, setActiveTab] = useState<'posts' | 'badges' | 'rewards'>('posts');
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
     const [userPosts, setUserPosts] = useState<any[]>([]);
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; postId: string | null }>({
         isOpen: false,
@@ -38,8 +40,13 @@ export default function ProfilePage() {
         if (profileUser) {
             const savedBg = localStorage.getItem(`profile_bg_${profileUser.id}`);
             if (savedBg) setBgImage(savedBg);
+
+            // Open chat if param is present
+            if (searchParams.get('chat') === 'true' && !isOwnProfile) {
+                setIsChatOpen(true);
+            }
         }
-    }, [profileUser]);
+    }, [profileUser, searchParams, isOwnProfile]);
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -134,6 +141,15 @@ export default function ProfilePage() {
 
             {isOwnProfile && <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />}
 
+            {isChatOpen && !isOwnProfile && (
+                <ChatWindow
+                    otherUserId={profileUser.id}
+                    otherUserName={profileUser.displayName || profileUser.name}
+                    otherUserAvatar={profileUser.avatarUrl}
+                    onClose={() => setIsChatOpen(false)}
+                />
+            )}
+
             <ConfirmModal
                 isOpen={deleteModal.isOpen}
                 onClose={() => setDeleteModal({ isOpen: false, postId: null })}
@@ -177,15 +193,21 @@ export default function ProfilePage() {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Crown Icon - Magazine Members Only */}
+                            {!isSRT && (
+                                <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12 animate-pulse-slow">
+                                    <Crown
+                                        size={32}
+                                        className="text-yellow-400"
+                                        fill="currentColor"
+                                        strokeWidth={1.5}
+                                    />
+                                </div>
+                            )}
+
                             <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${isSRT ? 'bg-red-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
                                 Lvl {profileUser.level || 1}
-                            </div>
-                            {/* Level Progress Bar */}
-                            <div className={`absolute -bottom-6 left-1/2 -translate-x-1/2 w-24 h-1.5 ${theme === 'light' ? 'bg-gray-300' : 'bg-gray-800/50'} backdrop-blur-md rounded-full overflow-hidden border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'}`}>
-                                <div
-                                    className={`h-full ${isSRT ? 'bg-gradient-to-r from-red-600 to-red-400' : 'bg-gradient-to-r from-gold-600 to-gold-400'} rounded-full transition-all duration-1000`}
-                                    style={{ width: `${Math.min(100, Math.max(0, ((profileUser.xp || 0) - ((profileUser.level || 1) - 1) * 100) / (((profileUser.level || 1) * 100) - ((profileUser.level || 1) - 1) * 100) * 100))}%` }}
-                                />
                             </div>
                         </div>
 
@@ -240,12 +262,20 @@ export default function ProfilePage() {
                                                 <span className={`text-xs transition-colors ${theme === 'light' ? 'text-gray-800' : 'text-gray-400 group-hover:text-white'}`}>Editar Perfil</span>
                                             </button>
                                             {currentUser?.role === 'ADMIN' && (
-                                                <button
-                                                    onClick={() => window.location.href = '/admin'}
-                                                    className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/10 hover:bg-gold-500/20 transition-colors group shrink-0"
-                                                >
-                                                    <span className="text-xs text-gold-400 font-medium">Admin</span>
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={() => window.location.href = '/admin'}
+                                                        className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/10 hover:bg-gold-500/20 transition-colors group shrink-0"
+                                                    >
+                                                        <span className="text-xs text-gold-400 font-medium">Admin</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => navigate('/admin/devtools')}
+                                                        className="flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition-colors group shrink-0"
+                                                    >
+                                                        <span className="text-xs text-blue-400 font-medium">DevTools</span>
+                                                    </button>
+                                                </>
                                             )}
                                             {isSRT && (
                                                 <button
@@ -258,6 +288,14 @@ export default function ProfilePage() {
                                         </>
                                     ) : (
                                         <>
+                                            <button
+                                                onClick={() => setIsChatOpen(true)}
+                                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10"
+                                            >
+                                                <MessageCircle className="w-4 h-4" />
+                                                <span className="text-xs font-bold uppercase tracking-wide">Mensagem</span>
+                                            </button>
+
                                             {friendshipStatus === 'NONE' && (
                                                 <button
                                                     onClick={handleAddFriend}
@@ -302,6 +340,11 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Level Timeline */}
+                    <div className="mb-8">
+                        <LevelTimeline currentLevel={profileUser.level || 1} currentTrophies={profileUser.trophies || 0} />
                     </div>
                 </div>
 

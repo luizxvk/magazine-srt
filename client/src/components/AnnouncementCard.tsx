@@ -38,7 +38,9 @@ export default function AnnouncementCard() {
         fetchAnnouncement();
     }, []);
 
-    if (loading) return null; // Or skeleton
+    // Loading state removed as per user request
+    if (!announcement && !loading) return <SrtLogCard />;
+    if (!announcement) return null; // Fail safe
     if (!announcement) return <SrtLogCard />;
 
     // Theme Colors

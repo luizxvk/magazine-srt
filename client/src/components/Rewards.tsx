@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gift, Lock, Check, Clock } from 'lucide-react';
+import { Gift, Lock, Check, Clock, Box, Tag } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -10,6 +10,7 @@ interface Reward {
     costZions: number;
     stock: number;
     metadata: any;
+    backgroundColor?: string;
 }
 
 interface Redemption {
@@ -110,52 +111,71 @@ export default function Rewards() {
                     Recompensas Exclusivas
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {rewards.map((reward) => {
                         const canAfford = (user?.zions || 0) >= reward.costZions;
                         const isRedeemed = redeemedCode?.id === reward.id;
 
                         return (
-                            <div key={reward.id} className={`glass-panel p-4 rounded-xl border ${canAfford ? themeBorder : 'border-white/5'} relative overflow-hidden group transition-all ${themeHoverBorder}`}>
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h4 className="text-white font-medium">{reward.title}</h4>
-                                        <p className="text-xs text-gray-400 uppercase tracking-wider mt-1">{reward.type}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className={`text-lg font-bold ${canAfford ? themeText : 'text-gray-500'}`}>
-                                            {reward.costZions === 0 ? 'Gratuito' : reward.costZions}
-                                        </span>
-                                        {reward.costZions > 0 && (
-                                            <span className="text-[10px] text-gray-600 block uppercase tracking-widest">Zions</span>
-                                        )}
+                            <div
+                                key={reward.id}
+                                className="border border-white/10 rounded-xl overflow-hidden shadow-lg relative group flex flex-col"
+                                style={{
+                                    background: reward.backgroundColor || 'linear-gradient(to bottom right, #111827, #000000)'
+                                }}
+                            >
+                                {/* Image/Icon Area */}
+                                <div className="h-40 bg-black/50 flex items-center justify-center relative overflow-hidden">
+                                    {reward.metadata?.imageUrl ? (
+                                        <img src={reward.metadata.imageUrl} alt={reward.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                    ) : (
+                                        <div className="text-gold-500/50 transition-transform duration-500 group-hover:scale-110">
+                                            {reward.type === 'PRODUCT' ? <Box className="w-16 h-16" /> :
+                                                reward.type === 'COUPON' ? <Tag className="w-16 h-16" /> :
+                                                    <Gift className="w-16 h-16" />}
+                                        </div>
+                                    )}
+
+                                    {/* Cost Badge */}
+                                    <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs font-bold text-gold-400 border border-gold-500/20 shadow-lg z-10">
+                                        {reward.costZions === 0 ? 'GRÁTIS' : `${reward.costZions} Z`}
                                     </div>
                                 </div>
 
-                                <div className="mt-4 flex items-center justify-between">
-                                    <span className="text-xs text-gray-500">
-                                        {reward.stock > 0 ? `${reward.stock} disponíveis` : 'Esgotado'}
-                                    </span>
+                                {/* Content */}
+                                <div className="p-5 flex flex-col flex-1">
+                                    <h4 className="text-lg font-bold text-white leading-tight mb-1 font-serif truncate text-center group-hover:text-gold-400 transition-colors">
+                                        {reward.title}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 mb-6 text-center uppercase tracking-wider font-medium">
+                                        {reward.type === 'PRODUCT' ? 'Produto Físico' : reward.type === 'COUPON' ? 'Cupom' : 'Digital'}
+                                    </p>
 
-                                    {isRedeemed ? (
-                                        <div className="bg-green-500/20 text-green-400 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide flex items-center gap-2">
-                                            <Check className="w-3 h-3" />
-                                            {redeemedCode.code}
+                                    <div className="mt-auto space-y-3">
+                                        {isRedeemed ? (
+                                            <div className="w-full py-2.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2">
+                                                <Check className="w-4 h-4" />
+                                                {redeemedCode.code}
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleRedeem(reward)}
+                                                disabled={!canAfford || reward.stock === 0 || redeeming === reward.id}
+                                                className={`w-full py-2.5 rounded-lg border text-xs font-bold uppercase tracking-wider text-center transition-all flex items-center justify-center gap-2
+                                                    ${canAfford && reward.stock > 0
+                                                        ? 'bg-gold-500/10 border-gold-500/30 text-gold-400 hover:bg-gold-500 hover:text-black hover:border-gold-500 shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'
+                                                        : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed'}`}
+                                            >
+                                                {redeeming === reward.id ? 'Processando...' : (
+                                                    canAfford ? (reward.stock > 0 ? 'Resgatar' : 'Esgotado') : <><Lock className="w-3 h-3" /> Bloqueado</>
+                                                )}
+                                            </button>
+                                        )}
+
+                                        <div className="flex justify-center items-center text-[10px] text-gray-600 font-medium uppercase tracking-widest">
+                                            {reward.stock > 0 ? `${reward.stock} disponíveis` : 'Sem estoque'}
                                         </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleRedeem(reward)}
-                                            disabled={!canAfford || reward.stock === 0 || redeeming === reward.id}
-                                            className={`px-4 py-1.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-all flex items-center gap-2
-                                                ${canAfford && reward.stock > 0
-                                                    ? `${themeButton} text-white`
-                                                    : 'bg-white/5 text-gray-500 cursor-not-allowed'}`}
-                                        >
-                                            {redeeming === reward.id ? 'Resgatando...' : (
-                                                canAfford ? 'Resgatar' : <><Lock className="w-3 h-3" /> Bloqueado</>
-                                            )}
-                                        </button>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         );

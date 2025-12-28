@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Award, Lock } from 'lucide-react';
+import { Award, Lock, UserPlus, Users, Star, Crown, PenTool, FileText, Megaphone, MessageCircle, Heart, ThumbsUp, Camera, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+const iconMap: { [key: string]: any } = {
+    UserPlus, Users, Star, Crown, PenTool, FileText, Megaphone, MessageCircle, Heart, ThumbsUp, Camera, MessageSquare
+};
 
 interface Badge {
     id: string;
@@ -45,7 +49,16 @@ export default function Badges() {
                 {badges.map((badge) => (
                     <div key={badge.id} className={`flex flex-col items-center text-center group ${badge.isEarned ? 'opacity-100' : 'opacity-40 grayscale'}`}>
                         <div className={`w-16 h-16 rounded-full bg-black/40 border ${isSRT ? 'border-red-500/30 group-hover:border-red-500/60' : 'border-gold-500/30 group-hover:border-gold-500/60'} flex items-center justify-center mb-2 relative overflow-hidden transition-all duration-300 group-hover:scale-105 ${themeShadow}`}>
-                            {badge.imageUrl ? (
+                            {badge.imageUrl && badge.imageUrl.startsWith('icon:') ? (
+                                (() => {
+                                    const IconComponent = iconMap[badge.imageUrl.split(':')[1]];
+                                    return IconComponent ? (
+                                        <IconComponent className={`w-8 h-8 ${isSRT ? 'text-red-500' : 'text-gold-500'}`} />
+                                    ) : (
+                                        <Award className={`w-8 h-8 ${isSRT ? 'text-red-500' : 'text-gold-500'}`} />
+                                    );
+                                })()
+                            ) : badge.imageUrl ? (
                                 <img src={badge.imageUrl} alt={badge.name} className="w-full h-full object-cover" />
                             ) : (
                                 <Award className={`w-8 h-8 ${isSRT ? 'text-red-500' : 'text-gold-500'}`} />

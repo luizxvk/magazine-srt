@@ -21,11 +21,6 @@ export default function AchievementPopup({ title, description, onClose }: Achiev
     const themeTitle = theme === 'light' ? 'text-gray-900' : 'text-white';
 
     useEffect(() => {
-        // Play sound
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'); // Elegant chime
-        audio.volume = 0.5;
-        audio.play().catch(e => console.log('Audio play failed', e));
-
         // Animate in
         setTimeout(() => setVisible(true), 100);
 

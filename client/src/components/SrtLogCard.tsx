@@ -1,11 +1,75 @@
-import { ArrowRight, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowRight, Star, Edit2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+
+interface Announcement {
+    id: string;
+    title: string;
+    tag: string;
+    subscriptionType: string;
+    description: string;
+    logoUrl: string;
+    backgroundImageUrl: string;
+}
 
 export default function SrtLogCard() {
     const { user, theme } = useAuth();
     const navigate = useNavigate();
     const isSRT = user?.membershipType === 'SRT';
+    const isAdmin = user?.role === 'ADMIN';
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    // Fallback/Default Content
+    const defaultContent: Announcement = {
+        id: 'default',
+        title: 'Anunciamos a',
+        tag: 'Lançamento',
+        subscriptionType: 'Assinatura Premium',
+        description: 'Escolha seu carro, defina seu estilo. A nova assinatura exclusiva para membros da elite.',
+        logoUrl: '/assets/srt-log-logo.png',
+        backgroundImageUrl: '/ads/srt-log-ad.png'
+    };
+
+    const currentItem = announcements.length > 0 ? announcements[currentIndex] : defaultContent;
+
+    useEffect(() => {
+        fetchAnnouncements();
+    }, []);
+
+    const fetchAnnouncements = async () => {
+        try {
+            const response = await api.get('/announcements');
+            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                setAnnouncements(response.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch announcements', error);
+        }
+    };
+
+    useEffect(() => {
+        if (!isEditing && announcements.length > 1) {
+            const interval = setInterval(() => {
+                setCurrentIndex((prev) => (prev + 1) % announcements.length);
+            }, 5000);
+            return () => clearInterval(interval);
+        }
+    }, [isEditing, announcements.length]);
+
+    const handleNext = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev + 1) % announcements.length);
+    };
+
+    const handlePrev = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev - 1 + announcements.length) % announcements.length);
+    };
 
     // Theme Colors
     const themeBorder = isSRT
@@ -23,14 +87,42 @@ export default function SrtLogCard() {
 
     return (
         <div
-            onClick={() => navigate('/srt-log')}
+            onClick={() => !isEditing && navigate('/srt-log')}
             className={`relative overflow-hidden rounded-2xl border-2 ${themeBorder} ${themeGradient} ${themeGlow} group cursor-pointer transition-all duration-500`}
         >
+            {/* Carousel Controls */}
+            {announcements.length > 1 && !isEditing && (
+                <>
+                    <button
+                        onClick={handlePrev}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-1 rounded-full bg-black/50 text-white/50 hover:text-white hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                        onClick={handleNext}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-1 rounded-full bg-black/50 text-white/50 hover:text-white hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100"
+                    >
+                        <ChevronRight className="w-6 h-6" />
+                    </button>
+
+                    {/* Indicators */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-1.5">
+                        {announcements.map((_, idx) => (
+                            <div
+                                key={idx}
+                                className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white w-3' : 'bg-white/30'}`}
+                            />
+                        ))}
+                    </div>
+                </>
+            )}
+
             {/* Background Image Effect */}
             <div className="absolute inset-0 opacity-50 group-hover:opacity-60 transition-opacity duration-500 scale-105 group-hover:scale-110 transform">
                 <img
-                    src="/ads/srt-log-ad.png"
-                    alt="SRT LOG Background"
+                    src={currentItem.backgroundImageUrl || "/ads/srt-log-ad.png"}
+                    alt="Background"
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -45,30 +137,31 @@ export default function SrtLogCard() {
                 {/* Badge Lançamento - Absolute Top Center */}
                 <div className={`absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 backdrop-blur-md border border-white/20 ${themeText} shadow-lg whitespace-nowrap z-20 flex items-center justify-center gap-2`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_#ef4444] shrink-0" />
-                    <span className="mt-[1px]">Lançamento</span>
+                    <span className="mt-[1px]">{currentItem.tag || 'Lançamento'}</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 mb-2 mt-8">
                     <div className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest ${themeAccent} drop-shadow-md whitespace-nowrap`}>
                         <Star className="w-3 h-3 fill-current" />
-                        Assinatura Premium
+                        {currentItem.subscriptionType || 'Assinatura Premium'}
                     </div>
                 </div>
 
                 <h3 className={`text-2xl md:text-3xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-3 leading-none drop-shadow-lg flex flex-col items-center w-full transition-all duration-300`}>
-                    Anunciamos a <br />
-                    <div className="relative mt-4 group w-full flex justify-center">
+                    {currentItem.title} <br />
+                    <div className="relative mt-4 group w-full flex justify-center flex-col items-center">
                         <div className={`absolute inset-0 ${isSRT ? 'bg-red-600' : 'bg-gold-500'} blur-[30px] opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full`} />
+
                         <img
-                            src="/assets/srt-log-logo.png"
-                            alt="SRT LOG"
-                            className="h-20 md:h-28 w-auto relative z-10 drop-shadow-xl invert brightness-0 opacity-90 transition-all duration-300"
+                            src={currentItem.logoUrl}
+                            alt="Logo"
+                            className="h-20 md:h-28 w-auto relative z-10 drop-shadow-xl invert brightness-0 opacity-90 transition-all duration-300 object-contain"
                         />
                     </div>
                 </h3>
 
-                <p className="text-gray-200 text-sm mb-8 leading-relaxed font-light drop-shadow-md max-w-[90%] mt-2">
-                    Escolha seu carro, defina seu estilo. A nova assinatura exclusiva para membros da elite.
+                <p className="text-gray-200 text-sm mb-8 leading-relaxed font-light drop-shadow-md max-w-[90%] mt-2 min-h-[60px]">
+                    {currentItem.description}
                 </p>
 
                 <div className="mt-auto w-full">

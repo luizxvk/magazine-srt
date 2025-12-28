@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/authMiddleware';
-import { awardTrophies, checkAndAwardBadges, awardZions } from '../services/gamificationService';
+import { awardTrophies, checkAndAwardBadges, awardZions, awardXP } from '../services/gamificationService';
 
 const prisma = new PrismaClient();
 
@@ -50,43 +50,6 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
 
         res.json(formattedPosts);
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-export const createPost = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
-        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
-        const { imageUrl, caption } = createPostSchema.parse(req.body);
-
-        const post = await prisma.post.create({
-            data: {
-                userId,
-                imageUrl,
-                caption,
-            },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        displayName: true,
-                        avatarUrl: true,
-                    },
-                },
-            },
-        });
-
-        // Award 1 Zion for posting
-        await awardZions(userId, 1, 'Created a post');
-
-        res.status(201).json(post);
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            return res.status(400).json({ error: (error as any).errors });
-        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -164,7 +127,6 @@ export const likePost = async (req: AuthRequest, res: Response) => {
 
             // --- GAMIFICATION (Liker) ---
             // Check if user already received Zions for liking this specific post
-            // We use the 'reason' field to store the postId to track uniqueness for this action
             const alreadyAwarded = await prisma.zionHistory.findFirst({
                 where: {
                     userId,
@@ -182,15 +144,71 @@ export const likePost = async (req: AuthRequest, res: Response) => {
             // Check Badges (Trophies awarded if badge earned)
             const badgeResult = await checkAndAwardBadges(userId, 'LIKE');
 
+            // Get updated user stats
+            const updatedUser = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { id: true, xp: true, level: true, zions: true, trophies: true }
+            });
+
             return res.json({
                 message: 'Liked',
                 isLiked: true,
                 newBadges: badgeResult?.newBadges || [],
-                zionsEarned
+                zionsEarned,
+                user: updatedUser
             });
         }
     } catch (error) {
         console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const createPost = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const { imageUrl, caption } = createPostSchema.parse(req.body);
+
+        const post = await prisma.post.create({
+            data: {
+                userId,
+                imageUrl,
+                caption,
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true,
+                    },
+                },
+            },
+        });
+
+        // Award 1 Zion for posting
+        await awardZions(userId, 1, 'Created a post');
+
+        // Award 250 XP for posting
+        await awardXP(userId, 250, 'Created a post');
+
+        // Get updated user stats
+        const updatedUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, xp: true, level: true, zions: true, trophies: true }
+        });
+
+        res.status(201).json({
+            ...post,
+            userStats: updatedUser
+        });
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: (error as any).errors });
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -261,26 +279,78 @@ export const commentPost = async (req: AuthRequest, res: Response) => {
         // Award 2 Zions for commenting (to commenter)
         await awardZions(userId, 2, 'Commented on a post');
 
+        // Award 100 XP to Commenter
+        await awardXP(userId, 100, 'Commented on a post');
+
         // Award 20 XP to Post Owner (if not self-comment)
         if (post.userId !== userId) {
-            await prisma.user.update({
-                where: { id: post.userId },
-                data: { xp: { increment: 20 } }
-            });
+            await awardXP(post.userId, 20, 'Received a comment');
         }
 
         // Check Badges
         const badgeResult = await checkAndAwardBadges(userId, 'COMMENT');
 
+        // Get updated user stats
+        const updatedUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, xp: true, level: true, zions: true, trophies: true }
+        });
+
         res.status(201).json({
             ...comment,
             newBadges: badgeResult?.newBadges || [],
-            zionsEarned: 2
+            zionsEarned: 2,
+            userStats: updatedUser
         });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: (error as any).errors });
         }
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const createStory = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const { imageUrl } = req.body;
+        if (!imageUrl) return res.status(400).json({ error: 'Image URL is required' });
+
+        // Create Story in DB
+        // Expires in 24 hours
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        const story = await prisma.story.create({
+            data: {
+                userId,
+                imageUrl,
+                expiresAt
+            }
+        });
+
+        // Award 50 XP for posting a story
+        await awardXP(userId, 50, 'Posted a story');
+
+        // Award 1 Zion (optional, but consistent with other actions)
+        await awardZions(userId, 1, 'Posted a story');
+
+        // Get updated user stats
+        const updatedUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, xp: true, level: true, zions: true, trophies: true }
+        });
+
+        res.status(201).json({
+            message: 'Story created',
+            story,
+            xpEarned: 50,
+            userStats: updatedUser
+        });
+    } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -318,6 +388,84 @@ export const likeStory = async (req: AuthRequest, res: Response) => {
         });
 
         res.json({ message: 'Story liked' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const getStories = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        // Fetch active stories (created in the last 24 hours)
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+        const stories = await prisma.story.findMany({
+            where: {
+                createdAt: {
+                    gte: twentyFourHoursAgo
+                }
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true
+                    }
+                },
+                views: {
+                    where: {
+                        viewerId: userId
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        // Group stories by user
+        const storiesByUser = new Map();
+
+        stories.forEach(story => {
+            if (!storiesByUser.has(story.userId)) {
+                storiesByUser.set(story.userId, {
+                    user: story.user,
+                    stories: [],
+                    hasUnseen: false
+                });
+            }
+
+            const userGroup = storiesByUser.get(story.userId);
+            const isSeen = story.views.length > 0;
+
+            userGroup.stories.push({
+                id: story.id,
+                imageUrl: story.imageUrl,
+                createdAt: story.createdAt,
+                isSeen
+            });
+
+            if (!isSeen) {
+                userGroup.hasUnseen = true;
+            }
+        });
+
+        // Format for frontend
+        const formattedStories = Array.from(storiesByUser.values()).map((group: any) => ({
+            id: `story-group-${group.user.id}`,
+            user: group.user,
+            items: group.stories,
+            hasUnseen: group.hasUnseen,
+            // Use the latest story for the preview
+            latestStory: group.stories[0]
+        }));
+
+        res.json(formattedStories);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });

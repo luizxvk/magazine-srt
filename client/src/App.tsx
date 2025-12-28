@@ -1,74 +1,73 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import FeedPage from './pages/FeedPage';
-import ProfilePage from './pages/ProfilePage';
-import SocialPage from './pages/SocialPage';
-import AdminDashboard from './pages/AdminDashboard';
-import NotificationsPage from './pages/NotificationsPage';
-import RequestInvite from './pages/RequestInvite';
-import LandingPage from './pages/LandingPage';
-import SrtLogPage from './pages/SrtLogPage';
-import PostPage from './pages/PostPage';
+
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
+import ModernLogin from './pages/ModernLogin';
+import Register from './pages/Register';
+import RequestInvite from './pages/RequestInvite';
+import FeedPage from './pages/FeedPage';
+import PostPage from './pages/PostPage';
+import ProfilePage from './pages/ProfilePage';
+import SocialPage from './pages/SocialPage';
+import NotificationsPage from './pages/NotificationsPage';
+import AdminDashboard from './pages/AdminDashboard';
+import SrtLogPage from './pages/SrtLogPage';
+import DevToolsPage from './pages/admin/DevToolsPage';
+import AdminEditSrtLogPage from './pages/admin/AdminEditSrtLogPage';
+import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
-import LoadingScreen from './components/LoadingScreen';
-import WelcomeTour from './components/WelcomeTour';
+import MessagePopup from './components/MessagePopup';
 
-function AppRoutes() {
-  const { user, clearAchievement, achievement, loading } = useAuth();
-  const location = useLocation();
-  const isSRT = user ? user.membershipType === 'SRT' : (location.state?.membershipType === 'SRT' || localStorage.getItem('lastMembershipType') === 'SRT');
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
 
-  return (
-    <>
-      {isSRT ? (
-        <div className="fixed inset-0 bg-black z-[-1]" />
-      ) : (
-        <>
-          <div className="global-bg" />
-          <div className="gold-flow" />
-          <div className="animated-fog" />
-          <div className="bg-pattern" />
-        </>
-      )}
+// Initialize Logger
+logger.init();
 
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/request-invite" element={<RequestInvite />} />
-        <Route path="/feed" element={<PrivateRoute><FeedPage /></PrivateRoute>} />
-        <Route path="/post/:id" element={<PrivateRoute><PostPage /></PrivateRoute>} />
-        <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-        <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
-        <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
-        <Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
-        <Route path="/srt-log" element={<PrivateRoute><SrtLogPage /></PrivateRoute>} />
-      </Routes>
-      {achievement && (
-        <AchievementPopup
-          title={achievement.title}
-          description={achievement.description}
-          onClose={clearAchievement}
-        />
-      )}
-      <WelcomeTour />
-    </>
-  );
-}
-
-export default function App() {
+function App() {
   return (
     <AuthProvider>
       <Router>
-        <AppRoutes />
+        <Routes>
+          <Route path="/" element={<ModernLogin />} />
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/request-invite" element={<RequestInvite />} />
+
+          {/* Protected Routes */}
+          <Route path="/feed" element={<PrivateRoute><FeedPage /></PrivateRoute>} />
+          <Route path="/post/:id" element={<PrivateRoute><PostPage /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+          <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
+          <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
+          <Route path="/srt-log" element={<PrivateRoute><SrtLogPage /></PrivateRoute>} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
+          <Route path="/admin/edit-srt-log" element={<AdminRoute><AdminEditSrtLogPage /></AdminRoute>} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        <AchievementWrapper />
+        <MessagePopup />
       </Router>
     </AuthProvider>
   );
 }
+
+function AchievementWrapper() {
+  const { achievement, clearAchievement } = useAuth();
+
+  if (!achievement) return null;
+
+  return (
+    <AchievementPopup
+      title={achievement.title}
+      description={achievement.description}
+      onClose={clearAchievement}
+    />
+  );
+}
+
+export default App;

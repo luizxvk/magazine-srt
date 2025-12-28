@@ -8,7 +8,7 @@ interface CreatePostWidgetProps {
 }
 
 export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProps) {
-    const { user, isVisitor, showAchievement, updateUserZions, theme } = useAuth();
+    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -91,6 +91,10 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
             if (response.data.zionsEarned) {
                 showAchievement('Recompensa!', `Você ganhou ${response.data.zionsEarned} Zions!`);
                 updateUserZions(response.data.zionsEarned);
+            }
+
+            if (response.data.userStats) {
+                updateUser(response.data.userStats);
             }
 
             // Deduct Zions locally for immediate feedback if highlight

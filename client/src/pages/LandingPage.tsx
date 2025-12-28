@@ -36,7 +36,7 @@ export default function LandingPage() {
                         MAGAZINE
                     </h2>
                     <p className="text-gold-400 uppercase tracking-widest text-sm md:text-base mb-8 font-medium">
-                        A Elite do Sucesso
+                        Elegância Pura
                     </p>
                     <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                         <button className="flex items-center gap-2 text-white border-b border-gold-500 pb-1 hover:text-gold-400 transition-colors">
@@ -66,7 +66,7 @@ export default function LandingPage() {
                         SRT
                     </h2>
                     <p className="text-red-500 uppercase tracking-widest text-sm md:text-base mb-8 font-medium">
-                        Velocidade e Poder
+                        Street Runner Team
                     </p>
                     <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                         <button className="flex items-center gap-2 text-white border-b border-red-500 pb-1 hover:text-red-400 transition-colors">
@@ -76,9 +76,8 @@ export default function LandingPage() {
                 </div>
             </div>
 
-            {/* Center Divider/Logo */}
-            {/* Center Divider/Logo */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+            {/* Center Divider/Logo - REMOVED */}
+            {/* <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
                 <div
                     className={`w-16 h-16 bg-black border rounded-full flex items-center justify-center shadow-2xl backdrop-blur-xl transition-all duration-500
                         ${hoveredSide === 'left' ? 'border-gold-500 shadow-[0_0_30px_rgba(212,175,55,0.5)] scale-110' : ''}
@@ -92,7 +91,7 @@ export default function LandingPage() {
                         ${!hoveredSide ? 'text-white' : ''}
                     `}>M</span>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

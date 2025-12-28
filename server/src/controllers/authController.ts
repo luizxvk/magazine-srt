@@ -64,15 +64,21 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
+        console.log('Login attempt:', req.body); // Log request body
         const { email, password } = loginSchema.parse(req.body);
+        console.log('Login schema parsed for:', email);
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
+            console.log('User not found:', email);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
+        console.log('User found:', user.email, user.passwordHash);
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);
+        console.log('Password valid:', validPassword);
         if (!validPassword) {
+            console.log('Invalid password for:', email);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
@@ -218,6 +224,41 @@ export const resetPassword = async (req: Request, res: Response) => {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: (error as any).errors });
         }
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const { currentPassword, newPassword } = z.object({
+            currentPassword: z.string(),
+            newPassword: z.string().min(6)
+        }).parse(req.body);
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const validPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'Senha atual incorreta' });
+        }
+
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { passwordHash }
+        });
+
+        res.json({ message: 'Senha alterada com sucesso' });
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: (error as any).errors });
+        }
+        console.error('Change password error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

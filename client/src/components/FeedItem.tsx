@@ -82,14 +82,12 @@ export default function FeedItem({
             {/* Expand Button (only if not expanded) */}
             {!isExpanded && (
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Link
-                        to={`/post/${id}`}
-                        className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-black/80 transition-colors block"
+                    <div
+                        className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-black/80 transition-colors block cursor-pointer"
                         title="Expandir"
-                        onClick={(e) => e.stopPropagation()}
                     >
                         <Maximize2 className="w-4 h-4" />
-                    </Link>
+                    </div>
                 </div>
             )}
         </>

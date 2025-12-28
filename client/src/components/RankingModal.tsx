@@ -14,7 +14,6 @@ interface RankedUser {
     avatarUrl?: string;
     trophies: number;
     level: number;
-    // xp: number; // Unused
     membershipType: 'MAGAZINE' | 'SRT';
 }
 
@@ -70,7 +69,7 @@ export default function RankingModal({ isOpen, onClose, isSRT }: RankingModalPro
                         <Crown className={`w-6 h-6 ${isSRT ? 'text-red-500' : 'text-gold-500'}`} />
                         <h2 className={`text-xl font-serif ${isSRT ? 'text-white' : 'text-gold-400'}`}>Elite Ranking</h2>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Fechar">
                         <X className="w-6 h-6" />
                     </button>
                 </div>

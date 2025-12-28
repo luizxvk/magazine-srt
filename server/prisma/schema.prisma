@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -27,6 +26,7 @@ model User {
   updatedAt    DateTime      @updatedAt
   resetToken   String?
   resetTokenExpiry DateTime?
+  deletedAt    DateTime?
   
   posts        Post[]
   comments     Comment[]
@@ -37,8 +37,49 @@ model User {
   redemptions  Redemption[]
   notifications Notification[]
   
-  sentFriendRequests     Friendship[] @relation("FriendRequestsSent")
-  receivedFriendRequests Friendship[] @relation("FriendRequestsReceived")
+  sentMessages   Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  
+  friendRequestsSent     Friendship[] @relation("FriendRequestsSent")
+  friendRequestsReceived Friendship[] @relation("FriendRequestsReceived")
+
+  stories      Story[]
+  storyViews   StoryView[]
+}
+
+model Story {
+  id        String   @id @default(uuid())
+  userId    String
+  imageUrl  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id])
+  views     StoryView[]
+}
+
+model StoryView {
+  id        String   @id @default(uuid())
+  storyId   String
+  viewerId  String
+  viewedAt  DateTime @default(now())
+
+  story     Story    @relation(fields: [storyId], references: [id])
+  viewer    User     @relation(fields: [viewerId], references: [id])
+
+  @@unique([storyId, viewerId])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  senderId  String
+  receiverId String
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }
 
 model Post {
@@ -110,6 +151,7 @@ model Reward {
   costZions   Int          @default(0)
   stock       Int
   metadata    Json?
+  backgroundColor String?
   redemptions Redemption[]
 }
 
@@ -243,4 +285,20 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model PageContent {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   // INFO, WARN, ERROR
+  source    String   // FRONTEND, BACKEND
+  message   String
+  timestamp DateTime @default(now())
+  metadata  Json?
 }

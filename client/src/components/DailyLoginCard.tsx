@@ -17,12 +17,22 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
     const themeBorder = isSRT ? 'border-red-500/30' : 'border-gold-500/30';
     const themeHover = isSRT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
 
-    if (!status) return null;
+    if (!status) {
+        return (
+            <div className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} animate-pulse`}>
+                <div className="flex justify-between items-center">
+                    <div className="h-4 bg-white/10 rounded w-32 mb-2"></div>
+                    <div className="h-8 bg-white/10 rounded w-12"></div>
+                </div>
+                <div className="h-3 bg-white/10 rounded w-48"></div>
+            </div>
+        );
+    }
 
     return (
         <button
             onClick={onClick}
-            className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} ${themeHover} transition-all group text-left relative overflow-hidden mb-6`}
+            className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} ${themeHover} transition-all group text-left relative overflow-hidden`}
         >
             <div className={`absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity`}>
                 <Calendar className={`w-24 h-24 ${themeText}`} />

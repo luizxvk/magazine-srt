@@ -28,7 +28,7 @@ export default function LuxuriousBackground() {
         : 'bg-[radial-gradient(circle_at_50%_50%,_#1a1a1a_0%,_#000000_100%)]';
 
     return (
-        <div className={`fixed inset-0 z-[-1] overflow-hidden ${isLight ? 'bg-gray-50' : 'bg-black'} transition-colors duration-500`}>
+        <div className={`fixed inset-0 z-[-1] overflow-hidden transition-colors duration-500`}>
             {/* Deep Ambient Gradient Base */}
             <div className={`absolute inset-0 ${bgGradient} transition-all duration-500`} />
 

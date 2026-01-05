@@ -77,10 +77,10 @@ app.use((req, res, next) => {
 
 
 
-// Health check route moved to /api/health or handled by specific routes
-// app.get('/', (req, res) => {
-//     res.json({ message: 'MAGAZINE API is running', status: 'active' });
-// });
+// Health check route
+app.get('/', (req, res) => {
+    res.json({ message: 'MAGAZINE API is running', status: 'active' });
+});
 
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {

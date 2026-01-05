@@ -14,19 +14,17 @@
         }
     ],
     "routes": [
-        "routes": [
-            {
-                "src": "/api/(.*)",
-                "dest": "/server/index.ts"
-            },
-            {
-                "src": "/(.*\\..*)",
-                "dest": "/client/$1"
-            },
-            {
-                "src": "/(.*)",
-                "dest": "/client/index.html"
-            }
-        ]
+        {
+            "src": "/api/(.*)",
+            "dest": "/server/index.ts"
+        },
+        {
+            "src": "/(.*\\..*)",
+            "dest": "/client/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/client/index.html"
+        }
     ]
 }

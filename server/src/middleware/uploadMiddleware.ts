@@ -4,8 +4,12 @@ import fs from 'fs';
 
 // Ensure uploads directory exists
 const uploadDir = 'uploads';
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+try {
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir);
+    }
+} catch (error) {
+    console.warn(`[WARNING] Could not create uploads directory: ${error instanceof Error ? error.message : String(error)}`);
 }
 
 const storage = multer.diskStorage({

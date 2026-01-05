@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 import * as catalogController from '../controllers/catalogController';
+import { upload } from '../middleware/uploadMiddleware';
 
 const router = Router();
 
 // Public routes
 router.get('/public', authenticateToken, catalogController.getPublicCatalogPhotos);
 router.get('/filters', authenticateToken, catalogController.getFilterOptions);
-
-import { upload } from '../middleware/uploadMiddleware';
 
 // ...
 

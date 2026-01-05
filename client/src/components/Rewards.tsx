@@ -34,9 +34,6 @@ export default function Rewards() {
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeHoverBorder = isMGT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
-    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500 shadow-[0_0_15px_rgba(220,20,60,0.3)]' : 'bg-gold-500 hover:bg-gold-400 shadow-[0_0_15px_rgba(212,175,55,0.3)]';
 
     useEffect(() => {
         loadData();

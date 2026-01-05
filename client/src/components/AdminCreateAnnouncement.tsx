@@ -1,5 +1,5 @@
 import { useState, useRef, type ChangeEvent, useEffect } from 'react';
-import { Image as ImageIcon, Send, Megaphone, Upload, X, Star, Zap, Shield, Plus, Trash2, Save } from 'lucide-react';
+import { Image as ImageIcon, Send, Megaphone, Upload, X, Zap, Shield, Trash2, Save } from 'lucide-react';
 import api from '../services/api';
 
 interface AdminCreateAnnouncementProps {
@@ -516,7 +516,6 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
                                         ...pageContent,
                                         logoUrl: '',
                                         heroTitle: '',
-                                        heroSubtitle: '',
                                         tag: '',
                                         heroDescription: ''
                                     });

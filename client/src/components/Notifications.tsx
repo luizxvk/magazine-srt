@@ -110,9 +110,6 @@ export default function Notifications() {
                                 key={notification.id}
                                 onClick={() => {
                                     if (!notification.read) markAsRead(notification.id);
-                                    if (notification.type === 'MESSAGE' && parsedContent.actor?.id) {
-                                        navigate(`/profile?id=${parsedContent.actor.id}&chat=true`);
-                                    }
                                 }}
                                 className={`p-4 border-b ${itemBorder} transition-colors flex gap-3 cursor-pointer ${!notification.read ? themeBg : ''}`}
                             >

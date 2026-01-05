@@ -61,8 +61,6 @@ export default function MessagePopup() {
     };
 
     const themeBg = theme === 'light' ? 'bg-white border-gray-200' : 'bg-white/10 backdrop-blur-xl border-white/20';
-    const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const themeSubText = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
     const themeHover = theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/20';
 
     // MGT Colors

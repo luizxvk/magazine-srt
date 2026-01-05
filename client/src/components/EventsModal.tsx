@@ -47,8 +47,6 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
     const borderColor = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
-    const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const themeSubText = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">

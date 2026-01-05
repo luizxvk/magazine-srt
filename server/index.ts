@@ -47,19 +47,27 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static('uploads'));
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/feed', feedRoutes);
-app.use('/posts', postRoutes);
-app.use('/social', socialRoutes);
-app.use('/notifications', notificationRoutes);
-app.use('/gamification', gamificationRoutes);
-app.use('/messages', messageRoutes);
-app.use('/invites', inviteRoutes);
-app.use('/announcements', announcementRoutes);
-app.use('/announcements', announcementRoutes);
-app.use('/content', contentRoutes); // Fixed: Removed /api to match client requests
-app.use('/logs', logsRoutes);
+// API Router
+const apiRouter = express.Router();
+
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/users', userRoutes);
+apiRouter.use('/feed', feedRoutes);
+apiRouter.use('/posts', postRoutes);
+apiRouter.use('/social', socialRoutes);
+apiRouter.use('/notifications', notificationRoutes);
+apiRouter.use('/gamification', gamificationRoutes);
+apiRouter.use('/messages', messageRoutes);
+apiRouter.use('/invites', inviteRoutes);
+apiRouter.use('/announcements', announcementRoutes);
+apiRouter.use('/content', contentRoutes);
+apiRouter.use('/logs', logsRoutes);
+apiRouter.use('/catalog', catalogRoutes);
+apiRouter.use('/payments', paymentRoutes);
+apiRouter.use('/events', eventRoutes);
+
+// Mount API Router
+app.use('/api', apiRouter);
 app.use((req, res, next) => {
     console.log(`[REQUEST] ${req.method} ${req.path}`);
     next();
@@ -67,10 +75,7 @@ app.use((req, res, next) => {
 
 
 
-// Standard Route Mount
-app.use('/catalog', catalogRoutes);
-app.use('/payments', paymentRoutes);
-app.use('/events', eventRoutes);
+
 
 // Health check route moved to /api/health or handled by specific routes
 // app.get('/', (req, res) => {

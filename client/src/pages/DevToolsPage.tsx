@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { Terminal, Activity, Cpu, Server, RefreshCw, Trash2, AlertTriangle, Info, Bug } from 'lucide-react';
+import { Terminal, Activity, Cpu, Server, RefreshCw } from 'lucide-react';
 import api from '../services/api';
 
 interface LogEntry {
@@ -30,7 +30,7 @@ export default function DevToolsPage() {
     const [stats, setStats] = useState<SystemStats | null>(null);
     const [activeTab, setActiveTab] = useState<'logs' | 'stats'>('logs');
     const [autoRefresh, setAutoRefresh] = useState(true);
-    const [loading, setLoading] = useState(false);
+
     const logsEndRef = useRef<HTMLDivElement>(null);
 
     const fetchData = async () => {

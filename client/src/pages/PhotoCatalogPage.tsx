@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
-import { Camera, Filter, Plus, User as UserIcon, Globe, Star, Trash2 } from 'lucide-react';
+import { Camera, Filter, Globe, Star, Trash2 } from 'lucide-react';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 
 interface CatalogPhoto {
@@ -31,21 +31,20 @@ export default function PhotoCatalogPage() {
 
     // Theme setup
     const themeColors = isMGT ? 'text-emerald-500' : 'text-gold-500';
-    const themeBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
-    const themeBorder = isMGT ? 'border-emerald-500' : 'border-gold-500';
 
-    const [activeTab, setActiveTab] = useState<'my' | 'explore'>('my');
+
+    const [activeTab] = useState<'my' | 'explore'>('my');
     const [photos, setPhotos] = useState<CatalogPhoto[]>([]);
     const [loading, setLoading] = useState(true);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
 
     // Filters
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedBrand, setSelectedBrand] = useState('');
-    const [onlyFavorites, setOnlyFavorites] = useState(false);
+    const [selectedCategory] = useState('');
+    const [selectedBrand] = useState('');
+    const [onlyFavorites] = useState(false);
 
     // Dynamic Filter Options
-    const [filterOptions, setFilterOptions] = useState({
+    const [, setFilterOptions] = useState({
         categories: [] as string[],
         carBrands: [] as string[]
     });

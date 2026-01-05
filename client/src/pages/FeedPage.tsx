@@ -169,8 +169,7 @@ export default function FeedPage() {
     const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
 
     const themeTextHover = isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
-    const themeTitleColor = isMGT ? 'text-white' : 'text-gold-400';
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+
 
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">

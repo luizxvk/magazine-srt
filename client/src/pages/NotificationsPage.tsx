@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
-import { Bell, Heart, MessageCircle, Star, ArrowLeft, Trash2 } from 'lucide-react';
+import { Bell, Heart, MessageCircle, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,7 +22,7 @@ export default function NotificationsPage() {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
-    const themeGradient = isMGT ? 'from-red-400 via-white to-red-400' : 'from-gold-200 via-gold-400 to-gold-200';
+
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
     const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
@@ -85,8 +85,6 @@ export default function NotificationsPage() {
             }
         } else if (notification.type === 'BADGE') {
             navigate('/profile');
-        } else if (notification.type === 'FRIEND_REQUEST') {
-            navigate('/social');
         }
     };
 

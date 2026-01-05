@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRightLeft, User, Lock } from 'lucide-react';
-import logoLogin from '../assets/logo-login.png';
+
 import logo from '../assets/logo-mgzn.png';
 import logoMgt from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';

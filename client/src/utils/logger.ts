@@ -1,4 +1,4 @@
-import api from '../services/api';
+// Logger utility - sends frontend logs to backend
 
 type LogLevel = 'INFO' | 'WARN' | 'ERROR';
 

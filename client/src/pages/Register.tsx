@@ -2,8 +2,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { User, Mail, Lock } from 'lucide-react';
 import logo from '../assets/logo-mgzn.png';
-import logoSrt from '../assets/logo-mgt.png';
+import logoMgt from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -32,7 +33,7 @@ export default function Register() {
                 ...data,
                 membershipType
             });
-            login(response.data.token, response.data.user);
+            login(response.data.token, response.data.user, membershipType);
             navigate('/feed');
         } catch (error: any) {
             console.error('Registration failed', error);
@@ -43,93 +44,137 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden p-4">
-            <div className={`z-10 w-full max-w-md glass-panel rounded-2xl p-10 relative overflow-hidden group ${isMGT ? 'border-emerald-600/50 bg-black/80' : 'border-gold-500/30'}`}>
-                <div className={`absolute inset-0 bg-gradient-to-br ${isMGT ? 'from-red-900/20' : 'from-gold-500/5'} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
+        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0a0a] font-sans">
+            {/* Dynamic Background */}
+            <div className={`fixed inset-0 transition-colors duration-1000 ease-in-out ${isMGT ? 'bg-emerald-950/20' : 'bg-gold-950/20'}`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,0,0,0)_0%,_#000000_100%)]" />
+                <div className={`absolute top-0 left-0 w-full h-full opacity-30 transition-opacity duration-1000 ${isMGT ? 'bg-[url("/patterns/grid.svg")]' : 'gold-flow'}`} />
+                <div className="animated-fog opacity-30" />
+            </div>
 
+            {/* Logo Top Center */}
+            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center animate-fade-in-down">
+                <img
+                    src={logo}
+                    alt="Logo"
+                    className={`h-28 w-auto drop-shadow-[0_0_15px_${isMGT ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.5)'}] transition-all duration-500`}
+                />
+            </div>
+
+            {/* Main Card Container */}
+            <div className={`relative w-full max-w-md bg-neutral-950/60 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border p-10 z-10 ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                {/* Gradient Overlay */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${isMGT ? 'from-emerald-900/10' : 'from-gold-900/10'} to-transparent pointer-events-none`} />
+
+                {/* Header */}
                 <div className="text-center mb-10 relative z-10">
                     <img
-                        src={isMGT ? logoSrt : logo}
-                        alt={isMGT ? "SRT" : "MAGAZINE"}
-                        className={`mx-auto mb-6 ${isMGT ? 'h-20 drop-shadow-[0_0_15px_rgba(255,0,0,0.5)]' : 'h-24 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]'}`}
+                        src={isMGT ? logoMgt : logo}
+                        alt={isMGT ? "MGT" : "MAGAZINE"}
+                        className={`mx-auto mb-6 ${isMGT ? 'h-16 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'h-28 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]'}`}
                     />
-                    <h2 className={`text-3xl font-bold tracking-wide ${isMGT ? 'text-white drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]' : 'text-gradient-gold'}`}>
-                        {isMGT ? 'CADASTRO SRT' : 'Solicitar Convite'}
+                    <h2 className={`text-2xl font-bold tracking-wide ${isMGT ? 'text-white drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]' : 'text-gradient-gold'}`}>
+                        {isMGT ? 'CRIAR CONTA MGT' : 'CRIAR CONTA'}
                     </h2>
-                    <p className="text-gray-400 text-sm mt-3 font-light tracking-widest uppercase">
-                        {isMGT ? 'Machine Gold Team' : 'Junte-se à Elite.'}
+                    <p className={`text-sm mt-3 font-light tracking-widest uppercase ${isMGT ? 'text-emerald-400/60' : 'text-gold-400/60'}`}>
+                        {isMGT ? 'Velocidade e Poder' : 'A Elite do Sucesso'}
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative z-10">
-                    <div>
-                        <label className={`block text-xs uppercase tracking-widest mb-2 font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-300'}`}>Nome Completo</label>
-                        <input
-                            {...register('name')}
-                            type="text"
-                            className={`w-full bg-black/40 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all duration-300 placeholder-gray-600 
-                                ${isMGT
-                                    ? 'border-red-500/20 focus:border-red-500/50 focus:shadow-[0_0_15px_rgba(220,20,60,0.1)]'
-                                    : 'border-gold-500/20 focus:border-gold-500/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.1)]'
-                                }`}
-                            placeholder="Seu Nome"
-                        />
-                        {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>}
+                {/* Form */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
+                    {/* Name Field */}
+                    <div className="space-y-1">
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border bg-neutral-900/60 transition-all duration-300
+                            ${isMGT
+                                ? 'border-emerald-500/20 focus-within:border-emerald-500/60 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                                : 'border-gold-500/20 focus-within:border-gold-500/60 focus-within:shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                            }`}>
+                            <User size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
+                            <input
+                                {...register('name')}
+                                type="text"
+                                placeholder="Seu nome completo"
+                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
+                            />
+                        </div>
+                        {errors.name && <p className="text-red-400 text-[10px] pl-2">{errors.name.message}</p>}
                     </div>
 
-                    <div>
-                        <label className={`block text-xs uppercase tracking-widest mb-2 font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-300'}`}>Email</label>
-                        <input
-                            {...register('email')}
-                            type="email"
-                            className={`w-full bg-black/40 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all duration-300 placeholder-gray-600 
-                                ${isMGT
-                                    ? 'border-red-500/20 focus:border-red-500/50 focus:shadow-[0_0_15px_rgba(220,20,60,0.1)]'
-                                    : 'border-gold-500/20 focus:border-gold-500/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.1)]'
-                                }`}
-                            placeholder="voce@exemplo.com"
-                        />
-                        {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
+                    {/* Email Field */}
+                    <div className="space-y-1">
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border bg-neutral-900/60 transition-all duration-300
+                            ${isMGT
+                                ? 'border-emerald-500/20 focus-within:border-emerald-500/60 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                                : 'border-gold-500/20 focus-within:border-gold-500/60 focus-within:shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                            }`}>
+                            <Mail size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
+                            <input
+                                {...register('email')}
+                                type="email"
+                                placeholder="seu@email.com"
+                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
+                            />
+                        </div>
+                        {errors.email && <p className="text-red-400 text-[10px] pl-2">{errors.email.message}</p>}
                     </div>
 
-                    <div>
-                        <label className={`block text-xs uppercase tracking-widest mb-2 font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-300'}`}>Senha</label>
-                        <input
-                            {...register('password')}
-                            type="password"
-                            className={`w-full bg-black/40 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all duration-300 placeholder-gray-600 
-                                ${isMGT
-                                    ? 'border-red-500/20 focus:border-red-500/50 focus:shadow-[0_0_15px_rgba(220,20,60,0.1)]'
-                                    : 'border-gold-500/20 focus:border-gold-500/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.1)]'
-                                }`}
-                            placeholder="••••••••"
-                        />
-                        {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
+                    {/* Password Field */}
+                    <div className="space-y-1">
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border bg-neutral-900/60 transition-all duration-300
+                            ${isMGT
+                                ? 'border-emerald-500/20 focus-within:border-emerald-500/60 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                                : 'border-gold-500/20 focus-within:border-gold-500/60 focus-within:shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                            }`}>
+                            <Lock size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
+                            <input
+                                {...register('password')}
+                                type="password"
+                                placeholder="Senha (mínimo 6 caracteres)"
+                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
+                            />
+                        </div>
+                        {errors.password && <p className="text-red-400 text-[10px] pl-2">{errors.password.message}</p>}
                     </div>
 
+                    {/* Submit Button */}
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`w-full mt-6 ${isMGT ? 'btn-srt' : 'btn-primary'}`}
+                        className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg mt-4
+                            ${isMGT
+                                ? 'bg-gradient-to-r from-emerald-700 to-emerald-600 text-white shadow-emerald-900/30 hover:shadow-emerald-600/40'
+                                : 'bg-gradient-to-r from-gold-600 to-gold-500 text-black shadow-gold-900/30 hover:shadow-gold-500/40'
+                            }`}
                     >
-                        {isSubmitting ? 'Criando Conta...' : 'Criar Conta'}
+                        {isSubmitting ? 'Criando...' : 'Criar Conta'}
                     </button>
-                    {errors.root && <p className="text-red-400 text-sm text-center mt-4">{errors.root.message}</p>}
+
+                    {errors.root && <p className="text-red-400 text-xs text-center">{errors.root.message}</p>}
                 </form>
 
+                {/* Footer Link */}
                 <div className="mt-8 text-center relative z-10">
-                    <p className="text-gray-500 text-xs tracking-wide">
-                        Já possui convite?
+                    <p className="text-gray-500 text-xs">
+                        Já tem conta?
                         <Link
                             to="/login"
                             state={{ membershipType }}
-                            className={`font-bold ml-1 transition-colors ${isMGT ? 'text-emerald-400 hover:text-red-300' : 'text-gold-400 hover:text-gold-300'}`}
+                            className={`font-bold ml-1 transition-colors ${isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300'}`}
                         >
-                            Acessar Clube
+                            Fazer Login
                         </Link>
                     </p>
                 </div>
             </div>
+
+            {/* Visitor Access - Bottom */}
+            <button
+                onClick={() => navigate('/login')}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500 hover:text-white text-xs uppercase tracking-widest transition-colors opacity-60 hover:opacity-100 z-20"
+            >
+                Voltar para Login
+            </button>
         </div>
     );
 }

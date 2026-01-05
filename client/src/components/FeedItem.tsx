@@ -46,7 +46,7 @@ export default function FeedItem({
     const { user, theme } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const isOwner = user?.id === authorId;
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
 
     const handleShare = () => {
@@ -74,7 +74,7 @@ export default function FeedItem({
 
             {/* Category Badge */}
             <div className="absolute top-4 left-4 pointer-events-none">
-                <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isSRT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isSRT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
+                <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isMGT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isMGT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
                     {category}
                 </span>
             </div>
@@ -99,7 +99,7 @@ export default function FeedItem({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={!isExpanded ? { scale: 1.02, y: -5 } : {}}
-            className={`glass-panel rounded-xl overflow-hidden group h-full flex flex-col relative ${isSRT ? 'hover:border-white/40' : 'hover:border-gold-500/40'}`}
+            className={`glass-panel rounded-xl overflow-hidden group h-full flex flex-col relative ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'}`}
         >
             {/* Image Container - Only render if image or video exists */}
             {(image || video) && (
@@ -120,11 +120,11 @@ export default function FeedItem({
             <div className={`p-6 flex flex-col flex-1 relative ${theme === 'light' ? 'bg-white/80' : 'bg-black/40'} backdrop-blur-sm ${!(image || video) ? 'min-h-[200px]' : ''}`}>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center overflow-hidden ${isSRT ? 'bg-red-500/20 border-red-500/50' : 'bg-gold-500/20 border-gold-500/50'}`}>
+                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center overflow-hidden ${isMGT ? 'bg-emerald-500/20 border-red-500/50' : 'bg-gold-500/20 border-gold-500/50'}`}>
                             {authorAvatar ? (
                                 <img src={authorAvatar} alt={author} className="w-full h-full object-cover" />
                             ) : (
-                                <div className={`w-1.5 h-1.5 rounded-full ${isSRT ? 'bg-red-500' : 'bg-gold-500'}`} />
+                                <div className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />
                             )}
                         </div>
                         <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">{author}</span>
@@ -133,7 +133,7 @@ export default function FeedItem({
                     <div className="relative">
                         <button
                             onClick={() => setShowMenu(!showMenu)}
-                            className={`${isSRT ? 'text-white/50 hover:text-white' : 'text-gold-500/50 hover:text-gold-400'} transition-colors p-1`}
+                            className={`${isMGT ? 'text-white/50 hover:text-white' : 'text-gold-500/50 hover:text-gold-400'} transition-colors p-1`}
                             aria-label="More options"
                         >
                             <MoreHorizontal className="w-5 h-5" />
@@ -141,7 +141,7 @@ export default function FeedItem({
 
                         {/* Dropdown Menu */}
                         {showMenu && (
-                            <div className={`absolute right-0 top-full mt-2 w-32 bg-black/90 border rounded-lg shadow-xl backdrop-blur-xl z-50 overflow-hidden ${isSRT ? 'border-white/20' : 'border-gold-500/20'}`}>
+                            <div className={`absolute right-0 top-full mt-2 w-32 bg-black/90 border rounded-lg shadow-xl backdrop-blur-xl z-50 overflow-hidden ${isMGT ? 'border-white/20' : 'border-gold-500/20'}`}>
                                 {isOwner && (
                                     <button
                                         onClick={() => { onDelete && onDelete(id); setShowMenu(false); }}
@@ -174,13 +174,13 @@ export default function FeedItem({
                 {/* If no image, show category here */}
                 {!(image || video) && (
                     <div className="mb-4">
-                        <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-gray-100 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isSRT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isSRT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
+                        <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-gray-100 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isMGT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isMGT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
                             {category}
                         </span>
                     </div>
                 )}
 
-                <h3 className={`text-xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-4 leading-snug transition-colors uppercase tracking-wider ${image || video ? (isExpanded ? '' : 'line-clamp-2') : ''} ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'}`}>
+                <h3 className={`text-xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-4 leading-snug transition-colors uppercase tracking-wider ${image || video ? (isExpanded ? '' : 'line-clamp-2') : ''} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'}`}>
                     {title}
                 </h3>
 
@@ -190,15 +190,15 @@ export default function FeedItem({
                         <motion.button
                             whileTap={{ scale: 0.8 }}
                             onClick={(e) => { e.stopPropagation(); onLike && onLike(id); }}
-                            className={`flex items-center gap-2 transition-colors group/like ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
+                            className={`flex items-center gap-2 transition-colors group/like ${isLiked ? 'text-red-500' : (isMGT ? 'text-gray-500 hover:text-emerald-500' : 'text-gray-500 hover:text-red-500')}`}
                         >
-                            <Heart className={`w-4 h-4 transition-colors ${isLiked ? 'fill-red-500' : 'group-hover/like:fill-red-500'}`} />
+                            <Heart className={`w-4 h-4 transition-colors ${isLiked ? 'fill-red-500' : (isMGT ? 'group-hover/like:fill-emerald-500' : 'group-hover/like:fill-red-500')}`} />
                             <span className="text-xs tracking-wider font-medium">{likes}</span>
                         </motion.button>
                         <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={(e) => { e.stopPropagation(); onComment && onComment(id); }}
-                            className={`flex items-center gap-2 text-gray-500 transition-colors ${isSRT ? 'hover:text-white' : 'hover:text-gold-400'}`}
+                            className={`flex items-center gap-2 text-gray-500 transition-colors ${isMGT ? 'hover:text-white' : 'hover:text-gold-400'}`}
                         >
                             <MessageCircle className="w-4 h-4" />
                             <span className="text-xs tracking-wider font-medium">{comments}</span>

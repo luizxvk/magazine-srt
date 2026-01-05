@@ -1,0 +1,11 @@
+
+function ZionsModalWrapper() {
+  const { isZionsModalOpen, closeZionsModal } = useAuth();
+
+  return (
+    <ZionsPurchaseModal 
+      isOpen={isZionsModalOpen} 
+      onClose={closeZionsModal} 
+    />
+  );
+}

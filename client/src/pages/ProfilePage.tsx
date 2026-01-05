@@ -125,7 +125,7 @@ export default function ProfilePage() {
 
     if (!profileUser) return <div className="min-h-screen flex items-center justify-center text-gold-500">Carregando perfil...</div>;
 
-    const isSRT = profileUser.membershipType === 'SRT';
+    const isMGT = profileUser.membershipType === 'MGT';
 
     return (
         <div className="min-h-screen pb-20 relative text-white font-sans selection:bg-gold-500/30">
@@ -169,14 +169,14 @@ export default function ProfilePage() {
                             style={{ backgroundImage: `url(${bgImage})` }}
                         />
                     )}
-                    <div className={`absolute inset-0 bg-gradient-to-b ${isSRT ? 'from-red-900/20' : 'from-gold-500/10'} ${theme === 'light' ? 'to-white/80' : 'to-black/80'} z-0`} />
+                    <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-red-900/20' : 'from-gold-500/10'} ${theme === 'light' ? 'to-white/80' : 'to-black/80'} z-0`} />
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start relative z-10">
                         {/* Avatar */}
                         <div className="relative group mx-auto md:mx-0 shrink-0">
-                            <div className={`w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-br ${isSRT ? 'from-red-600 via-black to-red-800 shadow-[0_0_30px_rgba(255,0,0,0.3)]' : 'from-gold-300 via-gold-500 to-gold-800 shadow-[0_0_30px_rgba(212,175,55,0.3)]'}`}>
+                            <div className={`w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-br ${isMGT ? 'from-emerald-600 via-black to-emerald-800 shadow-[0_0_30px_rgba(16,185,129,0.3)]' : 'from-gold-300 via-gold-500 to-gold-800 shadow-[0_0_30px_rgba(212,175,55,0.3)]'}`}>
                                 <div className="w-full h-full rounded-full bg-black overflow-hidden relative">
                                     <img
-                                        src={profileUser.avatarUrl || `https://ui-avatars.com/api/?name=${profileUser.name}&background=000&color=${isSRT ? 'ff0000' : 'd4af37'}`}
+                                        src={profileUser.avatarUrl || `https://ui-avatars.com/api/?name=${profileUser.name}&background=000&color=${isMGT ? 'ff0000' : 'd4af37'}`}
                                         alt={profileUser.name}
                                         className="w-full h-full object-cover"
                                     />
@@ -195,7 +195,7 @@ export default function ProfilePage() {
                             </div>
 
                             {/* Crown Icon - Magazine Members Only */}
-                            {!isSRT && (
+                            {!isMGT && (
                                 <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12 animate-pulse-slow">
                                     <Crown
                                         size={32}
@@ -206,7 +206,7 @@ export default function ProfilePage() {
                                 </div>
                             )}
 
-                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${isSRT ? 'bg-red-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
+                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
                                 Lvl {profileUser.level || 1}
                             </div>
                         </div>
@@ -216,8 +216,8 @@ export default function ProfilePage() {
                             <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-2 gap-4 md:gap-0">
                                 <div>
                                     <h2 className={`text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>{profileUser.displayName || profileUser.name}</h2>
-                                    <p className={`text-sm uppercase tracking-widest mb-2 font-medium ${isSRT ? 'text-red-500 text-shine-red' : 'text-gold-400 text-shine-gold'}`}>
-                                        {isSRT ? 'Membro SRT' : 'Membro Magazine'}
+                                    <p className={`text-sm uppercase tracking-widest mb-2 font-medium ${isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold'}`}>
+                                        {isMGT ? 'Membro MGT' : 'Membro Magazine'}
                                     </p>
                                     {profileUser.bio && <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} text-sm italic mb-4 max-w-md mx-auto md:mx-0`}>"{profileUser.bio}"</p>}
                                 </div>
@@ -277,7 +277,7 @@ export default function ProfilePage() {
                                                     </button>
                                                 </>
                                             )}
-                                            {isSRT && (
+                                            {isMGT && (
                                                 <button
                                                     onClick={toggleTheme}
                                                     className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors group shrink-0 ${theme === 'light' ? 'border-gray-400 bg-gray-200 text-gray-800' : 'border-white/10 hover:bg-white/5 text-gray-400'}`}
@@ -353,20 +353,20 @@ export default function ProfilePage() {
                 <div className="flex gap-8 border-b border-white/10 mb-8 px-4 overflow-x-auto scrollbar-hide">
                     <button
                         onClick={() => setActiveTab('posts')}
-                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'posts' ? (isSRT ? 'text-red-500 border-b-2 border-red-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
+                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'posts' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                     >
                         Postagens
                     </button>
                     <button
                         onClick={() => setActiveTab('badges')}
-                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'badges' ? (isSRT ? 'text-red-500 border-b-2 border-red-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
+                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'badges' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                     >
                         Conquistas
                     </button>
                     {isOwnProfile && (
                         <button
                             onClick={() => setActiveTab('rewards')}
-                            className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'rewards' ? (isSRT ? 'text-red-500 border-b-2 border-red-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
+                            className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'rewards' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                         >
                             Prêmios
                         </button>
@@ -384,7 +384,7 @@ export default function ProfilePage() {
                                     </div>
                                 ) : (
                                     userPosts.map((post) => (
-                                        <div key={post.id} className={`glass-panel rounded-3xl p-6 border ${isSRT ? 'border-red-500/10 hover:border-red-500/30' : 'border-gold-500/10 hover:border-gold-500/30'} transition-all relative group`}>
+                                        <div key={post.id} className={`glass-panel rounded-3xl p-6 border ${isMGT ? 'border-emerald-500/10 hover:border-emerald-500/30' : 'border-gold-500/10 hover:border-gold-500/30'} transition-all relative group`}>
                                             {/* Share Button */}
                                             <button
                                                 onClick={() => handleShare(post.id)}

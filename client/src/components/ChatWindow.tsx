@@ -25,7 +25,7 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, onClose }: ChatWindowProps) {
-    const { user } = useAuth();
+    const { user, theme } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -84,7 +84,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
             {/* Vision Pro Style Container - SRT Theme (Black/Gold) */}
-            <div className="w-full max-w-lg h-[80vh] flex flex-col bg-[#0a0a0a]/80 backdrop-blur-3xl border border-white/10 rounded-[32px] shadow-2xl overflow-hidden relative ring-1 ring-white/5">
+            <div className={`w-full max-w-lg h-[80vh] flex flex-col ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-[#0a0a0a]/80 border-white/10'} backdrop-blur-3xl border rounded-[32px] shadow-2xl overflow-hidden relative ring-1 ring-white/5`}>
 
                 {/* Glassy Header */}
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-xl z-10">
@@ -102,18 +102,20 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                         </div>
                         <div>
                             <h3 className="font-bold text-white text-base leading-tight tracking-wide font-serif">{otherUserName}</h3>
-                            <span className="text-[10px] text-gold-400 font-bold tracking-widest uppercase">Membro SRT</span>
+                            <span className="text-[10px] text-gold-400 font-bold tracking-widest uppercase">Membro MGT</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={onClose}
+                            aria-label="Minimizar chat"
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all duration-300 border border-white/5 hover:border-white/20"
                         >
                             <Minimize2 className="w-4 h-4" />
                         </button>
                         <button
                             onClick={onClose}
+                            aria-label="Fechar chat"
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-300 border border-red-500/10 hover:border-red-500/30"
                         >
                             <X className="w-4 h-4" />
@@ -122,7 +124,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                 </div>
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <div className={`flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent`}>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="relative">
@@ -142,16 +144,17 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                     ) : (
                         messages.map((msg) => {
                             const isMe = msg.senderId === user?.id;
+                            const bubbleClass = isMe
+                                ? 'bg-gold-500/10 text-gold-100 border-gold-500/20 rounded-tr-sm'
+                                : (theme === 'light' ? 'bg-gray-100 text-gray-800 border-gray-200 rounded-tl-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-tl-sm');
+
                             return (
                                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
                                     <div
-                                        className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg backdrop-blur-md border ${isMe
-                                                ? 'bg-gold-500/10 text-gold-100 border-gold-500/20 rounded-tr-sm'
-                                                : 'bg-white/5 text-gray-200 border-white/10 rounded-tl-sm'
-                                            }`}
+                                        className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg backdrop-blur-md border ${bubbleClass}`}
                                     >
                                         {msg.content}
-                                        <div className={`text-[10px] mt-1 opacity-50 ${isMe ? 'text-right text-gold-200' : 'text-left text-gray-400'}`}>
+                                        <div className={`text-[10px] mt-1 opacity-50 ${isMe ? 'text-right text-gold-200' : (theme === 'light' ? 'text-left text-gray-500' : 'text-left text-gray-400')}`}>
                                             {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                     </div>
@@ -176,6 +179,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                         <button
                             onClick={handleSendMessage}
                             disabled={!newMessage.trim()}
+                            aria-label="Enviar mensagem"
                             className="p-2.5 bg-gold-500 text-black rounded-full hover:bg-gold-400 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-gold-500/20"
                         >
                             <Send className="w-4 h-4" />

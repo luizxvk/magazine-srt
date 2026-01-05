@@ -167,10 +167,15 @@ export const redeemReward = async (req: Request, res: Response) => {
             }
         }
 
+        const admins = await prisma.user.findMany({
+            where: { role: 'ADMIN' },
+            select: { id: true }
+        });
+
         // Transaction to ensure atomicity
         const ticketCode = `TKT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${reward.id.slice(0, 4).toUpperCase()}-${reward.costZions}`;
 
-        await prisma.$transaction([
+        const transactionOperations = [
             prisma.user.update({
                 where: { id: userId },
                 data: { zions: { decrement: reward.costZions } }
@@ -183,7 +188,9 @@ export const redeemReward = async (req: Request, res: Response) => {
                 data: {
                     userId,
                     rewardId,
-                    cost: reward.costZions
+                    cost: reward.costZions,
+                    status: 'PENDING',
+                    metadata: { ticketCode }
                 }
             }),
             prisma.zionHistory.create({
@@ -192,8 +199,26 @@ export const redeemReward = async (req: Request, res: Response) => {
                     amount: -reward.costZions,
                     reason: `Redeemed reward: ${reward.title}`
                 }
-            })
-        ]);
+            }),
+            // Notify User
+            prisma.notification.create({
+                data: {
+                    userId,
+                    type: 'SYSTEM',
+                    content: `Resgate confirmado! "${reward.title}" está sendo processado. Ticket: ${ticketCode}`
+                }
+            }),
+            // Notify Admins
+            ...admins.map(admin => prisma.notification.create({
+                data: {
+                    userId: admin.id,
+                    type: 'SYSTEM',
+                    content: `NOVO RESGATE: ${user.name} resgatou "${reward.title}" (Ticket: ${ticketCode})`
+                }
+            }))
+        ];
+
+        await prisma.$transaction(transactionOperations);
 
         res.json({ success: true, message: 'Reward redeemed successfully', code: { code: ticketCode } });
     } catch (error) {

@@ -35,15 +35,15 @@ export default function SocialPage() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const isSRT = user?.membershipType === 'SRT';
-    const themeColor = isSRT ? 'text-red-500' : 'text-gold-400';
-    const themeBg = isSRT ? 'bg-red-500/10' : 'bg-gold-500/10';
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
-    const themeHoverBorder = isSRT ? 'hover:border-red-500/30' : 'hover:border-gold-500/30';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
-    const themeShadow = isSRT ? 'shadow-[0_0_10px_rgba(255,0,0,0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
-    const themeTabActive = isSRT ? 'text-red-500' : 'text-gold-400';
-    const themeTabBorder = isSRT ? 'bg-red-500' : 'bg-gold-500';
+    const isMGT = user?.membershipType === 'MGT';
+    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeHoverBorder = isMGT ? 'hover:border-red-500/30' : 'hover:border-gold-500/30';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeShadow = isMGT ? 'shadow-[0_0_10px_rgba(255,0,0,0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
+    const themeTabActive = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeTabBorder = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
 
     useEffect(() => {
         fetchData();
@@ -151,7 +151,7 @@ export default function SocialPage() {
 
                 {/* Content */}
                 {loading ? (
-                    <div className={`text-center py-20 animate-pulse ${isSRT ? 'text-red-500/50' : 'text-gold-500/50'}`}>Carregando...</div>
+                    <div className={`text-center py-20 animate-pulse ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`}>Carregando...</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {activeTab === 'friends' ? (
@@ -172,7 +172,7 @@ export default function SocialPage() {
                                                 {friend.displayName || friend.name}
                                             </h3>
                                             <p className="text-xs text-gray-400 flex items-center gap-2">
-                                                <span className={`${isSRT ? 'text-red-500/80' : 'text-gold-500/80'}`}>{friend.trophies} Troféus</span>
+                                                <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{friend.trophies} Troféus</span>
                                                 <span className="w-1 h-1 bg-gray-600 rounded-full" />
                                                 <span>Nível {friend.level}</span>
                                             </p>
@@ -251,12 +251,12 @@ export default function SocialPage() {
                                                 {rec.displayName || rec.name}
                                             </h3>
                                             <p className="text-xs text-gray-400 flex items-center gap-2">
-                                                <span className={`${isSRT ? 'text-red-500/80' : 'text-gold-500/80'}`}>{rec.trophies} Troféus</span>
+                                                <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{rec.trophies} Troféus</span>
                                                 <span className="w-1 h-1 bg-gray-600 rounded-full" />
                                                 <span>Nível {rec.level || 1}</span>
                                             </p>
                                         </div>
-                                        <button className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isSRT ? 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}>
+                                        <button className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-red-500 hover:bg-red-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}>
                                             Ver Perfil
                                         </button>
                                     </div>

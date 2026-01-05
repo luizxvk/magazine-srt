@@ -139,6 +139,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 {imageUrl && (
                                     <button
                                         onClick={() => setImageUrl('')}
+                                        aria-label="Remover imagem"
                                         className="px-4 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-bold flex items-center gap-2 transition-colors border border-red-500/20"
                                     >
                                         <X className="w-4 h-4" />

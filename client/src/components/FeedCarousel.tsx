@@ -23,7 +23,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
     const { user } = useAuth();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
     useEffect(() => {
         if (posts.length <= 1) return;
@@ -95,7 +95,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                         {/* Content */}
                         <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
                             <div className="flex items-center gap-2 mb-4">
-                                <span className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isSRT ? 'bg-red-500/20 border-red-500/30 text-white' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
+                                <span className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isMGT ? 'bg-emerald-500/20 border-red-500/30 text-white' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
                                     <Sparkles className="w-3 h-3" />
                                     Destaque
                                 </span>
@@ -109,7 +109,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                             </h2>
 
                             <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-full p-0.5 ${isSRT ? 'bg-red-500/20' : 'bg-gold-500/20'}`}>
+                                <div className={`w-8 h-8 rounded-full p-0.5 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
                                     <img
                                         src={currentPost.author.avatarUrl}
                                         alt={currentPost.author.name}
@@ -117,7 +117,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                                     />
                                 </div>
                                 <span className="text-sm text-gray-300 font-medium">
-                                    Por <span className={`${isSRT ? 'text-red-400' : 'text-gold-400'}`}>{currentPost.author.name}</span>
+                                    Por <span className={`${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{currentPost.author.name}</span>
                                 </span>
                             </div>
                         </div>
@@ -130,14 +130,14 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                 <>
                     <button
                         onClick={prevSlide}
-                        className={`absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isSRT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
+                        className={`absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isMGT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
                         aria-label="Slide anterior"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
                     <button
                         onClick={nextSlide}
-                        className={`absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isSRT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isMGT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
                         aria-label="Próximo slide"
                     >
                         <ChevronRight className="w-6 h-6" />
@@ -153,7 +153,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                                     setCurrentIndex(idx);
                                 }}
                                 className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentIndex
-                                    ? (isSRT ? 'w-8 bg-red-500 shadow-[0_0_10px_#ff0000]' : 'w-8 bg-gold-500 shadow-[0_0_10px_#D4AF37]')
+                                    ? (isMGT ? 'w-8 bg-red-500 shadow-[0_0_10px_#ff0000]' : 'w-8 bg-gold-500 shadow-[0_0_10px_#D4AF37]')
                                     : 'bg-white/30 hover:bg-white/50'
                                     }`}
                                 aria-label={`Ir para slide ${idx + 1}`}

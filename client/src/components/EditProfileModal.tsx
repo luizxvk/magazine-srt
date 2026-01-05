@@ -12,17 +12,17 @@ interface EditProfileModalProps {
 
 export default function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
     const { user, updateUser } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
-    const themeHeaderBg = isSRT ? 'from-red-900/10' : 'from-gold-900/10';
-    const themeText = isSRT ? 'text-red-100' : 'text-gold-100';
-    const themeAvatarBorder = isSRT ? 'border-red-500/30 group-hover:border-red-500' : 'border-gold-500/30 group-hover:border-gold-500';
-    const themeIcon = isSRT ? 'text-red-500/50' : 'text-gold-500/50';
-    const themeLabel = isSRT ? 'text-red-500/70' : 'text-gold-500/70';
-    const themeFocus = isSRT ? 'focus:border-red-500/50' : 'focus:border-gold-500/50';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
-    const themeToggle = isSRT ? 'bg-red-500' : 'bg-gold-500';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeHeaderBg = isMGT ? 'from-red-900/10' : 'from-gold-900/10';
+    const themeText = isMGT ? 'text-emerald-100' : 'text-gold-100';
+    const themeAvatarBorder = isMGT ? 'border-emerald-500/30 group-hover:border-red-500' : 'border-gold-500/30 group-hover:border-gold-500';
+    const themeIcon = isMGT ? 'text-emerald-500/50' : 'text-gold-500/50';
+    const themeLabel = isMGT ? 'text-emerald-500/70' : 'text-gold-500/70';
+    const themeFocus = isMGT ? 'focus:border-red-500/50' : 'focus:border-gold-500/50';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
+    const themeToggle = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
 
     const [name, setName] = useState(user?.name || '');
     const [displayName, setDisplayName] = useState(user?.displayName || ''); // Nickname
@@ -104,6 +104,16 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
+                                            // Check for GIF restriction
+                                            if (file.type === 'image/gif') {
+                                                const currentLevel = user?.level || 1;
+                                                if (currentLevel < 15) {
+                                                    alert('GIFs de perfil são permitidos apenas para usuários Nível 15 ou superior!');
+                                                    e.target.value = ''; // Reset input
+                                                    return;
+                                                }
+                                            }
+
                                             const reader = new FileReader();
                                             reader.onloadend = () => {
                                                 setAvatarUrl(reader.result as string);

@@ -19,6 +19,8 @@ interface Redemption {
     cost: number;
     redeemedAt: string;
     code?: string;
+    status: string;
+    metadata?: any;
 }
 
 export default function Rewards() {
@@ -29,12 +31,12 @@ export default function Rewards() {
     const [redeeming, setRedeeming] = useState<string | null>(null);
     const [redeemedCode, setRedeemedCode] = useState<{ id: string, code: string } | null>(null);
 
-    const isSRT = user?.membershipType === 'SRT';
-    const themeColor = isSRT ? 'text-red-500' : 'text-gold-500';
-    const themeText = isSRT ? 'text-red-400' : 'text-gold-400';
-    const themeBorder = isSRT ? 'border-red-500/30' : 'border-gold-500/30';
-    const themeHoverBorder = isSRT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(220,20,60,0.3)]' : 'bg-gold-500 hover:bg-gold-400 shadow-[0_0_15px_rgba(212,175,55,0.3)]';
+    const isMGT = user?.membershipType === 'MGT';
+    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeHoverBorder = isMGT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500 shadow-[0_0_15px_rgba(220,20,60,0.3)]' : 'bg-gold-500 hover:bg-gold-400 shadow-[0_0_15px_rgba(212,175,55,0.3)]';
 
     useEffect(() => {
         loadData();
@@ -208,21 +210,35 @@ export default function Rewards() {
                                         <span className="text-[10px] text-gray-600 block uppercase tracking-widest">Zions</span>
                                     </div>
 
-                                    {/* Display Code if available in metadata (assuming backend sends it, or we need to store it in Redemption model) */}
-                                    {/* Since we don't store code in Redemption model yet, we might show a generic 'Resgatado' or check reward type */}
+                                    {/* Status Display */}
+                                    <div className="flex flex-col items-end gap-1">
+                                        {redemption.status === 'PENDING' && (
+                                            <div className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-yellow-500/20">
+                                                Em Análise
+                                            </div>
+                                        )}
+                                        {redemption.status === 'PROCESSING' && (
+                                            <div className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
+                                                Processando
+                                            </div>
+                                        )}
+                                        {redemption.status === 'COMPLETED' && (
+                                            <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
+                                                Completo
+                                            </div>
+                                        )}
+                                        {redemption.status === 'CANCELLED' && (
+                                            <div className="bg-red-500/10 text-red-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-red-500/20">
+                                                Cancelado
+                                            </div>
+                                        )}
 
-                                    {redemption.reward.type === 'DIGITAL' || redemption.reward.type === 'COUPON' ? (
-                                        <div className="bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
-                                            <span className="text-xs font-mono text-gray-300">
-                                                {/* Fallback if we don't have the code stored in history yet */}
-                                                VERIFICAR EMAIL
+                                        {redemption.metadata?.ticketCode && (
+                                            <span className="text-[10px] font-mono text-gray-500">
+                                                {redemption.metadata.ticketCode}
                                             </span>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
-                                            Confirmado
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}

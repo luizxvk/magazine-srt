@@ -114,6 +114,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
                             onClick={() => setIsHighlight(!isHighlight)}
                             className={`p-2 rounded-lg transition-colors border flex items-center gap-2 ${isHighlight ? 'bg-gold-500/20 border-gold-500/30 text-gold-400' : 'bg-white/5 border-white/5 text-gray-400'}`}
                             title="Priorizar no Feed"
+                            aria-label={isHighlight ? 'Remover destaque' : 'Adicionar destaque'}
                         >
                             <Layers className="w-5 h-5" />
                             <span className="text-xs font-medium hidden sm:inline">Destaque</span>

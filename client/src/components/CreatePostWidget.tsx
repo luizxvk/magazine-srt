@@ -23,42 +23,43 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const canUseCarousel = (user?.zions || 0) >= 300;
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
     // Theme Colors
-    const themeBorder = isSRT ? 'border-red-500/40' : 'border-gold-500/20';
-    const themeText = isSRT ? (theme === 'light' ? 'text-red-900' : 'text-red-100') : (theme === 'light' ? 'text-gray-900' : 'text-gold-200');
-    const themeTextMuted = isSRT ? (theme === 'light' ? 'text-red-700' : 'text-red-100') : (theme === 'light' ? 'text-gray-600' : 'text-gold-200/80');
-    const themeTextHover = isSRT ? 'hover:text-red-100' : 'hover:text-gold-100';
-    const themeBgHover = isSRT ? 'hover:bg-red-200/10' : 'hover:bg-gold-200/10';
-    const themeBgActive = isSRT ? 'bg-red-500/20' : 'bg-gold-500/20';
-    const themeTextActive = isSRT ? 'text-red-300' : 'text-gold-300';
-    const themeButton = isSRT ? 'bg-red-500 hover:bg-red-400' : 'bg-gold-400 hover:bg-gold-300';
-    const themeButtonShadow = isSRT ? 'hover:shadow-[0_0_15px_rgba(255,0,0,0.6)]' : 'hover:shadow-[0_0_15px_rgba(252,246,186,0.6)]';
+    // Theme Colors
+    const themeBorder = isMGT ? 'border-emerald-500/40' : 'border-gold-500/20';
+    const themeText = isMGT ? (theme === 'light' ? 'text-emerald-900' : 'text-emerald-100') : (theme === 'light' ? 'text-gray-900' : 'text-gold-200');
+    const themeTextMuted = isMGT ? (theme === 'light' ? 'text-emerald-700' : 'text-emerald-100') : (theme === 'light' ? 'text-gray-600' : 'text-gold-200/80');
+    const themeTextHover = isMGT ? 'hover:text-emerald-100' : 'hover:text-gold-100';
+    const themeBgHover = isMGT ? 'hover:bg-emerald-200/10' : 'hover:bg-gold-200/10';
+    const themeBgActive = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
+    const themeTextActive = isMGT ? 'text-emerald-300' : 'text-gold-300';
+    const themeButton = isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-400 hover:bg-gold-300';
+    const themeButtonShadow = isMGT ? 'hover:shadow-[0_0_15px_rgba(16,185,129,0.6)]' : 'hover:shadow-[0_0_15px_rgba(252,246,186,0.6)]';
 
-    const themePillBg = isSRT
-        ? (theme === 'light' ? 'bg-red-50 border-red-200' : 'bg-red-900/20')
+    const themePillBg = isMGT
+        ? (theme === 'light' ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-900/20')
         : (theme === 'light' ? 'bg-white border-gray-200' : 'bg-gold-300/10');
 
-    const themePillBorder = isSRT ? 'border-red-500/30' : 'border-gold-200/30';
-    const themePillShadow = isSRT ? 'shadow-[0_8px_32px_0_rgba(255,0,0,0.1)]' : 'shadow-[0_8px_32px_0_rgba(252,246,186,0.1)]';
-    const themePillHoverShadow = isSRT ? 'hover:shadow-[0_8px_40px_0_rgba(255,0,0,0.2)]' : 'hover:shadow-[0_8px_40px_0_rgba(252,246,186,0.2)]';
-    const themePillHoverBorder = isSRT ? 'hover:border-red-500/40' : 'hover:border-gold-200/40';
-    const themePillExpandedBg = isSRT ? 'bg-red-900/30' : 'bg-gold-300/15';
-    const themeGlow = isSRT ? 'from-transparent via-red-500/10' : 'from-transparent via-gold-200/10';
+    const themePillBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-200/30';
+    const themePillShadow = isMGT ? 'shadow-[0_8px_32px_0_rgba(16,185,129,0.1)]' : 'shadow-[0_8px_32px_0_rgba(252,246,186,0.1)]';
+    const themePillHoverShadow = isMGT ? 'hover:shadow-[0_8px_40px_0_rgba(16,185,129,0.2)]' : 'hover:shadow-[0_8px_40px_0_rgba(252,246,186,0.2)]';
+    const themePillHoverBorder = isMGT ? 'hover:border-emerald-500/40' : 'hover:border-gold-200/40';
+    const themePillExpandedBg = isMGT ? 'bg-emerald-900/30' : 'bg-gold-300/15';
+    const themeGlow = isMGT ? 'from-transparent via-emerald-500/10' : 'from-transparent via-gold-200/10';
 
-    const themeInputText = isSRT
-        ? (theme === 'light' ? 'text-red-900' : 'text-red-100')
+    const themeInputText = isMGT
+        ? (theme === 'light' ? 'text-emerald-900' : 'text-emerald-100')
         : (theme === 'light' ? 'text-gray-800' : 'text-gold-100');
 
-    const themeInputPlaceholder = isSRT
-        ? (theme === 'light' ? 'placeholder-red-900/50' : 'placeholder-red-200/60')
+    const themeInputPlaceholder = isMGT
+        ? (theme === 'light' ? 'placeholder-emerald-900/50' : 'placeholder-emerald-200/60')
         : (theme === 'light' ? 'placeholder-gray-400' : 'placeholder-gold-200/60');
 
-    const themeSelection = isSRT ? 'selection:bg-red-500/30' : 'selection:bg-gold-200/30';
-    const themeTagBg = isSRT ? 'bg-red-500/20' : 'bg-gold-500/20';
-    const themeTagBorder = isSRT ? 'border-red-500/30' : 'border-gold-500/30';
-    const themeTagText = isSRT ? 'text-red-300' : 'text-gold-300';
+    const themeSelection = isMGT ? 'selection:bg-emerald-500/30' : 'selection:bg-gold-200/30';
+    const themeTagBg = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
+    const themeTagBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeTagText = isMGT ? 'text-emerald-300' : 'text-gold-300';
 
     const handleSubmit = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -185,12 +186,12 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
             {/* Tag Input Popup */}
             {showTagInput && (
                 <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl border ${themeBorder} rounded-2xl p-4 shadow-2xl w-64 animate-fade-in-up z-50`}>
-                    <h3 className={`${isSRT ? 'text-red-400' : 'text-gold-400'} text-xs uppercase tracking-widest mb-2 text-center`}>Adicionar Tag</h3>
+                    <h3 className={`${isMGT ? 'text-emerald-400' : 'text-gold-400'} text-xs uppercase tracking-widest mb-2 text-center`}>Adicionar Tag</h3>
                     <input
                         autoFocus
                         type="text"
                         aria-label="Nome da tag"
-                        className={`w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-${isSRT ? 'red' : 'gold'}-500/50 outline-none mb-2`}
+                        className={`w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-${isMGT ? 'red' : 'gold'}-500/50 outline-none mb-2`}
                         placeholder="Ex: Tecnologia"
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {

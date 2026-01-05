@@ -5,7 +5,7 @@ import api from '../services/api';
 interface RankingModalProps {
     isOpen: boolean;
     onClose: () => void;
-    isSRT: boolean;
+    isMGT: boolean;
 }
 
 interface RankedUser {
@@ -14,10 +14,10 @@ interface RankedUser {
     avatarUrl?: string;
     trophies: number;
     level: number;
-    membershipType: 'MAGAZINE' | 'SRT';
+    membershipType: 'MAGAZINE' | 'MGT';
 }
 
-export default function RankingModal({ isOpen, onClose, isSRT }: RankingModalProps) {
+export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalProps) {
     const [users, setUsers] = useState<RankedUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState<'trophies' | 'level'>('trophies');
@@ -62,12 +62,12 @@ export default function RankingModal({ isOpen, onClose, isSRT }: RankingModalPro
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className={`w-full max-w-2xl glass-panel rounded-3xl border ${isSRT ? 'border-red-500/20' : 'border-gold-500/20'} overflow-hidden flex flex-col max-h-[80vh]`}>
+            <div className={`w-full max-w-2xl glass-panel rounded-3xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} overflow-hidden flex flex-col max-h-[80vh]`}>
                 {/* Header */}
-                <div className={`p-6 border-b ${isSRT ? 'border-red-500/10' : 'border-gold-500/10'} flex justify-between items-center bg-black/40`}>
+                <div className={`p-6 border-b ${isMGT ? 'border-emerald-500/10' : 'border-gold-500/10'} flex justify-between items-center bg-black/40`}>
                     <div className="flex items-center gap-3">
-                        <Crown className={`w-6 h-6 ${isSRT ? 'text-red-500' : 'text-gold-500'}`} />
-                        <h2 className={`text-xl font-serif ${isSRT ? 'text-white' : 'text-gold-400'}`}>Elite Ranking</h2>
+                        <Crown className={`w-6 h-6 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
+                        <h2 className={`text-xl font-serif ${isMGT ? 'text-white' : 'text-gold-400'}`}>Elite Ranking</h2>
                     </div>
                     <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Fechar">
                         <X className="w-6 h-6" />
@@ -78,13 +78,13 @@ export default function RankingModal({ isOpen, onClose, isSRT }: RankingModalPro
                 <div className="p-4 flex gap-4 border-b border-white/5 bg-white/5">
                     <button
                         onClick={() => setSortBy('trophies')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'trophies' ? (isSRT ? 'bg-red-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'trophies' ? (isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
                     >
                         <Trophy className="w-3 h-3" /> Por Troféus
                     </button>
                     <button
                         onClick={() => setSortBy('level')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'level' ? (isSRT ? 'bg-red-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'level' ? (isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
                     >
                         <Star className="w-3 h-3" /> Por Nível
                     </button>
@@ -112,14 +112,14 @@ export default function RankingModal({ isOpen, onClose, isSRT }: RankingModalPro
                                         </td>
                                         <td className="py-3 px-4">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-full p-[1px] ${user.membershipType === 'SRT' ? 'bg-gradient-to-br from-red-600 to-black' : 'bg-gradient-to-br from-gold-400 to-gold-700'}`}>
+                                                <div className={`w-8 h-8 rounded-full p-[1px] ${user.membershipType === 'MGT' ? 'bg-gradient-to-br from-red-600 to-black' : 'bg-gradient-to-br from-gold-400 to-gold-700'}`}>
                                                     <img
                                                         src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}&background=000&color=fff`}
                                                         alt={user.name}
                                                         className="w-full h-full rounded-full object-cover border border-black"
                                                     />
                                                 </div>
-                                                <span className={`text-sm font-medium ${user.membershipType === 'SRT' ? 'text-red-100' : 'text-gold-100'}`}>
+                                                <span className={`text-sm font-medium ${user.membershipType === 'MGT' ? 'text-red-100' : 'text-gold-100'}`}>
                                                     {user.name}
                                                 </span>
                                             </div>

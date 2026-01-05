@@ -11,12 +11,12 @@ interface AchievementPopupProps {
 export default function AchievementPopup({ title, description, onClose }: AchievementPopupProps) {
     const [visible, setVisible] = useState(false);
     const { user, theme } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
-    const themeBorder = isSRT ? 'border-red-500/30' : 'border-gold-500/30';
-    const themeShadow = isSRT ? 'shadow-[0_0_30px_rgba(239,68,68,0.2)]' : 'shadow-[0_0_30px_rgba(212,175,55,0.2)]';
-    const themeIconBg = isSRT ? 'bg-gradient-to-br from-red-400 to-red-700' : 'bg-gradient-to-br from-gold-400 to-gold-700';
-    const themeText = isSRT ? 'text-red-500' : 'text-gold-500';
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeShadow = isMGT ? 'shadow-[0_0_30px_rgba(239,68,68,0.2)]' : 'shadow-[0_0_30px_rgba(212,175,55,0.2)]';
+    const themeIconBg = isMGT ? 'bg-gradient-to-br from-red-400 to-red-700' : 'bg-gradient-to-br from-gold-400 to-gold-700';
+    const themeText = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeBg = theme === 'light' ? 'bg-white/90' : 'bg-black/90';
     const themeTitle = theme === 'light' ? 'text-gray-900' : 'text-white';
 

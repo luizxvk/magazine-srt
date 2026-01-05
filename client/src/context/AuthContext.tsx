@@ -11,7 +11,7 @@ interface User {
     trophies: number;
     zions: number;
     level: number;
-    membershipType?: 'MAGAZINE' | 'SRT';
+    membershipType?: 'MAGAZINE' | 'MGT';
     avatarUrl?: string;
     displayName?: string;
     bio?: string;
@@ -26,10 +26,10 @@ export interface DailyLoginStatus {
 
 interface AuthContextType {
     user: User | null;
-    login: (token: string, user: User) => void;
+    login: (token: string, user: User, membershipContext?: 'MAGAZINE' | 'MGT') => void;
     updateUser: (user: User) => void;
     updateUserZions: (amount: number) => void;
-    loginAsVisitor: (membershipType?: 'MAGAZINE' | 'SRT') => void;
+    loginAsVisitor: (membershipType?: 'MAGAZINE' | 'MGT') => void;
     logout: () => void;
     isAuthenticated: boolean;
     loading: boolean;
@@ -39,6 +39,10 @@ interface AuthContextType {
     achievement: { title: string; description: string } | null;
     dailyLoginStatus: DailyLoginStatus | null;
     openDailyLoginModal: () => void;
+    // Zions Modal
+    isZionsModalOpen: boolean;
+    openZionsModal: () => void;
+    closeZionsModal: () => void;
     theme: 'dark' | 'light';
     toggleTheme: () => void;
 }
@@ -51,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [achievement, setAchievement] = useState<{ title: string; description: string } | null>(null);
     const [dailyLoginStatus, setDailyLoginStatus] = useState<DailyLoginStatus | null>(null);
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
+    const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
     const [theme, setTheme] = useState<'dark' | 'light'>(() => {
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
@@ -78,8 +83,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // 1. Load User
                     const userRes = await api.get('/users/me');
                     let userData = userRes.data;
-                    setUser(userData);
 
+                    // Override membership type if session context exists
+                    const sessionMembership = localStorage.getItem('sessionMembershipType');
+                    if (sessionMembership === 'MGT' || sessionMembership === 'MAGAZINE') {
+                        userData.membershipType = sessionMembership;
+                    }
+
+                    setUser(userData);
 
 
                     // 2. Check Daily Login Status
@@ -95,6 +106,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         }
                     } catch (loginError) {
                         console.error('Daily login status check failed', loginError);
+                        // Set fallback status to stop loading animation
+                        setDailyLoginStatus({
+                            claimed: true,
+                            streak: 0,
+                            nextReward: 0,
+                            rewards: []
+                        });
                     }
                 } catch (error) {
                     console.error('Failed to load user', error);
@@ -108,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []); // Removed theme dependency to avoid infinite loop, logic handled inside
 
     const toggleTheme = () => {
-        if (user?.membershipType === 'SRT') {
+        if (user?.membershipType === 'MGT') {
             setTheme(prev => prev === 'dark' ? 'light' : 'dark');
         }
     };
@@ -121,15 +139,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAchievement(null);
     };
 
-    const login = (token: string, userData: User) => {
+    const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {
         localStorage.setItem('token', token);
-        setUser(userData);
 
+        if (membershipContext) {
+            localStorage.setItem('sessionMembershipType', membershipContext);
+            userData.membershipType = membershipContext;
+        }
+
+        setUser(userData);
     };
 
     const updateUser = (userData: User) => {
         setUser(userData);
-
     };
 
     const updateUserZions = (amount: number) => {
@@ -138,7 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const loginAsVisitor = (membershipType: 'MAGAZINE' | 'SRT' = 'MAGAZINE') => {
+    const loginAsVisitor = (membershipType: 'MAGAZINE' | 'MGT' = 'MAGAZINE') => {
         setUser({
             id: 'visitor',
             name: 'Visitante',
@@ -173,6 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         localStorage.removeItem('token');
+        localStorage.removeItem('sessionMembershipType');
         setUser(null);
 
         // Force Dark Mode immediately and persist it
@@ -222,6 +245,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             achievement,
             dailyLoginStatus,
             openDailyLoginModal: () => setIsDailyLoginModalOpen(true),
+            isZionsModalOpen,
+            openZionsModal: () => setIsZionsModalOpen(true),
+            closeZionsModal: () => setIsZionsModalOpen(false),
             theme,
             toggleTheme
         }}>

@@ -30,7 +30,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                 particleCount: 100,
                 spread: 70,
                 origin: { y: 0.6 },
-                colors: user?.membershipType === 'SRT' ? ['#ef4444', '#b91c1c', '#ffffff'] : ['#eab308', '#a16207', '#ffffff']
+                colors: user?.membershipType === 'MGT' ? ['#ef4444', '#b91c1c', '#ffffff'] : ['#eab308', '#a16207', '#ffffff']
             });
         } catch (error) {
             console.error('Failed to claim', error);
@@ -39,13 +39,13 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
         }
     };
 
-    const isSRT = user?.membershipType === 'SRT';
-    const themeColor = isSRT ? 'text-red-500' : 'text-gold-500';
-    const themeBg = isSRT ? 'bg-red-500' : 'bg-gold-500';
-    const themeBorder = isSRT
+    const isMGT = user?.membershipType === 'MGT';
+    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const themeBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeBorder = isMGT
         ? (theme === 'light' ? 'border-red-500/30' : 'border-red-500/30')
         : (theme === 'light' ? 'border-gold-500/30' : 'border-gold-500/30');
-    const themeText = isSRT
+    const themeText = isMGT
         ? (theme === 'light' ? 'text-red-700' : 'text-red-200')
         : (theme === 'light' ? 'text-gold-700' : 'text-gold-200');
 
@@ -82,7 +82,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                         // Slide 0: Briefing / Welcome
                         <div className="w-full animate-fade-in">
                             <div className="text-center mb-6">
-                                <h2 className={`text-2xl font-serif ${textColor} mb-2`}>Bem-vindo à {isSRT ? 'SRT' : 'Magazine'}</h2>
+                                <h2 className={`text-2xl font-serif ${textColor} mb-2`}>Bem-vindo à {isMGT ? 'MGT' : 'Magazine'}</h2>
                                 <p className={`${subTextColor} text-sm`}>Explore o universo exclusivo da nossa comunidade.</p>
                             </div>
 
@@ -147,9 +147,9 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                                     let stateClass = theme === 'light' ? 'border-gray-200 bg-gray-100 text-gray-400' : 'border-white/10 bg-white/5 text-gray-500'; // Future
 
                                     if (isPast) {
-                                        stateClass = `${isSRT ? 'border-red-500/50 bg-red-500/10 text-red-400' : 'border-gold-500/50 bg-gold-500/10 text-gold-400'}`;
+                                        stateClass = `${isMGT ? 'border-emerald-500/50 bg-red-500/10 text-red-400' : 'border-gold-500/50 bg-gold-500/10 text-gold-400'}`;
                                     } else if (isToday) {
-                                        stateClass = `${isSRT ? 'border-red-500 bg-red-500/20 text-white shadow-[0_0_15px_rgba(220,20,60,0.3)]' : 'border-gold-500 bg-gold-500/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]'} scale-105 z-10`;
+                                        stateClass = `${isMGT ? 'border-emerald-500 bg-red-500/20 text-white shadow-[0_0_15px_rgba(220,20,60,0.3)]' : 'border-gold-500 bg-gold-500/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]'} scale-105 z-10`;
                                     }
 
                                     return (

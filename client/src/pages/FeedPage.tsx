@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import FeedItem from '../components/FeedItem';
 import CreatePostWidget from '../components/CreatePostWidget';
@@ -15,6 +16,8 @@ import DailyLoginCard from '../components/DailyLoginCard';
 import AnnouncementCard from '../components/AnnouncementCard';
 import StoriesBar from '../components/StoriesBar';
 import RecommendationsDrawer from '../components/RecommendationsDrawer';
+import NewMembersModal from '../components/NewMembersModal';
+import EventsModal from '../components/EventsModal';
 
 interface Post {
     id: string;
@@ -37,8 +40,8 @@ interface Post {
 
 export default function FeedPage() {
     const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser, theme } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
-    const themeTextGradient = isSRT
+    const isMGT = user?.membershipType === 'MGT';
+    const themeTextGradient = isMGT
         ? (theme === 'light' ? 'from-gray-800 via-gray-600 to-gray-800' : 'from-white via-gray-200 to-gray-100')
         : 'from-gold-200 via-gold-400 to-gold-200';
 
@@ -53,6 +56,10 @@ export default function FeedPage() {
     });
     const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
     const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
+
+    // New Modal States
+    const [isNewMembersOpen, setIsNewMembersOpen] = useState(false);
+    const [isEventsOpen, setIsEventsOpen] = useState(false);
 
     const fetchPosts = async (silent = false) => {
         try {
@@ -158,12 +165,12 @@ export default function FeedPage() {
     const highlightedPosts = posts.filter(post => post.isHighlight);
     const regularPosts = posts.filter(post => !post.isHighlight);
 
-    const themeIconColor = isSRT ? 'text-red-500' : 'text-gold-400';
-    const themeIconBg = isSRT ? 'bg-red-500/10' : 'bg-gold-500/10';
+    const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
 
-    const themeTextHover = isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
-    const themeTitleColor = isSRT ? 'text-white' : 'text-gold-400';
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
+    const themeTextHover = isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
+    const themeTitleColor = isMGT ? 'text-white' : 'text-gold-400';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
 
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
@@ -182,6 +189,16 @@ export default function FeedPage() {
                 onClose={() => setActiveCommentPostId(null)}
                 postId={activeCommentPostId || ''}
                 onCommentAdded={fetchPosts}
+            />
+
+            <NewMembersModal
+                isOpen={isNewMembersOpen}
+                onClose={() => setIsNewMembersOpen(false)}
+            />
+
+            <EventsModal
+                isOpen={isEventsOpen}
+                onClose={() => setIsEventsOpen(false)}
             />
 
             <ConfirmModal
@@ -210,7 +227,7 @@ export default function FeedPage() {
                             Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
                         </h1>
                         <p className="text-gray-400 text-lg font-light tracking-wide">
-                            {isSRT ? 'Seu feed exclusivo do Street Runner Team' : 'Seu feed exclusivo do Magazine'}
+                            {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
                         </p>
                     </div>
 
@@ -247,7 +264,7 @@ export default function FeedPage() {
 
                             {posts.length === 0 ? (
                                 <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
-                                    <Sparkles className={`w-12 h-12 ${isSRT ? 'text-red-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
+                                    <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
                                     <p className="text-gray-400 font-serif text-xl">Nenhuma postagem no momento</p>
                                     <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
                                 </div>
@@ -281,52 +298,76 @@ export default function FeedPage() {
 
                 {/* Right Sidebar (Desktop Only) */}
                 <aside className="hidden lg:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
+                    {/* Daily Login Card */}
+                    <div className="mb-10">
+                        <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+                    </div>
+
                     {/* SRT LOG Promotion Card - Featured at Top */}
                     <div className="mb-8 transform hover:scale-105 transition-transform duration-500">
                         <AnnouncementCard />
                     </div>
 
-                    <h3 className={`${themeTitleColor} font-serif text-xl mb-4 border-b ${themeBorder} pb-2`}>
-                        {isSRT ? 'Recomendações SRT' : 'Recomendações Magazine'}
-                    </h3>
-
-                    {/* Daily Login Card */}
-                    <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
-
-                    {/* Recommendation Cards */}
-                    <div className={`glass-panel rounded-xl p-4 border ${isSRT ? 'border-red-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                <Sparkles className="w-5 h-5" />
+                    {/* Photo Catalog Link */}
+                    <Link to="/catalog">
+                        <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'border-gold-500/20 hover:border-gold-500/50'} transition-all duration-300 group cursor-pointer mb-6 relative overflow-hidden`}>
+                            <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />
+                            <div className="flex items-center gap-3 mb-2 relative z-10">
+                                <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
+                                    <Sparkles className="w-5 h-5" />
+                                </div>
+                                <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Catálogo de Fotos</h4>
                             </div>
-                            <h4 className={`font-medium text-white ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Destaques da Semana</h4>
+                            <p className="text-sm text-gray-400 leading-relaxed relative z-10">
+                                Explore a galeria exclusiva e baixe fotos em alta resolução.
+                            </p>
                         </div>
-                        <p className="text-sm text-gray-400 leading-relaxed">
-                            Confira os posts mais curtidos e comentados pelos membros da elite.
-                        </p>
-                    </div>
+                    </Link>
 
-                    <div className={`glass-panel rounded-xl p-4 border ${isSRT ? 'border-red-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                    {/* Highlights Link */}
+                    <Link to="/highlights">
+                        <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
+                                    <Sparkles className="w-5 h-5" />
+                                </div>
+                                <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Destaques da Semana</h4>
+                            </div>
+                            <p className="text-sm text-gray-400 leading-relaxed">
+                                Confira os posts mais curtidos e comentados pelos membros da elite.
+                            </p>
+                        </div>
+                    </Link>
+
+                    {/* New Members Button */}
+                    <div
+                        onClick={() => setIsNewMembersOpen(true)}
+                        className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
+                    >
                         <div className="flex items-center gap-3 mb-2">
                             <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                 <Users className="w-5 h-5" />
                             </div>
-                            <h4 className={`font-medium text-white ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Novos Membros</h4>
+                            <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Novos Membros</h4>
                         </div>
                         <p className="text-sm text-gray-400 leading-relaxed">
                             Dê as boas-vindas aos novos integrantes da nossa comunidade exclusiva.
                         </p>
                     </div>
 
-                    <div className={`glass-panel rounded-xl p-4 border ${isSRT ? 'border-red-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                    {/* Events Button */}
+                    <div
+                        onClick={() => setIsEventsOpen(true)}
+                        className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
+                    >
                         <div className="flex items-center gap-3 mb-2">
                             <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                 <Calendar className="w-5 h-5" />
                             </div>
-                            <h4 className={`font-medium text-white ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Eventos Exclusivos</h4>
+                            <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Eventos Exclusivos</h4>
                         </div>
                         <p className="text-sm text-gray-400 leading-relaxed">
-                            Fique por dentro dos próximos encontros e experiências {isSRT ? 'SRT' : 'Magazine'}.
+                            Fique por dentro dos próximos encontros e experiências {isMGT ? 'MGT' : 'Magazine'}.
                         </p>
                     </div>
                 </aside>

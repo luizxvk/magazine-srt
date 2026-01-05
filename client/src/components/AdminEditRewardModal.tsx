@@ -88,7 +88,7 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                     <h2 className="text-xl font-serif text-white flex items-center gap-2">
                         <Edit2 className="w-5 h-5 text-gold-400" /> Editar Recompensa
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={onClose} aria-label="Fechar modal" className="text-gray-400 hover:text-white transition-colors">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
@@ -140,7 +140,7 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                                             <input type="file" className="hidden" accept="image/*" onChange={handleImageSelect} />
                                         </label>
                                         {imageUrl && (
-                                            <button onClick={() => setImageUrl('')} className="p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20">
+                                            <button onClick={() => setImageUrl('')} aria-label="Remover imagem" className="p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20">
                                                 <X className="w-4 h-4" />
                                             </button>
                                         )}

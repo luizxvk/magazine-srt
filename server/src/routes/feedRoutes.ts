@@ -5,6 +5,7 @@ import { authenticateToken, authenticateTokenOptional } from '../middleware/auth
 const router = Router();
 
 router.get('/', authenticateTokenOptional, feedController.getFeed);
+router.get('/highlights', authenticateTokenOptional, feedController.getHighlights); // Added this
 router.post('/', authenticateToken, feedController.createPost);
 router.post('/:id/like', authenticateToken, feedController.likePost);
 router.post('/:id/comment', authenticateToken, feedController.commentPost);

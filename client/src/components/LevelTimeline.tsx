@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Star, Crown, Gift } from 'lucide-react';
+import { Trophy, Star, Crown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface LevelTimelineProps {
@@ -12,34 +12,34 @@ const LEVELS = Array.from({ length: 30 }, (_, i) => i + 1);
 
 const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
     const { user, theme } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
     // Theme Colors
-    const themeProgressGradient = isSRT
-        ? 'from-red-600 via-red-500 to-red-400'
+    const themeProgressGradient = isMGT
+        ? 'from-emerald-600 via-emerald-500 to-emerald-400'
         : 'from-yellow-600 via-yellow-400 to-yellow-200';
 
-    const themeShadow = isSRT
-        ? 'shadow-[0_0_15px_rgba(220,20,60,0.3)]'
+    const themeShadow = isMGT
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.3)]'
         : 'shadow-[0_0_15px_rgba(234,179,8,0.3)]';
 
-    const themeNodeReached = isSRT
-        ? 'bg-gradient-to-br from-red-500 to-red-700 border-red-400 text-white shadow-[0_0_15px_rgba(220,20,60,0.4)]'
+    const themeNodeReached = isMGT
+        ? 'bg-gradient-to-br from-emerald-500 to-emerald-700 border-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]'
         : 'bg-gradient-to-br from-yellow-400 to-yellow-600 border-yellow-300 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]';
 
     const themeNodeUnreached = theme === 'light'
         ? 'bg-gray-200 border-gray-300 text-gray-400'
         : 'bg-gray-900 border-gray-700 text-gray-500';
 
-    const themeRewardIconReached = isSRT
-        ? 'bg-red-500/20 text-red-500 shadow-[0_0_10px_rgba(220,20,60,0.2)]'
+    const themeRewardIconReached = isMGT
+        ? 'bg-emerald-500/20 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
         : 'bg-yellow-500/20 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.2)]';
 
     const themeRewardIconUnreached = theme === 'light'
         ? 'bg-gray-200 text-gray-400'
         : 'bg-gray-800/50 text-gray-600';
 
-    const themeTextReached = isSRT ? 'text-red-500' : 'text-yellow-400';
+    const themeTextReached = isMGT ? 'text-emerald-500' : 'text-yellow-400';
     const themeTextUnreached = theme === 'light' ? 'text-gray-400' : 'text-gray-600';
 
     const getLevelReward = (level: number) => {
@@ -73,28 +73,48 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                 const isReached = level <= currentLevel;
                                 const isCurrent = level === currentLevel;
                                 const reward = getLevelReward(level);
-                                const RewardIcon = reward?.icon;
 
                                 return (
                                     <div key={level} className="relative flex flex-col items-center group">
                                         {/* Reward Indicator - Positioned higher and with more space */}
-                                        {reward && (
-                                            <div className="absolute -top-14 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
-                                                <div className={`p-2 rounded-full mb-1 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
-                                                    <RewardIcon size={16} />
+                                        {reward && (() => {
+                                            const Icon = reward.icon;
+                                            return (
+                                                <div className="absolute -top-14 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
+                                                    <div className={`p-2 rounded-full mb-1 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
+                                                        <Icon size={16} />
+                                                    </div>
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
+                                                        {reward.label}
+                                                    </span>
+
+                                                    {/* Tooltip for Reward - Visible on Group Hover - Positioned BELOW */}
+                                                    <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[60]">
+                                                        <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/90 border-white/20 text-gray-200'} border rounded-lg px-4 py-3 text-xs shadow-xl backdrop-blur-md min-w-[180px] relative`}>
+                                                            <div className="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 -rotate-45 border-t border-r border-white/20 bg-black/90 layer-50" />
+                                                            <div className="font-bold flex items-center gap-2 mb-2 border-b border-white/10 pb-2">
+                                                                <Icon className="w-4 h-4 text-gold-500" />
+                                                                <span className="uppercase tracking-wider">{reward.label}</span>
+                                                            </div>
+                                                            <div className="space-y-1 text-[11px] opacity-90">
+                                                                <p>• Nova Insígnia Exclusiva</p>
+                                                                <p>• Bônus de {level * 10} Zions</p>
+                                                                {level >= 15 && <p>• Foto de Perfil GIF</p>}
+                                                                {level >= 20 && <p>• Acesso VIP Eventos</p>}
+                                                                {level >= 25 && <p>• Suporte Prioritário</p>}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <span className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
-                                                    {reward.label}
-                                                </span>
-                                            </div>
-                                        )}
+                                            );
+                                        })()}
 
                                         {/* Level Node */}
                                         <motion.div
                                             className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isReached
                                                 ? themeNodeReached
                                                 : themeNodeUnreached
-                                                } ${isCurrent ? `scale-125 ring-4 ${isSRT ? 'ring-red-500/30' : 'ring-yellow-500/30'} z-30` : 'z-20'}`}
+                                                } ${isCurrent ? `scale-125 ring-4 ${isMGT ? 'ring-emerald-500/30' : 'ring-yellow-500/30'} z-30` : 'z-20'}`}
                                             initial={false}
                                             animate={{ scale: isCurrent ? 1.2 : 1 }}
                                             whileHover={{ scale: 1.1 }}

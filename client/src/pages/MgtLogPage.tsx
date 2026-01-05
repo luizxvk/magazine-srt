@@ -8,7 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 // Initialize Mercado Pago
-initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY || '', { locale: 'pt-BR' });
+const mpKey = import.meta.env.VITE_MP_PUBLIC_KEY;
+if (mpKey) {
+    initMercadoPago(mpKey, { locale: 'pt-BR' });
+} else {
+    console.warn('Mercado Pago public key not found');
+}
 
 interface Plan {
     id: string;
@@ -35,7 +40,7 @@ interface PageContent {
 const defaultPlans: Plan[] = [
     {
         id: 'stock',
-        name: 'SRT LOG Stock',
+        name: 'MGT LOG Stock',
         price: 5,
         displayPrice: 'R$ 5',
         period: '/mês',
@@ -46,7 +51,7 @@ const defaultPlans: Plan[] = [
     },
     {
         id: 'signature',
-        name: 'SRT LOG Signature',
+        name: 'MGT LOG Signature',
         price: 15,
         displayPrice: 'R$ 15',
         period: '/mês',
@@ -57,44 +62,44 @@ const defaultPlans: Plan[] = [
     },
     {
         id: 'plotted',
-        name: 'SRT LOG Plotted',
+        name: 'MGT LOG Plotted',
         price: 10,
         displayPrice: 'R$ 10',
         period: '/mês',
-        description: 'Carros personalizados, com identidade SRT.',
+        description: 'Carros personalizados, com identidade MGT.',
         features: ['4 carros por mês', '1 todo sábado', 'Personalização exclusiva', 'Acesso à coleção custom'],
         highlight: false,
         iconName: 'Zap'
     }
 ];
 
-export default function SrtLogPage() {
+export default function MgtLogPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
     const isAdmin = user?.role === 'ADMIN';
     const [loading, setLoading] = useState<string | null>(null);
 
-    // Theme Colors
-    const themeAccent = isSRT ? 'text-red-500' : 'text-gold-500';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
-    const themeBorder = isSRT ? 'border-red-500/30' : 'border-gold-500/30';
-    const themeGlow = isSRT ? 'shadow-red-500/20' : 'shadow-gold-500/20';
+    // Theme Colors (emerald for MGT, gold for Magazine)
+    const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeGlow = isMGT ? 'shadow-emerald-500/20' : 'shadow-gold-500/20';
 
     const [pageContent, setPageContent] = useState<PageContent>({
         tag: 'Nova Assinatura Premium',
         heroTitle: 'Anunciamos a',
         heroDescription: 'Nem todo carro criado é igual. Alguns carregam um nome.\nEscolha seu plano e defina seu legado na elite.',
-        logoUrl: '/assets/srt-log-logo.png',
+        logoUrl: '/assets/mgt-log-logo.png',
         plans: defaultPlans,
         footerText: '* A disponibilidade de modelos pode variar conforme cada atualização.',
-        footerSubText: 'Disponível em breve para membros SRT. Assine e receba acesso prioritário à nova coleção.'
+        footerSubText: 'Disponível em breve para membros MGT. Assine e receba acesso prioritário à nova coleção.'
     });
 
     useEffect(() => {
         const fetchContent = async () => {
             try {
-                const response = await api.get('/content/srt-log-page');
+                const response = await api.get('/content/mgt-log-page');
                 if (response.data) {
                     const mergedContent = { ...pageContent, ...response.data };
                     if (!mergedContent.plans || mergedContent.plans.length === 0) {
@@ -149,8 +154,8 @@ export default function SrtLogPage() {
 
             {isAdmin && (
                 <button
-                    onClick={() => navigate('/admin/edit-srt-log')}
-                    className="fixed bottom-6 right-6 z-50 p-4 bg-red-600 rounded-full shadow-lg hover:bg-red-500 transition-all hover:scale-110"
+                    onClick={() => navigate('/admin/edit-mgt-log')}
+                    className="fixed bottom-6 right-6 z-50 p-4 bg-emerald-600 rounded-full shadow-lg hover:bg-emerald-500 transition-all hover:scale-110"
                     title="Editar Página"
                 >
                     <Edit2 className="w-6 h-6 text-white" />
@@ -170,10 +175,10 @@ export default function SrtLogPage() {
                     <h1 className="text-5xl md:text-7xl font-serif mb-6 leading-tight flex flex-col items-center">
                         {pageContent.heroTitle} <br />
                         <div className="relative mt-0 group">
-                            <div className={`absolute inset-0 ${isSRT ? 'bg-red-600' : 'bg-gold-500'} blur-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 rounded-full`} />
+                            <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-600' : 'bg-gold-500'} blur-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 rounded-full`} />
                             <img
                                 src={pageContent.logoUrl}
-                                alt="SRT LOG"
+                                alt="MGT LOG"
                                 className="h-48 md:h-64 w-auto relative z-10 drop-shadow-2xl invert brightness-0"
                             />
                         </div>

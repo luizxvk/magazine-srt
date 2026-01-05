@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Terminal, Activity, RefreshCw, Pause, Play, Trash2, Filter } from 'lucide-react';
+import { Terminal, RefreshCw, Pause, Play, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 import Header from '../../components/Header';
 import LuxuriousBackground from '../../components/LuxuriousBackground';
@@ -126,12 +126,14 @@ export default function DevToolsPage() {
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setAutoRefresh(!autoRefresh)}
+                                    aria-label={autoRefresh ? 'Pausar atualização' : 'Retomar atualização'}
                                     className="p-1.5 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                                 >
                                     {autoRefresh ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                                 </button>
                                 <button
                                     onClick={fetchLogs}
+                                    aria-label="Atualizar logs"
                                     className="p-1.5 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />

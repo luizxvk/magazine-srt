@@ -10,7 +10,7 @@ interface ChangePasswordModalProps {
 
 export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProps) {
     const { user } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -60,16 +60,16 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
         }
     };
 
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
-    const themeFocus = isSRT ? 'focus:border-red-500/50' : 'focus:border-gold-500/50';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeFocus = isMGT ? 'focus:border-red-500/50' : 'focus:border-gold-500/50';
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
             <div className={`relative w-full max-w-md glass-panel border ${themeBorder} rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up`}>
-                <div className={`p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r ${isSRT ? 'from-red-900/10' : 'from-gold-900/10'} to-transparent`}>
-                    <h2 className={`text-xl font-serif ${isSRT ? 'text-red-100' : 'text-gold-100'} flex items-center gap-2`}>
+                <div className={`p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r ${isMGT ? 'from-red-900/10' : 'from-gold-900/10'} to-transparent`}>
+                    <h2 className={`text-xl font-serif ${isMGT ? 'text-emerald-100' : 'text-gold-100'} flex items-center gap-2`}>
                         <Lock className="w-5 h-5" /> Alterar Senha
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" title="Fechar" aria-label="Fechar modal de alteração de senha">

@@ -20,18 +20,18 @@ export default function NotificationsPage() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
-    const themeGradient = isSRT ? 'from-red-400 via-white to-red-400' : 'from-gold-200 via-gold-400 to-gold-200';
-    const themeText = isSRT ? 'text-red-400' : 'text-gold-400';
-    const themeBg = isSRT ? 'bg-red-500/10' : 'bg-gold-500/10';
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
-    const themeHoverBorder = isSRT ? 'hover:border-red-500/30' : 'hover:border-gold-500/30';
-    const themeShadow = isSRT ? 'shadow-[0_0_15px_rgba(220,20,60,0.1)]' : 'shadow-[0_0_15px_rgba(212,175,55,0.1)]';
-    const themeIconBg = isSRT ? 'bg-red-500/20' : 'bg-gold-500/20';
-    const themeDot = isSRT ? 'bg-red-500 shadow-[0_0_10px_#DC143C]' : 'bg-gold-500 shadow-[0_0_10px_#D4AF37]';
-    const themeLoading = isSRT ? 'text-red-500/50' : 'text-gold-500/50';
-    const themeEmptyIcon = isSRT ? 'text-red-500/30' : 'text-gold-500/30';
+    const themeGradient = isMGT ? 'from-red-400 via-white to-red-400' : 'from-gold-200 via-gold-400 to-gold-200';
+    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeHoverBorder = isMGT ? 'hover:border-red-500/30' : 'hover:border-gold-500/30';
+    const themeShadow = isMGT ? 'shadow-[0_0_15px_rgba(220,20,60,0.1)]' : 'shadow-[0_0_15px_rgba(212,175,55,0.1)]';
+    const themeIconBg = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
+    const themeDot = isMGT ? 'bg-emerald-500 shadow-[0_0_10px_#DC143C]' : 'bg-gold-500 shadow-[0_0_10px_#D4AF37]';
+    const themeLoading = isMGT ? 'text-emerald-500/50' : 'text-gold-500/50';
+    const themeEmptyIcon = isMGT ? 'text-emerald-500/30' : 'text-gold-500/30';
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -184,7 +184,7 @@ export default function NotificationsPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className={`text-lg leading-snug mb-1 ${!notification.read ? 'text-white' : 'text-gray-300'}`}>
-                                            {hasActor && <span className={`font-bold ${isSRT ? 'text-white' : 'text-gold-400'}`}>{parsedContent.actor.name} </span>}
+                                            {hasActor && <span className={`font-bold ${isMGT ? 'text-white' : 'text-gold-400'}`}>{parsedContent.actor.name} </span>}
                                             {parsedContent.text}
                                         </p>
                                         <p className="text-xs text-gray-500 font-medium tracking-wider uppercase flex items-center gap-2">

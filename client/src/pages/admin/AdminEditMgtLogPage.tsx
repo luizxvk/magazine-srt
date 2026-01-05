@@ -71,7 +71,7 @@ export default function AdminEditSrtLogPage() {
         tag: 'Nova Assinatura Premium',
         heroTitle: 'Anunciamos a',
         heroDescription: 'Nem todo carro criado é igual. Alguns carregam um nome.\nEscolha seu plano e defina seu legado na elite.',
-        logoUrl: '/assets/srt-log-logo.png',
+        logoUrl: '/assets/mgt-log-logo.png',
         plans: defaultPlans,
         footerText: '* A disponibilidade de modelos pode variar conforme cada atualização.',
         footerSubText: 'Disponível em breve para membros SRT. Assine e receba acesso prioritário à nova coleção.'
@@ -83,7 +83,7 @@ export default function AdminEditSrtLogPage() {
 
     const fetchContent = async () => {
         try {
-            const response = await api.get('/content/srt-log-page');
+            const response = await api.get('/content/mgt-log-page');
             if (response.data) {
                 // Ensure plans exist, merge with default if missing
                 const mergedContent = { ...content, ...response.data };
@@ -102,7 +102,7 @@ export default function AdminEditSrtLogPage() {
     const handleSave = async () => {
         setSaving(true);
         try {
-            await api.post('/content/srt-log-page', content); // Using POST/PUT handled by controller
+            await api.post('/content/mgt-log-page', content); // Using POST/PUT handled by controller
             alert('Alterações salvas com sucesso!');
         } catch (error) {
             console.error('Failed to save content', error);
@@ -133,7 +133,7 @@ export default function AdminEditSrtLogPage() {
             <main className="pt-32 pb-20 px-4 max-w-5xl mx-auto relative z-10">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate('/admin')} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <button onClick={() => navigate('/admin')} aria-label="Voltar para Admin" className="p-2 hover:bg-white/10 rounded-full transition-colors">
                             <ArrowLeft className="w-6 h-6 text-gold-400" />
                         </button>
                         <h1 className="text-3xl font-serif font-bold text-white">Editar Página SRT Log</h1>

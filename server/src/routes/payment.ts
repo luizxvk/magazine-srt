@@ -25,9 +25,9 @@ router.post('/create-preference', async (req, res) => {
                     }
                 ],
                 back_urls: {
-                    success: `${process.env.CLIENT_URL || 'http://localhost:5173'}/srt-log?status=success`,
-                    failure: `${process.env.CLIENT_URL || 'http://localhost:5173'}/srt-log?status=failure`,
-                    pending: `${process.env.CLIENT_URL || 'http://localhost:5173'}/srt-log?status=pending`
+                    success: `${process.env.CLIENT_URL || 'http://localhost:5173'}/mgt-log?status=success`,
+                    failure: `${process.env.CLIENT_URL || 'http://localhost:5173'}/mgt-log?status=failure`,
+                    pending: `${process.env.CLIENT_URL || 'http://localhost:5173'}/mgt-log?status=pending`
                 },
                 auto_return: 'approved',
             }

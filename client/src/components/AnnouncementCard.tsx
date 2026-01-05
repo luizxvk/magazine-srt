@@ -3,7 +3,7 @@ import { ArrowRight, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import SrtLogCard from './SrtLogCard';
+import MgtLogCard from './MgtLogCard'; // Updated to correct component name
 
 interface Announcement {
     id: string;
@@ -20,7 +20,7 @@ interface Announcement {
 export default function AnnouncementCard() {
     const { user, theme } = useAuth();
     const navigate = useNavigate();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
     const [announcement, setAnnouncement] = useState<Announcement | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -39,22 +39,22 @@ export default function AnnouncementCard() {
     }, []);
 
     // Loading state removed as per user request
-    if (!announcement && !loading) return <SrtLogCard />;
+    if (!announcement && !loading) return <MgtLogCard />;
     if (!announcement) return null; // Fail safe
-    if (!announcement) return <SrtLogCard />;
+    if (!announcement) return <MgtLogCard />;
 
     // Theme Colors
-    const themeBorder = isSRT
-        ? (theme === 'light' ? 'border-red-500/20' : 'border-red-500/50')
+    const themeBorder = isMGT
+        ? (theme === 'light' ? 'border-emerald-500/20' : 'border-emerald-500/50')
         : 'border-gold-500/50';
-    const themeGlow = isSRT
-        ? 'shadow-[0_0_30px_rgba(220,20,60,0.4)] hover:shadow-[0_0_50px_rgba(220,20,60,0.6)]'
+    const themeGlow = isMGT
+        ? 'shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)]'
         : 'shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:shadow-[0_0_50px_rgba(212,175,55,0.6)]';
-    const themeText = isSRT ? 'text-red-100' : 'text-gold-100';
-    const themeAccent = isSRT ? 'text-red-500' : 'text-gold-500';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
-    const themeGradient = isSRT
-        ? (theme === 'light' ? 'bg-gradient-to-br from-red-900/40 via-gray-900 to-black' : 'bg-gradient-to-br from-red-900/60 via-black to-black')
+    const themeText = isMGT ? 'text-emerald-100' : 'text-gold-100';
+    const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeGradient = isMGT
+        ? (theme === 'light' ? 'bg-gradient-to-br from-emerald-900/40 via-gray-900 to-black' : 'bg-gradient-to-br from-emerald-900/60 via-black to-black')
         : 'bg-gradient-to-br from-gold-900/60 via-black to-black';
 
     return (
@@ -82,7 +82,7 @@ export default function AnnouncementCard() {
 
                 {/* Badge Tag - Absolute Top Center */}
                 <div className={`absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 backdrop-blur-md border border-white/20 ${themeText} shadow-lg whitespace-nowrap z-20 flex items-center justify-center gap-2`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_#ef4444] shrink-0" />
+                    <span className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'} animate-pulse shrink-0`} />
                     <span className="mt-[1px]">{announcement.tag}</span>
                 </div>
 
@@ -96,7 +96,7 @@ export default function AnnouncementCard() {
                 <h3 className={`text-2xl md:text-3xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-3 leading-none drop-shadow-lg flex flex-col items-center w-full transition-all duration-300`}>
                     {announcement.title} <br />
                     <div className="relative mt-4 group w-full flex justify-center">
-                        <div className={`absolute inset-0 ${isSRT ? 'bg-red-600' : 'bg-gold-500'} blur-[30px] opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full`} />
+                        <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-600' : 'bg-gold-500'} blur-[30px] opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full`} />
                         <img
                             src={announcement.logoUrl}
                             alt="Logo"

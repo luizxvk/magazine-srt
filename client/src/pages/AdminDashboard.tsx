@@ -39,7 +39,7 @@ interface User {
     createdAt: string;
     trophies: number;
     level?: number;
-    membershipType?: 'MAGAZINE' | 'SRT';
+    membershipType?: 'MAGAZINE' | 'MGT';
 }
 
 export default function AdminDashboard() {
@@ -157,8 +157,8 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleToggleMembership = async (userId: string, currentType: 'MAGAZINE' | 'SRT' | undefined) => {
-        const newType = currentType === 'SRT' ? 'MAGAZINE' : 'SRT';
+    const handleToggleMembership = async (userId: string, currentType: 'MAGAZINE' | 'MGT' | undefined) => {
+        const newType = currentType === 'MGT' ? 'MAGAZINE' : 'MGT';
         try {
             await api.put(`/users/${userId}/membership`, { membershipType: newType });
             setUsersList(usersList.map(u => u.id === userId ? { ...u, membershipType: newType } : u));
@@ -237,6 +237,53 @@ export default function AdminDashboard() {
                                                 } catch (error) {
                                                     console.error('Failed to update trophies', error);
                                                     showToast('Erro ao atualizar troféus. Verifique se você tem permissão.', 'error');
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-xs text-gray-400 mb-1">Meu Nível (1-30)</label>
+                                    <input
+                                        type="number"
+                                        defaultValue={user?.level || 1}
+                                        min="1"
+                                        max="30"
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
+                                        aria-label="Editar meu nível"
+                                        onBlur={async (e) => {
+                                            const newLevel = parseInt(e.target.value);
+                                            if (!isNaN(newLevel) && newLevel >= 1 && newLevel <= 30) {
+                                                try {
+                                                    await api.put('/users/me', { level: newLevel });
+                                                    showToast('Nível atualizado!', 'success');
+                                                    window.location.reload();
+                                                } catch (error) {
+                                                    console.error('Failed to update level', error);
+                                                    showToast('Erro ao atualizar nível.', 'error');
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-xs text-gray-400 mb-1">Meus Zions</label>
+                                    <input
+                                        type="number"
+                                        defaultValue={user?.zions || 0}
+                                        min="0"
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
+                                        aria-label="Editar meus zions"
+                                        onBlur={async (e) => {
+                                            const newZions = parseInt(e.target.value);
+                                            if (!isNaN(newZions) && newZions >= 0) {
+                                                try {
+                                                    await api.put('/users/me', { zions: newZions });
+                                                    showToast('Zions atualizados!', 'success');
+                                                    window.location.reload();
+                                                } catch (error) {
+                                                    console.error('Failed to update zions', error);
+                                                    showToast('Erro ao atualizar zions.', 'error');
                                                 }
                                             }
                                         }}
@@ -362,7 +409,7 @@ export default function AdminDashboard() {
                                         <td className="p-3">
                                             <button
                                                 onClick={() => handleToggleMembership(u.id, u.membershipType)}
-                                                className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${u.membershipType === 'SRT'
+                                                className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${u.membershipType === 'MGT'
                                                     ? 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'
                                                     : 'bg-gold-500/20 text-gold-400 border-gold-500/30 hover:bg-gold-500/30'
                                                     }`}

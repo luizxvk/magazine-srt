@@ -11,7 +11,7 @@ const registerSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
     name: z.string().min(2),
-    membershipType: z.enum(['MAGAZINE', 'SRT']).optional(),
+    membershipType: z.enum(['MAGAZINE', 'MGT']).optional(),
 });
 
 const loginSchema = z.object({

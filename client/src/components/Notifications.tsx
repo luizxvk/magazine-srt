@@ -16,14 +16,14 @@ export default function Notifications() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const navigate = useNavigate();
     const { user, theme } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
-    const themeText = isSRT ? 'text-red-400' : 'text-gold-400';
-    const themeBg = isSRT
+    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeBg = isMGT
         ? (theme === 'light' ? 'bg-red-500/10' : 'bg-red-500/5')
         : (theme === 'light' ? 'bg-gold-500/10' : 'bg-gold-500/5');
-    const themeDot = isSRT ? 'bg-red-500' : 'bg-gold-500';
-    const themeIcon = isSRT ? 'text-red-400' : 'text-gold-400';
+    const themeDot = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeIcon = isMGT ? 'text-emerald-400' : 'text-gold-400';
 
     // Container Styles
     const containerStyle = theme === 'light'
@@ -140,7 +140,7 @@ export default function Notifications() {
                                 </div>
                                 <div>
                                     <p className={`text-sm leading-tight mb-1 ${contentColor}`}>
-                                        {hasActor && <span className={`font-bold ${isSRT ? 'text-white' : 'text-gold-400'}`}>{parsedContent.actor.name} </span>}
+                                        {hasActor && <span className={`font-bold ${isMGT ? 'text-white' : 'text-gold-400'}`}>{parsedContent.actor.name} </span>}
                                         {parsedContent.text}
                                     </p>
                                     <p className={`text-[10px] ${timeColor}`}>{getTimeAgo(notification.createdAt)}</p>

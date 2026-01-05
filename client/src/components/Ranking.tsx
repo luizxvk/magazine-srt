@@ -14,11 +14,11 @@ interface RankedUser {
 export default function Ranking() {
     const [users, setUsers] = useState<RankedUser[]>([]);
     const { user } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
-    const themeColor = isSRT ? 'text-red-500' : 'text-gold-400';
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
-    const themeBg = isSRT ? 'bg-red-500/10' : 'bg-gold-500/10';
+    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -50,15 +50,15 @@ export default function Ranking() {
                                 <span className={`text-lg font-bold w-6 text-center ${index < 3 ? themeColor : 'text-gray-500'}`}>
                                     {index + 1}
                                 </span>
-                                <div className={`w-10 h-10 rounded-full ${themeBg} border ${isSRT ? 'border-red-500/30' : 'border-gold-500/30'} overflow-hidden flex items-center justify-center`}>
+                                <div className={`w-10 h-10 rounded-full ${themeBg} border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} overflow-hidden flex items-center justify-center`}>
                                     {user.avatarUrl ? (
                                         <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <User className={`w-5 h-5 ${isSRT ? 'text-red-500/50' : 'text-gold-500/50'}`} />
+                                        <User className={`w-5 h-5 ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`} />
                                     )}
                                 </div>
                                 <div>
-                                    <p className={`text-white font-medium text-sm group-hover:${isSRT ? 'text-red-300' : 'text-gold-300'} transition-colors`}>{user.name}</p>
+                                    <p className={`text-white font-medium text-sm group-hover:${isMGT ? 'text-emerald-300' : 'text-gold-300'} transition-colors`}>{user.name}</p>
                                     <p className="text-xs text-gray-500 uppercase tracking-wider">{user.points} Troféus</p>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@ export default function Ranking() {
 
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className={`w-full py-3 rounded-xl border ${isSRT ? 'border-red-500/20 hover:bg-red-500/10 text-red-400' : 'border-gold-500/20 hover:bg-gold-500/10 text-gold-400'} transition-colors text-xs font-bold uppercase tracking-widest`}
+                    className={`w-full py-3 rounded-xl border ${isMGT ? 'border-emerald-500/20 hover:bg-emerald-500/10 text-emerald-400' : 'border-gold-500/20 hover:bg-gold-500/10 text-gold-400'} transition-colors text-xs font-bold uppercase tracking-widest`}
                 >
                     Ver Ranking Completo
                 </button>
@@ -77,7 +77,7 @@ export default function Ranking() {
             <RankingModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                isSRT={isSRT}
+                isMGT={isMGT}
             />
         </>
     );

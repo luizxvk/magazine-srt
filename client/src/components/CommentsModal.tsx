@@ -22,17 +22,17 @@ interface CommentsModalProps {
 
 export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded }: CommentsModalProps) {
     const { user, showAchievement, updateUserZions, theme } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
-    const themeBorder = isSRT
+    const themeBorder = isMGT
         ? (theme === 'light' ? 'border-red-200' : 'border-red-500/20')
         : (theme === 'light' ? 'border-gold-200' : 'border-gold-500/20');
-    const themeText = isSRT ? 'text-red-500' : 'text-gold-400';
+    const themeText = isMGT ? 'text-emerald-500' : 'text-gold-400';
     const themeTextSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
     const themeInputBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
     const themeInputText = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const themeButton = isSRT ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
+    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
     const themeCommentBg = theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5';
 
     const [comments, setComments] = useState<Comment[]>([]);
@@ -121,7 +121,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                     ) : (
                         comments.map((comment) => (
                             <div key={comment.id} className="flex gap-3">
-                                <div className={`w-8 h-8 rounded-full ${isSRT ? 'bg-red-500/10' : 'bg-gold-500/10'} overflow-hidden shrink-0`}>
+                                <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} overflow-hidden shrink-0`}>
                                     {comment.author.avatarUrl ? (
                                         <img src={comment.author.avatarUrl} alt={comment.author.name} className="w-full h-full object-cover" />
                                     ) : (

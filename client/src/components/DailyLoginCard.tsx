@@ -12,19 +12,24 @@ interface DailyLoginCardProps {
 
 export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps) {
     const { user } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
-    const themeText = isSRT ? 'text-red-400' : 'text-gold-400';
-    const themeBorder = isSRT ? 'border-red-500/30' : 'border-gold-500/30';
-    const themeHover = isSRT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
+    const isMGT = user?.membershipType === 'MGT';
+    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeHover = isMGT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
 
     if (!status) {
         return (
-            <div className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} animate-pulse`}>
-                <div className="flex justify-between items-center">
-                    <div className="h-4 bg-white/10 rounded w-32 mb-2"></div>
-                    <div className="h-8 bg-white/10 rounded w-12"></div>
+            <div className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} animate-pulse relative overflow-hidden`}>
+                <div className="flex justify-between items-start z-10 relative">
+                    <div>
+                        <div className="h-5 bg-white/10 rounded w-32 mb-2"></div>
+                        <div className="h-3 bg-white/10 rounded w-48"></div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <div className="h-8 bg-white/10 rounded w-8 mb-1"></div>
+                        <div className="h-2 bg-white/10 rounded w-20"></div>
+                    </div>
                 </div>
-                <div className="h-3 bg-white/10 rounded w-48"></div>
             </div>
         );
     }
@@ -40,7 +45,7 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
 
             <div className="relative z-10 flex items-center justify-between">
                 <div>
-                    <h3 className={`font-serif text-lg mb-1 flex items-center gap-2 ${isSRT ? 'text-white' : 'text-white'}`}>
+                    <h3 className={`font-serif text-lg mb-1 flex items-center gap-2 ${isMGT ? 'text-white' : 'text-white'}`}>
                         Bônus Diário
                         {status.claimed && <Check className="w-4 h-4 text-green-400" />}
                     </h3>

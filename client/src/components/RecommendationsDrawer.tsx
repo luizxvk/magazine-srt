@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Users, Calendar } from 'lucide-react';
+import { X, Users, Calendar, Star } from 'lucide-react';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';
+import PhotoCatalogCard from './PhotoCatalogCard';
 
 
 interface RecommendationsDrawerProps {
@@ -13,15 +14,15 @@ interface RecommendationsDrawerProps {
 
 export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatus, openDailyLoginModal }: RecommendationsDrawerProps) {
     const { user, theme } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-black';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const themeTitleColor = isSRT ? 'text-white' : 'text-gold-400';
-    const themeBorder = isSRT ? 'border-red-500/20' : 'border-gold-500/20';
-    const themeIconBg = isSRT ? 'bg-red-500/10' : 'bg-gold-500/10';
-    const themeIconColor = isSRT ? 'text-red-500' : 'text-gold-400';
-    const themeTextHover = isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
+    const themeTitleColor = isMGT ? 'text-white' : 'text-gold-400';
+    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
+    const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeTextHover = isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
 
     return (
         <AnimatePresence>
@@ -57,43 +58,48 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             </div>
 
                             {/* Daily Login Card */}
-                            <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+                            <div className="mb-6">
+                                <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+                            </div>
+
+                            {/* Photo Catalog Card */}
+                            <PhotoCatalogCard />
 
                             {/* Recommendation Cards */}
                             <div className="space-y-4">
-                                <div className={`glass-panel rounded-xl p-4 border ${isSRT ? 'border-red-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                                <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                            <Sparkles className="w-5 h-5" />
+                                            <Star className="w-5 h-5" />
                                         </div>
-                                        <h4 className={`font-medium ${themeText} ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Destaques da Semana</h4>
+                                        <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Destaques da Semana</h4>
                                     </div>
                                     <p className="text-sm text-gray-400 leading-relaxed">
                                         Confira os posts mais curtidos e comentados pelos membros da elite.
                                     </p>
                                 </div>
 
-                                <div className={`glass-panel rounded-xl p-4 border ${isSRT ? 'border-red-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                                <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                             <Users className="w-5 h-5" />
                                         </div>
-                                        <h4 className={`font-medium ${themeText} ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Novos Membros</h4>
+                                        <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Novos Membros</h4>
                                     </div>
                                     <p className="text-sm text-gray-400 leading-relaxed">
                                         Dê as boas-vindas aos novos integrantes da nossa comunidade exclusiva.
                                     </p>
                                 </div>
 
-                                <div className={`glass-panel rounded-xl p-4 border ${isSRT ? 'border-red-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                                <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                             <Calendar className="w-5 h-5" />
                                         </div>
-                                        <h4 className={`font-medium ${themeText} ${isSRT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Eventos Exclusivos</h4>
+                                        <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Eventos Exclusivos</h4>
                                     </div>
                                     <p className="text-sm text-gray-400 leading-relaxed">
-                                        Fique por dentro dos próximos encontros e experiências {isSRT ? 'SRT' : 'Magazine'}.
+                                        Fique por dentro dos próximos encontros e experiências {isMGT ? 'MGT' : 'Magazine'}.
                                     </p>
                                 </div>
                             </div>

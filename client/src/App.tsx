@@ -12,12 +12,16 @@ import ProfilePage from './pages/ProfilePage';
 import SocialPage from './pages/SocialPage';
 import NotificationsPage from './pages/NotificationsPage';
 import AdminDashboard from './pages/AdminDashboard';
-import SrtLogPage from './pages/SrtLogPage';
+import MgtLogPage from './pages/MgtLogPage';
+import PhotoCatalogPage from './pages/PhotoCatalogPage';
+import HighlightsPage from './pages/HighlightsPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
-import AdminEditSrtLogPage from './pages/admin/AdminEditSrtLogPage';
+import AdminEditMgtLogPage from './pages/admin/AdminEditMgtLogPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
 import MessagePopup from './components/MessagePopup';
+import DevBanner from './components/DevBanner';
+import ZionsPurchaseModal from './components/ZionsPurchaseModal';
 
 
 
@@ -40,17 +44,22 @@ function App() {
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
           <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
-          <Route path="/srt-log" element={<PrivateRoute><SrtLogPage /></PrivateRoute>} />
+          <Route path="/mgt-log" element={<PrivateRoute><MgtLogPage /></PrivateRoute>} />
+
+          <Route path="/catalog" element={<PrivateRoute><PhotoCatalogPage /></PrivateRoute>} />
+          <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
-          <Route path="/admin/edit-srt-log" element={<AdminRoute><AdminEditSrtLogPage /></AdminRoute>} />
+          <Route path="/admin/edit-mgt-log" element={<AdminRoute><AdminEditMgtLogPage /></AdminRoute>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <AchievementWrapper />
+        <ZionsModalWrapper />
         <MessagePopup />
+        <DevBanner />
       </Router>
     </AuthProvider>
   );
@@ -66,6 +75,17 @@ function AchievementWrapper() {
       title={achievement.title}
       description={achievement.description}
       onClose={clearAchievement}
+    />
+  );
+}
+
+function ZionsModalWrapper() {
+  const { isZionsModalOpen, closeZionsModal } = useAuth(); // @ts-ignore
+
+  return (
+    <ZionsPurchaseModal
+      isOpen={isZionsModalOpen}
+      onClose={closeZionsModal}
     />
   );
 }

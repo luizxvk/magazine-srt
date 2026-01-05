@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -45,6 +45,8 @@ model User {
 
   stories      Story[]
   storyViews   StoryView[]
+  catalogPhotos CatalogPhoto[]
+  zionPurchases ZionPurchase[]
 }
 
 model Story {
@@ -161,6 +163,9 @@ model Redemption {
   rewardId   String
   cost       Int
   redeemedAt DateTime @default(now())
+  status     String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, CANCELLED
+  completedAt DateTime?
+  metadata   Json?
 
   user       User     @relation(fields: [userId], references: [id])
   reward     Reward   @relation(fields: [rewardId], references: [id])
@@ -208,7 +213,7 @@ enum Role {
 
 enum MembershipType {
   MAGAZINE
-  SRT
+  MGT
 }
 
 enum RewardType {
@@ -301,4 +306,47 @@ model SystemLog {
   message   String
   timestamp DateTime @default(now())
   metadata  Json?
+}
+
+model CatalogPhoto {
+  id          String   @id @default(uuid())
+  userId      String
+  imageUrl    String
+  title       String?
+  description String?
+  category    String?  // Sport, SUV, Sedan, Muscle, JDM, Euro, Classic
+  carValue    String?  // Budget, Mid, Premium, Supercar
+  eventType   String?  // Drift, Street, Meeting, Roleplay, Race
+  carBrand    String?  // BMW, Toyota, Nissan, Ford, Chevrolet...
+  isPublic    Boolean  @default(true)
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model ZionPurchase {
+  id            String   @id @default(uuid())
+  userId        String
+  amount        Int
+  price         Float
+  paymentId     String?
+  preferenceId  String?
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  imageUrl    String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

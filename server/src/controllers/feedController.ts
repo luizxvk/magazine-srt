@@ -54,6 +54,42 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
     }
 };
 
+export const getHighlights = async (req: AuthRequest, res: Response) => {
+    try {
+        const posts = await prisma.post.findMany({
+            take: 10,
+            orderBy: { likesCount: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true,
+                        trophies: true,
+                    },
+                },
+                likes: {
+                    where: { userId: req.user?.userId },
+                    select: { userId: true },
+                },
+                tags: true,
+            },
+        });
+
+        const formattedPosts = posts.map((post) => ({
+            ...post,
+            isLiked: post.likes.length > 0,
+            likes: undefined,
+        }));
+
+        res.json(formattedPosts);
+    } catch (error) {
+        console.error('Error fetching highlights:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const likePost = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
@@ -170,6 +206,19 @@ export const createPost = async (req: AuthRequest, res: Response) => {
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
         const { imageUrl, caption } = createPostSchema.parse(req.body);
+
+        // Check daily limit (10 posts/day)
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const dailyPostCount = await prisma.post.count({
+            where: {
+                userId,
+                createdAt: { gte: twentyFourHoursAgo }
+            }
+        });
+
+        if (dailyPostCount >= 10) {
+            return res.status(400).json({ error: 'Você atingiu o limite de 10 postagens por dia.' });
+        }
 
         const post = await prisma.post.create({
             data: {

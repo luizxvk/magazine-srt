@@ -7,7 +7,7 @@ export default function LandingPage() {
     const navigate = useNavigate();
     const [hoveredSide, setHoveredSide] = useState<'left' | 'right' | null>(null);
 
-    const handleSelect = (type: 'MAGAZINE' | 'SRT') => {
+    const handleSelect = (type: 'MAGAZINE' | 'MGT') => {
         navigate('/login', { state: { membershipType: type } });
     };
 
@@ -54,7 +54,7 @@ export default function LandingPage() {
                 `}
                 onMouseEnter={() => setHoveredSide('right')}
                 onMouseLeave={() => setHoveredSide(null)}
-                onClick={() => handleSelect('SRT')}
+                onClick={() => handleSelect('MGT')}
             >
                 <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent opacity-50" />
 
@@ -66,7 +66,7 @@ export default function LandingPage() {
                         SRT
                     </h2>
                     <p className="text-red-500 uppercase tracking-widest text-sm md:text-base mb-8 font-medium">
-                        Street Runner Team
+                        Machine Gold Team
                     </p>
                     <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                         <button className="flex items-center gap-2 text-white border-b border-red-500 pb-1 hover:text-red-400 transition-colors">

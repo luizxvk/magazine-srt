@@ -162,6 +162,8 @@ const updateProfileSchema = z.object({
     bio: z.string().max(500).optional().or(z.literal('')),
     avatarUrl: z.string().optional().or(z.literal('')),
     trophies: z.number().optional(),
+    level: z.number().min(1).max(30).optional(),
+    zions: z.number().min(0).optional(),
 });
 
 export const getMe = async (req: AuthRequest, res: Response) => {
@@ -202,6 +204,13 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
         const data = updateProfileSchema.parse(req.body);
+
+        // Security Check: Only ADMIN can update level, trophies, zions
+        if ((data.level !== undefined || data.zions !== undefined) && req.user?.role !== 'ADMIN') {
+            // Strip them or throw error? Let's strip them to be safe or throw.
+            // Given the context, throwing might be better to signal unauthorized attempt if someone tries.
+            return res.status(403).json({ error: 'You are not authorized to update level or zions.' });
+        }
 
         const user = await prisma.user.update({
             where: { id: userId },
@@ -314,7 +323,7 @@ export const updateUserMembership = async (req: AuthRequest, res: Response) => {
         const { id } = req.params;
         const { membershipType } = req.body;
 
-        if (!['MAGAZINE', 'SRT'].includes(membershipType)) {
+        if (!['MAGAZINE', 'MGT'].includes(membershipType)) {
             return res.status(400).json({ error: 'Invalid membership type' });
         }
 
@@ -371,5 +380,27 @@ export const updateUserLevel = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error updating user level:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const getRecentMembers = async (req: AuthRequest, res: Response) => {
+    try {
+        const users = await prisma.user.findMany({
+            take: 5,
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                name: true,
+                displayName: true,
+                avatarUrl: true,
+                role: true,
+                membershipType: true,
+                createdAt: true
+            }
+        });
+        res.json(users);
+    } catch (error) {
+        console.error('Error fetching recent members:', error);
+        res.status(500).json({ error: 'Failed to fetch recent members' });
     }
 };

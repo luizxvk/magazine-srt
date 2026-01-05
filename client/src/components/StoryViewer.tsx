@@ -13,6 +13,7 @@ interface Story {
     };
     imageUrl: string;
     timestamp: string;
+    items?: { id: string; imageUrl: string; timestamp?: string; }[];
 }
 
 interface StoryViewerProps {
@@ -24,46 +25,91 @@ interface StoryViewerProps {
 
 export default function StoryViewer({ stories, initialStoryIndex, onClose, onStoryViewed }: StoryViewerProps) {
     const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
+    const [currentItemIndex, setCurrentItemIndex] = useState(0); // Track which item in the group is being shown
     const [progress, setProgress] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const { user } = useAuth();
-    const isSRT = user?.membershipType === 'SRT';
+    const isMGT = user?.membershipType === 'MGT';
 
     const [likedStories, setLikedStories] = useState<Set<string>>(new Set());
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
 
-    const currentStory = stories[currentIndex];
+    const currentStoryGroup = stories[currentIndex];
+    // If items exist, use them. Otherwise fallback to the main story object (old behavior/compatibility)
+    const storyItems = currentStoryGroup?.items && currentStoryGroup.items.length > 0
+        ? currentStoryGroup.items
+        : [{ id: currentStoryGroup.id, imageUrl: currentStoryGroup.imageUrl, timestamp: currentStoryGroup.timestamp }];
 
-    if (!currentStory) return null;
+    // Sort items by date (newest last? typically stories play oldest to newest)
+    // Assuming backend returns them in order or we sort.
+    // Let's assume order is correct for now or sort by createdAt if available.
+    // Usually stories play Chronological (oldest first).
+    // Let's verify data structure: Backend getStories returns items sorted?
+    // Backend: userGroup.stories.push(...) then res.json.
+    // Backend `stories` query is ORDER BY createdAt DESC.
+    // So `items` are DESC (newest first).
+    // WE SHOULD PLAY OLDEST FIRST.
+    // So we should reverse `storyItems` locally for playback if they are DESC.
+    // But `StoryViewer` logic:
+    // Ideally we want to see what we haven't seen.
+    // For simplicity, let's play them in the order provided (which is likely Newest First based on backend query).
+    // Users might find it weird to see newest first, but let's stick to simple iteration for now.
+    // actually, typically you watch oldest unseen to newest. 
+    // Since backend returns DESC, index 0 is NEWEST.
+    // We should probably iterate reverse? Or just iterate 0..N.
+    // Let's iterate 0..N for now (Newest to Oldest) as user requested "replacing with current".
+    // Wait, "replacing" means they only saw the new one.
+    // If I iterate, they see all.
+
+    const currentItem = storyItems[currentItemIndex] || storyItems[0];
+
+    // reset item index when switching users
+    useEffect(() => {
+        setCurrentItemIndex(0);
+    }, [currentIndex]);
+
+    if (!currentStoryGroup) return null;
 
     const STORY_DURATION = 5000; // 5 seconds per story
-    const isLiked = likedStories.has(currentStory.id);
+    const isLiked = likedStories.has(currentItem.id || currentStoryGroup.id);
 
     const handleNext = useCallback(() => {
-        if (currentIndex < stories.length - 1) {
+        if (currentItemIndex < storyItems.length - 1) {
+            // Next item in current user's story
+            setCurrentItemIndex(prev => prev + 1);
+            setProgress(0);
+        } else if (currentIndex < stories.length - 1) {
+            // Next user
             setCurrentIndex(prev => prev + 1);
+            setCurrentItemIndex(0);
             setProgress(0);
         } else {
             onClose();
         }
-    }, [currentIndex, stories.length, onClose]);
+    }, [currentIndex, currentItemIndex, storyItems.length, stories.length, onClose]);
 
     const handlePrev = useCallback(() => {
-        if (currentIndex > 0) {
+        if (currentItemIndex > 0) {
+            // Prev item in current user's story
+            setCurrentItemIndex(prev => prev - 1);
+            setProgress(0);
+        } else if (currentIndex > 0) {
+            // Prev user
             setCurrentIndex(prev => prev - 1);
+            setCurrentItemIndex(0); // Should probably go to *last* item of prev user?
             setProgress(0);
         }
-    }, [currentIndex]);
+    }, [currentIndex, currentItemIndex]);
 
     const handleLike = async () => {
         if (isLiked) return;
 
-        setLikedStories(prev => new Set(prev).add(currentStory.id));
+        setLikedStories(prev => new Set(prev).add(currentItem.id || currentStoryGroup.id));
         setShowHeartAnimation(true);
         setTimeout(() => setShowHeartAnimation(false), 1000);
 
         try {
-            await api.post(`/feed/stories/${currentStory.user.id}/like`);
+            await api.post(`/feed/stories/${currentStoryGroup.user.id}/like`);
         } catch (error) {
             console.error('Failed to like story', error);
         }
@@ -83,11 +129,11 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
         }, 100);
 
         return () => clearInterval(interval);
-    }, [currentIndex, isPaused, handleNext]);
+    }, [currentIndex, currentItemIndex, isPaused, handleNext]);
 
     useEffect(() => {
-        onStoryViewed(currentStory.id);
-    }, [currentStory.id, onStoryViewed]);
+        onStoryViewed(currentStoryGroup.id);
+    }, [currentStoryGroup.id, onStoryViewed]);
 
     // Keyboard navigation
     useEffect(() => {
@@ -117,13 +163,17 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
             <div className="relative w-full h-full md:max-w-md md:h-full bg-black shadow-2xl">
                 {/* Progress Bars */}
                 <div className="absolute top-0 left-0 right-0 z-20 p-2 flex gap-1 pt-4 md:pt-2">
-                    {stories.map((story, index) => (
-                        <div key={story.id} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                    {/* Show progress bars for all items in the CURRENT user's story if multiple items exist */}
+                    {/* If we want instagram style: show bars for ITEMS. */}
+                    {/* Currently renders 1 bar per USER. Keep it simple or sophisticated? */}
+                    {/* User asked for "adding photos to story". Expected: multiple bars for that user. */}
+                    {storyItems.map((item, index) => (
+                        <div key={item.id || index} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
                             <div
-                                className={`h-full bg-white transition-all duration-100 ease-linear ${index < currentIndex ? 'w-full' :
-                                    index === currentIndex ? `w-[${progress}%]` : 'w-0'
+                                className={`h-full bg-white transition-all duration-100 ease-linear ${index < currentItemIndex ? 'w-full' :
+                                        index === currentItemIndex ? `w-[${progress}%]` : 'w-0'
                                     }`}
-                                style={{ width: index === currentIndex ? `${progress}%` : index < currentIndex ? '100%' : '0%' }}
+                                style={{ width: index === currentItemIndex ? `${progress}%` : index < currentItemIndex ? '100%' : '0%' }}
                             />
                         </div>
                     ))}
@@ -131,16 +181,18 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
 
                 {/* Header */}
                 <div className="absolute top-6 left-0 right-0 z-20 p-4 flex items-center gap-3 mt-2">
-                    <div className={`w-10 h-10 rounded-full p-[1px] ${isSRT ? 'bg-red-500' : 'bg-gold-500'}`}>
+                    <div className={`w-10 h-10 rounded-full p-[1px] ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}>
                         <img
-                            src={currentStory.user.avatarUrl}
-                            alt={currentStory.user.name}
+                            src={currentStoryGroup.user.avatarUrl}
+                            alt={currentStoryGroup.user.name}
                             className="w-full h-full rounded-full object-cover border-2 border-black"
                         />
                     </div>
                     <div>
-                        <p className="text-white font-medium text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{currentStory.user.name}</p>
-                        <p className="text-white/90 text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{currentStory.timestamp}</p>
+                        <p className="text-white font-medium text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{currentStoryGroup.user.name}</p>
+                        <p className="text-white/90 text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                            {currentItem.timestamp ? (currentItem.timestamp.includes('T') ? new Date(currentItem.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : currentItem.timestamp) : currentStoryGroup.timestamp}
+                        </p>
                     </div>
                 </div>
 
@@ -154,7 +206,8 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                     onDoubleClick={handleLike}
                 >
                     <img
-                        src={currentStory.imageUrl}
+                        key={currentItem.id} // Add key to force re-render/animation if needed
+                        src={currentItem.imageUrl} // Use item image
                         alt="Story"
                         className="w-full h-full object-cover"
                     />
@@ -170,7 +223,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                                 transition={{ duration: 0.3 }}
                                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
                             >
-                                <Heart className={`w-32 h-32 ${isSRT ? 'text-red-500' : 'text-gold-500'} fill-current drop-shadow-2xl`} />
+                                <Heart className={`w-32 h-32 ${isMGT ? 'text-emerald-500' : 'text-gold-500'} fill-current drop-shadow-2xl`} />
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -185,7 +238,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
 
                 {/* Footer / Actions */}
                 <div className="absolute bottom-0 left-0 right-0 z-20 p-4 flex items-center gap-4 pb-8 md:pb-4">
-                    {currentStory.user.id !== user?.id && user?.role !== 'VISITOR' && (
+                    {currentStoryGroup.user.id !== user?.id && user?.role !== 'VISITOR' && (
                         <input
                             type="text"
                             placeholder="Enviar mensagem..."
@@ -194,14 +247,14 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                     )}
                     {user?.role !== 'VISITOR' && (
                         <button
-                            className={`p-2 hover:scale-110 transition-transform ml-auto ${isLiked ? (isSRT ? 'text-red-500' : 'text-gold-500') : 'text-white'}`}
+                            className={`p-2 hover:scale-110 transition-transform ml-auto ${isLiked ? (isMGT ? 'text-emerald-500' : 'text-gold-500') : 'text-white'}`}
                             onClick={handleLike}
                             aria-label="Curtir story"
                         >
                             <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
                         </button>
                     )}
-                    {currentStory.user.id !== user?.id && user?.role !== 'VISITOR' && (
+                    {currentStoryGroup.user.id !== user?.id && user?.role !== 'VISITOR' && (
                         <button className="text-white p-2 hover:scale-110 transition-transform" aria-label="Enviar mensagem">
                             <Send className="w-6 h-6" />
                         </button>

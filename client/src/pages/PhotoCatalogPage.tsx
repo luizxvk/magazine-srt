@@ -115,7 +115,7 @@ export default function PhotoCatalogPage() {
             <LuxuriousBackground />
             <Header />
 
-            <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
+            <div className="pt-40 pb-20 px-4 max-w-7xl mx-auto">
                 <PhotoUploadModal
                     isOpen={isUploadOpen}
                     onClose={() => setIsUploadOpen(false)}

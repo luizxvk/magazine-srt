@@ -70,26 +70,15 @@ export const addCatalogPhoto = async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user.userId;
         console.log(`[DEBUG] Adding photo for user: ${userId}`);
-        console.log(`[DEBUG] Raw Body:`, req.body);
-        console.log(`[DEBUG] File:`, req.file);
 
         const { imageUrl, title, description, category, carValue, eventType, carBrand, isPublic } = req.body;
 
-        let finalImageUrl = imageUrl;
-
-        if (req.file) {
-            // Construct full URL for the uploaded file
-            const protocol = req.protocol;
-            const host = req.get('host');
-            finalImageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
-        }
-
-        if (!finalImageUrl) {
+        if (!imageUrl) {
             console.error('[DEBUG] No image URL found');
-            return res.status(400).json({ error: 'Image is required (URL or File)' });
+            return res.status(400).json({ error: 'Image URL is required' });
         }
 
-        // Helper to sanitize optional string fields from FormData
+        // Helper to sanitize optional string fields
         const sanitize = (val: any) => {
             if (val === 'null' || val === 'undefined' || val === '' || val === null || val === undefined) {
                 return null;
@@ -99,7 +88,7 @@ export const addCatalogPhoto = async (req: Request, res: Response) => {
 
         const prismaData = {
             userId,
-            imageUrl: finalImageUrl,
+            imageUrl: imageUrl,
             title: sanitize(title),
             description: sanitize(description),
             category: sanitize(category),
@@ -108,8 +97,6 @@ export const addCatalogPhoto = async (req: Request, res: Response) => {
             carBrand: sanitize(carBrand),
             isPublic: isPublic === 'true' || isPublic === true
         };
-
-        console.log('[DEBUG] Prisma Create Data:', prismaData);
 
         const photo = await prisma.catalogPhoto.create({
             data: prismaData

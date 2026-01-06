@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Mail, Lock, X, AlertCircle } from 'lucide-react';
-import logo from '../assets/logo-mgzn.png';
+import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft } from 'lucide-react';
 import logoMgt from '../assets/logo-mgt-full.png';
+import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -21,7 +21,12 @@ export default function Register() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [avatarBase64, setAvatarBase64] = useState<string>('');
+    
     const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<RegisterForm>({
         resolver: zodResolver(registerSchema),
     });
@@ -29,11 +34,30 @@ export default function Register() {
     const membershipType = location.state?.membershipType || 'MAGAZINE';
     const isMGT = membershipType === 'MGT';
 
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                setErrorPopup('Imagem muito grande. Tamanho máximo: 2MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = reader.result as string;
+                setAvatarPreview(result);
+                setAvatarBase64(result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const onSubmit = async (data: RegisterForm) => {
         try {
             const response = await api.post('/auth/register', {
                 ...data,
-                membershipType
+                membershipType,
+                avatarUrl: avatarBase64 || undefined
             });
             login(response.data.token, response.data.user, membershipType);
             navigate('/feed');
@@ -41,7 +65,6 @@ export default function Register() {
             console.error('Registration failed', error);
             const errorMessage = error.response?.data?.error || 'Falha ao criar conta. Tente novamente.';
             
-            // Show styled popup for email already exists error
             if (errorMessage.toLowerCase().includes('email') || errorMessage.toLowerCase().includes('já existe') || errorMessage.toLowerCase().includes('already')) {
                 setErrorPopup(errorMessage);
             } else {
@@ -51,12 +74,12 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0a0a] font-sans">
+        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0a0a] font-sans p-4">
             {/* Error Popup Modal */}
             {errorPopup && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setErrorPopup(null)} />
-                    <div className={`relative w-full max-w-sm bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border p-6 animate-fade-in-up ${isMGT ? 'border-red-500/30' : 'border-red-500/30'}`}>
+                    <div className="relative w-full max-w-sm bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border border-red-500/30 p-6 animate-fade-in-up">
                         <button 
                             onClick={() => setErrorPopup(null)}
                             className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors"
@@ -64,7 +87,7 @@ export default function Register() {
                             <X className="w-5 h-5" />
                         </button>
                         <div className="flex flex-col items-center text-center">
-                            <div className={`p-3 rounded-full mb-4 ${isMGT ? 'bg-red-500/20' : 'bg-red-500/20'}`}>
+                            <div className="p-3 rounded-full mb-4 bg-red-500/20">
                                 <AlertCircle className="w-8 h-8 text-red-400" />
                             </div>
                             <h3 className="text-lg font-bold text-white mb-2">Erro no Cadastro</h3>
@@ -80,136 +103,182 @@ export default function Register() {
                 </div>
             )}
 
-            {/* Dynamic Background */}
-            <div className={`fixed inset-0 transition-colors duration-1000 ease-in-out ${isMGT ? 'bg-emerald-950/20' : 'bg-gold-950/20'}`}>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,0,0,0)_0%,_#000000_100%)]" />
-                <div className={`absolute top-0 left-0 w-full h-full opacity-30 transition-opacity duration-1000 ${isMGT ? 'bg-[url("/patterns/grid.svg")]' : 'gold-flow'}`} />
-                <div className="animated-fog opacity-30" />
+            {/* Animated Background */}
+            <div className={`fixed inset-0 transition-colors duration-1000 ${isMGT ? 'bg-emerald-950/10' : 'bg-gold-950/10'}`}>
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#000000_80%)]" />
+                <div className={`absolute inset-0 opacity-20 ${isMGT ? 'bg-[radial-gradient(circle_at_30%_20%,_rgba(16,185,129,0.15)_0%,_transparent_50%)]' : 'bg-[radial-gradient(circle_at_70%_20%,_rgba(212,175,55,0.15)_0%,_transparent_50%)]'}`} />
             </div>
 
-            {/* Logo Top Center */}
-            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center animate-fade-in-down">
-                <img
-                    src={logo}
-                    alt="Logo"
-                    className={`h-28 w-auto drop-shadow-[0_0_15px_${isMGT ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.5)'}] transition-all duration-500`}
-                />
-            </div>
-
-            {/* Main Card Container */}
-            <div className={`relative w-full max-w-md bg-neutral-950/60 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border p-10 z-10 ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-                {/* Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${isMGT ? 'from-emerald-900/10' : 'from-gold-900/10'} to-transparent pointer-events-none`} />
-
-                {/* Header */}
-                <div className="text-center mb-10 relative z-10">
-                    <img
-                        src={isMGT ? logoMgt : logo}
-                        alt={isMGT ? "MGT" : "MAGAZINE"}
-                        className={`mx-auto mb-6 ${isMGT ? 'h-16 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'h-28 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]'}`}
-                    />
-                    <h2 className={`text-2xl font-bold tracking-wide ${isMGT ? 'text-white drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]' : 'text-gradient-gold'}`}>
-                        {isMGT ? 'CRIAR CONTA MGT' : 'CRIAR CONTA'}
-                    </h2>
-                    <p className={`text-sm mt-3 font-light tracking-widest uppercase ${isMGT ? 'text-emerald-400/60' : 'text-gold-400/60'}`}>
-                        {isMGT ? 'Velocidade e Poder' : 'A Elite do Sucesso'}
-                    </p>
-                </div>
-
-                {/* Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
-                    {/* Name Field */}
-                    <div className="space-y-1">
-                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border bg-neutral-900/60 transition-all duration-300
-                            ${isMGT
-                                ? 'border-emerald-500/20 focus-within:border-emerald-500/60 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                                : 'border-gold-500/20 focus-within:border-gold-500/60 focus-within:shadow-[0_0_15px_rgba(212,175,55,0.15)]'
-                            }`}>
-                            <User size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
-                            <input
-                                {...register('name')}
-                                type="text"
-                                placeholder="Seu nome completo"
-                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
-                            />
-                        </div>
-                        {errors.name && <p className="text-red-400 text-[10px] pl-2">{errors.name.message}</p>}
-                    </div>
-
-                    {/* Email Field */}
-                    <div className="space-y-1">
-                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border bg-neutral-900/60 transition-all duration-300
-                            ${isMGT
-                                ? 'border-emerald-500/20 focus-within:border-emerald-500/60 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                                : 'border-gold-500/20 focus-within:border-gold-500/60 focus-within:shadow-[0_0_15px_rgba(212,175,55,0.15)]'
-                            }`}>
-                            <Mail size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
-                            <input
-                                {...register('email')}
-                                type="email"
-                                placeholder="seu@email.com"
-                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
-                            />
-                        </div>
-                        {errors.email && <p className="text-red-400 text-[10px] pl-2">{errors.email.message}</p>}
-                    </div>
-
-                    {/* Password Field */}
-                    <div className="space-y-1">
-                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border bg-neutral-900/60 transition-all duration-300
-                            ${isMGT
-                                ? 'border-emerald-500/20 focus-within:border-emerald-500/60 focus-within:shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                                : 'border-gold-500/20 focus-within:border-gold-500/60 focus-within:shadow-[0_0_15px_rgba(212,175,55,0.15)]'
-                            }`}>
-                            <Lock size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
-                            <input
-                                {...register('password')}
-                                type="password"
-                                placeholder="Senha (mínimo 6 caracteres)"
-                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
-                            />
-                        </div>
-                        {errors.password && <p className="text-red-400 text-[10px] pl-2">{errors.password.message}</p>}
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg mt-4
-                            ${isMGT
-                                ? 'bg-gradient-to-r from-emerald-700 to-emerald-600 text-white shadow-emerald-900/30 hover:shadow-emerald-600/40'
-                                : 'bg-gradient-to-r from-gold-600 to-gold-500 text-black shadow-gold-900/30 hover:shadow-gold-500/40'
-                            }`}
-                    >
-                        {isSubmitting ? 'Criando...' : 'Criar Conta'}
-                    </button>
-
-                    {errors.root && <p className="text-red-400 text-xs text-center">{errors.root.message}</p>}
-                </form>
-
-                {/* Footer Link */}
-                <div className="mt-8 text-center relative z-10">
-                    <p className="text-gray-500 text-xs">
-                        Já tem conta?
-                        <Link
-                            to="/login"
-                            state={{ membershipType }}
-                            className={`font-bold ml-1 transition-colors ${isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300'}`}
-                        >
-                            Fazer Login
-                        </Link>
-                    </p>
-                </div>
-            </div>
-
-            {/* Visitor Access - Bottom */}
+            {/* Back Button */}
             <button
-                onClick={() => navigate('/login')}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500 hover:text-white text-xs uppercase tracking-widest transition-colors opacity-60 hover:opacity-100 z-20"
+                onClick={() => navigate('/login', { state: { membershipType } })}
+                className={`absolute top-6 left-6 z-30 flex items-center gap-2 text-sm transition-colors ${isMGT ? 'text-emerald-500/70 hover:text-emerald-400' : 'text-gold-500/70 hover:text-gold-400'}`}
             >
-                Voltar para Login
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Voltar</span>
             </button>
+
+            {/* Main Card */}
+            <div className={`relative w-full max-w-md bg-neutral-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border z-10 ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                {/* Gradient top accent */}
+                <div className={`absolute top-0 left-0 right-0 h-1 ${isMGT ? 'bg-gradient-to-r from-transparent via-emerald-500 to-transparent' : 'bg-gradient-to-r from-transparent via-gold-500 to-transparent'}`} />
+
+                <div className="p-8 sm:p-10">
+                    {/* Header with Logo */}
+                    <div className="text-center mb-8">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={isMGT ? logoMgt : logo}
+                                alt={isMGT ? "MGT" : "MAGAZINE"}
+                                className={`${isMGT ? 'h-14' : 'h-20'} drop-shadow-lg`}
+                            />
+                        </div>
+                        <h2 className={`text-xl font-bold tracking-wide ${isMGT ? 'text-white' : 'text-gradient-gold'}`}>
+                            Criar Conta
+                        </h2>
+                        <p className={`text-xs mt-2 tracking-widest uppercase ${isMGT ? 'text-emerald-400/50' : 'text-gold-400/50'}`}>
+                            {isMGT ? 'Velocidade e Poder' : 'A Elite do Sucesso'}
+                        </p>
+                    </div>
+
+                    {/* Avatar Upload - Clean and Modern */}
+                    <div className="flex justify-center mb-8">
+                        <div className="relative group">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleAvatarChange}
+                                className="hidden"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`relative w-24 h-24 rounded-full overflow-hidden border-2 border-dashed transition-all duration-300 ${
+                                    isMGT 
+                                        ? 'border-emerald-500/40 hover:border-emerald-500/80 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]' 
+                                        : 'border-gold-500/40 hover:border-gold-500/80 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]'
+                                }`}
+                            >
+                                {avatarPreview ? (
+                                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className={`w-full h-full flex flex-col items-center justify-center ${isMGT ? 'bg-emerald-500/5' : 'bg-gold-500/5'}`}>
+                                        <Camera className={`w-6 h-6 mb-1 ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`} />
+                                        <span className={`text-[10px] ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`}>Foto</span>
+                                    </div>
+                                )}
+                                
+                                {/* Hover overlay */}
+                                <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ${avatarPreview ? 'bg-black/60' : ''}`}>
+                                    {avatarPreview && <Camera className="w-6 h-6 text-white" />}
+                                </div>
+                            </button>
+                            
+                            {/* Optional indicator */}
+                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                OPCIONAL
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        {/* Name Field */}
+                        <div className="space-y-1">
+                            <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border bg-white/[0.02] transition-all duration-300
+                                ${isMGT
+                                    ? 'border-white/10 focus-within:border-emerald-500/50 focus-within:bg-emerald-500/5'
+                                    : 'border-white/10 focus-within:border-gold-500/50 focus-within:bg-gold-500/5'
+                                }`}>
+                                <User size={18} className="text-gray-500" />
+                                <input
+                                    {...register('name')}
+                                    type="text"
+                                    placeholder="Seu nome completo"
+                                    className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
+                                />
+                            </div>
+                            {errors.name && <p className="text-red-400 text-[10px] pl-4">{errors.name.message}</p>}
+                        </div>
+
+                        {/* Email Field */}
+                        <div className="space-y-1">
+                            <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border bg-white/[0.02] transition-all duration-300
+                                ${isMGT
+                                    ? 'border-white/10 focus-within:border-emerald-500/50 focus-within:bg-emerald-500/5'
+                                    : 'border-white/10 focus-within:border-gold-500/50 focus-within:bg-gold-500/5'
+                                }`}>
+                                <Mail size={18} className="text-gray-500" />
+                                <input
+                                    {...register('email')}
+                                    type="email"
+                                    placeholder="seu@email.com"
+                                    className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
+                                />
+                            </div>
+                            {errors.email && <p className="text-red-400 text-[10px] pl-4">{errors.email.message}</p>}
+                        </div>
+
+                        {/* Password Field */}
+                        <div className="space-y-1">
+                            <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border bg-white/[0.02] transition-all duration-300
+                                ${isMGT
+                                    ? 'border-white/10 focus-within:border-emerald-500/50 focus-within:bg-emerald-500/5'
+                                    : 'border-white/10 focus-within:border-gold-500/50 focus-within:bg-gold-500/5'
+                                }`}>
+                                <Lock size={18} className="text-gray-500" />
+                                <input
+                                    {...register('password')}
+                                    type="password"
+                                    placeholder="Senha (mínimo 6 caracteres)"
+                                    className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
+                                />
+                            </div>
+                            {errors.password && <p className="text-red-400 text-[10px] pl-4">{errors.password.message}</p>}
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className={`w-full py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] mt-6 flex items-center justify-center gap-2
+                                ${isMGT
+                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30'
+                                    : 'bg-gold-500 hover:bg-gold-400 text-black shadow-lg shadow-gold-900/30'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    Criando...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="w-4 h-4" />
+                                    Criar Conta
+                                </>
+                            )}
+                        </button>
+
+                        {errors.root && <p className="text-red-400 text-xs text-center mt-2">{errors.root.message}</p>}
+                    </form>
+
+                    {/* Footer Link */}
+                    <div className="mt-6 text-center">
+                        <p className="text-gray-500 text-xs">
+                            Já tem conta?
+                            <Link
+                                to="/login"
+                                state={{ membershipType }}
+                                className={`font-bold ml-1 transition-colors ${isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300'}`}
+                            >
+                                Fazer Login
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

@@ -160,7 +160,7 @@ export default function ProfilePage() {
                 confirmText="Deletar"
             />
 
-            <div className="max-w-7xl mx-auto pt-32 pb-32 px-4 relative z-10">
+            <div className="max-w-7xl mx-auto pt-40 pb-32 px-4 relative z-10">
                 {/* Profile Card */}
                 <div className={`glass-panel p-8 rounded-3xl border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} relative overflow-hidden transition-all duration-500 mb-8`}>
                     {bgImage && (

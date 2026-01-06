@@ -43,44 +43,60 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
     const values = ['Budget', 'Mid', 'Premium', 'Supercar'];
     const events = ['Drift', 'Street', 'Meeting', 'Roleplay', 'Race'];
 
-    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [base64Image, setBase64Image] = useState<string>('');
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: { 'image/*': [] },
         maxFiles: 1,
         onDrop: (acceptedFiles) => {
             const file = acceptedFiles[0];
-            setImageFile(file);
-            setImageUrl(URL.createObjectURL(file));
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Imagem muito grande. Tamanho máximo: 5MB');
+                return;
+            }
+            
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = reader.result as string;
+                setBase64Image(result);
+                setImageUrl(result);
+            };
+            reader.readAsDataURL(file);
         }
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!imageFile && !imageUrl) return;
+        if (!base64Image && !imageUrl) return;
 
         try {
             setLoading(true);
-            const formData = new FormData();
-
-            if (imageFile) {
-                formData.append('image', imageFile);
-            } else {
-                formData.append('imageUrl', imageUrl);
-            }
-
-            formData.append('title', title);
-            formData.append('category', category);
-            formData.append('carValue', carValue);
-            formData.append('eventType', eventType);
-            formData.append('carBrand', carBrand);
-            formData.append('isPublic', String(isPublic));
-
-            await api.post('/catalog', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            
+            // Send as JSON with base64 image (same pattern as Stories)
+            await api.post('/catalog', {
+                imageUrl: base64Image || imageUrl,
+                title,
+                category,
+                carValue,
+                eventType,
+                carBrand,
+                isPublic
             });
 
             onSuccess();
             onClose();
+            
+            // Reset form
+            setBase64Image('');
+            setImageUrl('');
+            setTitle('');
+            setCategory('');
+            setCarValue('');
+            setEventType('');
+            setCarBrand('');
+            setIsPublic(true);
         } catch (error) {
             console.error('Failed to upload photo', error);
             alert('Falha ao enviar foto. Verifique se a imagem é válida e tente novamente.');

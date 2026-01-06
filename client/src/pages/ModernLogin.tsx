@@ -77,15 +77,6 @@ export default function ModernLogin() {
             </div>
 
 
-            {/* Logo Top Center */}
-            <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center animate-fade-in-down">
-                <img
-                    src={logo}
-                    alt="Logo"
-                    className={`h-16 md:h-28 w-auto drop-shadow-[0_0_15px_${isMGT ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.5)'}] transition-all duration-500`}
-                />
-            </div>
-
             {/* Main Card Container - Vertical on mobile, horizontal on desktop */}
             <div className="relative w-full max-w-[1000px] min-h-[600px] md:min-h-[600px] bg-neutral-950/60 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/5 flex flex-col md:flex-row z-10 mx-4 my-20 md:my-0">
 

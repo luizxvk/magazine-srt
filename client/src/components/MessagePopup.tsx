@@ -24,7 +24,7 @@ export default function MessagePopup() {
     const [unreadMessage, setUnreadMessage] = useState<UnreadMessage | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const lastNotifId = useRef<string | null>(null);
-    const autoDismissTimer = useRef<NodeJS.Timeout | null>(null);
+    const autoDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         if (isVisitor || !user) return;
@@ -73,7 +73,6 @@ export default function MessagePopup() {
         };
     }, [user, isVisitor]);
 
-    const isMGT = user?.membershipType === 'MGT';
     const isSenderMGT = unreadMessage?.sender?.membershipType === 'MGT';
 
     if (!unreadMessage) return null;

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
-import { Trash2, Gift, Edit2, User as UserIcon, Check, X, Mail } from 'lucide-react';
+import { Trash2, Gift, Edit2, User as UserIcon, Check, X } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import AdminCreatePost from '../components/AdminCreatePost';

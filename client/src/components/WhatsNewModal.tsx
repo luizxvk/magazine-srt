@@ -178,7 +178,7 @@ export default function WhatsNewModal() {
                         Entendi, vamos lá!
                     </button>
                     <p className="text-center text-zinc-500 text-xs mt-3">
-                        Obrigado por fazer parte do Clube Magazine! ❤️
+                        Obrigado por fazer parte do {isMGT ? 'Clube MGT' : 'Clube Magazine'}!
                     </p>
                 </div>
             </div>

@@ -41,19 +41,25 @@ export default function ForgotPasswordModal({ isOpen, onClose, isMGT }: ForgotPa
                 const emailSent = await sendPasswordResetEmail(emailData);
                 
                 if (emailSent) {
-                    setMessage('Email enviado com sucesso! Verifique sua caixa de entrada.');
+                    setMessage('Email enviado com sucesso! Verifique sua caixa de entrada (e spam).');
                 } else {
-                    setError('Falha ao enviar email. Tente novamente.');
+                    // EmailJS failed - show link directly for now
+                    setError('Falha ao enviar email. Use o link abaixo:');
+                    setMessage(emailData.reset_link);
                 }
             } else {
-                // EmailJS not configured - show message for dev/testing
-                console.log('[Dev] Reset link:', emailData.reset_link);
-                setMessage('Link de redefinição gerado. Configure o EmailJS para envio automático.');
-                // For development: show link in console
-                setStep('RESET');
+                // EmailJS not configured - show link directly
+                setMessage('Copie o link abaixo para redefinir sua senha:');
+                setToken(emailData.reset_link);
+                // Auto navigate to reset step
+                setTimeout(() => setStep('RESET'), 500);
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Falha ao solicitar redefinição.');
+            if (err.response?.status === 429) {
+                setError('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+            } else {
+                setError(err.response?.data?.error || 'Falha ao solicitar redefinição.');
+            }
         } finally {
             setLoading(false);
         }

@@ -21,7 +21,6 @@ interface FeedItemProps {
     onComment?: (id: string | number) => void;
     onDelete?: (id: string | number) => void;
     onShare?: (id: string | number) => void;
-    onReport?: (id: string | number) => void;
     isExpanded?: boolean;
 }
 
@@ -88,7 +87,6 @@ export default function FeedItem({
     onComment,
     onDelete,
     onShare,
-    onReport,
     isExpanded = false
 }: FeedItemProps) {
     const { user, theme } = useAuth();

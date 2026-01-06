@@ -26,8 +26,8 @@ const loginSchema = z.object({
     password: z.string(),
 });
 
-// Maintenance mode flag - set to false to re-enable registration/login
-const MAINTENANCE_MODE = true;
+// Maintenance mode flag - set to true to block registration/login
+const MAINTENANCE_MODE = false;
 const MAINTENANCE_MESSAGE = 'Estamos em manutenção! 🚧 Aguarde, em breve lançaremos a versão Beta com novidades incríveis. Fique atento às nossas redes sociais!';
 
 export const register = async (req: Request, res: Response) => {

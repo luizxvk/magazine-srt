@@ -24,7 +24,7 @@ export default function Register() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
-    const [showMaintenancePopup, setShowMaintenancePopup] = useState(true);
+    const [showMaintenancePopup, setShowMaintenancePopup] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [avatarBase64, setAvatarBase64] = useState<string>('');
     

@@ -23,8 +23,8 @@ export default function ModernLogin() {
     const location = useLocation();
     const { login, loginAsVisitor } = useAuth();
 
-    // Maintenance popup state
-    const [showMaintenancePopup, setShowMaintenancePopup] = useState(true);
+    // Maintenance popup state (disabled for beta)
+    const [showMaintenancePopup, setShowMaintenancePopup] = useState(false);
 
     // Determine initial state based on navigation or storage
     const initialMembership = location.state?.membershipType || localStorage.getItem('lastMembershipType') || 'MAGAZINE';

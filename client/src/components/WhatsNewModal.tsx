@@ -16,7 +16,6 @@ export default function WhatsNewModal() {
     const [isOpen, setIsOpen] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
 
-    const themeColor = isMGT ? 'emerald' : 'yellow';
     const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
     const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
     const accentColor = isMGT ? 'text-emerald-400' : 'text-yellow-400';

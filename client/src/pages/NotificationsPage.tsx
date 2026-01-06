@@ -5,6 +5,7 @@ import api from '../services/api';
 import { Bell, Heart, MessageCircle, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ModernLoader from '../components/ModernLoader';
 
 interface Notification {
     id: string;
@@ -136,9 +137,7 @@ export default function NotificationsPage() {
                 </div>
 
                 {loading ? (
-                    <div className={`text-center py-20 animate-pulse ${themeLoading}`}>
-                        <p className="text-center">Carregando notificações...</p>
-                    </div>
+                    <ModernLoader text="Carregando notificações..." />
                 ) : notifications.length === 0 ? (
                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
                         <Bell className={`w-12 h-12 ${themeEmptyIcon} mx-auto mb-4`} />

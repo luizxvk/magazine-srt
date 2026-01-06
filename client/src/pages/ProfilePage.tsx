@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
+import ModernLoader from '../components/ModernLoader';
 import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -123,7 +124,7 @@ export default function ProfilePage() {
         }
     };
 
-    if (!profileUser) return <div className="min-h-screen flex items-center justify-center text-gold-500">Carregando perfil...</div>;
+    if (!profileUser) return <ModernLoader text="Carregando perfil..." fullScreen />;
 
     const isMGT = profileUser.membershipType === 'MGT';
 

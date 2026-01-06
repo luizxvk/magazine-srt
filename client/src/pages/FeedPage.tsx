@@ -12,6 +12,7 @@ import { Sparkles, Users, Calendar } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import DailyLoginCard from '../components/DailyLoginCard';
+import ModernLoader from '../components/ModernLoader';
 
 import AnnouncementCard from '../components/AnnouncementCard';
 import StoriesBar from '../components/StoriesBar';
@@ -244,9 +245,7 @@ export default function FeedPage() {
 
                     {/* Feed Carousel & Feed Items */}
                     {loading ? (
-                        <div className="flex items-center justify-center py-20">
-                            <p className="text-gray-400 font-serif text-xl animate-pulse text-center">Carregando por enquanto...</p>
-                        </div>
+                        <ModernLoader text="Carregando feed..." />
                     ) : (
                         <>
                             {highlightedPosts.length > 0 && (

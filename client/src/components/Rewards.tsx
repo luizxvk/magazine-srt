@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Gift, Lock, Check, Clock, Box, Tag } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import ModernLoader from './ModernLoader';
 
 interface Reward {
     id: string;
@@ -99,7 +100,7 @@ export default function Rewards() {
         }
     };
 
-    if (loading) return <div className={`text-center ${themeColor} animate-pulse py-12 w-full`}>Carregando recompensas...</div>;
+    if (loading) return <ModernLoader text="Carregando recompensas..." />;
 
     return (
         <div className="space-y-12">

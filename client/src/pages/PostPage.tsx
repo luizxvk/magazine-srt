@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import FeedItem from '../components/FeedItem';
+import ModernLoader from '../components/ModernLoader';
 import api from '../services/api';
 import { ArrowLeft } from 'lucide-react';
 
@@ -60,7 +61,7 @@ export default function PostPage() {
         if (id) fetchPost();
     }, [id]);
 
-    if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Carregando...</div>;
+    if (loading) return <ModernLoader text="Carregando post..." fullScreen />;
     if (!post) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Post não encontrado</div>;
 
     return (

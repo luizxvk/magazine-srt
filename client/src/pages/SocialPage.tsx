@@ -5,6 +5,7 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ModernLoader from '../components/ModernLoader';
 
 interface Friend {
     id: string;
@@ -151,7 +152,7 @@ export default function SocialPage() {
 
                 {/* Content */}
                 {loading ? (
-                    <div className={`text-center py-20 animate-pulse ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`}>Carregando...</div>
+                    <ModernLoader text="Carregando..." />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {activeTab === 'friends' ? (

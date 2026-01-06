@@ -1,22 +1,36 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, User, FileText, Hash, Clock, TrendingUp } from 'lucide-react';
+import { Search, X, User, FileText, Hash, Clock, TrendingUp, Calendar, Gift, Star, Users, Trophy, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 interface SearchResult {
     id: string;
-    type: 'user' | 'post' | 'tag';
+    type: 'user' | 'post' | 'tag' | 'page';
     title: string;
     subtitle?: string;
     imageUrl?: string;
+    icon?: string;
+    path?: string;
 }
 
 interface SearchModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
+
+// Navigation pages that can be searched
+const NAVIGATION_PAGES = [
+    { id: 'events', title: 'Eventos', subtitle: 'Próximos eventos e atividades', keywords: ['eventos', 'event', 'calendario', 'atividades'], icon: '🎉', path: '/feed', action: 'events' },
+    { id: 'rewards', title: 'Recompensas', subtitle: 'Resgate prêmios com seus Zions', keywords: ['recompensas', 'rewards', 'premios', 'zions', 'resgatar'], icon: '🎁', path: '/rewards' },
+    { id: 'highlights', title: 'Destaques', subtitle: 'Melhores posts da semana', keywords: ['destaques', 'highlights', 'melhores', 'top', 'semana'], icon: '⭐', path: '/highlights' },
+    { id: 'ranking', title: 'Ranking', subtitle: 'Classificação dos membros', keywords: ['ranking', 'rankings', 'classificação', 'top', 'lideres', 'trofeus'], icon: '🏆', path: '/ranking' },
+    { id: 'profile', title: 'Meu Perfil', subtitle: 'Veja e edite seu perfil', keywords: ['perfil', 'profile', 'meu', 'conta', 'avatar'], icon: '👤', path: '/profile' },
+    { id: 'notifications', title: 'Notificações', subtitle: 'Suas notificações', keywords: ['notificações', 'notifications', 'alertas', 'avisos'], icon: '🔔', path: '/notifications' },
+    { id: 'mgt-log', title: 'MGT Log', subtitle: 'Histórico de atividades', keywords: ['mgt', 'log', 'historico', 'atividades'], icon: '📋', path: '/mgt-log' },
+    { id: 'admin', title: 'Painel Admin', subtitle: 'Administração do sistema', keywords: ['admin', 'administração', 'painel', 'dashboard'], icon: '⚙️', path: '/admin' },
+];
 
 const SUGGESTIONS = [
     { label: 'Eventos', icon: '🎉' },
@@ -63,11 +77,32 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const performSearch = async () => {
         setLoading(true);
         try {
+            const formattedResults: SearchResult[] = [];
+            const searchLower = query.toLowerCase().trim();
+            
+            // First, search navigation pages locally
+            const matchingPages = NAVIGATION_PAGES.filter(page => 
+                page.keywords.some(keyword => keyword.includes(searchLower) || searchLower.includes(keyword)) ||
+                page.title.toLowerCase().includes(searchLower)
+            );
+            
+            matchingPages.forEach(page => {
+                // Skip admin page for non-admins
+                if (page.id === 'admin' && user?.role !== 'ADMIN') return;
+                
+                formattedResults.push({
+                    id: page.id,
+                    type: 'page',
+                    title: page.title,
+                    subtitle: page.subtitle,
+                    icon: page.icon,
+                    path: page.path
+                });
+            });
+            
+            // Then search users and posts from API
             const response = await api.get(`/users/search?q=${encodeURIComponent(query)}`);
             const { users, posts } = response.data;
-            
-            // Transform API response to SearchResult format
-            const formattedResults: SearchResult[] = [];
             
             // Filter by active tab
             if (activeTab === 'all' || activeTab === 'users') {
@@ -118,6 +153,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             case 'post':
                 navigate(`/feed?postId=${result.id}`);
                 break;
+            case 'page':
+                if (result.path) {
+                    navigate(result.path);
+                }
+                break;
             default:
                 break;
         }
@@ -132,12 +172,23 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         localStorage.removeItem('recentSearches');
     };
 
-    const getResultIcon = (type: string) => {
+    const getResultIcon = (type: string, icon?: string) => {
+        if (icon) return <span className="text-lg">{icon}</span>;
         switch (type) {
             case 'user': return <User className="w-4 h-4" />;
             case 'post': return <FileText className="w-4 h-4" />;
             case 'tag': return <Hash className="w-4 h-4" />;
+            case 'page': return <Navigation className="w-4 h-4" />;
             default: return <Search className="w-4 h-4" />;
+        }
+    };
+
+    const getResultTypeLabel = (type: string) => {
+        switch (type) {
+            case 'user': return 'Usuário';
+            case 'post': return 'Post';
+            case 'page': return 'Página';
+            default: return type;
         }
     };
 
@@ -281,7 +332,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             <img src={result.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
                                         ) : (
                                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
-                                                {getResultIcon(result.type)}
+                                                {getResultIcon(result.type, result.icon)}
                                             </div>
                                         )}
                                         <div className="flex-1 min-w-0">
@@ -294,8 +345,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                 </p>
                                             )}
                                         </div>
-                                        <span className={`text-xs px-2 py-1 rounded-full ${theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/5 text-gray-400'}`}>
-                                            {result.type === 'user' ? 'Usuário' : result.type === 'post' ? 'Post' : 'Tag'}
+                                        <span className={`text-xs px-2 py-1 rounded-full ${
+                                            result.type === 'page' 
+                                                ? (isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400')
+                                                : (theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/5 text-gray-400')
+                                        }`}>
+                                            {getResultTypeLabel(result.type)}
                                         </span>
                                     </button>
                                 ))}

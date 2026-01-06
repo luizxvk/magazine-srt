@@ -22,6 +22,7 @@ import AchievementPopup from './components/AchievementPopup';
 import MessagePopup from './components/MessagePopup';
 import DevBanner from './components/DevBanner';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
+import WhatsNewModal from './components/WhatsNewModal';
 
 
 
@@ -58,6 +59,7 @@ function App() {
         </Routes>
         <AchievementWrapper />
         <ZionsModalWrapper />
+        <WhatsNewModal />
         <MessagePopup />
         <DevBanner />
       </Router>

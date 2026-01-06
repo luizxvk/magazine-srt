@@ -284,7 +284,6 @@ export default function FeedPage() {
                                             onComment={() => setActiveCommentPostId(post.id)}
                                             onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}
                                             onShare={() => handleShare(post.id)}
-                                            onReport={() => showToast('Denúncia enviada para análise.', 'success')}
                                         />
                                     ))}
                                 </div>

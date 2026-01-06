@@ -93,7 +93,6 @@ export default function PostPage() {
                         onComment={() => { }}
                         onDelete={() => { }}
                         onShare={() => { }}
-                        onReport={() => { }}
                         isExpanded={true} // New prop to indicate expanded view
                     />
                 </div>

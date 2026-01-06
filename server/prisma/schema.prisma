@@ -51,6 +51,13 @@ model User {
   catalogPhotos CatalogPhoto[]
   zionPurchases ZionPurchase[]
   reportsSent  Report[] @relation("ReportsSent")
+
+  // Performance indexes
+  @@index([membershipType])
+  @@index([isOnline])
+  @@index([createdAt])
+  @@index([trophies])
+  @@index([zions])
 }
 
 model Story {
@@ -62,6 +69,10 @@ model Story {
 
   user      User     @relation(fields: [userId], references: [id])
   views     StoryView[]
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([createdAt])
 }
 
 model StoryView {
@@ -87,6 +98,11 @@ model Message {
 
   sender    User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@index([senderId, receiverId])
 }
 
 model Post {
@@ -109,6 +125,11 @@ model Post {
   comments    Comment[]
   likes       Like[]
   tags        PostTag[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([isHighlight])
+  @@index([isRemoved])
 }
 
 model Comment {
@@ -120,6 +141,10 @@ model Comment {
 
   post      Post     @relation(fields: [postId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([postId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Like {
@@ -260,6 +285,11 @@ model Notification {
   createdAt DateTime         @default(now())
 
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([userId, read])
 }
 
 model PostTag {

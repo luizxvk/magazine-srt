@@ -9,7 +9,7 @@ interface AdminCreateEventProps {
 }
 
 export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCreateEventProps) {
-    const { user, theme } = useAuth();
+    const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
     const [isOpen, setIsOpen] = useState(false);

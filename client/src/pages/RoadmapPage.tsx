@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Code2, Shield, MessageSquare, Image, Users, Star, Zap, Globe, BrainCircuit } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -115,38 +115,6 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '12',
-        title: 'Eventos e Meetups',
-        description: 'Agende e participe de eventos presenciais e online.',
-        status: 'planned',
-        icon: <Globe className="w-5 h-5" />,
-        category: 'community'
-    },
-    {
-        id: '13',
-        title: 'Marketplace de Peças',
-        description: 'Compre e venda peças e acessórios com outros membros.',
-        status: 'planned',
-        icon: <Code2 className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '14',
-        title: 'App Mobile Nativo',
-        description: 'Aplicativo nativo para iOS e Android com notificações push.',
-        status: 'planned',
-        icon: <Rocket className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '15',
-        title: 'Integração com Discord',
-        description: 'Sincronize seu perfil e notificações com o Discord da comunidade.',
-        status: 'planned',
-        icon: <MessageSquare className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '16',
         title: 'Revista Digital com IA',
         description: 'Gere revistas digitais exclusivas usando IA com base nas fotos do seu catálogo. Crie layouts profissionais automaticamente.',
         status: 'planned',
@@ -154,7 +122,23 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '17',
+        id: '13',
+        title: 'App Mobile Nativo',
+        description: 'Aplicativo nativo para iOS e Android com notificações push.',
+        status: 'planned',
+        icon: <Rocket className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '14',
+        title: 'Integração com Discord',
+        description: 'Sincronize seu perfil e notificações com o Discord da comunidade.',
+        status: 'planned',
+        icon: <MessageSquare className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '15',
         title: 'Sistema de Pagamentos PIX',
         description: 'Compre Zions e produtos diretamente com PIX via QR Code.',
         status: 'completed',
@@ -163,7 +147,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '18',
+        id: '16',
         title: 'Recuperação de Senha por Email',
         description: 'Sistema seguro de recuperação de senha com link enviado por email.',
         status: 'completed',
@@ -269,7 +253,7 @@ export default function RoadmapPage() {
                 <div className="text-center mb-12">
                     <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${themeBg} ${themeBorder} border mb-4`}>
                         <Rocket className={`w-4 h-4 ${themeAccent}`} />
-                        <span className={`text-sm font-medium ${themeAccent}`}>Roadmap 2025</span>
+                        <span className={`text-sm font-medium ${themeAccent}`}>Roadmap 2026</span>
                     </div>
                     <h1 className={`text-4xl md:text-5xl font-serif mb-4 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                         O Futuro da Plataforma

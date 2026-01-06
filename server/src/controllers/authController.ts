@@ -18,6 +18,7 @@ const registerSchema = z.object({
     password: z.string().min(6),
     name: z.string().min(2),
     membershipType: z.enum(['MAGAZINE', 'MGT']).optional(),
+    avatarUrl: z.string().optional(),
 });
 
 const loginSchema = z.object({
@@ -27,7 +28,7 @@ const loginSchema = z.object({
 
 export const register = async (req: Request, res: Response) => {
     try {
-        const { email, password, name, membershipType } = registerSchema.parse(req.body);
+        const { email, password, name, membershipType, avatarUrl } = registerSchema.parse(req.body);
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
@@ -43,6 +44,7 @@ export const register = async (req: Request, res: Response) => {
                 name,
                 displayName: name,
                 membershipType: membershipType || 'MAGAZINE',
+                avatarUrl: avatarUrl || null,
             },
         });
 

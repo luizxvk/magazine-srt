@@ -26,8 +26,20 @@ const loginSchema = z.object({
     password: z.string(),
 });
 
+// Maintenance mode flag - set to false to re-enable registration/login
+const MAINTENANCE_MODE = true;
+const MAINTENANCE_MESSAGE = 'Estamos em manutenção! 🚧 Aguarde, em breve lançaremos a versão Beta com novidades incríveis. Fique atento às nossas redes sociais!';
+
 export const register = async (req: Request, res: Response) => {
     try {
+        // Block registration during maintenance
+        if (MAINTENANCE_MODE) {
+            return res.status(503).json({ 
+                error: 'maintenance',
+                message: MAINTENANCE_MESSAGE 
+            });
+        }
+
         const { email, password, name, membershipType, avatarUrl } = registerSchema.parse(req.body);
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -72,21 +84,31 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
-        console.log('Login attempt:', req.body); // Log request body
-        const { email, password } = loginSchema.parse(req.body);
-        console.log('Login schema parsed for:', email);
+        // Block login during maintenance (except admin)
+        const { email } = req.body;
+        if (MAINTENANCE_MODE && email !== 'admin@magazine.com') {
+            return res.status(503).json({ 
+                error: 'maintenance',
+                message: MAINTENANCE_MESSAGE 
+            });
+        }
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        console.log('Login attempt:', req.body); // Log request body
+        const { email: parsedEmail, password } = loginSchema.parse(req.body);
+        console.log('Login schema parsed for:', parsedEmail);
+
+        const user = await prisma.user.findUnique({ where: { email: parsedEmail } });
         if (!user) {
-            console.log('User not found:', email);
+            console.log('User not found:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
         console.log('User found:', user.email, user.passwordHash);
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);
         console.log('Password valid:', validPassword);
+        // Note: Using parsedEmail from schema parse above
         if (!validPassword) {
-            console.log('Invalid password for:', email);
+            console.log('Invalid password for:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Mail, Lock, ArrowRight, Check } from 'lucide-react';
 import api from '../services/api';
+import { sendPasswordResetEmail, isEmailJSConfigured } from '../services/emailjs';
 
 interface ForgotPasswordModalProps {
     isOpen: boolean;
@@ -16,18 +17,40 @@ export default function ForgotPasswordModal({ isOpen, onClose, isMGT }: ForgotPa
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+
     const handleRequestReset = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setMessage('');
+        
         try {
+            // 1. Request reset token from backend
             const response = await api.post('/auth/request-reset', { email });
-            setMessage(response.data.message);
+            
+            // If user doesn't exist, show generic message
+            if (!response.data.exists) {
+                setMessage('Se uma conta existir com este email, você receberá instruções.');
+                return;
+            }
 
-            // DEMO ONLY: Auto-fill token if provided
-            if (response.data.demoToken) {
-                setToken(response.data.demoToken);
-                setTimeout(() => setStep('RESET'), 1500);
+            // 2. Send email via EmailJS
+            const { emailData } = response.data;
+            
+            if (isEmailJSConfigured()) {
+                const emailSent = await sendPasswordResetEmail(emailData);
+                
+                if (emailSent) {
+                    setMessage('Email enviado com sucesso! Verifique sua caixa de entrada.');
+                } else {
+                    setError('Falha ao enviar email. Tente novamente.');
+                }
+            } else {
+                // EmailJS not configured - show message for dev/testing
+                console.log('[Dev] Reset link:', emailData.reset_link);
+                setMessage('Link de redefinição gerado. Configure o EmailJS para envio automático.');
+                // For development: show link in console
+                setStep('RESET');
             }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Falha ao solicitar redefinição.');

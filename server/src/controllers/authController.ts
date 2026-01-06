@@ -184,7 +184,10 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             // Security: Don't reveal if user exists
-            return res.json({ message: 'Se uma conta existir com este email, um link de redefinição foi enviado.' });
+            return res.json({ 
+                message: 'Se uma conta existir com este email, você receberá instruções.',
+                exists: false 
+            });
         }
 
         // Generate secure Token
@@ -196,19 +199,20 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
             data: { resetToken, resetTokenExpiry }
         });
 
-        // Send email
-        const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
-        
-        if (emailSent) {
-            res.json({ message: 'Link de redefinição enviado para seu email.' });
-        } else {
-            // If email not configured, return token for development
-            console.log('[Auth] Email not sent, returning token for dev:', resetToken);
-            res.json({ 
-                message: 'Link de redefinição gerado.', 
-                devToken: process.env.NODE_ENV !== 'production' ? resetToken : undefined 
-            });
-        }
+        // Build reset link
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+        // Return data for frontend to send email via EmailJS
+        res.json({ 
+            message: 'Dados de redefinição gerados com sucesso.',
+            exists: true,
+            emailData: {
+                to_email: email,
+                to_name: user.name || user.displayName || 'Usuário',
+                reset_link: resetLink
+            }
+        });
 
     } catch (error) {
         console.error('[Auth] Request password reset error:', error);

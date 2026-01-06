@@ -227,6 +227,8 @@ export const resetPassword = async (req: Request, res: Response) => {
             newPassword: z.string().min(6)
         }).parse(req.body);
 
+        console.log('[Auth] Reset password attempt with token:', token.substring(0, 10) + '...');
+
         const user = await prisma.user.findFirst({
             where: {
                 resetToken: token,
@@ -235,8 +237,11 @@ export const resetPassword = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(400).json({ error: 'Invalid or expired token' });
+            console.log('[Auth] Reset failed - invalid or expired token');
+            return res.status(400).json({ error: 'Token inválido ou expirado. Solicite um novo link.' });
         }
+
+        console.log('[Auth] Resetting password for user:', user.email);
 
         const passwordHash = await bcrypt.hash(newPassword, 10);
 
@@ -249,7 +254,9 @@ export const resetPassword = async (req: Request, res: Response) => {
             }
         });
 
-        res.json({ message: 'Password reset successfully' });
+        console.log('[Auth] Password reset SUCCESS for:', user.email);
+
+        res.json({ message: 'Senha redefinida com sucesso! Faça login com sua nova senha.' });
 
     } catch (error) {
         if (error instanceof z.ZodError) {

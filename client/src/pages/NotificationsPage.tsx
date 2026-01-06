@@ -31,7 +31,6 @@ export default function NotificationsPage() {
     const themeShadow = isMGT ? 'shadow-[0_0_15px_rgba(220,20,60,0.1)]' : 'shadow-[0_0_15px_rgba(212,175,55,0.1)]';
     const themeIconBg = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
     const themeDot = isMGT ? 'bg-emerald-500 shadow-[0_0_10px_#DC143C]' : 'bg-gold-500 shadow-[0_0_10px_#D4AF37]';
-    const themeLoading = isMGT ? 'text-emerald-500/50' : 'text-gold-500/50';
     const themeEmptyIcon = isMGT ? 'text-emerald-500/30' : 'text-gold-500/30';
 
     useEffect(() => {

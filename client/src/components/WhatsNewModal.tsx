@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check } from 'lucide-react';
+import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.2.0';
+const CURRENT_VERSION = '0.2.1';
 
 interface UpdateItem {
     icon: React.ReactNode;
     title: string;
     description: string;
     type: 'fix' | 'feature' | 'improvement';
+    version?: string;
 }
 
 export default function WhatsNewModal() {
     const { user } = useAuth();
+    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
 
@@ -22,59 +25,94 @@ export default function WhatsNewModal() {
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
+    // Todas as atualizações acumuladas (mais recentes primeiro)
     const updates: UpdateItem[] = [
+        // v0.2.1 - 06/01/2026
+        {
+            icon: <Smartphone className="w-5 h-5" />,
+            title: 'Login Mobile Melhorado',
+            description: 'Tela de login agora é vertical em dispositivos mobile para melhor usabilidade.',
+            type: 'improvement',
+            version: '0.2.1'
+        },
+        {
+            icon: <Layout className="w-5 h-5" />,
+            title: 'Responsividade Aprimorada',
+            description: 'Correções de viewport para dispositivos mobile. Sem mais necessidade de zoom.',
+            type: 'fix',
+            version: '0.2.1'
+        },
+        {
+            icon: <Shield className="w-5 h-5" />,
+            title: 'Popup de Sessão Expirada',
+            description: 'Novo popup estilizado quando a sessão é encerrada por login em outro dispositivo.',
+            type: 'improvement',
+            version: '0.2.1'
+        },
+        // v0.2.0 - 06/01/2026
         {
             icon: <Shield className="w-5 h-5" />,
             title: 'Login Único por Dispositivo',
             description: 'Agora sua conta só pode estar logada em um dispositivo por vez, aumentando a segurança.',
-            type: 'feature'
+            type: 'feature',
+            version: '0.2.0'
         },
         {
             icon: <Heart className="w-5 h-5" />,
             title: 'Curtidas Corrigidas',
             description: 'O problema das curtidas sumindo foi resolvido. Suas curtidas agora são salvas corretamente!',
-            type: 'fix'
+            type: 'fix',
+            version: '0.2.0'
         },
         {
             icon: <Trophy className="w-5 h-5" />,
             title: 'Novas Conquistas',
             description: 'Adicionamos 12 novas conquistas para você desbloquear. Confira na aba de conquistas!',
-            type: 'feature'
+            type: 'feature',
+            version: '0.2.0'
         },
         {
             icon: <Zap className="w-5 h-5" />,
             title: 'Sistema de Níveis Melhorado',
             description: 'Ganhe XP automaticamente ao postar e comentar. Level up agora gera notificação!',
-            type: 'improvement'
+            type: 'improvement',
+            version: '0.2.0'
         },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Bônus Diário Corrigido',
             description: 'O popup do bônus diário não aparece mais repetidamente após ser fechado.',
-            type: 'fix'
+            type: 'fix',
+            version: '0.2.0'
         },
         {
             icon: <Image className="w-5 h-5" />,
             title: 'Avatar GIF Premium',
             description: 'Membros nível 15+ agora podem usar GIFs animados como avatar (até 2MB).',
-            type: 'feature'
+            type: 'feature',
+            version: '0.2.0'
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Stories Modo Claro',
             description: 'Cores dos stories ajustadas para melhor visualização no modo claro (MGT).',
-            type: 'improvement'
+            type: 'improvement',
+            version: '0.2.0'
         },
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: 'Interface Aprimorada',
             description: 'Diversos ajustes visuais: loading centralizado, popups estilizados e mais.',
-            type: 'improvement'
+            type: 'improvement',
+            version: '0.2.0'
         }
     ];
 
     useEffect(() => {
-        if (user) {
+        // Só mostrar se: usuário logado E NÃO está na tela de login/register
+        const isAuthPage = ['/', '/login', '/register', '/request-invite'].includes(location.pathname);
+        
+        if (user && !isAuthPage) {
             const lastSeenVersion = localStorage.getItem('whatsNewVersion');
             if (lastSeenVersion !== CURRENT_VERSION) {
                 // Delay para não conflitar com outros modais
@@ -82,7 +120,7 @@ export default function WhatsNewModal() {
                 return () => clearTimeout(timer);
             }
         }
-    }, [user]);
+    }, [user, location.pathname]);
 
     const handleClose = () => {
         localStorage.setItem('whatsNewVersion', CURRENT_VERSION);

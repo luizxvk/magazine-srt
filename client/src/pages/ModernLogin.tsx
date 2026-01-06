@@ -78,22 +78,22 @@ export default function ModernLogin() {
 
 
             {/* Logo Top Center */}
-            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center animate-fade-in-down">
+            <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center animate-fade-in-down">
                 <img
                     src={logo}
                     alt="Logo"
-                    className={`h-28 w-auto drop-shadow-[0_0_15px_${isMGT ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.5)'}] transition-all duration-500`}
+                    className={`h-16 md:h-28 w-auto drop-shadow-[0_0_15px_${isMGT ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.5)'}] transition-all duration-500`}
                 />
             </div>
 
-            {/* Main Card Container */}
-            <div className="relative w-full max-w-[1000px] min-h-[600px] bg-neutral-950/60 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/5 flex z-10">
+            {/* Main Card Container - Vertical on mobile, horizontal on desktop */}
+            <div className="relative w-full max-w-[1000px] min-h-[600px] md:min-h-[600px] bg-neutral-950/60 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/5 flex flex-col md:flex-row z-10 mx-4 my-20 md:my-0">
 
-                {/* LEFT PANEL (Magazine Form) - Visible when !isMGT */}
-                <div className={`absolute top-0 left-0 w-1/2 h-full flex flex-col justify-center p-12 transition-all duration-700 ease-in-out ${isMGT ? 'opacity-0 -translate-x-20 pointer-events-none' : 'opacity-100 translate-x-0 z-10'}`}>
-                    <div className="text-center mb-8">
-                        <img src={logo} alt="Magazine" className="h-48 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
-                        <h2 className="text-3xl font-bold text-gradient-gold mb-2">MAGAZINE</h2>
+                {/* LEFT PANEL (Magazine Form) - Full width on mobile when active */}
+                <div className={`md:absolute md:top-0 md:left-0 md:w-1/2 w-full md:h-full flex flex-col justify-center p-6 md:p-12 transition-all duration-700 ease-in-out ${isMGT ? 'hidden md:flex md:opacity-0 md:-translate-x-20 md:pointer-events-none' : 'flex opacity-100 translate-x-0 z-10'}`}>
+                    <div className="text-center mb-6 md:mb-8">
+                        <img src={logo} alt="Magazine" className="h-24 md:h-48 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
+                        <h2 className="text-2xl md:text-3xl font-bold text-gradient-gold mb-2">MAGAZINE</h2>
                         <p className="text-gold-400/60 text-xs uppercase tracking-widest">A Elite do Sucesso</p>
                     </div>
 
@@ -106,7 +106,7 @@ export default function ModernLogin() {
                         onForgotPassword={() => setIsForgotPasswordOpen(true)}
                     />
 
-                    <div className="mt-6 text-center">
+                    <div className="mt-4 md:mt-6 text-center">
                         <p className="text-gray-500 text-xs">
                             Deseja fazer parte?
                             <Link to="/request-invite" className="text-gold-400 hover:text-gold-300 font-bold ml-1 transition-colors">
@@ -114,13 +114,21 @@ export default function ModernLogin() {
                             </Link>
                         </p>
                     </div>
+
+                    {/* Mobile: Button to switch to MGT */}
+                    <button
+                        onClick={toggleMembership}
+                        className="md:hidden mt-6 w-full py-3 rounded-xl border border-emerald-500/50 text-emerald-500 font-bold uppercase tracking-widest text-xs"
+                    >
+                        Acessar MGT
+                    </button>
                 </div>
 
-                {/* RIGHT PANEL (MGT Form) - Visible when isMGT - EMERALD THEME */}
-                <div className={`absolute top-0 right-0 w-1/2 h-full flex flex-col justify-center p-12 transition-all duration-700 ease-in-out ${!isMGT ? 'opacity-0 translate-x-20 pointer-events-none' : 'opacity-100 translate-x-0 z-10'}`}>
-                    <div className="text-center mb-8">
-                        <img src={logoMgt} alt="MGT" className="h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                        <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">MGT</h2>
+                {/* RIGHT PANEL (MGT Form) - Full width on mobile when active */}
+                <div className={`md:absolute md:top-0 md:right-0 md:w-1/2 w-full md:h-full flex flex-col justify-center p-6 md:p-12 transition-all duration-700 ease-in-out ${!isMGT ? 'hidden md:flex md:opacity-0 md:translate-x-20 md:pointer-events-none' : 'flex opacity-100 translate-x-0 z-10'}`}>
+                    <div className="text-center mb-6 md:mb-8">
+                        <img src={logoMgt} alt="MGT" className="h-16 md:h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">MGT</h2>
                         <p className="text-emerald-500/80 text-xs uppercase tracking-widest">Velocidade e Poder</p>
                     </div>
 
@@ -133,7 +141,7 @@ export default function ModernLogin() {
                         onForgotPassword={() => setIsForgotPasswordOpen(true)}
                     />
 
-                    <div className="mt-6 text-center">
+                    <div className="mt-4 md:mt-6 text-center">
                         <p className="text-gray-500 text-xs">
                             Ainda não é membro?
                             <Link to="/register" state={{ membershipType: 'MGT' }} className="text-emerald-500 hover:text-emerald-400 font-bold ml-1 transition-colors">
@@ -141,10 +149,18 @@ export default function ModernLogin() {
                             </Link>
                         </p>
                     </div>
+
+                    {/* Mobile: Button to switch to Magazine */}
+                    <button
+                        onClick={toggleMembership}
+                        className="md:hidden mt-6 w-full py-3 rounded-xl border border-gold-500/50 text-gold-400 font-bold uppercase tracking-widest text-xs"
+                    >
+                        Acessar Magazine
+                    </button>
                 </div>
 
-                {/* OVERLAY / SLIDER */}
-                <div className={`absolute top-0 left-0 w-1/2 h-full overflow-hidden transition-transform duration-700 ease-in-out z-20 ${isMGT ? 'translate-x-0' : 'translate-x-full'}`}>
+                {/* OVERLAY / SLIDER - Hidden on mobile */}
+                <div className={`hidden md:block absolute top-0 left-0 w-1/2 h-full overflow-hidden transition-transform duration-700 ease-in-out z-20 ${isMGT ? 'translate-x-0' : 'translate-x-full'}`}>
 
                     {/* Inner Content Container */}
                     <div className="relative w-full h-full">
@@ -215,7 +231,7 @@ export default function ModernLogin() {
                     loginAsVisitor(isMGT ? 'MGT' : 'MAGAZINE');
                     navigate('/feed');
                 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500 hover:text-white text-xs uppercase tracking-widest transition-colors opacity-60 hover:opacity-100 z-20"
+                className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 text-gray-500 hover:text-white text-xs uppercase tracking-widest transition-colors opacity-60 hover:opacity-100 z-20"
             >
                 Entrar como Visitante
             </button>

@@ -31,7 +31,16 @@ export const sendFriendRequest = async (req: AuthRequest, res: Response) => {
 
         const requester = await prisma.user.findUnique({
             where: { id: requesterId },
-            select: { name: true }
+            select: { id: true, name: true, avatarUrl: true }
+        });
+
+        const notificationContent = JSON.stringify({
+            text: 'enviou uma solicitação de amizade.',
+            actor: {
+                id: requester?.id,
+                name: requester?.name || 'Alguém',
+                avatarUrl: requester?.avatarUrl
+            }
         });
 
         await prisma.$transaction([
@@ -46,7 +55,7 @@ export const sendFriendRequest = async (req: AuthRequest, res: Response) => {
                 data: {
                     userId: addresseeId,
                     type: 'FRIEND_REQUEST',
-                    content: `${requester?.name || 'Alguém'} enviou uma solicitação de amizade.`
+                    content: notificationContent
                 }
             })
         ]);

@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import StoryViewer from './StoryViewer';
+import { compressImage, getBase64Size } from '../utils/imageCompression';
 
 interface Story {
     id: string;
@@ -60,21 +61,25 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
         fileInputRef.current?.click();
     };
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && user) {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                const imageUrl = reader.result as string;
+            try {
+                // Compress image for faster upload
+                const imageUrl = await compressImage(file, {
+                    maxWidth: 1080,
+                    maxHeight: 1920, // Story aspect ratio
+                    quality: 0.8,
+                    outputFormat: 'image/jpeg'
+                });
+                
+                console.log(`[Story] Compressed to ${getBase64Size(imageUrl)}KB`);
 
                 // Optimistic update
                 setStories(prev => {
                     const existingGroupIndex = prev.findIndex(s => s.user.id === user.id);
 
                     const newStoryItem = {
-                        // Minimal item compatible with the view logic if needed, 
-                        // but for the main list we display the 'latestStory' imageUrl.
-                        // The actual 'items' array inside might be needed if the user opens the viewer.
                         id: `story-local-${Date.now()}`,
                         imageUrl,
                         createdAt: new Date().toISOString(),
@@ -82,14 +87,11 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                     };
 
                     if (existingGroupIndex >= 0) {
-                        // Move to front and update
                         const updatedGroup = {
                             ...prev[existingGroupIndex],
-                            imageUrl: imageUrl, // Update thumbnail to latest
+                            imageUrl: imageUrl,
                             timestamp: 'Agora',
-                            hasUnseen: false, // Own story doesn't show unseen ring typically, or should it? 
-                            // Usually "Your Story" ring is only for others. 
-                            // But if we want to mimic "posted", maybe. 
+                            hasUnseen: false,
                             items: [newStoryItem, ...(prev[existingGroupIndex] as any).items || []]
                         };
 
@@ -97,7 +99,6 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                         newStories.splice(existingGroupIndex, 1);
                         return [updatedGroup, ...newStories];
                     } else {
-                        // Create new group
                         const newGroup: Story = {
                             id: `story-group-${user.id}`,
                             user: {
@@ -108,8 +109,8 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                             imageUrl: imageUrl,
                             timestamp: 'Agora',
                             hasUnseen: false,
-                            items: [newStoryItem] // Initialize items array
-                        } as any; // Cast because Story interface in this file is partial compared to full backend response
+                            items: [newStoryItem]
+                        } as any;
                         return [newGroup, ...prev];
                     }
                 });
@@ -119,10 +120,10 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                     await api.post('/feed/stories', { imageUrl });
                 } catch (error) {
                     console.error('Failed to create story on backend', error);
-                    // Revert logic could go here
                 }
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Failed to process story image', error);
+            }
         }
     };
 

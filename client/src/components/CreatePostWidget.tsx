@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { compressImage, getBase64Size } from '../utils/imageCompression';
 
 interface CreatePostWidgetProps {
     onPostCreated: () => void;
@@ -139,15 +140,31 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
         setShowTagInput(true);
     };
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setMediaUrl(reader.result as string);
+            try {
+                // Compress image for faster upload
+                const compressed = await compressImage(file, {
+                    maxWidth: 1920,
+                    maxHeight: 1920,
+                    quality: 0.85,
+                    outputFormat: 'image/jpeg'
+                });
+                
+                console.log(`[Post] Compressed to ${getBase64Size(compressed)}KB`);
+                setMediaUrl(compressed);
                 setMediaType('IMAGE');
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Failed to compress image', error);
+                // Fallback to original
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setMediaUrl(reader.result as string);
+                    setMediaType('IMAGE');
+                };
+                reader.readAsDataURL(file);
+            }
         }
     };
 

@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import dotenv from 'dotenv';
 import authRoutes from './src/routes/authRoutes';
 import userRoutes from './src/routes/userRoutes';
@@ -28,6 +29,9 @@ logger.init();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Enable gzip compression for all responses
+app.use(compression());
 
 // Security Headers
 app.use(securityHeaders);

@@ -3,6 +3,7 @@ import { X, Upload, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { compressImage, getBase64Size } from '../utils/imageCompression';
 
 interface PhotoUploadModalProps {
     isOpen: boolean;
@@ -44,26 +45,49 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
     const events = ['Drift', 'Street', 'Meeting', 'Roleplay', 'Race'];
 
     const [base64Image, setBase64Image] = useState<string>('');
+    const [isCompressing, setIsCompressing] = useState(false);
+    
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: { 'image/*': [] },
         maxFiles: 1,
-        onDrop: (acceptedFiles) => {
+        onDrop: async (acceptedFiles) => {
             const file = acceptedFiles[0];
             
-            // Check file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Imagem muito grande. Tamanho máximo: 5MB');
+            // Check file size (max 10MB before compression)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Imagem muito grande. Tamanho máximo: 10MB');
                 return;
             }
             
-            // Convert to base64
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const result = reader.result as string;
-                setBase64Image(result);
-                setImageUrl(result);
-            };
-            reader.readAsDataURL(file);
+            try {
+                setIsCompressing(true);
+                
+                // Compress image for faster upload
+                const compressed = await compressImage(file, {
+                    maxWidth: 1920,
+                    maxHeight: 1920,
+                    quality: 0.85,
+                    outputFormat: 'image/jpeg'
+                });
+                
+                const sizeKB = getBase64Size(compressed);
+                console.log(`[Image] Compressed to ${sizeKB}KB`);
+                
+                setBase64Image(compressed);
+                setImageUrl(compressed);
+            } catch (error) {
+                console.error('Failed to compress image', error);
+                // Fallback to original
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const result = reader.result as string;
+                    setBase64Image(result);
+                    setImageUrl(result);
+                };
+                reader.readAsDataURL(file);
+            } finally {
+                setIsCompressing(false);
+            }
         }
     });
 
@@ -129,7 +153,12 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
                                 className={`flex-1 relative rounded-xl overflow-hidden aspect-video ${themeColors.inputBg} border-2 border-dashed ${isDragActive ? 'border-emerald-500 bg-emerald-500/10' : 'border-gray-600'} flex items-center justify-center group cursor-pointer transition-all hover:border-gray-400`}
                             >
                                 <input {...getInputProps()} />
-                                {imageUrl ? (
+                                {isCompressing ? (
+                                    <div className="text-center p-8">
+                                        <Loader2 className="w-12 h-12 mx-auto mb-2 text-emerald-500 animate-spin" />
+                                        <p className="text-sm text-gray-400 font-medium">Otimizando imagem...</p>
+                                    </div>
+                                ) : imageUrl ? (
                                     <div className="relative w-full h-full">
                                         <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

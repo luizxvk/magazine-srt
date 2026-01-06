@@ -1,19 +1,32 @@
-import { Bell, Heart, MessageCircle, Star } from 'lucide-react';
+import { Bell, Heart, MessageCircle, Star, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import ChatWindow from './ChatWindow';
 
 interface Notification {
     id: string;
-    type: 'LIKE' | 'COMMENT' | 'SYSTEM' | 'BADGE';
+    type: 'LIKE' | 'COMMENT' | 'SYSTEM' | 'BADGE' | 'MESSAGE' | 'FRIEND_REQUEST';
     content: string;
     createdAt: string;
     read: boolean;
 }
 
-export default function Notifications() {
+interface ChatUser {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    membershipType?: 'MAGAZINE' | 'MGT';
+}
+
+interface NotificationsProps {
+    onClose?: () => void;
+}
+
+export default function Notifications({ onClose }: NotificationsProps) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [chatUser, setChatUser] = useState<ChatUser | null>(null);
     const navigate = useNavigate();
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
@@ -70,6 +83,70 @@ export default function Notifications() {
         }
     };
 
+    const handleNotificationClick = async (notification: Notification) => {
+        if (!notification.read) {
+            await markAsRead(notification.id);
+        }
+
+        const parsedContent = parseContent(notification.content);
+
+        // Handle different notification types
+        switch (notification.type) {
+            case 'MESSAGE':
+                // Open chat with the sender
+                if (parsedContent.actor) {
+                    setChatUser({
+                        id: parsedContent.actor.id,
+                        name: parsedContent.actor.name,
+                        avatarUrl: parsedContent.actor.avatarUrl,
+                        membershipType: parsedContent.actor.membershipType
+                    });
+                }
+                break;
+
+            case 'LIKE':
+            case 'COMMENT':
+                // Navigate to the post
+                if (parsedContent.postId) {
+                    onClose?.();
+                    navigate(`/feed?postId=${parsedContent.postId}`);
+                }
+                break;
+
+            case 'FRIEND_REQUEST':
+                // Navigate to the requester's profile or friends page
+                if (parsedContent.actor?.id) {
+                    onClose?.();
+                    navigate(`/profile/${parsedContent.actor.id}`);
+                } else {
+                    onClose?.();
+                    navigate('/profile?tab=friends');
+                }
+                break;
+
+            case 'BADGE':
+                // Navigate to profile badges section
+                onClose?.();
+                navigate('/profile?tab=badges');
+                break;
+
+            case 'SYSTEM':
+                // System notifications may have different contexts
+                if (parsedContent.postId) {
+                    onClose?.();
+                    navigate(`/feed?postId=${parsedContent.postId}`);
+                } else if (parsedContent.actor?.id) {
+                    onClose?.();
+                    navigate(`/profile/${parsedContent.actor.id}`);
+                }
+                // Otherwise just mark as read, no navigation
+                break;
+
+            default:
+                break;
+        }
+    };
+
     const getTimeAgo = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
@@ -92,7 +169,19 @@ export default function Notifications() {
     };
 
     return (
-        <div className={`absolute top-12 right-0 w-80 rounded-xl border overflow-hidden z-50 animate-fade-in-up backdrop-blur-xl ${containerStyle}`}>
+        <>
+            {/* Chat Window for MESSAGE notifications */}
+            {chatUser && (
+                <ChatWindow
+                    otherUserId={chatUser.id}
+                    otherUserName={chatUser.name}
+                    otherUserAvatar={chatUser.avatarUrl}
+                    otherUserMembershipType={chatUser.membershipType}
+                    onClose={() => setChatUser(null)}
+                />
+            )}
+            
+            <div className={`absolute top-12 right-0 w-80 rounded-xl border overflow-hidden z-50 animate-fade-in-up backdrop-blur-xl ${containerStyle}`}>
             <div className={`p-4 border-b ${headerBorder} flex justify-between items-center`}>
                 <h3 className={`${titleColor} font-serif text-sm tracking-wider`}>Notificações</h3>
                 <span onClick={markAllAsRead} className={`text-[10px] ${themeText} uppercase tracking-widest cursor-pointer hover:opacity-80 transition-opacity`}>Marcar lidas</span>
@@ -108,9 +197,7 @@ export default function Notifications() {
                         return (
                             <div
                                 key={notification.id}
-                                onClick={() => {
-                                    if (!notification.read) markAsRead(notification.id);
-                                }}
+                                onClick={() => handleNotificationClick(notification)}
                                 className={`p-4 border-b ${itemBorder} transition-colors flex gap-3 cursor-pointer ${!notification.read ? themeBg : ''}`}
                             >
                                 <div className="mt-1 shrink-0 relative">
@@ -124,12 +211,16 @@ export default function Notifications() {
                                             <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-0.5">
                                                 {notification.type === 'LIKE' && <Heart className="w-3 h-3 text-red-400 fill-current" />}
                                                 {notification.type === 'COMMENT' && <MessageCircle className="w-3 h-3 text-blue-400 fill-current" />}
+                                                {notification.type === 'MESSAGE' && <MessageCircle className="w-3 h-3 text-emerald-400 fill-current" />}
+                                                {notification.type === 'FRIEND_REQUEST' && <UserPlus className="w-3 h-3 text-blue-400" />}
                                             </div>
                                         </div>
                                     ) : (
                                         <>
                                             {notification.type === 'LIKE' && <Heart className="w-4 h-4 text-red-400" />}
                                             {notification.type === 'COMMENT' && <MessageCircle className="w-4 h-4 text-blue-400" />}
+                                            {notification.type === 'MESSAGE' && <MessageCircle className="w-4 h-4 text-emerald-400" />}
+                                            {notification.type === 'FRIEND_REQUEST' && <UserPlus className="w-4 h-4 text-blue-400" />}
                                             {notification.type === 'BADGE' && <Star className={`w-4 h-4 ${themeIcon}`} />}
                                             {notification.type === 'SYSTEM' && <Bell className="w-4 h-4 text-gray-400" />}
                                         </>
@@ -152,12 +243,16 @@ export default function Notifications() {
             </div>
             <div className={`p-3 text-center border-t ${footerBg}`}>
                 <button
-                    onClick={() => navigate('/notifications')}
+                    onClick={() => {
+                        onClose?.();
+                        navigate('/notifications');
+                    }}
                     className={`text-[10px] ${timeColor} hover:${titleColor} uppercase tracking-widest transition-colors`}
                 >
                     Ver todas
                 </button>
             </div>
         </div>
+        </>
     );
 }

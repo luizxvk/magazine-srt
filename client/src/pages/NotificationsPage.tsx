@@ -2,23 +2,32 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
-import { Bell, Heart, MessageCircle, Star } from 'lucide-react';
+import { Bell, Heart, MessageCircle, Star, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from '../components/ModernLoader';
+import ChatWindow from '../components/ChatWindow';
 
 interface Notification {
     id: string;
-    type: 'LIKE' | 'COMMENT' | 'SYSTEM' | 'BADGE';
+    type: 'LIKE' | 'COMMENT' | 'SYSTEM' | 'BADGE' | 'MESSAGE' | 'FRIEND_REQUEST';
     content: string;
     createdAt: string;
     read: boolean;
     postId?: string; // Optional, if the notification is related to a post
 }
 
+interface ChatUser {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    membershipType?: 'MAGAZINE' | 'MGT';
+}
+
 export default function NotificationsPage() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
+    const [chatUser, setChatUser] = useState<ChatUser | null>(null);
     const navigate = useNavigate();
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
@@ -73,18 +82,53 @@ export default function NotificationsPage() {
 
         const parsedContent = parseContent(notification.content);
 
-        // If it's a post-related notification (Like/Comment)
-        if ((notification.type === 'LIKE' || notification.type === 'COMMENT') && parsedContent.postId) {
-            try {
-                // Check if post exists
-                await api.get(`/posts/${parsedContent.postId}`);
-                navigate(`/feed?postId=${parsedContent.postId}`);
-            } catch (error) {
-                // If 404 or other error, assume deleted
-                navigate('/post-deleted');
-            }
-        } else if (notification.type === 'BADGE') {
-            navigate('/profile');
+        // Handle different notification types
+        switch (notification.type) {
+            case 'MESSAGE':
+                // Open chat with the sender
+                if (parsedContent.actor) {
+                    setChatUser({
+                        id: parsedContent.actor.id,
+                        name: parsedContent.actor.name,
+                        avatarUrl: parsedContent.actor.avatarUrl,
+                        membershipType: parsedContent.actor.membershipType
+                    });
+                }
+                break;
+
+            case 'LIKE':
+            case 'COMMENT':
+                // Navigate to the post
+                if (parsedContent.postId) {
+                    navigate(`/feed?postId=${parsedContent.postId}`);
+                }
+                break;
+
+            case 'FRIEND_REQUEST':
+                // Navigate to the requester's profile
+                if (parsedContent.actor?.id) {
+                    navigate(`/profile/${parsedContent.actor.id}`);
+                } else {
+                    navigate('/profile?tab=friends');
+                }
+                break;
+
+            case 'BADGE':
+                // Navigate to profile badges section
+                navigate('/profile?tab=badges');
+                break;
+
+            case 'SYSTEM':
+                // System notifications may have different contexts
+                if (parsedContent.postId) {
+                    navigate(`/feed?postId=${parsedContent.postId}`);
+                } else if (parsedContent.actor?.id) {
+                    navigate(`/profile/${parsedContent.actor.id}`);
+                }
+                break;
+
+            default:
+                break;
         }
     };
 
@@ -110,7 +154,19 @@ export default function NotificationsPage() {
     };
 
     return (
-        <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+        <>
+            {/* Chat Window for MESSAGE notifications */}
+            {chatUser && (
+                <ChatWindow
+                    otherUserId={chatUser.id}
+                    otherUserName={chatUser.name}
+                    otherUserAvatar={chatUser.avatarUrl}
+                    otherUserMembershipType={chatUser.membershipType}
+                    onClose={() => setChatUser(null)}
+                />
+            )}
+            
+            <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
             <LuxuriousBackground />
             <Header />
 
@@ -169,12 +225,16 @@ export default function NotificationsPage() {
                                                 <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-1 border border-black">
                                                     {notification.type === 'LIKE' && <Heart className="w-3 h-3 text-red-400 fill-current" />}
                                                     {notification.type === 'COMMENT' && <MessageCircle className="w-3 h-3 text-blue-400 fill-current" />}
+                                                    {notification.type === 'MESSAGE' && <MessageCircle className="w-3 h-3 text-emerald-400 fill-current" />}
+                                                    {notification.type === 'FRIEND_REQUEST' && <UserPlus className="w-3 h-3 text-blue-400" />}
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className={`p-3 rounded-full ${!notification.read ? `${themeIconBg} ${themeText}` : 'bg-white/5 text-gray-400'}`}>
                                                 {notification.type === 'LIKE' && <Heart className="w-6 h-6" />}
                                                 {notification.type === 'COMMENT' && <MessageCircle className="w-6 h-6" />}
+                                                {notification.type === 'MESSAGE' && <MessageCircle className="w-6 h-6" />}
+                                                {notification.type === 'FRIEND_REQUEST' && <UserPlus className="w-6 h-6" />}
                                                 {notification.type === 'BADGE' && <Star className="w-6 h-6" />}
                                                 {notification.type === 'SYSTEM' && <Bell className="w-6 h-6" />}
                                             </div>
@@ -199,5 +259,6 @@ export default function NotificationsPage() {
                 )}
             </div>
         </div>
+        </>
     );
 }

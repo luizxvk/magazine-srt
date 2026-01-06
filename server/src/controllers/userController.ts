@@ -205,6 +205,11 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
 
         const data = updateProfileSchema.parse(req.body);
 
+        // Debug: Log avatar size if provided
+        if (data.avatarUrl) {
+            console.log(`[updateMe] avatarUrl size: ${data.avatarUrl.length} chars, isBase64: ${data.avatarUrl.startsWith('data:')}`);
+        }
+
         // Security Check: Only ADMIN can update level, trophies, zions
         if ((data.level !== undefined || data.zions !== undefined) && req.user?.role !== 'ADMIN') {
             // Strip them or throw error? Let's strip them to be safe or throw.

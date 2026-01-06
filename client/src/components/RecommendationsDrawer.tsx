@@ -87,7 +87,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                 <h3 className={`text-xl font-serif ${themeTitleColor}`}>Recomendações</h3>
                                 <button
                                     onClick={onClose}
-                                    className={`p-2 rounded-full hover:bg-white/10 transition-colors ${themeText}`}
+                                    className={`p-2 rounded-full transition-colors ${themeText} ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}
                                     aria-label="Fechar"
                                 >
                                     <X className="w-6 h-6" />

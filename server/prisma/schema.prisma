@@ -236,6 +236,7 @@ enum NotificationType {
   SYSTEM
   BADGE
   FRIEND_REQUEST
+  MESSAGE
 }
 
 enum MediaType {

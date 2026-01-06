@@ -60,12 +60,23 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response) => {
             }
         });
 
-        // Create notification for receiver
+        // Create notification for receiver with MESSAGE type
         await prisma.notification.create({
             data: {
                 userId: receiverId,
-                type: 'SYSTEM', // Using SYSTEM for now, could add MESSAGE type later
-                content: `Você recebeu uma nova mensagem de ${message.sender.name}`,
+                type: 'MESSAGE',
+                content: JSON.stringify({
+                    text: content.substring(0, 100),
+                    actor: {
+                        id: message.sender.id,
+                        name: message.sender.name,
+                        avatarUrl: message.sender.avatarUrl,
+                        membershipType: (await prisma.user.findUnique({
+                            where: { id: senderId },
+                            select: { membershipType: true }
+                        }))?.membershipType
+                    }
+                }),
                 read: false
             }
         });

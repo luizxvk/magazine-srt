@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout, MessageCircle, Camera, CreditCard, Mail, Grid, Eye } from 'lucide-react';
+import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout, MessageCircle, Camera, CreditCard, Mail, Grid, Eye, Sun, Gamepad2, Map } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.2.3';
+const CURRENT_VERSION = '0.2.4';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -27,6 +27,35 @@ export default function WhatsNewModal() {
 
     // Todas as atualizações acumuladas (mais recentes primeiro)
     const updates: UpdateItem[] = [
+        // v0.2.4 - Janeiro 2026
+        {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'Popup de Mensagem Corrigido',
+            description: 'O popup de notificação de mensagem agora aparece corretamente no canto inferior direito.',
+            type: 'fix',
+            version: '0.2.4'
+        },
+        {
+            icon: <Sun className="w-5 h-5" />,
+            title: 'Modo Claro Aprimorado',
+            description: 'Correções visuais para o modo claro: catálogo, moedas Zions e botões de fechar.',
+            type: 'fix',
+            version: '0.2.4'
+        },
+        {
+            icon: <Gamepad2 className="w-5 h-5" />,
+            title: 'Roadmap: Gaming Social',
+            description: 'Nova meta: transformar a plataforma na maior rede social de comunidades gamers!',
+            type: 'feature',
+            version: '0.2.4'
+        },
+        {
+            icon: <Map className="w-5 h-5" />,
+            title: 'Roadmap Atualizado',
+            description: 'Novas metas incluem IA Magazine e integração Discord. Previsão para 2026.',
+            type: 'improvement',
+            version: '0.2.4'
+        },
         // v0.2.3 - Janeiro 2026
         {
             icon: <CreditCard className="w-5 h-5" />,

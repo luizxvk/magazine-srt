@@ -428,7 +428,11 @@ export default function PhotoCatalogPage() {
                 {/* Header Section */}
                 <div className="flex flex-col gap-6 mb-8 mt-4 md:mt-0">
                     {/* Title - Padronizado como Social */}
-                    <div className={`flex items-center gap-4 p-4 rounded-xl ${isMGT ? 'bg-emerald-950/30' : 'bg-gold-950/30'} border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${
+                        theme === 'light' 
+                            ? (isMGT ? 'bg-emerald-100' : 'bg-amber-100') 
+                            : (isMGT ? 'bg-emerald-950/30' : 'bg-gold-950/30')
+                    } border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
                         <div className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
                             <Image className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                         </div>

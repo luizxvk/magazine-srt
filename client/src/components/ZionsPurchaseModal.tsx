@@ -220,7 +220,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                     <img
                                         src={pkg.image}
                                         alt={`${pkg.zions} Zions`}
-                                        className="w-32 h-32 object-contain relative z-10 drop-shadow-2xl mix-blend-screen rounded-full"
+                                        className="w-32 h-32 object-contain relative z-10 drop-shadow-2xl rounded-full"
                                         style={{ backgroundColor: 'transparent' }}
                                     />
                                 </div>

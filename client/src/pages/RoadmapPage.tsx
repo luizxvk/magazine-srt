@@ -154,6 +154,14 @@ const roadmapItems: RoadmapItem[] = [
         version: 'v0.2.3',
         icon: <Shield className="w-5 h-5" />,
         category: 'security'
+    },
+    {
+        id: '17',
+        title: 'Maior Rede Social de Comunidades Gamers',
+        description: 'Transformar a plataforma na maior rede social de comunidades gamers do Brasil. Conecte-se com jogadores, participe de competições e acompanhe eventos.',
+        status: 'planned',
+        icon: <Rocket className="w-5 h-5" />,
+        category: 'community'
     }
 ];
 

@@ -1,4 +1,4 @@
-import { Calendar, Check } from 'lucide-react';
+import { Calendar, Check, Gift } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface DailyLoginCardProps {
@@ -11,23 +11,32 @@ interface DailyLoginCardProps {
 }
 
 export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps) {
-    const { user } = useAuth();
+    const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
+    
+    // Explicit theme colors - no ambiguity
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeHover = isMGT ? 'hover:border-emerald-500/50' : 'hover:border-gold-500/50';
+    const themeHover = isMGT ? 'hover:border-emerald-500/60' : 'hover:border-gold-500/60';
+    const themeGlow = isMGT 
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
+    const themeBg = theme === 'light' 
+        ? 'bg-white/80' 
+        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const iconBg = isMGT ? 'text-emerald-500/10' : 'text-gold-500/10';
 
     if (!status) {
         return (
-            <div className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} animate-pulse relative overflow-hidden`}>
+            <div className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-xl border ${themeBorder} ${themeGlow} animate-pulse relative overflow-hidden`}>
                 <div className="flex justify-between items-start z-10 relative">
                     <div>
-                        <div className="h-5 bg-white/10 rounded w-32 mb-2"></div>
-                        <div className="h-3 bg-white/10 rounded w-48"></div>
+                        <div className={`h-5 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-32 mb-2`}></div>
+                        <div className={`h-3 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-48`}></div>
                     </div>
                     <div className="flex flex-col items-end">
-                        <div className="h-8 bg-white/10 rounded w-8 mb-1"></div>
-                        <div className="h-2 bg-white/10 rounded w-20"></div>
+                        <div className={`h-8 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-8 mb-1`}></div>
+                        <div className={`h-2 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-20`}></div>
                     </div>
                 </div>
             </div>
@@ -37,19 +46,21 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
     return (
         <button
             onClick={onClick}
-            className={`w-full glass-panel p-4 rounded-xl border ${themeBorder} ${themeHover} transition-all group text-left relative overflow-hidden`}
+            className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-xl border ${themeBorder} ${themeHover} ${themeGlow} transition-all duration-300 group text-left relative overflow-hidden`}
         >
-            <div className={`absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity`}>
-                <Calendar className={`w-24 h-24 ${themeText}`} />
+            {/* Background Icon */}
+            <div className={`absolute -top-4 -right-4 opacity-20 group-hover:opacity-30 transition-opacity`}>
+                <Calendar className={`w-28 h-28 ${iconBg}`} style={{ color: isMGT ? 'rgba(16,185,129,0.3)' : 'rgba(212,175,55,0.3)' }} />
             </div>
 
             <div className="relative z-10 flex items-center justify-between">
                 <div>
-                    <h3 className={`font-serif text-lg mb-1 flex items-center gap-2 ${isMGT ? 'text-white' : 'text-white'}`}>
+                    <h3 className={`font-serif text-lg mb-1 flex items-center gap-2 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                        <Gift className={`w-5 h-5 ${themeText}`} />
                         Bônus Diário
                         {status.claimed && <Check className="w-4 h-4 text-green-400" />}
                     </h3>
-                    <p className="text-gray-400 text-xs">
+                    <p className={`text-xs ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
                         {status.claimed
                             ? `Volte amanhã para continuar sua sequência de ${status.streak} dias!`
                             : `Resgate agora seus ${status.nextReward} Zions e mantenha a sequência!`}
@@ -60,7 +71,7 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
                     <span className={`text-2xl font-bold ${themeText}`}>
                         {status.streak}
                     </span>
-                    <span className="text-[10px] uppercase tracking-widest text-gray-500">Dias Seguidos</span>
+                    <span className={`text-[10px] uppercase tracking-widest ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>Dias Seguidos</span>
                 </div>
             </div>
         </button>

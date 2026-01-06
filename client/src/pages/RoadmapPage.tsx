@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Code2, Shield, MessageSquare, Image, Users, Star, Zap, Globe } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Code2, Shield, MessageSquare, Image, Users, Star, Zap, Globe, BrainCircuit } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -144,6 +144,32 @@ const roadmapItems: RoadmapItem[] = [
         status: 'planned',
         icon: <MessageSquare className="w-5 h-5" />,
         category: 'feature'
+    },
+    {
+        id: '16',
+        title: 'Revista Digital com IA',
+        description: 'Gere revistas digitais exclusivas usando IA com base nas fotos do seu catálogo. Crie layouts profissionais automaticamente.',
+        status: 'planned',
+        icon: <BrainCircuit className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '17',
+        title: 'Sistema de Pagamentos PIX',
+        description: 'Compre Zions e produtos diretamente com PIX via QR Code.',
+        status: 'completed',
+        version: 'v0.2.3',
+        icon: <Zap className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '18',
+        title: 'Recuperação de Senha por Email',
+        description: 'Sistema seguro de recuperação de senha com link enviado por email.',
+        status: 'completed',
+        version: 'v0.2.3',
+        icon: <Shield className="w-5 h-5" />,
+        category: 'security'
     }
 ];
 

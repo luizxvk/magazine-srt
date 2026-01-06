@@ -1,8 +1,29 @@
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Calendar, Star } from 'lucide-react';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';
 import PhotoCatalogCard from './PhotoCatalogCard';
+import api from '../services/api';
+
+interface CatalogPhoto {
+    id: string;
+    imageUrl: string;
+    title?: string;
+    category?: string;
+    carValue?: string;
+    eventType?: string;
+    carBrand?: string;
+    isPublic: boolean;
+    isFavorite: boolean;
+    createdAt: string;
+    user?: {
+        id: string;
+        name: string;
+        displayName?: string;
+        avatarUrl?: string;
+    };
+}
 
 
 interface RecommendationsDrawerProps {
@@ -15,6 +36,22 @@ interface RecommendationsDrawerProps {
 export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatus, openDailyLoginModal }: RecommendationsDrawerProps) {
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
+    const [catalogPhotos, setCatalogPhotos] = useState<CatalogPhoto[]>([]);
+
+    // Fetch user's catalog photos when drawer opens
+    useEffect(() => {
+        if (isOpen && user) {
+            const fetchCatalogPhotos = async () => {
+                try {
+                    const response = await api.get('/catalog', { params: { limit: 4 } });
+                    setCatalogPhotos(response.data);
+                } catch (error) {
+                    console.error('Failed to fetch catalog photos:', error);
+                }
+            };
+            fetchCatalogPhotos();
+        }
+    }, [isOpen, user]);
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-black';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -63,7 +100,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             </div>
 
                             {/* Photo Catalog Card */}
-                            <PhotoCatalogCard />
+                            <PhotoCatalogCard photos={catalogPhotos} />
 
                             {/* Recommendation Cards */}
                             <div className="space-y-4">

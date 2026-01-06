@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
-import { Trash2, Gift, Edit2, User as UserIcon, Check, X } from 'lucide-react';
+import { Trash2, Gift, Edit2, User as UserIcon, Check, X, Mail } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import AdminCreatePost from '../components/AdminCreatePost';
@@ -11,6 +11,7 @@ import AdminCreateAnnouncement from '../components/AdminCreateAnnouncement';
 import AdminCreateReward from '../components/AdminCreateReward';
 import AdminEditRewardModal from '../components/AdminEditRewardModal';
 import AdminCreateEvent from '../components/AdminCreateEvent';
+import { sendWelcomeEmail, isEmailJSConfigured } from '../services/emailjs';
 
 interface Reward {
     id: string;
@@ -104,22 +105,45 @@ export default function AdminDashboard() {
 
     const handleApproveRequest = async (id: string) => {
         try {
+            // Find the request to get email and name
+            const request = requests.find(r => r.id === id);
+            if (!request) return;
+
             const response = await api.post(`/invites/${id}/approve`);
             setRequests(requests.filter(r => r.id !== id));
 
-            // Show password to admin
             const password = response.data.generatedPassword;
-            showToast(`Aprovado! Senha gerada: ${password} (Copie agora!)`, 'success');
+            
+            // Try to send email first
+            if (isEmailJSConfigured()) {
+                showToast('Enviando email com senha...', 'info');
+                
+                const emailSent = await sendWelcomeEmail({
+                    to_email: request.email,
+                    to_name: request.name,
+                    temp_password: password
+                });
+                
+                if (emailSent) {
+                    showToast(`✅ Email enviado para ${request.email} com a senha!`, 'success');
+                } else {
+                    // Fallback to clipboard if email fails
+                    showToast(`⚠️ Falha ao enviar email. Senha: ${password}`, 'error');
+                    navigator.clipboard.writeText(password).catch(() => {
+                        alert(`Usuário criado! A senha temporária é: ${password}\n\nPor favor, envie para o usuário.`);
+                    });
+                }
+            } else {
+                // Email not configured, use clipboard
+                showToast(`Aprovado! Senha gerada: ${password}`, 'success');
+                navigator.clipboard.writeText(password).then(() => {
+                    showToast(`Senha copiada para a área de transferência!`, 'success');
+                }).catch(() => {
+                    alert(`Usuário criado! A senha temporária é: ${password}\n\nPor favor, envie para o usuário.`);
+                });
+            }
 
-            // Also log to console for backup
-            console.log(`Password for ${id}: ${password}`);
-
-            // Optional: Copy to clipboard automatically
-            navigator.clipboard.writeText(password).then(() => {
-                showToast(`Senha ${password} copiada para a área de transferência!`, 'success');
-            }).catch(() => {
-                alert(`Usuário criado! A senha temporária é: ${password}\n\nPor favor, envie para o usuário.`);
-            });
+            console.log(`[Admin] Password for ${request.email}: ${password}`);
 
         } catch (error) {
             console.error('Failed to approve request', error);

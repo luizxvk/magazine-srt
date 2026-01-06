@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout, MessageCircle, Camera } from 'lucide-react';
+import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout, MessageCircle, Camera, CreditCard, Mail, Grid, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.2.2';
+const CURRENT_VERSION = '0.2.3';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -27,6 +27,56 @@ export default function WhatsNewModal() {
 
     // Todas as atualizações acumuladas (mais recentes primeiro)
     const updates: UpdateItem[] = [
+        // v0.2.3 - Janeiro 2026
+        {
+            icon: <CreditCard className="w-5 h-5" />,
+            title: 'Pagamento PIX',
+            description: 'Compre Zions com PIX! QR Code gerado automaticamente para pagamento rápido.',
+            type: 'feature',
+            version: '0.2.3'
+        },
+        {
+            icon: <Mail className="w-5 h-5" />,
+            title: 'Senha por Email',
+            description: 'Novos membros aprovados recebem a senha diretamente por email.',
+            type: 'feature',
+            version: '0.2.3'
+        },
+        {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'Popup de Mensagem',
+            description: 'Notificação estilo LinkedIn quando você recebe uma nova mensagem.',
+            type: 'feature',
+            version: '0.2.3'
+        },
+        {
+            icon: <Zap className="w-5 h-5" />,
+            title: 'Rate Limit de Mensagens',
+            description: 'Proteção anti-spam: 2 segundos entre cada mensagem enviada.',
+            type: 'improvement',
+            version: '0.2.3'
+        },
+        {
+            icon: <Grid className="w-5 h-5" />,
+            title: 'Modos de Visualização',
+            description: 'Catálogo agora tem 3 visualizações: masonry, grade e lista.',
+            type: 'feature',
+            version: '0.2.3'
+        },
+        {
+            icon: <Smartphone className="w-5 h-5" />,
+            title: 'Responsivo Melhorado',
+            description: 'Margens e espaçamentos ajustados para todos os dispositivos.',
+            type: 'improvement',
+            version: '0.2.3'
+        },
+        {
+            icon: <Eye className="w-5 h-5" />,
+            title: 'Cores MGT Corrigidas',
+            description: 'Card de bônus diário agora exibe cores corretas para membros MGT.',
+            type: 'fix',
+            version: '0.2.3'
+        },
         // v0.2.2 - 06/01/2026
         {
             icon: <Camera className="w-5 h-5" />,

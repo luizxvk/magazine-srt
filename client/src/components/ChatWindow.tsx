@@ -31,7 +31,12 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const [lastSentTime, setLastSentTime] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    
+    // Rate limit: 2 seconds between messages
+    const RATE_LIMIT_MS = 2000;
     
     // Determine other user's theme
     const isOtherMGT = otherUserMembershipType === 'MGT';
@@ -75,6 +80,13 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
 
+        // Check rate limit
+        const now = Date.now();
+        if (now - lastSentTime < RATE_LIMIT_MS) {
+            return; // Still within cooldown
+        }
+
+        setSending(true);
         try {
             const response = await api.post('/messages', {
                 receiverId: otherUserId,
@@ -82,10 +94,29 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
             });
             setMessages([...messages, response.data]);
             setNewMessage('');
+            setLastSentTime(now);
         } catch (error) {
             console.error('Failed to send message', error);
+        } finally {
+            setSending(false);
         }
     };
+
+    // Calculate remaining cooldown
+    const getRemainingCooldown = () => {
+        const elapsed = Date.now() - lastSentTime;
+        if (elapsed >= RATE_LIMIT_MS) return 0;
+        return Math.ceil((RATE_LIMIT_MS - elapsed) / 1000);
+    };
+
+    const [cooldown, setCooldown] = useState(0);
+    
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCooldown(getRemainingCooldown());
+        }, 100);
+        return () => clearInterval(timer);
+    }, [lastSentTime]);
 
     return (
         <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
@@ -208,11 +239,15 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                         />
                         <button
                             onClick={handleSendMessage}
-                            disabled={!newMessage.trim()}
+                            disabled={!newMessage.trim() || sending || cooldown > 0}
                             aria-label="Enviar mensagem"
-                            className={`p-2.5 text-black rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg ${isMeMGT ? 'bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/20' : 'bg-gold-500 hover:bg-gold-400 shadow-gold-500/20'}`}
+                            className={`p-2.5 text-black rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg relative ${isMeMGT ? 'bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/20' : 'bg-gold-500 hover:bg-gold-400 shadow-gold-500/20'}`}
                         >
-                            <Send className="w-4 h-4" />
+                            {cooldown > 0 ? (
+                                <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold">{cooldown}</span>
+                            ) : (
+                                <Send className="w-4 h-4" />
+                            )}
                         </button>
                     </div>
                 </div>

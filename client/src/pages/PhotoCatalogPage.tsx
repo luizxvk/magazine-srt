@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
-import { Camera, Filter, Globe, Star, Trash2, User } from 'lucide-react';
+import { Camera, Filter, Globe, Star, Trash2, User, Grid, LayoutList, LayoutGrid } from 'lucide-react';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -171,6 +171,150 @@ function PhotoCard({
     );
 }
 
+// Grid View Card - Equal sized squares
+function GridPhotoCard({ 
+    photo, 
+    onToggleFavorite, 
+    onDelete, 
+    showActions = false,
+    userId 
+}: { 
+    photo: CatalogPhoto; 
+    onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+    onDelete: (id: string, e: React.MouseEvent) => void;
+    showActions?: boolean;
+    userId?: string;
+}) {
+    return (
+        <div className="relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 aspect-square">
+            <img
+                src={photo.imageUrl}
+                alt={photo.title || 'Foto do catálogo'}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                {photo.title && (
+                    <h3 className="text-white font-bold text-sm line-clamp-1">{photo.title}</h3>
+                )}
+                {showActions && (
+                    <div className="absolute top-2 right-2 flex gap-1">
+                        <button
+                            onClick={(e) => onToggleFavorite(photo.id, e)}
+                            className="p-1.5 bg-black/40 hover:bg-black/60 rounded-full text-white backdrop-blur-sm transition-colors"
+                        >
+                            <Star className={`w-3 h-3 ${photo.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                        </button>
+                        {photo.user?.id === userId && (
+                            <button
+                                onClick={(e) => onDelete(photo.id, e)}
+                                className="p-1.5 bg-red-500/40 hover:bg-red-500/60 rounded-full text-white backdrop-blur-sm transition-colors"
+                            >
+                                <Trash2 className="w-3 h-3" />
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// List View Card - Horizontal layout with details
+function ListPhotoCard({ 
+    photo, 
+    onToggleFavorite, 
+    onDelete, 
+    showActions = false,
+    userId,
+    isMGT
+}: { 
+    photo: CatalogPhoto; 
+    onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+    onDelete: (id: string, e: React.MouseEvent) => void;
+    showActions?: boolean;
+    userId?: string;
+    isMGT?: boolean;
+}) {
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    
+    return (
+        <div className={`flex gap-4 p-4 rounded-2xl bg-white/5 border ${themeBorder} backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group`}>
+            <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 rounded-xl overflow-hidden">
+                <img
+                    src={photo.imageUrl}
+                    alt={photo.title || 'Foto do catálogo'}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+            </div>
+            <div className="flex-1 flex flex-col justify-between py-1">
+                <div>
+                    <h3 className="text-white font-bold text-lg line-clamp-1 mb-1">
+                        {photo.title || 'Sem título'}
+                    </h3>
+                    {photo.user && (
+                        <div className="flex items-center gap-2 mb-2">
+                            {photo.user.avatarUrl ? (
+                                <img 
+                                    src={photo.user.avatarUrl} 
+                                    alt={photo.user.displayName || photo.user.name}
+                                    className="w-6 h-6 rounded-full object-cover border border-white/30"
+                                />
+                            ) : (
+                                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                                    <User className="w-4 h-4 text-white/70" />
+                                </div>
+                            )}
+                            <span className="text-sm text-gray-400">
+                                {photo.user.displayName || photo.user.name}
+                            </span>
+                        </div>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                        {photo.category && (
+                            <span className="text-xs uppercase tracking-wider bg-white/10 px-2 py-1 rounded-full text-gray-300">
+                                {photo.category}
+                            </span>
+                        )}
+                        {photo.carBrand && (
+                            <span className="text-xs uppercase tracking-wider bg-white/10 px-2 py-1 rounded-full text-gray-300">
+                                {photo.carBrand}
+                            </span>
+                        )}
+                        {photo.isFavorite && (
+                            <span className="text-xs bg-yellow-500/20 px-2 py-1 rounded-full text-yellow-400 flex items-center gap-1">
+                                <Star className="w-3 h-3 fill-current" /> Favorito
+                            </span>
+                        )}
+                        {photo.isPublic && (
+                            <span className="text-xs bg-white/10 px-2 py-1 rounded-full text-gray-300 flex items-center gap-1">
+                                <Globe className="w-3 h-3" /> Público
+                            </span>
+                        )}
+                    </div>
+                </div>
+                {showActions && (
+                    <div className="flex gap-2 mt-3">
+                        <button
+                            onClick={(e) => onToggleFavorite(photo.id, e)}
+                            className={`p-2 rounded-lg transition-colors ${photo.isFavorite ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                        >
+                            <Star className={`w-4 h-4 ${photo.isFavorite ? 'fill-current' : ''}`} />
+                        </button>
+                        {photo.user?.id === userId && (
+                            <button
+                                onClick={(e) => onDelete(photo.id, e)}
+                                className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function PhotoCatalogPage() {
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
@@ -183,6 +327,7 @@ export default function PhotoCatalogPage() {
     const [photos, setPhotos] = useState<CatalogPhoto[]>([]);
     const [loading, setLoading] = useState(true);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+    const [viewMode, setViewMode] = useState<'masonry' | 'grid' | 'list'>('masonry');
     
     // Delete confirmation modal state
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -272,7 +417,7 @@ export default function PhotoCatalogPage() {
             <LuxuriousBackground />
             <Header />
 
-            <div className="pt-40 pb-20 px-4 max-w-7xl mx-auto">
+            <div className="pt-32 sm:pt-36 md:pt-40 pb-20 px-3 sm:px-4 md:px-6 max-w-7xl mx-auto">
                 <PhotoUploadModal
                     isOpen={isUploadOpen}
                     onClose={() => setIsUploadOpen(false)}
@@ -288,7 +433,38 @@ export default function PhotoCatalogPage() {
                         <p className="text-gray-400 text-sm mt-1">Explore e compartilhe momentos exclusivos</p>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 items-center">
+                        {/* View Mode Toggle */}
+                        <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}>
+                            <button
+                                onClick={() => setViewMode('masonry')}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'masonry' 
+                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                title="Visualização Masonry"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'grid' 
+                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                title="Visualização em Grade"
+                            >
+                                <Grid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'list' 
+                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                title="Visualização em Lista"
+                            >
+                                <LayoutList className="w-4 h-4" />
+                            </button>
+                        </div>
+                        
                         <button
                             onClick={() => setIsUploadOpen(true)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400'}`}
@@ -309,16 +485,41 @@ export default function PhotoCatalogPage() {
                 </div>
                 {/* (Lines 151-207 omitted for brevity, keeping original logic) */}
                 {/* Gallery Grid - Responsive with Dynamic Aspect Ratios */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 auto-rows-[200px]">
+                <div className={`
+                    ${viewMode === 'masonry' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 auto-rows-[200px]' : ''}
+                    ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4' : ''}
+                    ${viewMode === 'list' ? 'flex flex-col gap-4 max-w-3xl mx-auto' : ''}
+                `}>
                     {photos.map((photo) => (
-                        <PhotoCard
-                            key={photo.id}
-                            photo={photo}
-                            onToggleFavorite={handleToggleFavorite}
-                            onDelete={handleDelete}
-                            showActions={activeTab === 'my'}
-                            userId={user?.id}
-                        />
+                        viewMode === 'list' ? (
+                            <ListPhotoCard
+                                key={photo.id}
+                                photo={photo}
+                                onToggleFavorite={handleToggleFavorite}
+                                onDelete={handleDelete}
+                                showActions={activeTab === 'my'}
+                                userId={user?.id}
+                                isMGT={isMGT}
+                            />
+                        ) : viewMode === 'grid' ? (
+                            <GridPhotoCard
+                                key={photo.id}
+                                photo={photo}
+                                onToggleFavorite={handleToggleFavorite}
+                                onDelete={handleDelete}
+                                showActions={activeTab === 'my'}
+                                userId={user?.id}
+                            />
+                        ) : (
+                            <PhotoCard
+                                key={photo.id}
+                                photo={photo}
+                                onToggleFavorite={handleToggleFavorite}
+                                onDelete={handleDelete}
+                                showActions={activeTab === 'my'}
+                                userId={user?.id}
+                            />
+                        )
                     ))}
                 </div>
 

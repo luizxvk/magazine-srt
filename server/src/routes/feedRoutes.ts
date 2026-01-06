@@ -12,7 +12,8 @@ router.post('/', authenticateToken, postRateLimit, moderateContent(['caption']),
 router.post('/:id/like', authenticateToken, feedController.likePost);
 router.post('/:id/comment', authenticateToken, moderateContent(['text']), feedController.commentPost);
 router.get('/stories', authenticateToken, feedController.getStories);
-router.post('/stories', authenticateToken, postRateLimit, feedController.createStory);
+router.post('/stories', authenticateToken, postRateLimit, moderateContent(['caption']), feedController.createStory);
+router.delete('/stories/:storyId', authenticateToken, feedController.deleteStory);
 router.post('/stories/:storyUserId/like', authenticateToken, feedController.likeStory);
 
 export default router;

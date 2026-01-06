@@ -546,3 +546,41 @@ export const getStories = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const deleteStory = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { storyId } = req.params;
+
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        // Find the story
+        const story = await prisma.story.findUnique({
+            where: { id: storyId }
+        });
+
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+
+        // Check if user owns the story
+        if (story.userId !== userId) {
+            return res.status(403).json({ error: 'You can only delete your own stories' });
+        }
+
+        // Delete the story and its views
+        await prisma.$transaction([
+            prisma.storyView.deleteMany({
+                where: { storyId }
+            }),
+            prisma.story.delete({
+                where: { id: storyId }
+            })
+        ]);
+
+        res.json({ message: 'Story deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting story:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

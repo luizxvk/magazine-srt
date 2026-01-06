@@ -12,8 +12,20 @@ interface ImageCropModalProps {
 }
 
 export default function ImageCropModal({ isOpen, onClose, imageFile, onCropComplete }: ImageCropModalProps) {
-    const { user } = useAuth();
+    const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
+    
+    // Theme colors
+    const modalBg = theme === 'light' ? 'bg-white/95' : 'bg-[#0a0a0a]/95';
+    const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
+    const headerBorderColor = theme === 'light' ? 'border-gray-200' : 'border-white/5';
+    const titleColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+    const textColor = theme === 'light' ? 'text-gray-600' : 'text-gray-500';
+    const iconColor = theme === 'light' ? 'text-gray-500 hover:text-gray-900' : 'text-gray-400 hover:text-white';
+    const buttonBg = theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10';
+    const buttonText = theme === 'light' ? 'text-gray-700' : 'text-white';
+    const canvasBorder = theme === 'light' ? 'border-gray-300' : 'border-white/20';
+    const guideBorder = theme === 'light' ? 'border-gray-400/50' : 'border-white/30';
     
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
@@ -54,8 +66,8 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
         // Clear canvas
         ctx.clearRect(0, 0, viewSize, viewSize);
         
-        // Fill with dark background
-        ctx.fillStyle = '#0a0a0a';
+        // Fill with background color based on theme
+        ctx.fillStyle = theme === 'light' ? '#f5f5f5' : '#0a0a0a';
         ctx.fillRect(0, 0, viewSize, viewSize);
         
         // Calculate scaled dimensions
@@ -75,7 +87,7 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
         ctx.arc(viewSize / 2, viewSize / 2, viewSize / 2 - 20, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
-    }, [scale, position, imageLoaded, viewSize]);
+    }, [scale, position, imageLoaded, viewSize, theme]);
     
     useEffect(() => {
         drawImage();
@@ -196,14 +208,14 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="relative w-full max-w-sm bg-[#0a0a0a]/95 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                        className={`relative w-full max-w-sm ${modalBg} border ${borderColor} rounded-2xl shadow-2xl overflow-hidden`}
                     >
                         {/* Header */}
-                        <div className="p-4 border-b border-white/5 flex justify-between items-center">
-                            <h3 className="text-white font-serif text-lg">Ajustar Foto</h3>
+                        <div className={`p-4 border-b ${headerBorderColor} flex justify-between items-center`}>
+                            <h3 className={`${titleColor} font-serif text-lg`}>Ajustar Foto</h3>
                             <button
                                 onClick={onClose}
-                                className="text-gray-400 hover:text-white transition-colors p-1"
+                                className={`${iconColor} transition-colors p-1`}
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -234,15 +246,15 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
                                     ref={canvasRef}
                                     width={viewSize}
                                     height={viewSize}
-                                    className="rounded-full border-2 border-white/20"
+                                    className={`rounded-full border-2 ${canvasBorder}`}
                                 />
                                 {/* Circular guide overlay */}
                                 <div className="absolute inset-0 pointer-events-none">
-                                    <div className="w-full h-full rounded-full border-2 border-dashed border-white/30" />
+                                    <div className={`w-full h-full rounded-full border-2 border-dashed ${guideBorder}`} />
                                 </div>
                             </div>
                             
-                            <p className="text-gray-500 text-xs mt-3 text-center">
+                            <p className={`${textColor} text-xs mt-3 text-center`}>
                                 Arraste para mover • Use os controles para ajustar
                             </p>
                         </div>
@@ -251,21 +263,21 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
                         <div className="px-6 pb-4 flex justify-center gap-3">
                             <button
                                 onClick={handleZoomOut}
-                                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10"
+                                className={`p-2.5 ${buttonBg} rounded-full ${buttonText} transition-colors border ${borderColor}`}
                                 title="Diminuir"
                             >
                                 <ZoomOut className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10"
+                                className={`p-2.5 ${buttonBg} rounded-full ${buttonText} transition-colors border ${borderColor}`}
                                 title="Resetar"
                             >
                                 <RotateCcw className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={handleZoomIn}
-                                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10"
+                                className={`p-2.5 ${buttonBg} rounded-full ${buttonText} transition-colors border ${borderColor}`}
                                 title="Aumentar"
                             >
                                 <ZoomIn className="w-5 h-5" />
@@ -273,10 +285,10 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
                         </div>
                         
                         {/* Footer */}
-                        <div className="p-4 border-t border-white/5 flex justify-end gap-3">
+                        <div className={`p-4 border-t ${headerBorderColor} flex justify-end gap-3 ${theme === 'light' ? 'bg-gray-50' : 'bg-black/20'}`}>
                             <button
                                 onClick={onClose}
-                                className="px-5 py-2 rounded-full text-sm font-medium text-white hover:bg-white/10 transition-colors border border-white/10"
+                                className={`px-5 py-2 rounded-full text-sm font-medium ${buttonText} ${buttonBg} transition-colors border ${borderColor}`}
                             >
                                 Cancelar
                             </button>

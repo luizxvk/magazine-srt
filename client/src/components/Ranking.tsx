@@ -13,12 +13,14 @@ interface RankedUser {
 
 export default function Ranking() {
     const [users, setUsers] = useState<RankedUser[]>([]);
-    const { user } = useAuth();
+    const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
     const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
     const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
+    const themeTitle = theme === 'light' ? 'text-gray-900' : 'text-white';
+    const themeName = theme === 'light' ? 'text-gray-900' : 'text-white';
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -40,7 +42,7 @@ export default function Ranking() {
             <div className={`glass-panel rounded-xl p-6 border ${themeBorder}`}>
                 <div className="flex items-center gap-3 mb-6">
                     <Trophy className={`w-6 h-6 ${themeColor}`} />
-                    <h3 className="text-xl font-serif text-white tracking-wider uppercase">Ranking Elite</h3>
+                    <h3 className={`text-xl font-serif ${themeTitle} tracking-wider uppercase`}>Ranking Elite</h3>
                 </div>
 
                 <div className="space-y-4 mb-6">
@@ -58,7 +60,7 @@ export default function Ranking() {
                                     )}
                                 </div>
                                 <div>
-                                    <p className={`text-white font-medium text-sm group-hover:${isMGT ? 'text-emerald-300' : 'text-gold-300'} transition-colors`}>{user.name}</p>
+                                    <p className={`${themeName} font-medium text-sm group-hover:${isMGT ? 'text-emerald-300' : 'text-gold-300'} transition-colors`}>{user.name}</p>
                                     <p className="text-xs text-gray-500 uppercase tracking-wider">{user.points} Troféus</p>
                                 </div>
                             </div>

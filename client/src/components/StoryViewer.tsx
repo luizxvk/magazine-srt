@@ -3,6 +3,7 @@ import { X, Heart, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmModal from './ConfirmModal';
 
 interface Story {
     id: string;
@@ -35,6 +36,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
     const [commentText, setCommentText] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const currentStoryGroup = stories[currentIndex];
     // If items exist, use them. Otherwise fallback to the main story object (old behavior/compatibility)
@@ -164,22 +166,32 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
             {/* Delete Button (for own stories) */}
             {currentStoryGroup.user.id === user?.id && (
                 <button
-                    onClick={async () => {
-                        if (confirm('Deseja remover este story?')) {
-                            try {
-                                await api.delete(`/feed/stories/${currentItem.id}`);
-                                handleNext();
-                            } catch (error) {
-                                console.error('Failed to delete story', error);
-                            }
-                        }
-                    }}
+                    onClick={() => setShowDeleteConfirm(true)}
                     className="absolute top-4 left-4 text-white z-50 p-2 hover:bg-red-500/20 rounded-full transition-colors"
                     aria-label="Deletar story"
                 >
                     <Trash2 className="w-5 h-5" />
                 </button>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={async () => {
+                    try {
+                        await api.delete(`/feed/stories/${currentItem.id}`);
+                        handleNext();
+                    } catch (error) {
+                        console.error('Failed to delete story', error);
+                    }
+                }}
+                title="Remover Story"
+                message="Tem certeza que deseja remover este story? Esta ação não pode ser desfeita."
+                confirmText="Remover"
+                cancelText="Cancelar"
+                isDestructive={true}
+            />
 
             {/* Main Container */}
             <div className="relative w-full h-full md:max-w-md md:h-full bg-black shadow-2xl">

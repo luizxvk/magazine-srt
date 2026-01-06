@@ -15,7 +15,7 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
     const isMGT = user?.membershipType === 'MGT';
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeHover = isMGT ? 'hover:border-red-500/50' : 'hover:border-gold-500/50';
+    const themeHover = isMGT ? 'hover:border-emerald-500/50' : 'hover:border-gold-500/50';
 
     if (!status) {
         return (

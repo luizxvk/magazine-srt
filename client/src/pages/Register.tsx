@@ -37,6 +37,13 @@ export default function Register() {
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Validate file type - only PNG and JPG allowed
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+            if (!allowedTypes.includes(file.type)) {
+                setErrorPopup('Formato de imagem não permitido. Use apenas PNG ou JPG.');
+                return;
+            }
+            
             if (file.size > 2 * 1024 * 1024) {
                 setErrorPopup('Imagem muito grande. Tamanho máximo: 2MB');
                 return;
@@ -147,7 +154,7 @@ export default function Register() {
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept="image/*"
+                                accept="image/png,image/jpeg,image/jpg"
                                 onChange={handleAvatarChange}
                                 className="hidden"
                             />

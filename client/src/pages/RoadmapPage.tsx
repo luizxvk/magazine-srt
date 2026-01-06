@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2 } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -160,8 +160,40 @@ const roadmapItems: RoadmapItem[] = [
         title: 'Maior Rede Social de Comunidades Gamers',
         description: 'Transformar a plataforma na maior rede social de comunidades gamers do Brasil. Conecte-se com jogadores, participe de competições e acompanhe eventos.',
         status: 'planned',
-        icon: <Rocket className="w-5 h-5" />,
+        icon: <Gamepad2 className="w-5 h-5" />,
         category: 'community'
+    },
+    {
+        id: '18',
+        title: 'Sistema de Prestígio',
+        description: 'Ao atingir nível 30, escolha fazer prestígio: recomeçe do 0 e ganhe badges exclusivas e cards personalizados.',
+        status: 'planned',
+        icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '19',
+        title: 'Personalização Avançada',
+        description: 'Planos de fundo exclusivos, badges compráveis, cores de destaque e efeitos de texto no nickname. Tudo com Zions!',
+        status: 'planned',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '20',
+        title: 'Cards em GIF',
+        description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
+        status: 'planned',
+        icon: <Sparkles className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '21',
+        title: 'Mercado de Itens',
+        description: 'Compre, venda e troque itens exclusivos com outros membros usando Zions.',
+        status: 'planned',
+        icon: <ShoppingBag className="w-5 h-5" />,
+        category: 'feature'
     }
 ];
 

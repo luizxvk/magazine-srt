@@ -22,40 +22,40 @@ interface CustomizationShopProps {
 
 // Predefined backgrounds
 const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
-    { id: 'bg-aurora', name: 'Aurora Boreal', description: 'Ondas suaves de luz em movimento', price: 500, type: 'background', preview: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)' },
-    { id: 'bg-nebula', name: 'Nebulosa', description: 'Galáxia distante em cores vibrantes', price: 750, type: 'background', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)' },
-    { id: 'bg-cyber', name: 'Cyber Grid', description: 'Grade futurista animada', price: 600, type: 'background', preview: 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)' },
-    { id: 'bg-fire', name: 'Chamas', description: 'Fogo dançante nas bordas', price: 800, type: 'background', preview: 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)' },
-    { id: 'bg-ocean', name: 'Oceano Profundo', description: 'Ondas calmas em azul', price: 450, type: 'background', preview: 'linear-gradient(180deg, #0a1628 0%, #0c2340 50%, #0a1628 100%)' },
-    { id: 'bg-matrix', name: 'Matrix', description: 'Código caindo estilo matrix', price: 900, type: 'background', preview: 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)' },
-    { id: 'bg-sunset', name: 'Pôr do Sol', description: 'Gradiente quente e acolhedor', price: 400, type: 'background', preview: 'linear-gradient(135deg, #1a1a2e 0%, #2d1a3e 30%, #4a2a4e 50%, #2d1a3e 70%, #1a1a2e 100%)' },
-    { id: 'bg-minimal', name: 'Minimalista', description: 'Escuro puro e elegante', price: 200, type: 'background', preview: 'linear-gradient(180deg, #0a0a0a 0%, #121212 50%, #0a0a0a 100%)' },
+    { id: 'bg_aurora', name: 'Aurora Boreal', description: 'Ondas suaves de luz em movimento', price: 600, type: 'background', preview: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)' },
+    { id: 'bg_galaxy', name: 'Galáxia', description: 'Estrelas e constelações', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)' },
+    { id: 'bg_matrix', name: 'Matrix', description: 'Código caindo estilo matrix', price: 450, type: 'background', preview: 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)' },
+    { id: 'bg_fire', name: 'Fogo', description: 'Fogo dançante nas bordas', price: 400, type: 'background', preview: 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)' },
+    { id: 'bg_ocean', name: 'Oceano', description: 'Ondas calmas em azul', price: 350, type: 'background', preview: 'linear-gradient(180deg, #0a1628 0%, #0c2340 50%, #0a1628 100%)' },
+    { id: 'bg_forest', name: 'Floresta', description: 'Verde natural e sereno', price: 300, type: 'background', preview: 'linear-gradient(180deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)' },
+    { id: 'bg_city', name: 'Cidade Neon', description: 'Luzes urbanas vibrantes', price: 550, type: 'background', preview: 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)' },
+    { id: 'bg_space', name: 'Espaço Profundo', description: 'Vastidão do cosmos', price: 700, type: 'background', preview: 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)' },
 ];
 
 // Predefined badges (profile decorations)
 const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
-    { id: 'badge-skull', name: 'Caveira', description: 'Estilo rebelde', price: 300, type: 'badge', preview: '💀' },
-    { id: 'badge-fire', name: 'Fogo', description: 'Queima tudo!', price: 350, type: 'badge', preview: '🔥' },
-    { id: 'badge-star', name: 'Estrela', description: 'Brilhe sempre', price: 250, type: 'badge', preview: '⭐' },
-    { id: 'badge-diamond', name: 'Diamante', description: 'Precioso e raro', price: 500, type: 'badge', preview: '💎' },
-    { id: 'badge-lightning', name: 'Raio', description: 'Velocidade máxima', price: 400, type: 'badge', preview: '⚡' },
-    { id: 'badge-ghost', name: 'Fantasma', description: 'Misterioso', price: 350, type: 'badge', preview: '👻' },
-    { id: 'badge-rocket', name: 'Foguete', description: 'Rumo ao topo', price: 450, type: 'badge', preview: '🚀' },
-    { id: 'badge-unicorn', name: 'Unicórnio', description: 'Mágico e único', price: 600, type: 'badge', preview: '🦄' },
-    { id: 'badge-alien', name: 'Alien', description: 'De outro mundo', price: 400, type: 'badge', preview: '👽' },
-    { id: 'badge-robot', name: 'Robô', description: 'Tecnológico', price: 350, type: 'badge', preview: '🤖' },
+    { id: 'badge_skull', name: 'Caveira', description: 'Estilo rebelde', price: 300, type: 'badge', preview: '💀' },
+    { id: 'badge_fire', name: 'Fogo', description: 'Queima tudo!', price: 200, type: 'badge', preview: '🔥' },
+    { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 350, type: 'badge', preview: '⭐' },
+    { id: 'badge_diamond', name: 'Diamante', description: 'Precioso e raro', price: 500, type: 'badge', preview: '💎' },
+    { id: 'badge_lightning', name: 'Raio', description: 'Velocidade máxima', price: 400, type: 'badge', preview: '⚡' },
+    { id: 'badge_pony', name: 'Unicórnio', description: 'Mágico e único', price: 250, type: 'badge', preview: '🦄' },
+    { id: 'badge_crown', name: 'Coroa', description: 'Realeza', price: 600, type: 'badge', preview: '👑' },
+    { id: 'badge_heart', name: 'Coração', description: 'Com amor', price: 200, type: 'badge', preview: '❤️' },
+    { id: 'badge_moon', name: 'Lua', description: 'Noturno', price: 300, type: 'badge', preview: '🌙' },
+    { id: 'badge_sun', name: 'Sol', description: 'Radiante', price: 350, type: 'badge', preview: '☀️' },
 ];
 
 // Neon accent colors (excluding gold for Magazine exclusivity)
 const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
-    { id: 'color-cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 400, type: 'color', preview: '#00ffff' },
-    { id: 'color-magenta', name: 'Magenta Neon', description: 'Rosa intenso', price: 400, type: 'color', preview: '#ff00ff' },
-    { id: 'color-lime', name: 'Lima Neon', description: 'Verde vibrante', price: 400, type: 'color', preview: '#00ff00' },
-    { id: 'color-orange', name: 'Laranja Neon', description: 'Quente e energético', price: 400, type: 'color', preview: '#ff6600' },
-    { id: 'color-purple', name: 'Roxo Neon', description: 'Misterioso e elegante', price: 400, type: 'color', preview: '#9933ff' },
-    { id: 'color-pink', name: 'Rosa Neon', description: 'Doce e marcante', price: 400, type: 'color', preview: '#ff3399' },
-    { id: 'color-blue', name: 'Azul Neon', description: 'Clássico e moderno', price: 400, type: 'color', preview: '#3399ff' },
-    { id: 'color-red', name: 'Vermelho Neon', description: 'Intenso e poderoso', price: 400, type: 'color', preview: '#ff3333' },
+    { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 400, type: 'color', preview: '#00ffff' },
+    { id: 'color_magenta', name: 'Magenta Neon', description: 'Rosa intenso', price: 400, type: 'color', preview: '#ff00ff' },
+    { id: 'color_lime', name: 'Verde Limão', description: 'Verde vibrante', price: 400, type: 'color', preview: '#00ff00' },
+    { id: 'color_orange', name: 'Laranja Neon', description: 'Quente e energético', price: 400, type: 'color', preview: '#ff6600' },
+    { id: 'color_purple', name: 'Roxo Neon', description: 'Misterioso e elegante', price: 400, type: 'color', preview: '#9933ff' },
+    { id: 'color_pink', name: 'Rosa Neon', description: 'Doce e marcante', price: 400, type: 'color', preview: '#ff69b4' },
+    { id: 'color_blue', name: 'Azul Elétrico', description: 'Clássico e moderno', price: 400, type: 'color', preview: '#0066ff' },
+    { id: 'color_red', name: 'Vermelho Neon', description: 'Intenso e poderoso', price: 400, type: 'color', preview: '#ff0033' },
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {

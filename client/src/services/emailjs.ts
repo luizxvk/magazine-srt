@@ -83,5 +83,11 @@ export const sendWelcomeEmail = async (params: WelcomeEmailParams): Promise<bool
     }
 };
 
-    return configured;
-};
+export const isEmailJSConfigured = (): boolean => {
+    const configured = Boolean(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY);
+    if (!configured) {
+        console.log('[EmailJS] Status: NÃO CONFIGURADO');
+        console.log('  - Service ID:', EMAILJS_SERVICE_ID ? '✓' : '✗ faltando');
+        console.log('  - Template ID:', EMAILJS_TEMPLATE_ID ? '✓' : '✗ faltando');
+        console.log('  - Public Key:', EMAILJS_PUBLIC_KEY ? '✓' : '✗ faltando');
+    }

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
-import { Camera, Filter, Globe, Star, Trash2, User, Grid, LayoutList, LayoutGrid } from 'lucide-react';
+import { Camera, Filter, Globe, Star, Trash2, User, Grid, LayoutList, LayoutGrid, Image, ChevronDown, X } from 'lucide-react';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -334,12 +334,13 @@ export default function PhotoCatalogPage() {
     const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
 
     // Filters
-    const [selectedCategory] = useState('');
-    const [selectedBrand] = useState('');
-    const [onlyFavorites] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedBrand, setSelectedBrand] = useState('');
+    const [onlyFavorites, setOnlyFavorites] = useState(false);
+    const [showFilters, setShowFilters] = useState(false);
 
     // Dynamic Filter Options
-    const [, setFilterOptions] = useState({
+    const [filterOptions, setFilterOptions] = useState({
         categories: [] as string[],
         carBrands: [] as string[]
     });
@@ -425,46 +426,146 @@ export default function PhotoCatalogPage() {
                 />
 
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-end md:items-center justify-between gap-6 mb-8 mt-4 md:mt-0">
-                    <div>
-                        <h2 className={`text-3xl font-serif ${isMGT ? 'text-white' : 'text-gold-500'}`}>
-                            Catálogo de Fotos
-                        </h2>
-                        <p className="text-gray-400 text-sm mt-1">Explore e compartilhe momentos exclusivos</p>
+                <div className="flex flex-col gap-6 mb-8 mt-4 md:mt-0">
+                    {/* Title - Padronizado como Social */}
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${isMGT ? 'bg-emerald-950/30' : 'bg-gold-950/30'} border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
+                            <Image className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                        </div>
+                        <div>
+                            <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                Catálogo de Fotos
+                            </h2>
+                            <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                Explore e compartilhe momentos exclusivos.
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="flex gap-3 items-center">
-                        {/* View Mode Toggle */}
-                        <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}>
-                            <button
-                                onClick={() => setViewMode('masonry')}
-                                className={`p-2 rounded-md transition-all ${viewMode === 'masonry' 
-                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
-                                title="Visualização Masonry"
-                            >
-                                <LayoutGrid className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                className={`p-2 rounded-md transition-all ${viewMode === 'grid' 
-                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
-                                title="Visualização em Grade"
-                            >
-                                <Grid className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                className={`p-2 rounded-md transition-all ${viewMode === 'list' 
-                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
-                                title="Visualização em Lista"
-                            >
-                                <LayoutList className="w-4 h-4" />
-                            </button>
+                    {/* Actions Row */}
+                    <div className="flex flex-wrap gap-3 items-center justify-between">
+                        <div className="flex gap-3 items-center">
+                            {/* View Mode Toggle */}
+                            <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}>
+                                <button
+                                    onClick={() => setViewMode('masonry')}
+                                    className={`p-2 rounded-md transition-all ${viewMode === 'masonry' 
+                                        ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                        : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                    title="Visualização Masonry"
+                                >
+                                    <LayoutGrid className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`p-2 rounded-md transition-all ${viewMode === 'grid' 
+                                        ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                        : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                    title="Visualização em Grade"
+                                >
+                                    <Grid className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`p-2 rounded-md transition-all ${viewMode === 'list' 
+                                        ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                        : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                    title="Visualização em Lista"
+                                >
+                                    <LayoutList className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            {/* Filter Button */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className={`flex items-center gap-2 p-2 px-3 rounded-lg transition-colors ${
+                                        showFilters || selectedCategory || selectedBrand || onlyFavorites
+                                            ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black')
+                                            : (isMGT ? 'bg-gray-800 text-emerald-500 hover:bg-gray-700' : 'bg-gray-800 text-gold-500 hover:bg-gray-700')
+                                    }`}
+                                >
+                                    <Filter className="w-4 h-4" />
+                                    <span className="text-sm hidden sm:inline">Filtros</span>
+                                    {(selectedCategory || selectedBrand || onlyFavorites) && (
+                                        <span className={`w-2 h-2 rounded-full ${isMGT ? 'bg-white' : 'bg-black'}`} />
+                                    )}
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {/* Filter Dropdown */}
+                                {showFilters && (
+                                    <div className={`absolute top-full left-0 mt-2 w-72 p-4 rounded-xl shadow-2xl z-50 ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-900 border-white/10'} border backdrop-blur-xl`}>
+                                        <div className="space-y-4">
+                                            {/* Category Filter */}
+                                            <div>
+                                                <label className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                    Categoria
+                                                </label>
+                                                <select
+                                                    value={selectedCategory}
+                                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                                    className={`w-full mt-1 p-2 rounded-lg ${theme === 'light' ? 'bg-gray-100 text-gray-900' : 'bg-white/10 text-white'} border-none outline-none`}
+                                                >
+                                                    <option value="">Todas</option>
+                                                    {filterOptions.categories.map(cat => (
+                                                        <option key={cat} value={cat}>{cat}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            {/* Brand Filter */}
+                                            <div>
+                                                <label className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                    Marca
+                                                </label>
+                                                <select
+                                                    value={selectedBrand}
+                                                    onChange={(e) => setSelectedBrand(e.target.value)}
+                                                    className={`w-full mt-1 p-2 rounded-lg ${theme === 'light' ? 'bg-gray-100 text-gray-900' : 'bg-white/10 text-white'} border-none outline-none`}
+                                                >
+                                                    <option value="">Todas</option>
+                                                    {filterOptions.carBrands.map(brand => (
+                                                        <option key={brand} value={brand}>{brand}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            {/* Favorites Toggle */}
+                                            <div className="flex items-center justify-between">
+                                                <label className={`text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                                                    Apenas Favoritos
+                                                </label>
+                                                <button
+                                                    onClick={() => setOnlyFavorites(!onlyFavorites)}
+                                                    className={`w-12 h-6 rounded-full transition-colors ${onlyFavorites ? (isMGT ? 'bg-emerald-500' : 'bg-gold-500') : 'bg-gray-600'}`}
+                                                >
+                                                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${onlyFavorites ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                                </button>
+                                            </div>
+
+                                            {/* Clear Filters */}
+                                            {(selectedCategory || selectedBrand || onlyFavorites) && (
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedCategory('');
+                                                        setSelectedBrand('');
+                                                        setOnlyFavorites(false);
+                                                    }}
+                                                    className="w-full p-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                    Limpar Filtros
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        
+
+                        {/* Add Photo Button */}
                         <button
                             onClick={() => setIsUploadOpen(true)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400'}`}
@@ -472,16 +573,31 @@ export default function PhotoCatalogPage() {
                             <Camera className="w-4 h-4" />
                             <span className="hidden sm:inline">Adicionar Foto</span>
                         </button>
-
-                        <div className="relative group">
-                            <button
-                                className={`p-2 rounded-lg transition-colors ${isMGT ? 'bg-gray-800 text-emerald-500 hover:bg-gray-700' : 'bg-gray-800 text-gold-500 hover:bg-gray-700'}`}
-                            >
-                                <Filter className="w-5 h-5" />
-                            </button>
-                            {/* Simple Dropdown for filters could go here, for now just the button is restored as requested */}
-                        </div>
                     </div>
+
+                    {/* Active Filters Pills */}
+                    {(selectedCategory || selectedBrand || onlyFavorites) && (
+                        <div className="flex flex-wrap gap-2">
+                            {selectedCategory && (
+                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                    {selectedCategory}
+                                    <button onClick={() => setSelectedCategory('')}><X className="w-3 h-3" /></button>
+                                </span>
+                            )}
+                            {selectedBrand && (
+                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                    {selectedBrand}
+                                    <button onClick={() => setSelectedBrand('')}><X className="w-3 h-3" /></button>
+                                </span>
+                            )}
+                            {onlyFavorites && (
+                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-yellow-500/20 text-yellow-400`}>
+                                    <Star className="w-3 h-3 fill-current" /> Favoritos
+                                    <button onClick={() => setOnlyFavorites(false)}><X className="w-3 h-3" /></button>
+                                </span>
+                            )}
+                        </div>
+                    )}
                 </div>
                 {/* (Lines 151-207 omitted for brevity, keeping original logic) */}
                 {/* Gallery Grid - Responsive with Dynamic Aspect Ratios */}

@@ -91,3 +91,5 @@ export const isEmailJSConfigured = (): boolean => {
         console.log('  - Template ID:', EMAILJS_TEMPLATE_ID ? '✓' : '✗ faltando');
         console.log('  - Public Key:', EMAILJS_PUBLIC_KEY ? '✓' : '✗ faltando');
     }
+    return configured;
+};

@@ -9,6 +9,7 @@ interface Message {
     senderId: string;
     receiverId: string;
     content: string;
+    storyImageUrl?: string | null;
     createdAt: string;
     sender: {
         id: string;
@@ -21,15 +22,20 @@ interface ChatWindowProps {
     otherUserId: string;
     otherUserName: string;
     otherUserAvatar?: string | null;
+    otherUserMembershipType?: string;
     onClose: () => void;
 }
 
-export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, onClose }: ChatWindowProps) {
+export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, onClose }: ChatWindowProps) {
     const { user, theme } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    
+    // Determine other user's theme
+    const isOtherMGT = otherUserMembershipType === 'MGT';
+    const isMeMGT = user?.membershipType === 'MGT';
 
     useEffect(() => {
         let isMounted = true;
@@ -102,7 +108,9 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                         </div>
                         <div>
                             <h3 className="font-bold text-white text-base leading-tight tracking-wide font-serif">{otherUserName}</h3>
-                            <span className="text-[10px] text-gold-400 font-bold tracking-widest uppercase">Membro MGT</span>
+                            <span className={`text-[10px] font-bold tracking-widest uppercase ${isOtherMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                Membro {isOtherMGT ? 'MGT' : 'MAGAZINE'}
+                            </span>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -144,17 +152,39 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                     ) : (
                         messages.map((msg) => {
                             const isMe = msg.senderId === user?.id;
-                            const bubbleClass = isMe
-                                ? 'bg-gold-500/10 text-gold-100 border-gold-500/20 rounded-tr-sm'
+                            // My messages use my membership color, their messages use their membership color
+                            const myBubbleClass = isMeMGT 
+                                ? 'bg-emerald-500/10 text-emerald-100 border-emerald-500/20 rounded-tr-sm'
+                                : 'bg-gold-500/10 text-gold-100 border-gold-500/20 rounded-tr-sm';
+                            const theirBubbleClass = isOtherMGT
+                                ? 'bg-emerald-500/5 text-emerald-100 border-emerald-500/10 rounded-tl-sm'
                                 : (theme === 'light' ? 'bg-gray-100 text-gray-800 border-gray-200 rounded-tl-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-tl-sm');
+                            const bubbleClass = isMe ? myBubbleClass : theirBubbleClass;
+                            const timeClass = isMe 
+                                ? (isMeMGT ? 'text-emerald-200' : 'text-gold-200')
+                                : (theme === 'light' ? 'text-gray-500' : 'text-gray-400');
 
                             return (
                                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
                                     <div
                                         className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg backdrop-blur-md border ${bubbleClass}`}
                                     >
+                                        {/* Story thumbnail if it's a story reply */}
+                                        {msg.storyImageUrl && (
+                                            <div className="mb-2 -mt-1 -mx-1">
+                                                <div className="relative rounded-lg overflow-hidden border border-white/10">
+                                                    <img 
+                                                        src={msg.storyImageUrl} 
+                                                        alt="Story" 
+                                                        className="w-full h-20 object-cover opacity-80"
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                                    <span className="absolute bottom-1 left-2 text-[10px] text-white/70">📷 Story</span>
+                                                </div>
+                                            </div>
+                                        )}
                                         {msg.content}
-                                        <div className={`text-[10px] mt-1 opacity-50 ${isMe ? 'text-right text-gold-200' : (theme === 'light' ? 'text-left text-gray-500' : 'text-left text-gray-400')}`}>
+                                        <div className={`text-[10px] mt-1 opacity-50 ${isMe ? 'text-right' : 'text-left'} ${timeClass}`}>
                                             {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                     </div>
@@ -167,7 +197,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
 
                 {/* Input Area */}
                 <div className="p-4 bg-black/40 backdrop-blur-md border-t border-white/5">
-                    <div className="relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-2 py-2 focus-within:border-gold-500/30 focus-within:bg-white/10 transition-all duration-300 shadow-lg">
+                    <div className={`relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-2 py-2 transition-all duration-300 shadow-lg ${isMeMGT ? 'focus-within:border-emerald-500/30 focus-within:bg-emerald-500/5' : 'focus-within:border-gold-500/30 focus-within:bg-gold-500/5'}`}>
                         <input
                             type="text"
                             value={newMessage}
@@ -180,7 +210,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             onClick={handleSendMessage}
                             disabled={!newMessage.trim()}
                             aria-label="Enviar mensagem"
-                            className="p-2.5 bg-gold-500 text-black rounded-full hover:bg-gold-400 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-gold-500/20"
+                            className={`p-2.5 text-black rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg ${isMeMGT ? 'bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/20' : 'bg-gold-500 hover:bg-gold-400 shadow-gold-500/20'}`}
                         >
                             <Send className="w-4 h-4" />
                         </button>

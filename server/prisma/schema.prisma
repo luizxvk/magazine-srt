@@ -22,6 +22,8 @@ model User {
   xp           Int           @default(0)
   zions        Int           @default(0)
   membershipType MembershipType @default(MAGAZINE)
+  isOnline     Boolean       @default(false)
+  lastSeenAt   DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   resetToken   String?
@@ -48,6 +50,7 @@ model User {
   storyViews   StoryView[]
   catalogPhotos CatalogPhoto[]
   zionPurchases ZionPurchase[]
+  reportsSent  Report[] @relation("ReportsSent")
 }
 
 model Story {
@@ -74,12 +77,13 @@ model StoryView {
 }
 
 model Message {
-  id        String   @id @default(uuid())
-  senderId  String
-  receiverId String
-  content   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  senderId      String
+  receiverId    String
+  content       String
+  storyImageUrl String?
+  read          Boolean  @default(false)
+  createdAt     DateTime @default(now())
 
   sender    User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
@@ -93,7 +97,10 @@ model Post {
   caption     String?
   likesCount  Int       @default(0)
   commentsCount Int     @default(0)
+  reportsCount Int      @default(0)
   isHighlight Boolean   @default(false)
+  isPublic    Boolean   @default(true)
+  isRemoved   Boolean   @default(false)
   mediaType   MediaType @default(IMAGE)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -352,4 +359,26 @@ model Event {
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Report {
+  id          String       @id @default(uuid())
+  reporterId  String
+  postId      String?
+  userId      String?      // Reported user
+  reason      String
+  status      ReportStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  resolvedAt  DateTime?
+  resolvedBy  String?
+
+  reporter    User         @relation("ReportsSent", fields: [reporterId], references: [id])
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
 }

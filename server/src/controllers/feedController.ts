@@ -451,10 +451,35 @@ export const getStories = async (req: AuthRequest, res: Response) => {
         // Fetch active stories (created in the last 24 hours)
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
+        // First, get user's friends
+        const friendships = await prisma.friendship.findMany({
+            where: {
+                OR: [
+                    { requesterId: userId, status: 'ACCEPTED' },
+                    { addresseeId: userId, status: 'ACCEPTED' }
+                ]
+            },
+            select: {
+                requesterId: true,
+                addresseeId: true
+            }
+        });
+
+        // Extract friend IDs
+        const friendIds = friendships.map(f => 
+            f.requesterId === userId ? f.addresseeId : f.requesterId
+        );
+
+        // Include self to see own stories
+        const allowedUserIds = [userId, ...friendIds];
+
         const stories = await prisma.story.findMany({
             where: {
                 createdAt: {
                     gte: twentyFourHoursAgo
+                },
+                userId: {
+                    in: allowedUserIds
                 }
             },
             include: {
@@ -463,7 +488,8 @@ export const getStories = async (req: AuthRequest, res: Response) => {
                         id: true,
                         name: true,
                         displayName: true,
-                        avatarUrl: true
+                        avatarUrl: true,
+                        membershipType: true
                     }
                 },
                 views: {

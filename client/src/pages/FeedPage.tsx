@@ -19,6 +19,7 @@ import StoriesBar from '../components/StoriesBar';
 import RecommendationsDrawer from '../components/RecommendationsDrawer';
 import NewMembersModal from '../components/NewMembersModal';
 import EventsModal from '../components/EventsModal';
+import OnlineFriendsCard from '../components/OnlineFriendsCard';
 
 interface Post {
     id: string;
@@ -297,6 +298,11 @@ export default function FeedPage() {
                     {/* Daily Login Card */}
                     <div className="mb-10">
                         <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+                    </div>
+
+                    {/* Online Friends Card */}
+                    <div className="mb-6">
+                        <OnlineFriendsCard maxDisplay={5} />
                     </div>
 
                     {/* SRT LOG Promotion Card - Featured at Top */}

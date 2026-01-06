@@ -26,7 +26,7 @@ async function main() {
                 name: 'Nicole Valentina',
                 passwordHash,
                 role: 'ADMIN',
-                membershipType: 'SRT',
+                membershipType: 'MGT',
                 trophies: 100,
                 level: 5
             }

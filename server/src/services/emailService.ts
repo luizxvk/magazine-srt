@@ -1,15 +1,36 @@
 import nodemailer from 'nodemailer';
 
+// Log configuration status on startup
+console.log('[Email Service] Configuration check:');
+console.log('  - SMTP_HOST:', process.env.SMTP_HOST || 'not set (default: smtp.gmail.com)');
+console.log('  - SMTP_PORT:', process.env.SMTP_PORT || 'not set (default: 587)');
+console.log('  - SMTP_USER:', process.env.SMTP_USER ? '✓ configured' : '✗ not set');
+console.log('  - SMTP_PASS:', process.env.SMTP_PASS ? '✓ configured' : '✗ not set');
+
 // Configure transporter - uses environment variables
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    }
-});
+const createTransporter = () => {
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const port = parseInt(process.env.SMTP_PORT || '587');
+    const secure = process.env.SMTP_SECURE === 'true' || port === 465;
+    
+    return nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        },
+        // Timeout settings for better reliability
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 30000,
+        // TLS options for Gmail
+        tls: {
+            rejectUnauthorized: false // Accept self-signed certs
+        }
+    });
+};
 
 interface SendEmailOptions {
     to: string;
@@ -20,23 +41,38 @@ interface SendEmailOptions {
 export const sendEmail = async ({ to, subject, html }: SendEmailOptions): Promise<boolean> => {
     // Check if email is configured
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-        console.log('[Email] SMTP not configured - skipping email send');
+        console.log('[Email] SMTP not configured - email NOT sent');
+        console.log('[Email] To send emails, configure SMTP_USER and SMTP_PASS environment variables');
         console.log('[Email] Would send to:', to);
         console.log('[Email] Subject:', subject);
+        // Return true to not block user flow, but log the issue
         return false;
     }
 
     try {
-        await transporter.sendMail({
+        const transporter = createTransporter();
+        
+        // Verify connection first
+        await transporter.verify();
+        console.log('[Email] SMTP connection verified');
+        
+        const info = await transporter.sendMail({
             from: `"Magazine/MGT" <${process.env.SMTP_USER}>`,
             to,
             subject,
             html
         });
-        console.log('[Email] Sent to:', to);
+        
+        console.log('[Email] Sent successfully!');
+        console.log('[Email] Message ID:', info.messageId);
+        console.log('[Email] To:', to);
         return true;
-    } catch (error) {
-        console.error('[Email] Failed to send:', error);
+    } catch (error: any) {
+        console.error('[Email] Failed to send email:');
+        console.error('[Email] Error name:', error.name);
+        console.error('[Email] Error message:', error.message);
+        if (error.code) console.error('[Email] Error code:', error.code);
+        if (error.response) console.error('[Email] Server response:', error.response);
         return false;
     }
 };

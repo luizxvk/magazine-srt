@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -18,12 +18,157 @@ interface CatalogPhoto {
     isPublic: boolean;
     isFavorite: boolean;
     createdAt: string;
+    orientation?: 'landscape' | 'portrait' | 'square';
     user?: {
         id: string;
         name: string;
         displayName?: string;
         avatarUrl?: string;
     };
+}
+
+// Photo Card Component with dynamic aspect ratio
+function PhotoCard({ 
+    photo, 
+    onToggleFavorite, 
+    onDelete, 
+    showActions = false,
+    userId 
+}: { 
+    photo: CatalogPhoto; 
+    onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+    onDelete: (id: string, e: React.MouseEvent) => void;
+    showActions?: boolean;
+    userId?: string;
+}) {
+    const [orientation, setOrientation] = useState<'landscape' | 'portrait' | 'square'>(photo.orientation || 'square');
+    const [loaded, setLoaded] = useState(false);
+
+    const handleImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        const ratio = img.naturalWidth / img.naturalHeight;
+        if (ratio > 1.2) {
+            setOrientation('landscape');
+        } else if (ratio < 0.8) {
+            setOrientation('portrait');
+        } else {
+            setOrientation('square');
+        }
+        setLoaded(true);
+    }, []);
+
+    // Determine grid span based on orientation
+    const getGridClasses = () => {
+        switch (orientation) {
+            case 'landscape':
+                return 'col-span-2 row-span-1';
+            case 'portrait':
+                return 'col-span-1 row-span-2';
+            default:
+                return 'col-span-1 row-span-1';
+        }
+    };
+
+    // Determine aspect ratio style
+    const getAspectStyle = () => {
+        switch (orientation) {
+            case 'landscape':
+                return { aspectRatio: '16/9' };
+            case 'portrait':
+                return { aspectRatio: '3/4' };
+            default:
+                return { aspectRatio: '1/1' };
+        }
+    };
+
+    return (
+        <div
+            className={`${getGridClasses()} relative group rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${!loaded ? 'animate-pulse bg-white/5' : ''}`}
+            style={getAspectStyle()}
+        >
+            {/* Image */}
+            <img
+                src={photo.imageUrl}
+                alt={photo.title || 'Foto do catálogo'}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                onLoad={handleImageLoad}
+                style={{ opacity: loaded ? 1 : 0 }}
+            />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                <div className="flex justify-between items-start">
+                    <div className="flex gap-2">
+                        {photo.isFavorite && (
+                            <span className="p-1.5 bg-yellow-500/20 text-yellow-500 rounded-full backdrop-blur-sm">
+                                <Star className="w-3 h-3 fill-current" />
+                            </span>
+                        )}
+                        {photo.isPublic && (
+                            <span className="p-1.5 bg-white/20 text-white rounded-full backdrop-blur-sm">
+                                <Globe className="w-3 h-3" />
+                            </span>
+                        )}
+                    </div>
+
+                    {showActions && (
+                        <div className="flex gap-2">
+                            <button
+                                onClick={(e) => onToggleFavorite(photo.id, e)}
+                                className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm transition-colors"
+                            >
+                                <Star className={`w-4 h-4 ${photo.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                            </button>
+                            {photo.user?.id === userId && (
+                                <button
+                                    onClick={(e) => onDelete(photo.id, e)}
+                                    className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full text-red-400 backdrop-blur-sm transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <div>
+                    {photo.title && (
+                        <h3 className="text-white font-bold text-sm line-clamp-1">{photo.title}</h3>
+                    )}
+                    {photo.user && (
+                        <div className="flex items-center gap-2 mt-1.5 mb-1">
+                            {photo.user.avatarUrl ? (
+                                <img 
+                                    src={photo.user.avatarUrl} 
+                                    alt={photo.user.displayName || photo.user.name}
+                                    className="w-5 h-5 rounded-full object-cover border border-white/30"
+                                />
+                            ) : (
+                                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                                    <User className="w-3 h-3 text-white/70" />
+                                </div>
+                            )}
+                            <span className="text-xs text-white/80 font-medium">
+                                {photo.user.displayName || photo.user.name}
+                            </span>
+                        </div>
+                    )}
+                    <div className="flex flex-wrap gap-1 mt-1">
+                        {photo.category && (
+                            <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full text-white/90">
+                                {photo.category}
+                            </span>
+                        )}
+                        {photo.carBrand && (
+                            <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full text-white/90">
+                                {photo.carBrand}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default function PhotoCatalogPage() {
@@ -163,95 +308,17 @@ export default function PhotoCatalogPage() {
                     </div>
                 </div>
                 {/* (Lines 151-207 omitted for brevity, keeping original logic) */}
-                {/* Gallery Grid - Responsive */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 space-y-4 md:space-y-0">
+                {/* Gallery Grid - Responsive with Dynamic Aspect Ratios */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 auto-rows-[200px]">
                     {photos.map((photo) => (
-                        <div
+                        <PhotoCard
                             key={photo.id}
-                            className="break-inside-avoid relative group rounded-2xl overflow-hidden cursor-pointer"
-                        >
-                            {/* Image */}
-                            <img
-                                src={photo.imageUrl}
-                                alt={photo.title || 'Foto do catálogo'}
-                                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
-                            />
-
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
-                                <div className="flex justify-between items-start">
-                                    <div className="flex gap-2">
-                                        {photo.isFavorite && (
-                                            <span className="p-1.5 bg-yellow-500/20 text-yellow-500 rounded-full backdrop-blur-sm">
-                                                <Star className="w-3 h-3 fill-current" />
-                                            </span>
-                                        )}
-                                        {photo.isPublic && (
-                                            <span className="p-1.5 bg-white/20 text-white rounded-full backdrop-blur-sm">
-                                                <Globe className="w-3 h-3" />
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {activeTab === 'my' && (
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={(e) => handleToggleFavorite(photo.id, e)}
-                                                className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm transition-colors"
-                                            >
-                                                <Star className={`w-4 h-4 ${photo.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-                                            </button>
-                                            {/* Only show delete button if user owns the photo */}
-                                            {photo.user?.id === user?.id && (
-                                                <button
-                                                    onClick={(e) => handleDelete(photo.id, e)}
-                                                    className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full text-red-400 backdrop-blur-sm transition-colors"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div>
-                                    {photo.title && (
-                                        <h3 className="text-white font-bold text-sm line-clamp-1">{photo.title}</h3>
-                                    )}
-                                    {/* Photo owner info */}
-                                    {photo.user && (
-                                        <div className="flex items-center gap-2 mt-1.5 mb-1">
-                                            {photo.user.avatarUrl ? (
-                                                <img 
-                                                    src={photo.user.avatarUrl} 
-                                                    alt={photo.user.displayName || photo.user.name}
-                                                    className="w-5 h-5 rounded-full object-cover border border-white/30"
-                                                />
-                                            ) : (
-                                                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
-                                                    <User className="w-3 h-3 text-white/70" />
-                                                </div>
-                                            )}
-                                            <span className="text-xs text-white/80 font-medium">
-                                                {photo.user.displayName || photo.user.name}
-                                            </span>
-                                        </div>
-                                    )}
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                        {photo.category && (
-                                            <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full text-white/90">
-                                                {photo.category}
-                                            </span>
-                                        )}
-                                        {photo.carBrand && (
-                                            <span className="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full text-white/90">
-                                                {photo.carBrand}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            photo={photo}
+                            onToggleFavorite={handleToggleFavorite}
+                            onDelete={handleDelete}
+                            showActions={activeTab === 'my'}
+                            userId={user?.id}
+                        />
                     ))}
                 </div>
 

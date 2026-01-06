@@ -17,6 +17,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import MgtLogPage from './pages/MgtLogPage';
 import PhotoCatalogPage from './pages/PhotoCatalogPage';
 import HighlightsPage from './pages/HighlightsPage';
+import RoadmapPage from './pages/RoadmapPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
 import AdminEditMgtLogPage from './pages/admin/AdminEditMgtLogPage';
 import { logger } from './utils/logger';
@@ -53,6 +54,7 @@ function App() {
 
           <Route path="/catalog" element={<PrivateRoute><PhotoCatalogPage /></PrivateRoute>} />
           <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
+          <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

@@ -16,7 +16,10 @@ import logsRoutes from './src/routes/logsRoutes';
 import catalogRoutes from './src/routes/catalogRoutes';
 import paymentRoutes from './src/routes/paymentRoutes';
 import eventRoutes from './src/routes/eventRoutes';
+import reportRoutes from './src/routes/reportRoutes';
 import { logger } from './src/utils/logger';
+import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
+import { rateLimit } from './src/middleware/rateLimitMiddleware';
 
 dotenv.config();
 
@@ -25,6 +28,12 @@ logger.init();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Security Headers
+app.use(securityHeaders);
+
+// Global Rate Limiting (100 requests per minute per IP)
+app.use(rateLimit({ windowMs: 60 * 1000, max: 100 }));
 
 // Permissive CORS Configuration
 app.use(cors({
@@ -44,6 +53,10 @@ app.options(/.*/, cors({
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Input Sanitization
+app.use(sanitizeInput);
+
 app.use('/uploads', express.static('uploads'));
 
 // Routes
@@ -65,6 +78,7 @@ apiRouter.use('/logs', logsRoutes);
 apiRouter.use('/catalog', catalogRoutes);
 apiRouter.use('/payments', paymentRoutes);
 apiRouter.use('/events', eventRoutes);
+apiRouter.use('/reports', reportRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

@@ -139,10 +139,10 @@ export const getFriends = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true }
                 },
                 addressee: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true }
                 }
             }
         });
@@ -154,6 +154,86 @@ export const getFriends = async (req: AuthRequest, res: Response) => {
         res.json(friends);
     } catch (error) {
         console.error('Error fetching friends:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Get only online friends
+export const getOnlineFriends = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        // Consider a user online if they were active in the last 5 minutes
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
+        const friendships = await prisma.friendship.findMany({
+            where: {
+                status: 'ACCEPTED',
+                OR: [
+                    { requesterId: userId },
+                    { addresseeId: userId }
+                ]
+            },
+            include: {
+                requester: {
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true }
+                },
+                addressee: {
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true }
+                }
+            }
+        });
+
+        const onlineFriends = friendships
+            .map(f => f.requesterId === userId ? f.addressee : f.requester)
+            .filter(friend => friend.isOnline || (friend.lastSeenAt && new Date(friend.lastSeenAt) > fiveMinutesAgo));
+
+        res.json(onlineFriends);
+    } catch (error) {
+        console.error('Error fetching online friends:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Update user's online status (heartbeat)
+export const updateOnlineStatus = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                isOnline: true,
+                lastSeenAt: new Date()
+            }
+        });
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating online status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Set user offline (on logout or disconnect)
+export const setUserOffline = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                isOnline: false,
+                lastSeenAt: new Date()
+            }
+        });
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error setting user offline:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

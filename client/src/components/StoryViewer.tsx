@@ -270,10 +270,11 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                             onBlur={() => setIsInputFocused(false)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && commentText.trim()) {
-                                    // Send message via DM
+                                    // Send message via DM with story reference
                                     api.post(`/messages`, {
                                         receiverId: currentStoryGroup.user.id,
-                                        content: `📷 Respondeu ao seu story: "${commentText}"`
+                                        content: `📷 Respondeu ao seu story: "${commentText}"`,
+                                        storyImageUrl: currentItem.imageUrl
                                     }).then(() => {
                                         setCommentText('');
                                         // Show subtle feedback
@@ -302,7 +303,8 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                                 if (commentText.trim()) {
                                     api.post(`/messages`, {
                                         receiverId: currentStoryGroup.user.id,
-                                        content: `📷 Respondeu ao seu story: "${commentText}"`
+                                        content: `📷 Respondeu ao seu story: "${commentText}"`,
+                                        storyImageUrl: currentItem.imageUrl
                                     }).then(() => {
                                         setCommentText('');
                                         setShowHeartAnimation(true);

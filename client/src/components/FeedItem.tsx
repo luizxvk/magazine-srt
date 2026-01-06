@@ -3,6 +3,7 @@ import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2 }
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 interface FeedItemProps {
     id: string | number;
@@ -92,17 +93,35 @@ export default function FeedItem({
 }: FeedItemProps) {
     const { user, theme } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState('');
+    const [isReporting, setIsReporting] = useState(false);
     const isOwner = user?.id === authorId;
     const isMGT = user?.membershipType === 'MGT';
 
 
     const handleShare = () => {
+        // Generate public share link
+        const shareUrl = `${window.location.origin}/post/${id}`;
+        navigator.clipboard.writeText(shareUrl);
         if (onShare) {
             onShare(id);
-        } else {
-            // Default share behavior (copy link)
-            navigator.clipboard.writeText(`${window.location.origin}/post/${id}`);
-            alert('Link copiado para a área de transferência!');
+        }
+    };
+
+    const handleReport = async () => {
+        if (!reportReason.trim()) return;
+        
+        setIsReporting(true);
+        try {
+            await api.post(`/reports/post/${id}`, { reason: reportReason });
+            alert('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
+            setShowReportModal(false);
+            setReportReason('');
+        } catch (error: any) {
+            alert(error.response?.data?.error || 'Erro ao enviar denúncia');
+        } finally {
+            setIsReporting(false);
         }
     };
 
@@ -170,8 +189,7 @@ export default function FeedItem({
                                 </button>
                                 <button
                                     onClick={() => {
-                                        if (onReport) onReport(id);
-                                        else alert('Denúncia enviada para análise.');
+                                        setShowReportModal(true);
                                         setShowMenu(false);
                                     }}
                                     className="w-full px-4 py-2 text-left text-xs text-gray-300 hover:bg-white/5 flex items-center gap-2"
@@ -182,6 +200,50 @@ export default function FeedItem({
                         )}
                     </div>
                 </div>
+
+                {/* Report Modal */}
+                {showReportModal && (
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowReportModal(false)}>
+                        <div className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+                            <h3 className="text-white font-serif text-lg mb-4">Denunciar Postagem</h3>
+                            <p className="text-gray-400 text-sm mb-4">Por que você está denunciando esta postagem?</p>
+                            <div className="space-y-2 mb-4">
+                                {['Conteúdo impróprio', 'Spam', 'Discurso de ódio', 'Violência', 'Assédio', 'Outro'].map((reason) => (
+                                    <button
+                                        key={reason}
+                                        onClick={() => setReportReason(reason)}
+                                        className={`w-full p-3 rounded-lg text-left text-sm transition-colors ${
+                                            reportReason === reason 
+                                                ? (isMGT ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-gold-500/20 border-gold-500/50 text-gold-400')
+                                                : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'
+                                        } border`}
+                                    >
+                                        {reason}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowReportModal(false)}
+                                    className="flex-1 py-2 rounded-lg border border-white/10 text-gray-400 hover:bg-white/5"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleReport}
+                                    disabled={!reportReason || isReporting}
+                                    className={`flex-1 py-2 rounded-lg font-medium disabled:opacity-50 ${
+                                        isMGT 
+                                            ? 'bg-emerald-500 text-black hover:bg-emerald-400' 
+                                            : 'bg-gold-500 text-black hover:bg-gold-400'
+                                    }`}
+                                >
+                                    {isReporting ? 'Enviando...' : 'Denunciar'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* If no image, show category here */}
                 {!(image || video) && (

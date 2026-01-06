@@ -13,7 +13,7 @@ interface AuthenticatedRequest extends Request {
 // Send a message
 export const sendMessage = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { receiverId, content } = req.body;
+        const { receiverId, content, storyImageUrl } = req.body;
         const senderId = req.user?.userId;
 
         if (!senderId) {
@@ -37,7 +37,8 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response) => {
             data: {
                 senderId,
                 receiverId,
-                content
+                content,
+                storyImageUrl: storyImageUrl || null
             },
             include: {
                 sender: {

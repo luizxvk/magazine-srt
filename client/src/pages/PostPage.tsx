@@ -61,7 +61,7 @@ export default function PostPage() {
         if (id) fetchPost();
     }, [id]);
 
-    if (loading) return <ModernLoader text="Carregando post..." fullScreen />;
+    if (loading) return <ModernLoader fullScreen />;
     if (!post) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Post não encontrado</div>;
 
     return (

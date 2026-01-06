@@ -124,7 +124,7 @@ export default function ProfilePage() {
         }
     };
 
-    if (!profileUser) return <ModernLoader text="Carregando perfil..." fullScreen />;
+    if (!profileUser) return <ModernLoader fullScreen />;
 
     const isMGT = profileUser.membershipType === 'MGT';
 

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout } from 'lucide-react';
+import { X, Sparkles, Shield, Heart, Trophy, Zap, Bell, Image, Users, Check, Smartphone, Layout, MessageCircle, Camera } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.2.1';
+const CURRENT_VERSION = '0.2.2';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -27,6 +27,35 @@ export default function WhatsNewModal() {
 
     // Todas as atualizações acumuladas (mais recentes primeiro)
     const updates: UpdateItem[] = [
+        // v0.2.2 - 06/01/2026
+        {
+            icon: <Camera className="w-5 h-5" />,
+            title: 'Catálogo de Fotos Melhorado',
+            description: 'Agora mostra quem postou cada foto e só o dono pode remover.',
+            type: 'improvement',
+            version: '0.2.2'
+        },
+        {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'Mensagens Estilo Facebook',
+            description: 'Chat agora aparece no canto inferior direito da tela, mais acessível.',
+            type: 'feature',
+            version: '0.2.2'
+        },
+        {
+            icon: <Shield className="w-5 h-5" />,
+            title: 'Recuperação de Senha',
+            description: 'Agora você pode recuperar sua senha via email caso a esqueça.',
+            type: 'feature',
+            version: '0.2.2'
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Redimensionar Avatar',
+            description: 'Ao trocar de foto, você pode ajustar o zoom e posição da imagem.',
+            type: 'improvement',
+            version: '0.2.2'
+        },
         // v0.2.1 - 06/01/2026
         {
             icon: <Smartphone className="w-5 h-5" />,

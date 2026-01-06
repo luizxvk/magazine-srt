@@ -12,7 +12,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     const { user, loading } = useAuth();
 
     if (loading) {
-        return <ModernLoader text="Carregando..." fullScreen />;
+        return <ModernLoader fullScreen />;
     }
 
     if (!user || user.role !== 'ADMIN') {

@@ -3,8 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
-import { Camera, Filter, Globe, Star, Trash2 } from 'lucide-react';
+import { Camera, Filter, Globe, Star, Trash2, User } from 'lucide-react';
 import PhotoUploadModal from '../components/PhotoUploadModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 interface CatalogPhoto {
     id: string;
@@ -37,6 +38,10 @@ export default function PhotoCatalogPage() {
     const [photos, setPhotos] = useState<CatalogPhoto[]>([]);
     const [loading, setLoading] = useState(true);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+    
+    // Delete confirmation modal state
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
 
     // Filters
     const [selectedCategory] = useState('');
@@ -100,13 +105,20 @@ export default function PhotoCatalogPage() {
 
     const handleDelete = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!confirm('Tem certeza que deseja excluir esta foto?')) return;
-
+        setPhotoToDelete(id);
+        setDeleteModalOpen(true);
+    };
+    
+    const confirmDelete = async () => {
+        if (!photoToDelete) return;
+        
         try {
-            await api.delete(`/catalog/${id}`);
-            setPhotos(prev => prev.filter(p => p.id !== id));
+            await api.delete(`/catalog/${photoToDelete}`);
+            setPhotos(prev => prev.filter(p => p.id !== photoToDelete));
         } catch (error) {
             console.error('Failed to delete photo', error);
+        } finally {
+            setPhotoToDelete(null);
         }
     };
 
@@ -189,12 +201,15 @@ export default function PhotoCatalogPage() {
                                             >
                                                 <Star className={`w-4 h-4 ${photo.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
                                             </button>
-                                            <button
-                                                onClick={(e) => handleDelete(photo.id, e)}
-                                                className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full text-red-400 backdrop-blur-sm transition-colors"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            {/* Only show delete button if user owns the photo */}
+                                            {photo.user?.id === user?.id && (
+                                                <button
+                                                    onClick={(e) => handleDelete(photo.id, e)}
+                                                    className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full text-red-400 backdrop-blur-sm transition-colors"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -202,6 +217,25 @@ export default function PhotoCatalogPage() {
                                 <div>
                                     {photo.title && (
                                         <h3 className="text-white font-bold text-sm line-clamp-1">{photo.title}</h3>
+                                    )}
+                                    {/* Photo owner info */}
+                                    {photo.user && (
+                                        <div className="flex items-center gap-2 mt-1.5 mb-1">
+                                            {photo.user.avatarUrl ? (
+                                                <img 
+                                                    src={photo.user.avatarUrl} 
+                                                    alt={photo.user.displayName || photo.user.name}
+                                                    className="w-5 h-5 rounded-full object-cover border border-white/30"
+                                                />
+                                            ) : (
+                                                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                                                    <User className="w-3 h-3 text-white/70" />
+                                                </div>
+                                            )}
+                                            <span className="text-xs text-white/80 font-medium">
+                                                {photo.user.displayName || photo.user.name}
+                                            </span>
+                                        </div>
                                     )}
                                     <div className="flex flex-wrap gap-1 mt-1">
                                         {photo.category && (
@@ -245,6 +279,21 @@ export default function PhotoCatalogPage() {
                         )}
                     </div>
                 )}
+                
+                {/* Delete Confirmation Modal */}
+                <ConfirmModal
+                    isOpen={deleteModalOpen}
+                    onClose={() => {
+                        setDeleteModalOpen(false);
+                        setPhotoToDelete(null);
+                    }}
+                    onConfirm={confirmDelete}
+                    title="Excluir foto"
+                    message="Tem certeza que deseja excluir esta foto? Esta ação não pode ser desfeita."
+                    confirmText="Excluir"
+                    cancelText="Cancelar"
+                    isDestructive={true}
+                />
             </div>
         </div>
     );

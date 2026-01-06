@@ -100,7 +100,7 @@ export default function Rewards() {
         }
     };
 
-    if (loading) return <ModernLoader text="Carregando recompensas..." />;
+    if (loading) return <ModernLoader />;
 
     return (
         <div className="space-y-12">

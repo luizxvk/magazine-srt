@@ -270,14 +270,15 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                             onBlur={() => setIsInputFocused(false)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && commentText.trim()) {
-                                    // Send message
+                                    // Send message via DM
                                     api.post(`/messages`, {
-                                        recipientId: currentStoryGroup.user.id,
-                                        content: commentText,
-                                        context: 'story'
+                                        receiverId: currentStoryGroup.user.id,
+                                        content: `📷 Respondeu ao seu story: "${commentText}"`
                                     }).then(() => {
                                         setCommentText('');
-                                        alert('Mensagem enviada!');
+                                        // Show subtle feedback
+                                        setShowHeartAnimation(true);
+                                        setTimeout(() => setShowHeartAnimation(false), 1000);
                                     }).catch(console.error);
                                 }
                             }}
@@ -300,12 +301,12 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                             onClick={() => {
                                 if (commentText.trim()) {
                                     api.post(`/messages`, {
-                                        recipientId: currentStoryGroup.user.id,
-                                        content: commentText,
-                                        context: 'story'
+                                        receiverId: currentStoryGroup.user.id,
+                                        content: `📷 Respondeu ao seu story: "${commentText}"`
                                     }).then(() => {
                                         setCommentText('');
-                                        alert('Mensagem enviada!');
+                                        setShowHeartAnimation(true);
+                                        setTimeout(() => setShowHeartAnimation(false), 1000);
                                     }).catch(console.error);
                                 }
                             }}

@@ -7,7 +7,7 @@ export default function PrivateRoute({ children }: { children: React.ReactElemen
     const { isAuthenticated, loading } = useAuth();
 
     if (loading) {
-        return <ModernLoader text="Carregando..." fullScreen />;
+        return <ModernLoader fullScreen />;
     }
 
     return isAuthenticated ? children : <Navigate to="/login" />;

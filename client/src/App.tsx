@@ -6,6 +6,7 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import ModernLogin from './pages/ModernLogin';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import RequestInvite from './pages/RequestInvite';
 import FeedPage from './pages/FeedPage';
 import PostPage from './pages/PostPage';
@@ -39,6 +40,7 @@ function App() {
           <Route path="/" element={<ModernLogin />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/request-invite" element={<RequestInvite />} />
 
           {/* Protected Routes */}

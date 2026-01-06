@@ -245,7 +245,7 @@ export default function FeedPage() {
 
                     {/* Feed Carousel & Feed Items */}
                     {loading ? (
-                        <ModernLoader text="Carregando feed..." />
+                        <ModernLoader />
                     ) : (
                         <>
                             {highlightedPosts.length > 0 && (

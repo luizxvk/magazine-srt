@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import crypto from 'crypto';
+import { sendPasswordResetEmail } from '../services/emailService';
 
 const prisma = new PrismaClient();
 
@@ -183,11 +184,11 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             // Security: Don't reveal if user exists
-            return res.json({ message: 'If an account exists, a reset link has been sent.' });
+            return res.json({ message: 'Se uma conta existir com este email, um link de redefinição foi enviado.' });
         }
 
-        // Generate Token (Simple random string for demo)
-        const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        // Generate secure Token
+        const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
 
         await prisma.user.update({
@@ -195,11 +196,23 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
             data: { resetToken, resetTokenExpiry }
         });
 
-        // DEMO ONLY: Return token in response
-        res.json({ message: 'Reset link sent', demoToken: resetToken });
+        // Send email
+        const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
+        
+        if (emailSent) {
+            res.json({ message: 'Link de redefinição enviado para seu email.' });
+        } else {
+            // If email not configured, return token for development
+            console.log('[Auth] Email not sent, returning token for dev:', resetToken);
+            res.json({ 
+                message: 'Link de redefinição gerado.', 
+                devToken: process.env.NODE_ENV !== 'production' ? resetToken : undefined 
+            });
+        }
 
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('[Auth] Request password reset error:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
     }
 };
 

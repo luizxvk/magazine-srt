@@ -152,7 +152,7 @@ export default function SocialPage() {
 
                 {/* Content */}
                 {loading ? (
-                    <ModernLoader text="Carregando..." />
+                    <ModernLoader />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {activeTab === 'friends' ? (

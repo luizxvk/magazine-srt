@@ -82,9 +82,9 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-            {/* Vision Pro Style Container - SRT Theme (Black/Gold) */}
-            <div className={`w-full max-w-lg h-[80vh] flex flex-col ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-[#0a0a0a]/80 border-white/10'} backdrop-blur-3xl border rounded-[32px] shadow-2xl overflow-hidden relative ring-1 ring-white/5`}>
+        <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
+            {/* Vision Pro Style Container - SRT Theme (Black/Gold) - Facebook-style bottom-right position */}
+            <div className={`w-[360px] h-[480px] flex flex-col ${theme === 'light' ? 'bg-white/95 border-gray-200' : 'bg-[#0a0a0a]/95 border-white/10'} backdrop-blur-3xl border rounded-2xl shadow-2xl overflow-hidden relative ring-1 ring-white/5`}>
 
                 {/* Glassy Header */}
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-xl z-10">

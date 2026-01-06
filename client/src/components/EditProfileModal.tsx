@@ -4,6 +4,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ChangePasswordModal from './ChangePasswordModal';
 import ConfirmModal from './ConfirmModal';
+import ImageCropModal from './ImageCropModal';
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -33,6 +34,8 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
     if (!isOpen) return null;
 
@@ -126,30 +129,18 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                                                     e.target.value = '';
                                                     return;
                                                 }
-                                            }
-
-                                            // Validate image dimensions for non-GIFs
-                                            if (file.type !== 'image/gif') {
-                                                const img = new Image();
-                                                img.onload = () => {
-                                                    if (img.width > 400 || img.height > 400) {
-                                                        // Just warn, don't block - image will be resized on display
-                                                        console.log('Image will be resized to fit 400x400');
-                                                    }
-                                                    const reader = new FileReader();
-                                                    reader.onloadend = () => {
-                                                        setAvatarUrl(reader.result as string);
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                };
-                                                img.src = URL.createObjectURL(file);
-                                            } else {
+                                                // GIFs go directly without cropping
                                                 const reader = new FileReader();
                                                 reader.onloadend = () => {
                                                     setAvatarUrl(reader.result as string);
                                                 };
                                                 reader.readAsDataURL(file);
+                                            } else {
+                                                // Open crop modal for non-GIF images
+                                                setSelectedImageFile(file);
+                                                setIsCropModalOpen(true);
                                             }
+                                            e.target.value = ''; // Reset input
                                         }
                                     }}
                                     className="hidden"
@@ -262,6 +253,20 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 cancelText="Cancelar"
                 isDestructive={true}
             />
+            
+            {selectedImageFile && (
+                <ImageCropModal
+                    isOpen={isCropModalOpen}
+                    onClose={() => {
+                        setIsCropModalOpen(false);
+                        setSelectedImageFile(null);
+                    }}
+                    imageFile={selectedImageFile}
+                    onCropComplete={(croppedUrl) => {
+                        setAvatarUrl(croppedUrl);
+                    }}
+                />
+            )}
         </>
     );
 }

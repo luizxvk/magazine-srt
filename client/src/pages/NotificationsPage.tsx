@@ -136,7 +136,7 @@ export default function NotificationsPage() {
                 </div>
 
                 {loading ? (
-                    <ModernLoader text="Carregando notificações..." />
+                    <ModernLoader />
                 ) : notifications.length === 0 ? (
                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
                         <Bell className={`w-12 h-12 ${themeEmptyIcon} mx-auto mb-4`} />

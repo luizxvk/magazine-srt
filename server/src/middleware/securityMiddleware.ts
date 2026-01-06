@@ -41,16 +41,28 @@ const sanitizeObject = (obj: any): any => {
 
 // Input sanitization middleware
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
+    // Only sanitize req.body - query and params are read-only getters in Express
     if (req.body && typeof req.body === 'object') {
         req.body = sanitizeObject(req.body);
     }
     
+    // For query params, sanitize individual values in-place
     if (req.query && typeof req.query === 'object') {
-        req.query = sanitizeObject(req.query);
+        for (const key in req.query) {
+            const value = req.query[key];
+            if (typeof value === 'string') {
+                (req.query as any)[key] = sanitizeString(value);
+            }
+        }
     }
     
+    // For route params, sanitize individual values in-place
     if (req.params && typeof req.params === 'object') {
-        req.params = sanitizeObject(req.params);
+        for (const key in req.params) {
+            if (typeof req.params[key] === 'string') {
+                req.params[key] = sanitizeString(req.params[key]);
+            }
+        }
     }
     
     next();

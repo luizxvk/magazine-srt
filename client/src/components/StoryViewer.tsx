@@ -46,7 +46,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [friends, setFriends] = useState<Friend[]>([]);
-    const [holdTimer, setHoldTimer] = useState<NodeJS.Timeout | null>(null);
+    const [holdTimer, setHoldTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
     const currentStoryGroup = stories[currentIndex];
     // If items exist, use them. Otherwise fallback to the main story object (old behavior/compatibility)

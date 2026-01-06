@@ -225,7 +225,9 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
                 role: true,
                 points: true,
                 trophies: true,
+                zions: true,
                 level: true,
+                membershipType: true,
                 updatedAt: true,
             },
         });

@@ -24,6 +24,53 @@ interface FeedItemProps {
     isExpanded?: boolean;
 }
 
+interface MediaContentProps {
+    video?: string;
+    image?: string;
+    title: string;
+    category: string;
+    theme: 'dark' | 'light';
+    isMGT: boolean;
+    isExpanded: boolean;
+}
+
+// Extracted outside to avoid re-creation on each render
+function MediaContent({ video, image, title, category, theme, isMGT, isExpanded }: MediaContentProps) {
+    return (
+        <>
+            {video ? (
+                <video src={video} controls className="w-full h-full object-cover" />
+            ) : (
+                <img
+                    src={image}
+                    alt={title}
+                    className={`w-full h-full object-cover transition-transform duration-700 ${!isExpanded ? 'group-hover:scale-110' : ''}`}
+                />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-red-900/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Category Badge */}
+            <div className="absolute top-4 left-4 pointer-events-none">
+                <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isMGT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isMGT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
+                    {category}
+                </span>
+            </div>
+
+            {/* Expand Button (only if not expanded) */}
+            {!isExpanded && (
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div
+                        className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-black/80 transition-colors block cursor-pointer"
+                        title="Expandir"
+                    >
+                        <Maximize2 className="w-4 h-4" />
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
 export default function FeedItem({
     id,
     image,
@@ -59,40 +106,6 @@ export default function FeedItem({
         }
     };
 
-    const MediaContent = () => (
-        <>
-            {video ? (
-                <video src={video} controls className="w-full h-full object-cover" />
-            ) : (
-                <img
-                    src={image}
-                    alt={title}
-                    className={`w-full h-full object-cover transition-transform duration-700 ${!isExpanded ? 'group-hover:scale-110' : ''}`}
-                />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-red-900/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none" />
-
-            {/* Category Badge */}
-            <div className="absolute top-4 left-4 pointer-events-none">
-                <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isMGT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isMGT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
-                    {category}
-                </span>
-            </div>
-
-            {/* Expand Button (only if not expanded) */}
-            {!isExpanded && (
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div
-                        className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-black/80 transition-colors block cursor-pointer"
-                        title="Expandir"
-                    >
-                        <Maximize2 className="w-4 h-4" />
-                    </div>
-                </div>
-            )}
-        </>
-    );
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -101,16 +114,15 @@ export default function FeedItem({
             whileHover={!isExpanded ? { scale: 1.02, y: -5 } : {}}
             className={`glass-panel rounded-xl overflow-hidden group h-full flex flex-col relative ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'}`}
         >
-            {/* Image Container - Only render if image or video exists */}
             {(image || video) && (
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>
                     {!isExpanded ? (
                         <Link to={`/post/${id}`} className="block w-full h-full">
-                            <MediaContent />
+                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} />
                         </Link>
                     ) : (
                         <div className="w-full h-full">
-                            <MediaContent />
+                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} />
                         </div>
                     )}
                 </div>

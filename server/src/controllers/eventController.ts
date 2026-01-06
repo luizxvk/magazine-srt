@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getEvents = async (req: Request, res: Response) => {
+export const getEvents = async (_req: Request, res: Response) => {
     try {
         const events = await prisma.event.findMany({
             where: { active: true },
@@ -18,13 +18,15 @@ export const getEvents = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
     try {
-        const { title, description, date, imageUrl } = req.body;
+        const { title, description, date, category, game, imageUrl } = req.body;
 
         const event = await prisma.event.create({
             data: {
                 title,
                 description,
                 date: new Date(date),
+                category,
+                game,
                 imageUrl
             }
         });

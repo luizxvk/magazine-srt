@@ -82,10 +82,17 @@ app.get('/', (req, res) => {
     res.json({ message: 'MAGAZINE API is running', status: 'active' });
 });
 
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
+// Start server (only for local development, not for serverless)
+const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+if (!isServerless) {
+    const server = app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
+
+    // Keep the server alive
+    server.keepAliveTimeout = 65000;
+    server.headersTimeout = 66000;
 }
 
 export default app;

@@ -27,6 +27,7 @@ model User {
   resetToken   String?
   resetTokenExpiry DateTime?
   deletedAt    DateTime?
+  sessionToken String?       // For single device login - invalidates previous sessions
   
   posts        Post[]
   comments     Comment[]
@@ -343,8 +344,10 @@ model ZionPurchase {
 model Event {
   id          String   @id @default(uuid())
   title       String
-  description String
+  description String?
   date        DateTime
+  category    String?
+  game        String?
   imageUrl    String?
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())

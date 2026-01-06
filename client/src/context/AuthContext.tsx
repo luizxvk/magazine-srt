@@ -100,8 +100,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         });
                         setDailyLoginStatus(statusRes.data);
 
-                        // Auto-open modal if not claimed
-                        if (!statusRes.data.claimed) {
+                        // Auto-open modal if not claimed AND not already shown this session
+                        const today = new Date().toDateString();
+                        const lastModalShown = localStorage.getItem('dailyLoginModalShown');
+                        
+                        if (!statusRes.data.claimed && lastModalShown !== today) {
+                            localStorage.setItem('dailyLoginModalShown', today);
                             setTimeout(() => setIsDailyLoginModalOpen(true), 1500);
                         }
                     } catch (loginError) {
@@ -150,8 +154,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
     };
 
-    const updateUser = (userData: User) => {
-        setUser(userData);
+    const updateUser = (userData: Partial<User>) => {
+        setUser(prev => {
+            if (!prev) return userData as User;
+            // Preserve membershipType from session if not in new data
+            const sessionMembership = localStorage.getItem('sessionMembershipType') as 'MAGAZINE' | 'MGT' | null;
+            return {
+                ...prev,
+                ...userData,
+                membershipType: userData.membershipType || sessionMembership || prev.membershipType
+            };
+        });
     };
 
     const updateUserZions = (amount: number) => {
@@ -218,8 +231,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Update status
                 setDailyLoginStatus(prev => prev ? { ...prev, claimed: true } : null);
 
-                // Show achievement removed as per user request
-                // showAchievement('Bônus Diário Resgatado!', `+${response.data.awarded} Zions`);
+                // Mark as claimed for today so modal won't reopen
+                localStorage.setItem('dailyLoginModalShown', new Date().toDateString());
 
                 // Close modal after delay
                 setTimeout(() => setIsDailyLoginModalOpen(false), 2000);

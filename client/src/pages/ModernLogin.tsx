@@ -266,7 +266,22 @@ function LoginForm({ register, errors, isSubmitting, onSubmit, isMGT, onForgotPa
                 {errors.password && <p className="text-red-400 text-[10px] pl-2">{errors.password.message}</p>}
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                        type="checkbox"
+                        defaultChecked={localStorage.getItem('rememberMe') === 'true'}
+                        onChange={(e) => localStorage.setItem('rememberMe', e.target.checked.toString())}
+                        className={`w-4 h-4 rounded border-2 appearance-none cursor-pointer transition-all duration-200
+                            ${isMGT
+                                ? 'border-emerald-500/50 checked:bg-emerald-500 checked:border-emerald-500'
+                                : 'border-gold-500/50 checked:bg-gold-500 checked:border-gold-500'
+                            }`}
+                    />
+                    <span className="text-[10px] uppercase tracking-wider text-gray-400 group-hover:text-gray-300 transition-colors">
+                        Lembrar-me
+                    </span>
+                </label>
                 <button
                     type="button"
                     onClick={onForgotPassword}

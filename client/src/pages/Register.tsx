@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, X, AlertCircle } from 'lucide-react';
 import logo from '../assets/logo-mgzn.png';
 import logoMgt from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
@@ -20,6 +21,7 @@ export default function Register() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
+    const [errorPopup, setErrorPopup] = useState<string | null>(null);
     const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<RegisterForm>({
         resolver: zodResolver(registerSchema),
     });
@@ -37,14 +39,47 @@ export default function Register() {
             navigate('/feed');
         } catch (error: any) {
             console.error('Registration failed', error);
-            setError('root', {
-                message: error.response?.data?.error || 'Falha ao criar conta. Tente novamente.',
-            });
+            const errorMessage = error.response?.data?.error || 'Falha ao criar conta. Tente novamente.';
+            
+            // Show styled popup for email already exists error
+            if (errorMessage.toLowerCase().includes('email') || errorMessage.toLowerCase().includes('já existe') || errorMessage.toLowerCase().includes('already')) {
+                setErrorPopup(errorMessage);
+            } else {
+                setError('root', { message: errorMessage });
+            }
         }
     };
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0a0a] font-sans">
+            {/* Error Popup Modal */}
+            {errorPopup && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setErrorPopup(null)} />
+                    <div className={`relative w-full max-w-sm bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border p-6 animate-fade-in-up ${isMGT ? 'border-red-500/30' : 'border-red-500/30'}`}>
+                        <button 
+                            onClick={() => setErrorPopup(null)}
+                            className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                        <div className="flex flex-col items-center text-center">
+                            <div className={`p-3 rounded-full mb-4 ${isMGT ? 'bg-red-500/20' : 'bg-red-500/20'}`}>
+                                <AlertCircle className="w-8 h-8 text-red-400" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Erro no Cadastro</h3>
+                            <p className="text-gray-300 text-sm mb-4">{errorPopup}</p>
+                            <button
+                                onClick={() => setErrorPopup(null)}
+                                className={`w-full py-2.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'}`}
+                            >
+                                Entendi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Dynamic Background */}
             <div className={`fixed inset-0 transition-colors duration-1000 ease-in-out ${isMGT ? 'bg-emerald-950/20' : 'bg-gold-950/20'}`}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,0,0,0)_0%,_#000000_100%)]" />

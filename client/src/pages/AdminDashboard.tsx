@@ -10,6 +10,7 @@ import AdminCreatePost from '../components/AdminCreatePost';
 import AdminCreateAnnouncement from '../components/AdminCreateAnnouncement';
 import AdminCreateReward from '../components/AdminCreateReward';
 import AdminEditRewardModal from '../components/AdminEditRewardModal';
+import AdminCreateEvent from '../components/AdminCreateEvent';
 
 interface Reward {
     id: string;
@@ -210,6 +211,7 @@ export default function AdminDashboard() {
                         <AdminCreatePost showToast={showToast} />
                         <AdminCreateAnnouncement showToast={showToast} />
                         <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
+                        <AdminCreateEvent showToast={showToast} />
                     </div>
 
                     {/* Rewards List */}
@@ -356,7 +358,6 @@ export default function AdminDashboard() {
                                         <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
                                             <div>
                                                 <h3 className="font-bold text-white">{req.name}</h3>
-                                                <p className="text-xs text-gray-400 break-all">{req.email}</p>
                                                 {req.instagram && <p className="text-xs text-gold-400 mt-1">@{req.instagram}</p>}
                                             </div>
                                             <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full shrink-0">

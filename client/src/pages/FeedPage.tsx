@@ -35,7 +35,7 @@ interface Post {
     timestamp: string;
     isHighlight: boolean;
     tags: string[];
-    likedBy: string[];
+    isLiked: boolean;
 }
 
 export default function FeedPage() {
@@ -81,7 +81,7 @@ export default function FeedPage() {
                 timestamp: p.createdAt,
                 isHighlight: p.isHighlight,
                 tags: p.tags?.map((t: any) => t.tag) || [],
-                likedBy: p.isLiked ? ['me'] : [] // Simplified for now
+                isLiked: p.isLiked || false
             }));
             setPosts(mappedPosts);
         } catch (error) {
@@ -149,9 +149,7 @@ export default function FeedPage() {
                 if (post.id === postId) {
                     return {
                         ...post,
-                        likedBy: response.data.isLiked
-                            ? [...post.likedBy, 'me']
-                            : post.likedBy.filter(id => id !== 'me'),
+                        isLiked: response.data.isLiked,
                         likes: response.data.isLiked ? post.likes + 1 : post.likes - 1
                     };
                 }
@@ -247,7 +245,7 @@ export default function FeedPage() {
                     {/* Feed Carousel & Feed Items */}
                     {loading ? (
                         <div className="flex items-center justify-center py-20">
-                            <p className="text-gray-400 font-serif text-xl animate-pulse">Carregando por enquanto...</p>
+                            <p className="text-gray-400 font-serif text-xl animate-pulse text-center">Carregando por enquanto...</p>
                         </div>
                     ) : (
                         <>
@@ -281,7 +279,7 @@ export default function FeedPage() {
                                             authorId={post.author.id}
                                             likes={post.likes}
                                             comments={post.comments}
-                                            isLiked={post.likedBy?.includes('me')}
+                                            isLiked={post.isLiked}
                                             onLike={() => handleLike(post.id)}
                                             onComment={() => setActiveCommentPostId(post.id)}
                                             onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}

@@ -153,7 +153,6 @@ export default function Header({ onOpenRecommendations }: HeaderProps) {
                             )}
                         </button>
                         {showNotifications && <Notifications />}
-                        {showNotifications && <Notifications />}
                     </div>
 
                     <button

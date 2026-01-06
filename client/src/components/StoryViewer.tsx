@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { X, Heart, Send } from 'lucide-react';
+import { X, Heart, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +33,8 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
 
     const [likedStories, setLikedStories] = useState<Set<string>>(new Set());
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+    const [commentText, setCommentText] = useState('');
+    const [isInputFocused, setIsInputFocused] = useState(false);
 
     const currentStoryGroup = stories[currentIndex];
     // If items exist, use them. Otherwise fallback to the main story object (old behavior/compatibility)
@@ -116,7 +118,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
     };
 
     useEffect(() => {
-        if (isPaused) return;
+        if (isPaused || isInputFocused) return;
 
         const interval = setInterval(() => {
             setProgress(prev => {
@@ -129,7 +131,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
         }, 100);
 
         return () => clearInterval(interval);
-    }, [currentIndex, currentItemIndex, isPaused, handleNext]);
+    }, [currentIndex, currentItemIndex, isPaused, isInputFocused, handleNext]);
 
     useEffect(() => {
         onStoryViewed(currentStoryGroup.id);
@@ -159,6 +161,26 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                 <X className="w-6 h-6" />
             </button>
 
+            {/* Delete Button (for own stories) */}
+            {currentStoryGroup.user.id === user?.id && (
+                <button
+                    onClick={async () => {
+                        if (confirm('Deseja remover este story?')) {
+                            try {
+                                await api.delete(`/feed/stories/${currentItem.id}`);
+                                handleNext();
+                            } catch (error) {
+                                console.error('Failed to delete story', error);
+                            }
+                        }
+                    }}
+                    className="absolute top-4 left-4 text-white z-50 p-2 hover:bg-red-500/20 rounded-full transition-colors"
+                    aria-label="Deletar story"
+                >
+                    <Trash2 className="w-5 h-5" />
+                </button>
+            )}
+
             {/* Main Container */}
             <div className="relative w-full h-full md:max-w-md md:h-full bg-black shadow-2xl">
                 {/* Progress Bars */}
@@ -171,7 +193,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                         <div key={item.id || index} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
                             <div
                                 className={`h-full bg-white transition-all duration-100 ease-linear ${index < currentItemIndex ? 'w-full' :
-                                        index === currentItemIndex ? `w-[${progress}%]` : 'w-0'
+                                    index === currentItemIndex ? `w-[${progress}%]` : 'w-0'
                                     }`}
                                 style={{ width: index === currentItemIndex ? `${progress}%` : index < currentItemIndex ? '100%' : '0%' }}
                             />
@@ -189,7 +211,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                         />
                     </div>
                     <div>
-                        <p className="text-white font-medium text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{currentStoryGroup.user.name}</p>
+                        <p className={`font-medium text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${isMGT ? 'text-emerald-400' : 'text-white'}`}>{currentStoryGroup.user.name}</p>
                         <p className="text-white/90 text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                             {currentItem.timestamp ? (currentItem.timestamp.includes('T') ? new Date(currentItem.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : currentItem.timestamp) : currentStoryGroup.timestamp}
                         </p>
@@ -242,6 +264,23 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                         <input
                             type="text"
                             placeholder="Enviar mensagem..."
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            onFocus={() => setIsInputFocused(true)}
+                            onBlur={() => setIsInputFocused(false)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && commentText.trim()) {
+                                    // Send message
+                                    api.post(`/messages`, {
+                                        recipientId: currentStoryGroup.user.id,
+                                        content: commentText,
+                                        context: 'story'
+                                    }).then(() => {
+                                        setCommentText('');
+                                        alert('Mensagem enviada!');
+                                    }).catch(console.error);
+                                }
+                            }}
                             className="flex-1 bg-transparent border border-white/30 rounded-full px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-white/60 backdrop-blur-sm"
                         />
                     )}
@@ -255,7 +294,22 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                         </button>
                     )}
                     {currentStoryGroup.user.id !== user?.id && user?.role !== 'VISITOR' && (
-                        <button className="text-white p-2 hover:scale-110 transition-transform" aria-label="Enviar mensagem">
+                        <button
+                            className="text-white p-2 hover:scale-110 transition-transform"
+                            aria-label="Enviar mensagem"
+                            onClick={() => {
+                                if (commentText.trim()) {
+                                    api.post(`/messages`, {
+                                        recipientId: currentStoryGroup.user.id,
+                                        content: commentText,
+                                        context: 'story'
+                                    }).then(() => {
+                                        setCommentText('');
+                                        alert('Mensagem enviada!');
+                                    }).catch(console.error);
+                                }
+                            }}
+                        >
                             <Send className="w-6 h-6" />
                         </button>
                     )}

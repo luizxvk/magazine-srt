@@ -136,7 +136,9 @@ export default function NotificationsPage() {
                 </div>
 
                 {loading ? (
-                    <div className={`text-center py-20 animate-pulse ${themeLoading}`}>Carregando notificações...</div>
+                    <div className={`text-center py-20 animate-pulse ${themeLoading}`}>
+                        <p className="text-center">Carregando notificações...</p>
+                    </div>
                 ) : notifications.length === 0 ? (
                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
                         <Bell className={`w-12 h-12 ${themeEmptyIcon} mx-auto mb-4`} />

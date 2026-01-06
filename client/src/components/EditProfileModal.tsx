@@ -83,7 +83,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
                         {/* Avatar Input */}
-                        <div className="flex justify-center">
+                        <div className="flex flex-col items-center">
                             <div className="relative group cursor-pointer" onClick={() => document.getElementById('avatar-upload')?.click()}>
                                 <div className={`w-24 h-24 rounded-full overflow-hidden border-2 ${themeAvatarBorder} transition-colors`}>
                                     {avatarUrl ? (
@@ -104,27 +104,62 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                            // Check for GIF restriction
+                                            // Check file size limit (2MB max)
+                                            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                                            if (file.size > maxSize) {
+                                                alert('O arquivo é muito grande. Tamanho máximo: 2MB');
+                                                e.target.value = '';
+                                                return;
+                                            }
+
+                                            // Check for GIF restriction (level 15+ required)
                                             if (file.type === 'image/gif') {
                                                 const currentLevel = user?.level || 1;
                                                 if (currentLevel < 15) {
                                                     alert('GIFs de perfil são permitidos apenas para usuários Nível 15 ou superior!');
-                                                    e.target.value = ''; // Reset input
+                                                    e.target.value = '';
+                                                    return;
+                                                }
+                                                // GIF size limit is stricter
+                                                if (file.size > maxSize) {
+                                                    alert('GIFs devem ter no máximo 2MB');
+                                                    e.target.value = '';
                                                     return;
                                                 }
                                             }
 
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                                setAvatarUrl(reader.result as string);
-                                            };
-                                            reader.readAsDataURL(file);
+                                            // Validate image dimensions for non-GIFs
+                                            if (file.type !== 'image/gif') {
+                                                const img = new Image();
+                                                img.onload = () => {
+                                                    if (img.width > 400 || img.height > 400) {
+                                                        // Just warn, don't block - image will be resized on display
+                                                        console.log('Image will be resized to fit 400x400');
+                                                    }
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setAvatarUrl(reader.result as string);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                };
+                                                img.src = URL.createObjectURL(file);
+                                            } else {
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setAvatarUrl(reader.result as string);
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
                                         }
                                     }}
                                     className="hidden"
                                     aria-label="Alterar foto de perfil"
                                 />
                             </div>
+                            {/* Size limit info */}
+                            <p className="text-[10px] text-gray-500 mt-2 text-center">
+                                Máximo: 2MB • {(user?.level || 1) >= 15 ? 'GIFs permitidos' : 'GIFs: Nível 15+'}
+                            </p>
                         </div>
 
                         <div className="space-y-4">

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Award, Lock, UserPlus, Users, Star, Crown, PenTool, FileText, Megaphone, MessageCircle, Heart, ThumbsUp, Camera, MessageSquare } from 'lucide-react';
+import { Award, Lock, UserPlus, Users, Star, Crown, PenTool, FileText, Megaphone, MessageCircle, Heart, ThumbsUp, Camera, MessageSquare, Coins, Calendar, Flame } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const iconMap: { [key: string]: any } = {
-    UserPlus, Users, Star, Crown, PenTool, FileText, Megaphone, MessageCircle, Heart, ThumbsUp, Camera, MessageSquare
+    UserPlus, Users, Star, Crown, PenTool, FileText, Megaphone, MessageCircle, Heart, ThumbsUp, Camera, MessageSquare, Coins, Calendar, Flame, Award
 };
 
 interface Badge {

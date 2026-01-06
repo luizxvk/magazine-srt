@@ -3,9 +3,14 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
+// Generate unique session token for single device login
+const generateSessionToken = (): string => {
+    return crypto.randomBytes(32).toString('hex');
+};
 
 const registerSchema = z.object({
     email: z.string().email(),
@@ -136,7 +141,16 @@ export const login = async (req: Request, res: Response) => {
             console.error('Failed to create welcome notification:', err);
         }
 
-        const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!, {
+        // Generate unique session token for single device login
+        const sessionToken = generateSessionToken();
+        
+        // Store session token in database (invalidates any previous sessions)
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { sessionToken }
+        });
+
+        const token = jwt.sign({ userId: user.id, role: user.role, sessionToken }, process.env.JWT_SECRET!, {
             expiresIn: '7d',
         });
 

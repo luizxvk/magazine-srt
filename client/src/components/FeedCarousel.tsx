@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -25,23 +25,23 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
     const [direction, setDirection] = useState(0);
     const isMGT = user?.membershipType === 'MGT';
 
+    const nextSlide = useCallback(() => {
+        setDirection(1);
+        setCurrentIndex((prev) => (prev + 1) % posts.length);
+    }, [posts.length]);
+
+    const prevSlide = useCallback(() => {
+        setDirection(-1);
+        setCurrentIndex((prev) => (prev - 1 + posts.length) % posts.length);
+    }, [posts.length]);
+
     useEffect(() => {
         if (posts.length <= 1) return;
         const timer = setInterval(() => {
             nextSlide();
         }, 5000);
         return () => clearInterval(timer);
-    }, [currentIndex, posts.length]);
-
-    const nextSlide = () => {
-        setDirection(1);
-        setCurrentIndex((prev) => (prev + 1) % posts.length);
-    };
-
-    const prevSlide = () => {
-        setDirection(-1);
-        setCurrentIndex((prev) => (prev - 1 + posts.length) % posts.length);
-    };
+    }, [posts.length, nextSlide]);
 
     if (!posts.length) return null;
 

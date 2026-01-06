@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/authMiddleware';
-import { awardTrophies, checkAndAwardBadges, awardZions } from '../services/gamificationService';
+import { awardTrophies, checkAndAwardBadges, awardZions, awardXP } from '../services/gamificationService';
 
 const prisma = new PrismaClient();
 
@@ -81,10 +81,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 
         // 1. Award Zions (1) and XP (10)
         await awardZions(userId, 1, 'Created a post');
-        await prisma.user.update({
-            where: { id: userId },
-            data: { xp: { increment: 10 } }
-        });
+        await awardXP(userId, 10, 'Created a post');
 
         // 2. Check Badges (Trophies awarded if badge earned)
         const badgeResult = await checkAndAwardBadges(userId, 'POST');

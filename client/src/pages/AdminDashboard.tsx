@@ -113,7 +113,17 @@ export default function AdminDashboard() {
             setRequests(requests.filter(r => r.id !== id));
 
             const password = response.data.generatedPassword;
+            const wasConversion = response.data.wasConversion;
             
+            // If this was an MGT conversion, no password was generated
+            // The server already sent the welcome email
+            if (wasConversion) {
+                showToast(`🎉 ${request.name} agora é membro Magazine! Email de boas-vindas enviado.`, 'success');
+                console.log(`[Admin] MGT user ${request.email} converted to Magazine`);
+                return;
+            }
+            
+            // For new users, handle password delivery
             // Try to send email first
             if (isEmailJSConfigured()) {
                 showToast('Enviando email com senha...', 'info');

@@ -99,7 +99,7 @@ export default function Rewards() {
         }
     };
 
-    if (loading) return <div className={`text-center ${themeColor} animate-pulse`}>Carregando recompensas...</div>;
+    if (loading) return <div className={`text-center ${themeColor} animate-pulse py-12 w-full`}>Carregando recompensas...</div>;
 
     return (
         <div className="space-y-12">

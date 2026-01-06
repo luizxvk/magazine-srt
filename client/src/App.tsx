@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
@@ -23,6 +24,7 @@ import MessagePopup from './components/MessagePopup';
 import DevBanner from './components/DevBanner';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
 import WhatsNewModal from './components/WhatsNewModal';
+import SessionExpiredModal from './components/SessionExpiredModal';
 
 
 
@@ -59,6 +61,7 @@ function App() {
         </Routes>
         <AchievementWrapper />
         <ZionsModalWrapper />
+        <SessionExpiredWrapper />
         <WhatsNewModal />
         <MessagePopup />
         <DevBanner />
@@ -90,6 +93,23 @@ function ZionsModalWrapper() {
       onClose={closeZionsModal}
     />
   );
+}
+
+function SessionExpiredWrapper() {
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    const handleSessionExpired = () => setIsExpired(true);
+    window.addEventListener('session-expired', handleSessionExpired);
+    return () => window.removeEventListener('session-expired', handleSessionExpired);
+  }, []);
+
+  const handleConfirm = () => {
+    setIsExpired(false);
+    window.location.href = '/login';
+  };
+
+  return <SessionExpiredModal isOpen={isExpired} onConfirm={handleConfirm} />;
 }
 
 export default App;

@@ -22,9 +22,8 @@ api.interceptors.response.use(
             localStorage.removeItem('sessionMembershipType');
             localStorage.removeItem('dailyLoginModalShown');
             
-            // Show alert and redirect to login
-            alert('Sua sessão foi encerrada pois você fez login em outro dispositivo.');
-            window.location.href = '/login';
+            // Dispatch custom event to show modal
+            window.dispatchEvent(new CustomEvent('session-expired'));
         }
         return Promise.reject(error);
     }

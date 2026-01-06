@@ -165,7 +165,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                                     </div>
                                 </div>
                             </div>
-                            <span className={`text-xs font-medium ${isMGT ? 'text-gray-300' : 'text-gray-300'}`}>Seu Story</span>
+                            <span className={`text-xs font-medium ${isMGT ? 'text-gray-300 dark:text-gray-300' : 'text-gray-700 dark:text-gray-300'}`}>Seu Story</span>
                         </div>
                     )}
 
@@ -187,7 +187,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                                     />
                                 </div>
                             </div>
-                            <span className="text-xs font-medium text-gray-300">{story.user.name.split(' ')[0]}</span>
+                            <span className={`text-xs font-medium ${isMGT ? 'text-gray-300 dark:text-gray-300' : 'text-gray-700 dark:text-gray-300'}`}>{story.user.name.split(' ')[0]}</span>
                         </div>
                     ))}
                 </div>

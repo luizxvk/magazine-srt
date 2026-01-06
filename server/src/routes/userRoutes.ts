@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, updateMe, getUserProfile, getUserPosts, getAllUsers, getRecentMembers, resetUserPassword, deleteUser, getMyRedemptions, getAllRedemptions, updateUserMembership, updateUserLevel } from '../controllers/userController';
+import { getMe, updateMe, getUserProfile, getUserPosts, getAllUsers, getRecentMembers, resetUserPassword, deleteUser, getMyRedemptions, getAllRedemptions, updateUserMembership, updateUserLevel, getCustomizations, purchaseCustomization, equipCustomization, unequipCustomization, searchAll } from '../controllers/userController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -11,6 +11,15 @@ router.get('/me/redemptions', authenticateToken, getMyRedemptions);
 router.get('/redemptions', authenticateToken, getAllRedemptions);
 router.get('/recent', authenticateToken, getRecentMembers);
 router.get('/', authenticateToken, getAllUsers);
+
+// Search route
+router.get('/search', authenticateToken, searchAll);
+
+// Customization routes
+router.get('/customizations', authenticateToken, getCustomizations);
+router.post('/customizations/purchase', authenticateToken, purchaseCustomization);
+router.post('/customizations/equip', authenticateToken, equipCustomization);
+router.post('/customizations/unequip', authenticateToken, unequipCustomization);
 
 // Parameterized routes last
 router.get('/:id', authenticateToken, getUserProfile);

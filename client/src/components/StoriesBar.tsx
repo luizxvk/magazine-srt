@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import StoryViewer from './StoryViewer';
+import StoryEditor from './StoryEditor';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
 
 interface Story {
@@ -27,6 +28,8 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [stories, setStories] = useState<Story[]>([]);
+    const [editorImage, setEditorImage] = useState<string | null>(null);
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -65,7 +68,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
         const file = e.target.files?.[0];
         if (file && user) {
             try {
-                // Compress image for faster upload
+                // Compress image for editor
                 const imageUrl = await compressImage(file, {
                     maxWidth: 1080,
                     maxHeight: 1920, // Story aspect ratio
@@ -74,56 +77,72 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                 });
                 
                 console.log(`[Story] Compressed to ${getBase64Size(imageUrl)}KB`);
-
-                // Optimistic update
-                setStories(prev => {
-                    const existingGroupIndex = prev.findIndex(s => s.user.id === user.id);
-
-                    const newStoryItem = {
-                        id: `story-local-${Date.now()}`,
-                        imageUrl,
-                        createdAt: new Date().toISOString(),
-                        isSeen: false
-                    };
-
-                    if (existingGroupIndex >= 0) {
-                        const updatedGroup = {
-                            ...prev[existingGroupIndex],
-                            imageUrl: imageUrl,
-                            timestamp: 'Agora',
-                            hasUnseen: false,
-                            items: [newStoryItem, ...(prev[existingGroupIndex] as any).items || []]
-                        };
-
-                        const newStories = [...prev];
-                        newStories.splice(existingGroupIndex, 1);
-                        return [updatedGroup, ...newStories];
-                    } else {
-                        const newGroup: Story = {
-                            id: `story-group-${user.id}`,
-                            user: {
-                                id: user.id,
-                                name: user.name,
-                                avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`
-                            },
-                            imageUrl: imageUrl,
-                            timestamp: 'Agora',
-                            hasUnseen: false,
-                            items: [newStoryItem]
-                        } as any;
-                        return [newGroup, ...prev];
-                    }
-                });
-
-                // Call API to create story
-                try {
-                    await api.post('/feed/stories', { imageUrl });
-                } catch (error) {
-                    console.error('Failed to create story on backend', error);
+                
+                // Open editor with compressed image
+                setEditorImage(imageUrl);
+                setIsEditorOpen(true);
+                
+                // Clear file input for next selection
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
                 }
             } catch (error) {
                 console.error('Failed to process story image', error);
             }
+        }
+    };
+
+    const handlePublishStory = async (finalImageUrl: string) => {
+        if (!user) return;
+        
+        setIsEditorOpen(false);
+        setEditorImage(null);
+        
+        // Optimistic update
+        setStories(prev => {
+            const existingGroupIndex = prev.findIndex(s => s.user.id === user.id);
+
+            const newStoryItem = {
+                id: `story-local-${Date.now()}`,
+                imageUrl: finalImageUrl,
+                createdAt: new Date().toISOString(),
+                isSeen: false
+            };
+
+            if (existingGroupIndex >= 0) {
+                const updatedGroup = {
+                    ...prev[existingGroupIndex],
+                    imageUrl: finalImageUrl,
+                    timestamp: 'Agora',
+                    hasUnseen: false,
+                    items: [newStoryItem, ...(prev[existingGroupIndex] as any).items || []]
+                };
+
+                const newStories = [...prev];
+                newStories.splice(existingGroupIndex, 1);
+                return [updatedGroup, ...newStories];
+            } else {
+                const newGroup: Story = {
+                    id: `story-group-${user.id}`,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`
+                    },
+                    imageUrl: finalImageUrl,
+                    timestamp: 'Agora',
+                    hasUnseen: false,
+                    items: [newStoryItem]
+                } as any;
+                return [newGroup, ...prev];
+            }
+        });
+
+        // Call API to create story
+        try {
+            await api.post('/feed/stories', { imageUrl: finalImageUrl });
+        } catch (error) {
+            console.error('Failed to create story on backend', error);
         }
     };
 
@@ -201,6 +220,18 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                     initialStoryIndex={stories.findIndex(s => s.id === viewingStoryId)}
                     onClose={onCloseStory}
                     onStoryViewed={(id) => setStories(prev => prev.map(s => s.id === id ? { ...s, hasUnseen: false } : s))}
+                />
+            )}
+
+            {/* Story Editor Modal */}
+            {isEditorOpen && editorImage && (
+                <StoryEditor
+                    imageUrl={editorImage}
+                    onClose={() => {
+                        setIsEditorOpen(false);
+                        setEditorImage(null);
+                    }}
+                    onPublish={handlePublishStory}
                 />
             )}
         </>

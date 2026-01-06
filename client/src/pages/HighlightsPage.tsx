@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { ArrowLeft, Heart, MessageCircle } from 'lucide-react';
 import LuxuriousBackground from '../components/LuxuriousBackground';
+import Header from '../components/Header';
 
 interface HighlightPost {
     id: string;
@@ -44,6 +45,7 @@ export default function HighlightsPage() {
     return (
         <div className="min-h-screen text-white font-sans relative">
             <LuxuriousBackground />
+            <Header />
 
             <div className="max-w-7xl mx-auto pt-24 px-4 relative z-10">
                 <div className="flex items-center gap-4 mb-8">

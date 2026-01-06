@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, Rocket, Clock } from 'lucide-react';
+import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft } from 'lucide-react';
 import logoMgt from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +24,6 @@ export default function Register() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
-    const [showMaintenancePopup, setShowMaintenancePopup] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [avatarBase64, setAvatarBase64] = useState<string>('');
     
@@ -71,11 +70,6 @@ export default function Register() {
             navigate('/feed');
         } catch (error: any) {
             console.error('Registration failed', error);
-            // Check if it's maintenance mode
-            if (error.response?.data?.error === 'maintenance') {
-                setShowMaintenancePopup(true);
-                return;
-            }
             const errorMessage = error.response?.data?.error || 'Falha ao criar conta. Tente novamente.';
             
             if (errorMessage.toLowerCase().includes('email') || errorMessage.toLowerCase().includes('já existe') || errorMessage.toLowerCase().includes('already')) {
@@ -88,73 +82,6 @@ export default function Register() {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0a0a] font-sans p-4">
-            {/* Maintenance Popup */}
-            {showMaintenancePopup && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl overflow-y-auto">
-                    <div className="relative w-full max-w-md bg-gradient-to-br from-neutral-900 via-neutral-950 to-black rounded-3xl border border-gold-500/30 shadow-[0_0_60px_rgba(212,175,55,0.15)] overflow-hidden animate-fade-in-up my-8">
-                        {/* Gold accent line */}
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
-                        
-                        {/* Close button */}
-                        <button
-                            onClick={() => setShowMaintenancePopup(false)}
-                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
-                        >
-                            <X className="w-5 h-5 text-gray-400" />
-                        </button>
-
-                        <div className="p-6 text-center">
-                            {/* Icon */}
-                            <div className="mb-4 relative">
-                                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gold-500/20 to-gold-600/10 flex items-center justify-center border border-gold-500/30">
-                                    <Rocket className="w-8 h-8 text-gold-400" />
-                                </div>
-                            </div>
-
-                            {/* Title */}
-                            <h2 className="text-xl font-bold text-white mb-1">
-                                Estamos em Manutenção
-                            </h2>
-                            
-                            <p className="text-gold-400 font-semibold text-xs uppercase tracking-widest mb-4">
-                                🚧 Aguarde a versão Beta
-                            </p>
-
-                            {/* Message */}
-                            <div className="text-gray-300 text-sm leading-relaxed mb-6">
-                                <p>
-                                    O cadastro está temporariamente desativado. Estamos preparando novidades incríveis para você!
-                                </p>
-                            </div>
-
-                            {/* Coming Soon Box */}
-                            <div className="py-3 px-4 bg-gold-500/10 rounded-xl border border-gold-500/20 mb-4">
-                                <div className="flex items-center justify-center gap-2">
-                                    <Clock className="w-4 h-4 text-gold-400" />
-                                    <p className="text-gold-400 font-semibold text-sm">
-                                        Em breve voltaremos!
-                                    </p>
-                                </div>
-                                <p className="text-gray-400 text-xs mt-1">
-                                    Fique atento às nossas redes sociais.
-                                </p>
-                            </div>
-
-                            {/* Back Button */}
-                            <Link
-                                to="/login"
-                                className="block w-full py-3 rounded-xl bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold uppercase tracking-widest text-xs hover:from-gold-500 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/25"
-                            >
-                                Voltar ao Login
-                            </Link>
-                        </div>
-
-                        {/* Bottom accent */}
-                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/50 to-transparent" />
-                    </div>
-                </div>
-            )}
-
             {/* Error Popup Modal */}
             {errorPopup && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

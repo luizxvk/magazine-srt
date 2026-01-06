@@ -31,6 +31,13 @@ model User {
   deletedAt    DateTime?
   sessionToken String?       // For single device login - invalidates previous sessions
   
+  // Customization shop fields
+  ownedCustomizations String?   // JSON array of owned item IDs
+  equippedBackground  String?   // Currently equipped background ID
+  equippedBadge       String?   // Currently equipped badge ID
+  equippedColor       String?   // Currently equipped neon color ID
+  liteMode            Boolean   @default(false) // Disable animations/effects
+  
   posts        Post[]
   comments     Comment[]
   likes        Like[]

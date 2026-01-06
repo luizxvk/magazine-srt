@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRightLeft, User, Lock, X, Heart, Sparkles, Rocket, Check, Clock } from 'lucide-react';
+import { ArrowRightLeft, User, Lock } from 'lucide-react';
 
 import logo from '../assets/logo-mgzn.png';
 import logoMgt from '../assets/logo-mgt-full.png';
@@ -23,8 +23,7 @@ export default function ModernLogin() {
     const location = useLocation();
     const { login, loginAsVisitor } = useAuth();
 
-    // Maintenance popup state (disabled for beta)
-    const [showMaintenancePopup, setShowMaintenancePopup] = useState(false);
+
 
     // Determine initial state based on navigation or storage
     const initialMembership = location.state?.membershipType || localStorage.getItem('lastMembershipType') || 'MAGAZINE';
@@ -65,11 +64,6 @@ export default function ModernLogin() {
             navigate('/feed');
         } catch (error: any) {
             console.error('Login failed', error);
-            // Check if it's maintenance mode
-            if (error.response?.data?.error === 'maintenance') {
-                setShowMaintenancePopup(true);
-                return;
-            }
             const errorMessage = error.response?.data?.error || 'Falha ao entrar. Verifique suas credenciais.';
             setError('root', { message: errorMessage });
         }
@@ -77,111 +71,6 @@ export default function ModernLogin() {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0a0a] font-sans">
-            {/* Maintenance Popup */}
-            {showMaintenancePopup && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl overflow-y-auto">
-                    <div className="relative w-full max-w-lg bg-gradient-to-br from-neutral-900 via-neutral-950 to-black rounded-3xl border border-gold-500/30 shadow-[0_0_60px_rgba(212,175,55,0.15)] overflow-hidden animate-fade-in-up my-8">
-                        {/* Gold accent line */}
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
-                        
-                        {/* Close button */}
-                        <button
-                            onClick={() => setShowMaintenancePopup(false)}
-                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
-                        >
-                            <X className="w-5 h-5 text-gray-400" />
-                        </button>
-
-                        <div className="p-6 md:p-8 text-center">
-                            {/* Icon */}
-                            <div className="mb-4 relative">
-                                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gold-500/20 to-gold-600/10 flex items-center justify-center border border-gold-500/30">
-                                    <Heart className="w-8 h-8 text-gold-400 fill-gold-400/50" />
-                                </div>
-                                <Sparkles className="absolute top-0 right-1/3 w-5 h-5 text-gold-400 animate-pulse" />
-                            </div>
-
-                            {/* Title */}
-                            <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                                Obrigado por fazer parte!
-                            </h2>
-                            
-                            <p className="text-gold-400 font-semibold text-xs uppercase tracking-widest mb-4">
-                                Versão Alpha Encerrada
-                            </p>
-
-                            {/* Message */}
-                            <div className="text-gray-300 text-sm leading-relaxed mb-6">
-                                <p>
-                                    Agradecemos a todos que acessaram e testaram a nossa plataforma durante a fase alpha. 
-                                    Seu feedback foi essencial! 🙏
-                                </p>
-                            </div>
-
-                            {/* Simple Roadmap */}
-                            <div className="bg-black/40 rounded-xl border border-white/10 p-4 mb-6 text-left">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Rocket className="w-4 h-4 text-gold-400" />
-                                    <h3 className="text-sm font-bold text-white">Próximas Novidades</h3>
-                                </div>
-                                
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <Check className="w-3.5 h-3.5 text-green-500" />
-                                        <span className="text-xs text-gray-400 line-through">Sistema de Gamificação</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Check className="w-3.5 h-3.5 text-green-500" />
-                                        <span className="text-xs text-gray-400 line-through">Chat em tempo real</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Check className="w-3.5 h-3.5 text-green-500" />
-                                        <span className="text-xs text-gray-400 line-through">Sistema de Badges</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-3.5 h-3.5 text-gold-400" />
-                                        <span className="text-xs text-gray-300">Sistema de Prestígio</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-3.5 h-3.5 text-gold-400" />
-                                        <span className="text-xs text-gray-300">Marketplace de Itens</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-3.5 h-3.5 text-gold-400" />
-                                        <span className="text-xs text-gray-300">Crews e Rankings</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-3.5 h-3.5 text-gold-400" />
-                                        <span className="text-xs text-gray-300">Notificações Push</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Coming Soon Box */}
-                            <div className="py-3 px-4 bg-gold-500/10 rounded-xl border border-gold-500/20">
-                                <p className="text-gold-400 font-semibold text-sm">
-                                    🚀 Em breve voltaremos!
-                                </p>
-                                <p className="text-gray-400 text-xs mt-1">
-                                    Fique atento às nossas redes sociais.
-                                </p>
-                            </div>
-
-                            {/* Button */}
-                            <button
-                                onClick={() => setShowMaintenancePopup(false)}
-                                className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold uppercase tracking-widest text-xs hover:from-gold-500 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/25"
-                            >
-                                Entendi
-                            </button>
-                        </div>
-
-                        {/* Bottom accent */}
-                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/50 to-transparent" />
-                    </div>
-                </div>
-            )}
-
             {/* Dynamic Background */}
             <div className={`fixed inset-0 transition-colors duration-1000 ease-in-out ${isMGT ? 'bg-emerald-950/20' : 'bg-gold-950/20'}`}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,0,0,0)_0%,_#000000_100%)]" />

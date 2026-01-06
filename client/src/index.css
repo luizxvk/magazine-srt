@@ -398,3 +398,218 @@
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
   border-color: rgba(255, 0, 0, 0.3);
 }
+
+/* Page Transition Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.animate-fade-out-down {
+  animation: fadeOutDown 0.2s ease-in forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-slide-out-right {
+  animation: slideOutRight 0.2s ease-in forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.25s ease-out forwards;
+}
+
+.animate-scale-out {
+  animation: scaleOut 0.2s ease-in forwards;
+}
+
+/* Super Like Heart Animation */
+@keyframes superLikeHeart {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  15% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(0.95);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+  60% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-super-like {
+  animation: superLikeHeart 1s ease-out forwards;
+}
+
+/* Sparkle animation for super like */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 0.6s ease-out forwards;
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==================== LITE MODE ==================== */
+/* Disables animations, transitions, and fancy effects for performance */
+
+.lite-mode *,
+.lite-mode *::before,
+.lite-mode *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Disable backdrop filters */
+.lite-mode .backdrop-blur-sm,
+.lite-mode .backdrop-blur-md,
+.lite-mode .backdrop-blur-lg,
+.lite-mode .backdrop-blur-xl,
+.lite-mode .backdrop-blur-2xl,
+.lite-mode .backdrop-blur-3xl {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Simplify glass panels */
+.lite-mode .glass-panel {
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: none !important;
+}
+
+.lite-mode.light .glass-panel {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Remove gradients */
+.lite-mode [class*="bg-gradient-"] {
+  background-image: none !important;
+}
+
+/* Disable animated backgrounds */
+.lite-mode .animate-pulse,
+.lite-mode .animate-bounce,
+.lite-mode .animate-spin,
+.lite-mode .animate-ping,
+.lite-mode .animate-fade-in-up,
+.lite-mode .animate-scale-in,
+.lite-mode .animate-slide-in-right,
+.lite-mode .animate-super-like,
+.lite-mode .animate-sparkle {
+  animation: none !important;
+}
+
+/* Reduce shadows */
+.lite-mode .shadow-2xl,
+.lite-mode .shadow-xl,
+.lite-mode .shadow-lg {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Simplify hover effects */
+.lite-mode *:hover {
+  transform: none !important;
+}
+
+/* Keep functionality for clicks */
+.lite-mode button:active,
+.lite-mode a:active {
+  opacity: 0.7;
+}

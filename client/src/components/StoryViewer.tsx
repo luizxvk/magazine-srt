@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { X, Heart, Send, Trash2 } from 'lucide-react';
+import { X, Heart, Send, Trash2, Share2, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,12 @@ interface Story {
     imageUrl: string;
     timestamp: string;
     items?: { id: string; imageUrl: string; timestamp?: string; }[];
+}
+
+interface Friend {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
 }
 
 interface StoryViewerProps {
@@ -34,9 +40,13 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
 
     const [likedStories, setLikedStories] = useState<Set<string>>(new Set());
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+    const [showSuperLike, setShowSuperLike] = useState(false);
     const [commentText, setCommentText] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [friends, setFriends] = useState<Friend[]>([]);
+    const [holdTimer, setHoldTimer] = useState<NodeJS.Timeout | null>(null);
 
     const currentStoryGroup = stories[currentIndex];
     // If items exist, use them. Otherwise fallback to the main story object (old behavior/compatibility)
@@ -118,6 +128,70 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
             console.error('Failed to like story', error);
         }
     };
+
+    // Super Like - hold heart for 1 second
+    const handleLikeHoldStart = () => {
+        if (isLiked) return;
+        const timer = setTimeout(() => {
+            handleSuperLike();
+        }, 800);
+        setHoldTimer(timer);
+    };
+
+    const handleLikeHoldEnd = () => {
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            setHoldTimer(null);
+        }
+    };
+
+    const handleSuperLike = async () => {
+        setLikedStories(prev => new Set(prev).add(currentItem.id || currentStoryGroup.id));
+        setShowSuperLike(true);
+        setTimeout(() => setShowSuperLike(false), 1500);
+
+        try {
+            await api.post(`/feed/stories/${currentStoryGroup.user.id}/superlike`);
+            // Notify the story owner
+            await api.post(`/messages`, {
+                receiverId: currentStoryGroup.user.id,
+                content: `💖 ${user?.name} deu um Super Like no seu story!`,
+                storyImageUrl: currentItem.imageUrl
+            });
+        } catch (error) {
+            console.error('Failed to super like story', error);
+        }
+    };
+
+    // Share story to friend
+    const handleShare = async (friendId: string) => {
+        try {
+            await api.post(`/messages`, {
+                receiverId: friendId,
+                content: `📤 Compartilhou um story de ${currentStoryGroup.user.name}`,
+                storyImageUrl: currentItem.imageUrl,
+                sharedStoryUserId: currentStoryGroup.user.id
+            });
+            setShowShareModal(false);
+            setShowHeartAnimation(true);
+            setTimeout(() => setShowHeartAnimation(false), 1000);
+        } catch (error) {
+            console.error('Failed to share story', error);
+        }
+    };
+
+    // Fetch friends for sharing
+    useEffect(() => {
+        const fetchFriends = async () => {
+            try {
+                const response = await api.get('/social/friends');
+                setFriends(response.data || []);
+            } catch (error) {
+                console.error('Failed to fetch friends', error);
+            }
+        };
+        fetchFriends();
+    }, []);
 
     useEffect(() => {
         if (isPaused || isInputFocused) return;
@@ -261,6 +335,27 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                             </motion.div>
                         )}
                     </AnimatePresence>
+
+                    {/* Super Like Animation Overlay */}
+                    <AnimatePresence>
+                        {showSuperLike && (
+                            <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: [0, 1.5, 1.3, 1.5], opacity: [0, 1, 1, 0] }}
+                                transition={{ duration: 1.5 }}
+                                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                            >
+                                <div className="relative">
+                                    <Heart className={`w-40 h-40 ${isMGT ? 'text-emerald-500' : 'text-gold-500'} fill-current drop-shadow-2xl animate-pulse`} />
+                                    <Sparkles className={`absolute -top-4 -right-4 w-12 h-12 ${isMGT ? 'text-emerald-400' : 'text-gold-400'} animate-spin`} />
+                                    <Sparkles className={`absolute -bottom-4 -left-4 w-10 h-10 ${isMGT ? 'text-emerald-400' : 'text-gold-400'} animate-bounce`} />
+                                    <span className={`absolute -bottom-8 left-1/2 -translate-x-1/2 text-lg font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'} drop-shadow-lg`}>
+                                        Super Like!
+                                    </span>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Navigation Areas */}
@@ -270,8 +365,47 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                     <div className="w-1/3 h-full" onClick={handleNext} />
                 </div>
 
+                {/* Share Modal */}
+                <AnimatePresence>
+                    {showShareModal && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 100 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 100 }}
+                            className="absolute bottom-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-xl rounded-t-3xl p-6 max-h-[60vh] overflow-y-auto"
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-white font-bold text-lg">Compartilhar com</h3>
+                                <button onClick={() => setShowShareModal(false)} className="p-2 hover:bg-white/10 rounded-full">
+                                    <X className="w-5 h-5 text-white" />
+                                </button>
+                            </div>
+                            {friends.length === 0 ? (
+                                <p className="text-gray-400 text-center py-8">Você ainda não tem amigos para compartilhar</p>
+                            ) : (
+                                <div className="grid grid-cols-4 gap-4">
+                                    {friends.map(friend => (
+                                        <button
+                                            key={friend.id}
+                                            onClick={() => handleShare(friend.id)}
+                                            className="flex flex-col items-center gap-2 p-2 hover:bg-white/10 rounded-xl transition-colors"
+                                        >
+                                            <img
+                                                src={friend.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}`}
+                                                alt={friend.name}
+                                                className="w-14 h-14 rounded-full object-cover border-2 border-white/20"
+                                            />
+                                            <span className="text-white text-xs truncate max-w-full">{friend.name.split(' ')[0]}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Footer / Actions */}
-                <div className="absolute bottom-0 left-0 right-0 z-20 p-4 flex items-center gap-4 pb-8 md:pb-4">
+                <div className="absolute bottom-0 left-0 right-0 z-20 p-4 flex items-center gap-3 pb-8 md:pb-4">
                     {currentStoryGroup.user.id !== user?.id && user?.role !== 'VISITOR' && (
                         <input
                             type="text"
@@ -282,14 +416,12 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                             onBlur={() => setIsInputFocused(false)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && commentText.trim()) {
-                                    // Send message via DM with story reference
                                     api.post(`/messages`, {
                                         receiverId: currentStoryGroup.user.id,
                                         content: `📷 Respondeu ao seu story: "${commentText}"`,
                                         storyImageUrl: currentItem.imageUrl
                                     }).then(() => {
                                         setCommentText('');
-                                        // Show subtle feedback
                                         setShowHeartAnimation(true);
                                         setTimeout(() => setShowHeartAnimation(false), 1000);
                                     }).catch(console.error);
@@ -298,15 +430,36 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                             className="flex-1 bg-transparent border border-white/30 rounded-full px-4 py-2 text-white placeholder-white/70 focus:outline-none focus:border-white/60 backdrop-blur-sm"
                         />
                     )}
+                    
+                    {/* Like Button with Super Like on hold */}
                     {user?.role !== 'VISITOR' && (
                         <button
-                            className={`p-2 hover:scale-110 transition-transform ml-auto ${isLiked ? (isMGT ? 'text-emerald-500' : 'text-gold-500') : 'text-white'}`}
+                            className={`p-2 hover:scale-110 transition-all ${isLiked ? (isMGT ? 'text-emerald-500' : 'text-gold-500') : 'text-white'}`}
                             onClick={handleLike}
-                            aria-label="Curtir story"
+                            onMouseDown={handleLikeHoldStart}
+                            onMouseUp={handleLikeHoldEnd}
+                            onMouseLeave={handleLikeHoldEnd}
+                            onTouchStart={handleLikeHoldStart}
+                            onTouchEnd={handleLikeHoldEnd}
+                            aria-label="Curtir story (segure para Super Like)"
+                            title="Segure para Super Like"
                         >
                             <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
                         </button>
                     )}
+
+                    {/* Share Button */}
+                    {currentStoryGroup.user.id !== user?.id && user?.role !== 'VISITOR' && (
+                        <button
+                            className="text-white p-2 hover:scale-110 transition-transform"
+                            onClick={() => setShowShareModal(true)}
+                            aria-label="Compartilhar story"
+                        >
+                            <Share2 className="w-6 h-6" />
+                        </button>
+                    )}
+
+                    {/* Send Message Button */}
                     {currentStoryGroup.user.id !== user?.id && user?.role !== 'VISITOR' && (
                         <button
                             className="text-white p-2 hover:scale-110 transition-transform"

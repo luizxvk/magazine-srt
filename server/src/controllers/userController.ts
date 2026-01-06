@@ -411,3 +411,284 @@ export const getRecentMembers = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Failed to fetch recent members' });
     }
 };
+
+// ================= CUSTOMIZATION SHOP =================
+
+// Available customization items (stored in code, not DB for simplicity)
+const CUSTOMIZATION_ITEMS = {
+    backgrounds: [
+        { id: 'bg_galaxy', name: 'Galáxia', price: 500, type: 'animated', preview: '🌌' },
+        { id: 'bg_aurora', name: 'Aurora Boreal', price: 600, type: 'animated', preview: '🌈' },
+        { id: 'bg_matrix', name: 'Matrix', price: 450, type: 'animated', preview: '💚' },
+        { id: 'bg_fire', name: 'Fogo', price: 400, type: 'animated', preview: '🔥' },
+        { id: 'bg_ocean', name: 'Oceano', price: 350, type: 'dynamic', preview: '🌊' },
+        { id: 'bg_forest', name: 'Floresta', price: 300, type: 'static', preview: '🌲' },
+        { id: 'bg_city', name: 'Cidade Neon', price: 550, type: 'animated', preview: '🌃' },
+        { id: 'bg_space', name: 'Espaço Profundo', price: 700, type: 'animated', preview: '🚀' },
+    ],
+    badges: [
+        { id: 'badge_skull', name: 'Caveira', price: 300, preview: '💀' },
+        { id: 'badge_pony', name: 'Pony', price: 250, preview: '🦄' },
+        { id: 'badge_fire', name: 'Fogo', price: 200, preview: '🔥' },
+        { id: 'badge_diamond', name: 'Diamante', price: 500, preview: '💎' },
+        { id: 'badge_crown', name: 'Coroa', price: 600, preview: '👑' },
+        { id: 'badge_star', name: 'Estrela', price: 350, preview: '⭐' },
+        { id: 'badge_heart', name: 'Coração', price: 200, preview: '❤️' },
+        { id: 'badge_lightning', name: 'Raio', price: 400, preview: '⚡' },
+        { id: 'badge_moon', name: 'Lua', price: 300, preview: '🌙' },
+        { id: 'badge_sun', name: 'Sol', price: 350, preview: '☀️' },
+    ],
+    colors: [
+        { id: 'color_cyan', name: 'Ciano Neon', price: 400, hex: '#00FFFF' },
+        { id: 'color_magenta', name: 'Magenta Neon', price: 400, hex: '#FF00FF' },
+        { id: 'color_lime', name: 'Verde Limão', price: 400, hex: '#00FF00' },
+        { id: 'color_orange', name: 'Laranja Neon', price: 400, hex: '#FF6600' },
+        { id: 'color_pink', name: 'Rosa Neon', price: 400, hex: '#FF69B4' },
+        { id: 'color_blue', name: 'Azul Elétrico', price: 400, hex: '#0066FF' },
+        { id: 'color_purple', name: 'Roxo Neon', price: 400, hex: '#9933FF' },
+        { id: 'color_red', name: 'Vermelho Neon', price: 400, hex: '#FF0033' },
+    ]
+};
+
+export const getCustomizations = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                zions: true,
+                ownedCustomizations: true,
+                equippedBackground: true,
+                equippedBadge: true,
+                equippedColor: true,
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Parse owned customizations (stored as JSON string)
+        const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
+
+        res.json({
+            zions: user.zions,
+            owned,
+            equipped: {
+                background: user.equippedBackground,
+                badge: user.equippedBadge,
+                color: user.equippedColor,
+            },
+            shop: CUSTOMIZATION_ITEMS
+        });
+    } catch (error) {
+        console.error('Error fetching customizations:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const purchaseCustomization = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { itemId, category } = req.body;
+
+        if (!itemId || !category) {
+            return res.status(400).json({ error: 'Item ID and category required' });
+        }
+
+        // Find the item in our catalog
+        const categoryItems = CUSTOMIZATION_ITEMS[category as keyof typeof CUSTOMIZATION_ITEMS];
+        if (!categoryItems) {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        const item = categoryItems.find((i: any) => i.id === itemId);
+        if (!item) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { zions: true, ownedCustomizations: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if user has enough Zions
+        if (user.zions < item.price) {
+            return res.status(400).json({ error: 'Not enough Zions' });
+        }
+
+        // Check if already owned
+        const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
+        if (owned.includes(itemId)) {
+            return res.status(400).json({ error: 'Item already owned' });
+        }
+
+        // Purchase: deduct Zions and add to owned
+        owned.push(itemId);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                zions: { decrement: item.price },
+                ownedCustomizations: JSON.stringify(owned)
+            }
+        });
+
+        res.json({ 
+            success: true, 
+            message: `${item.name} purchased successfully!`,
+            newBalance: user.zions - item.price,
+            owned 
+        });
+    } catch (error) {
+        console.error('Error purchasing customization:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const equipCustomization = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { itemId, category } = req.body;
+
+        if (!itemId || !category) {
+            return res.status(400).json({ error: 'Item ID and category required' });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { ownedCustomizations: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if user owns this item
+        const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
+        if (!owned.includes(itemId)) {
+            return res.status(400).json({ error: 'You do not own this item' });
+        }
+
+        // Equip based on category
+        const updateData: any = {};
+        if (category === 'backgrounds') {
+            updateData.equippedBackground = itemId;
+        } else if (category === 'badges') {
+            updateData.equippedBadge = itemId;
+        } else if (category === 'colors') {
+            updateData.equippedColor = itemId;
+        } else {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: updateData
+        });
+
+        res.json({ success: true, message: 'Item equipped!' });
+    } catch (error) {
+        console.error('Error equipping customization:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const unequipCustomization = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { category } = req.body;
+
+        if (!category) {
+            return res.status(400).json({ error: 'Category required' });
+        }
+
+        // Unequip based on category
+        const updateData: any = {};
+        if (category === 'backgrounds') {
+            updateData.equippedBackground = null;
+        } else if (category === 'badges') {
+            updateData.equippedBadge = null;
+        } else if (category === 'colors') {
+            updateData.equippedColor = null;
+        } else {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: updateData
+        });
+
+        res.json({ success: true, message: 'Item unequipped!' });
+    } catch (error) {
+        console.error('Error unequipping customization:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// ================= SEARCH =================
+
+export const searchAll = async (req: AuthRequest, res: Response) => {
+    try {
+        const { q } = req.query;
+        
+        if (!q || typeof q !== 'string') {
+            return res.status(400).json({ error: 'Search query required' });
+        }
+
+        const searchTerm = q.trim().toLowerCase();
+
+        // Search users
+        const users = await prisma.user.findMany({
+            where: {
+                OR: [
+                    { name: { contains: searchTerm, mode: 'insensitive' } },
+                    { displayName: { contains: searchTerm, mode: 'insensitive' } },
+                ],
+                deletedAt: null
+            },
+            take: 10,
+            select: {
+                id: true,
+                name: true,
+                displayName: true,
+                avatarUrl: true,
+                level: true,
+                membershipType: true
+            }
+        });
+
+        // Search posts by caption
+        const posts = await prisma.post.findMany({
+            where: {
+                caption: { contains: searchTerm, mode: 'insensitive' }
+            },
+            take: 10,
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        res.json({
+            users: users.map(u => ({ ...u, type: 'user' })),
+            posts: posts.map(p => ({ ...p, type: 'post' }))
+        });
+    } catch (error) {
+        console.error('Error searching:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

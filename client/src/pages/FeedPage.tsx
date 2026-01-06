@@ -20,6 +20,7 @@ import RecommendationsDrawer from '../components/RecommendationsDrawer';
 import NewMembersModal from '../components/NewMembersModal';
 import EventsModal from '../components/EventsModal';
 import OnlineFriendsCard from '../components/OnlineFriendsCard';
+import CustomizationShop from '../components/CustomizationShop';
 
 interface Post {
     id: string;
@@ -62,6 +63,7 @@ export default function FeedPage() {
     // New Modal States
     const [isNewMembersOpen, setIsNewMembersOpen] = useState(false);
     const [isEventsOpen, setIsEventsOpen] = useState(false);
+    const [isShopOpen, setIsShopOpen] = useState(false);
 
     const fetchPosts = async (silent = false) => {
         try {
@@ -174,7 +176,7 @@ export default function FeedPage() {
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
             <LuxuriousBackground />
-            {!viewingStoryId && <Header onOpenRecommendations={() => setIsRecommendationsOpen(true)} />}
+            {!viewingStoryId && <Header onOpenRecommendations={() => setIsRecommendationsOpen(true)} onOpenShop={() => setIsShopOpen(true)} />}
 
             <ToastNotification
                 message={toast.message}
@@ -215,6 +217,11 @@ export default function FeedPage() {
                 onClose={() => setIsRecommendationsOpen(false)}
                 dailyLoginStatus={dailyLoginStatus}
                 openDailyLoginModal={openDailyLoginModal}
+            />
+
+            <CustomizationShop
+                isOpen={isShopOpen}
+                onClose={() => setIsShopOpen(false)}
             />
 
             <div className="max-w-7xl mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-3 sm:px-4 md:px-6 flex gap-8 relative z-10">

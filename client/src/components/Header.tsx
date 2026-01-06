@@ -1,21 +1,24 @@
-import { Search, Bell, User, LogOut, X, Users, Sparkles, Zap, Rocket } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Sparkles, Zap, Rocket, Store } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
+import SearchModal from './SearchModal';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 
 interface HeaderProps {
     onOpenRecommendations?: () => void;
+    onOpenShop?: () => void;
 }
 
-export default function Header({ onOpenRecommendations }: HeaderProps) {
+export default function Header({ onOpenRecommendations, onOpenShop }: HeaderProps) {
     const { user, isVisitor, logout, showAchievement, theme, openZionsModal } = useAuth();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
@@ -64,6 +67,9 @@ export default function Header({ onOpenRecommendations }: HeaderProps) {
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${themeBorder} bg-black/50 backdrop-blur-xl transition-colors duration-500`}>
+            {/* Search Modal */}
+            <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
+            
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                 {/* Logo */}
                 <div className="flex items-center gap-4 shrink-0">
@@ -83,7 +89,9 @@ export default function Header({ onOpenRecommendations }: HeaderProps) {
                     <input
                         type="text"
                         placeholder="Buscar..."
-                        className={`w-full ${theme === 'light' ? 'bg-white border-gray-300 text-black placeholder-gray-600 shadow-sm' : 'bg-white/5 border-white/10 text-white placeholder-white/20'} backdrop-blur-md border hover:border-white/20 focus:border-white/30 rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] focus:shadow-[0_0_20px_rgba(255,255,255,0.05)] relative z-0`}
+                        onClick={() => setIsSearchModalOpen(true)}
+                        readOnly
+                        className={`w-full ${theme === 'light' ? 'bg-white border-gray-300 text-black placeholder-gray-600 shadow-sm' : 'bg-white/5 border-white/10 text-white placeholder-white/20'} backdrop-blur-md border hover:border-white/20 focus:border-white/30 rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] focus:shadow-[0_0_20px_rgba(255,255,255,0.05)] relative z-0 cursor-pointer`}
                     />
                 </div>
 
@@ -130,12 +138,24 @@ export default function Header({ onOpenRecommendations }: HeaderProps) {
 
                     {/* Mobile Search Toggle */}
                     <button
-                        onClick={() => setIsMobileSearchOpen(true)}
+                        onClick={() => setIsSearchModalOpen(true)}
                         className={`md:hidden p-2 ${theme === 'light' ? 'text-black' : (isMGT ? 'text-emerald-500' : 'text-gold-400')}`}
                         aria-label="Abrir busca"
                     >
                         <Search className="w-5 h-5" />
                     </button>
+
+                    {/* Shop Button */}
+                    {onOpenShop && (
+                        <button
+                            onClick={onOpenShop}
+                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                            aria-label="Loja"
+                            title="Loja de Personalização"
+                        >
+                            <Store className="w-5 h-5" />
+                        </button>
+                    )}
 
                     <Link to="/social" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
                         <Users className="w-5 h-5" />

@@ -181,7 +181,18 @@ export default function Notifications({ onClose }: NotificationsProps) {
                 />
             )}
             
-            <div className={`absolute top-12 right-0 w-80 rounded-xl border overflow-hidden z-50 animate-fade-in-up backdrop-blur-xl ${containerStyle}`}>
+            {/* Desktop: positioned relative to bell icon, Mobile: centered modal */}
+            <div className={`
+                fixed md:absolute 
+                inset-x-4 md:inset-x-auto
+                top-20 md:top-12 
+                md:right-0 
+                w-auto md:w-80 
+                max-w-sm md:max-w-none
+                mx-auto md:mx-0
+                rounded-xl border overflow-hidden z-50 animate-fade-in-up backdrop-blur-xl 
+                ${containerStyle}
+            `}>
             <div className={`p-4 border-b ${headerBorder} flex justify-between items-center`}>
                 <h3 className={`${titleColor} font-serif text-sm tracking-wider`}>Notificações</h3>
                 <span onClick={markAllAsRead} className={`text-[10px] ${themeText} uppercase tracking-widest cursor-pointer hover:opacity-80 transition-opacity`}>Marcar lidas</span>

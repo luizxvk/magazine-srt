@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Check, CreditCard, ShoppingBag, Loader2, QrCode, Copy, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { X, Check, ShoppingBag, Loader2, QrCode, Copy, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -23,7 +23,7 @@ const PACKAGES = [
 ];
 
 export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseModalProps) {
-    const { user, theme, refreshUser } = useAuth();
+    const { user, theme, updateUser } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [loading, setLoading] = useState<number | null>(null);
     const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number } | null>(null);
@@ -82,8 +82,11 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     const handleConfirmPayment = async () => {
         setCheckingPayment(true);
         try {
-            // Refresh user to get updated Zions
-            await refreshUser();
+            // Get updated user data
+            const response = await api.get('/users/me');
+            if (response.data) {
+                updateUser(response.data);
+            }
             setPixData(null);
             onClose();
         } catch (error) {

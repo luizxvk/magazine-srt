@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Check, CreditCard, ShoppingBag, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Check, CreditCard, ShoppingBag, Loader2, QrCode, Copy, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -23,9 +23,12 @@ const PACKAGES = [
 ];
 
 export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseModalProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, refreshUser } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [loading, setLoading] = useState<number | null>(null);
+    const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number } | null>(null);
+    const [copied, setCopied] = useState(false);
+    const [checkingPayment, setCheckingPayment] = useState(false);
 
     /* Centering Fix: Use 'items-center' (already present) but verify height constraints. Using 'max-h-screen' and 'overflow-y-auto' on the container might help smaller screens. */
     /* MGT Color Fix: Ensure 'text' is emerald, remove other colors if conflicting. The user mentioned "red green and blue". Check 'themeColors' object. */
@@ -49,21 +52,17 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     };
 
     const handlePurchase = async (amount: number) => {
-        // Special link for 50 Zions package
-        if (amount === 50) {
-            window.open('https://mpago.la/1CvJqSd', '_blank');
-            return;
-        }
-
         try {
             setLoading(amount);
-            const response = await api.post('/payments/zions/preference', {
-                amount,
-                packageId: 'zion_' + amount
-            });
+            const response = await api.post('/payments/zions/pix', { zions: amount });
 
-            if (response.data.init_point) {
-                window.location.href = response.data.init_point;
+            if (response.data.qrCodeBase64) {
+                setPixData({
+                    qrCode: response.data.qrCode,
+                    qrCodeBase64: response.data.qrCodeBase64,
+                    copyPaste: response.data.copyPaste,
+                    amount: amount
+                });
             }
         } catch (error) {
             console.error('Purchase failed', error);
@@ -72,11 +71,117 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
         }
     };
 
+    const handleCopyPix = async () => {
+        if (pixData?.copyPaste) {
+            await navigator.clipboard.writeText(pixData.copyPaste);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 3000);
+        }
+    };
+
+    const handleConfirmPayment = async () => {
+        setCheckingPayment(true);
+        try {
+            // Refresh user to get updated Zions
+            await refreshUser();
+            setPixData(null);
+            onClose();
+        } catch (error) {
+            console.error('Error refreshing user', error);
+        } finally {
+            setCheckingPayment(false);
+        }
+    };
+
+    const handleClose = () => {
+        setPixData(null);
+        setCopied(false);
+        onClose();
+    };
+
     if (!isOpen) return null;
 
+    // PIX Payment Screen
+    if (pixData) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                <div className={`w-full max-w-md ${themeColors.bg} rounded-3xl border ${themeColors.border} shadow-2xl p-6`}>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className={`text-xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                            Pagar com PIX
+                        </h2>
+                        <button onClick={handleClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                            <X className={`w-5 h-5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`} />
+                        </button>
+                    </div>
+
+                    <div className="text-center">
+                        <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} mb-4`}>
+                            Escaneie o QR Code ou copie o código PIX
+                        </p>
+
+                        {/* QR Code */}
+                        <div className={`inline-block p-4 rounded-2xl ${theme === 'light' ? 'bg-white' : 'bg-white'} mb-4`}>
+                            <img 
+                                src={`data:image/png;base64,${pixData.qrCodeBase64}`} 
+                                alt="QR Code PIX" 
+                                className="w-48 h-48"
+                            />
+                        </div>
+
+                        {/* Amount */}
+                        <div className="mb-4">
+                            <span className={`text-2xl font-bold ${themeColors.text}`}>
+                                {pixData.amount} Zions
+                            </span>
+                        </div>
+
+                        {/* Copy Paste Code */}
+                        <button
+                            onClick={handleCopyPix}
+                            className={`w-full py-3 px-4 rounded-xl border ${themeColors.cardBorder} ${themeColors.cardBg} flex items-center justify-center gap-2 hover:opacity-80 transition-opacity mb-4`}
+                        >
+                            {copied ? (
+                                <>
+                                    <CheckCircle className="w-5 h-5 text-green-500" />
+                                    <span className="text-green-500 font-medium">Copiado!</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Copy className={`w-5 h-5 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`} />
+                                    <span className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>Copiar código PIX</span>
+                                </>
+                            )}
+                        </button>
+
+                        {/* Confirm Button */}
+                        <button
+                            onClick={handleConfirmPayment}
+                            disabled={checkingPayment}
+                            className={`w-full py-3 rounded-xl font-bold text-white ${themeColors.button} flex items-center justify-center gap-2 disabled:opacity-50`}
+                        >
+                            {checkingPayment ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <>
+                                    <CheckCircle className="w-5 h-5" />
+                                    Já paguei
+                                </>
+                            )}
+                        </button>
+
+                        <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'} mt-4`}>
+                            Os Zions serão creditados automaticamente após a confirmação do pagamento.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto pt-10 pb-10"> {/* Added overflow handling */}
-            <div className={`w-full max-w-4xl ${themeColors.bg} rounded-3xl border ${themeColors.border} shadow-2xl flex flex-col my-auto relative`}> {/* Removed fixed max-h, added relative and my-auto */}
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto pt-10 pb-10">
+            <div className={`w-full max-w-4xl ${themeColors.bg} rounded-3xl border ${themeColors.border} shadow-2xl flex flex-col my-auto relative`}>
                 <div className="p-6 border-b border-white/10 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-xl ${themeColors.cardBg} ${themeColors.text}`}>
@@ -89,7 +194,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                             <p className="text-sm text-gray-500">Invista na sua jornada automotiva</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <button onClick={handleClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <X className={`w-6 h-6 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`} />
                     </button>
                 </div>
@@ -138,8 +243,8 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                             <Loader2 className="w-5 h-5 animate-spin" />
                                         ) : (
                                             <>
+                                                <QrCode className="w-4 h-4" />
                                                 <span>R$ {pkg.price.toFixed(2).replace('.', ',')}</span>
-                                                <CreditCard className="w-4 h-4" />
                                             </>
                                         )}
                                     </button>

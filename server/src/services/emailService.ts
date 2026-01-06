@@ -151,3 +151,73 @@ export const sendPasswordResetEmail = async (to: string, resetToken: string, use
         html
     });
 };
+
+export const sendWelcomeToMagazineEmail = async (to: string, userName: string): Promise<boolean> => {
+    const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h1 style="color: #d4af37; font-size: 32px; margin: 0; letter-spacing: 3px;">MAGAZINE</h1>
+                    <p style="color: #666; font-size: 12px; margin-top: 8px; letter-spacing: 2px;">A ELITE DO SUCESSO</p>
+                </div>
+
+                <!-- Content -->
+                <div style="background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-radius: 16px; padding: 40px; border: 1px solid rgba(212, 175, 55, 0.2);">
+                    <h2 style="color: #fff; font-size: 24px; margin: 0 0 20px 0;">🎉 Parabéns, ${userName}!</h2>
+                    
+                    <p style="color: #aaa; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                        Sua solicitação foi <strong style="color: #d4af37;">aprovada</strong>! 
+                        Você agora faz parte da <strong style="color: #d4af37;">Magazine</strong>, a elite do sucesso.
+                    </p>
+
+                    <p style="color: #aaa; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                        Atualize a página para ver seu novo layout exclusivo e aproveitar todos os benefícios de ser um membro Magazine!
+                    </p>
+
+                    <!-- Button -->
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${frontendUrl}/feed" 
+                           style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%); 
+                                  color: #000; text-decoration: none; padding: 16px 40px; border-radius: 8px; 
+                                  font-weight: bold; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
+                            Acessar Magazine
+                        </a>
+                    </div>
+
+                    <div style="background: rgba(212, 175, 55, 0.1); border-radius: 8px; padding: 20px; margin-top: 20px;">
+                        <h3 style="color: #d4af37; font-size: 14px; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 1px;">Benefícios Magazine</h3>
+                        <ul style="color: #aaa; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                            <li>Layout exclusivo dourado</li>
+                            <li>Badge de membro Magazine</li>
+                            <li>Acesso a conteúdos exclusivos</li>
+                            <li>Prioridade em eventos</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align: center; margin-top: 40px;">
+                    <p style="color: #444; font-size: 12px;">
+                        © ${new Date().getFullYear()} Magazine/MGT. Todos os direitos reservados.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    return sendEmail({
+        to,
+        subject: '🌟 Bem-vindo à Magazine! - Sua solicitação foi aprovada',
+        html
+    });
+};

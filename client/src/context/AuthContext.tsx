@@ -84,10 +84,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     const userRes = await api.get('/users/me');
                     let userData = userRes.data;
 
-                    // Override membership type if session context exists
-                    const sessionMembership = localStorage.getItem('sessionMembershipType');
-                    if (sessionMembership === 'MGT' || sessionMembership === 'MAGAZINE') {
-                        userData.membershipType = sessionMembership;
+                    // Update localStorage with server's membership type (server is source of truth)
+                    // This ensures when membership changes (e.g., MGT to MAGAZINE), it's reflected
+                    if (userData.membershipType) {
+                        localStorage.setItem('sessionMembershipType', userData.membershipType);
                     }
 
                     setUser(userData);

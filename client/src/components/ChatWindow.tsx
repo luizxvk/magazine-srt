@@ -126,16 +126,16 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                 {/* Glassy Header */}
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-xl z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-black overflow-hidden border border-gold-500/30 shadow-inner relative group">
+                        <div className="w-10 h-10 rounded-full bg-black overflow-visible border border-gold-500/30 shadow-inner relative group">
                             {otherUserAvatar ? (
-                                <img src={otherUserAvatar} alt={otherUserName} className="w-full h-full object-cover" />
+                                <img src={otherUserAvatar} alt={otherUserName} className="w-full h-full rounded-full object-cover" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-400 bg-neutral-900">
+                                <div className="w-full h-full rounded-full flex items-center justify-center text-gray-400 bg-neutral-900">
                                     <User className="w-5 h-5" />
                                 </div>
                             )}
                             {/* Online Indicator */}
-                            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-black"></div>
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
                         </div>
                         <div>
                             <h3 className="font-bold text-white text-base leading-tight tracking-wide font-serif">{otherUserName}</h3>

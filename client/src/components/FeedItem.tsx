@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 
 interface FeedItemProps {
@@ -94,14 +94,24 @@ export default function FeedItem({
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
     const [isReporting, setIsReporting] = useState(false);
+    const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
     const isOwner = user?.id === authorId;
     const isMGT = user?.membershipType === 'MGT';
 
 
-    const handleShare = () => {
+    const handleShare = async () => {
         // Generate public share link
         const shareUrl = `${window.location.origin}/post/${id}`;
-        navigator.clipboard.writeText(shareUrl);
+        
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setShowCopiedFeedback(true);
+            setTimeout(() => setShowCopiedFeedback(false), 2000);
+        } catch (err) {
+            // Fallback for browsers that don't support clipboard API
+            console.error('Failed to copy:', err);
+        }
+        
         if (onShare) {
             onShare(id);
         }
@@ -196,6 +206,20 @@ export default function FeedItem({
                                 </button>
                             </div>
                         )}
+
+                        {/* Copied Feedback */}
+                        <AnimatePresence>
+                            {showCopiedFeedback && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute right-0 top-full mt-2 px-3 py-2 bg-green-500 text-white text-xs rounded-lg flex items-center gap-1 shadow-lg z-50"
+                                >
+                                    <Check className="w-3 h-3" /> Link copiado!
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
 

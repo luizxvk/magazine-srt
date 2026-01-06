@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { sendWelcomeToMagazineEmail } from '../services/emailService';
 
 const prisma = new PrismaClient();
 
@@ -123,6 +124,9 @@ export const approveRequest = async (req: Request, res: Response) => {
                     read: false
                 }
             });
+
+            // Send welcome email to Magazine
+            await sendWelcomeToMagazineEmail(user.email, user.name);
         } else {
             // Create new user (original behavior)
             generatedPassword = Math.random().toString(36).slice(-8);

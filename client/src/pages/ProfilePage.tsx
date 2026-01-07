@@ -241,16 +241,24 @@ export default function ProfilePage() {
                                     </p>
                                     {profileUser.bio && <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} text-sm italic mb-4 max-w-md mx-auto md:mx-0`}>"{profileUser.bio}"</p>}
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 flex-wrap justify-center md:justify-start">
                                     {isOwnProfile ? (
                                         <>
                                             <div className="relative">
                                                 <button
-                                                    onClick={() => document.getElementById('bg-upload')?.click()}
-                                                    className={`flex items-center justify-center w-8 h-8 rounded-full border ${theme === 'light' ? 'border-gray-300 hover:bg-gray-200' : 'border-white/10 hover:bg-white/5'} transition-colors group shrink-0`}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        const input = document.getElementById('bg-upload') as HTMLInputElement;
+                                                        if (input) {
+                                                            input.click();
+                                                        }
+                                                    }}
+                                                    className={`flex items-center justify-center w-10 h-10 md:w-8 md:h-8 rounded-full border ${theme === 'light' ? 'border-gray-300 hover:bg-gray-200' : 'border-white/10 hover:bg-white/5'} transition-colors group shrink-0 touch-manipulation`}
                                                     title="Alterar Imagem de Fundo"
+                                                    type="button"
                                                 >
-                                                    <Palette className={`w-4 h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} group-hover:text-gold-400 transition-colors`} />
+                                                    <Palette className={`w-5 h-5 md:w-4 md:h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} group-hover:text-gold-400 transition-colors`} />
                                                 </button>
                                                 <input
                                                     id="bg-upload"
@@ -266,11 +274,14 @@ export default function ProfilePage() {
                                                                 const result = reader.result as string;
                                                                 if (currentUser) {
                                                                     localStorage.setItem(`profile_bg_${currentUser.id}`, result);
-                                                                    window.location.reload();
+                                                                    setBgImage(result);
+                                                                    showToast('Imagem de fundo atualizada!', 'success');
                                                                 }
                                                             };
                                                             reader.readAsDataURL(file);
                                                         }
+                                                        // Reset input value so same file can be selected again
+                                                        e.target.value = '';
                                                     }}
                                                 />
                                             </div>
@@ -308,13 +319,16 @@ export default function ProfilePage() {
                                         </>
                                     ) : (
                                         <>
-                                            <button
-                                                onClick={() => setIsChatOpen(true)}
-                                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10"
-                                            >
-                                                <MessageCircle className="w-4 h-4" />
-                                                <span className="text-xs font-bold uppercase tracking-wide">Mensagem</span>
-                                            </button>
+                                            {/* Message button - only show if friends */}
+                                            {friendshipStatus === 'ACCEPTED' && (
+                                                <button
+                                                    onClick={() => setIsChatOpen(true)}
+                                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10"
+                                                >
+                                                    <MessageCircle className="w-4 h-4" />
+                                                    <span className="text-xs font-bold uppercase tracking-wide">Mensagem</span>
+                                                </button>
+                                            )}
 
                                             {friendshipStatus === 'NONE' && (
                                                 <button

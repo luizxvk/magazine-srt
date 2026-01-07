@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, X, User, Minimize2 } from 'lucide-react';
+import { Send, X, User, Minimize2, Eye } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import ModernLoader from './ModernLoader';
 
 // ChatWindow Component - Vision Pro Style (SRT Edition)
 interface Message {
@@ -11,6 +12,7 @@ interface Message {
     content: string;
     storyImageUrl?: string | null;
     createdAt: string;
+    read: boolean;
     sender: {
         id: string;
         name: string;
@@ -50,6 +52,15 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                 const response = await api.get(`/messages/${otherUserId}`);
                 if (isMounted) {
                     setMessages(response.data);
+                    
+                    // Mark messages from other user as read
+                    const unreadFromOther = response.data.filter((msg: Message) => 
+                        msg.senderId === otherUserId && !msg.read
+                    );
+                    
+                    if (unreadFromOther.length > 0) {
+                        await api.put('/messages/read', { senderId: otherUserId });
+                    }
                 }
             } catch (error) {
                 console.error('Failed to fetch messages', error);
@@ -166,12 +177,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                 <div className={`flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent`}>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
-                            <div className="relative">
-                                <div className="w-12 h-12 border-4 border-gold-500/20 border-t-gold-500 rounded-full animate-spin"></div>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
-                                </div>
-                            </div>
+                            <ModernLoader />
                         </div>
                     ) : messages.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-50">
@@ -181,19 +187,21 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             <p className="text-gray-400 text-sm">Inicie uma conversa com <span className="text-gold-400 font-bold">{otherUserName}</span></p>
                         </div>
                     ) : (
-                        messages.map((msg) => {
+                        messages.map((msg, index) => {
                             const isMe = msg.senderId === user?.id;
+                            const isLastRead = isMe && msg.read && (index === messages.length - 1 || !messages[index + 1]?.read);
+                            
                             // My messages use my membership color, their messages use their membership color
                             const myBubbleClass = isMeMGT 
-                                ? 'bg-emerald-500/10 text-emerald-100 border-emerald-500/20 rounded-tr-sm'
-                                : 'bg-gold-500/10 text-gold-100 border-gold-500/20 rounded-tr-sm';
+                                ? 'bg-emerald-500/10 text-white border-emerald-500/20 rounded-tr-sm'
+                                : 'bg-gold-500/10 text-white border-gold-500/20 rounded-tr-sm';
                             const theirBubbleClass = isOtherMGT
-                                ? 'bg-emerald-500/5 text-emerald-100 border-emerald-500/10 rounded-tl-sm'
-                                : (theme === 'light' ? 'bg-gray-100 text-gray-800 border-gray-200 rounded-tl-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-tl-sm');
+                                ? 'bg-emerald-500/5 text-white border-emerald-500/10 rounded-tl-sm'
+                                : (theme === 'light' ? 'bg-gray-100 text-gray-900 border-gray-200 rounded-tl-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-tl-sm');
                             const bubbleClass = isMe ? myBubbleClass : theirBubbleClass;
                             const timeClass = isMe 
                                 ? (isMeMGT ? 'text-emerald-200' : 'text-gold-200')
-                                : (theme === 'light' ? 'text-gray-500' : 'text-gray-400');
+                                : (theme === 'light' ? 'text-gray-600' : 'text-gray-400');
 
                             return (
                                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
@@ -215,8 +223,13 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                                             </div>
                                         )}
                                         {msg.content}
-                                        <div className={`text-[10px] mt-1 opacity-50 ${isMe ? 'text-right' : 'text-left'} ${timeClass}`}>
-                                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        <div className={`text-[10px] mt-1 opacity-50 ${isMe ? 'text-right' : 'text-left'} ${timeClass} flex items-center gap-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                            <span>{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            {isLastRead && (
+                                                <span className="ml-1" title="Visto">
+                                                    <Eye className="w-3 h-3 text-blue-400" />
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

@@ -181,8 +181,8 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                 ctx.restore();
             });
 
-            // Export
-            const editedUrl = canvas.toDataURL('image/jpeg', 0.9);
+            // Export with maximum quality
+            const editedUrl = canvas.toDataURL('image/jpeg', 1.0);
             onPublish(editedUrl);
         };
 
@@ -204,10 +204,10 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full">
                     <X className="w-6 h-6 text-white" />
                 </button>
-                <h3 className="text-white font-medium">Editar Story</h3>
+                <h3 className="text-white font-medium hidden sm:block">Editar Story</h3>
                 <button 
                     onClick={saveImage}
-                    className={`px-4 py-2 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} text-black font-bold flex items-center gap-2 hover:scale-105 transition-transform`}
+                    className={`shrink-0 px-3 sm:px-4 py-2 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} text-black font-bold flex items-center gap-2 hover:scale-105 transition-transform text-sm sm:text-base`}
                 >
                     Enviar Story
                     <Send className="w-4 h-4" />

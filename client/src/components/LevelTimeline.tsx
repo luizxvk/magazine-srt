@@ -54,9 +54,9 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
 
     return (
         <div className="w-full">
-            <div className="overflow-x-auto pb-8 pt-4 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
-                <div className="min-w-[2000px] px-16">
-                    <div className="relative pt-16 pb-4">
+            <div className="overflow-x-auto overflow-y-hidden pb-8 pt-4 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                <div className="min-w-[1600px] px-8 md:px-16">
+                    <div className="relative pt-12 pb-4">
                         {/* Progress Bar Background */}
                         <div className={`absolute top-1/2 left-0 w-full h-3 rounded-full -translate-y-1/2 backdrop-blur-sm ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-800/50'}`} />
 
@@ -80,23 +80,23 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                         {reward && (() => {
                                             const Icon = reward.icon;
                                             return (
-                                                <div className="absolute -top-14 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
-                                                    <div className={`p-2 rounded-full mb-1 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
-                                                        <Icon size={16} />
+                                                <div className="absolute -top-10 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
+                                                    <div className={`p-1.5 rounded-full mb-1 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
+                                                        <Icon size={14} />
                                                     </div>
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
+                                                    <span className={`text-[9px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
                                                         {reward.label}
                                                     </span>
 
                                                     {/* Tooltip for Reward - Visible on Group Hover - Positioned BELOW */}
-                                                    <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[60]">
-                                                        <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/90 border-white/20 text-gray-200'} border rounded-lg px-4 py-3 text-xs shadow-xl backdrop-blur-md min-w-[180px] relative`}>
-                                                            <div className="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 -rotate-45 border-t border-r border-white/20 bg-black/90 layer-50" />
-                                                            <div className="font-bold flex items-center gap-2 mb-2 border-b border-white/10 pb-2">
-                                                                <Icon className="w-4 h-4 text-gold-500" />
-                                                                <span className="uppercase tracking-wider">{reward.label}</span>
+                                                    <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[60]">
+                                                        <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/90 border-white/20 text-gray-200'} border rounded-lg px-3 py-2 text-xs shadow-xl backdrop-blur-md min-w-[160px] relative`}>
+                                                            <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 -rotate-45 border-t border-r border-white/20 bg-black/90 layer-50" />
+                                                            <div className="font-bold flex items-center gap-2 mb-1.5 border-b border-white/10 pb-1.5">
+                                                                <Icon className="w-3 h-3 text-gold-500" />
+                                                                <span className="uppercase tracking-wider text-[10px]">{reward.label}</span>
                                                             </div>
-                                                            <div className="space-y-1 text-[11px] opacity-90">
+                                                            <div className="space-y-0.5 text-[10px] opacity-90">
                                                                 <p>• Nova Insígnia Exclusiva</p>
                                                                 <p>• Bônus de {level * 10} Zions</p>
                                                                 {level >= 15 && <p>• Foto de Perfil GIF</p>}
@@ -111,7 +111,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
 
                                         {/* Level Node */}
                                         <motion.div
-                                            className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isReached
+                                            className={`w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isReached
                                                 ? themeNodeReached
                                                 : themeNodeUnreached
                                                 } ${isCurrent ? `scale-125 ring-4 ${isMGT ? 'ring-emerald-500/30' : 'ring-yellow-500/30'} z-30` : 'z-20'}`}
@@ -119,13 +119,13 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                             animate={{ scale: isCurrent ? 1.2 : 1 }}
                                             whileHover={{ scale: 1.1 }}
                                         >
-                                            <span className="text-xs md:text-sm">{level}</span>
+                                            <span className="text-[11px] md:text-sm">{level}</span>
                                         </motion.div>
 
                                         {/* Tooltip for non-reward levels */}
                                         {!reward && (
-                                            <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">
-                                                <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-600' : 'bg-black/80 border-white/10 text-gray-300'} border rounded px-2 py-1 text-[10px] backdrop-blur-md`}>
+                                            <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">
+                                                <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-600' : 'bg-black/80 border-white/10 text-gray-300'} border rounded px-2 py-1 text-[9px] backdrop-blur-md`}>
                                                     Nível {level}
                                                 </div>
                                             </div>

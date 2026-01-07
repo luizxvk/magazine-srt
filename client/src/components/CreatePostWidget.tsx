@@ -170,7 +170,7 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
 
     if (isVisitor) {
         return (
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 w-[95%] max-w-2xl z-50">
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-50 px-4 md:px-0">
                 <div className={`bg-black/60 backdrop-blur-xl border ${themeBorder} rounded-full p-4 text-center shadow-2xl`}>
                     <p className={`${themeText} text-sm`}>
                         <span className="font-semibold">Visitante:</span> Faça login para interagir e publicar.
@@ -181,7 +181,7 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     }
 
     return (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 w-[95%] max-w-2xl z-50">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-50 px-4 md:px-0">
             {/* Media Preview (Pops up above the bar) */}
             {mediaUrl && (
                 <div className={`mb-4 bg-black/40 backdrop-blur-xl rounded-2xl p-2 border ${themeBorder} animate-fade-in-up relative mx-auto w-full max-w-sm shadow-2xl`}>

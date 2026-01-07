@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Sparkles, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, BookOpen } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -36,7 +36,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
-    const themeBorder = isMGT ? 'border-emerald-600/30' : 'border-gold-500/20';
+    const headerBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
 
     // Get badge icon - default crown for Magazine
     const getBadgeIcon = () => {
@@ -115,7 +115,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
     ];
 
     return (
-        <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${themeBorder} bg-black/50 backdrop-blur-xl transition-colors duration-500`}>
+        <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${headerBorder} bg-black/50 backdrop-blur-xl transition-colors duration-500`}>
             {/* Search Modal */}
             <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
             
@@ -215,12 +215,12 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
                             title="Adquirir Zions"
                         >
-                            <Sparkles className="w-5 h-5" />
+                            <Coins className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* Profile Link - Both Mobile & Desktop */}
-                    <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${theme === 'light' ? 'border-black/10' : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/10')} hover:opacity-80 transition-opacity`}>
+                    <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${headerBorder} hover:opacity-80 transition-opacity`}>
                         <div className="text-right hidden lg:block">
                             <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
                             <div className="h-4 relative overflow-hidden w-32 flex justify-end">
@@ -294,7 +294,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     {!isVisitor && (
                         <button
                             onClick={logout}
-                            className={`hidden md:block p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500/50 hover:text-red-500' : 'text-gold-500/50 hover:text-red-500')} transition-colors border-l ${theme === 'light' ? 'border-black/10' : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/10')} pl-2 md:pl-4 ml-1 md:ml-2`}
+                            className={`hidden md:block p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500/50 hover:text-red-500' : 'text-gold-500/50 hover:text-red-500')} transition-colors border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
                             title="Sair"
                         >
                             <LogOut className="w-5 h-5" />
@@ -331,10 +331,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={`mobile-menu-container fixed top-0 right-0 h-full w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-50 md:hidden shadow-2xl border-l ${themeBorder} flex flex-col`}
+                            className={`mobile-menu-container fixed top-0 right-0 h-full w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-[60] md:hidden shadow-2xl border-l ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} flex flex-col overflow-hidden`}
                         >
                             {/* Drawer Header */}
-                            <div className={`p-4 border-b ${themeBorder} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/50'}`}>
+                            <div className={`p-4 border-b ${headerBorder} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/50'}`}>
                                 <div className="flex items-center justify-between mb-4">
                                     <span className={`font-bold text-lg ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`}>
                                         Menu
@@ -386,7 +386,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             </div>
 
                             {/* Quick Actions */}
-                            <div className={`p-4 border-b ${themeBorder} flex gap-2`}>
+                            <div className={`p-4 border-b ${headerBorder} flex gap-2`}>
                                 <button
                                     onClick={() => {
                                         setIsMobileMenuOpen(false);
@@ -416,7 +416,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
                                 >
-                                    <Sparkles className="w-4 h-4" />
+                                    <Coins className="w-4 h-4" />
                                     <span className="text-sm">Zions</span>
                                 </button>
                             </div>

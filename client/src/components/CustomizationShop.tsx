@@ -38,6 +38,15 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'bg_forest', name: 'Floresta', description: 'Verde natural e sereno', price: 300, type: 'background', preview: 'linear-gradient(180deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)' },
     { id: 'bg_city', name: 'Cidade Neon', description: 'Luzes urbanas vibrantes', price: 550, type: 'background', preview: 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)' },
     { id: 'bg_space', name: 'Espaço Profundo', description: 'Vastidão do cosmos', price: 700, type: 'background', preview: 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)' },
+    // NOVOS FUNDOS ANIMADOS
+    { id: 'bg_sunset', name: 'Pôr do Sol', description: 'Transição laranja-rosa vibrante', price: 650, type: 'background', preview: 'linear-gradient(135deg, #1a0505 0%, #2a0a0a 25%, #3a1515 50%, #2a0a0a 75%, #1a0505 100%)' },
+    { id: 'bg_cyberpunk', name: 'Cyberpunk', description: 'Néon rosa e azul futurista', price: 750, type: 'background', preview: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)' },
+    { id: 'bg_lava', name: 'Lava', description: 'Magma incandescente em movimento', price: 800, type: 'background', preview: 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)' },
+    { id: 'bg_ice', name: 'Gelo Ártico', description: 'Cristais de gelo azulados', price: 600, type: 'background', preview: 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)' },
+    { id: 'bg_neon_grid', name: 'Grade Neon', description: 'Grid retro synthwave', price: 850, type: 'background', preview: 'linear-gradient(135deg, #0d0d0d 0%, #1a0d1a 25%, #2a0d2a 50%, #1a0d1a 75%, #0d0d0d 100%)' },
+    { id: 'bg_emerald', name: 'Esmeralda', description: 'Verde profundo luxuoso', price: 700, type: 'background', preview: 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)' },
+    { id: 'bg_royal', name: 'Real Púrpura', description: 'Púrpura majestoso', price: 900, type: 'background', preview: 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)' },
+    { id: 'bg_carbon', name: 'Fibra de Carbono', description: 'Textura escura premium', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)' },
 ];
 
 // Predefined badges (profile decorations)
@@ -57,6 +66,7 @@ const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 // Neon accent colors (excluding gold for Magazine exclusivity)
 const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     defaultItems.color,
+    { id: 'color_rgb', name: 'RGB Dinâmico', description: 'Troca entre Red, Green, Blue ao vivo!', price: 1000, type: 'color', preview: 'rgb-dynamic' },
     { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 400, type: 'color', preview: '#00ffff' },
     { id: 'color_magenta', name: 'Magenta Neon', description: 'Rosa intenso', price: 400, type: 'color', preview: '#ff00ff' },
     { id: 'color_lime', name: 'Verde Limão', description: 'Verde vibrante', price: 400, type: 'color', preview: '#00ff00' },
@@ -320,13 +330,17 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                 <span className="text-5xl">{item.preview}</span>
                                             )}
                                             {item.type === 'color' && (
-                                                <div 
-                                                    className="w-16 h-16 rounded-full shadow-lg"
-                                                    style={{ 
-                                                        backgroundColor: item.preview,
-                                                        boxShadow: `0 0 30px ${item.preview}50`
-                                                    }}
-                                                />
+                                                item.preview === 'rgb-dynamic' ? (
+                                                    <div className="w-16 h-16 rounded-full shadow-lg animate-rgb-cycle" />
+                                                ) : (
+                                                    <div 
+                                                        className="w-16 h-16 rounded-full shadow-lg"
+                                                        style={{ 
+                                                            backgroundColor: item.preview,
+                                                            boxShadow: `0 0 30px ${item.preview}50`
+                                                        }}
+                                                    />
+                                                )
                                             )}
                                             
                                             {/* Equipped badge */}

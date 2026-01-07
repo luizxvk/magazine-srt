@@ -435,6 +435,15 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'bg_forest', name: 'Floresta', price: 300, type: 'static', preview: '🌲' },
         { id: 'bg_city', name: 'Cidade Neon', price: 550, type: 'animated', preview: '🌃' },
         { id: 'bg_space', name: 'Espaço Profundo', price: 700, type: 'animated', preview: '🚀' },
+        // NOVOS FUNDOS
+        { id: 'bg_sunset', name: 'Pôr do Sol', price: 650, type: 'animated', preview: '🌅' },
+        { id: 'bg_cyberpunk', name: 'Cyberpunk', price: 750, type: 'animated', preview: '🤖' },
+        { id: 'bg_lava', name: 'Lava', price: 800, type: 'animated', preview: '🌋' },
+        { id: 'bg_ice', name: 'Gelo Ártico', price: 600, type: 'animated', preview: '❄️' },
+        { id: 'bg_neon_grid', name: 'Grade Neon', price: 850, type: 'animated', preview: '🎮' },
+        { id: 'bg_emerald', name: 'Esmeralda', price: 700, type: 'static', preview: '💚' },
+        { id: 'bg_royal', name: 'Real Púrpura', price: 900, type: 'animated', preview: '👑' },
+        { id: 'bg_carbon', name: 'Fibra de Carbono', price: 500, type: 'static', preview: '⬛' },
     ],
     badges: [
         { id: 'badge_skull', name: 'Caveira', price: 300, preview: '💀' },
@@ -449,6 +458,7 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'badge_sun', name: 'Sol', price: 350, preview: '☀️' },
     ],
     colors: [
+        { id: 'color_rgb', name: 'RGB Dinâmico', price: 1000, hex: 'rgb-dynamic' },
         { id: 'color_cyan', name: 'Ciano Neon', price: 400, hex: '#00FFFF' },
         { id: 'color_magenta', name: 'Magenta Neon', price: 400, hex: '#FF00FF' },
         { id: 'color_lime', name: 'Verde Limão', price: 400, hex: '#00FF00' },

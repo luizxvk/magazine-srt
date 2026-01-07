@@ -3,7 +3,7 @@ import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCi
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.2';
+const CURRENT_VERSION = '0.3.3';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -32,37 +32,46 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.2 - Melhorias visuais e UX
+    // v0.3.3 - Interface redesenhada + Novos itens de personalização
     const updates: UpdateItem[] = [
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Editor de Stories Redesenhado',
+            description: 'Interface estilo Instagram com botão ENVIAR sempre visível e destaque!',
+            isNew: true
+        },
+        {
+            icon: <Trophy className="w-5 h-5" />,
+            title: 'Timeline de Níveis Melhorada',
+            description: 'Números agora aparecem abaixo da barra com muito mais espaço!',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: '8 Novos Fundos Animados',
+            description: 'Pôr do Sol, Cyberpunk, Lava, Gelo Ártico, Grade Neon e mais!',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'Cor RGB Dinâmica',
+            description: 'Cor especial que muda entre Red, Green e Blue automaticamente! (1000 Zions)',
+            isNew: true
+        },
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: 'Cores Personalizadas',
             description: 'Post pill, loading e todos elementos respeitam sua cor escolhida!',
-            isNew: true
         },
         {
             icon: <Zap className="w-5 h-5" />,
             title: 'MAGAZINE Animado',
             description: 'Logo com animação mais rápida e brilhante para maior exclusividade!',
-            isNew: true
-        },
-        {
-            icon: <Trophy className="w-5 h-5" />,
-            title: 'Timeline de Níveis',
-            description: 'Interface melhorada com melhor espaçamento e visualização!',
-            isNew: true
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Editor de Stories',
-            description: 'Botão de enviar agora visível e interface reformulada!',
-            isNew: true
         },
         {
             icon: <Wrench className="w-5 h-5" />,
             title: 'Textos Originais',
             description: 'Posts mantêm formatação original sem uppercase forçado.',
-            isNew: true
         },
         {
             icon: <Wrench className="w-5 h-5" />,

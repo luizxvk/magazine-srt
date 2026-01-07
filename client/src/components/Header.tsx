@@ -84,7 +84,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         };
 
         checkNotifications();
-        const interval = setInterval(checkNotifications, 15000);
+        const interval = setInterval(checkNotifications, 60000); // Reduced from 15s to 60s to save bandwidth
         return () => clearInterval(interval);
     }, [isVisitor, showAchievement]);
 

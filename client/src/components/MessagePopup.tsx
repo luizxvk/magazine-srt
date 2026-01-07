@@ -74,7 +74,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
         };
 
         checkUnreadMessages();
-        const interval = setInterval(checkUnreadMessages, 5000);
+        const interval = setInterval(checkUnreadMessages, 15000); // Reduced from 5s to 15s to save bandwidth
         return () => {
             clearInterval(interval);
             if (autoDismissTimer.current) {

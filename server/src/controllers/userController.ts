@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { uploadAvatar } from '../services/cloudinaryService';
 
 const prisma = new PrismaClient();
 
@@ -205,9 +206,14 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
 
         const data = updateProfileSchema.parse(req.body);
 
-        // Debug: Log avatar size if provided
-        if (data.avatarUrl) {
-            console.log(`[updateMe] avatarUrl size: ${data.avatarUrl.length} chars, isBase64: ${data.avatarUrl.startsWith('data:')}`);
+        // Upload avatar to Cloudinary CDN if base64 (reduces DB egress)
+        if (data.avatarUrl && data.avatarUrl.startsWith('data:')) {
+            console.log(`[updateMe] avatarUrl size: ${data.avatarUrl.length} chars, uploading to CDN...`);
+            const cloudinaryUrl = await uploadAvatar(data.avatarUrl);
+            if (cloudinaryUrl) {
+                data.avatarUrl = cloudinaryUrl;
+                console.log(`[updateMe] Avatar uploaded to CDN: ${cloudinaryUrl.substring(0, 50)}...`);
+            }
         }
 
         // Security Check: Only ADMIN can update level, trophies, zions
@@ -671,7 +677,7 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
             },
             take: 10,
             include: {
-                author: {
+                user: {
                     select: {
                         id: true,
                         name: true,

@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { awardTrophies, checkAndAwardBadges, awardZions, awardXP } from '../services/gamificationService';
+import { uploadPostImage, uploadStoryImage } from '../services/cloudinaryService';
 
 const prisma = new PrismaClient();
 
@@ -207,6 +208,16 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 
         const { imageUrl, caption } = createPostSchema.parse(req.body);
 
+        // Upload to Cloudinary CDN if base64 (reduces DB egress)
+        let finalImageUrl = imageUrl;
+        if (imageUrl.startsWith('data:')) {
+            const cloudinaryUrl = await uploadPostImage(imageUrl);
+            if (cloudinaryUrl) {
+                finalImageUrl = cloudinaryUrl;
+                console.log(`[createPost] Image uploaded to CDN: ${cloudinaryUrl.substring(0, 50)}...`);
+            }
+        }
+
         // Check daily limit (10 posts/day)
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const dailyPostCount = await prisma.post.count({
@@ -223,7 +234,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
         const post = await prisma.post.create({
             data: {
                 userId,
-                imageUrl,
+                imageUrl: finalImageUrl,
                 caption,
             },
             include: {
@@ -368,6 +379,16 @@ export const createStory = async (req: AuthRequest, res: Response) => {
         const { imageUrl } = req.body;
         if (!imageUrl) return res.status(400).json({ error: 'Image URL is required' });
 
+        // Upload to Cloudinary CDN if base64 (reduces DB egress)
+        let finalImageUrl = imageUrl;
+        if (imageUrl.startsWith('data:')) {
+            const cloudinaryUrl = await uploadStoryImage(imageUrl);
+            if (cloudinaryUrl) {
+                finalImageUrl = cloudinaryUrl;
+                console.log(`[createStory] Image uploaded to CDN: ${cloudinaryUrl.substring(0, 50)}...`);
+            }
+        }
+
         // Create Story in DB
         // Expires in 24 hours
         const expiresAt = new Date();
@@ -376,7 +397,7 @@ export const createStory = async (req: AuthRequest, res: Response) => {
         const story = await prisma.story.create({
             data: {
                 userId,
-                imageUrl,
+                imageUrl: finalImageUrl,
                 expiresAt
             }
         });

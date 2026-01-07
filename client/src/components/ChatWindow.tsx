@@ -61,7 +61,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
         };
 
         fetchMessages();
-        const interval = setInterval(fetchMessages, 3000);
+        const interval = setInterval(fetchMessages, 5000); // Reduced from 3s to 5s to save bandwidth
 
         return () => {
             isMounted = false;

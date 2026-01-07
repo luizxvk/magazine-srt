@@ -99,7 +99,7 @@ export default function FeedPage() {
         fetchPosts();
         const interval = setInterval(() => {
             fetchPosts(true);
-        }, 15000);
+        }, 60000); // Reduced from 15s to 60s to save bandwidth
         return () => clearInterval(interval);
     }, []);
 

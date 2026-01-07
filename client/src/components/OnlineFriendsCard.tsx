@@ -46,8 +46,8 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
         };
 
         fetchOnlineFriends();
-        // Refresh every 30 seconds
-        const interval = setInterval(fetchOnlineFriends, 30000);
+        // Refresh every 60 seconds (reduced from 30s to save bandwidth)
+        const interval = setInterval(fetchOnlineFriends, 60000);
         return () => clearInterval(interval);
     }, []);
 

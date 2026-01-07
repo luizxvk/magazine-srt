@@ -106,16 +106,16 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] bg-black flex items-center justify-center"
+            className="fixed inset-0 z-[10000] bg-black flex flex-col"
         >
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* Header */}
-            <div className="absolute top-0 left-0 right-0 z-50 p-4">
+            {/* Header - FIXO NO TOPO COM SOMBRA */}
+            <div className="relative z-[60] bg-gradient-to-b from-black/80 via-black/40 to-transparent p-4 pb-8">
                 <div className="flex items-center justify-between max-w-lg mx-auto">
                     <button
                         onClick={onClose}
-                        className="p-2 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                        className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors shadow-lg"
                     >
                         <X className="w-6 h-6 text-white" />
                     </button>
@@ -124,27 +124,27 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                         onClick={saveImage}
                         disabled={isPublishing}
                         whileTap={{ scale: 0.95 }}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white shadow-2xl transition-all ${
+                        className={`flex items-center gap-3 px-8 py-3.5 rounded-full font-bold text-white shadow-2xl transition-all text-lg ${
                             isPublishing 
-                                ? 'bg-gray-600 cursor-not-allowed' 
+                                ? 'bg-gray-600 cursor-not-allowed opacity-50' 
                                 : isMGT 
-                                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 hover:shadow-emerald-500/50' 
-                                    : 'bg-gradient-to-r from-gold-600 to-gold-400 hover:shadow-gold-500/50'
+                                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 hover:shadow-emerald-500/50 hover:scale-105' 
+                                    : 'bg-gradient-to-r from-gold-600 to-gold-400 hover:shadow-gold-500/50 hover:scale-105'
                         }`}
                     >
-                        <Send className="w-5 h-5" />
+                        <Send className="w-6 h-6" />
                         <span>{isPublishing ? 'Publicando...' : 'POSTAR'}</span>
                     </motion.button>
                 </div>
             </div>
 
-            {/* Story Preview */}
-            <div className="relative w-full h-full max-w-lg flex items-center justify-center">
-                <div className="relative w-full h-full">
+            {/* Story Preview - COM PADDING PARA NÃO SER COBERTO */}
+            <div className="flex-1 relative flex items-center justify-center px-4" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+                <div className="relative w-full h-full max-w-lg">
                     <img
                         src={imageUrl}
                         alt="Story preview"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain rounded-2xl"
                     />
                     
                     {/* Text Overlay */}
@@ -174,8 +174,8 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
             </div>
 
             {/* Bottom Toolbar - SEMPRE VISÍVEL */}
-            <div className="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-32 pb-safe">
-                <div className="max-w-lg mx-auto px-4 pb-6 space-y-4">
+            <div className="relative z-[60] bg-gradient-to-t from-black via-black/90 to-transparent pt-8">
+                <div className="max-w-lg mx-auto px-6 pb-safe space-y-4">
                     {/* Text Input */}
                     <div className="flex items-center gap-2">
                         <div className="flex-1 relative">
@@ -203,8 +203,8 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                             <span className="text-white/70 text-sm font-medium">Cor do Texto</span>
                         </div>
 
-                        {/* Color Options */}
-                        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                        {/* Color Options - COM PADDING PARA NÃO CORTAR */}
+                        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide px-1">
                             {colors.map((color) => (
                                 <button
                                     key={color}
@@ -241,6 +241,23 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                             />
                         </div>
                     </motion.div>
+
+                    {/* BOTÃO POSTAR GRANDE NO RODAPÉ TAMBÉM */}
+                    <motion.button
+                        onClick={saveImage}
+                        disabled={isPublishing}
+                        whileTap={{ scale: 0.95 }}
+                        className={`w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-white shadow-2xl transition-all text-lg ${
+                            isPublishing 
+                                ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+                                : isMGT 
+                                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 hover:shadow-emerald-500/50 hover:scale-105' 
+                                    : 'bg-gradient-to-r from-gold-600 to-gold-400 hover:shadow-gold-500/50 hover:scale-105'
+                        }`}
+                    >
+                        <Send className="w-6 h-6" />
+                        <span>{isPublishing ? 'PUBLICANDO...' : 'PUBLICAR STORY'}</span>
+                    </motion.button>
                 </div>
             </div>
         </motion.div>

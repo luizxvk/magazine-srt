@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Type, Smile, Trash2, RotateCcw, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+// Build v0.3.4-fix1 - Botão POSTAR Vision Pro Style
+
 interface TextOverlay {
     id: string;
     text: string;

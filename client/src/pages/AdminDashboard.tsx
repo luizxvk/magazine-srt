@@ -379,7 +379,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Member Requests Card - Moved inside main column */}
-                    <div className="glass-panel p-6 rounded-xl h-fit">
+                    <div className="glass-panel p-6 rounded-xl h-fit mb-8">
                         <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
                             <UserIcon className="w-5 h-5 text-gold-400" /> Solicitações de Membros
                         </h2>
@@ -420,7 +420,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Users Management */}
-                <div className="lg:col-span-3 glass-panel p-6 rounded-xl">
+                <div className="lg:col-span-3 glass-panel p-6 rounded-xl mt-8">
                     <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
                         <UserIcon className="w-5 h-5 text-gold-400" /> Gerenciar Usuários
                     </h2>
@@ -445,9 +445,9 @@ export default function AdminDashboard() {
                                             <button
                                                 onClick={() => handleToggleMembership(u.id, u.membershipType)}
                                                 className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${u.membershipType === 'MGT'
-                                                    ? 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'
+                                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30'
                                                     : 'bg-gold-500/20 text-gold-400 border-gold-500/30 hover:bg-gold-500/30'
-                                                    }`}
+                                                    }`}}
                                             >
                                                 {u.membershipType || 'MAGAZINE'}
                                             </button>

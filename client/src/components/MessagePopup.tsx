@@ -29,6 +29,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const [showChat, setShowChat] = useState(false);
     const lastNotifId = useRef<string | null>(null);
     const autoDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const dismissedNotifIds = useRef<Set<string>>(new Set()); // Track dismissed notifications
 
     useEffect(() => {
         if (isVisitor || !user) return;
@@ -37,37 +38,46 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
             try {
                 const response = await api.get('/notifications');
                 const notifications = response.data;
-                const messageNotif = notifications.find((n: any) => n.type === 'MESSAGE' && !n.read);
+                
+                // Find unread MESSAGE notification that hasn't been dismissed
+                const messageNotif = notifications.find((n: any) => 
+                    n.type === 'MESSAGE' && 
+                    !n.read && 
+                    !dismissedNotifIds.current.has(n.id)
+                );
 
-                if (messageNotif && messageNotif.id !== lastNotifId.current) {
-                    lastNotifId.current = messageNotif.id;
-                    const content = JSON.parse(messageNotif.content);
-                    
-                    // Don't show notification if chat with this user is already open
-                    if (activeChatUserId === content.actor.id) {
-                        return;
-                    }
-                    
-                    setUnreadMessage({
-                        id: messageNotif.id,
-                        senderId: content.actor.id,
-                        content: content.text,
-                        createdAt: messageNotif.createdAt,
-                        sender: {
-                            ...content.actor,
-                            membershipType: content.actor.membershipType
-                        }
-                    });
-                    setIsVisible(true);
-
-                    // Auto dismiss after 10 seconds
-                    if (autoDismissTimer.current) {
-                        clearTimeout(autoDismissTimer.current);
-                    }
-                    autoDismissTimer.current = setTimeout(() => {
-                        setIsVisible(false);
-                    }, 10000);
+                // If no unread message or same as last shown, don't show popup
+                if (!messageNotif || messageNotif.id === lastNotifId.current) {
+                    return;
                 }
+                
+                const content = JSON.parse(messageNotif.content);
+                    
+                // Don't show notification if chat with this user is already open
+                if (activeChatUserId === content.actor.id) {
+                    return;
+                }
+                
+                lastNotifId.current = messageNotif.id;
+                setUnreadMessage({
+                    id: messageNotif.id,
+                    senderId: content.actor.id,
+                    content: content.text,
+                    createdAt: messageNotif.createdAt,
+                    sender: {
+                        ...content.actor,
+                        membershipType: content.actor.membershipType
+                    }
+                });
+                setIsVisible(true);
+
+                // Auto dismiss after 10 seconds
+                if (autoDismissTimer.current) {
+                    clearTimeout(autoDismissTimer.current);
+                }
+                autoDismissTimer.current = setTimeout(() => {
+                    setIsVisible(false);
+                }, 10000);
             } catch (error) {
                 console.error('Failed to check messages', error);
             }
@@ -87,14 +97,27 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     useEffect(() => {
         if (activeChatUserId && unreadMessage && activeChatUserId === unreadMessage.senderId) {
             setIsVisible(false);
+            // Mark as dismissed when opening chat
+            if (unreadMessage.id) {
+                dismissedNotifIds.current.add(unreadMessage.id);
+            }
         }
     }, [activeChatUserId, unreadMessage]);
 
     const isSenderMGT = unreadMessage?.sender?.membershipType === 'MGT';
 
-    const handleOpenChat = () => {
+    const handleOpenChat = async () => {
         setShowChat(true);
         setIsVisible(false);
+        // Mark the notification as read when opening chat
+        if (unreadMessage?.id) {
+            dismissedNotifIds.current.add(unreadMessage.id);
+            try {
+                await api.put(`/notifications/${unreadMessage.id}/read`);
+            } catch (error) {
+                console.error('Failed to mark notification as read', error);
+            }
+        }
     };
 
     const handleCloseChat = () => {
@@ -106,6 +129,10 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const handleDismiss = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsVisible(false);
+        // Mark as dismissed so it won't show again until a NEW message arrives
+        if (unreadMessage?.id) {
+            dismissedNotifIds.current.add(unreadMessage.id);
+        }
     };
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-[#0a0a0a]';

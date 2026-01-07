@@ -200,7 +200,7 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full">
                     <X className="w-6 h-6 text-white" />
                 </button>
@@ -214,84 +214,86 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                 </button>
             </div>
 
-            {/* Editor Area */}
+            {/* Editor Area - Fixed aspect ratio container for web */}
             <div 
                 ref={containerRef}
-                className="flex-1 relative overflow-hidden"
+                className="flex-1 relative overflow-hidden flex items-center justify-center"
                 onMouseMove={dragging ? handleDrag : undefined}
                 onMouseUp={handleDragEnd}
                 onMouseLeave={handleDragEnd}
                 onTouchMove={dragging ? handleDrag : undefined}
                 onTouchEnd={handleDragEnd}
             >
-                {/* Background Image */}
-                <img 
-                    src={imageUrl} 
-                    alt="Story" 
-                    className="w-full h-full object-contain"
-                    draggable={false}
-                />
+                {/* Background Image - Contained with max dimensions for web */}
+                <div className="relative w-full h-full max-w-[500px] max-h-[calc(100vh-180px)] mx-auto">
+                    <img 
+                        src={imageUrl} 
+                        alt="Story" 
+                        className="w-full h-full object-contain"
+                        draggable={false}
+                    />
 
-                {/* Text Overlays */}
-                {textOverlays.map(overlay => (
-                    <div
-                        key={overlay.id}
-                        className={`absolute cursor-move select-none ${selectedTextId === overlay.id ? 'ring-2 ring-white' : ''}`}
-                        style={{
-                            left: `${overlay.x}%`,
-                            top: `${overlay.y}%`,
-                            transform: `translate(-50%, -50%) rotate(${overlay.rotation}deg)`,
-                            fontSize: overlay.fontSize,
-                            color: overlay.color,
-                            fontWeight: overlay.fontWeight,
-                            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                        }}
-                        onMouseDown={() => handleDragStart('text', overlay.id)}
-                        onTouchStart={() => handleDragStart('text', overlay.id)}
-                        onClick={() => setSelectedTextId(overlay.id)}
-                    >
-                        {overlay.text}
-                        {selectedTextId === overlay.id && (
-                            <button
-                                onClick={(e) => { e.stopPropagation(); deleteText(overlay.id); }}
-                                className="absolute -top-6 -right-6 p-1 bg-red-500 rounded-full"
-                            >
-                                <Trash2 className="w-3 h-3 text-white" />
-                            </button>
-                        )}
-                    </div>
-                ))}
+                    {/* Text Overlays - Inside the image container */}
+                    {textOverlays.map(overlay => (
+                        <div
+                            key={overlay.id}
+                            className={`absolute cursor-move select-none ${selectedTextId === overlay.id ? 'ring-2 ring-white' : ''}`}
+                            style={{
+                                left: `${overlay.x}%`,
+                                top: `${overlay.y}%`,
+                                transform: `translate(-50%, -50%) rotate(${overlay.rotation}deg)`,
+                                fontSize: overlay.fontSize,
+                                color: overlay.color,
+                                fontWeight: overlay.fontWeight,
+                                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                            }}
+                            onMouseDown={() => handleDragStart('text', overlay.id)}
+                            onTouchStart={() => handleDragStart('text', overlay.id)}
+                            onClick={() => setSelectedTextId(overlay.id)}
+                        >
+                            {overlay.text}
+                            {selectedTextId === overlay.id && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); deleteText(overlay.id); }}
+                                    className="absolute -top-6 -right-6 p-1 bg-red-500 rounded-full"
+                                >
+                                    <Trash2 className="w-3 h-3 text-white" />
+                                </button>
+                            )}
+                        </div>
+                    ))}
 
-                {/* Sticker Overlays */}
-                {stickerOverlays.map(overlay => (
-                    <div
-                        key={overlay.id}
-                        className="absolute cursor-move select-none group"
-                        style={{
-                            left: `${overlay.x}%`,
-                            top: `${overlay.y}%`,
-                            transform: `translate(-50%, -50%) rotate(${overlay.rotation}deg)`,
-                            fontSize: overlay.size,
-                        }}
-                        onMouseDown={() => handleDragStart('sticker', overlay.id)}
-                        onTouchStart={() => handleDragStart('sticker', overlay.id)}
-                        onDoubleClick={() => deleteSticker(overlay.id)}
-                    >
-                        {overlay.emoji}
-                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-white/50 opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                            Duplo-clique para remover
-                        </span>
-                    </div>
-                ))}
+                    {/* Sticker Overlays - Inside the image container */}
+                    {stickerOverlays.map(overlay => (
+                        <div
+                            key={overlay.id}
+                            className="absolute cursor-move select-none group"
+                            style={{
+                                left: `${overlay.x}%`,
+                                top: `${overlay.y}%`,
+                                transform: `translate(-50%, -50%) rotate(${overlay.rotation}deg)`,
+                                fontSize: overlay.size,
+                            }}
+                            onMouseDown={() => handleDragStart('sticker', overlay.id)}
+                            onTouchStart={() => handleDragStart('sticker', overlay.id)}
+                            onDoubleClick={() => deleteSticker(overlay.id)}
+                        >
+                            {overlay.emoji}
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-white/50 opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                                Duplo-clique para remover
+                            </span>
+                        </div>
+                    ))}
+                </div>
 
-                {/* Sticker Picker */}
+                {/* Sticker Picker - Outside the image container */}
                 <AnimatePresence>
                     {showStickerPicker && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
-                            className="absolute bottom-20 left-4 right-4 bg-black/90 backdrop-blur-xl rounded-2xl p-4 border border-white/10"
+                            className="absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md bg-black/90 backdrop-blur-xl rounded-2xl p-4 border border-white/10 mx-4"
                         >
                             <div className="grid grid-cols-8 gap-2">
                                 {STICKERS.map(emoji => (
@@ -308,14 +310,14 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                     )}
                 </AnimatePresence>
 
-                {/* Text Input */}
+                {/* Text Input - Outside the image container */}
                 <AnimatePresence>
                     {activeMode === 'text' && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
-                            className="absolute bottom-20 left-4 right-4 bg-black/90 backdrop-blur-xl rounded-2xl p-4 border border-white/10"
+                            className="absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md bg-black/90 backdrop-blur-xl rounded-2xl p-4 border border-white/10 mx-4"
                         >
                             <input
                                 type="text"
@@ -327,7 +329,7 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                                 onKeyDown={(e) => e.key === 'Enter' && addText()}
                             />
                             <div className="flex items-center justify-between">
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 flex-wrap">
                                     {TEXT_COLORS.map(color => (
                                         <button
                                             key={color}
@@ -351,7 +353,7 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             </div>
 
             {/* Bottom Toolbar */}
-            <div className="flex items-center justify-center gap-6 p-4 border-t border-white/10 bg-black/80">
+            <div className="flex items-center justify-center gap-6 p-4 border-t border-white/10 bg-black/80 shrink-0">
                 <button
                     onClick={() => { setActiveMode(activeMode === 'text' ? 'none' : 'text'); setShowStickerPicker(false); }}
                     className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-colors ${activeMode === 'text' ? (isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400') : 'text-white hover:bg-white/10'}`}

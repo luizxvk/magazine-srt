@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dynamic accent color CSS variables */
+:root {
+  --accent-color: #d4af37;
+  --accent-color-rgb: 212, 175, 55;
+  --accent-50: color-mix(in srgb, var(--accent-color) 10%, white);
+  --accent-100: color-mix(in srgb, var(--accent-color) 20%, white);
+  --accent-200: color-mix(in srgb, var(--accent-color) 40%, white);
+  --accent-300: color-mix(in srgb, var(--accent-color) 60%, white);
+  --accent-400: var(--accent-color);
+  --accent-500: var(--accent-color);
+  --accent-600: color-mix(in srgb, var(--accent-color) 80%, black);
+  --accent-700: color-mix(in srgb, var(--accent-color) 60%, black);
+}
+
 @layer base {
   html {
     /* Prevent iOS zoom on input focus */
@@ -35,6 +49,39 @@
   h6 {
     @apply font-serif;
   }
+}
+
+/* Dynamic accent color utilities */
+.text-accent { color: var(--accent-color) !important; }
+.text-accent-300 { color: var(--accent-300) !important; }
+.text-accent-400 { color: var(--accent-400) !important; }
+.text-accent-500 { color: var(--accent-500) !important; }
+.text-accent-600 { color: var(--accent-600) !important; }
+
+.bg-accent { background-color: var(--accent-color) !important; }
+.bg-accent-500 { background-color: var(--accent-500) !important; }
+.bg-accent\/10 { background-color: rgba(var(--accent-color-rgb), 0.1) !important; }
+.bg-accent\/20 { background-color: rgba(var(--accent-color-rgb), 0.2) !important; }
+.bg-accent\/30 { background-color: rgba(var(--accent-color-rgb), 0.3) !important; }
+
+.border-accent { border-color: var(--accent-color) !important; }
+.border-accent\/20 { border-color: rgba(var(--accent-color-rgb), 0.2) !important; }
+.border-accent\/30 { border-color: rgba(var(--accent-color-rgb), 0.3) !important; }
+.border-accent\/50 { border-color: rgba(var(--accent-color-rgb), 0.5) !important; }
+
+.ring-accent { --tw-ring-color: var(--accent-color) !important; }
+.shadow-accent { box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4) !important; }
+
+/* Gradient with accent */
+.bg-gradient-accent {
+  background: linear-gradient(to right, var(--accent-600), var(--accent-400), var(--accent-600)) !important;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(to right, var(--accent-300), var(--accent-100), var(--accent-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Light Mode Overrides */

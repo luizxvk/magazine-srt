@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { ArrowLeft, Heart, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter } from 'lucide-react';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 
@@ -13,6 +13,7 @@ interface HighlightPost {
     caption?: string;
     likesCount: number;
     commentsCount: number;
+    tags?: { tag: string }[];
     user: {
         id: string;
         name: string;
@@ -25,7 +26,11 @@ export default function HighlightsPage() {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [posts, setPosts] = useState<HighlightPost[]>([]);
+    const [filteredPosts, setFilteredPosts] = useState<HighlightPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const [availableTags, setAvailableTags] = useState<string[]>([]);
 
     useEffect(() => {
         fetchHighlights();
@@ -34,7 +39,19 @@ export default function HighlightsPage() {
     const fetchHighlights = async () => {
         try {
             const response = await api.get('/feed/highlights');
-            setPosts(response.data);
+            // Filter to only show posts WITH images
+            const postsWithImages = response.data.filter((post: HighlightPost) => 
+                post.imageUrl && post.imageUrl.trim() !== ''
+            );
+            setPosts(postsWithImages);
+            setFilteredPosts(postsWithImages);
+            
+            // Extract unique tags
+            const tags = new Set<string>();
+            postsWithImages.forEach((post: HighlightPost) => {
+                post.tags?.forEach(t => tags.add(t.tag));
+            });
+            setAvailableTags(Array.from(tags));
         } catch (error) {
             console.error('Failed to fetch highlights', error);
         } finally {
@@ -42,60 +59,172 @@ export default function HighlightsPage() {
         }
     };
 
+    // Filter posts by tag
+    useEffect(() => {
+        if (selectedTag) {
+            setFilteredPosts(posts.filter(post => 
+                post.tags?.some(t => t.tag === selectedTag)
+            ));
+        } else {
+            setFilteredPosts(posts);
+        }
+    }, [selectedTag, posts]);
+
+    const accentColor = isMGT ? 'emerald' : 'gold';
+
     return (
         <div className="min-h-screen text-white font-sans relative">
             <LuxuriousBackground />
             <Header />
 
             <div className="max-w-7xl mx-auto pt-24 px-4 relative z-10">
-                <div className="flex items-center gap-4 mb-8">
-                    <Link to="/feed" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors" title="Voltar ao Feed">
-                        <ArrowLeft className="w-6 h-6 text-white" />
-                    </Link>
-                    <h1 className={`text-3xl font-serif ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                        Destaques da Semana
-                    </h1>
+                {/* Header with title and controls */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div className="flex items-center gap-4">
+                        <Link to="/feed" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors" title="Voltar ao Feed">
+                            <ArrowLeft className="w-6 h-6 text-white" />
+                        </Link>
+                        <h1 className={`text-3xl font-serif text-${accentColor}-400`}>
+                            Destaques da Semana
+                        </h1>
+                    </div>
+
+                    {/* Controls */}
+                    <div className="flex items-center gap-3">
+                        {/* View Mode Toggle */}
+                        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? `bg-${accentColor}-500/20 text-${accentColor}-400` : 'text-gray-400 hover:text-white'}`}
+                                title="Visualização em grade"
+                            >
+                                <Grid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? `bg-${accentColor}-500/20 text-${accentColor}-400` : 'text-gray-400 hover:text-white'}`}
+                                title="Visualização em lista"
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Tag Filters */}
+                {availableTags.length > 0 && (
+                    <div className="mb-6 flex flex-wrap items-center gap-2">
+                        <Filter className="w-4 h-4 text-gray-400" />
+                        <button
+                            onClick={() => setSelectedTag(null)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                !selectedTag 
+                                    ? `bg-${accentColor}-500 text-black` 
+                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                            }`}
+                        >
+                            Todos
+                        </button>
+                        {availableTags.map(tag => (
+                            <button
+                                key={tag}
+                                onClick={() => setSelectedTag(tag)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    selectedTag === tag 
+                                        ? `bg-${accentColor}-500 text-black` 
+                                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                }`}
+                            >
+                                #{tag}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 border-${accentColor}-500`}></div>
+                    </div>
+                ) : filteredPosts.length === 0 ? (
+                    <div className="text-center py-20">
+                        <p className="text-gray-400">Nenhum destaque encontrado.</p>
+                        <p className="text-gray-500 text-sm mt-2">Posts precisam ter imagem para aparecer aqui.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
-                        {posts.map((post, index) => (
-                            <div key={post.id} className="glass-panel group relative overflow-hidden rounded-xl aspect-[4/5] hover:scale-[1.02] transition-transform duration-300">
-                                {(post.imageUrl || post.videoUrl) ? (
-                                    <img
-                                        src={post.imageUrl || post.videoUrl}
-                                        alt={post.caption}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gray-900 text-gray-500">
-                                        Sem mídia
-                                    </div>
-                                )}
+                    <div className={viewMode === 'grid' 
+                        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20"
+                        : "flex flex-col gap-4 pb-20 max-w-2xl mx-auto"
+                    }>
+                        {filteredPosts.map((post, index) => (
+                            <div 
+                                key={post.id} 
+                                className={`glass-panel group relative overflow-hidden rounded-xl ${
+                                    viewMode === 'grid' ? 'aspect-[4/5]' : 'flex gap-4 p-4'
+                                } hover:scale-[1.02] transition-transform duration-300`}
+                            >
+                                {viewMode === 'grid' ? (
+                                    <>
+                                        <img
+                                            src={post.imageUrl}
+                                            alt={post.caption}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
 
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index < 3 ? 'bg-gold-500 text-black' : 'bg-white/20 text-white'}`}>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index < 3 ? `bg-${accentColor}-500 text-black` : 'bg-white/20 text-white'}`}>
+                                                    #{index + 1}
+                                                </div>
+                                                <h3 className="font-medium text-white truncate max-w-[150px]">{post.user.name}</h3>
+                                            </div>
+                                            <p className="text-gray-300 text-sm line-clamp-2 mb-4">{post.caption}</p>
+                                            {post.tags && post.tags.length > 0 && (
+                                                <div className="flex flex-wrap gap-1 mb-3">
+                                                    {post.tags.slice(0, 3).map(t => (
+                                                        <span key={t.tag} className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white">
+                                                            #{t.tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-1.5 text-red-500">
+                                                    <Heart className="w-5 h-5 fill-current" />
+                                                    <span className="font-bold text-white">{post.likesCount}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-blue-400">
+                                                    <MessageCircle className="w-5 h-5" />
+                                                    <span className="font-bold text-white">{post.commentsCount}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 ${index < 3 ? `bg-${accentColor}-500 text-black` : 'bg-white/20 text-white'}`}>
                                             #{index + 1}
                                         </div>
-                                        <h3 className="font-medium text-white truncate max-w-[150px]">{post.user.name}</h3>
-                                    </div>
-                                    <p className="text-gray-300 text-sm line-clamp-2 mb-4">{post.caption}</p>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex items-center gap-1.5 text-red-500">
-                                            <Heart className="w-5 h-5 fill-current" />
-                                            <span className="font-bold text-white">{post.likesCount}</span>
+                                        <img
+                                            src={post.imageUrl}
+                                            alt={post.caption}
+                                            className="w-20 h-20 object-cover rounded-lg shrink-0"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-medium text-white truncate">{post.user.name}</h3>
+                                            <p className="text-gray-400 text-sm line-clamp-2">{post.caption}</p>
+                                            <div className="flex items-center gap-4 mt-2">
+                                                <div className="flex items-center gap-1 text-red-500">
+                                                    <Heart className="w-4 h-4 fill-current" />
+                                                    <span className="text-sm text-white">{post.likesCount}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-blue-400">
+                                                    <MessageCircle className="w-4 h-4" />
+                                                    <span className="text-sm text-white">{post.commentsCount}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1.5 text-blue-400">
-                                            <MessageCircle className="w-5 h-5" />
-                                            <span className="font-bold text-white">{post.commentsCount}</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>

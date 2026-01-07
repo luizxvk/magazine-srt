@@ -182,10 +182,17 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const isEquipped = (item: Omit<ShopItem, 'owned' | 'equipped'>) => equippedItems[item.type] === item.id;
 
     const getItems = () => {
+        // Filter out Magazine-exclusive items for MGT users
+        const filterMagazineExclusive = (items: typeof backgrounds | typeof badges | typeof colors) => {
+            if (!isMGT) return items;
+            // MGT users don't see Magazine-exclusive items (bg_default, badge_crown, color_gold)
+            return items.filter(item => !['bg_default', 'badge_crown', 'color_gold'].includes(item.id));
+        };
+
         switch (activeTab) {
-            case 'background': return backgrounds;
-            case 'badge': return badges;
-            case 'color': return colors;
+            case 'background': return filterMagazineExclusive(backgrounds);
+            case 'badge': return filterMagazineExclusive(badges);
+            case 'color': return filterMagazineExclusive(colors);
         }
     };
 

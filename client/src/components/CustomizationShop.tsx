@@ -20,8 +20,16 @@ interface CustomizationShopProps {
     onClose: () => void;
 }
 
+// Default items (free, always owned)
+const defaultItems = {
+    background: { id: 'bg_default', name: 'Magazine Clássico', description: 'O visual padrão do Magazine', price: 0, type: 'background' as const, preview: 'linear-gradient(125deg, #0a0a0a 0%, #1a1a1a 100%)' },
+    badge: { id: 'badge_crown', name: 'Coroa Magazine', description: 'Símbolo de elite', price: 0, type: 'badge' as const, preview: '👑' },
+    color: { id: 'color_gold', name: 'Dourado Magazine', description: 'A cor clássica Magazine', price: 0, type: 'color' as const, preview: '#d4af37' },
+};
+
 // Predefined backgrounds
 const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
+    defaultItems.background,
     { id: 'bg_aurora', name: 'Aurora Boreal', description: 'Ondas suaves de luz em movimento', price: 600, type: 'background', preview: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)' },
     { id: 'bg_galaxy', name: 'Galáxia', description: 'Estrelas e constelações', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)' },
     { id: 'bg_matrix', name: 'Matrix', description: 'Código caindo estilo matrix', price: 450, type: 'background', preview: 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)' },
@@ -34,13 +42,13 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 
 // Predefined badges (profile decorations)
 const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
+    defaultItems.badge,
     { id: 'badge_skull', name: 'Caveira', description: 'Estilo rebelde', price: 300, type: 'badge', preview: '💀' },
     { id: 'badge_fire', name: 'Fogo', description: 'Queima tudo!', price: 200, type: 'badge', preview: '🔥' },
     { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 350, type: 'badge', preview: '⭐' },
     { id: 'badge_diamond', name: 'Diamante', description: 'Precioso e raro', price: 500, type: 'badge', preview: '💎' },
     { id: 'badge_lightning', name: 'Raio', description: 'Velocidade máxima', price: 400, type: 'badge', preview: '⚡' },
     { id: 'badge_pony', name: 'Unicórnio', description: 'Mágico e único', price: 250, type: 'badge', preview: '🦄' },
-    { id: 'badge_crown', name: 'Coroa', description: 'Realeza', price: 600, type: 'badge', preview: '👑' },
     { id: 'badge_heart', name: 'Coração', description: 'Com amor', price: 200, type: 'badge', preview: '❤️' },
     { id: 'badge_moon', name: 'Lua', description: 'Noturno', price: 300, type: 'badge', preview: '🌙' },
     { id: 'badge_sun', name: 'Sol', description: 'Radiante', price: 350, type: 'badge', preview: '☀️' },
@@ -48,6 +56,7 @@ const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 
 // Neon accent colors (excluding gold for Magazine exclusivity)
 const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
+    defaultItems.color,
     { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 400, type: 'color', preview: '#00ffff' },
     { id: 'color_magenta', name: 'Magenta Neon', description: 'Rosa intenso', price: 400, type: 'color', preview: '#ff00ff' },
     { id: 'color_lime', name: 'Verde Limão', description: 'Verde vibrante', price: 400, type: 'color', preview: '#00ff00' },
@@ -59,7 +68,7 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {
-    const { user, updateUserZions } = useAuth();
+    const { user, updateUserZions, updateUser } = useAuth();
     const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color'>('background');
     const [purchasing, setPurchasing] = useState<string | null>(null);
     const [ownedItems, setOwnedItems] = useState<string[]>([]);
@@ -68,6 +77,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'emerald' : 'gold';
+
+    // Default items are always owned
+    const defaultItemIds = [defaultItems.background.id, defaultItems.badge.id, defaultItems.color.id];
 
     useEffect(() => {
         if (isOpen) {
@@ -78,14 +90,22 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const fetchUserCustomizations = async () => {
         try {
             const response = await api.get('/users/customizations');
-            setOwnedItems(response.data.owned || []);
+            setOwnedItems([...defaultItemIds, ...(response.data.owned || [])]);
             setEquippedItems(response.data.equipped || {});
         } catch (error) {
             console.error('Failed to fetch customizations', error);
+            // At minimum, user has default items
+            setOwnedItems(defaultItemIds);
         }
     };
 
     const handlePurchase = async (item: Omit<ShopItem, 'owned' | 'equipped'>) => {
+        // Default items are free and always owned
+        if (item.price === 0) {
+            handleEquip(item);
+            return;
+        }
+
         if (!user || (user.zions || 0) < item.price) {
             setNotification({ type: 'error', message: 'Zions insuficientes!' });
             setTimeout(() => setNotification(null), 3000);
@@ -119,6 +139,16 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                 category: categoryMap[item.type] 
             });
             setEquippedItems(prev => ({ ...prev, [item.type]: item.id }));
+            
+            // Update user state with the equipped item so it applies globally
+            if (item.type === 'background') {
+                updateUser({ ...user!, equippedBackground: item.id });
+            } else if (item.type === 'badge') {
+                updateUser({ ...user!, equippedBadge: item.id });
+            } else if (item.type === 'color') {
+                updateUser({ ...user!, equippedColor: item.id });
+            }
+            
             setNotification({ type: 'success', message: `${item.name} equipado!` });
         } catch (error) {
             setNotification({ type: 'error', message: 'Erro ao equipar item' });
@@ -131,10 +161,25 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
             await api.post('/users/customizations/unequip', { category: categoryMap[type] });
             setEquippedItems(prev => ({ ...prev, [type]: undefined }));
+            
+            // Update user state to remove the equipped item
+            if (type === 'background') {
+                updateUser({ ...user!, equippedBackground: null });
+            } else if (type === 'badge') {
+                updateUser({ ...user!, equippedBadge: null });
+            } else if (type === 'color') {
+                updateUser({ ...user!, equippedColor: null });
+            }
+            
+            setNotification({ type: 'success', message: 'Item desequipado!' });
         } catch (error) {
             console.error('Failed to unequip', error);
         }
+        setTimeout(() => setNotification(null), 3000);
     };
+
+    const isOwned = (itemId: string) => ownedItems.includes(itemId);
+    const isEquipped = (item: Omit<ShopItem, 'owned' | 'equipped'>) => equippedItems[item.type] === item.id;
 
     const getItems = () => {
         switch (activeTab) {
@@ -229,8 +274,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     <div className="p-4 overflow-y-auto max-h-[calc(85vh-180px)] custom-scrollbar">
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {getItems().map(item => {
-                                const owned = ownedItems.includes(item.id);
-                                const equipped = equippedItems[item.type] === item.id;
+                                const owned = isOwned(item.id);
+                                const equipped = isEquipped(item);
+                                const isFree = item.price === 0;
 
                                 return (
                                     <motion.div
@@ -262,6 +308,13 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                             {equipped && (
                                                 <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                     <Check className="w-3 h-3 text-black" />
+                                                </div>
+                                            )}
+                                            
+                                            {/* Free badge for default items */}
+                                            {isFree && (
+                                                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
+                                                    <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
                                                 </div>
                                             )}
                                         </div>

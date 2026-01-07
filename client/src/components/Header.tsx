@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Sparkles, Zap, Rocket, Store } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Sparkles, Zap, Rocket, Store, Menu, Crown, Star, Home, Trophy, Settings, Ticket, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -9,20 +9,39 @@ import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 
 interface HeaderProps {
-    onOpenRecommendations?: () => void;
     onOpenShop?: () => void;
 }
 
-export default function Header({ onOpenRecommendations, onOpenShop }: HeaderProps) {
-    const { user, isVisitor, logout, showAchievement, theme, openZionsModal } = useAuth();
+// Badge icons based on equipped badge
+const BADGE_ICONS: Record<string, React.ReactNode> = {
+    'badge_crown': <Crown className="w-3 h-3 text-gold-400" />,
+    'badge_skull': <span className="text-xs">💀</span>,
+    'badge_fire': <span className="text-xs">🔥</span>,
+    'badge_diamond': <span className="text-xs">💎</span>,
+    'badge_star': <Star className="w-3 h-3 text-gold-400" />,
+    'badge_lightning': <Zap className="w-3 h-3 text-yellow-400" />,
+};
+
+export default function Header({ onOpenShop }: HeaderProps) {
+    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge } = useAuth();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
     const themeBorder = isMGT ? 'border-emerald-600/30' : 'border-gold-500/20';
+
+    // Get badge icon - default crown for Magazine
+    const getBadgeIcon = () => {
+        if (equippedBadge && BADGE_ICONS[equippedBadge]) {
+            return BADGE_ICONS[equippedBadge];
+        }
+        // Default: crown for Magazine, nothing for MGT
+        return user?.membershipType === 'MAGAZINE' ? <Crown className="w-3 h-3 text-gold-400" /> : null;
+    };
 
     useEffect(() => {
         if (isVisitor) return;
@@ -65,6 +84,32 @@ export default function Header({ onOpenRecommendations, onOpenShop }: HeaderProp
         return () => clearInterval(interval);
     }, [isVisitor, showAchievement]);
 
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            const handleClick = (e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+                if (!target.closest('.mobile-menu-container') && !target.closest('.mobile-menu-button')) {
+                    setIsMobileMenuOpen(false);
+                }
+            };
+            document.addEventListener('click', handleClick);
+            return () => document.removeEventListener('click', handleClick);
+        }
+    }, [isMobileMenuOpen]);
+
+    const menuItems = [
+        { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
+        { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
+        { icon: <Trophy className="w-5 h-5" />, label: 'Ranking', path: '/ranking' },
+        { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
+        { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
+        { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
+        { icon: <BookOpen className="w-5 h-5" />, label: 'MGT Log', path: '/mgt-log' },
+        { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
+        ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: 'Admin', path: '/admin' }] : []),
+    ];
+
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${themeBorder} bg-black/50 backdrop-blur-xl transition-colors duration-500`}>
             {/* Search Modal */}
@@ -75,9 +120,9 @@ export default function Header({ onOpenRecommendations, onOpenShop }: HeaderProp
                 <div className="flex items-center gap-4 shrink-0">
                     <Link to="/feed" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         {isMGT ? (
-                            <img src={logoSrt} alt="SRT Logo" className={`h-20 md:h-28 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} />
+                            <img src={logoSrt} alt="SRT Logo" className={`h-16 sm:h-20 md:h-28 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} />
                         ) : (
-                            <span className="text-xl md:text-2xl font-bold animate-gold-shimmer tracking-widest font-serif">MAGAZINE</span>
+                            <span className="text-lg sm:text-xl md:text-2xl font-bold animate-gold-shimmer tracking-widest font-serif">MAGAZINE</span>
                         )}
                     </Link>
                 </div>
@@ -125,69 +170,53 @@ export default function Header({ onOpenRecommendations, onOpenShop }: HeaderProp
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 md:gap-4 shrink-0">
-                    {/* Mobile Recommendations Toggle */}
-                    {onOpenRecommendations && (
-                        <button
-                            onClick={onOpenRecommendations}
-                            className={`md:hidden p-2 ${theme === 'light' ? 'text-black' : (isMGT ? 'text-emerald-500' : 'text-gold-400')}`}
-                            aria-label="Recomendações"
-                        >
-                            <Zap className="w-5 h-5" />
-                        </button>
-                    )}
+                    {/* Desktop Actions */}
+                    <div className="hidden md:flex items-center gap-2 md:gap-4">
+                        {/* Shop Button */}
+                        {onOpenShop && (
+                            <button
+                                onClick={onOpenShop}
+                                className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                                aria-label="Loja"
+                                title="Loja de Personalização"
+                            >
+                                <Store className="w-5 h-5" />
+                            </button>
+                        )}
 
-                    {/* Mobile Search Toggle */}
-                    <button
-                        onClick={() => setIsSearchModalOpen(true)}
-                        className={`md:hidden p-2 ${theme === 'light' ? 'text-black' : (isMGT ? 'text-emerald-500' : 'text-gold-400')}`}
-                        aria-label="Abrir busca"
-                    >
-                        <Search className="w-5 h-5" />
-                    </button>
+                        <Link to="/social" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
+                            <Users className="w-5 h-5" />
+                        </Link>
 
-                    {/* Shop Button */}
-                    {onOpenShop && (
+                        <Link to="/roadmap" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Roadmap" title="Roadmap">
+                            <Rocket className="w-5 h-5" />
+                        </Link>
+
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors relative`}
+                                aria-label="Notifications"
+                            >
+                                <Bell className="w-5 h-5" />
+                                {hasUnread && (
+                                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                )}
+                            </button>
+                            {showNotifications && <Notifications />}
+                        </div>
+
                         <button
-                            onClick={onOpenShop}
+                            onClick={openZionsModal}
                             className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
-                            aria-label="Loja"
-                            title="Loja de Personalização"
+                            title="Adquirir Zions"
                         >
-                            <Store className="w-5 h-5" />
+                            <Sparkles className="w-5 h-5" />
                         </button>
-                    )}
-
-                    <Link to="/social" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
-                        <Users className="w-5 h-5" />
-                    </Link>
-
-                    <Link to="/roadmap" className={`hidden sm:block p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Roadmap" title="Roadmap">
-                        <Rocket className="w-5 h-5" />
-                    </Link>
-
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowNotifications(!showNotifications)}
-                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors relative`}
-                            aria-label="Notifications"
-                        >
-                            <Bell className="w-5 h-5" />
-                            {hasUnread && (
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                            )}
-                        </button>
-                        {showNotifications && <Notifications />}
                     </div>
 
-                    <button
-                        onClick={openZionsModal}
-                        className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
-                        title="Adquirir Zions"
-                    >
-                        <Sparkles className="w-5 h-5" />
-                    </button>
-
-                    <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-3 pl-2 md:pl-4 border-l ${theme === 'light' ? 'border-black/10' : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/10')} hover:opacity-80 transition-opacity`}>
+                    {/* Profile Link - Both Mobile & Desktop */}
+                    <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${theme === 'light' ? 'border-black/10' : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/10')} hover:opacity-80 transition-opacity`}>
                         <div className="text-right hidden lg:block">
                             <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
                             <div className="h-4 relative overflow-hidden w-32 flex justify-end">
@@ -238,28 +267,175 @@ export default function Header({ onOpenRecommendations, onOpenShop }: HeaderProp
                             </div>
                         </div>
 
-                        <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black border border-emerald-500' : 'from-gold-400 to-gold-700'} p-[1px]`}>
-                            <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                {user?.avatarUrl ? (
-                                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <User className={`w-4 h-4 md:w-5 md:h-5 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
-                                )}
+                        <div className="relative flex-shrink-0">
+                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black border border-emerald-500' : 'from-gold-400 to-gold-700'} p-[1px]`}>
+                                <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                    {user?.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className={`w-4 h-4 md:w-5 md:h-5 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
+                                    )}
+                                </div>
                             </div>
+                            {/* Badge indicator */}
+                            {getBadgeIcon() && (
+                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-black/80 rounded-full flex items-center justify-center border border-gold-500/50">
+                                    {getBadgeIcon()}
+                                </div>
+                            )}
                         </div>
                     </Link>
 
+                    {/* Desktop Logout */}
                     {!isVisitor && (
                         <button
                             onClick={logout}
-                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500/50 hover:text-red-500' : 'text-gold-500/50 hover:text-red-500')} transition-colors border-l ${theme === 'light' ? 'border-black/10' : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/10')} pl-2 md:pl-4 ml-1 md:ml-2`}
+                            className={`hidden md:block p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500/50 hover:text-red-500' : 'text-gold-500/50 hover:text-red-500')} transition-colors border-l ${theme === 'light' ? 'border-black/10' : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/10')} pl-2 md:pl-4 ml-1 md:ml-2`}
                             title="Sair"
                         >
                             <LogOut className="w-5 h-5" />
                         </button>
                     )}
+
+                    {/* Mobile Hamburger Menu */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className={`mobile-menu-button md:hidden p-2 ${theme === 'light' ? 'text-black' : (isMGT ? 'text-emerald-500' : 'text-gold-400')} transition-colors`}
+                        aria-label="Menu"
+                    >
+                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </button>
                 </div>
-            </div >
-        </header >
+            </div>
+
+            {/* Mobile Menu Drawer */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                        
+                        {/* Drawer */}
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className={`mobile-menu-container fixed top-0 right-0 h-full w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-50 md:hidden shadow-2xl border-l ${themeBorder}`}
+                        >
+                            {/* Drawer Header */}
+                            <div className={`p-4 border-b ${themeBorder}`}>
+                                <div className="flex items-center justify-between">
+                                    <span className={`font-bold ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`}>
+                                        Menu
+                                    </span>
+                                    <button
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={`p-1 ${theme === 'light' ? 'text-gray-500' : 'text-white/50'} hover:text-white transition-colors`}
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                
+                                {/* User Info */}
+                                {user && (
+                                    <div className="flex items-center gap-3 mt-4">
+                                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black' : 'from-gold-400 to-gold-700'} p-[1px]`}>
+                                            <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                                {user.avatarUrl ? (
+                                                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className={`w-5 h-5 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p className={`text-sm font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{user.displayName || user.name}</p>
+                                            <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-white/50'}`}>{user.zions || 0} Zions</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className={`p-4 border-b ${themeBorder} flex gap-2`}>
+                                <button
+                                    onClick={() => {
+                                        setIsMobileMenuOpen(false);
+                                        setIsSearchModalOpen(true);
+                                    }}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
+                                >
+                                    <Search className="w-4 h-4" />
+                                    <span className="text-sm">Buscar</span>
+                                </button>
+                                {onOpenShop && (
+                                    <button
+                                        onClick={() => {
+                                            setIsMobileMenuOpen(false);
+                                            onOpenShop();
+                                        }}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
+                                    >
+                                        <Store className="w-4 h-4" />
+                                        <span className="text-sm">Loja</span>
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        setIsMobileMenuOpen(false);
+                                        openZionsModal();
+                                    }}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    <span className="text-sm">Zions</span>
+                                </button>
+                            </div>
+
+                            {/* Menu Items */}
+                            <div className="p-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+                                {menuItems.map((item) => (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg ${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/5 text-white/80'} transition-colors`}
+                                    >
+                                        <span className={isMGT ? 'text-emerald-500' : 'text-gold-400'}>{item.icon}</span>
+                                        <span className="text-sm">{item.label}</span>
+                                        {item.badge && (
+                                            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-auto" />
+                                        )}
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {/* Logout Button */}
+                            {!isVisitor && (
+                                <div className={`absolute bottom-0 left-0 right-0 p-4 border-t ${themeBorder}`}>
+                                    <button
+                                        onClick={() => {
+                                            setIsMobileMenuOpen(false);
+                                            logout();
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                                    >
+                                        <LogOut className="w-5 h-5" />
+                                        <span>Sair</span>
+                                    </button>
+                                </div>
+                            )}
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </header>
     );
 }

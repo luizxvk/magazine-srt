@@ -15,6 +15,12 @@ interface User {
     avatarUrl?: string;
     displayName?: string;
     bio?: string;
+    // Customization fields
+    ownedCustomizations?: string[];
+    equippedBackground?: string | null;
+    equippedBadge?: string | null;
+    equippedColor?: string | null;
+    liteMode?: boolean;
 }
 
 export interface DailyLoginStatus {
@@ -45,9 +51,47 @@ interface AuthContextType {
     closeZionsModal: () => void;
     theme: 'dark' | 'light';
     toggleTheme: () => void;
+    // Customization
+    accentColor: string;
+    backgroundStyle: string | null;
+    equippedBadge: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Background CSS configurations
+const BACKGROUND_STYLES: Record<string, string> = {
+    'bg_aurora': 'linear-gradient(125deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 100%)',
+    'bg_sunset': 'linear-gradient(125deg, #1a0a0a 0%, #2d1f1f 25%, #4a2020 50%, #1a0a0a 100%)',
+    'bg_ocean': 'linear-gradient(125deg, #0a1628 0%, #0c2340 50%, #0a1628 100%)',
+    'bg_forest': 'linear-gradient(125deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)',
+    'bg_galaxy': 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)',
+    'bg_matrix': 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)',
+    'bg_fire': 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)',
+    'bg_city': 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)',
+    'bg_space': 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)',
+};
+
+// Accent color configurations
+const ACCENT_COLORS: Record<string, string> = {
+    'color_gold': '#d4af37',
+    'color_cyan': '#00ffff',
+    'color_magenta': '#ff00ff',
+    'color_lime': '#00ff00',
+    'color_orange': '#ff6600',
+    'color_purple': '#9933ff',
+    'color_pink': '#ff69b4',
+    'color_blue': '#0066ff',
+    'color_red': '#ff0033',
+};
+
+// Helper to convert hex to rgb
+const hexToRgb = (hex: string): string => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result 
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : '212, 175, 55';
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -66,6 +110,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return 'dark';
     });
+
+    // Compute accent color from user's equipped customization
+    const accentColor = React.useMemo(() => {
+        if (user?.equippedColor && ACCENT_COLORS[user.equippedColor]) {
+            return ACCENT_COLORS[user.equippedColor];
+        }
+        // Default colors based on membership
+        return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
+    }, [user?.equippedColor, user?.membershipType]);
+
+    // Compute background style from user's equipped customization
+    const backgroundStyle = React.useMemo(() => {
+        if (user?.equippedBackground && BACKGROUND_STYLES[user.equippedBackground]) {
+            return BACKGROUND_STYLES[user.equippedBackground];
+        }
+        return null; // Use default background
+    }, [user?.equippedBackground]);
+
+    // Apply accent color as CSS variable
+    useEffect(() => {
+        document.documentElement.style.setProperty('--accent-color', accentColor);
+        document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(accentColor));
+    }, [accentColor]);
+
+    // Apply custom background
+    useEffect(() => {
+        if (backgroundStyle) {
+            document.body.style.background = backgroundStyle;
+            document.body.style.backgroundAttachment = 'fixed';
+        } else {
+            document.body.style.background = '';
+            document.body.style.backgroundAttachment = '';
+        }
+    }, [backgroundStyle]);
 
     useEffect(() => {
         // Apply theme class to html element
@@ -262,7 +340,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             openZionsModal: () => setIsZionsModalOpen(true),
             closeZionsModal: () => setIsZionsModalOpen(false),
             theme,
-            toggleTheme
+            toggleTheme,
+            // Customization values
+            accentColor,
+            backgroundStyle,
+            equippedBadge: user?.equippedBadge || null,
         }}>
             {children}
             <DailyLoginModal

@@ -22,15 +22,30 @@ interface SearchModalProps {
 
 // Navigation pages that can be searched
 const NAVIGATION_PAGES = [
-    { id: 'events', title: 'Eventos', subtitle: 'Próximos eventos e atividades', keywords: ['eventos', 'event', 'calendario', 'atividades'], icon: '🎉', path: '/feed', action: 'events' },
-    { id: 'rewards', title: 'Recompensas', subtitle: 'Resgate prêmios com seus Zions', keywords: ['recompensas', 'rewards', 'premios', 'zions', 'resgatar'], icon: '🎁', path: '/rewards' },
-    { id: 'highlights', title: 'Destaques', subtitle: 'Melhores posts da semana', keywords: ['destaques', 'highlights', 'melhores', 'top', 'semana'], icon: '⭐', path: '/highlights' },
-    { id: 'ranking', title: 'Ranking', subtitle: 'Classificação dos membros', keywords: ['ranking', 'rankings', 'classificação', 'top', 'lideres', 'trofeus'], icon: '🏆', path: '/ranking' },
-    { id: 'profile', title: 'Meu Perfil', subtitle: 'Veja e edite seu perfil', keywords: ['perfil', 'profile', 'meu', 'conta', 'avatar'], icon: '👤', path: '/profile' },
-    { id: 'notifications', title: 'Notificações', subtitle: 'Suas notificações', keywords: ['notificações', 'notifications', 'alertas', 'avisos'], icon: '🔔', path: '/notifications' },
-    { id: 'mgt-log', title: 'MGT Log', subtitle: 'Histórico de atividades', keywords: ['mgt', 'log', 'historico', 'atividades'], icon: '📋', path: '/mgt-log' },
-    { id: 'admin', title: 'Painel Admin', subtitle: 'Administração do sistema', keywords: ['admin', 'administração', 'painel', 'dashboard'], icon: '⚙️', path: '/admin' },
+    { id: 'events', title: 'Eventos', subtitle: 'Próximos eventos e atividades', keywords: ['evento', 'eventos', 'event', 'calendario', 'atividades', 'encontro', 'encontros'], icon: '🎉', path: '/feed', action: 'events' },
+    { id: 'rewards', title: 'Recompensas', subtitle: 'Resgate prêmios com seus Zions', keywords: ['recompensa', 'recompensas', 'rewards', 'premio', 'premios', 'zions', 'resgatar', 'resgate'], icon: '🎁', path: '/rewards' },
+    { id: 'highlights', title: 'Destaques da Semana', subtitle: 'Melhores posts da semana', keywords: ['destaque', 'destaques', 'highlights', 'melhores', 'top', 'semana', 'populares'], icon: '⭐', path: '/highlights' },
+    { id: 'ranking', title: 'Ranking', subtitle: 'Classificação dos membros', keywords: ['ranking', 'rankings', 'classificação', 'top', 'lideres', 'trofeus', 'trofeu', 'placar'], icon: '🏆', path: '/ranking' },
+    { id: 'profile', title: 'Meu Perfil', subtitle: 'Veja e edite seu perfil', keywords: ['perfil', 'profile', 'meu', 'conta', 'avatar', 'foto', 'editar'], icon: '👤', path: '/profile' },
+    { id: 'notifications', title: 'Notificações', subtitle: 'Suas notificações', keywords: ['notificação', 'notificações', 'notifications', 'alertas', 'avisos', 'alerta'], icon: '🔔', path: '/notifications' },
+    { id: 'social', title: 'Social', subtitle: 'Amigos e conexões', keywords: ['social', 'amigos', 'amigo', 'conexões', 'conexao', 'seguir', 'seguidores'], icon: '👥', path: '/social' },
+    { id: 'mgt-log', title: 'MGT Log', subtitle: 'Histórico de atividades', keywords: ['mgt', 'log', 'historico', 'atividades', 'registro'], icon: '📋', path: '/mgt-log' },
+    { id: 'admin', title: 'Painel Admin', subtitle: 'Administração do sistema', keywords: ['admin', 'administração', 'painel', 'dashboard', 'gerenciar'], icon: '⚙️', path: '/admin' },
+    { id: 'shop', title: 'Loja de Personalização', subtitle: 'Customize seu perfil', keywords: ['loja', 'shop', 'personalização', 'customização', 'comprar', 'badge', 'fundo', 'cor'], icon: '🛍️', path: '/feed', action: 'shop' },
 ];
+
+// Fuzzy match function - checks if query matches any part of keywords
+const fuzzyMatch = (query: string, keywords: string[]): boolean => {
+    const q = query.toLowerCase().trim();
+    if (q.length < 2) return false;
+    
+    return keywords.some(keyword => {
+        // Check if keyword contains query or query contains keyword
+        return keyword.includes(q) || q.includes(keyword) || 
+               // Check for partial match (at least 70% of characters match)
+               (q.length >= 3 && keyword.startsWith(q.substring(0, Math.ceil(q.length * 0.7))));
+    });
+};
 
 const SUGGESTIONS = [
     { label: 'Eventos', icon: '🎉' },
@@ -80,10 +95,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             const formattedResults: SearchResult[] = [];
             const searchLower = query.toLowerCase().trim();
             
-            // First, search navigation pages locally
+            // First, search navigation pages locally using fuzzy matching
             const matchingPages = NAVIGATION_PAGES.filter(page => 
-                page.keywords.some(keyword => keyword.includes(searchLower) || searchLower.includes(keyword)) ||
-                page.title.toLowerCase().includes(searchLower)
+                fuzzyMatch(searchLower, page.keywords) ||
+                page.title.toLowerCase().includes(searchLower) ||
+                searchLower.includes(page.title.toLowerCase().substring(0, Math.min(searchLower.length, page.title.length)))
             );
             
             matchingPages.forEach(page => {

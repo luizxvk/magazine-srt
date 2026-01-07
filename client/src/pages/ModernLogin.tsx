@@ -3,7 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRightLeft, User, Lock } from 'lucide-react';
+import { ArrowRightLeft, User, Lock, AlertCircle, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import logo from '../assets/logo-mgzn.png';
 import logoMgt from '../assets/logo-mgt-full.png';
@@ -30,6 +31,8 @@ export default function ModernLogin() {
     const [isMGT, setIsMGT] = useState(initialMembership === 'MGT');
 
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+    const [showUserNotFoundPopup, setShowUserNotFoundPopup] = useState(false);
+    const [notFoundEmail, setNotFoundEmail] = useState('');
 
     // Form hooks - Separate forms to avoid input registration conflicts
     const magazineForm = useForm<LoginFormValues>({
@@ -65,7 +68,17 @@ export default function ModernLogin() {
         } catch (error: any) {
             console.error('Login failed', error);
             const errorMessage = error.response?.data?.error || 'Falha ao entrar. Verifique suas credenciais.';
-            setError('root', { message: errorMessage });
+            
+            // Check if it's a "user not found" error
+            if (errorMessage.toLowerCase().includes('não encontrado') || 
+                errorMessage.toLowerCase().includes('not found') ||
+                errorMessage.toLowerCase().includes('usuário não existe') ||
+                error.response?.status === 404) {
+                setNotFoundEmail(data.email);
+                setShowUserNotFoundPopup(true);
+            } else {
+                setError('root', { message: errorMessage });
+            }
         }
     };
 
@@ -234,6 +247,82 @@ export default function ModernLogin() {
                 onClose={() => setIsForgotPasswordOpen(false)}
                 isMGT={isMGT}
             />
+
+            {/* User Not Found Popup */}
+            <AnimatePresence>
+                {showUserNotFoundPopup && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setShowUserNotFoundPopup(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`relative w-full max-w-md p-6 rounded-2xl border ${isMGT ? 'bg-emerald-950/90 border-emerald-500/30' : 'bg-gold-950/90 border-gold-500/30'} shadow-2xl`}
+                        >
+                            <button
+                                onClick={() => setShowUserNotFoundPopup(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            
+                            <div className="text-center">
+                                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
+                                    <AlertCircle className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                </div>
+                                
+                                <h3 className="text-xl font-bold text-white mb-2">
+                                    Usuário não encontrado
+                                </h3>
+                                
+                                <p className="text-gray-400 text-sm mb-4">
+                                    Não encontramos uma conta com o email <span className={`font-semibold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{notFoundEmail}</span>
+                                </p>
+                                
+                                <p className="text-gray-500 text-xs mb-6">
+                                    Verifique se digitou corretamente ou crie uma nova conta.
+                                </p>
+                                
+                                <div className="flex flex-col gap-3">
+                                    <button
+                                        onClick={() => setShowUserNotFoundPopup(false)}
+                                        className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all
+                                            ${isMGT 
+                                                ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                                                : 'bg-gold-500 text-black hover:bg-gold-400'
+                                            }`}
+                                    >
+                                        Tentar Novamente
+                                    </button>
+                                    
+                                    {isMGT ? (
+                                        <Link
+                                            to="/register"
+                                            state={{ membershipType: 'MGT' }}
+                                            className="w-full py-3 rounded-xl border border-emerald-500/50 text-emerald-400 font-bold uppercase tracking-widest text-xs text-center hover:bg-emerald-500/10 transition-all"
+                                        >
+                                            Criar Nova Conta
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            to="/request-invite"
+                                            className="w-full py-3 rounded-xl border border-gold-500/50 text-gold-400 font-bold uppercase tracking-widest text-xs text-center hover:bg-gold-500/10 transition-all"
+                                        >
+                                            Solicitar Convite
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

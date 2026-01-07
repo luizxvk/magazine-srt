@@ -43,10 +43,24 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
         if (isOpen && user) {
             const fetchCatalogPhotos = async () => {
                 try {
-                    const response = await api.get('/catalog', { params: { limit: 4 } });
-                    setCatalogPhotos(response.data);
+                    // Try user's own photos first, fallback to public catalog
+                    const response = await api.get('/catalog');
+                    if (response.data && response.data.length > 0) {
+                        setCatalogPhotos(response.data.slice(0, 4));
+                    } else {
+                        // Fallback to public photos
+                        const publicResponse = await api.get('/catalog/public', { params: { limit: 4 } });
+                        setCatalogPhotos(publicResponse.data);
+                    }
                 } catch (error) {
                     console.error('Failed to fetch catalog photos:', error);
+                    // Try public photos on error
+                    try {
+                        const publicResponse = await api.get('/catalog/public', { params: { limit: 4 } });
+                        setCatalogPhotos(publicResponse.data);
+                    } catch (e) {
+                        console.error('Failed to fetch public catalog photos:', e);
+                    }
                 }
             };
             fetchCatalogPhotos();

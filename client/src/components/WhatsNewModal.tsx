@@ -65,6 +65,12 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             isNew: true
         },
         {
+            icon: <Wrench className="w-5 h-5" />,
+            title: 'Grid AdminDashboard',
+            description: 'Dependências instaladas (react-grid-layout). Implementação completa em breve!',
+            isNew: true
+        },
+        {
             icon: <Palette className="w-5 h-5" />,
             title: '8 Novos Fundos Animados',
             description: 'Pôr do Sol, Cyberpunk, Lava, Gelo Ártico, Grade Neon e mais!',

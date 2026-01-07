@@ -126,7 +126,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         {isMGT ? (
                             <img src={logoSrt} alt="SRT Logo" className={`h-16 sm:h-20 md:h-28 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} />
                         ) : (
-                            <span className="text-lg sm:text-xl md:text-2xl font-bold animate-gold-shimmer tracking-widest font-serif">MAGAZINE</span>
+                            <span className="text-lg sm:text-xl md:text-2xl font-bold tracking-widest font-serif text-gradient-magazine animate-shimmer">MAGAZINE</span>
                         )}
                     </Link>
                 </div>
@@ -331,7 +331,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={`mobile-menu-container fixed top-0 right-0 h-full w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-[60] md:hidden shadow-2xl border-l ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} flex flex-col overflow-hidden`}
+                            className={`mobile-menu-container fixed top-0 right-0 bottom-0 h-screen w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-[60] md:hidden shadow-2xl border-l ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} flex flex-col overflow-y-auto`}
                         >
                             {/* Drawer Header */}
                             <div className={`p-4 border-b ${headerBorder} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/50'}`}>

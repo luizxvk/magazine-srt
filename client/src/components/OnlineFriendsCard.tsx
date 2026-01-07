@@ -87,7 +87,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                         Amigos Online
                     </h3>
                 </div>
-                <div className="flex gap-2 animate-pulse">
+                <div className="flex flex-wrap items-center justify-center gap-2 animate-pulse overflow-hidden">
                     {[1, 2, 3].map(i => (
                         <div key={i} className="w-10 h-10 rounded-full bg-white/10" />
                     ))}

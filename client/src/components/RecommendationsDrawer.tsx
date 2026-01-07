@@ -85,7 +85,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60]"
                     />
 
                     {/* Drawer */}

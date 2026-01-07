@@ -136,6 +136,10 @@ export const deletePost = async (req: AuthRequest, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
+        // Check if this is the user's last post (to remove 'Primeira Voz' badge)
+        const userPostCount = await prisma.post.count({ where: { userId } });
+        const isLastPost = userPostCount === 1;
+
         // Delete related records first (cascading delete manually)
         await prisma.$transaction([
             prisma.comment.deleteMany({ where: { postId: id } }),
@@ -143,6 +147,32 @@ export const deletePost = async (req: AuthRequest, res: Response) => {
             prisma.postTag.deleteMany({ where: { postId: id } }),
             prisma.post.delete({ where: { id } })
         ]);
+
+        // If this was the user's last post, remove 'Primeira Voz' badge and trophies
+        if (isLastPost) {
+            const primeiraVozBadge = await prisma.badge.findFirst({ where: { name: 'Primeira Voz' } });
+            if (primeiraVozBadge) {
+                // Remove the badge from the user
+                await prisma.userBadge.deleteMany({
+                    where: {
+                        userId,
+                        badgeId: primeiraVozBadge.id
+                    }
+                });
+
+                // Remove the trophies associated with the badge
+                if (primeiraVozBadge.trophies > 0) {
+                    await prisma.user.update({
+                        where: { id: userId },
+                        data: {
+                            trophies: {
+                                decrement: primeiraVozBadge.trophies
+                            }
+                        }
+                    });
+                }
+            }
+        }
 
         res.json({ message: 'Post deleted' });
     } catch (error) {

@@ -198,7 +198,14 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
-
+/* MAGAZINE logo gradient animation with custom colors */
+.text-gradient-magazine {
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-100), var(--accent-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+}
 /* Keep header divider borders neutral (white/transparent) */
 .custom-accent header .border-l {
   border-color: rgba(255, 255, 255, 0.1) !important;
@@ -405,7 +412,10 @@
 }
 
 @keyframes shine {
-  to {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
     background-position: 200% center;
   }
 }

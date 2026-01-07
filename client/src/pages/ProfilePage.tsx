@@ -264,11 +264,18 @@ export default function ProfilePage() {
                                                     id="bg-upload"
                                                     aria-label="Upload background image"
                                                     type="file"
-                                                    accept="image/*"
+                                                    accept="image/jpeg,image/jpg,image/png"
                                                     className="hidden"
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
+                                                            // Validate file type
+                                                            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                                                            if (!validTypes.includes(file.type)) {
+                                                                showToast('Apenas imagens JPG e PNG são permitidas', 'error');
+                                                                e.target.value = '';
+                                                                return;
+                                                            }
                                                             const reader = new FileReader();
                                                             reader.onloadend = () => {
                                                                 const result = reader.result as string;

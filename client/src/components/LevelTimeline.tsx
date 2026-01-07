@@ -88,10 +88,10 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                                         {reward.label}
                                                     </span>
 
-                                                    {/* Tooltip for Reward - Visible on Group Hover - Positioned BELOW */}
-                                                    <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[60]">
+                                                    {/* Tooltip for Reward - Visible on Group Hover - Positioned to the side */}
+                                                    <div className="absolute top-0 left-full ml-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[60]">
                                                         <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/90 border-white/20 text-gray-200'} border rounded-lg px-3 py-2 text-xs shadow-xl backdrop-blur-md min-w-[160px] relative`}>
-                                                            <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 -rotate-45 border-t border-r border-white/20 bg-black/90 layer-50" />
+                                                            <div className="absolute top-1/2 -left-[5px] -translate-y-1/2 w-2.5 h-2.5 rotate-45 border-l border-b border-white/20 bg-black/90 layer-50" />
                                                             <div className="font-bold flex items-center gap-2 mb-1.5 border-b border-white/10 pb-1.5">
                                                                 <Icon className="w-3 h-3 text-gold-500" />
                                                                 <span className="uppercase tracking-wider text-[10px]">{reward.label}</span>

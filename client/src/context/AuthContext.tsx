@@ -130,11 +130,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Apply accent color as CSS variable
     useEffect(() => {
-        document.documentElement.style.setProperty('--accent-color', accentColor);
-        document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(accentColor));
+        const mixHex = (hexA: string, hexB: string, weightA: number) => {
+            const normalize = (hex: string) => hex.replace('#', '');
+            const a = normalize(hexA);
+            const b = normalize(hexB);
+            const aRgb = {
+                r: parseInt(a.slice(0, 2), 16),
+                g: parseInt(a.slice(2, 4), 16),
+                b: parseInt(a.slice(4, 6), 16),
+            };
+            const bRgb = {
+                r: parseInt(b.slice(0, 2), 16),
+                g: parseInt(b.slice(2, 4), 16),
+                b: parseInt(b.slice(4, 6), 16),
+            };
+            const clamp = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
+            const r = clamp(aRgb.r * weightA + bRgb.r * (1 - weightA));
+            const g = clamp(aRgb.g * weightA + bRgb.g * (1 - weightA));
+            const bCh = clamp(aRgb.b * weightA + bRgb.b * (1 - weightA));
+            const toHex2 = (n: number) => n.toString(16).padStart(2, '0');
+            return `#${toHex2(r)}${toHex2(g)}${toHex2(bCh)}`;
+        };
+
+        const root = document.documentElement;
+        root.style.setProperty('--accent-color', accentColor);
+        root.style.setProperty('--accent-color-rgb', hexToRgb(accentColor));
+        // Precompute accent shades in JS (avoids relying on CSS color-mix support)
+        root.style.setProperty('--accent-50', mixHex(accentColor, '#ffffff', 0.10));
+        root.style.setProperty('--accent-100', mixHex(accentColor, '#ffffff', 0.20));
+        root.style.setProperty('--accent-200', mixHex(accentColor, '#ffffff', 0.40));
+        root.style.setProperty('--accent-300', mixHex(accentColor, '#ffffff', 0.60));
+        root.style.setProperty('--accent-400', accentColor);
+        root.style.setProperty('--accent-500', accentColor);
+        root.style.setProperty('--accent-600', mixHex(accentColor, '#000000', 0.80));
+        root.style.setProperty('--accent-700', mixHex(accentColor, '#000000', 0.60));
         
         // Add class when custom color is equipped to enable global color replacement
-        const root = document.documentElement;
         if (user?.equippedColor) {
             root.classList.add('custom-accent');
         } else {

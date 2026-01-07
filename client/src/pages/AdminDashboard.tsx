@@ -239,17 +239,17 @@ export default function AdminDashboard() {
             <div className="max-w-7xl mx-auto pt-32 pb-32 px-4 relative z-10">
                 <h1 className="text-3xl font-serif text-gold-300 mb-8">Painel Administrativo</h1>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Column 1: Actions */}
-                    <div className="space-y-8 h-fit">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    {/* Actions */}
+                    <div className="space-y-8 h-fit xl:sticky xl:top-28">
                         <AdminCreatePost showToast={showToast} />
                         <AdminCreateAnnouncement showToast={showToast} />
                         <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
                         <AdminCreateEvent showToast={showToast} />
                     </div>
 
-                    {/* Rewards List */}
-                    <div className="lg:col-span-2 space-y-8">
+                    {/* Main management column */}
+                    <div className="xl:col-span-2 space-y-8">
                         {/* Admin Stats Edit */}
                         <div className="glass-panel p-6 rounded-xl">
                             <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
@@ -331,6 +331,46 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
+                        {/* Member Requests */}
+                        <div className="glass-panel p-6 rounded-xl">
+                            <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
+                                <UserIcon className="w-5 h-5 text-gold-400" /> Solicitações de Membros
+                            </h2>
+                            {requests.length === 0 ? (
+                                <p className="text-gray-500 text-sm">Nenhuma solicitação pendente.</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {requests.map(req => (
+                                        <div key={req.id} className="p-4 bg-white/5 rounded-lg border border-white/5">
+                                            <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
+                                                <div>
+                                                    <h3 className="font-bold text-white">{req.name}</h3>
+                                                    {req.instagram && <p className="text-xs text-gold-400 mt-1">@{req.instagram}</p>}
+                                                </div>
+                                                <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full shrink-0">
+                                                    Pendente
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleApproveRequest(req.id)}
+                                                    className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                                                >
+                                                    <Check className="w-3 h-3" /> Aprovar
+                                                </button>
+                                                <button
+                                                    onClick={() => handleRejectRequest(req.id)}
+                                                    className="flex-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                                                >
+                                                    <X className="w-3 h-3" /> Rejeitar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
                         <div className="glass-panel p-6 rounded-xl">
                             <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
                                 <Gift className="w-5 h-5 text-gold-400" /> Recompensas Ativas
@@ -376,46 +416,6 @@ export default function AdminDashboard() {
                                 </div>
                             )}
                         </div>
-                    </div>
-
-                    {/* Member Requests Card - Moved inside main column */}
-                    <div className="glass-panel p-6 rounded-xl h-fit mb-8">
-                        <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                            <UserIcon className="w-5 h-5 text-gold-400" /> Solicitações de Membros
-                        </h2>
-                        {requests.length === 0 ? (
-                            <p className="text-gray-500 text-sm">Nenhuma solicitação pendente.</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {requests.map(req => (
-                                    <div key={req.id} className="p-4 bg-white/5 rounded-lg border border-white/5">
-                                        <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
-                                            <div>
-                                                <h3 className="font-bold text-white">{req.name}</h3>
-                                                {req.instagram && <p className="text-xs text-gold-400 mt-1">@{req.instagram}</p>}
-                                            </div>
-                                            <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full shrink-0">
-                                                Pendente
-                                            </span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => handleApproveRequest(req.id)}
-                                                className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
-                                            >
-                                                <Check className="w-3 h-3" /> Aprovar
-                                            </button>
-                                            <button
-                                                onClick={() => handleRejectRequest(req.id)}
-                                                className="flex-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
-                                            >
-                                                <X className="w-3 h-3" /> Rejeitar
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </div>
                 </div>
 

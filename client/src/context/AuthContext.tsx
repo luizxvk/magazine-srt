@@ -332,6 +332,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('sessionMembershipType');
         setUser(null);
 
+        // Reset custom colors to default (gold for Magazine)
+        const root = document.documentElement;
+        root.style.setProperty('--accent-color', '#d4af37');
+        root.style.setProperty('--accent-color-rgb', '212, 175, 55');
+        root.classList.remove('custom-accent');
+
         // Force Dark Mode immediately and persist it
         setTheme('dark');
         localStorage.setItem('theme', 'dark');

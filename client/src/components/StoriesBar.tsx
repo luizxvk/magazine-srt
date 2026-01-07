@@ -195,7 +195,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
                                     </div>
                                 </div>
                             </div>
-                            <span className={`text-xs font-medium ${isMGT ? 'text-gray-300 dark:text-gray-300' : 'text-gray-700 dark:text-gray-300'}`}>Seu Story</span>
+                            <span className={`text-xs font-medium ${isMGT ? 'text-gray-300 dark:text-gray-300' : 'text-gray-700 dark:text-gray-300'}`}>Adicionar</span>
                         </div>
                     )}
 

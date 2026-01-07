@@ -13,6 +13,10 @@ import PostPage from './pages/PostPage';
 import ProfilePage from './pages/ProfilePage';
 import SocialPage from './pages/SocialPage';
 import NotificationsPage from './pages/NotificationsPage';
+import RankingPage from './pages/RankingPage';
+import RewardsPage from './pages/RewardsPage';
+import HighlightsPage from './pages/HighlightsPage';
+import RoadmapPage from './pages/RoadmapPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MgtLogPage from './pages/MgtLogPage';
 import GroupsPage from './pages/GroupsPage';
@@ -49,6 +53,10 @@ function App() {
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
           <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
+          <Route path="/ranking" element={<PrivateRoute><RankingPage /></PrivateRoute>} />
+          <Route path="/rewards" element={<PrivateRoute><RewardsPage /></PrivateRoute>} />
+          <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
+          <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
           <Route path="/mgt-log" element={<PrivateRoute><MgtLogPage /></PrivateRoute>} />
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Image as ImageIcon, Video, Tag, Sparkles } from 'lucide-react';
+import { X, Image as ImageIcon, Video, Tag, Sparkles, MoreHorizontal } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,6 +18,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
     const [tagInput, setTagInput] = useState('');
     const [isHighlight, setIsHighlight] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
 
     if (!isOpen) return null;
 
@@ -127,51 +128,113 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                                 {/* Left Side: Media & Tags */}
                                 <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-                                    {!mediaUrl && (
-                                        <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2 border border-white/10">
-                                            <input
-                                                type="text"
-                                                value={mediaUrl}
-                                                onChange={(e) => {
-                                                    setMediaUrl(e.target.value);
-                                                    if (e.target.value) setMediaType('IMAGE');
-                                                }}
-                                                placeholder="URL da mídia..."
-                                                className="bg-transparent border-none text-sm text-white focus:ring-0 w-32 md:w-48 placeholder-gray-600"
-                                            />
-                                            <div className="w-px h-4 bg-white/10" />
-                                            <button
-                                                type="button"
-                                                onClick={() => setMediaType('IMAGE')}
-                                                className={`text-gray-400 hover:text-gold-400 transition-colors ${mediaType === 'IMAGE' ? 'text-gold-400' : ''}`}
-                                                title="Adicionar Imagem"
-                                            >
-                                                <ImageIcon className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setMediaType('VIDEO')}
-                                                className={`text-gray-400 hover:text-gold-400 transition-colors ${mediaType === 'VIDEO' ? 'text-gold-400' : ''}`}
-                                                title="Adicionar Vídeo"
-                                            >
-                                                <Video className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    )}
+                                    {/* Mobile: Show only More button */}
+                                    <div className="md:hidden relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowMoreMenu(!showMoreMenu)}
+                                            className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2 border border-white/10 hover:border-gold-500/30 transition-colors"
+                                        >
+                                            <MoreHorizontal className="w-5 h-5 text-gold-400" />
+                                            <span className="text-sm text-gray-400">Opções</span>
+                                        </button>
+                                        
+                                        {/* Mobile Menu Dropdown */}
+                                        {showMoreMenu && (
+                                            <div className="absolute top-full mt-2 left-0 bg-black/95 border border-white/10 rounded-xl p-2 shadow-xl z-10 min-w-[200px]">
+                                                {!mediaUrl && (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setMediaType('IMAGE');
+                                                                const url = prompt('URL da Imagem:');
+                                                                if (url) setMediaUrl(url);
+                                                                setShowMoreMenu(false);
+                                                            }}
+                                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-gold-400 transition-colors"
+                                                        >
+                                                            <ImageIcon className="w-5 h-5" />
+                                                            <span className="text-sm">Adicionar Imagem</span>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setMediaType('VIDEO');
+                                                                const url = prompt('URL do Vídeo:');
+                                                                if (url) setMediaUrl(url);
+                                                                setShowMoreMenu(false);
+                                                            }}
+                                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-gold-400 transition-colors"
+                                                        >
+                                                            <Video className="w-5 h-5" />
+                                                            <span className="text-sm">Adicionar Vídeo</span>
+                                                        </button>
+                                                    </>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        document.getElementById('tag-input')?.focus();
+                                                        setShowMoreMenu(false);
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-gold-400 transition-colors"
+                                                >
+                                                    <Tag className="w-5 h-5" />
+                                                    <span className="text-sm">Adicionar Tags</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                    {/* Tag Input */}
-                                    <div className="relative group">
-                                        <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2 border border-white/10 hover:border-gold-500/30 transition-colors cursor-text" onClick={() => document.getElementById('tag-input')?.focus()}>
-                                            <Tag className="w-4 h-4 text-gold-400" />
-                                            <input
-                                                id="tag-input"
-                                                type="text"
-                                                value={tagInput}
-                                                onChange={(e) => setTagInput(e.target.value)}
-                                                onKeyDown={handleAddTag}
-                                                placeholder={tags.length ? "Mais tags..." : "Tags"}
-                                                className="bg-transparent border-none text-sm text-white focus:ring-0 w-20 placeholder-gray-600"
-                                            />
+                                    {/* Desktop: Show all icons inline */}
+                                    <div className="hidden md:flex items-center gap-2">
+                                        {!mediaUrl && (
+                                            <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2 border border-white/10">
+                                                <input
+                                                    type="text"
+                                                    value={mediaUrl}
+                                                    onChange={(e) => {
+                                                        setMediaUrl(e.target.value);
+                                                        if (e.target.value) setMediaType('IMAGE');
+                                                    }}
+                                                    placeholder="URL da mídia..."
+                                                    className="bg-transparent border-none text-sm text-white focus:ring-0 w-32 md:w-48 placeholder-gray-600"
+                                                />
+                                                <div className="w-px h-4 bg-white/10" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMediaType('IMAGE')}
+                                                    className={`text-gray-400 hover:text-gold-400 transition-colors ${mediaType === 'IMAGE' ? 'text-gold-400' : ''}`}
+                                                    title="Adicionar Imagem"
+                                                >
+                                                    <ImageIcon className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMediaType('VIDEO')}
+                                                    className={`text-gray-400 hover:text-gold-400 transition-colors ${mediaType === 'VIDEO' ? 'text-gold-400' : ''}`}
+                                                    title="Adicionar Vídeo"
+                                                >
+                                                    <Video className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* Tag Input */}
+                                        <div className="relative group">
+                                            <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2 border border-white/10 hover:border-gold-500/30 transition-colors cursor-text" onClick={() => document.getElementById('tag-input')?.focus()}>
+                                                <Tag className="w-4 h-4 text-gold-400" />
+                                                <input
+                                                    id="tag-input"
+                                                    type="text"
+                                                    value={tagInput}
+                                                    onChange={(e) => setTagInput(e.target.value)}
+                                                    onKeyDown={handleAddTag}
+                                                    placeholder={tags.length ? "Mais tags..." : "Tags"}
+                                                    className="bg-transparent border-none text-sm text-white focus:ring-0 w-20 placeholder-gray-600"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

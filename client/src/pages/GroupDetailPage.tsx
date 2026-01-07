@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Send, Settings, UserPlus, Crown, Shield } from 'lucide-react';
+import { ArrowLeft, Users, Send, Settings, Crown, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';

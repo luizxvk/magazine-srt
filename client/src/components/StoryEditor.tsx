@@ -46,6 +46,7 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
     const [textColor, setTextColor] = useState('#ffffff');
     const [dragging, setDragging] = useState<{ type: 'text' | 'sticker'; id: string } | null>(null);
     const [showStickerPicker, setShowStickerPicker] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
 
     // Add text overlay
     const addText = () => {
@@ -124,11 +125,20 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
 
     // Generate final image
     const saveImage = async () => {
+        if (isPublishing) return;
+        setIsPublishing(true);
+
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+            setIsPublishing(false);
+            return;
+        }
 
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+            setIsPublishing(false);
+            return;
+        }
 
         // Load background image
         const img = new Image();
@@ -184,6 +194,12 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             // Export with maximum quality
             const editedUrl = canvas.toDataURL('image/jpeg', 1.0);
             onPublish(editedUrl);
+            setIsPublishing(false);
+        };
+
+        img.onerror = () => {
+            setIsPublishing(false);
+            alert('Erro ao processar imagem. Tente novamente.');
         };
 
         img.src = imageUrl;
@@ -200,32 +216,63 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Top Actions - Sempre visível */}
-            <div className="absolute top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-black via-black/50 to-transparent">
+            <div className="absolute top-0 left-0 right-0 z-50 p-4">
                 <div className="flex items-center justify-between">
-                    <button onClick={onClose} className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors">
-                        <X className="w-6 h-6 text-white" />
-                    </button>
+                    {/* Close Button - Vision Pro Style */}
+                    <motion.button 
+                        onClick={onClose}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-12 h-12 flex items-center justify-center backdrop-blur-2xl bg-white/10 border border-white/20 rounded-2xl transition-all hover:bg-white/20 shadow-lg"
+                    >
+                        <X className="w-6 h-6 text-white drop-shadow-lg" />
+                    </motion.button>
                     
                     <div className="flex items-center gap-3">
-                        {/* Botão Limpar */}
+                        {/* Botão Limpar - Vision Pro Style */}
                         {(textOverlays.length > 0 || stickerOverlays.length > 0) && (
-                            <button
+                            <motion.button
                                 onClick={() => { setTextOverlays([]); setStickerOverlays([]); }}
-                                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium flex items-center gap-2 transition-all backdrop-blur-sm"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-5 py-3 backdrop-blur-2xl bg-white/10 border border-white/20 hover:bg-white/20 rounded-2xl text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg"
                             >
                                 <RotateCcw className="w-4 h-4" />
                                 Limpar
-                            </button>
+                            </motion.button>
                         )}
                         
-                        {/* Botão ENVIAR - SEMPRE VISÍVEL E DESTACADO */}
-                        <button 
+                        {/* Botão ENVIAR - Vision Pro Style com Gradient */}
+                        <motion.button 
                             onClick={saveImage}
-                            className={`px-6 py-2.5 rounded-full ${isMGT ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600'} text-white font-bold flex items-center gap-2 transition-all duration-200 shadow-2xl shadow-purple-500/50 hover:scale-105`}
+                            disabled={isPublishing}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`group relative px-8 py-3 rounded-2xl font-bold flex items-center gap-3 transition-all duration-300 shadow-2xl overflow-hidden ${
+                                isPublishing ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
-                            <Send className="w-5 h-5" />
-                            ENVIAR
-                        </button>
+                            {/* Gradient Background */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 opacity-100 group-hover:opacity-90 transition-opacity" />
+                            
+                            {/* Glassmorphism Overlay */}
+                            <div className="absolute inset-0 backdrop-blur-xl bg-white/10 border border-white/30 group-hover:bg-white/20 transition-all" />
+                            
+                            {/* Content */}
+                            <div className="relative z-10 flex items-center gap-3 text-white drop-shadow-lg">
+                                {isPublishing ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                                        <span>Publicando...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="w-5 h-5" />
+                                        <span>POSTAR</span>
+                                    </>
+                                )}
+                            </div>
+                        </motion.button>
                     </div>
                 </div>
             </div>

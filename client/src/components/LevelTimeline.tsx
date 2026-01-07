@@ -122,11 +122,6 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                             <span className="text-sm md:text-base font-bold">{level}</span>
                                         </motion.div>
 
-                                        {/* Label do Nível Abaixo da Barra */}
-                                        <span className={`absolute top-[calc(100%+24px)] text-xs font-medium whitespace-nowrap transition-colors ${isReached ? themeTextReached : themeTextUnreached}`}>
-                                            {level}
-                                        </span>
-
                                         {/* Tooltip for non-reward levels */}
                                         {!reward && (
                                             <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">

@@ -3,7 +3,7 @@ import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCi
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.3';
+const CURRENT_VERSION = '0.3.4';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -32,18 +32,36 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.3 - Interface redesenhada + Novos itens de personalização
+    // v0.3.4 - Sistema de GRUPOS + RGB Animado + Correções
     const updates: UpdateItem[] = [
         {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'Sistema de GRUPOS Completo!',
+            description: 'Crie grupos públicos ou privados, chat em tempo real, permissões (Admin/Moderador) e muito mais!',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'Cor RGB Animada REAL',
+            description: 'RGB agora troca entre Red→Magenta→Blue→Cyan→Green→Yellow em loop contínuo!',
+            isNew: true
+        },
+        {
             icon: <Image className="w-5 h-5" />,
-            title: 'Editor de Stories Redesenhado',
-            description: 'Interface estilo Instagram com botão ENVIAR sempre visível e destaque!',
+            title: 'Editor Stories Apple Vision Pro',
+            description: 'Interface glassmorphism com botão POSTAR redesenhado e loading visual!',
             isNew: true
         },
         {
             icon: <Trophy className="w-5 h-5" />,
-            title: 'Timeline de Níveis Melhorada',
-            description: 'Números agora aparecem abaixo da barra com muito mais espaço!',
+            title: 'Timeline de Níveis Corrigida',
+            description: 'Números duplicados removidos - agora aparece apenas no círculo!',
+            isNew: true
+        },
+        {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'MGT Log no Drawer',
+            description: 'Card do MGT Log agora aparece na barra lateral de recomendações!',
             isNew: true
         },
         {

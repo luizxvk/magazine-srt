@@ -160,3 +160,96 @@ export const getBase64Size = (base64: string): number => {
     const sizeInBytes = (base64Data.length * 3) / 4;
     return Math.round(sizeInBytes / 1024);
 };
+
+/**
+ * Crop image to specific aspect ratio (center crop)
+ * @param file - The image file to crop
+ * @param aspectRatio - Target aspect ratio (width/height), e.g., 9/16 for stories
+ * @param options - Compression options
+ * @returns Promise<string> - Base64 encoded cropped image
+ */
+export const cropImageToAspectRatio = async (
+    file: File | Blob,
+    aspectRatio: number,
+    options: CompressionOptions = {}
+): Promise<string> => {
+    const opts = { ...defaultOptions, ...options };
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const { width: imgWidth, height: imgHeight } = img;
+                
+                // Calculate crop dimensions
+                const imgAspect = imgWidth / imgHeight;
+                let srcX = 0, srcY = 0, srcWidth = imgWidth, srcHeight = imgHeight;
+
+                if (imgAspect > aspectRatio) {
+                    // Image is wider than target - crop horizontally
+                    srcWidth = imgHeight * aspectRatio;
+                    srcX = (imgWidth - srcWidth) / 2;
+                } else if (imgAspect < aspectRatio) {
+                    // Image is taller than target - crop vertically
+                    srcHeight = imgWidth / aspectRatio;
+                    srcY = (imgHeight - srcHeight) / 2;
+                }
+
+                // Calculate output dimensions
+                let outputWidth = srcWidth;
+                let outputHeight = srcHeight;
+
+                if (outputWidth > opts.maxWidth! || outputHeight > opts.maxHeight!) {
+                    const ratio = Math.min(
+                        opts.maxWidth! / outputWidth,
+                        opts.maxHeight! / outputHeight
+                    );
+                    outputWidth = Math.round(outputWidth * ratio);
+                    outputHeight = Math.round(outputHeight * ratio);
+                }
+
+                canvas.width = outputWidth;
+                canvas.height = outputHeight;
+
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    reject(new Error('Could not get canvas context'));
+                    return;
+                }
+
+                // Draw cropped image
+                if (opts.outputFormat === 'image/jpeg') {
+                    ctx.fillStyle = '#000000'; // Black background for stories
+                    ctx.fillRect(0, 0, outputWidth, outputHeight);
+                }
+
+                ctx.drawImage(
+                    img,
+                    srcX, srcY, srcWidth, srcHeight, // Source rectangle
+                    0, 0, outputWidth, outputHeight   // Destination rectangle
+                );
+
+                const croppedBase64 = canvas.toDataURL(
+                    opts.outputFormat,
+                    opts.quality
+                );
+
+                resolve(croppedBase64);
+            };
+
+            img.onerror = () => {
+                reject(new Error('Failed to load image'));
+            };
+        };
+
+        reader.onerror = () => {
+            reject(new Error('Failed to read file'));
+        };
+    });
+};

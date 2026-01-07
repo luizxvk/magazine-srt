@@ -123,11 +123,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             // Filter by active tab
             if (activeTab === 'all' || activeTab === 'users') {
                 users?.forEach((u: any) => {
+                    // Use nickname for @ if displayName is set, otherwise use name
+                    const atName = u.displayName ? u.displayName : u.name;
                     formattedResults.push({
                         id: u.id,
                         type: 'user',
                         title: u.displayName || u.name,
-                        subtitle: `@${u.name} • Nível ${u.level}`,
+                        subtitle: `@${atName} • Nível ${u.level || 1}`,
                         imageUrl: u.avatarUrl
                     });
                 });
@@ -155,28 +157,35 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     };
 
     const handleResultClick = (result: SearchResult) => {
+        // Prevent default and stop propagation to avoid logout
+        
         // Save to recent searches
         const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
         setRecentSearches(updated);
         localStorage.setItem('recentSearches', JSON.stringify(updated));
 
+        // Close modal first
         onClose();
         
-        switch (result.type) {
-            case 'user':
-                navigate(`/profile/${result.id}`);
-                break;
-            case 'post':
-                navigate(`/feed?postId=${result.id}`);
-                break;
-            case 'page':
-                if (result.path) {
-                    navigate(result.path);
-                }
-                break;
-            default:
-                break;
-        }
+        // Use setTimeout to ensure modal is closed before navigation
+        setTimeout(() => {
+            switch (result.type) {
+                case 'user':
+                    // Navigate to user profile
+                    window.location.href = `/profile/${result.id}`;
+                    break;
+                case 'post':
+                    navigate(`/feed?postId=${result.id}`);
+                    break;
+                case 'page':
+                    if (result.path) {
+                        navigate(result.path);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }, 50);
     };
 
     const handleSuggestionClick = (suggestion: string) => {

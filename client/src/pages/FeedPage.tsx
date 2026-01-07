@@ -53,6 +53,7 @@ export default function FeedPage() {
     const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' as 'success' | 'error' | 'info' });
 
     const [viewingStoryId, setViewingStoryId] = useState<string | null>(null);
+    const [isStoryEditorOpen, setIsStoryEditorOpen] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; postId: string | null }>({
         isOpen: false,
         postId: null
@@ -243,6 +244,7 @@ export default function FeedPage() {
                             viewingStoryId={viewingStoryId}
                             onViewStory={setViewingStoryId}
                             onCloseStory={() => setViewingStoryId(null)}
+                            onEditorStateChange={setIsStoryEditorOpen}
                         />
                     </div>
 
@@ -381,8 +383,8 @@ export default function FeedPage() {
                 </aside>
             </div>
 
-            {/* Create Post Widget (Fixed Bottom) - Hide when viewing stories */}
-            {!viewingStoryId && <CreatePostWidget onPostCreated={handlePostCreated} />}
+            {/* Create Post Widget (Fixed Bottom) - Hide when viewing stories or editing story */}
+            {!viewingStoryId && !isStoryEditorOpen && <CreatePostWidget onPostCreated={handlePostCreated} />}
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import StoryViewer from './StoryViewer';
 import StoryEditor from './StoryEditor';
-import { compressImage, getBase64Size } from '../utils/imageCompression';
+import { cropImageToAspectRatio, getBase64Size } from '../utils/imageCompression';
 
 interface Story {
     id: string;
@@ -22,15 +22,21 @@ interface StoriesBarProps {
     viewingStoryId: string | null;
     onViewStory: (id: string) => void;
     onCloseStory: () => void;
+    onEditorStateChange?: (isOpen: boolean) => void;
 }
 
-export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }: StoriesBarProps) {
+export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, onEditorStateChange }: StoriesBarProps) {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [stories, setStories] = useState<Story[]>([]);
     const [editorImage, setEditorImage] = useState<string | null>(null);
     const [isEditorOpen, setIsEditorOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Notify parent when editor state changes
+    useEffect(() => {
+        onEditorStateChange?.(isEditorOpen);
+    }, [isEditorOpen, onEditorStateChange]);
 
     useEffect(() => {
         const fetchStories = async () => {
@@ -71,17 +77,17 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
                 // Close any open story viewer first
                 onCloseStory();
                 
-                // Compress image for editor
-                const imageUrl = await compressImage(file, {
+                // Auto-crop image to 9:16 aspect ratio for stories
+                const imageUrl = await cropImageToAspectRatio(file, 9/16, {
                     maxWidth: 1080,
                     maxHeight: 1920, // Story aspect ratio
-                    quality: 0.8,
+                    quality: 0.85,
                     outputFormat: 'image/jpeg'
                 });
                 
-                console.log(`[Story] Compressed to ${getBase64Size(imageUrl)}KB`);
+                console.log(`[Story] Cropped to 9:16 - ${getBase64Size(imageUrl)}KB`);
                 
-                // Open editor with compressed image
+                // Open editor with cropped image
                 setEditorImage(imageUrl);
                 setIsEditorOpen(true);
                 

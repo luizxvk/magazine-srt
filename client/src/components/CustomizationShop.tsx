@@ -91,11 +91,22 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         try {
             const response = await api.get('/users/customizations');
             setOwnedItems([...defaultItemIds, ...(response.data.owned || [])]);
-            setEquippedItems(response.data.equipped || {});
+            // If no items equipped, set defaults as equipped
+            const equipped = response.data.equipped || {};
+            setEquippedItems({
+                background: equipped.background || defaultItems.background.id,
+                badge: equipped.badge || defaultItems.badge.id,
+                color: equipped.color || defaultItems.color.id
+            });
         } catch (error) {
             console.error('Failed to fetch customizations', error);
-            // At minimum, user has default items
+            // At minimum, user has default items and they are equipped
             setOwnedItems(defaultItemIds);
+            setEquippedItems({
+                background: defaultItems.background.id,
+                badge: defaultItems.badge.id,
+                color: defaultItems.color.id
+            });
         }
     };
 
@@ -294,9 +305,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         } bg-black/40`}
                                     >
                                         {/* Preview */}
-                                        <div className="aspect-square relative flex items-center justify-center">
+                                        <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                             {item.type === 'background' && (
-                                                <div className="absolute inset-0" style={{ background: item.preview }} />
+                                                <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
                                             )}
                                             {item.type === 'badge' && (
                                                 <span className="text-5xl">{item.preview}</span>

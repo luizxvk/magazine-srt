@@ -71,7 +71,7 @@ function App() {
         <ZionsModalWrapper />
         <SessionExpiredWrapper />
         <WhatsNewModal />
-        <MessagePopup />
+        <MessagePopupWrapper />
         <DevBanner />
       </Router>
     </AuthProvider>
@@ -118,6 +118,11 @@ function SessionExpiredWrapper() {
   };
 
   return <SessionExpiredModal isOpen={isExpired} onConfirm={handleConfirm} />;
+}
+
+function MessagePopupWrapper() {
+  const { activeChatUserId } = useAuth();
+  return <MessagePopup activeChatUserId={activeChatUserId} />;
 }
 
 export default App;

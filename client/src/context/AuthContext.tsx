@@ -55,6 +55,9 @@ interface AuthContextType {
     accentColor: string;
     backgroundStyle: string | null;
     equippedBadge: string | null;
+    // Active Chat
+    activeChatUserId: string | null;
+    setActiveChatUserId: (userId: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,8 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [dailyLoginStatus, setDailyLoginStatus] = useState<DailyLoginStatus | null>(null);
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
-    const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-        if (typeof window !== 'undefined') {
+    const [theme, setTheme] = useState<'dark' | 'light'>(() => {    const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);        if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
             if (!token) return 'dark'; // Force dark if not logged in
 
@@ -176,8 +178,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             root.classList.add('custom-accent');
             // Add rgb-dynamic class for RGB animation
             if (user.equippedColor === 'color_rgb') {
+                console.log('[AuthContext] Aplicando RGB dinâmico - classe rgb-dynamic adicionada');
                 root.classList.add('rgb-dynamic');
             } else {
+                console.log('[AuthContext] Cor customizada, mas não RGB');
                 root.classList.remove('rgb-dynamic');
             }
         } else {
@@ -229,16 +233,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                     // 2. Check Daily Login Status
                     try {
-                        const statusRes = await api.get('/gamification/daily-login/status', {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
-                        setDailyLoginStatus(statusRes.data);
+                        const statusRes = await Promise.race([
+                            api.get('/gamification/daily-login/status', {
+                                headers: { Authorization: `Bearer ${token}` }
+                            }),
+                            new Promise((_, reject) => 
+                                setTimeout(() => reject(new Error('Timeout')), 5000)
+                            )
+                        ]);
+                        setDailyLoginStatus((statusRes as any).data);
 
                         // Auto-open modal if not claimed AND not already shown this session
                         const today = new Date().toDateString();
                         const lastModalShown = localStorage.getItem('dailyLoginModalShown');
                         
-                        if (!statusRes.data.claimed && lastModalShown !== today) {
+                        if (!(statusRes as any).data.claimed && lastModalShown !== today) {
                             localStorage.setItem('dailyLoginModalShown', today);
                             setTimeout(() => setIsDailyLoginModalOpen(true), 1500);
                         }
@@ -411,6 +420,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             accentColor,
             backgroundStyle,
             equippedBadge: user?.equippedBadge || null,
+            // Active Chat
+            activeChatUserId,
+            setActiveChatUserId,
         }}>
             {children}
             <DailyLoginModal

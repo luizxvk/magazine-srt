@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Send, Share2, MoreVertical, Eye, Heart, MessageCircle } from 'lucide-react';
+import { X, Send, MoreVertical, Eye, Heart, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 

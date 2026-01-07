@@ -70,8 +70,6 @@ export default function HighlightsPage() {
         }
     }, [selectedTag, posts]);
 
-    const accentColor = isMGT ? 'emerald' : 'gold';
-    
     // Explicit theme classes for Tailwind JIT
     const themeTitle = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeButtonActive = isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400';

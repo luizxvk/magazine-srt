@@ -579,10 +579,15 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Check if user owns this item
-        const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
-        if (!owned.includes(itemId)) {
-            return res.status(400).json({ error: 'You do not own this item' });
+        // Default items (free) that don't require ownership
+        const defaultItemIds = ['bg_default', 'badge_crown', 'color_gold'];
+        
+        // Check if user owns this item (skip check for default items)
+        if (!defaultItemIds.includes(itemId)) {
+            const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
+            if (!owned.includes(itemId)) {
+                return res.status(400).json({ error: 'You do not own this item' });
+            }
         }
 
         // Equip based on category

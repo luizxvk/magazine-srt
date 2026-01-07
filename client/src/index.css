@@ -103,10 +103,13 @@
    ============================================== */
 
 /* Text Color Overrides */
+.custom-accent .text-gold-100,
 .custom-accent .text-gold-200,
 .custom-accent .text-gold-300,
 .custom-accent .text-gold-400,
 .custom-accent .text-gold-500,
+.custom-accent .text-gold-600,
+.custom-accent .text-emerald-100,
 .custom-accent .text-emerald-200,
 .custom-accent .text-emerald-300,
 .custom-accent .text-emerald-400,
@@ -115,6 +118,7 @@
 }
 
 /* Background Color Overrides */
+.custom-accent .bg-gold-300,
 .custom-accent .bg-gold-400,
 .custom-accent .bg-gold-500,
 .custom-accent .bg-gold-600,
@@ -170,6 +174,46 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Override gold gradients in Bem vindo text when custom accent is equipped */
+.custom-accent .from-gold-200,
+.custom-accent .via-gold-400,
+.custom-accent .to-gold-200 {
+  --tw-gradient-from: var(--accent-color) !important;
+  --tw-gradient-via: var(--accent-100) !important;
+  --tw-gradient-to: var(--accent-color) !important;
+}
+
+/* Override gold shine text effect */
+.custom-accent .text-shine-gold {
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-100), var(--accent-color)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  animation: shine-custom 2s linear infinite !important;
+  background-size: 200% 100% !important;
+}
+
+@keyframes shine-custom {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Keep header divider borders neutral (white/transparent) */
+.custom-accent header .border-l {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Keep header bottom border neutral */
+.custom-accent header.border-b {
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Override gradients with accent */
+.custom-accent .from-gold-400,
+.custom-accent .to-gold-700 {
+  --tw-gradient-from: var(--accent-color) !important;
+  --tw-gradient-to: var(--accent-600) !important;
 }
 
 /* Light Mode Overrides */
@@ -248,6 +292,23 @@
     text-fill-color: transparent;
     background-size: 200% auto;
     animation: shine 4s linear infinite;
+  }
+
+  /* Override gold shimmer with custom accent color */
+  .custom-accent .animate-gold-shimmer {
+    background: linear-gradient(
+      to right, 
+      var(--accent-600) 20%, 
+      var(--accent-100) 30%, 
+      var(--accent-color) 70%, 
+      var(--accent-100) 80%
+    ) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-fill-color: transparent !important;
+    background-size: 200% auto !important;
+    animation: shine 4s linear infinite !important;
   }
 
   .custom-scrollbar::-webkit-scrollbar {

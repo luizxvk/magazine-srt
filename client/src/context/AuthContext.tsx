@@ -59,17 +59,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Background CSS configurations
+// Background CSS configurations - with animation
 const BACKGROUND_STYLES: Record<string, string> = {
-    'bg_aurora': 'linear-gradient(125deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 100%)',
-    'bg_sunset': 'linear-gradient(125deg, #1a0a0a 0%, #2d1f1f 25%, #4a2020 50%, #1a0a0a 100%)',
-    'bg_ocean': 'linear-gradient(125deg, #0a1628 0%, #0c2340 50%, #0a1628 100%)',
-    'bg_forest': 'linear-gradient(125deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)',
-    'bg_galaxy': 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)',
-    'bg_matrix': 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)',
-    'bg_fire': 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)',
-    'bg_city': 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)',
-    'bg_space': 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)',
+    'bg_aurora': 'linear-gradient(125deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #16213e 75%, #1a1a2e 100%)',
+    'bg_sunset': 'linear-gradient(125deg, #1a0a0a 0%, #2d1f1f 25%, #4a2020 50%, #2d1f1f 75%, #1a0a0a 100%)',
+    'bg_ocean': 'linear-gradient(125deg, #0a1628 0%, #0c2340 33%, #0a1628 66%, #0c2340 100%)',
+    'bg_forest': 'linear-gradient(125deg, #0a1a0a 0%, #0f2a0f 33%, #0a1a0a 66%, #0f2a0f 100%)',
+    'bg_galaxy': 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #2d1b4e 50%, #1a0a2e 75%, #0c0c0c 100%)',
+    'bg_matrix': 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 33%, #0a0f0a 66%, #0a1a0a 100%)',
+    'bg_fire': 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 25%, #4a2a0a 50%, #2d1a0a 75%, #1a0a0a 100%)',
+    'bg_city': 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 33%, #1a1a2e 66%, #0f0f1a 100%)',
+    'bg_space': 'linear-gradient(135deg, #000005 0%, #0a0a1a 33%, #000005 66%, #0a0a1a 100%)',
 };
 
 // Accent color configurations
@@ -146,10 +146,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         if (backgroundStyle) {
             document.body.style.background = backgroundStyle;
+            document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
         } else {
             document.body.style.background = '';
+            document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
+            document.body.style.animation = '';
         }
     }, [backgroundStyle]);
 

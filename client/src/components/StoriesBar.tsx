@@ -78,10 +78,11 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
                 onCloseStory();
                 
                 // Auto-crop image to 9:16 aspect ratio for stories
+                // Use higher quality and resolution to prevent pixelation
                 const imageUrl = await cropImageToAspectRatio(file, 9/16, {
                     maxWidth: 1080,
-                    maxHeight: 1920, // Story aspect ratio
-                    quality: 0.85,
+                    maxHeight: 1920,
+                    quality: 0.92,
                     outputFormat: 'image/jpeg'
                 });
                 

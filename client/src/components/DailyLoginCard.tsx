@@ -28,19 +28,9 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
 
     if (!status) {
         return (
-            <div className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-2xl border ${themeBorder} ${themeGlow} animate-pulse relative overflow-hidden`}>
-                <div className="flex justify-between items-center z-10 relative">
-                    <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded-full`}></div>
-                        <div>
-                            <div className={`h-4 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-24 mb-2`}></div>
-                            <div className={`h-3 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-40`}></div>
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-end">
-                        <div className={`h-8 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-8 mb-1`}></div>
-                        <div className={`h-2 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded w-16`}></div>
-                    </div>
+            <div className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-2xl border ${themeBorder} ${themeGlow} relative overflow-hidden`}>
+                <div className="flex justify-center items-center py-4">
+                    <div className={`w-6 h-6 border-2 ${isMGT ? 'border-emerald-500' : 'border-gold-500'} border-t-transparent rounded-full animate-spin`}></div>
                 </div>
             </div>
         );

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Type, Smile, Check, Trash2, RotateCcw } from 'lucide-react';
+import { X, Type, Smile, Trash2, RotateCcw, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface TextOverlay {
@@ -207,10 +207,10 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                 <h3 className="text-white font-medium">Editar Story</h3>
                 <button 
                     onClick={saveImage}
-                    className={`px-4 py-2 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} text-black font-medium flex items-center gap-2`}
+                    className={`px-4 py-2 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} text-black font-bold flex items-center gap-2 hover:scale-105 transition-transform`}
                 >
-                    <Check className="w-4 h-4" />
-                    Publicar
+                    Enviar Story
+                    <Send className="w-4 h-4" />
                 </button>
             </div>
 

@@ -12,11 +12,19 @@ interface UpdateItem {
     isNew?: boolean;
 }
 
-export default function WhatsNewModal() {
+interface WhatsNewModalProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externalOnClose }: WhatsNewModalProps = {}) {
     const { user } = useAuth();
     const location = useLocation();
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
+    
+    // Use external state if provided, otherwise use internal state
+    const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
 
     const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
     const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
@@ -110,6 +118,9 @@ export default function WhatsNewModal() {
     ];
 
     useEffect(() => {
+        // Only auto-show if using internal state (no external control)
+        if (externalIsOpen !== undefined) return;
+        
         // Só mostrar se: usuário logado E NÃO está na tela de login/register
         const isAuthPage = ['/', '/login', '/register', '/request-invite'].includes(location.pathname);
         
@@ -117,15 +128,19 @@ export default function WhatsNewModal() {
             const lastSeenVersion = localStorage.getItem('whatsNewVersion');
             if (lastSeenVersion !== CURRENT_VERSION) {
                 // Delay para não conflitar com outros modais
-                const timer = setTimeout(() => setIsOpen(true), 2000);
+                const timer = setTimeout(() => setInternalIsOpen(true), 2000);
                 return () => clearTimeout(timer);
             }
         }
-    }, [user, location.pathname]);
+    }, [user, location.pathname, externalIsOpen]);
 
     const handleClose = () => {
         localStorage.setItem('whatsNewVersion', CURRENT_VERSION);
-        setIsOpen(false);
+        if (externalOnClose) {
+            externalOnClose();
+        } else {
+            setInternalIsOpen(false);
+        }
     };
 
     if (!isOpen) return null;

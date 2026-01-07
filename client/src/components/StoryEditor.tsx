@@ -173,9 +173,9 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 </div>
             </div>
 
-            {/* Bottom Toolbar */}
-            <div className="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/80 to-transparent pt-20 pb-6 px-4">
-                <div className="max-w-lg mx-auto space-y-4">
+            {/* Bottom Toolbar - SEMPRE VISÍVEL */}
+            <div className="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-32 pb-safe">
+                <div className="max-w-lg mx-auto px-4 pb-6 space-y-4">
                     {/* Text Input */}
                     <div className="flex items-center gap-2">
                         <div className="flex-1 relative">
@@ -185,50 +185,62 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                 placeholder="Adicione um texto..."
                                 rows={2}
                                 maxLength={100}
-                                className="w-full px-4 py-3 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/40 transition-colors"
+                                className="w-full px-4 py-3 pr-12 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/40 transition-colors text-base sm:text-lg"
                             />
                             <Type className="absolute right-3 top-3 w-5 h-5 text-white/50" />
                         </div>
                     </div>
 
-                    {/* Color Palette */}
-                    {text && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="space-y-3"
-                        >
-                            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                                {colors.map((color) => (
-                                    <button
-                                        key={color}
-                                        onClick={() => setTextColor(color)}
-                                        className={`min-w-[44px] w-11 h-11 rounded-full transition-transform ${
-                                            textColor === color ? 'scale-110 ring-4 ring-white/50' : 'scale-100'
-                                        }`}
-                                        style={{ backgroundColor: color }}
-                                    />
-                                ))}
-                            </div>
+                    {/* Color Palette - SEMPRE VISÍVEL */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-3"
+                    >
+                        {/* Label */}
+                        <div className="flex items-center gap-2">
+                            <Palette className="w-4 h-4 text-white/70" />
+                            <span className="text-white/70 text-sm font-medium">Cor do Texto</span>
+                        </div>
 
-                            {/* Background Opacity */}
-                            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-2xl p-3">
-                                <Palette className="w-5 h-5 text-white" />
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="1"
-                                    step="0.1"
-                                    value={bgOpacity}
-                                    onChange={(e) => setBgOpacity(parseFloat(e.target.value))}
-                                    className="flex-1"
+                        {/* Color Options */}
+                        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                            {colors.map((color) => (
+                                <button
+                                    key={color}
+                                    onClick={() => setTextColor(color)}
+                                    className={`min-w-[48px] w-12 h-12 sm:w-14 sm:h-14 rounded-full transition-all flex-shrink-0 ${
+                                        textColor === color 
+                                            ? 'scale-110 ring-4 ring-white/60 shadow-xl' 
+                                            : 'scale-100 ring-2 ring-white/20 hover:scale-105'
+                                    }`}
+                                    style={{ backgroundColor: color }}
                                 />
-                                <span className="text-white text-sm font-medium min-w-[40px]">
+                            ))}
+                        </div>
+
+                        {/* Background Opacity Slider */}
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4">
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-white/70 text-sm font-medium">Fundo do Texto</span>
+                                <span className="text-white text-sm font-bold min-w-[50px] text-right">
                                     {Math.round(bgOpacity * 100)}%
                                 </span>
                             </div>
-                        </motion.div>
-                    )}
+                            <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value={bgOpacity}
+                                onChange={(e) => setBgOpacity(parseFloat(e.target.value))}
+                                className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer slider-thumb"
+                                style={{
+                                    background: `linear-gradient(to right, ${isMGT ? '#10b981' : '#d4af37'} 0%, ${isMGT ? '#10b981' : '#d4af37'} ${bgOpacity * 100}%, rgba(255,255,255,0.2) ${bgOpacity * 100}%, rgba(255,255,255,0.2) 100%)`
+                                }}
+                            />
+                        </div>
+                    </motion.div>
                 </div>
             </div>
         </motion.div>

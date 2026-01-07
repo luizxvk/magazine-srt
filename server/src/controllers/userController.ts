@@ -188,6 +188,10 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 level: true,
                 createdAt: true,
                 membershipType: true,
+                ownedCustomizations: true,
+                equippedBackground: true,
+                equippedBadge: true,
+                equippedColor: true,
             },
         });
 

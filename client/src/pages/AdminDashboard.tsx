@@ -447,7 +447,7 @@ export default function AdminDashboard() {
                                                 className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${u.membershipType === 'MGT'
                                                     ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30'
                                                     : 'bg-gold-500/20 text-gold-400 border-gold-500/30 hover:bg-gold-500/30'
-                                                    }`}}
+                                                    }`}
                                             >
                                                 {u.membershipType || 'MAGAZINE'}
                                             </button>

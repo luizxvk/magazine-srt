@@ -71,6 +71,13 @@ export default function HighlightsPage() {
     }, [selectedTag, posts]);
 
     const accentColor = isMGT ? 'emerald' : 'gold';
+    
+    // Explicit theme classes for Tailwind JIT
+    const themeTitle = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeButtonActive = isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400';
+    const themeTagActive = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
+    const themeBadge = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
+    const themeSpinner = isMGT ? 'border-emerald-500' : 'border-gold-500';
 
     return (
         <div className="min-h-screen text-white font-sans relative">
@@ -84,7 +91,7 @@ export default function HighlightsPage() {
                         <Link to="/feed" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors" title="Voltar ao Feed">
                             <ArrowLeft className="w-6 h-6 text-white" />
                         </Link>
-                        <h1 className={`text-3xl font-serif text-${accentColor}-400`}>
+                        <h1 className={`text-3xl font-serif ${themeTitle}`}>
                             Destaques da Semana
                         </h1>
                     </div>
@@ -95,14 +102,14 @@ export default function HighlightsPage() {
                         <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode('grid')}
-                                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? `bg-${accentColor}-500/20 text-${accentColor}-400` : 'text-gray-400 hover:text-white'}`}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? themeButtonActive : 'text-gray-400 hover:text-white'}`}
                                 title="Visualização em grade"
                             >
                                 <Grid className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setViewMode('list')}
-                                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? `bg-${accentColor}-500/20 text-${accentColor}-400` : 'text-gray-400 hover:text-white'}`}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? themeButtonActive : 'text-gray-400 hover:text-white'}`}
                                 title="Visualização em lista"
                             >
                                 <List className="w-4 h-4" />
@@ -119,7 +126,7 @@ export default function HighlightsPage() {
                             onClick={() => setSelectedTag(null)}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                                 !selectedTag 
-                                    ? `bg-${accentColor}-500 text-black` 
+                                    ? themeTagActive 
                                     : 'bg-white/10 text-gray-300 hover:bg-white/20'
                             }`}
                         >
@@ -131,7 +138,7 @@ export default function HighlightsPage() {
                                 onClick={() => setSelectedTag(tag)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                                     selectedTag === tag 
-                                        ? `bg-${accentColor}-500 text-black` 
+                                        ? themeTagActive 
                                         : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                 }`}
                             >
@@ -143,7 +150,7 @@ export default function HighlightsPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 border-${accentColor}-500`}></div>
+                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${themeSpinner}`}></div>
                     </div>
                 ) : filteredPosts.length === 0 ? (
                     <div className="text-center py-20">
@@ -172,7 +179,7 @@ export default function HighlightsPage() {
 
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                                             <div className="flex items-center gap-2 mb-2">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index < 3 ? `bg-${accentColor}-500 text-black` : 'bg-white/20 text-white'}`}>
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index < 3 ? themeBadge : 'bg-white/20 text-white'}`}>
                                                     #{index + 1}
                                                 </div>
                                                 <h3 className="font-medium text-white truncate max-w-[150px]">{post.user.name}</h3>
@@ -201,7 +208,7 @@ export default function HighlightsPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 ${index < 3 ? `bg-${accentColor}-500 text-black` : 'bg-white/20 text-white'}`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 ${index < 3 ? themeBadge : 'bg-white/20 text-white'}`}>
                                             #{index + 1}
                                         </div>
                                         <img

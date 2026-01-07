@@ -218,14 +218,14 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Top Actions - Sempre visível */}
-            <div className="absolute top-0 left-0 right-0 z-50 p-4">
+            <div className="absolute top-0 left-0 right-0 z-[9999] p-4 safe-area-top">
                 <div className="flex items-center justify-between">
                     {/* Close Button - Vision Pro Style */}
                     <motion.button 
                         onClick={onClose}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-12 h-12 flex items-center justify-center backdrop-blur-2xl bg-white/10 border border-white/20 rounded-2xl transition-all hover:bg-white/20 shadow-lg"
+                        className="w-12 h-12 flex items-center justify-center backdrop-blur-2xl bg-black/50 border border-white/30 rounded-2xl transition-all hover:bg-black/70 shadow-lg"
                     >
                         <X className="w-6 h-6 text-white drop-shadow-lg" />
                     </motion.button>
@@ -237,43 +237,34 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                                 onClick={() => { setTextOverlays([]); setStickerOverlays([]); }}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="px-5 py-3 backdrop-blur-2xl bg-white/10 border border-white/20 hover:bg-white/20 rounded-2xl text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg"
+                                className="px-5 py-3 backdrop-blur-2xl bg-black/50 border border-white/30 hover:bg-black/70 rounded-2xl text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg"
                             >
                                 <RotateCcw className="w-4 h-4" />
                                 Limpar
                             </motion.button>
                         )}
                         
-                        {/* Botão ENVIAR - Vision Pro Style com Gradient */}
+                        {/* Botão POSTAR - Sempre Visível e Destacado */}
                         <motion.button 
                             onClick={saveImage}
                             disabled={isPublishing}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`group relative px-8 py-3 rounded-2xl font-bold flex items-center gap-3 transition-all duration-300 shadow-2xl overflow-hidden ${
-                                isPublishing ? 'opacity-50 cursor-not-allowed' : ''
+                            className={`px-6 py-3 rounded-2xl font-bold flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white shadow-2xl shadow-pink-500/50 border-2 border-white/30 ${
+                                isPublishing ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-pink-500/70'
                             }`}
                         >
-                            {/* Gradient Background */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 opacity-100 group-hover:opacity-90 transition-opacity" />
-                            
-                            {/* Glassmorphism Overlay */}
-                            <div className="absolute inset-0 backdrop-blur-xl bg-white/10 border border-white/30 group-hover:bg-white/20 transition-all" />
-                            
-                            {/* Content */}
-                            <div className="relative z-10 flex items-center gap-3 text-white drop-shadow-lg">
-                                {isPublishing ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                                        <span>Publicando...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Send className="w-5 h-5" />
-                                        <span>POSTAR</span>
-                                    </>
-                                )}
-                            </div>
+                            {isPublishing ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                                    <span>Enviando...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="w-5 h-5" />
+                                    <span>POSTAR</span>
+                                </>
+                            )}
                         </motion.button>
                     </div>
                 </div>

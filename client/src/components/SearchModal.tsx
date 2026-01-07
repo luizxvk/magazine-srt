@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, User, FileText, Hash, Clock, TrendingUp, Calendar, Gift, Star, Users, Trophy, Navigation } from 'lucide-react';
+import { Search, X, User, FileText, Hash, Clock, TrendingUp, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';

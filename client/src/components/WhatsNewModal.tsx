@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Shield, Heart, Trophy, Bell } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.0';
+const CURRENT_VERSION = '0.3.1';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -24,58 +24,48 @@ export default function WhatsNewModal() {
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.0 - Principais novidades
+    // v0.3.1 - Correções e melhorias
     const updates: UpdateItem[] = [
+        {
+            icon: <Wrench className="w-5 h-5" />,
+            title: 'Correções v0.3.1',
+            description: 'Fundos, badges e cores da loja agora aplicam corretamente!',
+            isNew: true
+        },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Loja de Personalização',
             description: 'Compre fundos, badges e cores com Zions para customizar seu perfil!',
-            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'Temas Personalizados',
             description: 'Escolha cores de destaque e fundos únicos para sua experiência.',
-            isNew: true
         },
         {
             icon: <Search className="w-5 h-5" />,
             title: 'Busca Inteligente',
             description: 'Nova busca global: encontre páginas, usuários e posts facilmente.',
-            isNew: true
         },
         {
             icon: <Menu className="w-5 h-5" />,
             title: 'Menu Mobile Renovado',
             description: 'Header mais limpo com menu hambúrguer no celular.',
-            isNew: true
         },
         {
             icon: <Image className="w-5 h-5" />,
             title: 'Editor de Stories',
             description: 'Adicione textos e stickers aos seus stories antes de postar.',
-            isNew: true
         },
         {
             icon: <Zap className="w-5 h-5" />,
             title: 'Modo Lite',
             description: 'Desative animações para melhor performance em dispositivos mais lentos.',
-            isNew: true
         },
         {
             icon: <MessageCircle className="w-5 h-5" />,
             title: 'Chat Estilo Messenger',
             description: 'Mensagens aparecem no canto da tela como no Facebook.',
-        },
-        {
-            icon: <Shield className="w-5 h-5" />,
-            title: 'Login Único',
-            description: 'Sua conta só pode estar logada em um dispositivo por vez.',
-        },
-        {
-            icon: <Heart className="w-5 h-5" />,
-            title: 'Curtidas Persistentes',
-            description: 'Suas curtidas agora são salvas corretamente.',
         },
         {
             icon: <Trophy className="w-5 h-5" />,

@@ -236,18 +236,18 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                         </div>
                     </div>
 
-                    {/* Notification */}
+                    {/* Notification Toast - Fixed at bottom center of screen */}
                     <AnimatePresence>
                         {notification && (
                             <motion.div
-                                initial={{ opacity: 0, y: -20 }}
+                                initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                className={`absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg z-50 ${
-                                    notification.type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                exit={{ opacity: 0, y: 50 }}
+                                className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl z-[200] shadow-xl backdrop-blur-md ${
+                                    notification.type === 'success' ? 'bg-green-500/30 text-green-300 border border-green-500/40' : 'bg-red-500/30 text-red-300 border border-red-500/40'
                                 }`}
                             >
-                                {notification.message}
+                                <span className="font-medium">{notification.message}</span>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -311,8 +311,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                 </div>
                                             )}
                                             
-                                            {/* Free badge for default items */}
-                                            {isFree && (
+                                            {/* Free badge for default items - Only show for Magazine Classico for Magazine members */}
+                                            {isFree && !(isMGT && item.id === 'bg_default') && (
                                                 <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
                                                     <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
                                                 </div>

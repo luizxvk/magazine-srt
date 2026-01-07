@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Sparkles, Zap, Rocket, Store, Menu, Crown, Star, Home, Trophy, Settings, Ticket, BookOpen } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Sparkles, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -14,12 +14,16 @@ interface HeaderProps {
 
 // Badge icons based on equipped badge
 const BADGE_ICONS: Record<string, React.ReactNode> = {
-    'badge_crown': <Crown className="w-3 h-3 text-gold-400" />,
+    'badge_crown': <span className="text-xs">👑</span>,
     'badge_skull': <span className="text-xs">💀</span>,
     'badge_fire': <span className="text-xs">🔥</span>,
     'badge_diamond': <span className="text-xs">💎</span>,
-    'badge_star': <Star className="w-3 h-3 text-gold-400" />,
-    'badge_lightning': <Zap className="w-3 h-3 text-yellow-400" />,
+    'badge_star': <span className="text-xs">⭐</span>,
+    'badge_lightning': <span className="text-xs">⚡</span>,
+    'badge_pony': <span className="text-xs">🦄</span>,
+    'badge_heart': <span className="text-xs">❤️</span>,
+    'badge_moon': <span className="text-xs">🌙</span>,
+    'badge_sun': <span className="text-xs">☀️</span>,
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
@@ -40,7 +44,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
             return BADGE_ICONS[equippedBadge];
         }
         // Default: crown for Magazine, nothing for MGT
-        return user?.membershipType === 'MAGAZINE' ? <Crown className="w-3 h-3 text-gold-400" /> : null;
+        return user?.membershipType === 'MAGAZINE' ? <span className="text-xs">👑</span> : null;
     };
 
     useEffect(() => {
@@ -327,39 +331,57 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={`mobile-menu-container fixed top-0 right-0 h-full w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-50 md:hidden shadow-2xl border-l ${themeBorder}`}
+                            className={`mobile-menu-container fixed top-0 right-0 h-full w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-50 md:hidden shadow-2xl border-l ${themeBorder} flex flex-col`}
                         >
                             {/* Drawer Header */}
-                            <div className={`p-4 border-b ${themeBorder}`}>
-                                <div className="flex items-center justify-between">
-                                    <span className={`font-bold ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`}>
+                            <div className={`p-4 border-b ${themeBorder} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/50'}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className={`font-bold text-lg ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`}>
                                         Menu
                                     </span>
-                                    <button
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className={`p-1 ${theme === 'light' ? 'text-gray-500' : 'text-white/50'} hover:text-white transition-colors`}
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {!isVisitor && (
+                                            <button
+                                                onClick={() => {
+                                                    setIsMobileMenuOpen(false);
+                                                    logout();
+                                                }}
+                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-sm"
+                                            >
+                                                <LogOut className="w-4 h-4" />
+                                                <span>Sair</span>
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={`p-2 rounded-lg ${theme === 'light' ? 'text-gray-500 hover:bg-gray-200' : 'text-white/50 hover:bg-white/10'} transition-colors`}
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 </div>
                                 
                                 {/* User Info */}
                                 {user && (
-                                    <div className="flex items-center gap-3 mt-4">
-                                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black' : 'from-gold-400 to-gold-700'} p-[1px]`}>
+                                    <Link 
+                                        to="/profile" 
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors`}
+                                    >
+                                        <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black' : 'from-gold-400 to-gold-700'} p-[2px]`}>
                                             <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
                                                 {user.avatarUrl ? (
                                                     <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <User className={`w-5 h-5 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
+                                                    <User className={`w-6 h-6 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
                                                 )}
                                             </div>
                                         </div>
-                                        <div>
-                                            <p className={`text-sm font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{user.displayName || user.name}</p>
-                                            <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-white/50'}`}>{user.zions || 0} Zions</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'} truncate`}>{user.displayName || user.name}</p>
+                                            <p className={`text-xs ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{user.zions || 0} Zions</p>
                                         </div>
-                                    </div>
+                                    </Link>
                                 )}
                             </div>
 
@@ -400,7 +422,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             </div>
 
                             {/* Menu Items */}
-                            <div className="p-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+                            <div className="flex-1 p-2 overflow-y-auto">
                                 {menuItems.map((item) => (
                                     <Link
                                         key={item.path}
@@ -416,22 +438,6 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     </Link>
                                 ))}
                             </div>
-
-                            {/* Logout Button */}
-                            {!isVisitor && (
-                                <div className={`absolute bottom-0 left-0 right-0 p-4 border-t ${themeBorder}`}>
-                                    <button
-                                        onClick={() => {
-                                            setIsMobileMenuOpen(false);
-                                            logout();
-                                        }}
-                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-                                    >
-                                        <LogOut className="w-5 h-5" />
-                                        <span>Sair</span>
-                                    </button>
-                                </div>
-                            )}
                         </motion.div>
                     </>
                 )}

@@ -7,7 +7,7 @@ import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
 import ModernLoader from '../components/ModernLoader';
-import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown } from 'lucide-react';
+import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown, Zap, Star } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import ToastNotification from '../components/ToastNotification';
@@ -15,8 +15,22 @@ import ConfirmModal from '../components/ConfirmModal';
 import ChatWindow from '../components/ChatWindow';
 import LevelTimeline from '../components/LevelTimeline';
 
+// Badge emoji map
+const BADGE_EMOJIS: Record<string, string> = {
+    'badge_crown': '👑',
+    'badge_skull': '💀',
+    'badge_fire': '🔥',
+    'badge_star': '⭐',
+    'badge_diamond': '💎',
+    'badge_lightning': '⚡',
+    'badge_pony': '🦄',
+    'badge_heart': '❤️',
+    'badge_moon': '🌙',
+    'badge_sun': '☀️',
+};
+
 export default function ProfilePage() {
-    const { user: currentUser, theme, toggleTheme } = useAuth();
+    const { user: currentUser, theme, toggleTheme, equippedBadge } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const paramId = searchParams.get('id');
@@ -196,8 +210,12 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            {/* Crown Icon - Magazine Members Only */}
-                            {!isMGT && (
+                            {/* Badge Icon - Shows equipped badge or default crown for Magazine */}
+                            {(isOwnProfile ? equippedBadge : profileUser.equippedBadge) ? (
+                                <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12">
+                                    <span className="text-3xl">{BADGE_EMOJIS[(isOwnProfile ? equippedBadge : profileUser.equippedBadge) || ''] || '👑'}</span>
+                                </div>
+                            ) : !isMGT && (
                                 <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12 animate-pulse-slow">
                                     <Crown
                                         size={32}

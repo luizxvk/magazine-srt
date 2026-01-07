@@ -68,6 +68,9 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory }
         const file = e.target.files?.[0];
         if (file && user) {
             try {
+                // Close any open story viewer first
+                onCloseStory();
+                
                 // Compress image for editor
                 const imageUrl = await compressImage(file, {
                     maxWidth: 1080,

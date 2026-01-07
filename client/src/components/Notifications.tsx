@@ -1,5 +1,6 @@
 import { Bell, Heart, MessageCircle, Star, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -93,8 +94,9 @@ export default function Notifications({ onClose }: NotificationsProps) {
         // Handle different notification types
         switch (notification.type) {
             case 'MESSAGE':
-                // Open chat with the sender
+                // Open chat with the sender - Close notifications first
                 if (parsedContent.actor) {
+                    onClose?.(); // Close notifications dropdown first
                     setChatUser({
                         id: parsedContent.actor.id,
                         name: parsedContent.actor.name,
@@ -170,15 +172,16 @@ export default function Notifications({ onClose }: NotificationsProps) {
 
     return (
         <>
-            {/* Chat Window for MESSAGE notifications */}
-            {chatUser && (
+            {/* Chat Window for MESSAGE notifications - Rendered via portal to avoid z-index issues */}
+            {chatUser && createPortal(
                 <ChatWindow
                     otherUserId={chatUser.id}
                     otherUserName={chatUser.name}
                     otherUserAvatar={chatUser.avatarUrl}
                     otherUserMembershipType={chatUser.membershipType}
                     onClose={() => setChatUser(null)}
-                />
+                />,
+                document.body
             )}
             
             {/* Desktop: positioned relative to bell icon, Mobile: centered modal */}

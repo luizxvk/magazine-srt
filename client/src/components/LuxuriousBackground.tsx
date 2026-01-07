@@ -2,9 +2,14 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 export default function LuxuriousBackground() {
-    const { user, theme } = useAuth();
+    const { user, theme, backgroundStyle } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const isLight = theme === 'light';
+
+    // Don't render if user has a custom background equipped
+    if (backgroundStyle) {
+        return null;
+    }
 
     // Theme Colors
     const orb1Color = isLight

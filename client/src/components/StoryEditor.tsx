@@ -194,7 +194,7 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black flex flex-col"
+            className="fixed inset-0 z-[10000] bg-black flex flex-col"
         >
             {/* Hidden canvas for export */}
             <canvas ref={canvasRef} className="hidden" />

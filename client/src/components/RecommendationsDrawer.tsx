@@ -5,6 +5,7 @@ import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';
 import PhotoCatalogCard from './PhotoCatalogCard';
 import WhatsNewModal from './WhatsNewModal';
+import MgtLogCard from './MgtLogCard';
 import api from '../services/api';
 
 interface CatalogPhoto {
@@ -113,6 +114,11 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             {/* Daily Login Card */}
                             <div className="mb-6">
                                 <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+                            </div>
+
+                            {/* MGT Log Card */}
+                            <div className="mb-6">
+                                <MgtLogCard />
                             </div>
 
                             {/* Photo Catalog Card */}

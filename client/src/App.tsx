@@ -18,6 +18,8 @@ import MgtLogPage from './pages/MgtLogPage';
 import PhotoCatalogPage from './pages/PhotoCatalogPage';
 import HighlightsPage from './pages/HighlightsPage';
 import RoadmapPage from './pages/RoadmapPage';
+import GroupsPage from './pages/GroupsPage';
+import GroupDetailPage from './pages/GroupDetailPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
 import AdminEditMgtLogPage from './pages/admin/AdminEditMgtLogPage';
 import { logger } from './utils/logger';
@@ -51,12 +53,9 @@ function App() {
           <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
           <Route path="/mgt-log" element={<PrivateRoute><MgtLogPage /></PrivateRoute>} />
-
-          <Route path="/catalog" element={<PrivateRoute><PhotoCatalogPage /></PrivateRoute>} />
-          <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
-          <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
-
-          {/* Admin Routes */}
+          {/* Grupos */}
+          <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
+          <Route path="/groups/:id" element={<PrivateRoute><GroupDetailPage /></PrivateRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
           <Route path="/admin/edit-mgt-log" element={<AdminRoute><AdminEditMgtLogPage /></AdminRoute>} />

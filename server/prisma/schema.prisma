@@ -59,6 +59,11 @@ model User {
   zionPurchases ZionPurchase[]
   reportsSent  Report[] @relation("ReportsSent")
 
+  // Grupos
+  groupsCreated    Group[] @relation("GroupCreator")
+  groupMemberships GroupMember[] @relation("UserGroupMemberships")
+  groupMessages    GroupMessage[] @relation("UserGroupMessages")
+
   // Performance indexes
   @@index([membershipType])
   @@index([isOnline])
@@ -419,4 +424,89 @@ enum ReportStatus {
   REVIEWED
   RESOLVED
   DISMISSED
+}
+
+// ===== SISTEMA DE GRUPOS =====
+
+model Group {
+  id              String         @id @default(uuid())
+  name            String
+  description     String?
+  avatarUrl       String?
+  creatorId       String
+  membershipType  MembershipType // MAGAZINE ou MGT
+  isPrivate       Boolean        @default(false)
+  maxMembers      Int            @default(100)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  creator         User           @relation("GroupCreator", fields: [creatorId], references: [id])
+  members         GroupMember[]
+  messages        GroupMessage[]
+  settings        GroupSettings?
+
+  @@index([creatorId])
+  @@index([membershipType])
+  @@index([isPrivate])
+  @@index([createdAt])
+}
+
+model GroupMember {
+  id          String    @id @default(uuid())
+  groupId     String
+  userId      String
+  role        GroupRole @default(MEMBER)
+  joinedAt    DateTime  @default(now())
+  canPost     Boolean   @default(true)
+  canInvite   Boolean   @default(false)
+  canModerate Boolean   @default(false)
+
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserGroupMemberships", fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([role])
+}
+
+enum GroupRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+model GroupMessage {
+  id        String      @id @default(uuid())
+  groupId   String
+  senderId  String
+  content   String
+  imageUrl  String?
+  type      MessageType @default(TEXT)
+  createdAt DateTime    @default(now())
+  editedAt  DateTime?
+  deletedAt DateTime?
+
+  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender    User        @relation("UserGroupMessages", fields: [senderId], references: [id])
+
+  @@index([groupId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  ANNOUNCEMENT
+}
+
+model GroupSettings {
+  id                    String  @id @default(uuid())
+  groupId               String  @unique
+  requireApproval       Boolean @default(false)
+  allowMemberPosts      Boolean @default(true)
+  allowExternalInvites  Boolean @default(false)
+  muteNotifications     Boolean @default(false)
+
+  group                 Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }

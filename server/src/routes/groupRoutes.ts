@@ -11,12 +11,12 @@ import {
   updateMemberRole,
   deleteGroup,
 } from '../controllers/groupController';
-import { authenticate } from '../middleware/auth';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 // Todas as rotas requerem autenticação
-router.use(authenticate);
+router.use(authenticateToken);
 
 // Rotas de grupo
 router.post('/', createGroup);

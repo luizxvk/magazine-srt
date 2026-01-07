@@ -198,6 +198,33 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* RGB Dynamic Color Animation - Applies to all bg-accent elements when rgb-dynamic class is on root */
+html.rgb-dynamic .bg-accent,
+html.rgb-dynamic [class*="bg-accent"]:not(.bg-accent-hover) {
+  animation: rgb-cycle 3s linear infinite !important;
+  background: #ff0000 !important; /* Fallback */
+}
+
+html.rgb-dynamic .shadow-accent {
+  animation: rgb-shadow-cycle 3s linear infinite !important;
+}
+
+@keyframes rgb-shadow-cycle {
+  0% {
+    box-shadow: 0 0 20px #ff000080, 0 0 40px #ff000040;
+  }
+  33% {
+    box-shadow: 0 0 20px #00ff0080, 0 0 40px #00ff0040;
+  }
+  66% {
+    box-shadow: 0 0 20px #0000ff80, 0 0 40px #0000ff40;
+  }
+  100% {
+    box-shadow: 0 0 20px #ff000080, 0 0 40px #ff000040;
+  }
+}
+
 /* MAGAZINE logo gradient animation with custom colors */
 .text-gradient-magazine {
   background: linear-gradient(90deg, var(--accent-color), var(--accent-100), var(--accent-color));

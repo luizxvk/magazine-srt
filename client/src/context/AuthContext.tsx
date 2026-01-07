@@ -75,6 +75,7 @@ const BACKGROUND_STYLES: Record<string, string> = {
 // Accent color configurations
 const ACCENT_COLORS: Record<string, string> = {
     'color_gold': '#d4af37',
+    'color_rgb': 'rgb-dynamic', // Special case for RGB animation
     'color_cyan': '#00ffff',
     'color_magenta': '#ff00ff',
     'color_lime': '#00ff00',
@@ -114,7 +115,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Compute accent color from user's equipped customization
     const accentColor = React.useMemo(() => {
         if (user?.equippedColor && ACCENT_COLORS[user.equippedColor]) {
-            return ACCENT_COLORS[user.equippedColor];
+            const colorValue = ACCENT_COLORS[user.equippedColor];
+            // If RGB dynamic, return default color for CSS variables (animation handled separately)
+            if (colorValue === 'rgb-dynamic') {
+                return '#ff0000'; // Red as default for RGB cycle
+            }
+            return colorValue;
         }
         // Default colors based on membership
         return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
@@ -168,8 +174,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Add class when custom color is equipped to enable global color replacement
         if (user?.equippedColor) {
             root.classList.add('custom-accent');
+            // Add rgb-dynamic class for RGB animation
+            if (user.equippedColor === 'color_rgb') {
+                root.classList.add('rgb-dynamic');
+            } else {
+                root.classList.remove('rgb-dynamic');
+            }
         } else {
             root.classList.remove('custom-accent');
+            root.classList.remove('rgb-dynamic');
         }
     }, [accentColor, user?.equippedColor]);
 

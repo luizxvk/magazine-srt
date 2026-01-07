@@ -56,7 +56,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
         <div className="w-full">
             <div className="overflow-x-auto overflow-y-hidden pb-8 pt-4 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
                 <div className="min-w-[1600px] px-8 md:px-16">
-                    <div className="relative pt-20 pb-8">
+                    <div className="relative pt-20 pb-16">
                         {/* Progress Bar Background */}
                         <div className={`absolute top-1/2 left-0 w-full h-3 rounded-full -translate-y-1/2 backdrop-blur-sm ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-800/50'}`} />
 
@@ -121,6 +121,11 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                         >
                                             <span className="text-sm md:text-base font-bold">{level}</span>
                                         </motion.div>
+
+                                        {/* Label do Nível Abaixo da Barra */}
+                                        <span className={`absolute top-[calc(100%+24px)] text-xs font-medium whitespace-nowrap transition-colors ${isReached ? themeTextReached : themeTextUnreached}`}>
+                                            {level}
+                                        </span>
 
                                         {/* Tooltip for non-reward levels */}
                                         {!reward && (

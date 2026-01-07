@@ -199,19 +199,35 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             {/* Hidden canvas for export */}
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/90 to-transparent absolute top-0 left-0 right-0 z-50 shrink-0">
-                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full">
-                    <X className="w-6 h-6 text-white" />
-                </button>
-                <h3 className="text-white font-medium drop-shadow-lg hidden sm:block">Sua Story</h3>
-                <button 
-                    onClick={saveImage}
-                    className={`shrink-0 px-5 sm:px-6 py-2.5 rounded-full ${isMGT ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600'} text-white font-bold flex items-center gap-2 hover:scale-105 transition-all duration-200 shadow-lg shadow-black/50`}
-                >
-                    <Send className="w-5 h-5" />
-                    <span className="hidden sm:inline">Enviar</span>
-                </button>
+            {/* Top Actions - Sempre visível */}
+            <div className="absolute top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-black via-black/50 to-transparent">
+                <div className="flex items-center justify-between">
+                    <button onClick={onClose} className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors">
+                        <X className="w-6 h-6 text-white" />
+                    </button>
+                    
+                    <div className="flex items-center gap-3">
+                        {/* Botão Limpar */}
+                        {(textOverlays.length > 0 || stickerOverlays.length > 0) && (
+                            <button
+                                onClick={() => { setTextOverlays([]); setStickerOverlays([]); }}
+                                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-medium flex items-center gap-2 transition-all backdrop-blur-sm"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                                Limpar
+                            </button>
+                        )}
+                        
+                        {/* Botão ENVIAR - SEMPRE VISÍVEL E DESTACADO */}
+                        <button 
+                            onClick={saveImage}
+                            className={`px-6 py-2.5 rounded-full ${isMGT ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600'} text-white font-bold flex items-center gap-2 transition-all duration-200 shadow-2xl shadow-purple-500/50 hover:scale-105`}
+                        >
+                            <Send className="w-5 h-5" />
+                            ENVIAR
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Editor Area - Fixed aspect ratio container for web */}
@@ -352,29 +368,24 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
                 </AnimatePresence>
             </div>
 
-            {/* Bottom Toolbar */}
-            <div className="flex items-center justify-center gap-6 p-4 border-t border-white/10 bg-black/80 shrink-0">
-                <button
-                    onClick={() => { setActiveMode(activeMode === 'text' ? 'none' : 'text'); setShowStickerPicker(false); }}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-colors ${activeMode === 'text' ? (isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400') : 'text-white hover:bg-white/10'}`}
-                >
-                    <Type className="w-6 h-6" />
-                    <span className="text-[10px]">Texto</span>
-                </button>
-                <button
-                    onClick={() => { setShowStickerPicker(!showStickerPicker); setActiveMode('none'); }}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-colors ${showStickerPicker ? (isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400') : 'text-white hover:bg-white/10'}`}
-                >
-                    <Smile className="w-6 h-6" />
-                    <span className="text-[10px]">Stickers</span>
-                </button>
-                <button
-                    onClick={() => { setTextOverlays([]); setStickerOverlays([]); }}
-                    className="flex flex-col items-center gap-1 p-3 rounded-xl text-white hover:bg-white/10 transition-colors"
-                >
-                    <RotateCcw className="w-6 h-6" />
-                    <span className="text-[10px]">Limpar</span>
-                </button>
+            {/* Bottom Toolbar - Design Moderno */}
+            <div className="absolute bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
+                <div className="flex items-center justify-center gap-4">
+                    <button
+                        onClick={() => { setActiveMode(activeMode === 'text' ? 'none' : 'text'); setShowStickerPicker(false); }}
+                        className={`flex flex-col items-center gap-2 px-6 py-4 rounded-2xl transition-all duration-300 ${activeMode === 'text' ? (isMGT ? 'bg-emerald-500 text-white scale-110' : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white scale-110') : 'bg-white/10 text-white hover:bg-white/20 hover:scale-105'} backdrop-blur-sm`}
+                    >
+                        <Type className="w-7 h-7" />
+                        <span className="text-sm font-bold">Texto</span>
+                    </button>
+                    <button
+                        onClick={() => { setShowStickerPicker(!showStickerPicker); setActiveMode('none'); }}
+                        className={`flex flex-col items-center gap-2 px-6 py-4 rounded-2xl transition-all duration-300 ${showStickerPicker ? (isMGT ? 'bg-emerald-500 text-white scale-110' : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white scale-110') : 'bg-white/10 text-white hover:bg-white/20 hover:scale-105'} backdrop-blur-sm`}
+                    >
+                        <Smile className="w-7 h-7" />
+                        <span className="text-sm font-bold">Stickers</span>
+                    </button>
+                </div>
             </div>
         </motion.div>
     );

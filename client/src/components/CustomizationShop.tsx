@@ -145,10 +145,15 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const handleEquip = async (item: Omit<ShopItem, 'owned' | 'equipped'>) => {
         try {
             const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
-            await api.post('/users/customizations/equip', { 
+            const payload = { 
                 itemId: item.id, 
                 category: categoryMap[item.type] 
-            });
+            };
+            console.log('[CustomizationShop] Equipping item:', payload);
+            
+            const response = await api.post('/users/customizations/equip', payload);
+            console.log('[CustomizationShop] Equip response:', response.data);
+            
             setEquippedItems(prev => ({ ...prev, [item.type]: item.id }));
             
             // Update user state with the equipped item so it applies globally
@@ -161,8 +166,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             }
             
             setNotification({ type: 'success', message: `${item.name} equipado!` });
-        } catch (error) {
-            setNotification({ type: 'error', message: 'Erro ao equipar item' });
+        } catch (error: any) {
+            console.error('[CustomizationShop] Equip error:', error.response?.data || error.message);
+            const errorMsg = error.response?.data?.error || 'Erro ao equipar item';
+            setNotification({ type: 'error', message: errorMsg });
         }
         setTimeout(() => setNotification(null), 3000);
     };

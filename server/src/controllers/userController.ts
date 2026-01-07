@@ -566,8 +566,16 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         const { itemId, category } = req.body;
 
+        console.log('[equipCustomization] Request:', { userId, itemId, category });
+
         if (!itemId || !category) {
+            console.log('[equipCustomization] Missing itemId or category');
             return res.status(400).json({ error: 'Item ID and category required' });
+        }
+
+        if (!userId) {
+            console.log('[equipCustomization] No userId found');
+            return res.status(401).json({ error: 'Unauthorized' });
         }
 
         const user = await prisma.user.findUnique({
@@ -576,18 +584,23 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
         });
 
         if (!user) {
+            console.log('[equipCustomization] User not found:', userId);
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Default items (free) that don't require ownership
+        // Default items (free) that don't require ownership - available for all users
         const defaultItemIds = ['bg_default', 'badge_crown', 'color_gold'];
         
         // Check if user owns this item (skip check for default items)
         if (!defaultItemIds.includes(itemId)) {
             const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
+            console.log('[equipCustomization] Owned items:', owned, 'Checking for:', itemId);
             if (!owned.includes(itemId)) {
+                console.log('[equipCustomization] User does not own item:', itemId);
                 return res.status(400).json({ error: 'You do not own this item' });
             }
+        } else {
+            console.log('[equipCustomization] Item is a default item, skipping ownership check:', itemId);
         }
 
         // Equip based on category
@@ -599,6 +612,7 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
         } else if (category === 'colors') {
             updateData.equippedColor = itemId;
         } else {
+            console.log('[equipCustomization] Invalid category:', category);
             return res.status(400).json({ error: 'Invalid category' });
         }
 
@@ -607,6 +621,7 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
             data: updateData
         });
 
+        console.log('[equipCustomization] Success:', { itemId, category });
         res.json({ success: true, message: 'Item equipped!' });
     } catch (error) {
         console.error('Error equipping customization:', error);

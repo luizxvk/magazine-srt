@@ -96,6 +96,70 @@
 .ring-accent { --tw-ring-color: var(--accent-color) !important; }
 .shadow-accent { box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4) !important; }
 
+/* ==============================================
+   GLOBAL ACCENT COLOR OVERRIDE SYSTEM
+   When user has a custom color equipped (.custom-accent),
+   all gold and emerald colors are replaced with the accent color
+   ============================================== */
+
+/* Text Color Overrides */
+.custom-accent .text-gold-200,
+.custom-accent .text-gold-300,
+.custom-accent .text-gold-400,
+.custom-accent .text-gold-500,
+.custom-accent .text-emerald-200,
+.custom-accent .text-emerald-300,
+.custom-accent .text-emerald-400,
+.custom-accent .text-emerald-500 {
+  color: var(--accent-color) !important;
+}
+
+/* Background Color Overrides */
+.custom-accent .bg-gold-400,
+.custom-accent .bg-gold-500,
+.custom-accent .bg-gold-600,
+.custom-accent .bg-emerald-500,
+.custom-accent .bg-emerald-600 {
+  background-color: var(--accent-color) !important;
+}
+
+/* Background with opacity */
+.custom-accent .bg-gold-500\/10,
+.custom-accent .bg-gold-500\/20,
+.custom-accent .bg-gold-500\/30,
+.custom-accent .bg-emerald-500\/10,
+.custom-accent .bg-emerald-500\/20,
+.custom-accent .bg-emerald-500\/30 {
+  background-color: rgba(var(--accent-color-rgb), 0.2) !important;
+}
+
+/* Border Color Overrides */
+.custom-accent .border-gold-400,
+.custom-accent .border-gold-500,
+.custom-accent .border-gold-500\/10,
+.custom-accent .border-gold-500\/20,
+.custom-accent .border-gold-500\/30,
+.custom-accent .border-gold-500\/50,
+.custom-accent .border-emerald-500,
+.custom-accent .border-emerald-500\/10,
+.custom-accent .border-emerald-500\/20,
+.custom-accent .border-emerald-500\/30,
+.custom-accent .border-emerald-500\/50,
+.custom-accent .border-emerald-600\/30 {
+  border-color: rgba(var(--accent-color-rgb), 0.5) !important;
+}
+
+/* Ring Color Overrides */
+.custom-accent .ring-gold-500,
+.custom-accent .ring-emerald-500 {
+  --tw-ring-color: var(--accent-color) !important;
+}
+
+/* Selection Color */
+.custom-accent .selection\:bg-gold-500\/30 ::selection {
+  background-color: rgba(var(--accent-color-rgb), 0.3) !important;
+}
+
 /* Gradient with accent */
 .bg-gradient-accent {
   background: linear-gradient(to right, var(--accent-600), var(--accent-400), var(--accent-600)) !important;

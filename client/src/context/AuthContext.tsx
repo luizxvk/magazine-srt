@@ -132,7 +132,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         document.documentElement.style.setProperty('--accent-color', accentColor);
         document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(accentColor));
-    }, [accentColor]);
+        
+        // Add class when custom color is equipped to enable global color replacement
+        const root = document.documentElement;
+        if (user?.equippedColor) {
+            root.classList.add('custom-accent');
+        } else {
+            root.classList.remove('custom-accent');
+        }
+    }, [accentColor, user?.equippedColor]);
 
     // Apply custom background
     useEffect(() => {

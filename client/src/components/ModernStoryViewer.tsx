@@ -37,7 +37,7 @@ interface ModernStoryViewerProps {
 }
 
 export default function ModernStoryViewer({ stories, initialStoryIndex, onClose, onStoryViewed }: ModernStoryViewerProps) {
-    const { user, theme } = useAuth();
+    const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
     const [progress, setProgress] = useState(0);

@@ -16,6 +16,12 @@ interface Story {
     imageUrl: string;
     timestamp: string;
     hasUnseen: boolean;
+    items?: Array<{
+        id: string;
+        imageUrl: string;
+        createdAt: string;
+        expiresAt?: string;
+    }>;
 }
 
 interface StoriesBarProps {
@@ -227,7 +233,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
             {viewingStoryId && stories.find(s => s.id === viewingStoryId) && (
                 <ModernStoryViewer
                     stories={stories.flatMap(storyGroup => 
-                        storyGroup.items.map(item => ({
+                        (storyGroup.items || []).map((item: any) => ({
                             id: item.id,
                             imageUrl: item.imageUrl,
                             user: storyGroup.user,
@@ -236,11 +242,11 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
                             viewCount: 0
                         }))
                     )}
-                    initialStoryIndex={stories.flatMap(sg => sg.items).findIndex(item => 
-                        stories.find(s => s.id === viewingStoryId)?.items.includes(item)
+                    initialStoryIndex={stories.flatMap(sg => (sg.items || [])).findIndex((item: any) => 
+                        stories.find(s => s.id === viewingStoryId)?.items?.includes(item)
                     )}
                     onClose={onCloseStory}
-                    onStoryViewed={(id) => setStories(prev => prev.map(s => ({ ...s, hasUnseen: false })))}
+                    onStoryViewed={() => setStories(prev => prev.map(s => ({ ...s, hasUnseen: false })))}
                 />
             )}
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import StoryViewer from './StoryViewer';
+import ModernStoryViewer from './ModernStoryViewer';
 import StoryEditor from './StoryEditor';
 import { cropImageToAspectRatio, getBase64Size } from '../utils/imageCompression';
 
@@ -225,11 +225,22 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
 
             {/* Story Viewer Modal */}
             {viewingStoryId && stories.find(s => s.id === viewingStoryId) && (
-                <StoryViewer
-                    stories={stories}
-                    initialStoryIndex={stories.findIndex(s => s.id === viewingStoryId)}
+                <ModernStoryViewer
+                    stories={stories.flatMap(storyGroup => 
+                        storyGroup.items.map(item => ({
+                            id: item.id,
+                            imageUrl: item.imageUrl,
+                            user: storyGroup.user,
+                            createdAt: item.createdAt,
+                            expiresAt: item.expiresAt || new Date(new Date(item.createdAt).getTime() + 24 * 60 * 60 * 1000).toISOString(),
+                            viewCount: 0
+                        }))
+                    )}
+                    initialStoryIndex={stories.flatMap(sg => sg.items).findIndex(item => 
+                        stories.find(s => s.id === viewingStoryId)?.items.includes(item)
+                    )}
                     onClose={onCloseStory}
-                    onStoryViewed={(id) => setStories(prev => prev.map(s => s.id === id ? { ...s, hasUnseen: false } : s))}
+                    onStoryViewed={(id) => setStories(prev => prev.map(s => ({ ...s, hasUnseen: false })))}
                 />
             )}
 

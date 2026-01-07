@@ -78,7 +78,7 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {
-    const { user, updateUserZions, updateUser } = useAuth();
+    const { user, updateUserZions, updateUser, theme } = useAuth();
     const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color'>('background');
     const [purchasing, setPurchasing] = useState<string | null>(null);
     const [ownedItems, setOwnedItems] = useState<string[]>([]);
@@ -87,6 +87,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'emerald' : 'gold';
+    const isDarkMode = theme === 'dark';
 
     // Default items are always owned
     const defaultItemIds = [defaultItems.background.id, defaultItems.badge.id, defaultItems.color.id];
@@ -232,13 +233,18 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     if (!isOpen) return null;
 
+    const bgMain = isDarkMode ? 'bg-gradient-to-br from-neutral-900 via-neutral-950 to-black' : 'bg-white';
+    const borderColor = isDarkMode ? 'border-white/10' : 'border-gray-200';
+    const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
+    const textSub = isDarkMode ? 'text-gray-400' : 'text-gray-600';
+
     return (
         <AnimatePresence>
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                className={`fixed inset-0 z-[100] flex items-center justify-center p-4 ${isDarkMode ? 'bg-black/80' : 'bg-black/40'} backdrop-blur-sm`}
                 onClick={onClose}
             >
                 <motion.div
@@ -246,18 +252,18 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
                     transition={{ duration: 0.25 }}
-                    className="relative w-full max-w-2xl max-h-[85vh] bg-gradient-to-br from-neutral-900 via-neutral-950 to-black rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+                    className={`relative w-full max-w-2xl max-h-[85vh] ${bgMain} rounded-2xl border ${borderColor} shadow-2xl overflow-hidden`}
                     onClick={e => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className={`p-4 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-${themeColor}-500/10 to-transparent`}>
+                    <div className={`p-4 border-b ${borderColor} flex items-center justify-between bg-gradient-to-r from-${themeColor}-500/10 to-transparent`}>
                         <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-lg bg-${themeColor}-500/20`}>
                                 <Sparkles className={`w-5 h-5 text-${themeColor}-400`} />
                             </div>
                             <div>
-                                <h2 className="text-lg font-bold text-white">Loja de Personalização</h2>
-                                <p className="text-xs text-gray-400">Customize seu perfil</p>
+                                <h2 className={`text-lg font-bold ${textMain}`}>Loja de Personalização</h2>
+                                <p className={`text-xs ${textSub}`}>Customize seu perfil</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -265,8 +271,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 <Zap className={`w-4 h-4 text-${themeColor}-400`} />
                                 <span className={`text-sm font-bold text-${themeColor}-400`}>{user?.zions || 0}</span>
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                                <X className="w-5 h-5 text-gray-400" />
+                            <button onClick={onClose} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>
+                                <X className={`w-5 h-5 ${textSub}`} />
                             </button>
                         </div>
                     </div>
@@ -288,7 +294,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     </AnimatePresence>
 
                     {/* Tabs */}
-                    <div className="flex border-b border-white/10">
+                    <div className={`flex border-b ${borderColor}`}>
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
@@ -296,7 +302,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
                                     activeTab === tab.id
                                         ? `text-${themeColor}-400 border-b-2 border-${themeColor}-400 bg-${themeColor}-500/5`
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                        : `${textSub} ${isDarkMode ? 'hover:text-white hover:bg-white/5' : 'hover:text-gray-900 hover:bg-gray-100'}`
                                 }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -318,8 +324,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         key={item.id}
                                         whileHover={{ scale: 1.02 }}
                                         className={`relative rounded-xl overflow-hidden border ${
-                                            equipped ? `border-${themeColor}-500` : 'border-white/10'
-                                        } bg-black/40`}
+                                            equipped ? `border-${themeColor}-500` : borderColor
+                                        } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
                                     >
                                         {/* Preview */}
                                         <div className="aspect-square relative flex items-center justify-center overflow-hidden">
@@ -359,9 +365,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         </div>
 
                                         {/* Info */}
-                                        <div className="p-3 bg-black/60">
-                                            <h3 className="text-sm font-medium text-white truncate">{item.name}</h3>
-                                            <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                                        <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                            <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                            <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
                                             
                                             {/* Action */}
                                             <div className="mt-2">
@@ -370,7 +376,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
                                                         className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                                             equipped
-                                                                ? 'bg-white/10 text-gray-400 hover:bg-white/20'
+                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
                                                                 : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                         }`}
                                                     >
@@ -382,7 +388,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         disabled={purchasing === item.id || (user?.zions || 0) < item.price}
                                                         className={`w-full py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${
                                                             (user?.zions || 0) < item.price
-                                                                ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                                                                ? `${isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-300 text-gray-400'} cursor-not-allowed`
                                                                 : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
                                                         }`}
                                                     >

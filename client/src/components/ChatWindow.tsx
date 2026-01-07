@@ -29,7 +29,7 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, onClose }: ChatWindowProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, setActiveChatUserId } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -43,6 +43,12 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
     // Determine other user's theme
     const isOtherMGT = otherUserMembershipType === 'MGT';
     const isMeMGT = user?.membershipType === 'MGT';
+
+    // Notify context that this chat is active
+    useEffect(() => {
+        setActiveChatUserId(otherUserId);
+        return () => setActiveChatUserId(null);
+    }, [otherUserId, setActiveChatUserId]);
 
     useEffect(() => {
         let isMounted = true;

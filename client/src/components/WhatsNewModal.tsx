@@ -3,7 +3,7 @@ import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCi
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.1';
+const CURRENT_VERSION = '0.3.2';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -24,12 +24,42 @@ export default function WhatsNewModal() {
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.1 - Correções e melhorias
+    // v0.3.2 - Melhorias visuais e UX
     const updates: UpdateItem[] = [
         {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'Cores Personalizadas',
+            description: 'Post pill, loading e todos elementos respeitam sua cor escolhida!',
+            isNew: true
+        },
+        {
+            icon: <Zap className="w-5 h-5" />,
+            title: 'MAGAZINE Animado',
+            description: 'Logo com animação mais rápida e brilhante para maior exclusividade!',
+            isNew: true
+        },
+        {
+            icon: <Trophy className="w-5 h-5" />,
+            title: 'Timeline de Níveis',
+            description: 'Interface melhorada com melhor espaçamento e visualização!',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Editor de Stories',
+            description: 'Botão de enviar agora visível e interface reformulada!',
+            isNew: true
+        },
+        {
             icon: <Wrench className="w-5 h-5" />,
-            title: 'Correções v0.3.1',
-            description: 'Fundos, badges e cores da loja agora aplicam corretamente!',
+            title: 'Textos Originais',
+            description: 'Posts mantêm formatação original sem uppercase forçado.',
+            isNew: true
+        },
+        {
+            icon: <Wrench className="w-5 h-5" />,
+            title: 'Logout Corrigido',
+            description: 'Cores voltam ao padrão Magazine ao deslogar.',
             isNew: true
         },
         {

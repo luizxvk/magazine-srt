@@ -200,24 +200,24 @@ export default function StoryEditor({ imageUrl, onPublish, onClose }: StoryEdito
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/90 to-transparent absolute top-0 left-0 right-0 z-50 shrink-0">
                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full">
                     <X className="w-6 h-6 text-white" />
                 </button>
-                <h3 className="text-white font-medium hidden sm:block">Editar Story</h3>
+                <h3 className="text-white font-medium drop-shadow-lg hidden sm:block">Sua Story</h3>
                 <button 
                     onClick={saveImage}
-                    className={`shrink-0 px-3 sm:px-4 py-2 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} text-black font-bold flex items-center gap-2 hover:scale-105 transition-transform text-sm sm:text-base`}
+                    className={`shrink-0 px-5 sm:px-6 py-2.5 rounded-full ${isMGT ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600'} text-white font-bold flex items-center gap-2 hover:scale-105 transition-all duration-200 shadow-lg shadow-black/50`}
                 >
-                    Enviar Story
-                    <Send className="w-4 h-4" />
+                    <Send className="w-5 h-5" />
+                    <span className="hidden sm:inline">Enviar</span>
                 </button>
             </div>
 
             {/* Editor Area - Fixed aspect ratio container for web */}
             <div 
                 ref={containerRef}
-                className="flex-1 relative overflow-hidden flex items-center justify-center"
+                className="flex-1 relative overflow-hidden flex items-center justify-center pt-20"
                 onMouseMove={dragging ? handleDrag : undefined}
                 onMouseUp={handleDragEnd}
                 onMouseLeave={handleDragEnd}

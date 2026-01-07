@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Users, Calendar, Star } from 'lucide-react';
+import { X, Users, Calendar, Star, Sparkles } from 'lucide-react';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';
 import PhotoCatalogCard from './PhotoCatalogCard';
+import WhatsNewModal from './WhatsNewModal';
 import api from '../services/api';
 
 interface CatalogPhoto {
@@ -37,6 +38,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [catalogPhotos, setCatalogPhotos] = useState<CatalogPhoto[]>([]);
+    const [showWhatsNew, setShowWhatsNew] = useState(false);
 
     // Fetch user's catalog photos when drawer opens
     useEffect(() => {
@@ -118,6 +120,21 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
 
                             {/* Recommendation Cards */}
                             <div className="space-y-4">
+                                <div 
+                                    onClick={() => setShowWhatsNew(true)}
+                                    className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
+                                >
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
+                                            <Sparkles className="w-5 h-5" />
+                                        </div>
+                                        <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>O que há de novo</h4>
+                                    </div>
+                                    <p className="text-sm text-gray-400 leading-relaxed">
+                                        Confira as últimas atualizações e novidades da plataforma.
+                                    </p>
+                                </div>
+
                                 <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
@@ -156,6 +173,9 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             </div>
                         </div>
                     </motion.div>
+
+                    {/* WhatsNew Modal */}
+                    <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
                 </>
             )}
         </AnimatePresence>

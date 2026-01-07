@@ -56,7 +56,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
         <div className="w-full">
             <div className="overflow-x-auto overflow-y-hidden pb-8 pt-4 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
                 <div className="min-w-[1600px] px-8 md:px-16">
-                    <div className="relative pt-12 pb-4">
+                    <div className="relative pt-20 pb-8">
                         {/* Progress Bar Background */}
                         <div className={`absolute top-1/2 left-0 w-full h-3 rounded-full -translate-y-1/2 backdrop-blur-sm ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-800/50'}`} />
 
@@ -80,11 +80,11 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                         {reward && (() => {
                                             const Icon = reward.icon;
                                             return (
-                                                <div className="absolute -top-10 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
-                                                    <div className={`p-1.5 rounded-full mb-1 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
-                                                        <Icon size={14} />
+                                                <div className="absolute -top-16 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
+                                                    <div className={`p-2 rounded-full mb-2 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
+                                                        <Icon size={16} />
                                                     </div>
-                                                    <span className={`text-[9px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
                                                         {reward.label}
                                                     </span>
 
@@ -111,7 +111,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
 
                                         {/* Level Node */}
                                         <motion.div
-                                            className={`w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isReached
+                                            className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center border-3 transition-all duration-300 ${isReached
                                                 ? themeNodeReached
                                                 : themeNodeUnreached
                                                 } ${isCurrent ? `scale-125 ring-4 ${isMGT ? 'ring-emerald-500/30' : 'ring-yellow-500/30'} z-30` : 'z-20'}`}
@@ -119,7 +119,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
                                             animate={{ scale: isCurrent ? 1.2 : 1 }}
                                             whileHover={{ scale: 1.1 }}
                                         >
-                                            <span className="text-[11px] md:text-sm">{level}</span>
+                                            <span className="text-sm md:text-base font-bold">{level}</span>
                                         </motion.div>
 
                                         {/* Tooltip for non-reward levels */}

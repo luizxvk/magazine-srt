@@ -530,7 +530,8 @@
 
 .animate-shimmer {
   background-size: 200% auto;
-  animation: shine 3s linear infinite;
+  animation: shine 1.5s linear infinite;
+  filter: brightness(1.3);
 }
 
 @keyframes shine-gold {

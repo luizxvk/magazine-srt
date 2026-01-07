@@ -29,8 +29,8 @@ export default function ModernLoader({ text, size = 'md', className = '', fullSc
         lg: 'text-base'
     };
 
-    const accentColor = isMGT ? 'bg-emerald-500' : 'bg-yellow-500';
-    const textColor = isMGT ? 'text-emerald-500/70' : 'text-yellow-500/70';
+    const accentColor = isMGT ? 'bg-emerald-500' : 'bg-accent';
+    const textColor = isMGT ? 'text-emerald-500/70' : 'text-accent';
 
     const containerClass = fullScreen 
         ? 'min-h-screen flex flex-col items-center justify-center bg-black/90 w-full'

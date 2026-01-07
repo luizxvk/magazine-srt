@@ -176,7 +176,7 @@ export default function FeedPage() {
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
             <LuxuriousBackground />
-            {!viewingStoryId && <Header onOpenRecommendations={() => setIsRecommendationsOpen(true)} onOpenShop={() => setIsShopOpen(true)} />}
+            {!viewingStoryId && <Header onOpenShop={() => setIsShopOpen(true)} />}
 
             <ToastNotification
                 message={toast.message}

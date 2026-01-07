@@ -6,7 +6,7 @@ import { loginRateLimit, resetPasswordRateLimit, rateLimit } from '../middleware
 const router = Router();
 
 // Apply rate limiting to sensitive endpoints
-router.post('/register', rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: 'Muitas tentativas de registro.' }), register);
+router.post('/register', rateLimit({ windowMs: 60 * 60 * 1000, max: 20, message: 'Muitas tentativas de registro. Aguarde uma hora.' }), register);
 router.post('/login', loginRateLimit, login);
 router.post('/request-reset', resetPasswordRateLimit, requestPasswordReset);
 router.post('/reset-password', resetPasswordRateLimit, resetPassword);

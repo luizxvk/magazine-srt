@@ -306,8 +306,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (user) {
                     setUser({ ...user, zions: (user.zions || 0) + response.data.awarded });
                 }
-                // Update status
-                setDailyLoginStatus(prev => prev ? { ...prev, claimed: true } : null);
+                // Update status with new streak from backend
+                setDailyLoginStatus(prev => prev ? { 
+                    ...prev, 
+                    claimed: true,
+                    streak: response.data.streak || prev.streak
+                } : null);
 
                 // Mark as claimed for today so modal won't reopen
                 localStorage.setItem('dailyLoginModalShown', new Date().toDateString());

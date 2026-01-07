@@ -7,7 +7,7 @@ import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
 import ModernLoader from '../components/ModernLoader';
-import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown, Zap, Star } from 'lucide-react';
+import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import ToastNotification from '../components/ToastNotification';

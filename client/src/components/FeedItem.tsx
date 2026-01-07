@@ -179,33 +179,53 @@ export default function FeedItem({
                         </button>
 
                         {/* Dropdown Menu */}
-                        {showMenu && (
-                            <div className={`absolute right-0 top-full mt-2 w-32 bg-black/90 border rounded-lg shadow-xl backdrop-blur-xl z-50 overflow-hidden ${isMGT ? 'border-white/20' : 'border-gold-500/20'}`}>
-                                {isOwner && (
+                        <AnimatePresence>
+                            {showMenu && (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                                    transition={{ duration: 0.15 }}
+                                    className={`absolute right-0 top-full mt-2 w-36 bg-black/95 border rounded-xl shadow-2xl backdrop-blur-xl z-[60] overflow-hidden ${isMGT ? 'border-white/20' : 'border-gold-500/20'}`}
+                                >
+                                    {isOwner && (
+                                        <button
+                                            onClick={(e) => { 
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                setShowMenu(false);
+                                                onDelete && onDelete(id); 
+                                            }}
+                                            className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+                                        >
+                                            <Trash2 className="w-4 h-4" /> Deletar
+                                        </button>
+                                    )}
                                     <button
-                                        onClick={() => { onDelete && onDelete(id); setShowMenu(false); }}
-                                        className="w-full px-4 py-2 text-left text-xs text-red-400 hover:bg-white/5 flex items-center gap-2"
+                                        onClick={(e) => { 
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            setShowMenu(false);
+                                            handleShare(); 
+                                        }}
+                                        className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2 transition-colors"
                                     >
-                                        <Trash2 className="w-3 h-3" /> Deletar
+                                        <Share2 className="w-4 h-4" /> Compartilhar
                                     </button>
-                                )}
-                                <button
-                                    onClick={() => { handleShare(); setShowMenu(false); }}
-                                    className="w-full px-4 py-2 text-left text-xs text-gray-300 hover:bg-white/5 flex items-center gap-2"
-                                >
-                                    <Share2 className="w-3 h-3" /> Compartilhar
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setShowReportModal(true);
-                                        setShowMenu(false);
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-xs text-gray-300 hover:bg-white/5 flex items-center gap-2"
-                                >
-                                    <Flag className="w-3 h-3" /> Denunciar
-                                </button>
-                            </div>
-                        )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            setShowMenu(false);
+                                            setShowReportModal(true);
+                                        }}
+                                        className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2 transition-colors"
+                                    >
+                                        <Flag className="w-4 h-4" /> Denunciar
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Copied Feedback */}
                         <AnimatePresence>

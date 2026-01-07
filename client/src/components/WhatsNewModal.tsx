@@ -124,7 +124,10 @@ export default function WhatsNewModal() {
                             <Sparkles className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-white">Novidades v{CURRENT_VERSION} 🎉</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-2xl font-bold text-white">Novidades v{CURRENT_VERSION}</h2>
+                                <span className="text-[10px] px-2 py-0.5 rounded bg-red-500 text-white font-bold uppercase">BETA</span>
+                            </div>
                             <p className="text-white/80 text-sm">Confira o que há de novo!</p>
                         </div>
                     </div>

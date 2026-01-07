@@ -294,12 +294,24 @@ export const getDailyLoginStatus = async (req: Request, res: Response) => {
         // Calculate streak from recentClaims
         streak = 0;
         let checkDate = new Date(today);
-        // If not claimed today, start checking from yesterday
-        if (!claimed) {
+        
+        // If already claimed today, include today in streak count
+        if (claimed) {
+            const found = recentClaims.find(c => {
+                const cDate = new Date(c.createdAt);
+                cDate.setHours(0, 0, 0, 0);
+                return cDate.getTime() === today.getTime();
+            });
+            if (found) {
+                streak = 1; // Today counts
+                checkDate.setDate(checkDate.getDate() - 1); // Now check yesterday onwards
+            }
+        } else {
+            // Not claimed today, start checking from yesterday
             checkDate.setDate(checkDate.getDate() - 1);
         }
 
-        // Simple loop to count consecutive days
+        // Simple loop to count consecutive days backwards
         for (let i = 0; i < 7; i++) {
             const found = recentClaims.find(c => {
                 const cDate = new Date(c.createdAt);
@@ -310,15 +322,15 @@ export const getDailyLoginStatus = async (req: Request, res: Response) => {
                 streak++;
                 checkDate.setDate(checkDate.getDate() - 1);
             } else {
-                // If we are checking today and it's not claimed, we don't break yet, we already handled that by starting from yesterday.
-                // If we are checking yesterday and it's missing, streak breaks.
                 break;
             }
         }
 
-        // Next reward
+        // Next reward - use modulo for cycling through week
         const rewards = [5, 10, 15, 20, 25, 30, 50];
-        const nextReward = rewards[streak % 7];
+        // If claimed, show reward for next day. If not, show today's potential reward
+        const nextRewardIndex = claimed ? (streak % 7) : (streak % 7);
+        const nextReward = rewards[nextRewardIndex];
 
         res.json({ claimed, streak, nextReward, rewards });
     } catch (error) {

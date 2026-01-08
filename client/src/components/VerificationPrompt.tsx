@@ -17,6 +17,9 @@ export default function VerificationPrompt() {
             if (!dismissedUntil || new Date(dismissedUntil) < new Date()) {
                 setShow(true);
             }
+        } else if (user && user.isVerified) {
+            // Hide if user is verified
+            setShow(false);
         }
     }, [user, dismissed]);
 

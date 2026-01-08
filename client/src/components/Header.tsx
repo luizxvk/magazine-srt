@@ -390,8 +390,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                             </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'} truncate`}>{user.displayName || user.name}</p>
-                                            <p className={`text-xs ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{user.zions || 0} Zions</p>
+                                            <p className={`text-sm font-semibold truncate ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{user.displayName || user.name}</p>
+                                            <p className={`text-xs ${isMGT ? 'text-emerald-300' : 'text-gold-300'}`}>{user.zions || 0} Zions</p>
                                         </div>
                                     </Link>
                                 )}
@@ -435,7 +435,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
                             {/* Cards Section + Menu Items */}
                             <div className="flex-1 overflow-y-auto px-4 py-2">
-                                <div className="space-y-4 mb-4">
+                                <div className="flex flex-col gap-4 mb-4">
                                     <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileDrawerOpen(false); openDailyLoginModal(); }} />
                                     <OnlineFriendsCard />
                                     <WhatsNewCard />

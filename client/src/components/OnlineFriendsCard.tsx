@@ -21,7 +21,7 @@ interface OnlineFriendsCardProps {
 }
 
 export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, setIsMobileDrawerOpen } = useAuth();
     const [onlineFriends, setOnlineFriends] = useState<OnlineFriend[]>([]);
     const [loading, setLoading] = useState(true);
     const [chatOpen, setChatOpen] = useState<OnlineFriend | null>(null);
@@ -162,7 +162,10 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => setChatOpen(friend)}
+                                            onClick={() => {
+                                                setChatOpen(friend);
+                                                setIsMobileDrawerOpen(false);
+                                            }}
                                             className={`p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all ${friendMGT ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-gold-500/20 text-gold-400 hover:bg-gold-500/30'}`}
                                             title="Enviar mensagem"
                                         >

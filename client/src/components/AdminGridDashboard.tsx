@@ -171,6 +171,7 @@ export default function AdminGridDashboard() {
                     </div>
                 ))}
             </GridLayout>
+            </div>
         </div>
     );
 }

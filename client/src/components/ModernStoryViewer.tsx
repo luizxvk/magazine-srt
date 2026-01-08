@@ -81,7 +81,16 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         return () => clearInterval(timer);
     }, [currentIndex, isPaused]);
 
+    const isValidStoryId = (storyId: string | undefined): boolean => {
+        // Check if ID is valid (not undefined, not empty, and not a local temporary ID)
+        return !!storyId && storyId !== 'undefined' && !storyId.startsWith('story-local-');
+    };
+
     const markStoryAsViewed = async (storyId: string) => {
+        if (!isValidStoryId(storyId)) {
+            console.log('Skipping view mark for temporary/invalid story ID:', storyId);
+            return;
+        }
         try {
             await api.post(`/feed/stories/${storyId}/view`);
         } catch (error) {
@@ -90,6 +99,10 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     };
 
     const fetchViewers = async (storyId: string) => {
+        if (!isValidStoryId(storyId)) {
+            console.log('Skipping viewers fetch for temporary/invalid story ID:', storyId);
+            return;
+        }
         try {
             const response = await api.get(`/feed/stories/${storyId}/viewers`);
             setViewers(response.data);

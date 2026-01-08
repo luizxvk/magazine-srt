@@ -275,29 +275,35 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
             </div>
 
             {/* Story Viewer Modal */}
-            {viewingStoryId && stories.find(s => s.id === viewingStoryId) && (
-                <ModernStoryViewer
-                    stories={stories.flatMap(storyGroup => 
-                        (storyGroup.items || []).map((item: any) => {
-                            const createdDate = item.createdAt ? new Date(item.createdAt) : new Date();
-                            const isValidDate = !isNaN(createdDate.getTime());
-                            return {
-                                id: item.id,
-                                imageUrl: item.imageUrl,
-                                user: storyGroup.user,
-                                createdAt: isValidDate ? item.createdAt : new Date().toISOString(),
-                                expiresAt: item.expiresAt || (isValidDate ? new Date(createdDate.getTime() + 24 * 60 * 60 * 1000).toISOString() : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()),
-                                viewCount: 0
-                            };
-                        })
-                    )}
-                    initialStoryIndex={stories.flatMap(sg => (sg.items || [])).findIndex((item: any) => 
-                        stories.find(s => s.id === viewingStoryId)?.items?.includes(item)
-                    )}
-                    onClose={onCloseStory}
-                    onStoryViewed={() => setStories(prev => prev.map(s => ({ ...s, hasUnseen: false })))}
-                />
-            )}
+            {viewingStoryId && stories.find(s => s.id === viewingStoryId) && (() => {
+                const allStoryItems = stories.flatMap(storyGroup => 
+                    (storyGroup.items || []).filter((item: any) => item && item.id).map((item: any) => {
+                        const createdDate = item.createdAt ? new Date(item.createdAt) : new Date();
+                        const isValidDate = !isNaN(createdDate.getTime());
+                        return {
+                            id: item.id,
+                            imageUrl: item.imageUrl,
+                            user: storyGroup.user,
+                            createdAt: isValidDate ? item.createdAt : new Date().toISOString(),
+                            expiresAt: item.expiresAt || (isValidDate ? new Date(createdDate.getTime() + 24 * 60 * 60 * 1000).toISOString() : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()),
+                            viewCount: 0
+                        };
+                    })
+                );
+                const viewingGroup = stories.find(s => s.id === viewingStoryId);
+                const firstItemOfGroup = viewingGroup?.items?.[0];
+                let initialIndex = allStoryItems.findIndex((item: any) => item.id === firstItemOfGroup?.id);
+                if (initialIndex < 0) initialIndex = 0;
+                
+                return (
+                    <ModernStoryViewer
+                        stories={allStoryItems}
+                        initialStoryIndex={initialIndex}
+                        onClose={onCloseStory}
+                        onStoryViewed={() => setStories(prev => prev.map(s => ({ ...s, hasUnseen: false })))}
+                    />
+                );
+            })()}
 
             {/* Story Editor Modal */}
             {isEditorOpen && editorImage && (

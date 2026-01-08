@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Globe, Award } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.5';
+const CURRENT_VERSION = '0.3.6';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,71 +33,80 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.5 - Sistema Não Perturbe + Correções + Wallpapers + Badges
+    // v0.3.6 - Sistema de GRUPOS Completo + Stories Fixadas
     const updates: UpdateItem[] = [
+        {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'Sistema de GRUPOS Completo!',
+            description: 'Crie grupos públicos/privados, convide amigos via notificação, chat em tempo real, envie imagens (10 Zions), apelidos personalizados por grupo!',
+            isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Convites de Grupo via Notificação',
+            description: 'Receba e responda convites de grupo direto pelo sistema de notificações! Aceite ou recuse com um clique.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Backgrounds Customizáveis',
+            description: 'Admins podem mudar o fundo do grupo usando wallpapers comprados da loja!',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Enviar Imagens no Chat',
+            description: 'Compartilhe imagens dentro dos grupos! Custa 10 Zions por imagem enviada.',
+            isNew: true
+        },
+        {
+            icon: <Award className="w-5 h-5" />,
+            title: 'Apelidos Personalizados',
+            description: 'Defina um apelido único para cada grupo que você participa! Apareça com nomes diferentes em cada comunidade.',
+            isNew: true
+        },
+        {
+            icon: <Menu className="w-5 h-5" />,
+            title: 'Filtro de Conteúdo +18',
+            description: 'Marque conteúdo sensível nos grupos e ative/desative visualização com o botão de olhinho no chat!',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'Modo Silencioso Individual',
+            description: 'Silencie grupos específicos sem sair! Você não receberá popups de notificação daquele grupo.',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Stories Fixadas - Endpoint Corrigido',
+            description: 'Stories agora salvam ID real do backend após criação! Não mais erros 404 ao atualizar a página.',
+            isNew: true
+        },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Sistema Não Perturbe',
             description: 'Ative para bloquear popups de notificações e exibir ícone vermelho de "Ocupado" para amigos!',
-            isNew: true
         },
         {
             icon: <Award className="w-5 h-5" />,
             title: 'Selos nos Perfis e Amigos',
             description: 'Selos de admin agora aparecem nos amigos online e cards de perfil de usuários!',
-            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'Wallpapers Corrigidos',
             description: 'Todos os 8 novos fundos (Cyberpunk, Lava, Gelo, etc) agora funcionam corretamente!',
-            isNew: true
         },
         {
             icon: <Trophy className="w-5 h-5" />,
             title: 'Conquistas de Outros Usuários',
             description: 'Ao visitar perfis, agora você vê as conquistas reais daquele usuário!',
-            isNew: true
-        },
-        {
-            icon: <Menu className="w-5 h-5" />,
-            title: 'Cards no Drawer Mobile',
-            description: 'Bônus Diário, Amigos Online e Novidades agora aparecem no menu responsivo!',
-            isNew: true
-        },
-        {
-            icon: <Search className="w-5 h-5" />,
-            title: 'Busca de Posts Corrigida',
-            description: 'Pesquisa de postagens agora exibe autor corretamente e redireciona ao clicar!',
-            isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: 'RGB Dinâmico Funcional',
             description: 'Cor RGB agora realmente alterna entre as cores ao invés de ficar travada no vermelho!',
-            isNew: true
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Stories Endpoints Corrigidos',
-            description: 'Like e visualizações de stories agora funcionam com rotas /feed/stories corretas!',
-            isNew: true
-        },
-        {
-            icon: <Globe className="w-5 h-5" />,
-            title: 'Servidores no Brasil 🇧🇷',
-            description: 'Banco de dados e Vercel agora rodando no Brasil! Menor latência e maior velocidade para todos!',
-        },
-        {
-            icon: <MessageCircle className="w-5 h-5" />,
-            title: 'Sistema de GRUPOS Completo!',
-            description: 'Crie grupos públicos ou privados, chat em tempo real, permissões (Admin/Moderador) e muito mais!',
-        },
-        {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'Cor RGB Animada REAL',
-            description: 'RGB agora troca entre Red→Magenta→Blue→Cyan→Green→Yellow em loop contínuo!',
-            isNew: true
         },
         {
             icon: <Image className="w-5 h-5" />,

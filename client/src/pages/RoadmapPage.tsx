@@ -183,7 +183,8 @@ const roadmapItems: RoadmapItem[] = [
         id: '23',
         title: 'Dashboard Admin com Grid Arrastável',
         description: 'Dashboard administrativo com widgets arrastáveis usando @dnd-kit. Estatísticas em tempo real e reorganização personalizável.',
-        status: 'in-progress',
+        status: 'completed',
+        version: 'v0.3.6',
         icon: <Shield className="w-5 h-5" />,
         category: 'feature'
     },
@@ -191,18 +192,22 @@ const roadmapItems: RoadmapItem[] = [
         id: '24',
         title: 'Stories Avançados',
         description: 'Like, comentários, compartilhamento, redimensionamento de imagem, texto movível e animações estilo Apple Vision Pro.',
-        status: 'in-progress',
+        status: 'completed',
+        version: 'v0.3.6',
         icon: <Sparkles className="w-5 h-5" />,
         category: 'feature'
     },
     {
         id: '25',
-        title: 'Grupos Completos v2.0',
+        title: 'Sistema de Grupos Completo v2.0',
         description: 'Convites via notificação, apelidos personalizados, backgrounds comprados, modo mudo, compartilhamento de imagens (10 Zions) e filtro de conteúdo +18.',
-        status: 'in-progress',
+        status: 'completed',
+        version: 'v0.3.6',
         icon: <Users className="w-5 h-5" />,
         category: 'community'
     },
+    
+    // ===== IN PROGRESS =====
     {
         id: '26',
         title: 'Página MGT Log (Exclusiva)',

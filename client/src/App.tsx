@@ -21,7 +21,7 @@ import SettingsPage from './pages/SettingsPage';
 import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import GroupsPage from './pages/GroupsPage';
-import GroupDetailPage from './pages/GroupDetailPage';
+import GroupChatPage from './pages/GroupChatPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
@@ -63,7 +63,7 @@ function App() {
           <Route path="/verify-email" element={<PrivateRoute><VerificationPage /></PrivateRoute>} />
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
-          <Route path="/groups/:id" element={<PrivateRoute><GroupDetailPage /></PrivateRoute>} />
+          <Route path="/groups/:id" element={<PrivateRoute><GroupChatPage /></PrivateRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
 

@@ -434,15 +434,16 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 </button>
                             </div>
 
-                            {/* Cards Section */}
-                            <div className="px-4 py-2 space-y-4">
-                                <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileMenuOpen(false); openDailyLoginModal(); }} />
-                                <OnlineFriendsCard />
-                                <WhatsNewCard />
-                            </div>
+                            {/* Cards Section + Menu Items */}
+                            <div className="flex-1 overflow-y-auto px-4 py-2">
+                                <div className="space-y-4 mb-4">
+                                    <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileMenuOpen(false); openDailyLoginModal(); }} />
+                                    <OnlineFriendsCard />
+                                    <WhatsNewCard />
+                                </div>
 
-                            {/* Menu Items */}
-                            <div className="flex-1 p-2 overflow-y-auto">
+                                {/* Menu Items */}
+                                <div className="space-y-1">
                                 {menuItems.map((item) => (
                                     <Link
                                         key={item.path}
@@ -457,6 +458,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         )}
                                     </Link>
                                 ))}
+                                </div>
                             </div>
                         </motion.div>
                     </>

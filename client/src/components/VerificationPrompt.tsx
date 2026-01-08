@@ -29,11 +29,24 @@ export default function VerificationPrompt() {
         localStorage.setItem('verificationPromptDismissed', oneHourFromNow.toISOString());
     };
 
-    const handleVerify = () => {
+    const handleVerify = async () => {
+        try {
+            // Envia código de verificação antes de redirecionar
+            await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/resend-verification`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+        } catch (err) {
+            console.error('Erro ao enviar código:', err);
+        }
         navigate('/verify-email');
     };
 
-    if (!show || user?.isVerified) return null;
+    // Não mostrar se já verificado
+    if (user?.isVerified || !show) return null;
 
     return (
         <AnimatePresence>

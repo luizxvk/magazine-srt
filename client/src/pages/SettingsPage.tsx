@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Settings, Bell, LogOut, Trash2, User } from 'lucide-react';
+import { Settings, Bell, LogOut, Trash2, User, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
@@ -17,6 +17,9 @@ export default function SettingsPage() {
     );
     const [doNotDisturb, setDoNotDisturb] = useState(
         localStorage.getItem('doNotDisturb') === 'true'
+    );
+    const [liteMode, setLiteMode] = useState(
+        localStorage.getItem('liteMode') === 'true'
     );
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -41,7 +44,14 @@ export default function SettingsPage() {
         // Update on backend
         try {
             await api.put('/users/me/preferences', { doNotDisturb: newValue });
-        } catch (error) {
+      
+
+    const handleToggleLiteMode = () => {
+        const newValue = !liteMode;
+        setLiteMode(newValue);
+        localStorage.setItem('liteMode', String(newValue));
+        document.documentElement.classList.toggle('lite-mode', newValue);
+    };  } catch (error) {
             console.error('Error updating doNotDisturb:', error);
         }
     };
@@ -154,6 +164,27 @@ export default function SettingsPage() {
                                 <p className={`font-medium ${textMain}`}>Tema {theme === 'light' ? 'Claro' : 'Escuro'}</p>
                                 <p className={`text-sm ${textSub}`}>Alternar entre modo claro e escuro</p>
                             </div>
+
+                        {/* Lite Mode Toggle */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className={`font-medium ${textMain} flex items-center gap-2`}>
+                                    <Zap className="w-4 h-4" />
+                                    Modo Lite
+                                </p>
+                                <p className={`text-sm ${textSub}`}>Reduz animações e efeitos para melhor performance</p>
+                            </div>
+                            <button
+                                onClick={handleToggleLiteMode}
+                                className={`relative w-14 h-8 rounded-full transition-colors ${
+                                    liteMode ? `bg-${themeColor}-500` : 'bg-gray-600'
+                                }`}
+                            >
+                                <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                                    liteMode ? 'translate-x-6' : 'translate-x-0'
+                                }`} />
+                            </button>
+                        </div>
                             <button
                                 onClick={toggleTheme}
                                 className={`px-4 py-2 rounded-lg bg-${themeColor}-500/10 text-${themeColor}-400 hover:bg-${themeColor}-500/20 transition-colors font-medium`}

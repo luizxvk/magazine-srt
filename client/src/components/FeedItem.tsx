@@ -96,6 +96,7 @@ export default function FeedItem({
     const [reportReason, setReportReason] = useState('');
     const [isReporting, setIsReporting] = useState(false);
     const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
+    const [isPressed, setIsPressed] = useState(false);
     const isOwner = user?.id === authorId;
     const isAdmin = user?.role === 'ADMIN';
     const canDelete = isOwner || isAdmin;
@@ -142,7 +143,12 @@ export default function FeedItem({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={!isExpanded ? { scale: 1.02, y: -5 } : {}}
-            className={`glass-panel rounded-xl overflow-hidden group h-full flex flex-col relative ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'}`}
+            onMouseDown={() => setIsPressed(true)}
+            onMouseUp={() => setIsPressed(false)}
+            onMouseLeave={() => setIsPressed(false)}
+            onTouchStart={() => setIsPressed(true)}
+            onTouchEnd={() => setIsPressed(false)}
+            className={`glass-panel rounded-xl overflow-hidden group h-full flex flex-col relative transition-all duration-200 ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'} ${isPressed && theme === 'light' ? 'shadow-[0_0_30px_rgba(0,0,0,0.15)] ring-2 ring-gray-300' : ''}`}
         >
             {(image || video) && (
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>

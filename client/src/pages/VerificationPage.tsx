@@ -19,7 +19,22 @@ export default function VerificationPage() {
         // Redirect if already verified
         if (user?.isVerified) {
             navigate('/feed');
+            return;
         }
+
+        // Envia código automaticamente ao carregar página
+        const sendInitialCode = async () => {
+            try {
+                await api.post('/auth/resend-verification');
+                console.log('Código enviado automaticamente');
+            } catch (err: any) {
+                // Se já verificado, redireciona
+                if (err.response?.data?.error === 'Email already verified') {
+                    navigate('/feed');
+                }
+            }
+        };
+        sendInitialCode();
 
         // Calculate time remaining (mock - in real app get from user data)
         const calculateTimeRemaining = () => {
@@ -98,7 +113,16 @@ export default function VerificationPage() {
                 window.location.reload();
             }, 2000);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Código inválido. Tente novamente.');
+            const errorMsg = err.response?.data?.error;
+            // Se já verificado, considerar sucesso
+            if (errorMsg === 'Email already verified') {
+                setSuccess(true);
+                setTimeout(() => {
+                    navigate('/feed');
+                }, 1000);
+            } else {
+                setError(errorMsg || 'Código inválido. Tente novamente.');
+            }
         } finally {
             setLoading(false);
         }
@@ -112,7 +136,13 @@ export default function VerificationPage() {
             await api.post('/auth/resend-verification');
             alert('Código reenviado! Verifique seu email.');
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Erro ao reenviar código.');
+            const errorMsg = err.response?.data?.error;
+            // Se já verificado, redireciona
+            if (errorMsg === 'Email already verified') {
+                navigate('/feed');
+            } else {
+                setError(errorMsg || 'Erro ao reenviar código.');
+            }
         } finally {
             setResending(false);
         }

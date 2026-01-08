@@ -10,6 +10,7 @@ import {
   removeMember,
   updateMemberRole,
   deleteGroup,
+  updateGroup,
   deleteGroupMessage,
   inviteMember,
   respondInvite,
@@ -30,6 +31,7 @@ router.use(authenticateToken);
 router.post('/', createGroup);
 router.get('/', getMyGroups);
 router.get('/:id', getGroupById);
+router.put('/:id', updateGroup);
 router.post('/:id/join', joinGroup);
 router.post('/:id/leave', leaveGroup);
 router.delete('/:id', deleteGroup);

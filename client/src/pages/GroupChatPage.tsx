@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Image, ArrowLeft, Users, Settings, LogOut,
-  Edit3, Volume2, VolumeX, Palette, Eye, EyeOff, X
+  Edit3, Volume2, VolumeX, Palette, Eye, EyeOff, X, Edit
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
+import Header from '../components/Header';
+import LuxuriousBackground from '../components/LuxuriousBackground';
 
 interface Group {
   id: string;
@@ -74,6 +76,10 @@ export default function GroupChatPage() {
   const [nickname, setNickname] = useState('');
   const [showNSFW, setShowNSFW] = useState(true);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showEditNameModal, setShowEditNameModal] = useState(false);
+  const [newGroupName, setNewGroupName] = useState('');
+  const [showEditAvatarModal, setShowEditAvatarModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -206,6 +212,42 @@ export default function GroupChatPage() {
     }
   };
 
+  const handleUpdateGroupName = async () => {
+    if (!newGroupName.trim() || !isAdmin) return;
+    
+    try {
+      await api.put(`/groups/${id}`, { name: newGroupName });
+      setShowEditNameModal(false);
+      fetchGroup();
+    } catch (error) {
+      console.error('Error updating group name:', error);
+      alert('Erro ao atualizar nome do grupo');
+    }
+  };
+
+  const handleUpdateGroupAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !isAdmin) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const uploadResponse = await api.post('/upload', formData);
+      const avatarUrl = uploadResponse.data.url;
+
+      await api.put(`/groups/${id}`, { avatarUrl });
+      setShowEditAvatarModal(false);
+      fetchGroup();
+    } catch (error) {
+      console.error('Error updating group avatar:', error);
+      alert('Erro ao atualizar foto do grupo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const getDisplayName = (msg: Message) => {
     // Priority: nickname > displayName > name
     const member = group?.members.find(m => m.userId === msg.sender.id);
@@ -214,8 +256,12 @@ export default function GroupChatPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${themeBg} ${themeText} flex items-center justify-center`}>
-        <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-${accentColor}`}></div>
+      <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+        <LuxuriousBackground />
+        <Header />
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-${accentColor}`}></div>
+        </div>
       </div>
     );
   }
@@ -223,32 +269,54 @@ export default function GroupChatPage() {
   if (!group) return null;
 
   return (
-    <div className={`h-screen flex flex-col ${themeBg} ${themeText}`}>
+    <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+      <LuxuriousBackground />
+      <Header />
+      
+      {/* Centralized Chat Container */}
+      <div className="max-w-5xl mx-auto px-4 py-6 relative z-10">
+        <div className={`h-[calc(100vh-180px)] flex flex-col glass-panel rounded-xl overflow-hidden border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
       {/* Header */}
-      <div className={`border-b ${themeBorder} p-4 flex items-center justify-between`}>
+      <div className="border-b border-white/10 p-4 flex items-center justify-between bg-black/20">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/groups')}
-            className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           
-          {group.avatarUrl ? (
-            <img
-              src={group.avatarUrl}
-              alt={group.name}
-              className="w-10 h-10 rounded-full"
-            />
-          ) : (
-            <div className={`w-10 h-10 rounded-full ${accentBg} flex items-center justify-center`}>
-              <Users className="w-5 h-5 text-white" />
-            </div>
-          )}
+          <div
+            onClick={isAdmin ? () => setShowEditAvatarModal(true) : undefined}
+            className={`relative ${isAdmin ? 'cursor-pointer group' : ''}`}
+          >
+            {group.avatarUrl ? (
+              <img
+                src={group.avatarUrl}
+                alt={group.name}
+                className="w-10 h-10 rounded-full"
+              />
+            ) : (
+              <div className={`w-10 h-10 rounded-full ${accentBg} flex items-center justify-center`}>
+                <Users className="w-5 h-5 text-white" />
+              </div>
+            )}
+            {isAdmin && (
+              <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Edit className="w-4 h-4 text-white" />
+              </div>
+            )}
+          </div>
           
-          <div>
-            <h1 className={`font-semibold ${themeText}`}>{group.name}</h1>
-            <p className={`text-sm ${themeSecondary}`}>{group.members.length} membros</p>
+          <div
+            onClick={isAdmin ? () => { setNewGroupName(group.name); setShowEditNameModal(true); } : undefined}
+            className={isAdmin ? 'cursor-pointer group' : ''}
+          >
+            <h1 className="font-semibold text-white flex items-center gap-2">
+              {group.name}
+              {isAdmin && <Edit className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />}
+            </h1>
+            <p className="text-sm text-gray-400">{group.members.length} membros</p>
           </div>
         </div>
 
@@ -256,7 +324,7 @@ export default function GroupChatPage() {
           {showNSFW ? (
             <button
               onClick={() => setShowNSFW(false)}
-              className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
               title="Ocultar conteúdo +18"
             >
               <Eye className="w-5 h-5" />
@@ -264,7 +332,7 @@ export default function GroupChatPage() {
           ) : (
             <button
               onClick={() => setShowNSFW(true)}
-              className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
               title="Mostrar conteúdo +18"
             >
               <EyeOff className="w-5 h-5" />
@@ -273,14 +341,14 @@ export default function GroupChatPage() {
           
           <button
             onClick={() => setShowMembers(true)}
-            className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
           >
             <Users className="w-5 h-5" />
           </button>
           
           <button
             onClick={() => setShowSettings(true)}
-            className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
           >
             <Settings className="w-5 h-5" />
           </button>
@@ -288,7 +356,7 @@ export default function GroupChatPage() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/10">
         {messages
           .filter(msg => showNSFW || !msg.isNSFW)
           .map((msg) => {
@@ -334,7 +402,7 @@ export default function GroupChatPage() {
                     )}
                   </div>
                   
-                  <span className={`text-xs ${themeSecondary} mt-1 ${isMe ? 'mr-2' : 'ml-2'}`}>
+                  <span className="text-xs text-gray-400 mt-1 ${isMe ? 'mr-2' : 'ml-2'}">
                     {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
                       hour: '2-digit',
                       minute: '2-digit'
@@ -348,7 +416,7 @@ export default function GroupChatPage() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className={`border-t ${themeBorder} p-4 flex items-center gap-2`}>
+      <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 flex items-center gap-2 bg-black/20">
         <input
           type="file"
           accept="image/*"
@@ -358,7 +426,7 @@ export default function GroupChatPage() {
         />
         <label
           htmlFor="image-upload"
-          className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer`}
+          className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           title="Enviar imagem (10 Zions)"
         >
           <Image className="w-5 h-5" />
@@ -369,9 +437,7 @@ export default function GroupChatPage() {
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
           placeholder="Digite uma mensagem..."
-          className={`flex-1 px-4 py-2 rounded-full ${
-            theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'
-          } ${themeText} border-0 focus:outline-none focus:ring-2 focus:ring-${accentColor}`}
+          className="flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-${accentColor} placeholder-gray-400"
         />
 
         <button
@@ -382,6 +448,8 @@ export default function GroupChatPage() {
           <Send className="w-5 h-5" />
         </button>
       </form>
+        </div>
+      </div>
 
       {/* Settings Modal */}
       <AnimatePresence>
@@ -559,6 +627,90 @@ export default function GroupChatPage() {
         confirmText="Sair"
         cancelText="Cancelar"
       />
+
+      {/* Edit Group Name Modal */}
+      <AnimatePresence>
+        {showEditNameModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowEditNameModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel rounded-xl p-6 max-w-md w-full border border-white/10"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4">Editar Nome do Grupo</h2>
+              <input
+                type="text"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                placeholder="Digite o novo nome"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-${accentColor} mb-4"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowEditNameModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-white"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleUpdateGroupName}
+                  className={`flex-1 px-4 py-2 rounded-lg ${accentBg} text-white hover:opacity-90 transition-opacity`}
+                >
+                  Salvar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Group Avatar Modal */}
+      <AnimatePresence>
+        {showEditAvatarModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowEditAvatarModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel rounded-xl p-6 max-w-md w-full border border-white/10"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4">Editar Foto do Grupo</h2>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleUpdateGroupAvatar}
+                className="w-full px-4 py-2 rounded-lg bg-white/5 text-white border border-white/10 mb-4"
+                disabled={uploading}
+              />
+              {uploading && (
+                <p className="text-sm text-gray-400 mb-4">Enviando...</p>
+              )}
+              <button
+                onClick={() => setShowEditAvatarModal(false)}
+                disabled={uploading}
+                className="w-full px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-white"
+              >
+                Cancelar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

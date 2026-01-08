@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import CreateGroupModal from '../components/CreateGroupModal';
+import Header from '../components/Header';
+import LuxuriousBackground from '../components/LuxuriousBackground';
 
 interface Group {
   id: string;
@@ -36,7 +38,6 @@ export default function GroupsPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
@@ -70,26 +71,36 @@ export default function GroupsPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${themeBg} ${themeText} flex items-center justify-center`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-${accentColor}"></div>
+      <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+        <LuxuriousBackground />
+        <Header />
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-${accentColor}`}></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${themeBg} ${themeText}`}>
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Header */}
+    <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+      <LuxuriousBackground />
+      <Header />
+      
+      <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+        {/* Page Title with Icon */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className={`text-3xl font-serif ${themeText} mb-2`}>Grupos</h1>
-            <p className={themeSecondary}>Conecte-se com membros de interesses similares</p>
+          <div className="flex items-center gap-3">
+            <Users className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+            <div>
+              <h1 className={`text-4xl font-serif ${isMGT ? 'text-emerald-400' : 'text-gold-400'} mb-1`}>Grupos</h1>
+              <p className="text-gray-400 text-sm">Conecte-se com membros de interesses similares</p>
+            </div>
           </div>
           <motion.button
             onClick={handleCreateGroup}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`bg-${accentColor} text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg`}
+            className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400'} text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-colors`}
           >
             <Plus className="w-5 h-5" />
             Criar Grupo

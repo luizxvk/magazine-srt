@@ -607,6 +607,63 @@ export const deleteGroup = async (req: Request, res: Response) => {
   }
 };
 
+// Atualizar informações do grupo (nome, avatar)
+export const updateGroup = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { id } = req.params;
+    const { name, avatarUrl, description } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId: id, userId } }
+    });
+
+    if (!member || member.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Apenas admins podem editar o grupo' });
+    }
+
+    const updatedGroup = await prisma.group.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(avatarUrl !== undefined && { avatarUrl }),
+        ...(description !== undefined && { description })
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            avatarUrl: true
+          }
+        },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true,
+                avatarUrl: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.json(updatedGroup);
+  } catch (error) {
+    console.error('Error updating group:', error);
+    res.status(500).json({ error: 'Erro ao atualizar grupo' });
+  }
+};
+
 // Convidar membro para o grupo
 export const inviteMember = async (req: Request, res: Response) => {
   try {

@@ -11,6 +11,13 @@ import {
   updateMemberRole,
   deleteGroup,
   deleteGroupMessage,
+  inviteMember,
+  respondInvite,
+  getMyInvites,
+  updateNickname,
+  toggleMute,
+  updateGroupBackground,
+  postImageMessage,
 } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -26,14 +33,23 @@ router.get('/:id', getGroupById);
 router.post('/:id/join', joinGroup);
 router.post('/:id/leave', leaveGroup);
 router.delete('/:id', deleteGroup);
+router.put('/:groupId/background', updateGroupBackground);
 
-// Rotas de mensagens
-router.post('/:id/messages', postMessage);
-router.get('/:id/messages', getGroupMessages);
-router.delete('/:id/messages/:messageId', deleteGroupMessage);
+// Rotas de convites
+router.post('/:groupId/invite', inviteMember);
+router.post('/invites/:inviteId/respond', respondInvite);
+router.get('/invites/me', getMyInvites);
 
 // Rotas de membros
 router.delete('/:id/members/:memberId', removeMember);
 router.put('/:id/members/:memberId/role', updateMemberRole);
+router.put('/:groupId/nickname', updateNickname);
+router.post('/:groupId/mute', toggleMute);
+
+// Rotas de mensagens
+router.post('/:id/messages', postMessage);
+router.post('/:groupId/messages/image', postImageMessage);
+router.get('/:id/messages', getGroupMessages);
+router.delete('/:id/messages/:messageId', deleteGroupMessage);
 
 export default router;

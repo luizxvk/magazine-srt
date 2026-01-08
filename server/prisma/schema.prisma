@@ -70,6 +70,8 @@ model User {
   groupsCreated    Group[] @relation("GroupCreator")
   groupMemberships GroupMember[] @relation("UserGroupMemberships")
   groupMessages    GroupMessage[] @relation("UserGroupMessages")
+  sentGroupInvites     GroupInvite[] @relation("SentGroupInvites")
+  receivedGroupInvites GroupInvite[] @relation("ReceivedGroupInvites")
   
   // Admin Badges
   adminBadges AdminBadge[]
@@ -284,6 +286,7 @@ enum NotificationType {
   BADGE
   FRIEND_REQUEST
   MESSAGE
+  GROUP_INVITE
 }
 
 enum MediaType {
@@ -443,10 +446,12 @@ model Group {
   name            String
   description     String?
   avatarUrl       String?
+  backgroundId    String?        // Background from shop (user must own it)
   creatorId       String
   membershipType  MembershipType // MAGAZINE ou MGT
   isPrivate       Boolean        @default(false)
   maxMembers      Int            @default(100)
+  nsfw            Boolean        @default(false) // Contains +18 content
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
@@ -454,6 +459,7 @@ model Group {
   members         GroupMember[]
   messages        GroupMessage[]
   settings        GroupSettings?
+  invites         GroupInvite[]
 
   @@index([creatorId])
   @@index([membershipType])
@@ -466,10 +472,12 @@ model GroupMember {
   groupId     String
   userId      String
   role        GroupRole @default(MEMBER)
+  nickname    String?   // Custom nickname in this group
   joinedAt    DateTime  @default(now())
   canPost     Boolean   @default(true)
   canInvite   Boolean   @default(false)
   canModerate Boolean   @default(false)
+  isMuted     Boolean   @default(false) // Member muted the group notifications
 
   group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   user        User      @relation("UserGroupMemberships", fields: [userId], references: [id])
@@ -490,8 +498,9 @@ model GroupMessage {
   groupId   String
   senderId  String
   content   String
-  imageUrl  String?
+  imageUrl  String?     // For IMAGE messages (costs 10 Zions)
   type      MessageType @default(TEXT)
+  isNSFW    Boolean     @default(false) // Mark +18 content
   createdAt DateTime    @default(now())
   editedAt  DateTime?
   deletedAt DateTime?
@@ -519,6 +528,31 @@ model GroupSettings {
   muteNotifications     Boolean @default(false)
 
   group                 Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model GroupInvite {
+  id          String   @id @default(uuid())
+  groupId     String
+  inviterId   String   // Who sent the invite
+  invitedId   String   // Who was invited
+  status      InviteStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  respondedAt DateTime?
+
+  group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  inviter     User     @relation("SentGroupInvites", fields: [inviterId], references: [id])
+  invited     User     @relation("ReceivedGroupInvites", fields: [invitedId], references: [id])
+
+  @@unique([groupId, invitedId])
+  @@index([invitedId])
+  @@index([inviterId])
+  @@index([status])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
 
 model AdminBadge {

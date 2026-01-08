@@ -112,20 +112,18 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             </div>
 
                             {/* Daily Login Card */}
-                            <div className="mb-6">
-                                <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
-                            </div>
+                            <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
 
                             {/* MGT Log Card */}
-                            <div className="mb-6">
-                                <MgtLogCard />
-                            </div>
+                            <MgtLogCard />
 
                             {/* Photo Catalog Card */}
-                            <PhotoCatalogCard photos={catalogPhotos} />
+                            <div className="mt-6">
+                                <PhotoCatalogCard photos={catalogPhotos} />
+                            </div>
 
                             {/* Recommendation Cards */}
-                            <div className="space-y-4">
+                            <div className="space-y-4 mt-6">
                                 <div 
                                     onClick={() => setShowWhatsNew(true)}
                                     className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}

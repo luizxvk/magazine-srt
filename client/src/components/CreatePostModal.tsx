@@ -96,12 +96,12 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Input Area - The "Bar" Look */}
-                            <div className="bg-white/5 rounded-3xl p-4 border border-white/10 focus-within:border-gold-500/50 transition-colors relative">
+                            <div className="bg-white/5 rounded-3xl p-4 md:p-4 border border-white/10 focus-within:border-gold-500/50 transition-colors relative">
                                 <textarea
                                     value={caption}
                                     onChange={(e) => setCaption(e.target.value)}
                                     placeholder="Compartilhe algo exclusivo..."
-                                    className="w-full bg-transparent border-none text-white text-lg placeholder-gray-500 focus:ring-0 resize-none min-h-[120px] scrollbar-hide"
+                                    className="w-full bg-transparent border-none text-white text-base md:text-lg placeholder-gray-500 focus:ring-0 resize-none min-h-[180px] md:min-h-[120px] scrollbar-hide"
                                 />
 
                                 {/* Media Preview inside the "Bar" */}

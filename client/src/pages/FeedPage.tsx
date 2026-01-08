@@ -20,6 +20,7 @@ import RecommendationsDrawer from '../components/RecommendationsDrawer';
 import NewMembersModal from '../components/NewMembersModal';
 import EventsModal from '../components/EventsModal';
 import OnlineFriendsCard from '../components/OnlineFriendsCard';
+import WhatsNewCard from '../components/WhatsNewCard';
 import CustomizationShop from '../components/CustomizationShop';
 
 interface Post {
@@ -316,6 +317,11 @@ export default function FeedPage() {
                     {/* SRT LOG Promotion Card - Featured at Top */}
                     <div className="mb-8 transform hover:scale-105 transition-transform duration-500">
                         <AnnouncementCard />
+                    </div>
+
+                    {/* What's New Card */}
+                    <div className="mb-6">
+                        <WhatsNewCard />
                     </div>
 
                     {/* Photo Catalog Link */}

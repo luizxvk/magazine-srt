@@ -3,6 +3,7 @@ import { MessageCircle, User, Wifi } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ChatWindow from './ChatWindow';
+import BadgeDisplay from './BadgeDisplay';
 
 interface OnlineFriend {
     id: string;

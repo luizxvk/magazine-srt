@@ -94,18 +94,6 @@ export const uploadAvatar = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Failed to upload avatar' });
     }
 };
-            imageUrl = await uploadAvatarR2(req.file.buffer, req.file.mimetype);
-        } else {
-            // Fallback to Cloudinary or local storage
-            imageUrl = await uploadPostImageCloudinary(req.file.buffer);
-        }
-
-        res.json({ imageUrl });
-    } catch (error) {
-        console.error('Upload error:', error);
-        res.status(500).json({ error: 'Failed to upload avatar' });
-    }
-};
 
 // Upload catalog photo
 export const uploadCatalogPhoto = async (req: AuthRequest, res: Response) => {

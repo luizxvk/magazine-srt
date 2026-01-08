@@ -21,6 +21,7 @@ import reportRoutes from './src/routes/reportRoutes';
 import groupRoutes from './src/routes/groupRoutes';
 import adminBadgeRoutes from './src/routes/adminBadges';
 import cronRoutes from './src/routes/cronRoutes';
+import uploadRoutes from './src/routes/uploadRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -90,6 +91,7 @@ apiRouter.use('/reports', reportRoutes);
 apiRouter.use('/groups', groupRoutes);
 apiRouter.use('/admin/badges', adminBadgeRoutes);
 apiRouter.use('/cron', cronRoutes);
+apiRouter.use('/uploads', uploadRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

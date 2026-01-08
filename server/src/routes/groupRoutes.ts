@@ -10,6 +10,7 @@ import {
   removeMember,
   updateMemberRole,
   deleteGroup,
+  deleteGroupMessage,
 } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -29,6 +30,7 @@ router.delete('/:id', deleteGroup);
 // Rotas de mensagens
 router.post('/:id/messages', postMessage);
 router.get('/:id/messages', getGroupMessages);
+router.delete('/:id/messages/:messageId', deleteGroupMessage);
 
 // Rotas de membros
 router.delete('/:id/members/:memberId', removeMember);

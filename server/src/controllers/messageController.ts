@@ -216,3 +216,42 @@ export const markAsRead = async (req: AuthenticatedRequest, res: Response) => {
         res.status(500).json({ error: 'Failed to mark messages as read' });
     }
 };
+
+// Delete a message (owner or admin)
+export const deleteMessage = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { messageId } = req.params;
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Find the message
+        const message = await prisma.message.findUnique({
+            where: { id: messageId }
+        });
+
+        if (!message) {
+            return res.status(404).json({ error: 'Message not found' });
+        }
+
+        // Check if user is admin
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const isAdmin = user?.role === 'ADMIN';
+
+        // Only allow deletion if sender or admin
+        if (message.senderId !== userId && !isAdmin) {
+            return res.status(403).json({ error: 'You can only delete your own messages' });
+        }
+
+        await prisma.message.delete({
+            where: { id: messageId }
+        });
+
+        res.json({ success: true, message: 'Message deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting message:', error);
+        res.status(500).json({ error: 'Failed to delete message' });
+    }
+};

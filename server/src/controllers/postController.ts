@@ -129,15 +129,22 @@ export const deletePost = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         const { id } = req.params;
 
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
         const post = await prisma.post.findUnique({ where: { id } });
         if (!post) return res.status(404).json({ error: 'Post not found' });
 
-        if (post.userId !== userId) {
+        // Check if user is admin
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const isAdmin = user?.role === 'ADMIN';
+
+        // Only allow deletion if owner or admin
+        if (post.userId !== userId && !isAdmin) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
         // Check if this is the user's last post (to remove 'Primeira Voz' badge)
-        const userPostCount = await prisma.post.count({ where: { userId } });
+        const userPostCount = await prisma.post.count({ where: { userId: post.userId } });
         const isLastPost = userPostCount === 1;
 
         // Delete related records first (cascading delete manually)
@@ -152,18 +159,18 @@ export const deletePost = async (req: AuthRequest, res: Response) => {
         if (isLastPost) {
             const primeiraVozBadge = await prisma.badge.findFirst({ where: { name: 'Primeira Voz' } });
             if (primeiraVozBadge) {
-                // Remove the badge from the user
+                // Remove the badge from the post owner (not admin)
                 await prisma.userBadge.deleteMany({
                     where: {
-                        userId,
+                        userId: post.userId,
                         badgeId: primeiraVozBadge.id
                     }
                 });
 
-                // Remove the trophies associated with the badge
+                // Remove the trophies associated with the badge from post owner
                 if (primeiraVozBadge.trophies > 0) {
                     await prisma.user.update({
-                        where: { id: userId },
+                        where: { id: post.userId },
                         data: {
                             trophies: {
                                 decrement: primeiraVozBadge.trophies

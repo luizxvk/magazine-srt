@@ -413,6 +413,64 @@ export const getGroupMessages = async (req: Request, res: Response) => {
   }
 };
 
+// Delete group message (sender or admin)
+export const deleteGroupMessage = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { id, messageId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // Verificar se é membro do grupo
+    const member = await prisma.groupMember.findUnique({
+      where: {
+        groupId_userId: {
+          groupId: id,
+          userId,
+        },
+      },
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    // Buscar a mensagem
+    const message = await prisma.groupMessage.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Mensagem não encontrada' });
+    }
+
+    // Check if user is admin (global)
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const isGlobalAdmin = user?.role === 'ADMIN';
+
+    // Permitir deletar se for: autor da mensagem, admin do grupo, ou admin global
+    const canDelete =
+      message.senderId === userId ||
+      member.role === 'ADMIN' ||
+      isGlobalAdmin;
+
+    if (!canDelete) {
+      return res.status(403).json({ error: 'Você não tem permissão para deletar esta mensagem' });
+    }
+
+    await prisma.groupMessage.delete({
+      where: { id: messageId },
+    });
+
+    res.json({ success: true, message: 'Mensagem deletada com sucesso' });
+  } catch (error) {
+    console.error('Error deleting group message:', error);
+    res.status(500).json({ error: 'Erro ao deletar mensagem' });
+  }
+};
+
 // Remover membro (apenas admin/moderador)
 export const removeMember = async (req: Request, res: Response) => {
   try {

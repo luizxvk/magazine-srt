@@ -584,8 +584,12 @@ export const deleteStory = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ error: 'Story not found' });
         }
 
-        // Check if user owns the story
-        if (story.userId !== userId) {
+        // Check if user is admin
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const isAdmin = user?.role === 'ADMIN';
+
+        // Check if user owns the story or is admin
+        if (story.userId !== userId && !isAdmin) {
             return res.status(403).json({ error: 'You can only delete your own stories' });
         }
 

@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { moderateContent } from '../middleware/securityMiddleware';
@@ -7,7 +6,8 @@ import {
     sendMessage,
     getConversation,
     getRecentConversations,
-    markAsRead
+    markAsRead,
+    deleteMessage
 } from '../controllers/messageController';
 
 const router = express.Router();
@@ -19,5 +19,6 @@ router.post('/', messageRateLimit, moderateContent(['content']), sendMessage);
 router.get('/recent', getRecentConversations);
 router.get('/:otherUserId', getConversation);
 router.put('/read', markAsRead);
+router.delete('/:messageId', deleteMessage);
 
 export default router;

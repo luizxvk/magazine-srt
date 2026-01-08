@@ -1,8 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Responsive } from 'react-grid-layout';
-import type { Layout } from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -45,32 +41,6 @@ export default function AdminGridDashboard() {
             console.error('Failed to fetch dashboard stats', error);
         }
     };
-
-    const defaultLayouts = {
-        lg: [
-            { i: 'users', x: 0, y: 0, w: 3, h: 2 },
-            { i: 'activity', x: 3, y: 0, w: 3, h: 2 },
-            { i: 'posts', x: 6, y: 0, w: 3, h: 2 },
-            { i: 'online', x: 9, y: 0, w: 3, h: 2 },
-            { i: 'messages', x: 0, y: 2, w: 4, h: 2 },
-            { i: 'stories', x: 4, y: 2, w: 4, h: 2 },
-            { i: 'comments', x: 8, y: 2, w: 4, h: 2 }
-        ]
-    };
-
-    const [layouts, setLayouts] = useState(defaultLayouts);
-
-    const handleLayoutChange = (layout: Layout, allLayouts: Partial<Record<string, Layout>>) => {
-        setLayouts(allLayouts as any);
-        localStorage.setItem('adminDashboardLayouts', JSON.stringify(allLayouts));
-    };
-
-    useEffect(() => {
-        const savedLayouts = localStorage.getItem('adminDashboardLayouts');
-        if (savedLayouts) {
-            setLayouts(JSON.parse(savedLayouts));
-        }
-    }, []);
 
     const widgets = [
         {
@@ -141,25 +111,15 @@ export default function AdminGridDashboard() {
                     Dashboard Geral
                 </h2>
                 <p className="text-gray-400 text-sm mt-1">
-                    Arraste os cards para reorganizar • Redimensione conforme necessário • Layout salvo automaticamente
+                    Estatísticas em tempo real • Atualização automática a cada 30s
                 </p>
             </div>
 
-            <Responsive
-                className="layout"
-                layouts={layouts}
-                breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-                cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-                rowHeight={80}
-                onLayoutChange={handleLayoutChange}
-                isDraggable={true}
-                isResizable={true}
-                draggableHandle=".drag-handle"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {widgets.map((widget) => (
-                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
+                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]`}>
                         <div className="flex flex-col h-full">
-                            <div className="flex items-center justify-between mb-4 drag-handle cursor-move">
+                            <div className="flex items-center justify-between mb-4">
                                 <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
                                     {widget.icon}
                                 </div>
@@ -175,7 +135,7 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
-            </Responsive>
+            </div>
         </div>
     );
 }

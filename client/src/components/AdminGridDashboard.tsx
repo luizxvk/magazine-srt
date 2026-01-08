@@ -43,18 +43,40 @@ export default function AdminGridDashboard() {
         }
     };
 
-    const onLayoutChange = (layout: Layout[], layouts: {lg: Layout[]}) => {
-        setLayouts(layouts);
-        // Save to localStorage
-        localStorage.setItem('adminDashboardLayout', JSON.stringify(layouts));
+    const defaultLayout = [
+        { i: 'users', x: 0, y: 0, w: 3, h: 2 },
+        { i: 'activity', x: 3, y: 0, w: 3, h: 2 },
+        { i: 'posts', x: 6, y: 0, w: 3, h: 2 },
+        { i: 'online', x: 9, y: 0, w: 3, h: 2 },
+        { i: 'messages', x: 0, y: 2, w: 4, h: 2 },
+        { i: 'stories', x: 4, y: 2, w: 4, h: 2 },
+        { i: 'comments', x: 8, y: 2, w: 4, h: 2 }
+    ];
+
+    const [layout, setLayout] = useState(defaultLayout);
+
+    const handleLayoutChange = (newLayout: any) => {
+        setLayout(newLayout);
+        localStorage.setItem('adminDashboardLayout', JSON.stringify(newLayout));
     };
 
     // Load saved layout on mount
     useEffect(() => {
         const savedLayout = localStorage.getItem('adminDashboardLayout');
         if (savedLayout) {
-            setLayouts(JSON.parse(savedLayout));
+            setLayout(JSON.parse(savedLayout));
         }
+    }, []);
+
+    const widgets = [
+        {
+            i: 'users',
+            title: 'Total de Usuários',
+            value: stats.totalUsers,
+            icon: <Users className="w-6 h-6 text-blue-400" />,
+            subtitle: `+${stats.newUsersToday} hoje`,
+            color: 'blue'
+        },
         {
             i: 'activity',
             title: 'Usuários Ativos',
@@ -105,6 +127,9 @@ export default function AdminGridDashboard() {
         }
     ];
 
+    const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
+    const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
+
     return (
         <div className="mb-8">
             <div className="mb-6">
@@ -116,23 +141,18 @@ export default function AdminGridDashboard() {
                 </p>
             </div>
 
-            <ResponsiveGridLayout
+            <GridLayout
                 className="layout"
-                layouts={layouts}
-                breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-                cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-                rowHeight={60}
-                onLayoutChange={onLayoutChange}
+                layout={layout}
+                cols={12}
+                rowHeight={150}
+                width={1200}
+                onLayoutChange={handleLayoutChange}
                 isDraggable={true}
-                isResizable={true}
-                draggableHandle=".drag-handle"
-            >Estatísticas em tempo real • Atualização automática a cada 30s
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                isResizable={false}
+            >
                 {widgets.map((widget) => (
-                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
+                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-move`}>
                         <div className="flex flex-col h-full">
                             <div className="flex items-center justify-between mb-4">
                                 <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
@@ -150,4 +170,7 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
-            </div
+            </GridLayout>
+        </div>
+    );
+}

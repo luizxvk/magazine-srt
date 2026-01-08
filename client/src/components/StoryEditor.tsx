@@ -224,14 +224,11 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 {/* Controles - LADO DIREITO NO DESKTOP, EMBAIXO NO MOBILE */}
                 <div className="flex-1 lg:max-w-lg mx-auto lg:mx-0 flex flex-col justify-center">
                     <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                {/* Controles - LADO DIREITO NO DESKTOP, EMBAIXO NO MOBILE */}
-                <div className="flex-1 lg:max-w-lg mx-auto lg:mx-0 flex flex-col justify-center">
-                    <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
                         <h2 className={`text-2xl font-bold mb-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                             Editar Story
                         </h2>
 
-                    <div className="max-w-lg mx-auto px-6 space-y-4">
+                    <div className="space-y-4">
                         {/* Text Input */}
                         <div className="flex items-center gap-2">
                             <div className="flex-1 relative">

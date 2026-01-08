@@ -126,7 +126,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
             formData.append('image', blob, 'story.jpg');
             
             // Upload to server
-            const uploadResponse = await api.post('/upload/story', formData, {
+            const uploadResponse = await api.post('/uploads/story', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             uploadedImageUrl = uploadResponse.data.imageUrl;

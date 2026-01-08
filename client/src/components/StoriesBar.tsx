@@ -111,6 +111,9 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
     const handlePublishStory = async (finalImageUrl: string) => {
         if (!user) return;
         
+        console.log('[Story] Starting publish process...');
+        console.log('[Story] Blob URL:', finalImageUrl);
+        
         setIsEditorOpen(false);
         setEditorImage(null);
 
@@ -121,17 +124,22 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
             const blobResponse = await fetch(finalImageUrl);
             const blob = await blobResponse.blob();
             
+            console.log('[Story] Blob size:', Math.round(blob.size / 1024), 'KB');
+            console.log('[Story] Blob type:', blob.type);
+            
             // Create FormData
             const formData = new FormData();
             formData.append('image', blob, 'story.jpg');
             
             // Upload to server
+            console.log('[Story] Uploading image to server...');
             const uploadResponse = await api.post('/uploads/story', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             uploadedImageUrl = uploadResponse.data.imageUrl;
+            console.log('[Story] Image uploaded successfully:', uploadedImageUrl);
         } catch (error) {
-            console.error('Failed to upload story image', error);
+            console.error('[Story] Failed to upload story image:', error);
             return;
         }
         
@@ -177,8 +185,10 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
 
         // Call API to create story
         try {
+            console.log('[Story] Creating story in backend with imageUrl:', uploadedImageUrl);
             const response = await api.post('/feed/stories', { imageUrl: uploadedImageUrl });
             const createdStory = response.data;
+            console.log('[Story] Story created successfully:', createdStory);
             
             // Update local state with real story ID from backend
             setStories(prev => {

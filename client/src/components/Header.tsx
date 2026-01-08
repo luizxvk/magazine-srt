@@ -110,6 +110,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
         { icon: <Trophy className="w-5 h-5" />, label: 'Ranking', path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
+        { icon: <MessageCircle className="w-5 h-5" />, label: 'Grupos', path: '/groups' },
         { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
         { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
         { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },

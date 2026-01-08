@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Camera, Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Camera } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ChangePasswordModal from './ChangePasswordModal';
@@ -30,21 +30,12 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
     const [isNicknameEnabled, setIsNicknameEnabled] = useState(!!user?.displayName);
     const [bio, setBio] = useState(user?.bio || '');
     const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
-    const [liteMode, setLiteMode] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
-
-    // Load lite mode preference from localStorage
-    useEffect(() => {
-        const savedLiteMode = localStorage.getItem('liteMode') === 'true';
-        setLiteMode(savedLiteMode);
-        // Apply lite mode to document
-        document.documentElement.classList.toggle('lite-mode', savedLiteMode);
-    }, []);
 
     if (!isOpen) return null;
 
@@ -214,30 +205,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                                     className={`w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none ${themeFocus} transition-colors resize-none`}
                                     placeholder="Uma frase que te define..."
                                 />
-                            </div>
-
-                            {/* Lite Mode Toggle */}
-                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Zap className={`w-4 h-4 ${liteMode ? 'text-gray-500' : themeLabel.replace('text-', 'text-')}`} />
-                                        <div>
-                                            <span className="text-sm text-white font-medium">Modo Lite</span>
-                                            <p className="text-[10px] text-gray-500">Desativa animações e efeitos visuais</p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-colors ${liteMode ? themeToggle : 'bg-white/10'}`}
-                                        onClick={() => {
-                                            const newState = !liteMode;
-                                            setLiteMode(newState);
-                                            localStorage.setItem('liteMode', String(newState));
-                                            document.documentElement.classList.toggle('lite-mode', newState);
-                                        }}
-                                    >
-                                        <div className={`w-4 h-4 rounded-full bg-black transition-transform ${liteMode ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </div>
-                                </div>
                             </div>
                         </div>
 

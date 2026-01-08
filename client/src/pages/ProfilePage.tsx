@@ -31,7 +31,7 @@ const BADGE_EMOJIS: Record<string, string> = {
 };
 
 export default function ProfilePage() {
-    const { user: currentUser, theme, toggleTheme, equippedBadge } = useAuth();
+    const { user: currentUser, theme, equippedBadge } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const paramId = searchParams.get('id');
@@ -318,14 +318,6 @@ export default function ProfilePage() {
                                                         <span className="text-xs text-blue-400 font-medium">DevTools</span>
                                                     </button>
                                                 </>
-                                            )}
-                                            {isMGT && (
-                                                <button
-                                                    onClick={toggleTheme}
-                                                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors group shrink-0 ${theme === 'light' ? 'border-gray-400 bg-gray-200 text-gray-800' : 'border-white/10 hover:bg-white/5 text-gray-400'}`}
-                                                >
-                                                    <span className="text-xs font-medium">{theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}</span>
-                                                </button>
                                             )}
                                         </>
                                     ) : (

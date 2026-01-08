@@ -138,10 +138,10 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 <X className="w-6 h-6 text-white" />
             </button>
 
-            <div className="min-h-screen flex flex-col lg:flex-row gap-6 p-4 pt-20 lg:pt-8 lg:px-8">
-                {/* Story Preview - LADO ESQUERDO NO DESKTOP */}
-                <div className="flex-1 flex items-center justify-center lg:max-w-md mx-auto lg:mx-0">
-                    <div className="relative w-full">
+            <div className="min-h-screen flex flex-col p-4 pt-20">
+                {/* Story Preview - CENTRALIZADO */}
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="relative w-full max-w-md mx-auto">
                         {/* Controles de Zoom da Imagem */}
                         <div className="flex items-center justify-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1 mb-4 w-fit mx-auto">
                             <button
@@ -221,8 +221,8 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                     </div>
                 </div>
 
-                {/* Controles - LADO DIREITO NO DESKTOP, EMBAIXO NO MOBILE */}
-                <div className="flex-1 lg:max-w-lg mx-auto lg:mx-0 flex flex-col justify-center">
+                {/* Controles - EMBAIXO CENTRALIZADO */}
+                <div className="w-full max-w-md mx-auto pb-6">
                     <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
                         <h2 className={`text-2xl font-bold mb-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                             Editar Story

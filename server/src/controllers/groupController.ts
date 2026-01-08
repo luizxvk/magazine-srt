@@ -722,6 +722,10 @@ export const inviteMember = async (req: Request, res: Response) => {
         invitedId: invitedUserId,
         status: 'PENDING'
       },
+        inviterId: userId,
+        invitedId: invitedUserId,
+        status: 'PENDING'
+      },
       include: {
         group: {
           select: {

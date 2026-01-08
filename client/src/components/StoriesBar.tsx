@@ -278,14 +278,18 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
             {viewingStoryId && stories.find(s => s.id === viewingStoryId) && (
                 <ModernStoryViewer
                     stories={stories.flatMap(storyGroup => 
-                        (storyGroup.items || []).map((item: any) => ({
-                            id: item.id,
-                            imageUrl: item.imageUrl,
-                            user: storyGroup.user,
-                            createdAt: item.createdAt,
-                            expiresAt: item.expiresAt || new Date(new Date(item.createdAt).getTime() + 24 * 60 * 60 * 1000).toISOString(),
-                            viewCount: 0
-                        }))
+                        (storyGroup.items || []).map((item: any) => {
+                            const createdDate = item.createdAt ? new Date(item.createdAt) : new Date();
+                            const isValidDate = !isNaN(createdDate.getTime());
+                            return {
+                                id: item.id,
+                                imageUrl: item.imageUrl,
+                                user: storyGroup.user,
+                                createdAt: isValidDate ? item.createdAt : new Date().toISOString(),
+                                expiresAt: item.expiresAt || (isValidDate ? new Date(createdDate.getTime() + 24 * 60 * 60 * 1000).toISOString() : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()),
+                                viewCount: 0
+                            };
+                        })
                     )}
                     initialStoryIndex={stories.flatMap(sg => (sg.items || [])).findIndex((item: any) => 
                         stories.find(s => s.id === viewingStoryId)?.items?.includes(item)

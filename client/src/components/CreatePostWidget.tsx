@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
@@ -9,7 +10,7 @@ interface CreatePostWidgetProps {
 }
 
 export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProps) {
-    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme } = useAuth();
+    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -170,18 +171,40 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
 
     if (isVisitor) {
         return (
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-50 px-4 md:px-0">
+            <motion.div 
+                className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+                animate={{ 
+                    y: isMobileDrawerOpen ? 100 : 0,
+                    opacity: isMobileDrawerOpen ? 0 : 1
+                }}
+                transition={{ 
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30
+                }}
+            >
                 <div className={`bg-black/60 backdrop-blur-xl border ${themeBorder} rounded-full p-4 text-center shadow-2xl`}>
                     <p className={`${themeText} text-sm`}>
                         <span className="font-semibold">Visitante:</span> Faça login para interagir e publicar.
                     </p>
                 </div>
-            </div>
+            </motion.div>
         );
     }
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-50 px-4 md:px-0">
+        <motion.div 
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+            animate={{ 
+                y: isMobileDrawerOpen ? 100 : 0,
+                opacity: isMobileDrawerOpen ? 0 : 1
+            }}
+            transition={{ 
+                type: 'spring',
+                stiffness: 300,
+                damping: 30
+            }}
+        >
             {/* Media Preview (Pops up above the bar) */}
             {mediaUrl && (
                 <div className={`mb-4 bg-black/40 backdrop-blur-xl rounded-2xl p-2 border ${themeBorder} animate-fade-in-up relative mx-auto w-full max-w-sm shadow-2xl`}>
@@ -351,6 +374,6 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
                     </button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

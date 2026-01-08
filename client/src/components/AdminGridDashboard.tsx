@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import ReactGridLayout from 'react-grid-layout';
+import { Responsive, useContainerWidth } from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-
-const ResponsiveGridLayout = ReactGridLayout.WidthProvider(ReactGridLayout.Responsive);
 
 interface DashboardStats {
     totalUsers: number;
@@ -147,7 +145,7 @@ export default function AdminGridDashboard() {
                 </p>
             </div>
 
-            <ResponsiveGridLayout
+            <Responsive
                 className="layout"
                 layouts={layouts}
                 breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}

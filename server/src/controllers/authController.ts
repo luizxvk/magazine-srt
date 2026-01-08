@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { sendPasswordResetEmail } from '../services/emailService';
-import { generateVerificationCode, sendVerificationEmail } from '../services/emailVerificationService';
+import { generateVerificationCode, sendVerificationEmail, sendPasswordResetEmail as sendPasswordResetEmailVerification } from '../services/emailVerificationService';
 
 const prisma = new PrismaClient();
 
@@ -233,7 +233,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
             // Security: Don't reveal if user exists
             return res.json({ 
                 message: 'Se uma conta existir com este email, você receberá instruções.',
-                exists: false 
+                success: true
             });
         }
 
@@ -250,15 +250,16 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
         const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
         const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-        // Return data for frontend to send email via EmailJS
+        // Send password reset email via Nodemailer
+        await sendPasswordResetEmail({
+            to: user.email,
+            name: user.name || user.displayName || 'Usuário',
+            resetLink
+        });
+
         res.json({ 
-            message: 'Dados de redefinição gerados com sucesso.',
-            exists: true,
-            emailData: {
-                to_email: email,
-                to_name: user.name || user.displayName || 'Usuário',
-                reset_link: resetLink
-            }
+            message: 'Email de redefinição de senha enviado com sucesso!',
+            success: true
         });
 
     } catch (error) {

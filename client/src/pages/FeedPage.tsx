@@ -320,7 +320,7 @@ export default function FeedPage() {
                     </div>
 
                     {/* What's New Card */}
-                    <div className="mb-6">
+                    <div className="mb-8">
                         <WhatsNewCard />
                     </div>
 

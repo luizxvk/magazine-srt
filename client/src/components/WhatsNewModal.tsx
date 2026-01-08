@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -34,6 +34,12 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
 
     // v0.3.4 - Sistema de GRUPOS + RGB Animado + Correções
     const updates: UpdateItem[] = [
+        {
+            icon: <Globe className="w-5 h-5" />,
+            title: 'Servidores no Brasil 🇧🇷',
+            description: 'Banco de dados e Vercel agora rodando no Brasil! Menor latência e maior velocidade para todos!',
+            isNew: true
+        },
         {
             icon: <MessageCircle className="w-5 h-5" />,
             title: 'Sistema de GRUPOS Completo!',

@@ -61,12 +61,14 @@ const BadgeManager: React.FC = () => {
     };
 
     const searchUsers = async (query: string) => {
-        if (!query.trim()) {
-            setSearchResults([]);
-            return;
-        }
-
         try {
+            // If empty, get all users (limit 10)
+            if (!query.trim()) {
+                const response = await api.get('/users?limit=10');
+                setSearchResults(response.data.slice(0, 10));
+                return;
+            }
+
             const response = await api.get(`/users/search?query=${encodeURIComponent(query)}`);
             setSearchResults(response.data.slice(0, 5));
         } catch (error) {
@@ -287,6 +289,11 @@ const BadgeManager: React.FC = () => {
                                 onChange={(e) => {
                                     setSearchQuery(e.target.value);
                                     searchUsers(e.target.value);
+                                }}
+                                onFocus={() => {
+                                    if (!searchQuery) {
+                                        searchUsers(''); // Load all users on focus
+                                    }
                                 }}
                                 placeholder="Buscar usuário..."
                                 className={`w-full px-4 py-2 rounded-lg ${

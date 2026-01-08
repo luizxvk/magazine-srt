@@ -83,7 +83,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
 
     const markStoryAsViewed = async (storyId: string) => {
         try {
-            await api.post(`/social/stories/${storyId}/view`);
+            await api.post(`/feed/stories/${storyId}/view`);
         } catch (error) {
             console.error('Error marking story as viewed:', error);
         }
@@ -91,7 +91,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
 
     const fetchViewers = async (storyId: string) => {
         try {
-            const response = await api.get(`/social/stories/${storyId}/viewers`);
+            const response = await api.get(`/feed/stories/${storyId}/viewers`);
             setViewers(response.data);
         } catch (error) {
             console.error('Error fetching viewers:', error);
@@ -119,7 +119,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         if (!confirm('Deseja deletar este story?')) return;
 
         try {
-            await api.delete(`/social/stories/${currentStory.id}`);
+            await api.delete(`/feed/stories/${currentStory.id}`);
             onClose();
         } catch (error) {
             console.error('Error deleting story:', error);
@@ -135,7 +135,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
 
     const handleLike = async () => {
         try {
-            await api.post(`/social/stories/${currentStory.id}/like`);
+            await api.post(`/feed/stories/${currentStory.user.id}/like`);
             setIsLiked(!isLiked);
         } catch (error) {
             console.error('Error liking story:', error);

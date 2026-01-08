@@ -601,7 +601,6 @@ html.rgb-dynamic .bg-accent,
 html.rgb-dynamic .bg-accent-500,
 html.rgb-dynamic [class*="bg-accent"] {
   animation: rgb-cycle 3s linear infinite !important;
-  background-color: #ff0000 !important;
 }
 
 @keyframes shine-gold {

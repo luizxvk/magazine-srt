@@ -141,16 +141,16 @@ export default function AdminGridDashboard() {
                 </p>
             </div>
 
-            <GridLayout
-                className="layout"
-                layout={layout}
-                cols={12}
-                rowHeight={150}
-                width={1200}
-                onLayoutChange={handleLayoutChange}
-                isDraggable={true}
-                isResizable={false}
-            >
+            <div style={{ width: '100%' }}>
+                <GridLayout
+                    className="layout"
+                    layout={layout}
+                    rowHeight={150}
+                    width={1200}
+                    onLayoutChange={handleLayoutChange}
+                    isDraggable={true}
+                    isResizable={false}
+                >
                 {widgets.map((widget) => (
                     <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-move`}>
                         <div className="flex flex-col h-full">

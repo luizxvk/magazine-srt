@@ -4,8 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import crypto from 'crypto';
-import { sendPasswordResetEmail } from '../services/emailService';
-import { generateVerificationCode, sendVerificationEmail, sendPasswordResetEmail as sendPasswordResetEmailVerification } from '../services/emailVerificationService';
+import { generateVerificationCode, sendVerificationEmail, sendPasswordResetEmail } from '../services/emailVerificationService';
 
 const prisma = new PrismaClient();
 

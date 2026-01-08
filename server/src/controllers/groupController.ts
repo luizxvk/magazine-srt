@@ -366,18 +366,30 @@ export const getGroupMessages = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
 
-    // Verificar se é membro
-    const member = await prisma.groupMember.findUnique({
-      where: {
-        groupId_userId: {
-          groupId: id,
-          userId,
-        },
-      },
+    // Check if group exists and if it's private
+    const group = await prisma.group.findUnique({
+      where: { id },
+      select: { isPrivate: true },
     });
 
-    if (!member) {
-      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    if (!group) {
+      return res.status(404).json({ error: 'Grupo não encontrado' });
+    }
+
+    // For private groups, verify membership
+    if (group.isPrivate) {
+      const member = await prisma.groupMember.findUnique({
+        where: {
+          groupId_userId: {
+            groupId: id,
+            userId,
+          },
+        },
+      });
+
+      if (!member) {
+        return res.status(403).json({ error: 'Você não é membro deste grupo privado' });
+      }
     }
 
     const messages = await prisma.groupMessage.findMany({

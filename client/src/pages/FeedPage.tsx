@@ -276,7 +276,7 @@ export default function FeedPage() {
                                     <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
                                 </div>
                             ) : (
-                                <div className="space-y-8">
+                                <div className="space-y-8 mx-auto max-w-3xl">
                                     {regularPosts.map(post => (
                                         <FeedItem
                                             key={post.id}

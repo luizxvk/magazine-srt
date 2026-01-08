@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import GridLayout from 'react-grid-layout';
 import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -42,31 +41,6 @@ export default function AdminGridDashboard() {
             console.error('Failed to fetch dashboard stats', error);
         }
     };
-
-    const defaultLayout = [
-        { i: 'users', x: 0, y: 0, w: 3, h: 2 },
-        { i: 'activity', x: 3, y: 0, w: 3, h: 2 },
-        { i: 'posts', x: 6, y: 0, w: 3, h: 2 },
-        { i: 'online', x: 9, y: 0, w: 3, h: 2 },
-        { i: 'messages', x: 0, y: 2, w: 4, h: 2 },
-        { i: 'stories', x: 4, y: 2, w: 4, h: 2 },
-        { i: 'comments', x: 8, y: 2, w: 4, h: 2 }
-    ];
-
-    const [layout, setLayout] = useState(defaultLayout);
-
-    const handleLayoutChange = (newLayout: any) => {
-        setLayout(newLayout);
-        localStorage.setItem('adminDashboardLayout', JSON.stringify(newLayout));
-    };
-
-    // Load saved layout on mount
-    useEffect(() => {
-        const savedLayout = localStorage.getItem('adminDashboardLayout');
-        if (savedLayout) {
-            setLayout(JSON.parse(savedLayout));
-        }
-    }, []);
 
     const widgets = [
         {
@@ -152,7 +126,7 @@ export default function AdminGridDashboard() {
                     isResizable={false}
                 >
                 {widgets.map((widget) => (
-                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-move`}>
+                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                         <div className="flex flex-col h-full">
                             <div className="flex items-center justify-between mb-4">
                                 <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
@@ -170,8 +144,3 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
-            </GridLayout>
-            </div>
-        </div>
-    );
-}

@@ -104,7 +104,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [dailyLoginStatus, setDailyLoginStatus] = useState<DailyLoginStatus | null>(null);
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
-    const [theme, setTheme] = useState<'dark' | 'light'>(() => {    const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);        if (typeof window !== 'undefined') {
+    const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
+    const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+        if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
             if (!token) return 'dark'; // Force dark if not logged in
 

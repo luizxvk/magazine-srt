@@ -269,24 +269,6 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
 
             {/* Main Container */}
             <div className="relative w-full h-full md:max-w-md md:h-full bg-black shadow-2xl">
-                {/* Progress Bars */}
-                <div className="absolute top-0 left-0 right-0 z-20 p-2 flex gap-1 pt-4 md:pt-2">
-                    {/* Show progress bars for all items in the CURRENT user's story if multiple items exist */}
-                    {/* If we want instagram style: show bars for ITEMS. */}
-                    {/* Currently renders 1 bar per USER. Keep it simple or sophisticated? */}
-                    {/* User asked for "adding photos to story". Expected: multiple bars for that user. */}
-                    {storyItems.map((item, index) => (
-                        <div key={item.id || index} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-                            <div
-                                className={`h-full bg-white transition-all duration-100 ease-linear ${index < currentItemIndex ? 'w-full' :
-                                    index === currentItemIndex ? `w-[${progress}%]` : 'w-0'
-                                    }`}
-                                style={{ width: index === currentItemIndex ? `${progress}%` : index < currentItemIndex ? '100%' : '0%' }}
-                            />
-                        </div>
-                    ))}
-                </div>
-
                 {/* Header */}
                 <div className="absolute top-6 left-0 right-0 z-20 p-4 flex items-center gap-3 mt-2">
                     <div className={`w-10 h-10 rounded-full p-[1px] ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}>
@@ -313,9 +295,21 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                     onTouchEnd={() => setIsPaused(false)}
                     onDoubleClick={handleLike}
                 >
+                    {/* Progress Bars - Inside Image */}
+                    <div className="absolute top-2 left-2 right-2 z-20 flex gap-1">
+                        {storyItems.map((item, index) => (
+                            <div key={item.id || index} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-white transition-all duration-100 ease-linear"
+                                    style={{ width: index === currentItemIndex ? `${progress}%` : index < currentItemIndex ? '100%' : '0%' }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+
                     <img
-                        key={currentItem.id} // Add key to force re-render/animation if needed
-                        src={currentItem.imageUrl} // Use item image
+                        key={currentItem.id}
+                        src={currentItem.imageUrl}
                         alt="Story"
                         className="w-full h-full object-cover"
                     />

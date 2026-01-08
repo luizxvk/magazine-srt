@@ -82,25 +82,25 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+    <div className={`min-h-screen font-sans selection:${isMGT ? 'bg-emerald-500/30' : 'bg-gold-500/30'} relative`}>
       <LuxuriousBackground />
       <Header />
       
-      <div className="max-w-7xl mx-auto px-4 pt-48 pb-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 pt-24 pb-8 relative z-10">
         {/* Page Title with Icon */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <Users className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
             <div>
-              <h1 className={`text-4xl font-serif ${isMGT ? 'text-emerald-400' : 'text-gold-400'} mb-1`}>Grupos</h1>
-              <p className="text-gray-400 text-sm">Conecte-se com membros de interesses similares</p>
+              <h1 className={`text-3xl sm:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'} mb-1`}>Grupos</h1>
+              <p className={`${themeSecondary} text-sm`}>Conecte-se com membros de interesses similares</p>
             </div>
           </div>
           <motion.button
             onClick={handleCreateGroup}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400'} text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-colors`}
+            className={`${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-emerald-500/50' : 'bg-gradient-to-r from-gold-600 to-gold-500 hover:shadow-gold-500/50'} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-xl transition-all`}
           >
             <Plus className="w-5 h-5" />
             Criar Grupo
@@ -109,63 +109,79 @@ export default function GroupsPage() {
 
         {/* Groups Grid */}
         {groups.length === 0 ? (
-          <div className="text-center py-16">
-            <Users className={`w-16 h-16 ${themeSecondary} mx-auto mb-4`} />
-            <h3 className={`text-xl font-medium ${themeText} mb-2`}>Nenhum grupo ainda</h3>
-            <p className={themeSecondary}>Crie o primeiro grupo e comece a conectar membros!</p>
+          <div className="glass-panel rounded-2xl border border-white/10 p-16 text-center">
+            <Users className={`w-20 h-20 ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'} mx-auto mb-4`} />
+            <h3 className={`text-2xl font-bold ${themeText} mb-2`}>Nenhum grupo ainda</h3>
+            <p className={`${themeSecondary} mb-6`}>Crie o primeiro grupo e comece a conectar membros!</p>
+            <motion.button
+              onClick={handleCreateGroup}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500'} text-white px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg transition-colors`}
+            >
+              <Plus className="w-5 h-5" />
+              Criar Primeiro Grupo
+            </motion.button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {groups.map((group) => (
               <motion.div
                 key={group.id}
-                whileHover={{ y: -4 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -4, scale: 1.02 }}
                 onClick={() => navigate(`/groups/${group.id}`)}
-                className={`glass-panel rounded-xl overflow-hidden border ${themeBorder} cursor-pointer transition-all duration-300 hover:border-${accentColor}/50`}
+                className={`glass-panel rounded-2xl overflow-hidden border ${themeBorder} cursor-pointer transition-all duration-300 hover:border-${isMGT ? 'emerald' : 'gold'}-500/50 hover:shadow-xl`}
               >
                 {/* Avatar */}
-                <div className="relative h-32 bg-gradient-to-br from-${accentColor}/20 to-${accentColor}/5 flex items-center justify-center">
+                <div className={`relative h-32 ${isMGT ? 'bg-gradient-to-br from-emerald-600/20 to-emerald-500/5' : 'bg-gradient-to-br from-gold-600/20 to-gold-500/5'} flex items-center justify-center`}>
                   {group.avatarUrl ? (
                     <img
                       src={group.avatarUrl}
                       alt={group.name}
-                      className="w-20 h-20 rounded-full border-4 border-white/20"
+                      className="w-20 h-20 rounded-full border-4 border-white/20 object-cover"
                     />
                   ) : (
-                    <div className={`w-20 h-20 rounded-full bg-${accentColor}/20 flex items-center justify-center`}>
-                      <Users className={`w-10 h-10 text-${accentColor}`} />
+                    <div className={`w-20 h-20 rounded-full ${isMGT ? 'bg-emerald-600/30' : 'bg-gold-600/30'} flex items-center justify-center`}>
+                      <Users className={`w-10 h-10 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                    </div>
+                  )}
+                  {!group.isPrivate && (
+                    <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-full p-1.5">
+                      <Globe className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  {group.isPrivate && (
+                    <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-full p-1.5">
+                      <Lock className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className={`text-lg font-semibold ${themeText}`}>{group.name}</h3>
-                    {group.isPrivate ? (
-                      <Lock className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <Globe className="w-4 h-4 text-gray-500" />
-                    )}
-                  </div>
+                <div className="p-5">
+                  <h3 className={`text-lg font-bold ${themeText} mb-2`}>{group.name}</h3>
 
                   {group.description && (
-                    <p className={`${themeSecondary} text-sm mb-3 line-clamp-2`}>
+                    <p className={`${themeSecondary} text-sm mb-4 line-clamp-2 min-h-[40px]`}>
                       {group.description}
                     </p>
                   )}
 
                   {/* Stats */}
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-3">
-                      <span className={themeSecondary}>
-                        {group.members.length} {group.members.length === 1 ? 'membro' : 'membros'}
+                  <div className="flex items-center justify-between text-sm pt-3 border-t border-white/5">
+                    <div className="flex items-center gap-4">
+                      <span className={`${themeSecondary} flex items-center gap-1`}>
+                        <Users className="w-4 h-4" />
+                        {group.members.length}
                       </span>
-                      <span className={themeSecondary}>
-                        {group._count.messages} {group._count.messages === 1 ? 'mensagem' : 'mensagens'}
+                      <span className={`${themeSecondary} flex items-center gap-1`}>
+                        <span className="w-4 h-4 flex items-center justify-center text-xs">💬</span>
+                        {group._count.messages}
                       </span>
                     </div>
-                    <ChevronRight className={`w-5 h-5 ${themeSecondary}`} />
+                    <ChevronRight className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
                   </div>
                 </div>
               </motion.div>

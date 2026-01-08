@@ -113,14 +113,35 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
         
         setIsEditorOpen(false);
         setEditorImage(null);
+
+        // Convert blob URL to file and upload
+        let uploadedImageUrl: string;
+        try {
+            // Fetch the blob
+            const blobResponse = await fetch(finalImageUrl);
+            const blob = await blobResponse.blob();
+            
+            // Create FormData
+            const formData = new FormData();
+            formData.append('image', blob, 'story.jpg');
+            
+            // Upload to server
+            const uploadResponse = await api.post('/upload/story', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            uploadedImageUrl = uploadResponse.data.imageUrl;
+        } catch (error) {
+            console.error('Failed to upload story image', error);
+            return;
+        }
         
-        // Optimistic update
+        // Optimistic update with uploaded URL
         setStories(prev => {
             const existingGroupIndex = prev.findIndex(s => s.user.id === user.id);
 
             const newStoryItem = {
                 id: `story-local-${Date.now()}`,
-                imageUrl: finalImageUrl,
+                imageUrl: uploadedImageUrl,
                 createdAt: new Date().toISOString(),
                 isSeen: false
             };
@@ -128,7 +149,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
             if (existingGroupIndex >= 0) {
                 const updatedGroup = {
                     ...prev[existingGroupIndex],
-                    imageUrl: finalImageUrl,
+                    imageUrl: uploadedImageUrl,
                     timestamp: 'Agora',
                     hasUnseen: false,
                     items: [newStoryItem, ...(prev[existingGroupIndex] as any).items || []]
@@ -145,7 +166,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
                         name: user.name,
                         avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`
                     },
-                    imageUrl: finalImageUrl,
+                    imageUrl: uploadedImageUrl,
                     timestamp: 'Agora',
                     hasUnseen: false,
                     items: [newStoryItem]
@@ -156,7 +177,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
 
         // Call API to create story
         try {
-            const response = await api.post('/feed/stories', { imageUrl: finalImageUrl });
+            const response = await api.post('/feed/stories', { imageUrl: uploadedImageUrl });
             const createdStory = response.data;
             
             // Update local state with real story ID from backend

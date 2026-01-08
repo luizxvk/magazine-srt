@@ -14,13 +14,13 @@ export default function Footer() {
             year: 'numeric',
             hour: '2-digit', 
             minute: '2-digit'
-          })
+          }).replace(/\//g, '').replace(/,/g, '').replace(/\s/g, '').replace(/:/g, '')
         : 'local';
 
     return (
         <footer className="fixed bottom-4 right-4 z-10 pointer-events-none">
             <div className={`text-xs ${theme === 'light' ? 'text-gray-400' : 'text-gray-600'} font-mono`}>
-                {version} • {commitHash} • {buildDate}
+                {version}{commitHash}{buildDate}
             </div>
         </footer>
     );

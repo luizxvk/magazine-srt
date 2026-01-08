@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface DashboardStats {
     totalUsers: number;
@@ -41,6 +46,33 @@ export default function AdminGridDashboard() {
             console.error('Failed to fetch dashboard stats', error);
         }
     };
+
+    const defaultLayouts = {
+        lg: [
+            { i: 'users', x: 0, y: 0, w: 3, h: 2 },
+            { i: 'activity', x: 3, y: 0, w: 3, h: 2 },
+            { i: 'posts', x: 6, y: 0, w: 3, h: 2 },
+            { i: 'online', x: 9, y: 0, w: 3, h: 2 },
+            { i: 'messages', x: 0, y: 2, w: 4, h: 2 },
+            { i: 'stories', x: 4, y: 2, w: 4, h: 2 },
+            { i: 'comments', x: 8, y: 2, w: 4, h: 2 }
+        ]
+    };
+
+    const [layouts, setLayouts] = useState(defaultLayouts);
+
+    const handleLayoutChange = (_: Layout[], allLayouts: any) => {
+        setLayouts(allLayouts);
+        localStorage.setItem('adminDashboardLayouts', JSON.stringify(allLayouts));
+    };
+
+    // Load saved layouts on mount
+    useEffect(() => {
+        const savedLayouts = localStorage.getItem('adminDashboardLayouts');
+        if (savedLayouts) {
+            setLayouts(JSON.parse(savedLayouts));
+        }
+    }, []);
 
     const widgets = [
         {
@@ -84,31 +116,41 @@ export default function AdminGridDashboard() {
             color: 'cyan'
         },
         {
-            i: 'stories',
-            title: 'Stories Postados',
-            value: stats.totalStories,
-            icon: <Star className="w-6 h-6 text-pink-400" />,
-            subtitle: 'Últimas 24h',
-            color: 'pink'
-        },
-        {
-            i: 'comments',
-            title: 'Comentários',
-            value: stats.totalComments,
-            icon: <Shield className="w-6 h-6 text-emerald-400" />,
-            subtitle: 'Total de interações',
-            color: 'emerald'
-        }
-    ];
+            i: 'storArraste os cards para reorganizar • Redimensione conforme necessário • Layout salvo automaticamente
+                </p>
+            </div>
 
-    const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
-    const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
-
-    return (
-        <div className="mb-8">
-            <div className="mb-6">
-                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                    Dashboard Geral
+            <ResponsiveGridLayout
+                className="layout"
+                layouts={layouts}
+                breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+                cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+                rowHeight={80}
+                onLayoutChange={handleLayoutChange}
+                isDraggable={true}
+                isResizable={true}
+                draggableHandle=".drag-handle"
+            >
+                {widgets.map((widget) => (
+                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center justify-between mb-4 drag-handle cursor-move">
+                                <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
+                                    {widget.icon}
+                                </div>
+                                <TrendingUp className="w-4 h-4 text-green-400" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-gray-400 text-sm mb-2">{widget.title}</h3>
+                                <p className={`text-3xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                    {widget.value.toLocaleString()}
+                                </p>
+                            </div>
+                            <p className="text-gray-500 text-xs mt-2">{widget.subtitle}</p>
+                        </div>
+                    </div>
+                ))}
+            </ResponsiveGridLayout   Dashboard Geral
                 </h2>
                 <p className="text-gray-400 text-sm mt-1">
                     Estatísticas em tempo real • Atualização automática a cada 30s

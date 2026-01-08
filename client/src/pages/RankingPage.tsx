@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import Ranking from '../components/Ranking';

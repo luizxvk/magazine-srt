@@ -80,6 +80,9 @@ export default function GroupChatPage() {
   const [newGroupName, setNewGroupName] = useState('');
   const [showEditAvatarModal, setShowEditAvatarModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [friends, setFriends] = useState<any[]>([]);
+  const [inviting, setInviting] = useState(false);
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -90,6 +93,41 @@ export default function GroupChatPage() {
 
   const myMember = group?.members.find(m => m.userId === user?.id);
   const isAdmin = myMember?.role === 'ADMIN';
+
+  const fetchFriends = async () => {
+    try {
+      const response = await api.get('/social/friends');
+      // Filter out users already in the group
+      const currentMemberIds = group?.members.map(m => m.userId) || [];
+      const availableFriends = response.data.filter((friend: any) => 
+        !currentMemberIds.includes(friend.id)
+      );
+      setFriends(availableFriends);
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
+  };
+
+  const handleInviteMember = async (friendId: string) => {
+    if (!id) return;
+    
+    setInviting(true);
+    try {
+      await api.post(`/groups/${id}/invite`, { invitedUserId: friendId });
+      alert('Convite enviado com sucesso!');
+      setShowInviteModal(false);
+    } catch (error: any) {
+      console.error('Error inviting member:', error);
+      alert(error.response?.data?.error || 'Erro ao enviar convite');
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const openInviteModal = () => {
+    fetchFriends();
+    setShowInviteModal(true);
+  };
 
   useEffect(() => {
     fetchGroup();
@@ -274,7 +312,7 @@ export default function GroupChatPage() {
       <Header />
       
       {/* Centralized Chat Container */}
-      <div className="max-w-5xl mx-auto px-4 pt-32 pb-6 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 pt-48 pb-6 relative z-10">
         <div className={`h-[calc(100vh-180px)] flex flex-col glass-panel rounded-xl overflow-hidden border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
       {/* Header */}
       <div className="border-b border-white/10 p-4 flex items-center justify-between bg-black/20">
@@ -590,9 +628,19 @@ export default function GroupChatPage() {
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-xl font-semibold ${themeText}`}>Membros ({group.members.length})</h2>
-                <button onClick={() => setShowMembers(false)}>
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {isAdmin && (
+                    <button 
+                      onClick={openInviteModal}
+                      className={`px-3 py-1.5 rounded-lg ${accentBg} text-white text-sm hover:opacity-90 transition-opacity`}
+                    >
+                      + Adicionar
+                    </button>
+                  )}
+                  <button onClick={() => setShowMembers(false)}>
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -667,6 +715,65 @@ export default function GroupChatPage() {
                   Salvar
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Invite Member Modal */}
+      <AnimatePresence>
+        {showInviteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowInviteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel rounded-xl p-6 max-w-md w-full max-h-[70vh] overflow-y-auto border border-white/10"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-white">Convidar Amigos</h2>
+                <button onClick={() => setShowInviteModal(false)}>
+                  <X className="w-5 h-5 text-white" />
+                </button>
+              </div>
+
+              {friends.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">
+                  Nenhum amigo disponível para convidar
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {friends.map((friend) => (
+                    <div key={friend.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                      <img
+                        src={friend.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}`}
+                        alt={friend.name}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-white">
+                          {friend.displayName || friend.name}
+                        </p>
+                        <p className="text-xs text-gray-400">{friend.trophies} Troféus • Nível {friend.level}</p>
+                      </div>
+                      <button
+                        onClick={() => handleInviteMember(friend.id)}
+                        disabled={inviting}
+                        className={`px-4 py-2 rounded-lg ${accentBg} text-white text-sm hover:opacity-90 transition-opacity disabled:opacity-50`}
+                      >
+                        Convidar
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

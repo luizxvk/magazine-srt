@@ -27,11 +27,28 @@ interface FriendRequest {
     };
 }
 
+interface GroupInvite {
+    id: string;
+    group: {
+        id: string;
+        name: string;
+        avatarUrl?: string;
+        membershipType: 'MAGAZINE' | 'MGT';
+    };
+    inviter: {
+        id: string;
+        name: string;
+        displayName?: string;
+        avatarUrl?: string;
+    };
+}
+
 export default function SocialPage() {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended'>('friends');
     const [friends, setFriends] = useState<Friend[]>([]);
     const [requests, setRequests] = useState<FriendRequest[]>([]);
+    const [groupInvites, setGroupInvites] = useState<GroupInvite[]>([]);
     const [recommended, setRecommended] = useState<Friend[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -57,8 +74,12 @@ export default function SocialPage() {
                 const response = await api.get('/social/friends');
                 setFriends(response.data);
             } else if (activeTab === 'requests') {
-                const response = await api.get('/social/requests');
-                setRequests(response.data);
+                const [friendReqResponse, groupInvResponse] = await Promise.all([
+                    api.get('/social/requests'),
+                    api.get('/groups/invites')
+                ]);
+                setRequests(friendReqResponse.data);
+                setGroupInvites(groupInvResponse.data);
             } else {
                 // Fetch recommended users (mocking for now by fetching all users and filtering)
                 // In a real app, this should be a dedicated endpoint
@@ -92,6 +113,25 @@ export default function SocialPage() {
             setRequests(requests.filter(r => r.id !== requestId));
         } catch (error) {
             console.error('Failed to reject request', error);
+        }
+    };
+
+    const handleAcceptGroupInvite = async (inviteId: string) => {
+        try {
+            await api.post(`/groups/invites/${inviteId}/accept`);
+            setGroupInvites(groupInvites.filter(i => i.id !== inviteId));
+            // Optional: Show toast
+        } catch (error) {
+            console.error('Failed to accept group invite', error);
+        }
+    };
+
+    const handleRejectGroupInvite = async (inviteId: string) => {
+        try {
+            await api.post(`/groups/invites/${inviteId}/reject`);
+            setGroupInvites(groupInvites.filter(i => i.id !== inviteId));
+        } catch (error) {
+            console.error('Failed to reject group invite', error);
         }
     };
 
@@ -190,7 +230,14 @@ export default function SocialPage() {
                                 </div>
                             )
                         ) : activeTab === 'requests' ? (
-                            requests.length > 0 ? (
+                            <>
+                                {/* Friend Requests */}
+                                {requests.length > 0 && (
+                                    <div className="col-span-full">
+                                        <h3 className="text-white font-semibold mb-3">Solicitações de Amizade</h3>
+                                    </div>
+                                )}
+                                {requests.length > 0 ? (
                                 requests.map(req => (
                                     <div key={req.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4">
                                         <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
@@ -228,12 +275,60 @@ export default function SocialPage() {
                                         </div>
                                     </div>
                                 ))
-                            ) : (
+                            ) : null}
+
+                            {/* Group Invites */}
+                            {groupInvites.length > 0 && (
+                                <div className="col-span-full mt-6">
+                                    <h3 className="text-white font-semibold mb-3">Convites para Grupos</h3>
+                                </div>
+                            )}
+                            {groupInvites.map(invite => (
+                                <div key={invite.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
+                                        {invite.group.avatarUrl ? (
+                                            <img src={invite.group.avatarUrl} alt={invite.group.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                <Users className="w-5 h-5 text-gray-500" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-white font-medium truncate">
+                                            {invite.group.name}
+                                        </h3>
+                                        <p className="text-xs text-gray-400">
+                                            {invite.inviter.displayName || invite.inviter.name} convidou você
+                                        </p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handleAcceptGroupInvite(invite.id)}
+                                            className={`p-2 ${themeButton} text-black rounded-lg transition-colors`}
+                                            title="Aceitar"
+                                        >
+                                            <Check className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleRejectGroupInvite(invite.id)}
+                                            className="p-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                                            title="Rejeitar"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Empty State */}
+                            {requests.length === 0 && groupInvites.length === 0 && (
                                 <div className="col-span-full text-center py-20 bg-white/5 rounded-2xl border border-white/10">
                                     <UserCheck className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                                     <p className="text-gray-400">Nenhuma solicitação pendente.</p>
                                 </div>
-                            )
+                            )}
+                            </>
                         ) : (
                             recommended.length > 0 ? (
                                 recommended.map(rec => (

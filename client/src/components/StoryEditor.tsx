@@ -130,24 +130,20 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
         >
             <canvas ref={canvasRef} className="hidden" />
 
-            <div className="min-h-screen flex flex-col">
-                {/* Header - FIXO NO TOPO COM SOMBRA */}
-                <div className="relative z-[60] bg-gradient-to-b from-black via-black/80 to-transparent p-4 pb-6 flex-shrink-0">
-                    <div className="flex items-center justify-between max-w-lg mx-auto">
-                        <button
-                            onClick={onClose}
-                            className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors shadow-lg"
-                        >
-                            <X className="w-6 h-6 text-white" />
-                        </button>
-                    </div>
-                </div>
+            {/* Botão Fechar - Fixo no topo direito, sempre visível */}
+            <button
+                onClick={onClose}
+                className="fixed top-4 right-4 z-[70] p-3 bg-red-500 hover:bg-red-600 rounded-full shadow-xl transition-colors"
+            >
+                <X className="w-6 h-6 text-white" />
+            </button>
 
-                {/* Story Preview - CENTRALIZED COM CONTROLES DE ZOOM */}
-                <div className="flex-1 flex items-center justify-center px-4 py-8">
-                    <div className="relative w-full max-w-md">
+            <div className="min-h-screen flex flex-col lg:flex-row gap-6 p-4 pt-20 lg:pt-8 lg:px-8">
+                {/* Story Preview - LADO ESQUERDO NO DESKTOP */}
+                <div className="flex-1 flex items-center justify-center lg:max-w-md mx-auto lg:mx-0">
+                    <div className="relative w-full">
                         {/* Controles de Zoom da Imagem */}
-                        <div className="absolute -top-12 right-0 flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1 z-50">
+                        <div className="flex items-center justify-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1 mb-4 w-fit mx-auto">
                             <button
                                 onClick={() => setImageScale(Math.max(0.5, imageScale - 0.1))}
                                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -164,14 +160,6 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                 <ZoomIn className="w-4 h-4 text-white" />
                             </button>
                         </div>
-
-                        {/* Botão Fechar ao Lado da Imagem */}
-                        <button
-                            onClick={onClose}
-                            className="absolute -right-2 -top-2 z-50 p-2 bg-red-500 hover:bg-red-600 rounded-full shadow-xl transition-colors"
-                        >
-                            <X className="w-5 h-5 text-white" />
-                        </button>
 
                         <motion.div
                             style={{ scale: imageScale }}
@@ -233,8 +221,16 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                     </div>
                 </div>
 
-                {/* Bottom Toolbar - SEMPRE VISÍVEL COM SCROLL GARANTIDO */}
-                <div className="relative z-[60] bg-black pt-8 pb-8 flex-shrink-0">
+                {/* Controles - LADO DIREITO NO DESKTOP, EMBAIXO NO MOBILE */}
+                <div className="flex-1 lg:max-w-lg mx-auto lg:mx-0 flex flex-col justify-center">
+                    <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                {/* Controles - LADO DIREITO NO DESKTOP, EMBAIXO NO MOBILE */}
+                <div className="flex-1 lg:max-w-lg mx-auto lg:mx-0 flex flex-col justify-center">
+                    <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                        <h2 className={`text-2xl font-bold mb-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                            Editar Story
+                        </h2>
+
                     <div className="max-w-lg mx-auto px-6 space-y-4">
                         {/* Text Input */}
                         <div className="flex items-center gap-2">
@@ -378,6 +374,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                             <Send className="w-7 h-7" />
                             <span>{isPublishing ? 'PUBLICANDO...' : 'PUBLICAR STORY'}</span>
                         </motion.button>
+                    </div>
                     </div>
                 </div>
             </div>

@@ -274,7 +274,7 @@ export default function GroupChatPage() {
       <Header />
       
       {/* Centralized Chat Container */}
-      <div className="max-w-5xl mx-auto px-4 py-6 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 pt-24 pb-6 relative z-10">
         <div className={`h-[calc(100vh-180px)] flex flex-col glass-panel rounded-xl overflow-hidden border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
       {/* Header */}
       <div className="border-b border-white/10 p-4 flex items-center justify-between bg-black/20">

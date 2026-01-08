@@ -137,12 +137,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             
             if (activeTab === 'all' || activeTab === 'posts') {
                 posts?.forEach((p: any) => {
+                    const authorName = p.user?.displayName || p.user?.name || 'Usuário';
                     formattedResults.push({
                         id: p.id,
                         type: 'post',
                         title: p.caption?.substring(0, 50) || 'Post',
-                        subtitle: `por ${p.author?.displayName || p.author?.name}`,
-                        imageUrl: p.imageUrl || p.author?.avatarUrl
+                        subtitle: `por ${authorName}`,
+                        imageUrl: p.imageUrl || p.user?.avatarUrl
                     });
                 });
             }
@@ -175,7 +176,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     window.location.href = `/profile/${result.id}`;
                     break;
                 case 'post':
-                    navigate(`/feed?postId=${result.id}`);
+                    navigate(`/post/${result.id}`);
                     break;
                 case 'page':
                     if (result.path) {

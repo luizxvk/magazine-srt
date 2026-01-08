@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Globe } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Globe, Shield, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.4';
+const CURRENT_VERSION = '0.3.5';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -32,19 +32,65 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.4 - Sistema de GRUPOS + RGB Animado + Correções
+    // v0.3.5 - Sistema Não Perturbe + Correções + Wallpapers + Badges
     const updates: UpdateItem[] = [
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Sistema Não Perturbe',
+            description: 'Ative para bloquear popups de notificações e exibir ícone vermelho de "Ocupado" para amigos!',
+            isNew: true
+        },
+        {
+            icon: <Award className="w-5 h-5" />,
+            title: 'Selos nos Perfis e Amigos',
+            description: 'Selos de admin agora aparecem nos amigos online e cards de perfil de usuários!',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Wallpapers Corrigidos',
+            description: 'Todos os 8 novos fundos (Cyberpunk, Lava, Gelo, etc) agora funcionam corretamente!',
+            isNew: true
+        },
+        {
+            icon: <Trophy className="w-5 h-5" />,
+            title: 'Conquistas de Outros Usuários',
+            description: 'Ao visitar perfis, agora você vê as conquistas reais daquele usuário!',
+            isNew: true
+        },
+        {
+            icon: <Menu className="w-5 h-5" />,
+            title: 'Cards no Drawer Mobile',
+            description: 'Bônus Diário, Amigos Online e Novidades agora aparecem no menu responsivo!',
+            isNew: true
+        },
+        {
+            icon: <Search className="w-5 h-5" />,
+            title: 'Busca de Posts Corrigida',
+            description: 'Pesquisa de postagens agora exibe autor corretamente e redireciona ao clicar!',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'RGB Dinâmico Funcional',
+            description: 'Cor RGB agora realmente alterna entre as cores ao invés de ficar travada no vermelho!',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Stories Endpoints Corrigidos',
+            description: 'Like e visualizações de stories agora funcionam com rotas /feed/stories corretas!',
+            isNew: true
+        },
         {
             icon: <Globe className="w-5 h-5" />,
             title: 'Servidores no Brasil 🇧🇷',
             description: 'Banco de dados e Vercel agora rodando no Brasil! Menor latência e maior velocidade para todos!',
-            isNew: true
         },
         {
             icon: <MessageCircle className="w-5 h-5" />,
             title: 'Sistema de GRUPOS Completo!',
             description: 'Crie grupos públicos ou privados, chat em tempo real, permissões (Admin/Moderador) e muito mais!',
-            isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5" />,

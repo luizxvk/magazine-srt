@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, BookOpen, MessageCircle } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,9 @@ import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
 import SearchModal from './SearchModal';
 import BadgeDisplay from './BadgeDisplay';
+import DailyLoginCard from './DailyLoginCard';
+import OnlineFriendsCard from './OnlineFriendsCard';
+import WhatsNewCard from './WhatsNewCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 
@@ -28,7 +31,7 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
-    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge } = useAuth();
+    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal } = useAuth();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -429,6 +432,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     <Coins className="w-4 h-4" />
                                     <span className="text-sm">Zions</span>
                                 </button>
+                            </div>
+
+                            {/* Cards Section */}
+                            <div className="px-4 py-2 space-y-4">
+                                <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileMenuOpen(false); openDailyLoginModal(); }} />
+                                <OnlineFriendsCard />
+                                <WhatsNewCard />
                             </div>
 
                             {/* Menu Items */}

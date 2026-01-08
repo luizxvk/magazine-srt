@@ -14,6 +14,7 @@ import ToastNotification from '../components/ToastNotification';
 import ConfirmModal from '../components/ConfirmModal';
 import ChatWindow from '../components/ChatWindow';
 import LevelTimeline from '../components/LevelTimeline';
+import BadgeDisplay from '../components/BadgeDisplay';
 
 // Badge emoji map
 const BADGE_EMOJIS: Record<string, string> = {
@@ -235,7 +236,10 @@ export default function ProfilePage() {
                         <div className="flex-1 text-center md:text-left w-full">
                             <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-2 gap-4 md:gap-0">
                                 <div>
-                                    <h2 className={`text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>{profileUser.displayName || profileUser.name}</h2>
+                                    <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start mb-1">
+                                        <h2 className={`text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{profileUser.displayName || profileUser.name}</h2>
+                                        <BadgeDisplay userId={profileUser.id} />
+                                    </div>
                                     <p className={`text-sm uppercase tracking-widest mb-2 font-medium ${isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold'}`}>
                                         {isMGT ? 'Membro MGT' : 'Membro Magazine'}
                                     </p>

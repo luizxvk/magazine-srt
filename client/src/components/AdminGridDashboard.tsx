@@ -175,7 +175,7 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
-            </ResponsiveGridLayout>
+            </Responsive>
         </div>
     );
 }

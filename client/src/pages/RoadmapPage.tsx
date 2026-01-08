@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2 } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Trophy } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -14,11 +14,11 @@ interface RoadmapItem {
 }
 
 const roadmapItems: RoadmapItem[] = [
-    // Completed
+    // ===== COMPLETED (v0.1.0 - v0.3.5) =====
     {
         id: '1',
         title: 'Sistema de Login e Autenticação',
-        description: 'Login seguro com sessão única por dispositivo e recuperação de senha.',
+        description: 'Login seguro com sessão única por dispositivo, recuperação de senha por email e verificação de conta.',
         status: 'completed',
         version: 'v0.1.0',
         icon: <Shield className="w-5 h-5" />,
@@ -26,8 +26,8 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '2',
-        title: 'Feed de Postagens',
-        description: 'Compartilhe fotos e vídeos com a comunidade, curta e comente.',
+        title: 'Feed de Postagens com Carousel',
+        description: 'Compartilhe fotos e vídeos com a comunidade. Crie carousels com múltiplas imagens e adicione tags personalizadas.',
         status: 'completed',
         version: 'v0.1.0',
         icon: <Image className="w-5 h-5" />,
@@ -36,7 +36,7 @@ const roadmapItems: RoadmapItem[] = [
     {
         id: '3',
         title: 'Sistema de Amizades',
-        description: 'Adicione amigos, aceite solicitações e veja quem faz parte da sua rede.',
+        description: 'Adicione amigos, aceite solicitações e veja quem está online em tempo real.',
         status: 'completed',
         version: 'v0.1.0',
         icon: <Users className="w-5 h-5" />,
@@ -45,7 +45,7 @@ const roadmapItems: RoadmapItem[] = [
     {
         id: '4',
         title: 'Stories Temporários',
-        description: 'Publique stories que desaparecem em 24 horas.',
+        description: 'Publique stories que desaparecem em 24 horas com visualizador estilo Instagram.',
         status: 'completed',
         version: 'v0.2.0',
         icon: <Sparkles className="w-5 h-5" />,
@@ -53,8 +53,8 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '5',
-        title: 'Chat Privado',
-        description: 'Converse com outros membros em tempo real com mensagens diretas.',
+        title: 'Chat Privado em Tempo Real',
+        description: 'Converse com outros membros instantaneamente. Chat flutuante com notificações.',
         status: 'completed',
         version: 'v0.2.0',
         icon: <MessageSquare className="w-5 h-5" />,
@@ -63,7 +63,7 @@ const roadmapItems: RoadmapItem[] = [
     {
         id: '6',
         title: 'Sistema de Níveis e XP',
-        description: 'Ganhe XP ao interagir e suba de nível para desbloquear benefícios.',
+        description: 'Ganhe XP ao interagir (posts, comments, likes) e suba de nível para desbloquear benefícios exclusivos.',
         status: 'completed',
         version: 'v0.2.0',
         icon: <Star className="w-5 h-5" />,
@@ -71,8 +71,8 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '7',
-        title: 'Catálogo de Fotos',
-        description: 'Organize suas melhores fotos em um catálogo pessoal com filtros.',
+        title: 'Catálogo de Fotos Exclusivo',
+        description: 'Organize suas melhores fotos em um catálogo privado com sistema de compra via Zions.',
         status: 'completed',
         version: 'v0.2.1',
         icon: <Image className="w-5 h-5" />,
@@ -80,67 +80,17 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '8',
-        title: 'Sistema de Denúncias',
-        description: 'Denuncie conteúdo impróprio para manter a comunidade segura.',
+        title: 'Sistema de Denúncias e Moderação',
+        description: 'Denuncie conteúdo impróprio. Admin pode remover posts e banir usuários.',
         status: 'completed',
         version: 'v0.2.2',
         icon: <Shield className="w-5 h-5" />,
         category: 'security'
     },
-    // In Progress
-    {
-        id: '9',
-        title: 'Amigos Online',
-        description: 'Veja quem está online e envie mensagens rapidamente.',
-        status: 'in-progress',
-        icon: <Zap className="w-5 h-5" />,
-        category: 'community'
-    },
-    {
-        id: '10',
-        title: 'Moderação de Conteúdo',
-        description: 'Filtros inteligentes para detectar conteúdo impróprio automaticamente.',
-        status: 'in-progress',
-        icon: <Shield className="w-5 h-5" />,
-        category: 'security'
-    },
-    // Planned
-    {
-        id: '11',
-        title: 'Grupos e Comunidades',
-        description: 'Crie ou participe de grupos temáticos com outros membros.',
-        status: 'planned',
-        icon: <Users className="w-5 h-5" />,
-        category: 'community'
-    },
-    {
-        id: '12',
-        title: 'Revista Digital com IA',
-        description: 'Gere revistas digitais exclusivas usando IA com base nas fotos do seu catálogo. Crie layouts profissionais automaticamente.',
-        status: 'planned',
-        icon: <BrainCircuit className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '13',
-        title: 'App Mobile Nativo',
-        description: 'Aplicativo nativo para iOS e Android com notificações push.',
-        status: 'planned',
-        icon: <Rocket className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '14',
-        title: 'Integração com Discord',
-        description: 'Sincronize seu perfil e notificações com o Discord da comunidade.',
-        status: 'planned',
-        icon: <MessageSquare className="w-5 h-5" />,
-        category: 'feature'
-    },
     {
         id: '15',
-        title: 'Sistema de Pagamentos PIX',
-        description: 'Compre Zions e produtos diretamente com PIX via QR Code.',
+        title: 'Loja de Zions (Moeda Virtual)',
+        description: 'Sistema completo de moeda virtual. Compre Zions com PIX, cartão ou Mercado Pago.',
         status: 'completed',
         version: 'v0.2.3',
         icon: <Zap className="w-5 h-5" />,
@@ -148,51 +98,165 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '16',
-        title: 'Recuperação de Senha por Email',
-        description: 'Sistema seguro de recuperação de senha com link enviado por email.',
+        title: 'Sistema de Conquistas (Achievements)',
+        description: 'Desbloqueie conquistas ao completar desafios. Popup animado ao conquistar.',
         status: 'completed',
-        version: 'v0.2.3',
-        icon: <Shield className="w-5 h-5" />,
-        category: 'security'
-    },
-    {
-        id: '17',
-        title: 'Maior Rede Social de Comunidades Gamers',
-        description: 'Transformar a plataforma na maior rede social de comunidades gamers do Brasil. Conecte-se com jogadores, participe de competições e acompanhe eventos.',
-        status: 'planned',
-        icon: <Gamepad2 className="w-5 h-5" />,
+        version: 'v0.2.5',
+        icon: <Star className="w-5 h-5" />,
         category: 'community'
     },
     {
+        id: '17',
+        title: 'Login Diário com Recompensas',
+        description: 'Ganhe Zions ao fazer login todo dia. Sistema de sequência de 7 dias consecutivos.',
+        status: 'completed',
+        version: 'v0.2.8',
+        icon: <Zap className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
         id: '18',
+        title: 'Loja de Personalização',
+        description: 'Compre wallpapers exclusivos, badges e cores de destaque usando Zions.',
+        status: 'completed',
+        version: 'v0.3.0',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '19',
+        title: 'Sistema de Notificações',
+        description: 'Receba notificações de likes, comments, mensagens e solicitações de amizade.',
+        status: 'completed',
+        version: 'v0.3.2',
+        icon: <Zap className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '20',
+        title: 'Modo Lite (Performance)',
+        description: 'Desative animações e efeitos para melhor performance em dispositivos mais fracos.',
+        status: 'completed',
+        version: 'v0.3.5',
+        icon: <Zap className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '21',
+        title: 'Modo Não Perturbe (DND)',
+        description: 'Ative DND para silenciar notificações e aparecer offline para outros usuários.',
+        status: 'completed',
+        version: 'v0.3.5',
+        icon: <Shield className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '22',
+        title: 'Mobile Responsivo Premium',
+        description: 'Interface totalmente otimizada para mobile com gestos e animações suaves.',
+        status: 'completed',
+        version: 'v0.3.5',
+        icon: <Rocket className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    
+    // ===== IN PROGRESS =====
+    {
+        id: '23',
+        title: 'Sistema de Highlights',
+        description: 'Marque seus melhores posts como highlights e organize em coleções temáticas.',
+        status: 'in-progress',
+        icon: <Star className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '24',
+        title: 'Página MGT Log (Exclusiva)',
+        description: 'Catálogo exclusivo para membros MGT visualizarem modelos premium e reservarem ensaios.',
+        status: 'in-progress',
+        icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    
+    // ===== PLANNED =====
+    {
+        id: '25',
+        title: 'Grupos e Comunidades',
+        description: 'Crie ou participe de grupos temáticos. Chat em grupo e eventos exclusivos.',
+        status: 'planned',
+        icon: <Users className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '26',
+        title: 'Revista Digital com IA',
+        description: 'Gere revistas digitais automáticas usando IA com base nas fotos do seu catálogo. Layouts profissionais em minutos.',
+        status: 'planned',
+        icon: <BrainCircuit className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '27',
+        title: 'App Mobile Nativo',
+        description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
+        status: 'planned',
+        icon: <Rocket className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '28',
+        title: 'Integração com Discord',
+        description: 'Sincronize seu perfil e receba notificações no Discord da comunidade.',
+        status: 'planned',
+        icon: <MessageSquare className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29',
         title: 'Sistema de Prestígio',
-        description: 'Ao atingir nível 30, escolha fazer prestígio: recomeçe do 0 e ganhe badges exclusivas e cards personalizados.',
+        description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
         status: 'planned',
         icon: <Crown className="w-5 h-5" />,
         category: 'feature'
     },
     {
-        id: '19',
-        title: 'Personalização Avançada',
-        description: 'Planos de fundo exclusivos, badges compráveis, cores de destaque e efeitos de texto no nickname. Tudo com Zions!',
-        status: 'planned',
-        icon: <Palette className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '20',
-        title: 'Cards em GIF',
+        id: '30',
+        title: 'Cards Animados (GIF)',
         description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
         status: 'planned',
         icon: <Sparkles className="w-5 h-5" />,
         category: 'feature'
     },
     {
-        id: '21',
-        title: 'Mercado de Itens',
+        id: '31',
+        title: 'Mercado de Itens P2P',
         description: 'Compre, venda e troque itens exclusivos com outros membros usando Zions.',
         status: 'planned',
         icon: <ShoppingBag className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '32',
+        title: 'Hub de Comunidades Gamers',
+        description: 'Expanda para maior rede social de comunidades gamers do Brasil. Torneios, clãs e eventos ao vivo.',
+        status: 'planned',
+        icon: <Gamepad2 className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '33',
+        title: 'Sistema de Eventos e Torneios',
+        description: 'Crie e participe de eventos exclusivos. Rankings, prêmios e transmissões ao vivo.',
+        status: 'planned',
+        icon: <Trophy className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '34',
+        title: 'Transmissões ao Vivo',
+        description: 'Faça lives para seus seguidores com chat integrado e sistema de doações em Zions.',
+        status: 'planned',
+        icon: <Zap className="w-5 h-5" />,
         category: 'feature'
     }
 ];

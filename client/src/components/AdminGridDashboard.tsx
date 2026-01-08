@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
+import GridLayout from 'react-grid-layout';
 import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import 'react-grid-layout/css/styles.css';
-import 'react-grid-layout/css/styles.css';
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface DashboardStats {
     totalUsers: number;
@@ -30,17 +26,6 @@ export default function AdminGridDashboard() {
         totalMessages: 0,
         onlineNow: 0,
         newUsersToday: 0
-    });
-    const [layouts, setLayouts] = useState<{lg: Layout[]}>({
-        lg: [
-            { i: 'users', x: 0, y: 0, w: 3, h: 2 },
-            { i: 'activity', x: 3, y: 0, w: 3, h: 2 },
-            { i: 'posts', x: 6, y: 0, w: 3, h: 2 },
-            { i: 'online', x: 9, y: 0, w: 3, h: 2 },
-            { i: 'messages', x: 0, y: 2, w: 4, h: 3 },
-            { i: 'stories', x: 4, y: 2, w: 4, h: 3 },
-            { i: 'comments', x: 8, y: 2, w: 4, h: 3 }
-        ]
     });
 
     useEffect(() => {
@@ -70,20 +55,6 @@ export default function AdminGridDashboard() {
         if (savedLayout) {
             setLayouts(JSON.parse(savedLayout));
         }
-    }, []);
-
-    const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/40';
-    const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-
-    const widgets = [
-        {
-            i: 'users',
-            title: 'Total de Usuários',
-            value: stats.totalUsers,
-            icon: <Users className="w-6 h-6 text-blue-400" />,
-            subtitle: `+${stats.newUsersToday} hoje`,
-            color: 'blue'
-        },
         {
             i: 'activity',
             title: 'Usuários Ativos',
@@ -155,10 +126,14 @@ export default function AdminGridDashboard() {
                 isDraggable={true}
                 isResizable={true}
                 draggableHandle=".drag-handle"
-            >
+            >Estatísticas em tempo real • Atualização automática a cada 30s
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {widgets.map((widget) => (
-                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-move`}>
-                        <div className="drag-handle cursor-grab active:cursor-grabbing h-full flex flex-col">
+                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
+                        <div className="flex flex-col h-full">
                             <div className="flex items-center justify-between mb-4">
                                 <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
                                     {widget.icon}
@@ -175,7 +150,4 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
-            </ResponsiveGridLayout>
-        </div>
-    );
-}
+            </div

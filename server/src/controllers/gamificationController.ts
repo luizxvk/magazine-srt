@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { sendRewardRedemptionEmail } from '../services/emailVerificationService';
 
 const prisma = new PrismaClient();
 
@@ -224,6 +225,21 @@ export const redeemReward = async (req: Request, res: Response) => {
         ];
 
         await prisma.$transaction(transactionOperations);
+
+        // Send confirmation email
+        try {
+            await sendRewardRedemptionEmail({
+                to: user.email,
+                name: user.name,
+                rewardTitle: reward.title,
+                ticketCode,
+                costZions: reward.costZions
+            });
+            console.log(`✅ Email de resgate enviado para ${user.email}`);
+        } catch (emailError) {
+            console.error('⚠️ Falha ao enviar email de resgate:', emailError);
+            // Email failure doesn't affect the redemption itself
+        }
 
         res.json({ success: true, message: 'Reward redeemed successfully', code: { code: ticketCode } });
     } catch (error) {

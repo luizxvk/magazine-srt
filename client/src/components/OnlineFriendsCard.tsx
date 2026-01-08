@@ -12,6 +12,7 @@ interface OnlineFriend {
     isOnline: boolean;
     lastSeenAt?: string;
     membershipType?: string;
+    doNotDisturb?: boolean;
 }
 
 interface OnlineFriendsCardProps {
@@ -144,8 +145,8 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                         <User className={`w-5 h-5 ${themeAccent}`} />
                                                     </div>
                                                 )}
-                                                {/* Online indicator */}
-                                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black" />
+                                                {/* Online indicator - red if DND, green if online */}
+                                                <span className={`absolute bottom-0 right-0 w-3 h-3 ${friend.doNotDisturb ? 'bg-red-500' : 'bg-green-500'} rounded-full border-2 border-black`} />
                                             </div>
                                             <div>
                                                 <p className={`text-sm font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>

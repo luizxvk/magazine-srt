@@ -43,6 +43,7 @@ model User {
   equippedBadge       String?   // Currently equipped badge ID
   equippedColor       String?   // Currently equipped neon color ID
   liteMode            Boolean   @default(false) // Disable animations/effects
+  doNotDisturb        Boolean   @default(false) // Do Not Disturb mode
   
   posts        Post[]
   comments     Comment[]

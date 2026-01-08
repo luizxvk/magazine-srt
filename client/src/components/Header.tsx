@@ -110,7 +110,6 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
         { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
         { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
-        { icon: <BookOpen className="w-5 h-5" />, label: 'MGT Log', path: '/mgt-log' },
         { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
         { icon: <Settings className="w-5 h-5" />, label: 'Configurações', path: '/settings' },
         ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: 'Admin', path: '/admin' }] : []),
@@ -342,7 +341,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={`mobile-menu-container fixed top-0 right-0 bottom-0 h-screen w-72 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} z-[60] md:hidden shadow-2xl border-l ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} flex flex-col overflow-y-auto`}
+                            className={`mobile-menu-container fixed top-0 right-0 bottom-0 h-screen w-72 ${theme === 'light' ? 'bg-white/95' : 'bg-zinc-900/95'} backdrop-blur-xl z-[60] md:hidden shadow-2xl border-l ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} flex flex-col overflow-y-auto`}
                         >
                             {/* Drawer Header */}
                             <div className={`p-4 border-b ${headerBorder} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/50'}`}>

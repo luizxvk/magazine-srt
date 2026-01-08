@@ -34,6 +34,10 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     useEffect(() => {
         if (isVisitor || !user) return;
 
+        // Check if Do Not Disturb is enabled
+        const doNotDisturb = localStorage.getItem('doNotDisturb') === 'true';
+        if (doNotDisturb) return; // Don't show popups when DND is active
+
         const checkUnreadMessages = async () => {
             try {
                 const response = await api.get('/notifications');

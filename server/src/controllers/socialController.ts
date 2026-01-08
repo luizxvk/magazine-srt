@@ -186,10 +186,10 @@ export const getOnlineFriends = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true }
                 },
                 addressee: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true }
                 }
             }
         });

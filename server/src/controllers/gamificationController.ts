@@ -30,33 +30,38 @@ export const getRanking = async (req: Request, res: Response) => {
 export const getBadges = async (req: Request, res: Response) => {
     try {
         // @ts-ignore
-        const userId = req.user.userId;
+        const loggedUserId = req.user.userId;
+        
+        // Support fetching badges for another user via query param
+        const targetUserId = req.query.userId as string || loggedUserId;
 
-        // Auto-award "Primeiros Passos" if missing (self-healing)
-        const firstStepsBadge = await prisma.badge.findFirst({ where: { name: 'Primeiros Passos' } });
-        if (firstStepsBadge) {
-            const hasBadge = await prisma.userBadge.findUnique({
-                where: { userId_badgeId: { userId, badgeId: firstStepsBadge.id } }
-            });
-            if (!hasBadge) {
-                await prisma.$transaction([
-                    prisma.userBadge.create({
-                        data: { userId, badgeId: firstStepsBadge.id }
-                    }),
-                    prisma.notification.create({
-                        data: {
-                            userId,
-                            type: 'BADGE',
-                            content: `Você desbloqueou a conquista: ${firstStepsBadge.name}! (+${firstStepsBadge.trophies} Troféus)`,
-                        }
-                    })
-                ]);
+        // Auto-award "Primeiros Passos" if missing AND checking own badges (self-healing)
+        if (targetUserId === loggedUserId) {
+            const firstStepsBadge = await prisma.badge.findFirst({ where: { name: 'Primeiros Passos' } });
+            if (firstStepsBadge) {
+                const hasBadge = await prisma.userBadge.findUnique({
+                    where: { userId_badgeId: { userId: loggedUserId, badgeId: firstStepsBadge.id } }
+                });
+                if (!hasBadge) {
+                    await prisma.$transaction([
+                        prisma.userBadge.create({
+                            data: { userId: loggedUserId, badgeId: firstStepsBadge.id }
+                        }),
+                        prisma.notification.create({
+                            data: {
+                                userId: loggedUserId,
+                                type: 'BADGE',
+                                content: `Você desbloqueou a conquista: ${firstStepsBadge.name}! (+${firstStepsBadge.trophies} Troféus)`,
+                            }
+                        })
+                    ]);
+                }
             }
         }
 
         const allBadges = await prisma.badge.findMany();
         const userBadges = await prisma.userBadge.findMany({
-            where: { userId },
+            where: { userId: targetUserId },
         });
 
         const badgesWithStatus = allBadges.map((badge) => ({

@@ -20,11 +20,9 @@ import RoadmapPage from './pages/RoadmapPage';
 import SettingsPage from './pages/SettingsPage';
 import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
-import MgtLogPage from './pages/MgtLogPage';
 import GroupsPage from './pages/GroupsPage';
 import GroupDetailPage from './pages/GroupDetailPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
-import AdminEditMgtLogPage from './pages/admin/AdminEditMgtLogPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
 import MessagePopup from './components/MessagePopup';
@@ -63,13 +61,11 @@ function App() {
           <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
           <Route path="/verify-email" element={<PrivateRoute><VerificationPage /></PrivateRoute>} />
-          <Route path="/mgt-log" element={<PrivateRoute><MgtLogPage /></PrivateRoute>} />
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
           <Route path="/groups/:id" element={<PrivateRoute><GroupDetailPage /></PrivateRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
-          <Route path="/admin/edit-mgt-log" element={<AdminRoute><AdminEditMgtLogPage /></AdminRoute>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

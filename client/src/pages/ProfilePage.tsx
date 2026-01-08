@@ -461,7 +461,7 @@ export default function ProfilePage() {
                                 )}
                             </div>
                         )}
-                        {activeTab === 'badges' && <Badges />}
+                        {activeTab === 'badges' && <Badges userId={profileUser.id} />}
                         {activeTab === 'rewards' && isOwnProfile && <Rewards />}
                     </div>
 

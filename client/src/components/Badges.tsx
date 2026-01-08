@@ -16,7 +16,11 @@ interface Badge {
     trophies: number;
 }
 
-export default function Badges() {
+interface BadgesProps {
+    userId?: string; // Optional userId to fetch badges for specific user
+}
+
+export default function Badges({ userId }: BadgesProps = {}) {
     const [badges, setBadges] = useState<Badge[]>([]);
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
@@ -28,7 +32,11 @@ export default function Badges() {
     useEffect(() => {
         const fetchBadges = async () => {
             try {
-                const response = await api.get('/gamification/badges');
+                // Use provided userId or default to logged-in user
+                const targetUserId = userId || user?.id;
+                if (!targetUserId) return;
+                
+                const response = await api.get(`/gamification/badges?userId=${targetUserId}`);
                 setBadges(response.data);
             } catch (error) {
                 console.error('Failed to fetch badges', error);
@@ -36,7 +44,7 @@ export default function Badges() {
         };
 
         fetchBadges();
-    }, []);
+    }, [userId, user?.id]);
 
     return (
         <div className={`glass-panel rounded-xl p-6 border ${themeBorder}`}>

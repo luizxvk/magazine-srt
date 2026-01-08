@@ -732,3 +732,33 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// Update user preferences (doNotDisturb, liteMode)
+export const updatePreferences = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const { doNotDisturb, liteMode } = req.body;
+
+        const updateData: any = {};
+        if (typeof doNotDisturb === 'boolean') updateData.doNotDisturb = doNotDisturb;
+        if (typeof liteMode === 'boolean') updateData.liteMode = liteMode;
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: updateData,
+            select: {
+                id: true,
+                doNotDisturb: true,
+                liteMode: true,
+                isOnline: true
+            }
+        });
+
+        res.json(user);
+    } catch (error) {
+        console.error('Error updating preferences:', error);
+        res.status(500).json({ error: 'Failed to update preferences' });
+    }
+};

@@ -33,10 +33,17 @@ export default function SettingsPage() {
         localStorage.setItem('soundsEnabled', String(newValue));
     };
 
-    const handleToggleDoNotDisturb = () => {
+    const handleToggleDoNotDisturb = async () => {
         const newValue = !doNotDisturb;
         setDoNotDisturb(newValue);
         localStorage.setItem('doNotDisturb', String(newValue));
+        
+        // Update on backend
+        try {
+            await api.put('/users/me/preferences', { doNotDisturb: newValue });
+        } catch (error) {
+            console.error('Error updating doNotDisturb:', error);
+        }
     };
 
     const handleLogout = () => {

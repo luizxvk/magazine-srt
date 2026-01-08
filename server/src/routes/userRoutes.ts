@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, updateMe, getUserProfile, getUserPosts, getAllUsers, getRecentMembers, resetUserPassword, deleteUser, getMyRedemptions, getAllRedemptions, updateUserMembership, updateUserLevel, getCustomizations, purchaseCustomization, equipCustomization, unequipCustomization, searchAll } from '../controllers/userController';
+import { getMe, updateMe, getUserProfile, getUserPosts, getAllUsers, getRecentMembers, resetUserPassword, deleteUser, getMyRedemptions, getAllRedemptions, updateUserMembership, updateUserLevel, getCustomizations, purchaseCustomization, equipCustomization, unequipCustomization, searchAll, updatePreferences } from '../controllers/userController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -7,6 +7,7 @@ const router = Router();
 // Static routes first (before parameterized routes)
 router.get('/me', authenticateToken, getMe);
 router.put('/me', authenticateToken, updateMe);
+router.put('/me/preferences', authenticateToken, updatePreferences);
 router.get('/me/redemptions', authenticateToken, getMyRedemptions);
 router.get('/redemptions', authenticateToken, getAllRedemptions);
 router.get('/recent', authenticateToken, getRecentMembers);

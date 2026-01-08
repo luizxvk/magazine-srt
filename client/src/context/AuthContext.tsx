@@ -74,6 +74,14 @@ const BACKGROUND_STYLES: Record<string, string> = {
     'bg_fire': 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 25%, #4a2a0a 50%, #2d1a0a 75%, #1a0a0a 100%)',
     'bg_city': 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 33%, #1a1a2e 66%, #0f0f1a 100%)',
     'bg_space': 'linear-gradient(135deg, #000005 0%, #0a0a1a 33%, #000005 66%, #0a0a1a 100%)',
+    // Novos backgrounds animados
+    'bg_cyberpunk': 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)',
+    'bg_lava': 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)',
+    'bg_ice': 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)',
+    'bg_neon_grid': 'linear-gradient(135deg, #0d0d0d 0%, #1a0d1a 25%, #2a0d2a 50%, #1a0d1a 75%, #0d0d0d 100%)',
+    'bg_emerald': 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)',
+    'bg_royal': 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)',
+    'bg_carbon': 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)',
 };
 
 // Accent color configurations
@@ -256,11 +264,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         }
                     } catch (loginError) {
                         console.error('Daily login status check failed', loginError);
-                        // Set fallback status to stop loading animation
+                        // Set fallback status without claimed flag to avoid issues
                         setDailyLoginStatus({
-                            claimed: true,
+                            claimed: false,
                             streak: 0,
-                            nextReward: 0,
+                            nextReward: 50,
                             rewards: []
                         });
                     }

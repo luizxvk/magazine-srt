@@ -20,6 +20,7 @@ import eventRoutes from './src/routes/eventRoutes';
 import reportRoutes from './src/routes/reportRoutes';
 import groupRoutes from './src/routes/groupRoutes';
 import adminBadgeRoutes from './src/routes/adminBadges';
+import dashboardRoutes from './src/routes/dashboard';
 import cronRoutes from './src/routes/cronRoutes';
 import uploadRoutes from './src/routes/uploadRoutes';
 import { logger } from './src/utils/logger';
@@ -90,6 +91,7 @@ apiRouter.use('/events', eventRoutes);
 apiRouter.use('/reports', reportRoutes);
 apiRouter.use('/groups', groupRoutes);
 apiRouter.use('/admin/badges', adminBadgeRoutes);
+apiRouter.use('/admin/dashboard', dashboardRoutes);
 apiRouter.use('/cron', cronRoutes);
 apiRouter.use('/uploads', uploadRoutes);
 

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
+import AdminGridDashboard from '../components/AdminGridDashboard';
 import { Trash2, Gift, Edit2, User as UserIcon, Check, X } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
@@ -239,6 +240,9 @@ export default function AdminDashboard() {
 
             <div className="max-w-7xl mx-auto pt-32 pb-32 px-4 relative z-10">
                 <h1 className="text-3xl font-serif text-gold-300 mb-8">Painel Administrativo</h1>
+
+                {/* Grid Dashboard */}
+                <AdminGridDashboard />
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     {/* Actions */}

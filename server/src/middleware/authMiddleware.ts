@@ -85,3 +85,6 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     }
     next();
 };
+
+// Alias for compatibility
+export const requireAdmin = isAdmin;

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile } from 'lucide-react';
+import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile, Move, ZoomIn, ZoomOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface StoryEditorProps {
@@ -18,6 +18,9 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
     const [isPublishing, setIsPublishing] = useState(false);
     const [showControls, setShowControls] = useState(true);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [imageScale, setImageScale] = useState(1);
+    const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
+    const [isDraggingText, setIsDraggingText] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const emojis = ['😀', '😂', '🥰', '😍', '🤩', '😎', '🔥', '💯', '❤️', '💙', '💚', '💛', '🎉', '✨', '⚡', '🌟', '👍', '👏', '🙌', '💪', '🎂', '🎈', '🎁', '🌈', '☀️', '🌙', '⭐', '💫'];
@@ -67,7 +70,9 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
 
                 const lines = text.split('\n');
                 const lineHeight = 90;
-                const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+                // Apply text position offset (convert from percentage to pixels)
+                const startY = canvas.height / 2 + (textPosition.y * canvas.height / 100) - ((lines.length - 1) * lineHeight) / 2;
+                const centerX = canvas.width / 2 + (textPosition.x * canvas.width / 100);
 
                 lines.forEach((line, index) => {
                     const y = startY + index * lineHeight;
@@ -78,7 +83,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                         const metrics = ctx.measureText(line);
                         const padding = 40;
                         ctx.fillRect(
-                            canvas.width / 2 - metrics.width / 2 - padding,
+                            centerX - metrics.width / 2 - padding,
                             y - 45,
                             metrics.width + padding * 2,
                             90
@@ -87,16 +92,20 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
 
                     // Draw text
                     ctx.fillStyle = textColor;
-                    ctx.fillText(line, canvas.width / 2, y);
+                    ctx.fillText(line, centerX, y);
                 });
             }
 
-            // Convert to blob
+            // Convert to blob with Apple Vision Pro closing animation
             canvas.toBlob((blob) => {
                 if (!blob) return;
                 const url = URL.createObjectURL(blob);
-                onPublish(url);
-                setIsPublishing(false);
+                
+                // Apple Vision Pro style animation before closing
+                setTimeout(() => {
+                    onPublish(url);
+                    setIsPublishing(false);
+                }, 800); // Wait for animation
             }, 'image/jpeg', 0.92);
 
         } catch (error) {
@@ -107,9 +116,16 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
 
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ 
+                opacity: 0, 
+                scale: 0.8,
+                transition: { 
+                    duration: 0.6,
+                    ease: [0.32, 0.72, 0, 1] // Apple Vision Pro easing
+                }
+            }}
             className="fixed inset-0 z-[10000] bg-black overflow-y-auto"
         >
             <canvas ref={canvasRef} className="hidden" />
@@ -127,40 +143,95 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                     </div>
                 </div>
 
-                {/* Story Preview - CENTRALIZED */}
+                {/* Story Preview - CENTRALIZED COM CONTROLES DE ZOOM */}
                 <div className="flex-1 flex items-center justify-center px-4 py-8">
-                    <div className="relative w-full max-w-md" style={{ maxHeight: '50vh' }}>
-                        <img
-                            src={imageUrl}
-                            alt="Story preview"
-                            className="w-full h-full object-contain rounded-2xl"
-                        />
-                    
-                    {/* Text Overlay */}
-                    {text && (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="text-center px-8">
-                                {text.split('\n').map((line, index) => (
-                                    <div key={index} className="relative inline-block my-1">
-                                        {bgOpacity > 0 && (
-                                            <div
-                                                className="absolute inset-0 -mx-6 -my-1 rounded-lg"
-                                                style={{ backgroundColor: `rgba(0, 0, 0, ${bgOpacity})` }}
-                                            />
-                                        )}
-                                        <p
-                                            className="relative text-4xl md:text-5xl font-bold px-6"
-                                            style={{ color: textColor }}
-                                        >
-                                            {line}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
+                    <div className="relative w-full max-w-md">
+                        {/* Controles de Zoom da Imagem */}
+                        <div className="absolute -top-12 right-0 flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1 z-50">
+                            <button
+                                onClick={() => setImageScale(Math.max(0.5, imageScale - 0.1))}
+                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            >
+                                <ZoomOut className="w-4 h-4 text-white" />
+                            </button>
+                            <span className="text-white text-xs px-2 min-w-[50px] text-center">
+                                {Math.round(imageScale * 100)}%
+                            </span>
+                            <button
+                                onClick={() => setImageScale(Math.min(2, imageScale + 0.1))}
+                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            >
+                                <ZoomIn className="w-4 h-4 text-white" />
+                            </button>
                         </div>
-                    )}
+
+                        {/* Botão Fechar ao Lado da Imagem */}
+                        <button
+                            onClick={onClose}
+                            className="absolute -right-2 -top-2 z-50 p-2 bg-red-500 hover:bg-red-600 rounded-full shadow-xl transition-colors"
+                        >
+                            <X className="w-5 h-5 text-white" />
+                        </button>
+
+                        <motion.div
+                            style={{ scale: imageScale }}
+                            className="relative w-full"
+                        >
+                            <img
+                                src={imageUrl}
+                                alt="Story preview"
+                                className="w-full h-full object-contain rounded-2xl"
+                            />
+                        </motion.div>
+                    
+                        {/* Text Overlay - DRAGGABLE */}
+                        {text && (
+                            <motion.div
+                                drag
+                                dragMomentum={false}
+                                dragElastic={0.1}
+                                onDragStart={() => setIsDraggingText(true)}
+                                onDragEnd={(_, info) => {
+                                    setIsDraggingText(false);
+                                    // Convert pixels to percentage for canvas rendering
+                                    const containerRect = (info.point.x && info.point.y) ? { width: 384, height: 682 } : { width: 384, height: 682 };
+                                    setTextPosition({
+                                        x: textPosition.x + (info.offset.x / containerRect.width) * 100,
+                                        y: textPosition.y + (info.offset.y / containerRect.height) * 100
+                                    });
+                                }}
+                                style={{
+                                    x: 0,
+                                    y: 0,
+                                }}
+                                className={`absolute inset-0 flex items-center justify-center ${isDraggingText ? 'cursor-grabbing' : 'cursor-grab'}`}
+                            >
+                                <div className="text-center px-8 select-none">
+                                    <div className="flex items-center justify-center gap-2 mb-2 opacity-70">
+                                        <Move className="w-4 h-4 text-white" />
+                                        <span className="text-white text-xs">Arraste para mover</span>
+                                    </div>
+                                    {text.split('\n').map((line, index) => (
+                                        <div key={index} className="relative inline-block my-1">
+                                            {bgOpacity > 0 && (
+                                                <div
+                                                    className="absolute inset-0 -mx-6 -my-1 rounded-lg"
+                                                    style={{ backgroundColor: `rgba(0, 0, 0, ${bgOpacity})` }}
+                                                />
+                                            )}
+                                            <p
+                                                className="relative text-4xl md:text-5xl font-bold px-6"
+                                                style={{ color: textColor }}
+                                            >
+                                                {line}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                    </div>
                 </div>
-            </div>
 
                 {/* Bottom Toolbar - SEMPRE VISÍVEL COM SCROLL GARANTIDO */}
                 <div className="relative z-[60] bg-black pt-8 pb-8 flex-shrink-0">
@@ -282,11 +353,20 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                         )}
                         </AnimatePresence>
 
-                        {/* BOTÃO POSTAR GRANDE - SEMPRE VISÍVEL */}
+                        {/* BOTÃO POSTAR GRANDE - SEMPRE VISÍVEL COM ANIMAÇÃO */}
                         <motion.button
                             onClick={saveImage}
                             disabled={isPublishing}
                             whileTap={{ scale: 0.95 }}
+                            animate={isPublishing ? {
+                                scale: [1, 0.95, 1],
+                                opacity: [1, 0.8, 1],
+                            } : {}}
+                            transition={{
+                                duration: 1.5,
+                                repeat: isPublishing ? Infinity : 0,
+                                ease: "easeInOut"
+                            }}
                             className={`w-full flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all text-xl ${
                                 isPublishing 
                                     ? 'bg-gray-600 cursor-not-allowed opacity-50' 

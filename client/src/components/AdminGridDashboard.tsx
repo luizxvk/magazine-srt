@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Responsive, WidthProvider } from 'react-grid-layout';
+import ReactGridLayout from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -7,7 +7,7 @@ import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
+const ResponsiveGridLayout = ReactGridLayout.WidthProvider(ReactGridLayout.Responsive);
 
 interface DashboardStats {
     totalUsers: number;

@@ -17,6 +17,7 @@ import RankingPage from './pages/RankingPage';
 import RewardsPage from './pages/RewardsPage';
 import HighlightsPage from './pages/HighlightsPage';
 import RoadmapPage from './pages/RoadmapPage';
+import SettingsPage from './pages/SettingsPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MgtLogPage from './pages/MgtLogPage';
 import GroupsPage from './pages/GroupsPage';
@@ -57,6 +58,7 @@ function App() {
           <Route path="/rewards" element={<PrivateRoute><RewardsPage /></PrivateRoute>} />
           <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
           <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
           <Route path="/mgt-log" element={<PrivateRoute><MgtLogPage /></PrivateRoute>} />
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />

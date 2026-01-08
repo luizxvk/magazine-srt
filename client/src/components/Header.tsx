@@ -111,6 +111,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
         { icon: <BookOpen className="w-5 h-5" />, label: 'MGT Log', path: '/mgt-log' },
         { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
+        { icon: <Settings className="w-5 h-5" />, label: 'Configurações', path: '/settings' },
         ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: 'Admin', path: '/admin' }] : []),
     ];
 
@@ -224,7 +225,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     </div>
 
                     {/* Profile Link - Both Mobile & Desktop */}
-                    <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${headerBorder} hover:opacity-80 transition-opacity`}>
+                    <div className="relative">
+                        <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${headerBorder} hover:opacity-80 transition-opacity`}>
                         <div className="text-right hidden lg:block">
                             <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
                             <div className="h-4 relative overflow-hidden w-32 flex justify-end">
@@ -293,6 +295,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             )}
                         </div>
                     </Link>
+                    </div>
 
                     {/* Desktop Logout */}
                     {!isVisitor && (

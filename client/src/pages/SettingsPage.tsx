@@ -1,0 +1,205 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Settings, Bell, LogOut, Trash2, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import Header from '../components/Header';
+import ConfirmModal from '../components/ConfirmModal';
+import api from '../services/api';
+
+export default function SettingsPage() {
+    const { user, logout, theme, toggleTheme } = useAuth();
+    const navigate = useNavigate();
+    const isMGT = user?.membershipType === 'MGT';
+    
+    const [soundsEnabled, setSoundsEnabled] = useState(
+        localStorage.getItem('soundsEnabled') !== 'false'
+    );
+    const [doNotDisturb, setDoNotDisturb] = useState(
+        localStorage.getItem('doNotDisturb') === 'true'
+    );
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+    const themeColor = isMGT ? 'emerald' : 'gold';
+    const themeBg = theme === 'light' ? 'bg-gray-50' : 'bg-black';
+    const cardBg = theme === 'light' ? 'bg-white' : 'bg-neutral-900/50';
+    const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
+    const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+
+    const handleToggleSounds = () => {
+        const newValue = !soundsEnabled;
+        setSoundsEnabled(newValue);
+        localStorage.setItem('soundsEnabled', String(newValue));
+    };
+
+    const handleToggleDoNotDisturb = () => {
+        const newValue = !doNotDisturb;
+        setDoNotDisturb(newValue);
+        localStorage.setItem('doNotDisturb', String(newValue));
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    const handleDeleteAccount = async () => {
+        try {
+            await api.delete(`/users/${user?.id}`);
+            logout();
+            navigate('/login');
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            alert('Erro ao remover conta. Tente novamente.');
+        }
+    };
+
+    return (
+        <div className={`min-h-screen ${themeBg}`}>
+            <Header />
+            
+            <div className="pt-20 pb-16 px-4 max-w-2xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-6"
+                >
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                        <div className={`inline-flex p-4 rounded-full bg-${themeColor}-500/10 mb-4`}>
+                            <Settings className={`w-8 h-8 text-${themeColor}-400`} />
+                        </div>
+                        <h1 className={`text-3xl font-bold ${textMain} mb-2`}>Configurações</h1>
+                        <p className={textSub}>Personalize sua experiência na plataforma</p>
+                    </div>
+
+                    {/* Profile Section */}
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className={`p-3 rounded-full bg-${themeColor}-500/10`}>
+                                <User className={`w-6 h-6 text-${themeColor}-400`} />
+                            </div>
+                            <div>
+                                <h2 className={`text-xl font-bold ${textMain}`}>Perfil</h2>
+                                <p className={`text-sm ${textSub}`}>{user?.email}</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => navigate('/profile')}
+                            className={`w-full py-3 rounded-xl bg-${themeColor}-500/10 text-${themeColor}-400 hover:bg-${themeColor}-500/20 transition-colors font-medium`}
+                        >
+                            Editar Perfil
+                        </button>
+                    </div>
+
+                    {/* Notifications Settings */}
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <Bell className={`w-5 h-5 text-${themeColor}-400`} />
+                            <h3 className={`font-semibold ${textMain}`}>Notificações</h3>
+                        </div>
+
+                        {/* Sounds Toggle */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className={`font-medium ${textMain}`}>Sons de Notificação</p>
+                                <p className={`text-sm ${textSub}`}>Reproduzir som ao receber notificações</p>
+                            </div>
+                            <button
+                                onClick={handleToggleSounds}
+                                className={`relative w-14 h-8 rounded-full transition-colors ${
+                                    soundsEnabled ? `bg-${themeColor}-500` : 'bg-gray-600'
+                                }`}
+                            >
+                                <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                                    soundsEnabled ? 'translate-x-6' : 'translate-x-0'
+                                }`} />
+                            </button>
+                        </div>
+
+                        {/* Do Not Disturb */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className={`font-medium ${textMain}`}>Não Perturbe</p>
+                                <p className={`text-sm ${textSub}`}>Desativar todas as notificações</p>
+                            </div>
+                            <button
+                                onClick={handleToggleDoNotDisturb}
+                                className={`relative w-14 h-8 rounded-full transition-colors ${
+                                    doNotDisturb ? `bg-${themeColor}-500` : 'bg-gray-600'
+                                }`}
+                            >
+                                <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                                    doNotDisturb ? 'translate-x-6' : 'translate-x-0'
+                                }`} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Appearance Settings */}
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
+                        <h3 className={`font-semibold ${textMain} mb-4`}>Aparência</h3>
+
+                        {/* Theme Toggle */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className={`font-medium ${textMain}`}>Tema {theme === 'light' ? 'Claro' : 'Escuro'}</p>
+                                <p className={`text-sm ${textSub}`}>Alternar entre modo claro e escuro</p>
+                            </div>
+                            <button
+                                onClick={toggleTheme}
+                                className={`px-4 py-2 rounded-lg bg-${themeColor}-500/10 text-${themeColor}-400 hover:bg-${themeColor}-500/20 transition-colors font-medium`}
+                            >
+                                Alternar
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Account Actions */}
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-3`}>
+                        <h3 className={`font-semibold ${textMain} mb-4`}>Conta</h3>
+
+                        <button
+                            onClick={() => setShowLogoutConfirm(true)}
+                            className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 transition-colors font-medium"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            Sair da Conta
+                        </button>
+
+                        <button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-medium"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                            Remover Conta
+                        </button>
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* Logout Confirmation */}
+            <ConfirmModal
+                isOpen={showLogoutConfirm}
+                onClose={() => setShowLogoutConfirm(false)}
+                onConfirm={handleLogout}
+                title="Sair da Conta?"
+                message="Você será desconectado e redirecionado para a página de login."
+                confirmText="Sair"
+                cancelText="Cancelar"
+            />
+
+            {/* Delete Account Confirmation */}
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={handleDeleteAccount}
+                title="Remover Conta?"
+                message="Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos."
+                confirmText="Remover"
+                cancelText="Cancelar"
+            />
+        </div>
+    );
+}

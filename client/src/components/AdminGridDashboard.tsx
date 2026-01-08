@@ -111,20 +111,11 @@ export default function AdminGridDashboard() {
                     Dashboard Geral
                 </h2>
                 <p className="text-gray-400 text-sm mt-1">
-                    Arraste os cards para reorganizar • Layout salvo automaticamente
+                    Estatísticas em tempo real • Atualização automática a cada 30s
                 </p>
             </div>
 
-            <div style={{ width: '100%' }}>
-                <GridLayout
-                    className="layout"
-                    layout={layout}
-                    rowHeight={150}
-                    width={1200}
-                    onLayoutChange={handleLayoutChange}
-                    isDraggable={true}
-                    isResizable={false}
-                >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {widgets.map((widget) => (
                     <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                         <div className="flex flex-col h-full">
@@ -144,3 +135,7 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
+            </div>
+        </div>
+    );
+}

@@ -59,6 +59,9 @@ interface AuthContextType {
     // Active Chat
     activeChatUserId: string | null;
     setActiveChatUserId: (userId: string | null) => void;
+    // Mobile Drawer State
+    isMobileDrawerOpen: boolean;
+    setIsMobileDrawerOpen: (isOpen: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -114,6 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
     const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
+    const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
     const [theme, setTheme] = useState<'dark' | 'light'>(() => {
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');

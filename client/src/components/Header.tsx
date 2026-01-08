@@ -31,12 +31,11 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
-    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal } = useAuth();
+    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen } = useAuth();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
@@ -94,17 +93,17 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
     // Close mobile menu when clicking outside
     useEffect(() => {
-        if (isMobileMenuOpen) {
+        if (isMobileDrawerOpen) {
             const handleClick = (e: MouseEvent) => {
                 const target = e.target as HTMLElement;
                 if (!target.closest('.mobile-menu-container') && !target.closest('.mobile-menu-button')) {
-                    setIsMobileMenuOpen(false);
+                    setIsMobileDrawerOpen(false);
                 }
             };
             document.addEventListener('click', handleClick);
             return () => document.removeEventListener('click', handleClick);
         }
-    }, [isMobileMenuOpen]);
+    }, [isMobileDrawerOpen, setIsMobileDrawerOpen]);
 
     const menuItems = [
         { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
@@ -316,18 +315,18 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
                     {/* Mobile Hamburger Menu */}
                     <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        onClick={() => setIsMobileDrawerOpen(!isMobileDrawerOpen)}
                         className={`mobile-menu-button md:hidden p-2 ${theme === 'light' ? 'text-black' : (isMGT ? 'text-emerald-500' : 'text-gold-400')} transition-colors`}
                         aria-label="Menu"
                     >
-                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        {isMobileDrawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
                 </div>
             </div>
 
             {/* Mobile Menu Drawer */}
             <AnimatePresence>
-                {isMobileMenuOpen && (
+                {isMobileDrawerOpen && (
                     <>
                         {/* Backdrop */}
                         <motion.div
@@ -335,7 +334,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            onClick={() => setIsMobileDrawerOpen(false)}
                         />
                         
                         {/* Drawer */}
@@ -356,7 +355,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         {!isVisitor && (
                                             <button
                                                 onClick={() => {
-                                                    setIsMobileMenuOpen(false);
+                                                    setIsMobileDrawerOpen(false);
                                                     logout();
                                                 }}
                                                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-sm"
@@ -366,7 +365,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                             </button>
                                         )}
                                         <button
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() => setIsMobileDrawerOpen(false)}
                                             className={`p-2 rounded-lg ${theme === 'light' ? 'text-gray-500 hover:bg-gray-200' : 'text-white/50 hover:bg-white/10'} transition-colors`}
                                         >
                                             <X className="w-5 h-5" />
@@ -378,7 +377,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 {user && (
                                     <Link 
                                         to="/profile" 
-                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        onClick={() => setIsMobileDrawerOpen(false)}
                                         className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors`}
                                     >
                                         <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black' : 'from-gold-400 to-gold-700'} p-[2px]`}>
@@ -402,7 +401,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <div className={`p-4 border-b ${headerBorder} flex gap-2`}>
                                 <button
                                     onClick={() => {
-                                        setIsMobileMenuOpen(false);
+                                        setIsMobileDrawerOpen(false);
                                         setIsSearchModalOpen(true);
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
@@ -413,7 +412,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 {onOpenShop && (
                                     <button
                                         onClick={() => {
-                                            setIsMobileMenuOpen(false);
+                                            setIsMobileDrawerOpen(false);
                                             onOpenShop();
                                         }}
                                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
@@ -424,7 +423,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 )}
                                 <button
                                     onClick={() => {
-                                        setIsMobileMenuOpen(false);
+                                        setIsMobileDrawerOpen(false);
                                         openZionsModal();
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
@@ -437,7 +436,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             {/* Cards Section + Menu Items */}
                             <div className="flex-1 overflow-y-auto px-4 py-2">
                                 <div className="space-y-4 mb-4">
-                                    <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileMenuOpen(false); openDailyLoginModal(); }} />
+                                    <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileDrawerOpen(false); openDailyLoginModal(); }} />
                                     <OnlineFriendsCard />
                                     <WhatsNewCard />
                                 </div>
@@ -448,7 +447,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     <Link
                                         key={item.path}
                                         to={item.path}
-                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        onClick={() => setIsMobileDrawerOpen(false)}
                                         className={`flex items-center gap-3 px-4 py-3 rounded-lg ${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/5 text-white/80'} transition-colors`}
                                     >
                                         <span className={isMGT ? 'text-emerald-500' : 'text-gold-400'}>{item.icon}</span>

@@ -1,5 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity } from 'lucide-react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity, GripVertical } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -12,6 +29,74 @@ interface DashboardStats {
     totalMessages: number;
     onlineNow: number;
     newUsersToday: number;
+}
+
+interface Widget {
+    id: string;
+    title: string;
+    value: number;
+    icon: React.ReactNode;
+    subtitle: string;
+    color: string;
+}
+
+interface SortableWidgetProps {
+    widget: Widget;
+    cardBg: string;
+    cardBorder: string;
+    theme: string;
+}
+
+function SortableWidget({ widget, cardBg, cardBorder, theme }: SortableWidgetProps) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: widget.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : 'auto',
+        opacity: isDragging ? 0.9 : 1,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all ${isDragging ? 'scale-105 shadow-2xl ring-2 ring-gold-500/50' : 'hover:scale-[1.02]'}`}
+        >
+            <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between mb-4">
+                    <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
+                        {widget.icon}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-green-400" />
+                        <button
+                            {...attributes}
+                            {...listeners}
+                            className="p-1.5 rounded-lg hover:bg-white/10 cursor-grab active:cursor-grabbing transition-colors"
+                            title="Arrastar para reorganizar"
+                        >
+                            <GripVertical className="w-4 h-4 text-gray-500" />
+                        </button>
+                    </div>
+                </div>
+                <div className="flex-1">
+                    <h3 className="text-gray-400 text-sm mb-2">{widget.title}</h3>
+                    <p className={`text-3xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                        {widget.value.toLocaleString()}
+                    </p>
+                </div>
+                <p className="text-gray-500 text-xs mt-2">{widget.subtitle}</p>
+            </div>
+        </div>
+    );
 }
 
 export default function AdminGridDashboard() {
@@ -27,10 +112,32 @@ export default function AdminGridDashboard() {
         newUsersToday: 0
     });
 
+    const [widgetOrder, setWidgetOrder] = useState<string[]>([
+        'users', 'activity', 'posts', 'online', 'messages', 'stories', 'comments'
+    ]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
     useEffect(() => {
         fetchStats();
         const interval = setInterval(fetchStats, 30000);
         return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        const savedOrder = localStorage.getItem('adminDashboardOrder');
+        if (savedOrder) {
+            setWidgetOrder(JSON.parse(savedOrder));
+        }
     }, []);
 
     const fetchStats = async () => {
@@ -42,64 +149,76 @@ export default function AdminGridDashboard() {
         }
     };
 
-    const widgets = [
-        {
-            i: 'users',
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setWidgetOrder((items) => {
+                const oldIndex = items.indexOf(active.id as string);
+                const newIndex = items.indexOf(over.id as string);
+                const newOrder = arrayMove(items, oldIndex, newIndex);
+                localStorage.setItem('adminDashboardOrder', JSON.stringify(newOrder));
+                return newOrder;
+            });
+        }
+    };
+
+    const widgetConfigs: Record<string, Omit<Widget, 'id'>> = {
+        users: {
             title: 'Total de Usuários',
             value: stats.totalUsers,
             icon: <Users className="w-6 h-6 text-blue-400" />,
             subtitle: `+${stats.newUsersToday} hoje`,
             color: 'blue'
         },
-        {
-            i: 'activity',
+        activity: {
             title: 'Usuários Ativos',
             value: stats.activeUsers,
             icon: <Activity className="w-6 h-6 text-green-400" />,
             subtitle: 'Últimas 24h',
             color: 'green'
         },
-        {
-            i: 'posts',
+        posts: {
             title: 'Total de Posts',
             value: stats.totalPosts,
             icon: <ImageIcon className="w-6 h-6 text-purple-400" />,
             subtitle: 'Todos os tempos',
             color: 'purple'
         },
-        {
-            i: 'online',
+        online: {
             title: 'Online Agora',
             value: stats.onlineNow,
             icon: <Zap className="w-6 h-6 text-amber-400" />,
             subtitle: 'Conectados',
             color: 'amber'
         },
-        {
-            i: 'messages',
+        messages: {
             title: 'Mensagens',
             value: stats.totalMessages,
             icon: <MessageSquare className="w-6 h-6 text-cyan-400" />,
             subtitle: 'Total enviadas',
             color: 'cyan'
         },
-        {
-            i: 'stories',
+        stories: {
             title: 'Stories Postados',
             value: stats.totalStories,
             icon: <Star className="w-6 h-6 text-pink-400" />,
             subtitle: 'Últimas 24h',
             color: 'pink'
         },
-        {
-            i: 'comments',
+        comments: {
             title: 'Comentários',
             value: stats.totalComments,
             icon: <Shield className="w-6 h-6 text-emerald-400" />,
             subtitle: 'Total de interações',
             color: 'emerald'
         }
-    ];
+    };
+
+    const widgets: Widget[] = widgetOrder.map(id => ({
+        id,
+        ...widgetConfigs[id]
+    }));
 
     const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
     const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
@@ -111,31 +230,29 @@ export default function AdminGridDashboard() {
                     Dashboard Geral
                 </h2>
                 <p className="text-gray-400 text-sm mt-1">
-                    Estatísticas em tempo real • Atualização automática a cada 30s
+                    Arraste os cards para reorganizar • Layout salvo automaticamente • Atualização a cada 30s
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {widgets.map((widget) => (
-                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]`}>
-                        <div className="flex flex-col h-full">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
-                                    {widget.icon}
-                                </div>
-                                <TrendingUp className="w-4 h-4 text-green-400" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="text-gray-400 text-sm mb-2">{widget.title}</h3>
-                                <p className={`text-3xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                    {widget.value.toLocaleString()}
-                                </p>
-                            </div>
-                            <p className="text-gray-500 text-xs mt-2">{widget.subtitle}</p>
-                        </div>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+                <SortableContext items={widgetOrder} strategy={rectSortingStrategy}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {widgets.map((widget) => (
+                            <SortableWidget
+                                key={widget.id}
+                                widget={widget}
+                                cardBg={cardBg}
+                                cardBorder={cardBorder}
+                                theme={theme}
+                            />
+                        ))}
                     </div>
-                ))}
-            </div>
+                </SortableContext>
+            </DndContext>
         </div>
     );
 }

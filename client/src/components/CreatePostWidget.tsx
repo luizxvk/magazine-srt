@@ -172,8 +172,10 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     if (isVisitor) {
         return (
             <motion.div 
-                className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+                className="fixed bottom-8 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+                style={{ left: '50%' }}
                 animate={{ 
+                    x: '-50%',
                     y: isMobileDrawerOpen ? 100 : 0,
                     opacity: isMobileDrawerOpen ? 0 : 1
                 }}
@@ -194,8 +196,10 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
 
     return (
         <motion.div 
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+            className="fixed bottom-8 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+            style={{ left: '50%' }}
             animate={{ 
+                x: '-50%',
                 y: isMobileDrawerOpen ? 100 : 0,
                 opacity: isMobileDrawerOpen ? 0 : 1
             }}

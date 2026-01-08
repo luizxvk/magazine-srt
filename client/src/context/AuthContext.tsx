@@ -438,6 +438,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Active Chat
             activeChatUserId,
             setActiveChatUserId,
+            // Mobile Drawer State
+            isMobileDrawerOpen,
+            setIsMobileDrawerOpen,
         }}>
             {children}
             <DailyLoginModal

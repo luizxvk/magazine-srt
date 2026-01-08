@@ -44,16 +44,16 @@ export default function SettingsPage() {
         // Update on backend
         try {
             await api.put('/users/me/preferences', { doNotDisturb: newValue });
-      
+        } catch (error) {
+            console.error('Error updating doNotDisturb:', error);
+        }
+    };
 
     const handleToggleLiteMode = () => {
         const newValue = !liteMode;
         setLiteMode(newValue);
         localStorage.setItem('liteMode', String(newValue));
         document.documentElement.classList.toggle('lite-mode', newValue);
-    };  } catch (error) {
-            console.error('Error updating doNotDisturb:', error);
-        }
     };
 
     const handleLogout = () => {
@@ -164,6 +164,13 @@ export default function SettingsPage() {
                                 <p className={`font-medium ${textMain}`}>Tema {theme === 'light' ? 'Claro' : 'Escuro'}</p>
                                 <p className={`text-sm ${textSub}`}>Alternar entre modo claro e escuro</p>
                             </div>
+                            <button
+                                onClick={toggleTheme}
+                                className={`px-4 py-2 rounded-lg bg-${themeColor}-500/10 text-${themeColor}-400 hover:bg-${themeColor}-500/20 transition-colors font-medium`}
+                            >
+                                Alternar
+                            </button>
+                        </div>
 
                         {/* Lite Mode Toggle */}
                         <div className="flex items-center justify-between">
@@ -183,13 +190,6 @@ export default function SettingsPage() {
                                 <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
                                     liteMode ? 'translate-x-6' : 'translate-x-0'
                                 }`} />
-                            </button>
-                        </div>
-                            <button
-                                onClick={toggleTheme}
-                                className={`px-4 py-2 rounded-lg bg-${themeColor}-500/10 text-${themeColor}-400 hover:bg-${themeColor}-500/20 transition-colors font-medium`}
-                            >
-                                Alternar
                             </button>
                         </div>
                     </div>

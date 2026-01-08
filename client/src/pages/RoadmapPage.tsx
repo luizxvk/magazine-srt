@@ -258,6 +258,46 @@ const roadmapItems: RoadmapItem[] = [
         status: 'planned',
         icon: <Zap className="w-5 h-5" />,
         category: 'feature'
+    },
+    {
+        id: '35',
+        title: 'Sistema de Selos Admin',
+        description: 'Admin pode atribuir selos personalizados aos usuários (BETA, DEV, MGT) com cores customizadas.',
+        status: 'planned',
+        icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '36',
+        title: 'Stories Avançados',
+        description: 'Like, comentários, compartilhamento, figurinhas e controles de texto/opacidade nos stories.',
+        status: 'planned',
+        icon: <Sparkles className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '37',
+        title: 'Grupos Completos v2.0',
+        description: 'Convites, apelidos, backgrounds personalizados, modo mudo, compartilhamento de imagens (10 Zions) e filtro de conteúdo +18.',
+        status: 'planned',
+        icon: <Users className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '38',
+        title: 'Admin Dashboard com Grid',
+        description: 'Dashboard administrativo com widgets arrastáveis e reorganizáveis. Gestão total de usuários e conteúdo.',
+        status: 'planned',
+        icon: <Shield className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '39',
+        title: 'Verificação de Email Obrigatória',
+        description: 'Sistema de verificação via SMS/Email com código de 6 dígitos. 3 dias para verificar ou conta suspensa.',
+        status: 'planned',
+        icon: <Shield className="w-5 h-5" />,
+        category: 'security'
     }
 ];
 

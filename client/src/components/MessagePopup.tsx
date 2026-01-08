@@ -58,7 +58,9 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                 const content = JSON.parse(messageNotif.content);
                     
                 // Don't show notification if chat with this user is already open
-                if (activeChatUserId === content.actor.id) {
+                if (activeChatUserId && activeChatUserId === content.actor.id) {
+                    // Mark as dismissed if chat is already open
+                    dismissedNotifIds.current.add(messageNotif.id);
                     return;
                 }
                 

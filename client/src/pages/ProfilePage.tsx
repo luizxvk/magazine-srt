@@ -377,11 +377,11 @@ export default function ProfilePage() {
                             <div className={`grid grid-cols-2 gap-4 border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} pt-6 mt-4`}>
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>{profileUser.trophies || 0}</p>
-                                    <p className={`text-[10px] md:text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} uppercase tracking-wider`}>Troféus</p>
+                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>Troféus</p>
                                 </div>
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>#{profileUser.id?.slice(0, 4) || '0000'}</p>
-                                    <p className={`text-[10px] md:text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} uppercase tracking-wider`}>ID Membro</p>
+                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>ID Membro</p>
                                 </div>
                             </div>
                         </div>

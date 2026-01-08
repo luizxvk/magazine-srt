@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { MessageCircle, User, Wifi } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -184,15 +185,16 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                 </div>
             </div>
 
-            {/* Chat Window */}
-            {chatOpen && (
+            {/* Chat Window - Rendered with Portal to prevent unmounting */}
+            {chatOpen && createPortal(
                 <ChatWindow
                     otherUserId={chatOpen.id}
                     otherUserName={chatOpen.displayName || chatOpen.name}
                     otherUserAvatar={chatOpen.avatarUrl}
                     otherUserMembershipType={chatOpen.membershipType}
                     onClose={() => setChatOpen(null)}
-                />
+                />,
+                document.body
             )}
         </>
     );

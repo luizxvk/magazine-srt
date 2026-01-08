@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -48,8 +49,8 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
             <div className={`relative w-full max-w-lg ${themeBg} rounded-2xl border ${borderColor} shadow-2xl overflow-hidden`}>
                 {/* Header */}
                 <div className={`p-6 border-b ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/40'}`}>
@@ -119,4 +120,6 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

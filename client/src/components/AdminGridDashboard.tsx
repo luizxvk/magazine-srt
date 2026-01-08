@@ -34,7 +34,7 @@ export default function AdminGridDashboard() {
 
     useEffect(() => {
         fetchStats();
-        const interval = setInterval(fetchStats, 30000); // Update every 30s
+        const interval = setInterval(fetchStats, 30000);
         return () => clearInterval(interval);
     }, []);
 
@@ -66,7 +66,6 @@ export default function AdminGridDashboard() {
         localStorage.setItem('adminDashboardLayouts', JSON.stringify(allLayouts));
     };
 
-    // Load saved layouts on mount
     useEffect(() => {
         const savedLayouts = localStorage.getItem('adminDashboardLayouts');
         if (savedLayouts) {
@@ -116,7 +115,34 @@ export default function AdminGridDashboard() {
             color: 'cyan'
         },
         {
-            i: 'storArraste os cards para reorganizar • Redimensione conforme necessário • Layout salvo automaticamente
+            i: 'stories',
+            title: 'Stories Postados',
+            value: stats.totalStories,
+            icon: <Star className="w-6 h-6 text-pink-400" />,
+            subtitle: 'Últimas 24h',
+            color: 'pink'
+        },
+        {
+            i: 'comments',
+            title: 'Comentários',
+            value: stats.totalComments,
+            icon: <Shield className="w-6 h-6 text-emerald-400" />,
+            subtitle: 'Total de interações',
+            color: 'emerald'
+        }
+    ];
+
+    const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
+    const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
+
+    return (
+        <div className="mb-8">
+            <div className="mb-6">
+                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                    Dashboard Geral
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                    Arraste os cards para reorganizar • Redimensione conforme necessário • Layout salvo automaticamente
                 </p>
             </div>
 
@@ -150,34 +176,7 @@ export default function AdminGridDashboard() {
                         </div>
                     </div>
                 ))}
-            </ResponsiveGridLayout   Dashboard Geral
-                </h2>
-                <p className="text-gray-400 text-sm mt-1">
-                    Estatísticas em tempo real • Atualização automática a cada 30s
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {widgets.map((widget) => (
-                    <div key={widget.i} className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
-                        <div className="flex flex-col h-full">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
-                                    {widget.icon}
-                                </div>
-                                <TrendingUp className="w-4 h-4 text-green-400" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="text-gray-400 text-sm mb-2">{widget.title}</h3>
-                                <p className={`text-3xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                    {widget.value.toLocaleString()}
-                                </p>
-                            </div>
-                            <p className="text-gray-500 text-xs mt-2">{widget.subtitle}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            </ResponsiveGridLayout>
         </div>
     );
 }

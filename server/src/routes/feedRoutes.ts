@@ -14,6 +14,8 @@ router.post('/:id/comment', authenticateToken, moderateContent(['text']), feedCo
 router.get('/stories', authenticateToken, feedController.getStories);
 router.post('/stories', authenticateToken, postRateLimit, moderateContent(['caption']), feedController.createStory);
 router.delete('/stories/:storyId', authenticateToken, feedController.deleteStory);
+router.post('/stories/:storyId/view', authenticateToken, feedController.markStoryAsViewed);
+router.get('/stories/:storyId/viewers', authenticateToken, feedController.getStoryViewers);
 router.post('/stories/:storyUserId/like', authenticateToken, feedController.likeStory);
 
 export default router;

@@ -156,7 +156,31 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
 
         // Call API to create story
         try {
-            await api.post('/feed/stories', { imageUrl: finalImageUrl });
+            const response = await api.post('/feed/stories', { imageUrl: finalImageUrl });
+            const createdStory = response.data;
+            
+            // Update local state with real story ID from backend
+            setStories(prev => {
+                const existingGroupIndex = prev.findIndex(s => s.user.id === user.id);
+                
+                if (existingGroupIndex >= 0) {
+                    const updatedGroup = { ...prev[existingGroupIndex] };
+                    if (updatedGroup.items) {
+                        // Replace the local ID with the real one from backend
+                        updatedGroup.items[0] = {
+                            id: createdStory.id,
+                            imageUrl: createdStory.imageUrl,
+                            createdAt: createdStory.createdAt
+                        };
+                    }
+                    
+                    const newStories = [...prev];
+                    newStories[existingGroupIndex] = updatedGroup;
+                    return newStories;
+                }
+                
+                return prev;
+            });
         } catch (error) {
             console.error('Failed to create story on backend', error);
         }

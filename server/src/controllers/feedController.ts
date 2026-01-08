@@ -609,3 +609,89 @@ export const deleteStory = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const markStoryAsViewed = async (req: any, res: any) => {
+    try {
+        const { storyId } = req.params;
+        const userId = req.user.userId;
+
+        // Ignore local stories (they don't exist in DB yet)
+        if (storyId.startsWith('story-local-')) {
+            return res.json({ message: 'Local story, skipping view tracking' });
+        }
+
+        // Check if story exists
+        const story = await prisma.story.findUnique({
+            where: { id: storyId }
+        });
+
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+
+        // Create or update story view
+        await prisma.storyView.upsert({
+            where: {
+                storyId_viewerId: {
+                    storyId,
+                    viewerId: userId
+                }
+            },
+            create: {
+                storyId,
+                viewerId: userId
+            },
+            update: {}
+        });
+
+        res.json({ message: 'Story marked as viewed' });
+    } catch (error) {
+        console.error('Error marking story as viewed:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const getStoryViewers = async (req: any, res: any) => {
+    try {
+        const { storyId } = req.params;
+
+        // Ignore local stories
+        if (storyId.startsWith('story-local-')) {
+            return res.json([]);
+        }
+
+        // Check if story exists
+        const story = await prisma.story.findUnique({
+            where: { id: storyId },
+            include: {
+                views: {
+                    include: {
+                        viewer: {
+                            select: {
+                                id: true,
+                                name: true,
+                                avatarUrl: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+
+        const viewers = story.views.map(view => ({
+            id: view.viewer.id,
+            name: view.viewer.name,
+            avatarUrl: view.viewer.avatarUrl,
+            viewedAt: view.viewedAt
+        }));
+
+        res.json(viewers);
+    } catch (error) {
+        console.error('Error fetching story viewers:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

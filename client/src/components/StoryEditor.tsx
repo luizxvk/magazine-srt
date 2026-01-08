@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { X, Type, Send, Palette } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface StoryEditorProps {
@@ -16,7 +16,11 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
     const [textColor, setTextColor] = useState('#FFFFFF');
     const [bgOpacity, setBgOpacity] = useState(0.5);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [showControls, setShowControls] = useState(true);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const emojis = ['😀', '😂', '🥰', '😍', '🤩', '😎', '🔥', '💯', '❤️', '💙', '💚', '💛', '🎉', '✨', '⚡', '🌟', '👍', '👏', '🙌', '💪', '🎂', '🎈', '🎁', '🌈', '☀️', '🌙', '⭐', '💫'];
 
     const colors = [
         '#FFFFFF', // White
@@ -120,22 +124,6 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                         >
                             <X className="w-6 h-6 text-white" />
                         </button>
-
-                        <motion.button
-                            onClick={saveImage}
-                            disabled={isPublishing}
-                            whileTap={{ scale: 0.95 }}
-                            className={`flex items-center gap-3 px-8 py-3.5 rounded-full font-bold text-white shadow-2xl transition-all text-lg ${
-                                isPublishing 
-                                    ? 'bg-gray-600 cursor-not-allowed opacity-50' 
-                                    : isMGT 
-                                        ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 hover:shadow-emerald-500/50 hover:scale-105' 
-                                        : 'bg-gradient-to-r from-gold-600 to-gold-400 hover:shadow-gold-500/50 hover:scale-105'
-                            }`}
-                        >
-                            <Send className="w-6 h-6" />
-                            <span>{isPublishing ? 'Publicando...' : 'POSTAR'}</span>
-                        </motion.button>
                     </div>
                 </div>
 
@@ -186,18 +174,67 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                     placeholder="Adicione um texto..."
                                     rows={2}
                                     maxLength={100}
-                                    className="w-full px-4 py-3 pr-12 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/40 transition-colors text-base sm:text-lg"
+                                    className="w-full px-4 py-3 pr-24 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/40 transition-colors text-base sm:text-lg"
                                 />
-                                <Type className="absolute right-3 top-3 w-5 h-5 text-white/50" />
+                                <div className="absolute right-3 top-3 flex items-center gap-2">
+                                    <button
+                                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                        className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                                    >
+                                        <Smile className="w-5 h-5 text-white/50 hover:text-white/80" />
+                                    </button>
+                                    <Type className="w-5 h-5 text-white/50" />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Color Palette - SEMPRE VISÍVEL */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="space-y-3"
+                        {/* Emoji Picker */}
+                        <AnimatePresence>
+                            {showEmojiPicker && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 overflow-hidden"
+                                >
+                                    <div className="grid grid-cols-7 gap-2 max-h-40 overflow-y-auto">
+                                        {emojis.map((emoji, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => {
+                                                    setText(text + emoji);
+                                                    setShowEmojiPicker(false);
+                                                }}
+                                                className="text-2xl hover:scale-125 transition-transform p-2 hover:bg-white/10 rounded-lg"
+                                            >
+                                                {emoji}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Collapse/Expand Button */}
+                        <button
+                            onClick={() => setShowControls(!showControls)}
+                            className="w-full flex items-center justify-center gap-2 py-2 text-white/70 hover:text-white transition-colors"
                         >
+                            <span className="text-sm font-medium">
+                                {showControls ? 'Ocultar Controles' : 'Mostrar Controles'}
+                            </span>
+                            {showControls ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </button>
+
+                        {/* Color Palette - COLAPSÁVEL */}
+                        <AnimatePresence>
+                            {showControls && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="space-y-3 overflow-hidden"
+                                >
                             {/* Label */}
                             <div className="flex items-center gap-2">
                                 <Palette className="w-4 h-4 text-white/70" />
@@ -242,6 +279,8 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                 />
                             </div>
                         </motion.div>
+                        )}
+                        </AnimatePresence>
 
                         {/* BOTÃO POSTAR GRANDE - SEMPRE VISÍVEL */}
                         <motion.button

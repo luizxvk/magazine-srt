@@ -45,6 +45,9 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     const [showViewers, setShowViewers] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [showCommentInput, setShowCommentInput] = useState(false);
+    const [commentText, setCommentText] = useState('');
 
     const currentStory = stories[currentIndex];
     const isMyStory = currentStory?.user.id === user?.id;
@@ -128,6 +131,48 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         link.href = currentStory.imageUrl;
         link.download = `story-${currentStory.id}.jpg`;
         link.click();
+    };
+
+    const handleLike = async () => {
+        try {
+            await api.post(`/social/stories/${currentStory.id}/like`);
+            setIsLiked(!isLiked);
+        } catch (error) {
+            console.error('Error liking story:', error);
+        }
+    };
+
+    const handleComment = () => {
+        setShowCommentInput(true);
+        setIsPaused(true);
+    };
+
+    const handleSendComment = async () => {
+        if (!commentText.trim()) return;
+        
+        try {
+            // Send as direct message with story context
+            await api.post('/messages', {
+                receiverId: currentStory.user.id,
+                content: commentText,
+                storyImageUrl: currentStory.imageUrl
+            });
+            setCommentText('');
+            setShowCommentInput(false);
+            setIsPaused(false);
+        } catch (error) {
+            console.error('Error sending comment:', error);
+        }
+    };
+
+    const handleShare = async () => {
+        try {
+            const shareUrl = `${window.location.origin}/story/${currentStory.id}`;
+            await navigator.clipboard.writeText(shareUrl);
+            alert('Link copiado!');
+        } catch (error) {
+            console.error('Error sharing story:', error);
+        }
     };
 
     const timeAgo = (date: string) => {
@@ -232,19 +277,79 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                         </button>
 
                         <div className="flex items-center gap-3">
-                            <button className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors">
-                                <Heart className="w-6 h-6 text-white" />
+                            <button 
+                                onClick={handleLike}
+                                className={`p-3 backdrop-blur-md rounded-full transition-all ${
+                                    isLiked 
+                                        ? 'bg-red-500/80 hover:bg-red-500' 
+                                        : 'bg-white/10 hover:bg-white/20'
+                                }`}
+                            >
+                                <Heart className={`w-6 h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`} />
                             </button>
-                            <button className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors">
+                            <button 
+                                onClick={handleComment}
+                                className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                            >
                                 <MessageCircle className="w-6 h-6 text-white" />
                             </button>
-                            <button className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors">
+                            <button 
+                                onClick={handleShare}
+                                className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                            >
                                 <Send className="w-6 h-6 text-white" />
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Comment Input */}
+            <AnimatePresence>
+                {showCommentInput && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="absolute bottom-6 left-0 right-0 z-50 px-6"
+                    >
+                        <div className="max-w-lg mx-auto">
+                            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-3 flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
+                                    placeholder="Enviar mensagem..."
+                                    autoFocus
+                                    className="flex-1 bg-transparent text-white placeholder-white/50 outline-none"
+                                />
+                                <button
+                                    onClick={handleSendComment}
+                                    className={`p-2 rounded-full transition-all ${
+                                        commentText.trim() 
+                                            ? `bg-${accentColor} text-black` 
+                                            : 'bg-white/10 text-white/50'
+                                    }`}
+                                    disabled={!commentText.trim()}
+                                >
+                                    <Send className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowCommentInput(false);
+                                        setIsPaused(false);
+                                        setCommentText('');
+                                    }}
+                                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-white" />
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Viewers Modal */}
             <AnimatePresence>

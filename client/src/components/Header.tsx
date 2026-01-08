@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
 import SearchModal from './SearchModal';
+import BadgeDisplay from './BadgeDisplay';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 
@@ -228,7 +229,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     <div className="relative">
                         <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${headerBorder} hover:opacity-80 transition-opacity`}>
                         <div className="text-right hidden lg:block">
-                            <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
+                            <div className="flex items-center gap-2 justify-end">
+                                <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
+                                {!isVisitor && user?.id && <BadgeDisplay userId={user.id} />}
+                            </div>
                             <div className="h-4 relative overflow-hidden w-32 flex justify-end">
                                 {isVisitor ? (
                                     <p className="text-[10px] text-gold-500 uppercase tracking-[0.15em] font-bold absolute right-0">

@@ -19,6 +19,7 @@ import paymentRoutes from './src/routes/paymentRoutes';
 import eventRoutes from './src/routes/eventRoutes';
 import reportRoutes from './src/routes/reportRoutes';
 import groupRoutes from './src/routes/groupRoutes';
+import adminBadgeRoutes from './src/routes/adminBadges';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -85,6 +86,7 @@ apiRouter.use('/payments', paymentRoutes);
 apiRouter.use('/events', eventRoutes);
 apiRouter.use('/reports', reportRoutes);
 apiRouter.use('/groups', groupRoutes);
+apiRouter.use('/admin/badges', adminBadgeRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

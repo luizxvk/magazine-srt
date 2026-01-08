@@ -11,6 +11,7 @@ import AdminCreateAnnouncement from '../components/AdminCreateAnnouncement';
 import AdminCreateReward from '../components/AdminCreateReward';
 import AdminEditRewardModal from '../components/AdminEditRewardModal';
 import AdminCreateEvent from '../components/AdminCreateEvent';
+import BadgeManager from '../components/BadgeManager';
 import { sendWelcomeEmail, isEmailJSConfigured } from '../services/emailjs';
 
 interface Reward {
@@ -246,6 +247,7 @@ export default function AdminDashboard() {
                         <AdminCreateAnnouncement showToast={showToast} />
                         <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
                         <AdminCreateEvent showToast={showToast} />
+                        <BadgeManager />
                     </div>
 
                     {/* Main management column */}

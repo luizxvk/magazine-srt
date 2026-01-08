@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Responsive, useContainerWidth } from 'react-grid-layout';
+import { Responsive } from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -60,8 +60,8 @@ export default function AdminGridDashboard() {
 
     const [layouts, setLayouts] = useState(defaultLayouts);
 
-    const handleLayoutChange = (_: Layout[], allLayouts: any) => {
-        setLayouts(allLayouts);
+    const handleLayoutChange = (layout: Layout, allLayouts: Partial<Record<string, Layout>>) => {
+        setLayouts(allLayouts as any);
         localStorage.setItem('adminDashboardLayouts', JSON.stringify(allLayouts));
     };
 

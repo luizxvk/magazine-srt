@@ -96,6 +96,8 @@ export default function FeedItem({
     const [isReporting, setIsReporting] = useState(false);
     const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
     const isOwner = user?.id === authorId;
+    const isAdmin = user?.role === 'ADMIN';
+    const canDelete = isOwner || isAdmin;
     const isMGT = user?.membershipType === 'MGT';
 
 
@@ -188,7 +190,7 @@ export default function FeedItem({
                                     transition={{ duration: 0.15 }}
                                     className={`absolute right-0 top-full mt-2 w-36 bg-black/95 border rounded-xl shadow-2xl backdrop-blur-xl z-[60] overflow-hidden ${isMGT ? 'border-white/20' : 'border-gold-500/20'}`}
                                 >
-                                    {isOwner && (
+                                    {canDelete && (
                                         <button
                                             onClick={(e) => { 
                                                 e.stopPropagation();
@@ -198,7 +200,7 @@ export default function FeedItem({
                                             }}
                                             className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
                                         >
-                                            <Trash2 className="w-4 h-4" /> Deletar
+                                            <Trash2 className="w-4 h-4" /> {isAdmin && !isOwner ? 'Remover (Admin)' : 'Deletar'}
                                         </button>
                                     )}
                                     <button

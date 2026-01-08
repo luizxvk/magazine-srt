@@ -48,6 +48,8 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
 
     const currentStory = stories[currentIndex];
     const isMyStory = currentStory?.user.id === user?.id;
+    const isAdmin = user?.role === 'ADMIN';
+    const canDelete = isMyStory || isAdmin;
     const accentColor = isMGT ? 'emerald-500' : 'gold-500';
 
     useEffect(() => {
@@ -110,7 +112,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     };
 
     const handleDelete = async () => {
-        if (!isMyStory) return;
+        if (!canDelete) return;
         if (!confirm('Deseja deletar este story?')) return;
 
         try {
@@ -299,12 +301,14 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                         exit={{ opacity: 0, scale: 0.9 }}
                         className="absolute right-4 top-20 bg-white rounded-2xl shadow-2xl overflow-hidden z-[70] min-w-[200px]"
                     >
-                        <button
-                            onClick={handleDelete}
-                            className="w-full px-6 py-3 text-left hover:bg-gray-50 text-red-600 font-medium"
-                        >
-                            Delete
-                        </button>
+                        {canDelete && (
+                            <button
+                                onClick={handleDelete}
+                                className="w-full px-6 py-3 text-left hover:bg-gray-50 text-red-600 font-medium"
+                            >
+                                {isAdmin && !isMyStory ? 'Delete (Admin)' : 'Delete'}
+                            </button>
+                        )}
                         <button
                             onClick={handleDownload}
                             className="w-full px-6 py-3 text-left hover:bg-gray-50 text-gray-900"

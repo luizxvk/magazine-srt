@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, X, User, Minimize2, Eye } from 'lucide-react';
+import { Send, X, User, Minimize2, Eye, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from './ModernLoader';
@@ -92,6 +92,18 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleDeleteMessage = async (messageId: string) => {
+        if (!confirm('Deletar esta mensagem?')) return;
+        
+        try {
+            await api.delete(`/messages/${messageId}`);
+            setMessages(messages.filter(msg => msg.id !== messageId));
+        } catch (error) {
+            console.error('Failed to delete message', error);
+            alert('Erro ao deletar mensagem');
+        }
     };
 
     const handleSendMessage = async () => {
@@ -210,10 +222,22 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                                 : (theme === 'light' ? 'text-gray-600' : 'text-gray-400');
 
                             return (
-                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
-                                    <div
-                                        className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg backdrop-blur-md border ${bubbleClass}`}
-                                    >
+                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in-up group`}>
+                                    <div className="flex items-end gap-2">
+                                        {/* Delete button (sender or admin) */}
+                                        {(isMe || user?.role === 'ADMIN') && (
+                                            <button
+                                                onClick={() => handleDeleteMessage(msg.id)}
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-500/20 text-red-400"
+                                                title="Deletar mensagem"
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </button>
+                                        )}
+                                        
+                                        <div
+                                            className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg backdrop-blur-md border ${bubbleClass}`}
+                                        >
                                         {/* Story thumbnail if it's a story reply */}
                                         {msg.storyImageUrl && (
                                             <div className="mb-2 -mt-1 -mx-1">
@@ -237,6 +261,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                                                 </span>
                                             )}
                                         </div>
+                                    </div>
                                     </div>
                                 </div>
                             );

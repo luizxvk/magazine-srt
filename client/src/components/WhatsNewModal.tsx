@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Globe, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
@@ -230,8 +231,8 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
@@ -303,4 +304,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             </div>
         </div>
     );
+    
+    return createPortal(modalContent, document.body);
 }

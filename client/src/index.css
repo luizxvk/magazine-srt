@@ -599,7 +599,13 @@ html.rgb-dynamic .shadow-accent {
 /* Aplica o RGB dinâmico quando a classe rgb-dynamic está ativa */
 html.rgb-dynamic .bg-accent,
 html.rgb-dynamic .bg-accent-500,
-html.rgb-dynamic [class*="bg-accent"] {
+html.rgb-dynamic [class*="bg-accent"],
+html.rgb-dynamic .text-accent,
+html.rgb-dynamic .text-accent-400,
+html.rgb-dynamic .text-accent-500,
+html.rgb-dynamic .border-accent,
+html.rgb-dynamic [class*="text-accent"],
+html.rgb-dynamic [class*="border-accent"] {
   animation: rgb-cycle 3s linear infinite !important;
 }
 

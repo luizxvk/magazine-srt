@@ -117,28 +117,29 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             {/* MGT Log Card */}
                             <MgtLogCard />
 
-                            {/* Photo Catalog Card */}
-                            <div className="mt-6">
+                            {/* O que há de novo - card separado */}
+                            <div 
+                                onClick={() => setShowWhatsNew(true)}
+                                className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
+                            >
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
+                                        <Sparkles className="w-5 h-5" />
+                                    </div>
+                                    <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>O que há de novo</h4>
+                                </div>
+                                <p className="text-sm text-gray-400 leading-relaxed">
+                                    Confira as últimas atualizações e novidades da plataforma.
+                                </p>
+                            </div>
+
+                            {/* Photo Catalog Card - separado */}
+                            <div>
                                 <PhotoCatalogCard photos={catalogPhotos} />
                             </div>
 
                             {/* Recommendation Cards */}
-                            <div className="space-y-4 mt-6">
-                                <div 
-                                    onClick={() => setShowWhatsNew(true)}
-                                    className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
-                                >
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                            <Sparkles className="w-5 h-5" />
-                                        </div>
-                                        <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>O que há de novo</h4>
-                                    </div>
-                                    <p className="text-sm text-gray-400 leading-relaxed">
-                                        Confira as últimas atualizações e novidades da plataforma.
-                                    </p>
-                                </div>
-
+                            <div className="space-y-4">
                                 <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>

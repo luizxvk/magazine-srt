@@ -151,7 +151,25 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
+        id: '21',
+        title: 'Verificação de Email Obrigatória',
+        description: 'Sistema de verificação via Email com código de 6 dígitos. 3 dias para verificar ou conta suspensa.',
+        status: 'completed',
+        version: 'v0.3.5',
+        icon: <Shield className="w-5 h-5" />,
+        category: 'security'
+    },
+    {
         id: '22',
+        title: 'Sistema de Selos Admin',
+        description: 'Admin pode atribuir selos personalizados aos usuários (BETA, PRO, FOUNDER) com cores e ícones customizados.',
+        status: 'completed',
+        version: 'v0.3.5',
+        icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '23',
         title: 'Mobile Responsivo Premium',
         description: 'Interface totalmente otimizada para mobile com gestos e animações suaves.',
         status: 'completed',
@@ -163,14 +181,30 @@ const roadmapItems: RoadmapItem[] = [
     // ===== IN PROGRESS =====
     {
         id: '23',
-        title: 'Sistema de Highlights',
-        description: 'Marque seus melhores posts como highlights e organize em coleções temáticas.',
+        title: 'Dashboard Admin com Grid Arrastável',
+        description: 'Dashboard administrativo com widgets arrastáveis usando @dnd-kit. Estatísticas em tempo real e reorganização personalizável.',
         status: 'in-progress',
-        icon: <Star className="w-5 h-5" />,
+        icon: <Shield className="w-5 h-5" />,
         category: 'feature'
     },
     {
         id: '24',
+        title: 'Stories Avançados',
+        description: 'Like, comentários, compartilhamento, redimensionamento de imagem, texto movível e animações estilo Apple Vision Pro.',
+        status: 'in-progress',
+        icon: <Sparkles className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '25',
+        title: 'Grupos Completos v2.0',
+        description: 'Convites via notificação, apelidos personalizados, backgrounds comprados, modo mudo, compartilhamento de imagens (10 Zions) e filtro de conteúdo +18.',
+        status: 'in-progress',
+        icon: <Users className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '26',
         title: 'Página MGT Log (Exclusiva)',
         description: 'Catálogo exclusivo para membros MGT visualizarem modelos premium e reservarem ensaios.',
         status: 'in-progress',
@@ -180,27 +214,11 @@ const roadmapItems: RoadmapItem[] = [
     
     // ===== PLANNED =====
     {
-        id: '25',
-        title: 'Grupos e Comunidades',
-        description: 'Crie ou participe de grupos temáticos. Chat em grupo e eventos exclusivos.',
-        status: 'planned',
-        icon: <Users className="w-5 h-5" />,
-        category: 'community'
-    },
-    {
-        id: '26',
+        id: '27',
         title: 'Revista Digital com IA',
         description: 'Gere revistas digitais automáticas usando IA com base nas fotos do seu catálogo. Layouts profissionais em minutos.',
         status: 'planned',
         icon: <BrainCircuit className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '27',
-        title: 'App Mobile Nativo',
-        description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
-        status: 'planned',
-        icon: <Rocket className="w-5 h-5" />,
         category: 'feature'
     },
     {
@@ -213,22 +231,14 @@ const roadmapItems: RoadmapItem[] = [
     },
     {
         id: '29',
-        title: 'Sistema de Prestígio',
-        description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
-        status: 'planned',
-        icon: <Crown className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '30',
-        title: 'Cards Animados (GIF)',
-        description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
+        title: 'Integração com Reddit',
+        description: 'Publique automaticamente seus highlights no Reddit e amplie seu alcance.',
         status: 'planned',
         icon: <Sparkles className="w-5 h-5" />,
         category: 'feature'
     },
     {
-        id: '31',
+        id: '30',
         title: 'Mercado de Itens P2P',
         description: 'Compre, venda e troque itens exclusivos com outros membros usando Zions.',
         status: 'planned',
@@ -236,7 +246,39 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
+        id: '31',
+        title: 'Sistema de Highlights',
+        description: 'Marque seus melhores posts como highlights e organize em coleções temáticas.',
+        status: 'planned',
+        icon: <Star className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
         id: '32',
+        title: 'App Mobile Nativo',
+        description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
+        status: 'planned',
+        icon: <Rocket className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '33',
+        title: 'Sistema de Prestígio',
+        description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
+        status: 'planned',
+        icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '34',
+        title: 'Cards Animados (GIF)',
+        description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
+        status: 'planned',
+        icon: <Sparkles className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '35',
         title: 'Hub de Comunidades Gamers',
         description: 'Expanda para maior rede social de comunidades gamers do Brasil. Torneios, clãs e eventos ao vivo.',
         status: 'planned',
@@ -252,52 +294,12 @@ const roadmapItems: RoadmapItem[] = [
         category: 'community'
     },
     {
-        id: '34',
+        id: '35',
         title: 'Transmissões ao Vivo',
         description: 'Faça lives para seus seguidores com chat integrado e sistema de doações em Zions.',
         status: 'planned',
         icon: <Zap className="w-5 h-5" />,
         category: 'feature'
-    },
-    {
-        id: '35',
-        title: 'Sistema de Selos Admin',
-        description: 'Admin pode atribuir selos personalizados aos usuários (BETA, DEV, MGT) com cores customizadas.',
-        status: 'planned',
-        icon: <Crown className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '36',
-        title: 'Stories Avançados',
-        description: 'Like, comentários, compartilhamento, figurinhas e controles de texto/opacidade nos stories.',
-        status: 'planned',
-        icon: <Sparkles className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '37',
-        title: 'Grupos Completos v2.0',
-        description: 'Convites, apelidos, backgrounds personalizados, modo mudo, compartilhamento de imagens (10 Zions) e filtro de conteúdo +18.',
-        status: 'planned',
-        icon: <Users className="w-5 h-5" />,
-        category: 'community'
-    },
-    {
-        id: '38',
-        title: 'Admin Dashboard com Grid',
-        description: 'Dashboard administrativo com widgets arrastáveis e reorganizáveis. Gestão total de usuários e conteúdo.',
-        status: 'planned',
-        icon: <Shield className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '39',
-        title: 'Verificação de Email Obrigatória',
-        description: 'Sistema de verificação via SMS/Email com código de 6 dígitos. 3 dias para verificar ou conta suspensa.',
-        status: 'planned',
-        icon: <Shield className="w-5 h-5" />,
-        category: 'security'
     }
 ];
 

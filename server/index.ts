@@ -20,9 +20,11 @@ import eventRoutes from './src/routes/eventRoutes';
 import reportRoutes from './src/routes/reportRoutes';
 import groupRoutes from './src/routes/groupRoutes';
 import adminBadgeRoutes from './src/routes/adminBadges';
+import cronRoutes from './src/routes/cronRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
+import { runVerificationCronJobs } from './src/services/verificationCronService';
 
 dotenv.config();
 
@@ -87,6 +89,7 @@ apiRouter.use('/events', eventRoutes);
 apiRouter.use('/reports', reportRoutes);
 apiRouter.use('/groups', groupRoutes);
 apiRouter.use('/admin/badges', adminBadgeRoutes);
+apiRouter.use('/cron', cronRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);
@@ -110,6 +113,18 @@ const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTI
 if (!isServerless) {
     const server = app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
+        
+        // Run verification cron job every hour
+        setInterval(() => {
+            runVerificationCronJobs().catch(err => 
+                console.error('Cron job error:', err)
+            );
+        }, 60 * 60 * 1000); // 1 hour
+        
+        // Run immediately on startup
+        runVerificationCronJobs().catch(err => 
+            console.error('Initial cron job error:', err)
+        );
     });
 
     // Keep the server alive

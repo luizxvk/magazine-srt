@@ -31,6 +31,12 @@ model User {
   deletedAt    DateTime?
   sessionToken String?       // For single device login - invalidates previous sessions
   
+  // Email Verification
+  isVerified          Boolean   @default(false)
+  verificationCode    String?
+  verificationExpiry  DateTime?
+  verificationSentAt  DateTime?
+  
   // Customization shop fields
   ownedCustomizations String?   // JSON array of owned item IDs
   equippedBackground  String?   // Currently equipped background ID

@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken, requireAdmin } from '../middleware/authMiddleware';
 import {
     createBadge,
     getAllBadges,

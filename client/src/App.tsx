@@ -18,6 +18,7 @@ import RewardsPage from './pages/RewardsPage';
 import HighlightsPage from './pages/HighlightsPage';
 import RoadmapPage from './pages/RoadmapPage';
 import SettingsPage from './pages/SettingsPage';
+import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MgtLogPage from './pages/MgtLogPage';
 import GroupsPage from './pages/GroupsPage';
@@ -28,6 +29,7 @@ import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
 import MessagePopup from './components/MessagePopup';
 import DevBanner from './components/DevBanner';
+import VerificationPrompt from './components/VerificationPrompt';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
 import WhatsNewModal from './components/WhatsNewModal';
 import SessionExpiredModal from './components/SessionExpiredModal';
@@ -59,6 +61,7 @@ function App() {
           <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
           <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
+          <Route path="/verify-email" element={<PrivateRoute><VerificationPage /></PrivateRoute>} />
           <Route path="/mgt-log" element={<PrivateRoute><MgtLogPage /></PrivateRoute>} />
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
@@ -74,6 +77,7 @@ function App() {
         <SessionExpiredWrapper />
         <WhatsNewModal />
         <MessagePopupWrapper />
+        <VerificationPrompt />
         <DevBanner />
       </Router>
     </AuthProvider>

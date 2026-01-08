@@ -15,6 +15,7 @@ interface User {
     avatarUrl?: string;
     displayName?: string;
     bio?: string;
+    isVerified?: boolean;
     // Customization fields
     ownedCustomizations?: string[];
     equippedBackground?: string | null;

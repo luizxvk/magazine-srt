@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, requestPasswordReset, resetPassword, changePassword } from '../controllers/authController';
+import { register, login, requestPasswordReset, resetPassword, changePassword, verifyEmail, resendVerificationCode } from '../controllers/authController';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { loginRateLimit, resetPasswordRateLimit, rateLimit } from '../middleware/rateLimitMiddleware';
 
@@ -11,5 +11,7 @@ router.post('/login', loginRateLimit, login);
 router.post('/request-reset', resetPasswordRateLimit, requestPasswordReset);
 router.post('/reset-password', resetPasswordRateLimit, resetPassword);
 router.post('/change-password', authenticateToken, changePassword);
+router.post('/verify-email', authenticateToken, verifyEmail);
+router.post('/resend-verification', authenticateToken, resendVerificationCode);
 
 export default router;

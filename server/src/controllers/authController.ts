@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { sendPasswordResetEmail } from '../services/emailService';
+import { generateVerificationCode, sendVerificationEmail } from '../services/emailVerificationService';
 
 const prisma = new PrismaClient();
 
@@ -49,6 +50,11 @@ export const register = async (req: Request, res: Response) => {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
+        // Generate verification code valid for 3 days
+        const verificationCode = generateVerificationCode();
+        const verificationExpiry = new Date();
+        verificationExpiry.setDate(verificationExpiry.getDate() + 3); // 3 days
+
         const user = await prisma.user.create({
             data: {
                 email,
@@ -57,8 +63,24 @@ export const register = async (req: Request, res: Response) => {
                 displayName: name,
                 membershipType: membershipType || 'MAGAZINE',
                 avatarUrl: avatarUrl || null,
+                isVerified: false,
+                verificationCode,
+                verificationExpiry,
+                verificationSentAt: new Date(),
             },
         });
+
+        // Send verification email (don't block registration if it fails)
+        try {
+            await sendVerificationEmail({
+                to: email,
+                name,
+                code: verificationCode,
+            });
+        } catch (emailError) {
+            console.error('Failed to send verification email:', emailError);
+            // Continue with registration even if email fails
+        }
 
         const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!, {
             expiresIn: '7d',
@@ -71,7 +93,8 @@ export const register = async (req: Request, res: Response) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                membershipType: user.membershipType
+                membershipType: user.membershipType,
+                isVerified: user.isVerified,
             }
         });
     } catch (error) {
@@ -322,5 +345,97 @@ export const changePassword = async (req: Request, res: Response) => {
         }
         console.error('Change password error:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Verify email with code
+export const verifyEmail = async (req: Request, res: Response) => {
+    try {
+        const { code } = z.object({
+            code: z.string().length(6)
+        }).parse(req.body);
+
+        const userId = (req as any).user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        if (user.isVerified) {
+            return res.status(400).json({ error: 'Email already verified' });
+        }
+
+        if (!user.verificationCode || !user.verificationExpiry) {
+            return res.status(400).json({ error: 'No verification code found. Please request a new one.' });
+        }
+
+        // Check if code expired
+        if (new Date() > user.verificationExpiry) {
+            return res.status(400).json({ error: 'Verification code expired. Your account will be suspended.' });
+        }
+
+        // Check if code matches
+        if (user.verificationCode !== code) {
+            return res.status(400).json({ error: 'Invalid verification code' });
+        }
+
+        // Verify user
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                isVerified: true,
+                verificationCode: null,
+                verificationExpiry: null,
+            }
+        });
+
+        res.json({ message: 'Email verified successfully!' });
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: (error as any).errors });
+        }
+        console.error('Verify email error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Resend verification code
+export const resendVerificationCode = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        if (user.isVerified) {
+            return res.status(400).json({ error: 'Email already verified' });
+        }
+
+        // Generate new code
+        const verificationCode = generateVerificationCode();
+        const verificationExpiry = new Date();
+        verificationExpiry.setDate(verificationExpiry.getDate() + 3);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                verificationCode,
+                verificationExpiry,
+                verificationSentAt: new Date(),
+            }
+        });
+
+        // Send new verification email
+        await sendVerificationEmail({
+            to: user.email,
+            name: user.name,
+            code: verificationCode,
+        });
+
+        res.json({ message: 'Verification code sent successfully!' });
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({ error: 'Failed to resend verification code' });
     }
 };

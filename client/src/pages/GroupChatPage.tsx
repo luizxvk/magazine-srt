@@ -92,7 +92,7 @@ export default function GroupChatPage() {
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [showImageConfirm, setShowImageConfirm] = useState(false);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';

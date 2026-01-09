@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.6';
+const CURRENT_VERSION = '0.3.7';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,61 +33,82 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.6 - Sistema de GRUPOS Completo + Stories Fixadas
+    // v0.3.7 - Cores Pastel + Melhorias UI
     const updates: UpdateItem[] = [
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: '10 Novas Cores Pastel!',
+            description: 'Rosa, Lavanda, Menta, Pêssego, Céu, Coral, Lilás, Sálvia, Manteiga e Pervinca! Tons suaves para seu perfil.',
+            isNew: true
+        },
+        {
+            icon: <Eye className="w-5 h-5" />,
+            title: 'Visualizadores de Stories',
+            description: 'Novo popup moderno mostra quem viu seus stories com animação slide-up e design temático!',
+            isNew: true
+        },
+        {
+            icon: <Award className="w-5 h-5" />,
+            title: 'Cor de Texto nos Selos',
+            description: 'Admins agora podem definir a cor do texto dos selos, não apenas o fundo!',
+            isNew: true
+        },
+        {
+            icon: <Settings className="w-5 h-5" />,
+            title: 'Botão Config no Feed',
+            description: 'Acesse configurações rapidamente pelo ícone no cabeçalho do feed!',
+            isNew: true
+        },
+        {
+            icon: <Wrench className="w-5 h-5" />,
+            title: 'Switches Corrigidos',
+            description: 'Botões toggle das configurações com alinhamento e animação melhorados!',
+            isNew: true
+        },
         {
             icon: <MessageCircle className="w-5 h-5" />,
             title: 'Sistema de GRUPOS Completo!',
             description: 'Crie grupos públicos/privados, convide amigos via notificação, chat em tempo real, envie imagens (10 Zions), apelidos personalizados por grupo!',
-            isNew: true
         },
         {
             icon: <Wrench className="w-5 h-5" />,
             title: 'Múltiplas Correções de Bugs',
             description: 'Corrigido erro de CORS no upload de imagens, botão de fechar stories reposicionado, botão configurações adicionado no header desktop.',
-            isNew: true
         },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Convites de Grupo via Notificação',
             description: 'Receba e responda convites de grupo direto pelo sistema de notificações! Aceite ou recuse com um clique.',
-            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'Backgrounds Customizáveis',
             description: 'Admins podem mudar o fundo do grupo usando wallpapers comprados da loja!',
-            isNew: true
         },
         {
             icon: <Image className="w-5 h-5" />,
             title: 'Enviar Imagens no Chat',
             description: 'Compartilhe imagens dentro dos grupos! Custa 10 Zions por imagem enviada.',
-            isNew: true
         },
         {
             icon: <Award className="w-5 h-5" />,
             title: 'Apelidos Personalizados',
             description: 'Defina um apelido único para cada grupo que você participa! Apareça com nomes diferentes em cada comunidade.',
-            isNew: true
         },
         {
             icon: <Menu className="w-5 h-5" />,
             title: 'Filtro de Conteúdo +18',
             description: 'Marque conteúdo sensível nos grupos e ative/desative visualização com o botão de olhinho no chat!',
-            isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: 'Modo Silencioso Individual',
             description: 'Silencie grupos específicos sem sair! Você não receberá popups de notificação daquele grupo.',
-            isNew: true
         },
         {
             icon: <Image className="w-5 h-5" />,
             title: 'Stories - IDs Corrigidos',
             description: 'Stories agora salvam ID real do backend após criação! Não mais erros 404.',
-            isNew: true
         },
         {
             icon: <Bell className="w-5 h-5" />,
@@ -118,37 +139,31 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Image className="w-5 h-5" />,
             title: 'Editor Stories Apple Vision Pro',
             description: 'Interface glassmorphism com botão POSTAR redesenhado e loading visual!',
-            isNew: true
         },
         {
             icon: <Trophy className="w-5 h-5" />,
             title: 'Timeline de Níveis Corrigida',
             description: 'Números duplicados removidos - agora aparece apenas no círculo!',
-            isNew: true
         },
         {
             icon: <MessageCircle className="w-5 h-5" />,
             title: 'MGT Log no Drawer',
             description: 'Card do MGT Log agora aparece na barra lateral de recomendações!',
-            isNew: true
         },
         {
             icon: <Wrench className="w-5 h-5" />,
             title: 'Grid AdminDashboard',
             description: 'Dependências instaladas (react-grid-layout). Implementação completa em breve!',
-            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: '8 Novos Fundos Animados',
             description: 'Pôr do Sol, Cyberpunk, Lava, Gelo Ártico, Grade Neon e mais!',
-            isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: 'Cor RGB Dinâmica',
             description: 'Cor especial que muda entre Red, Green e Blue automaticamente! (1000 Zions)',
-            isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5" />,
@@ -169,7 +184,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Wrench className="w-5 h-5" />,
             title: 'Logout Corrigido',
             description: 'Cores voltam ao padrão Magazine ao deslogar.',
-            isNew: true
         },
         {
             icon: <Store className="w-5 h-5" />,

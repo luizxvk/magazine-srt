@@ -26,7 +26,11 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const themeInput = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
-  const accentColor = isMGT ? 'emerald-500' : 'gold-500';
+  
+  // Use CSS variables for custom accent colors
+  const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+  const accentText = isMGT ? 'text-emerald-500' : 'text-gold-500';
+  const accentBorder = isMGT ? 'border-emerald-500' : 'border-gold-500';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,10 +82,10 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
           >
             <div className={`${themeBg} rounded-2xl shadow-2xl max-w-lg w-full border ${themeBorder}`}>
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b ${themeBorder}">
+              <div className={`flex items-center justify-between p-6 border-b ${themeBorder}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 bg-${accentColor}/20 rounded-lg`}>
-                    <Users className={`w-6 h-6 text-${accentColor}`} />
+                  <div className={`p-2 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} rounded-lg`}>
+                    <Users className={`w-6 h-6 ${accentText}`} />
                   </div>
                   <h2 className={`text-xl font-serif ${themeText}`}>Criar Novo Grupo</h2>
                 </div>
@@ -106,7 +110,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     onChange={(e) => setName(e.target.value)}
                     maxLength={50}
                     placeholder="Ex: Carros Esportivos"
-                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 focus:ring-${accentColor} focus:border-transparent transition-all`}
+                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all`}
                   />
                 </div>
 
@@ -121,7 +125,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     maxLength={200}
                     rows={3}
                     placeholder="Descreva o propósito do grupo..."
-                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 focus:ring-${accentColor} focus:border-transparent transition-all resize-none`}
+                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all resize-none`}
                   />
                   <p className={`text-xs ${themeSecondary} mt-1`}>
                     {description.length}/200 caracteres
@@ -139,11 +143,11 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                       onClick={() => setIsPrivate(false)}
                       className={`flex-1 p-4 rounded-lg border-2 transition-all ${
                         !isPrivate
-                          ? `border-${accentColor} bg-${accentColor}/10`
-                          : `border-${themeBorder} ${themeInput}`
+                          ? `${accentBorder} ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`
+                          : `${themeBorder} ${themeInput}`
                       }`}
                     >
-                      <Globe className={`w-6 h-6 ${!isPrivate ? `text-${accentColor}` : themeSecondary} mx-auto mb-2`} />
+                      <Globe className={`w-6 h-6 ${!isPrivate ? accentText : themeSecondary} mx-auto mb-2`} />
                       <p className={`font-medium ${themeText} text-sm`}>Público</p>
                       <p className={`text-xs ${themeSecondary} mt-1`}>Qualquer um pode entrar</p>
                     </button>
@@ -153,11 +157,11 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                       onClick={() => setIsPrivate(true)}
                       className={`flex-1 p-4 rounded-lg border-2 transition-all ${
                         isPrivate
-                          ? `border-${accentColor} bg-${accentColor}/10`
-                          : `border-${themeBorder} ${themeInput}`
+                          ? `${accentBorder} ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`
+                          : `${themeBorder} ${themeInput}`
                       }`}
                     >
-                      <Lock className={`w-6 h-6 ${isPrivate ? `text-${accentColor}` : themeSecondary} mx-auto mb-2`} />
+                      <Lock className={`w-6 h-6 ${isPrivate ? accentText : themeSecondary} mx-auto mb-2`} />
                       <p className={`font-medium ${themeText} text-sm`}>Privado</p>
                       <p className={`text-xs ${themeSecondary} mt-1`}>Apenas por convite</p>
                     </button>
@@ -175,7 +179,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     onChange={(e) => setMaxMembers(Number(e.target.value))}
                     min={2}
                     max={500}
-                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 focus:ring-${accentColor} focus:border-transparent transition-all`}
+                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all`}
                   />
                 </div>
 
@@ -198,7 +202,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                   <button
                     type="submit"
                     disabled={loading || !name.trim()}
-                    className={`flex-1 px-6 py-3 rounded-full bg-${accentColor} text-white font-medium hover:bg-${accentColor}/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`flex-1 px-6 py-3 rounded-full ${accentBg} text-white font-medium hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {loading ? 'Criando...' : 'Criar Grupo'}
                   </button>

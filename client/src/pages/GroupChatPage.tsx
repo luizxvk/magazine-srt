@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -58,6 +58,12 @@ interface Message {
   senderNickname?: string;
 }
 
+interface TypingUser {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+}
+
 export default function GroupChatPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -83,6 +89,10 @@ export default function GroupChatPage() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [friends, setFriends] = useState<any[]>([]);
   const [inviting, setInviting] = useState(false);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  const [showImageConfirm, setShowImageConfirm] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -135,6 +145,46 @@ export default function GroupChatPage() {
     const interval = setInterval(fetchMessages, 3000); // Poll messages every 3s
     return () => clearInterval(interval);
   }, [id]);
+
+  // Poll for typing users
+  useEffect(() => {
+    if (!id) return;
+    
+    const fetchTypingUsers = async () => {
+      try {
+        const response = await api.get(`/groups/${id}/typing`);
+        setTypingUsers(response.data);
+      } catch (error) {
+        // Silently ignore errors
+      }
+    };
+    
+    fetchTypingUsers();
+    const typingInterval = setInterval(fetchTypingUsers, 2000);
+    return () => clearInterval(typingInterval);
+  }, [id]);
+
+  // Send typing indicator when user types
+  const sendTypingIndicator = useCallback(async () => {
+    if (!id) return;
+    try {
+      await api.post(`/groups/${id}/typing`);
+    } catch (error) {
+      // Silently ignore
+    }
+  }, [id]);
+
+  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageText(e.target.value);
+    
+    // Send typing indicator (debounced)
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      sendTypingIndicator();
+    }, 300);
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -199,12 +249,22 @@ export default function GroupChatPage() {
       return;
     }
 
-    const confirmed = window.confirm('Enviar esta imagem custará 10 Zions. Confirmar?');
-    if (!confirmed) return;
+    // Store file and show custom confirmation modal
+    setPendingImageFile(file);
+    setShowImageConfirm(true);
+    
+    // Clear the input so user can select same file again if needed
+    e.target.value = '';
+  };
+
+  const handleConfirmSendImage = async () => {
+    if (!pendingImageFile) return;
+    
+    setShowImageConfirm(false);
 
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', pendingImageFile);
 
       const uploadResponse = await api.post('/uploads/group', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -221,6 +281,8 @@ export default function GroupChatPage() {
     } catch (error) {
       console.error('Error sending image:', error);
       alert('Erro ao enviar imagem');
+    } finally {
+      setPendingImageFile(null);
     }
   };
 
@@ -455,10 +517,72 @@ export default function GroupChatPage() {
                       minute: '2-digit'
                     })}
                   </span>
+
+                  {/* Read receipts - small avatars for who has seen the message */}
+                  {isMe && (
+                    <div className="flex -space-x-1 mt-1 mr-2">
+                      {group?.members
+                        .filter(m => m.userId !== user?.id)
+                        .slice(0, 3)
+                        .map((member) => (
+                          <img
+                            key={member.id}
+                            src={member.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.user.name)}&size=16`}
+                            alt={member.user.name}
+                            className="w-4 h-4 rounded-full border border-gray-800"
+                            title={member.user.displayName || member.user.name}
+                          />
+                        ))
+                      }
+                      {(group?.members.length || 0) > 4 && (
+                        <div className="w-4 h-4 rounded-full bg-gray-700 flex items-center justify-center text-[8px] text-white border border-gray-800">
+                          +{(group?.members.length || 0) - 4}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             );
           })}
+
+        {/* Typing Indicator */}
+        <AnimatePresence>
+          {typingUsers.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex items-center gap-2 px-4 py-2"
+            >
+              <div className="flex -space-x-2">
+                {typingUsers.slice(0, 3).map((typingUser) => (
+                  <img
+                    key={typingUser.id}
+                    src={typingUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(typingUser.name)}&size=24`}
+                    alt={typingUser.name}
+                    className="w-6 h-6 rounded-full border-2 border-gray-900"
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-gray-400">
+                  {typingUsers.length === 1 
+                    ? `${typingUsers[0].name} está digitando`
+                    : `${typingUsers.length} pessoas estão digitando`
+                  }
+                </span>
+                {/* Typing dots animation */}
+                <div className="flex gap-0.5">
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -482,9 +606,9 @@ export default function GroupChatPage() {
         <input
           type="text"
           value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
+          onChange={handleMessageChange}
           placeholder="Digite uma mensagem..."
-          className="flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-${accentColor} placeholder-gray-400"
+          className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
         />
 
         <button
@@ -823,6 +947,55 @@ export default function GroupChatPage() {
               >
                 Cancelar
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Send Confirmation Modal */}
+      <AnimatePresence>
+        {showImageConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-[200] p-4"
+            onClick={() => {
+              setShowImageConfirm(false);
+              setPendingImageFile(null);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel rounded-2xl p-6 max-w-sm w-full border border-white/10 text-center"
+            >
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${accentBg} flex items-center justify-center`}>
+                <Image className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Enviar Imagem</h3>
+              <p className="text-gray-400 mb-6">
+                Enviar esta imagem custará <span className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>10 Zions</span>. Deseja continuar?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowImageConfirm(false);
+                    setPendingImageFile(null);
+                  }}
+                  className="flex-1 px-4 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-colors font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmSendImage}
+                  className={`flex-1 px-4 py-3 rounded-xl ${accentBg} text-white font-medium hover:opacity-90 transition-opacity`}
+                >
+                  Confirmar
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

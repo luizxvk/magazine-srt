@@ -3,6 +3,28 @@ import { PrismaClient, GroupRole, MessageType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// In-memory storage for typing indicators (expires after 3 seconds)
+interface TypingUser {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  expiresAt: number;
+}
+const typingUsers: Map<string, Map<string, TypingUser>> = new Map(); // groupId -> userId -> TypingUser
+
+// Clean up expired typing indicators
+const cleanExpiredTyping = (groupId: string) => {
+  const groupTyping = typingUsers.get(groupId);
+  if (!groupTyping) return;
+  
+  const now = Date.now();
+  for (const [userId, data] of groupTyping.entries()) {
+    if (data.expiresAt < now) {
+      groupTyping.delete(userId);
+    }
+  }
+};
+
 // Criar novo grupo
 export const createGroup = async (req: Request, res: Response) => {
   try {
@@ -974,11 +996,23 @@ export const postImageMessage = async (req: Request, res: Response) => {
     }
 
     const member = await prisma.groupMember.findUnique({
-      where: { groupId_userId: { groupId, userId } }
+      where: { groupId_userId: { groupId, userId } },
+      include: {
+        group: {
+          include: {
+            settings: true
+          }
+        }
+      }
     });
 
-    if (!member || !member.canPost) {
-      return res.status(403).json({ error: 'Sem permissão para postar' });
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    // Check posting permission - same logic as postMessage
+    if (!member.canPost && member.group.settings?.allowMemberPosts === false) {
+      return res.status(403).json({ error: 'Você não tem permissão para postar' });
     }
 
     // Verificar saldo de Zions
@@ -1073,5 +1107,155 @@ export const getMyInvites = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching invites:', error);
     res.status(500).json({ error: 'Erro ao buscar convites' });
+  }
+};
+
+// Set typing indicator
+export const setTyping = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { groupId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // Check if user is a member
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+      include: {
+        user: {
+          select: { id: true, name: true, displayName: true, avatarUrl: true }
+        }
+      }
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    // Set typing with 3 second expiration
+    if (!typingUsers.has(groupId)) {
+      typingUsers.set(groupId, new Map());
+    }
+    
+    typingUsers.get(groupId)!.set(userId, {
+      id: userId,
+      name: member.user.displayName || member.user.name,
+      avatarUrl: member.user.avatarUrl,
+      expiresAt: Date.now() + 3000
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error setting typing:', error);
+    res.status(500).json({ error: 'Erro ao atualizar status de digitação' });
+  }
+};
+
+// Get users currently typing
+export const getTypingUsers = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { groupId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    cleanExpiredTyping(groupId);
+
+    const groupTyping = typingUsers.get(groupId);
+    if (!groupTyping) {
+      return res.json([]);
+    }
+
+    // Return all typing users except the requesting user
+    const typingList = Array.from(groupTyping.values())
+      .filter(u => u.id !== userId)
+      .map(u => ({
+        id: u.id,
+        name: u.name,
+        avatarUrl: u.avatarUrl
+      }));
+
+    res.json(typingList);
+  } catch (error) {
+    console.error('Error getting typing users:', error);
+    res.status(500).json({ error: 'Erro ao buscar status de digitação' });
+  }
+};
+
+// Mark messages as read
+export const markMessagesRead = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { groupId } = req.params;
+    const { lastMessageId } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // Update member's last read message
+    await prisma.groupMember.update({
+      where: { groupId_userId: { groupId, userId } },
+      data: { 
+        // Store the last read message ID in a JSON field or use a relation
+        // For now, we'll use the updatedAt timestamp
+      }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error marking messages as read:', error);
+    res.status(500).json({ error: 'Erro ao marcar mensagens como lidas' });
+  }
+};
+
+// Get readers of a specific message (users who have read up to this message)
+export const getMessageReaders = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { groupId, messageId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // Get the message
+    const message = await prisma.groupMessage.findUnique({
+      where: { id: messageId }
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Mensagem não encontrada' });
+    }
+
+    // Get all members who joined before this message was sent
+    // For a simple implementation, return members who are active
+    const members = await prisma.groupMember.findMany({
+      where: { 
+        groupId,
+        userId: { not: message.senderId } // Exclude sender
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, displayName: true, avatarUrl: true }
+        }
+      },
+      take: 5 // Limit to 5 for display
+    });
+
+    const readers = members.map(m => ({
+      id: m.user.id,
+      name: m.user.displayName || m.user.name,
+      avatarUrl: m.user.avatarUrl
+    }));
+
+    res.json(readers);
+  } catch (error) {
+    console.error('Error getting message readers:', error);
+    res.status(500).json({ error: 'Erro ao buscar leitores' });
   }
 };

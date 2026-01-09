@@ -280,10 +280,11 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                 />
             </div>
 
-            {/* Bottom Actions */}
-            {isMyStory && (
-                <div className="absolute bottom-6 left-0 right-0 z-50 px-6">
-                    <div className="flex items-center justify-between max-w-lg mx-auto">
+            {/* Bottom Actions - Show for all stories */}
+            <div className="absolute bottom-6 left-0 right-0 z-50 px-6">
+                <div className="flex items-center justify-between max-w-lg mx-auto">
+                    {/* Viewers count - only for own stories */}
+                    {isMyStory ? (
                         <button
                             onClick={() => setShowViewers(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
@@ -291,34 +292,37 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                             <Eye className="w-5 h-5 text-white" />
                             <span className="text-white font-semibold">{currentStory?.viewCount || viewers.length}</span>
                         </button>
+                    ) : (
+                        <div /> /* Empty spacer */
+                    )}
 
-                        <div className="flex items-center gap-3">
-                            <button 
-                                onClick={handleLike}
-                                className={`p-3 backdrop-blur-md rounded-full transition-all ${
-                                    isLiked 
-                                        ? 'bg-red-500/80 hover:bg-red-500' 
-                                        : 'bg-white/10 hover:bg-white/20'
-                                }`}
-                            >
-                                <Heart className={`w-6 h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`} />
-                            </button>
-                            <button 
-                                onClick={handleComment}
-                                className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
-                            >
-                                <MessageCircle className="w-6 h-6 text-white" />
-                            </button>
-                            <button 
-                                onClick={handleShare}
-                                className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
-                            >
-                                <Send className="w-6 h-6 text-white" />
-                            </button>
-                        </div>
+                    {/* Interaction buttons - for all stories */}
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={handleLike}
+                            className={`p-3 backdrop-blur-md rounded-full transition-all ${
+                                isLiked 
+                                    ? 'bg-red-500/80 hover:bg-red-500' 
+                                    : 'bg-white/10 hover:bg-white/20'
+                            }`}
+                        >
+                            <Heart className={`w-6 h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`} />
+                        </button>
+                        <button 
+                            onClick={handleComment}
+                            className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                        >
+                            <MessageCircle className="w-6 h-6 text-white" />
+                        </button>
+                        <button 
+                            onClick={handleShare}
+                            className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                        >
+                            <Send className="w-6 h-6 text-white" />
+                        </button>
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* Comment Input */}
             <AnimatePresence>

@@ -22,6 +22,7 @@ import EventsModal from '../components/EventsModal';
 import OnlineFriendsCard from '../components/OnlineFriendsCard';
 import WhatsNewCard from '../components/WhatsNewCard';
 import CustomizationShop from '../components/CustomizationShop';
+import GroupChatCard from '../components/GroupChatCard';
 
 interface Post {
     id: string;
@@ -312,6 +313,11 @@ export default function FeedPage() {
                     {/* Online Friends Card */}
                     <div className="mb-6">
                         <OnlineFriendsCard maxDisplay={5} />
+                    </div>
+
+                    {/* Group Chat Card */}
+                    <div className="mb-6">
+                        <GroupChatCard />
                     </div>
 
                     {/* SRT LOG Promotion Card - Featured at Top */}

@@ -134,16 +134,31 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 className={`h-10 sm:h-12 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
                             />
                         ) : (
-                            <span className="text-2xl sm:text-3xl font-serif tracking-wider relative group select-none">
-                                {/* Glow layers */}
-                                <span className="absolute inset-0 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent blur-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500">
+                            <span 
+                                className="text-2xl sm:text-3xl font-serif tracking-wider relative group select-none"
+                                style={{ '--user-accent': 'var(--accent-color, #d4af37)' } as React.CSSProperties}
+                            >
+                                {/* Glow layers - use CSS variable for custom accent */}
+                                <span 
+                                    className="absolute inset-0 blur-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                                    style={{ color: 'var(--accent-color, #d4af37)' }}
+                                >
                                     MAGAZINE
                                 </span>
-                                <span className="absolute inset-0 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent blur-md opacity-70">
+                                <span 
+                                    className="absolute inset-0 blur-md opacity-70"
+                                    style={{ color: 'var(--accent-color, #d4af37)' }}
+                                >
                                     MAGAZINE
                                 </span>
                                 {/* Main text with shimmer */}
-                                <span className="relative animate-text-shimmer" style={{ filter: 'drop-shadow(0 0 30px rgba(218,165,32,0.8)) drop-shadow(0 0 60px rgba(218,165,32,0.4))' }}>
+                                <span 
+                                    className="relative animate-text-shimmer"
+                                    style={{ 
+                                        color: 'var(--accent-color, #d4af37)',
+                                        filter: 'drop-shadow(0 0 30px var(--accent-color, rgba(218,165,32,0.8))) drop-shadow(0 0 60px var(--accent-color, rgba(218,165,32,0.4)))'
+                                    }}
+                                >
                                     MAGAZINE
                                 </span>
                             </span>

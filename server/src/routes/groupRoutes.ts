@@ -19,6 +19,10 @@ import {
   toggleMute,
   updateGroupBackground,
   postImageMessage,
+  setTyping,
+  getTypingUsers,
+  markMessagesRead,
+  getMessageReaders,
 } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -53,5 +57,11 @@ router.post('/:id/messages', postMessage);
 router.post('/:groupId/messages/image', postImageMessage);
 router.get('/:id/messages', getGroupMessages);
 router.delete('/:id/messages/:messageId', deleteGroupMessage);
+
+// Rotas de typing e read receipts
+router.post('/:groupId/typing', setTyping);
+router.get('/:groupId/typing', getTypingUsers);
+router.post('/:groupId/read', markMessagesRead);
+router.get('/:groupId/messages/:messageId/readers', getMessageReaders);
 
 export default router;

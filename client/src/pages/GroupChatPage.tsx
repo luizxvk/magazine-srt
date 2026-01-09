@@ -206,8 +206,10 @@ export default function GroupChatPage() {
       const formData = new FormData();
       formData.append('image', file);
 
-      const uploadResponse = await api.post('/upload', formData);
-      const imageUrl = uploadResponse.data.url;
+      const uploadResponse = await api.post('/uploads/group', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      const imageUrl = uploadResponse.data.imageUrl;
 
       await api.post(`/groups/${id}/messages/image`, {
         imageUrl,
@@ -272,8 +274,10 @@ export default function GroupChatPage() {
       const formData = new FormData();
       formData.append('image', file);
 
-      const uploadResponse = await api.post('/upload', formData);
-      const avatarUrl = uploadResponse.data.url;
+      const uploadResponse = await api.post('/uploads/group', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      const avatarUrl = uploadResponse.data.imageUrl;
 
       await api.put(`/groups/${id}`, { avatarUrl });
       setShowEditAvatarModal(false);

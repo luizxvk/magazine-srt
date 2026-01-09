@@ -47,6 +47,7 @@ export default function GroupChatCard() {
   const { user } = useAuth();
   const isMGT = user?.membershipType === 'MGT';
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -120,7 +121,9 @@ export default function GroupChatCard() {
 
   // Scroll to bottom when messages update
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const sendTypingIndicator = async () => {
@@ -288,7 +291,7 @@ export default function GroupChatCard() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-black/10">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-2 space-y-2 bg-black/10">
               {messages.map((msg) => {
                 const isMe = msg.sender.id === user?.id;
                 return (

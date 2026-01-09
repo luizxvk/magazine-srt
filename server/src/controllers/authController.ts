@@ -209,12 +209,12 @@ export const login = async (req: Request, res: Response) => {
                 trophies: user.trophies || 0,
                 zions: user.zions || 0,
                 avatarUrl: user.avatarUrl,
-                membershipType: user.membershipType,
+                membershipType: user.membershipType || 'MAGAZINE', // Use default from schema
                 isVerified: user.isVerified
             }
         });
     } catch (error) {
-        console.error('Login error');
+        console.error('Login error:', error);
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: 'Invalid input' });
         }

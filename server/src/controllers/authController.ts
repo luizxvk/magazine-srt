@@ -124,11 +124,10 @@ export const login = async (req: Request, res: Response) => {
             console.log('User not found:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
-        console.log('User found:', user.email, user.passwordHash);
+        console.log('User found:', user.email);
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);
         console.log('Password valid:', validPassword);
-        // Note: Using parsedEmail from schema parse above
         if (!validPassword) {
             console.log('Invalid password for:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
@@ -152,14 +151,14 @@ export const login = async (req: Request, res: Response) => {
                     });
 
                     // Award Trophies (Only once)
-                    const updatedUser = await (prisma.user as any).update({
+                    const updatedUser = await prisma.user.update({
                         where: { id: user.id },
                         data: { trophies: { increment: 50 } },
                     });
                     (user as any).trophies = updatedUser.trophies;
 
                     // Create Notification
-                    await (prisma as any).notification.create({
+                    await prisma.notification.create({
                         data: {
                             userId: user.id,
                             type: 'BADGE',
@@ -174,9 +173,9 @@ export const login = async (req: Request, res: Response) => {
 
         // Create Welcome Notification (fail-safe)
         try {
-            const notificationCount = await (prisma as any).notification.count({ where: { userId: user.id } });
+            const notificationCount = await prisma.notification.count({ where: { userId: user.id } });
             if (notificationCount === 0) {
-                await (prisma as any).notification.create({
+                await prisma.notification.create({
                     data: {
                         userId: user.id,
                         type: 'SYSTEM',
@@ -192,15 +191,22 @@ export const login = async (req: Request, res: Response) => {
         const sessionToken = generateSessionToken();
         
         // Store session token in database (invalidates any previous sessions)
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { sessionToken }
-        });
+        try {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { sessionToken }
+            });
+            console.log('Session token updated successfully');
+        } catch (err) {
+            console.error('Failed to update session token:', err);
+            // Continue even if session token update fails
+        }
 
         const token = jwt.sign({ userId: user.id, role: user.role, sessionToken }, process.env.JWT_SECRET!, {
             expiresIn: '7d',
         });
 
+        console.log('Login successful for:', user.email);
         res.json({
             token,
             user: {
@@ -208,10 +214,11 @@ export const login = async (req: Request, res: Response) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                trophies: (user as any).trophies || 0,
-                zions: (user as any).zions || 0,
+                trophies: user.trophies || 0,
+                zions: user.zions || 0,
                 avatarUrl: user.avatarUrl,
-                membershipType: user.membershipType
+                membershipType: user.membershipType,
+                isVerified: user.isVerified
             }
         });
     } catch (error) {
@@ -219,7 +226,7 @@ export const login = async (req: Request, res: Response) => {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: (error as any).errors });
         }
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error', details: (error as Error).message });
     }
 };
 

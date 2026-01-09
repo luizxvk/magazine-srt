@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConfirmModal from './ConfirmModal';
+import MessagePopup from './MessagePopup';
 
 interface Story {
     id: string;
@@ -47,6 +48,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
     const [showShareModal, setShowShareModal] = useState(false);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [holdTimer, setHoldTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     const currentStoryGroup = stories[currentIndex];
     // If items exist, use them. Otherwise fallback to the main story object (old behavior/compatibility)
@@ -255,6 +257,8 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                 onConfirm={async () => {
                     try {
                         await api.delete(`/feed/stories/${currentItem.id}`);
+                        setShowSuccessMessage(true);
+                        setTimeout(() => setShowSuccessMessage(false), 3000);
                         handleNext();
                     } catch (error) {
                         console.error('Failed to delete story', error);
@@ -265,6 +269,12 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                 confirmText="Remover"
                 cancelText="Cancelar"
                 isDestructive={true}
+            />
+
+            {/* Success Message */}
+            <MessagePopup 
+                message="Story removido com sucesso!"
+                isVisible={showSuccessMessage}
             />
 
             {/* Main Container */}

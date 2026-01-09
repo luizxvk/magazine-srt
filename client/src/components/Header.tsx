@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import BadgeDisplay from './BadgeDisplay';
 import DailyLoginCard from './DailyLoginCard';
 import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewCard from './WhatsNewCard';
+import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
@@ -37,6 +38,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const [hasUnread, setHasUnread] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [isWhatsNewModalOpen, setIsWhatsNewModalOpen] = useState(false);
     const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
@@ -124,6 +126,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${headerBorder} bg-black/50 backdrop-blur-xl transition-colors duration-500`}>
             {/* Search Modal */}
             <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
+            <WhatsNewModal isOpen={isWhatsNewModalOpen} onClose={() => setIsWhatsNewModalOpen(false)} />
             
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                 {/* Logo */}
@@ -257,6 +260,14 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             title="Adquirir Zions"
                         >
                             <Coins className="w-5 h-5" />
+                        </button>
+
+                        <button
+                            onClick={() => setIsWhatsNewModalOpen(true)}
+                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                            title="O que há de novo"
+                        >
+                            <Sparkles className="w-5 h-5" />
                         </button>
 
                         <Link to="/settings" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Configurações" title="Configurações">

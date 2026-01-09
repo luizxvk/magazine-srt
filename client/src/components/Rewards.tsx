@@ -25,7 +25,7 @@ interface Redemption {
 }
 
 export default function Rewards() {
-    const { user, login } = useAuth();
+    const { user, login, theme } = useAuth();
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [redemptions, setRedemptions] = useState<Redemption[]>([]);
     const [loading, setLoading] = useState(true);
@@ -35,6 +35,9 @@ export default function Rewards() {
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeCardBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
+    const themeCardText = theme === 'light' ? 'text-gray-900' : 'text-white';
+    const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
     useEffect(() => {
         loadData();
@@ -106,7 +109,7 @@ export default function Rewards() {
         <div className="space-y-12">
             {/* Available Rewards */}
             <div className="space-y-4">
-                <h3 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
+                <h3 className={`text-xl font-serif ${themeCardText} mb-6 flex items-center gap-2`}>
                     <Gift className={`w-5 h-5 ${themeColor}`} />
                     Recompensas Exclusivas
                 </h3>
@@ -144,10 +147,10 @@ export default function Rewards() {
 
                                 {/* Content */}
                                 <div className="p-5 flex flex-col flex-1">
-                                    <h4 className="text-lg font-bold text-white leading-tight mb-1 font-serif truncate text-center group-hover:text-gold-400 transition-colors">
+                                    <h4 className={`text-lg font-bold ${themeCardText} leading-tight mb-1 font-serif truncate text-center group-hover:${themeText} transition-colors`}>
                                         {reward.title}
                                     </h4>
-                                    <p className="text-xs text-gray-500 mb-6 text-center uppercase tracking-wider font-medium">
+                                    <p className={`text-xs ${themeSecondary} mb-6 text-center uppercase tracking-wider font-medium`}>
                                         {reward.type === 'PRODUCT' ? 'Produto Físico' : reward.type === 'COUPON' ? 'Cupom' : 'Digital'}
                                     </p>
 
@@ -186,7 +189,7 @@ export default function Rewards() {
             {/* Redemption History */}
             {redemptions.length > 0 && (
                 <div className="space-y-4 pt-8 border-t border-white/10">
-                    <h3 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
+                    <h3 className={`text-xl font-serif ${themeCardText} mb-6 flex items-center gap-2`}>
                         <Clock className={`w-5 h-5 ${themeColor}`} />
                         Meus Resgates
                     </h3>
@@ -195,8 +198,8 @@ export default function Rewards() {
                         {redemptions.map((redemption) => (
                             <div key={redemption.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center justify-between">
                                 <div>
-                                    <h4 className="text-white font-medium">{redemption.reward.title}</h4>
-                                    <p className="text-xs text-gray-400 mt-1">
+                                    <h4 className={`${themeCardText} font-medium`}>{redemption.reward.title}</h4>
+                                    <p className={`text-xs ${themeSecondary} mt-1`}>
                                         Resgatado em {new Date(redemption.redeemedAt).toLocaleDateString()}
                                     </p>
                                 </div>

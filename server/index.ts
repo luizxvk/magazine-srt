@@ -40,20 +40,16 @@ const PORT = process.env.PORT || 3000;
 app.use(compression());
 
 // Permissive CORS Configuration - MUST be before security headers
-app.use(cors({
-    origin: '*', // Allow ALL origins
+const corsOptions = {
+    origin: true, // Reflect request origin
     credentials: false, // Disable credentials (cookies) since we use Bearer tokens
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control']
-}));
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+};
 
-// Handle preflight for all routes
-app.options('*', cors({
-    origin: '*',
-    credentials: false,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control']
-}));
+app.use(cors(corsOptions));
 
 // Security Headers (after CORS)
 app.use(securityHeaders);

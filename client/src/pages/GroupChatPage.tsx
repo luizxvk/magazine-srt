@@ -247,8 +247,13 @@ export default function GroupChatPage() {
     try {
       await api.post(`/groups/${id}/leave`);
       navigate('/groups');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error leaving group:', error);
+      if (error.response?.status === 400) {
+        alert('O criador do grupo não pode sair. Você precisa transferir a propriedade ou deletar o grupo.');
+      } else {
+        alert('Erro ao sair do grupo');
+      }
     }
   };
 

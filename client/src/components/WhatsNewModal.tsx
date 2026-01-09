@@ -42,6 +42,12 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             isNew: true
         },
         {
+            icon: <Wrench className="w-5 h-5" />,
+            title: 'Múltiplas Correções de Bugs',
+            description: 'Corrigido erro de CORS no upload de imagens, botão de fechar stories reposicionado, botão configurações adicionado no header desktop.',
+            isNew: true
+        },
+        {
             icon: <Bell className="w-5 h-5" />,
             title: 'Convites de Grupo via Notificação',
             description: 'Receba e responda convites de grupo direto pelo sistema de notificações! Aceite ou recuse com um clique.',
@@ -79,8 +85,8 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         },
         {
             icon: <Image className="w-5 h-5" />,
-            title: 'Stories Fixadas - Endpoint Corrigido',
-            description: 'Stories agora salvam ID real do backend após criação! Não mais erros 404 ao atualizar a página.',
+            title: 'Stories - IDs Corrigidos',
+            description: 'Stories agora salvam ID real do backend após criação! Não mais erros 404.',
             isNew: true
         },
         {

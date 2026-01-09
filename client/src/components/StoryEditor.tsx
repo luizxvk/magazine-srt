@@ -130,15 +130,15 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
         >
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* Botão Fechar - Fixo no topo direito, sempre visível */}
+            {/* Botão Fechar - Fixo no topo direito, abaixo do header */}
             <button
                 onClick={onClose}
-                className="fixed top-4 right-4 z-[70] p-3 bg-red-500 hover:bg-red-600 rounded-full shadow-xl transition-colors"
+                className="fixed top-20 right-4 z-[70] p-3 bg-red-500 hover:bg-red-600 rounded-full shadow-xl transition-colors"
             >
                 <X className="w-6 h-6 text-white" />
             </button>
 
-            <div className="min-h-screen flex flex-col p-4 pt-20">
+            <div className="min-h-screen flex flex-col p-4 pt-24">
                 {/* Story Preview - CENTRALIZADO */}
                 <div className="flex-1 flex items-center justify-center">
                     <div className="relative w-full max-w-md mx-auto">

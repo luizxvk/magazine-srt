@@ -226,6 +226,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         >
                             <Coins className="w-5 h-5" />
                         </button>
+
+                        <Link to="/settings" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Configurações" title="Configurações">
+                            <Settings className="w-5 h-5" />
+                        </Link>
                     </div>
 
                     {/* Profile Link - Both Mobile & Desktop */}

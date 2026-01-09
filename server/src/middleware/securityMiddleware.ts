@@ -70,6 +70,11 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
 
 // Security headers middleware
 export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
+    // Skip security headers for OPTIONS requests (CORS preflight)
+    if (req.method === 'OPTIONS') {
+        return next();
+    }
+    
     // Prevent clickjacking
     res.setHeader('X-Frame-Options', 'DENY');
     
@@ -79,8 +84,8 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
     // Enable XSS filter
     res.setHeader('X-XSS-Protection', '1; mode=block');
     
-    // Content Security Policy
-    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src * data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';");
+    // Content Security Policy - relaxed for API
+    // res.setHeader('Content-Security-Policy', "default-src 'self'; img-src * data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';");
     
     // Referrer Policy
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');

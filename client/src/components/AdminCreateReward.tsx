@@ -14,6 +14,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
     const [costZions, setCostZions] = useState(100);
     const [zionsReward, setZionsReward] = useState(0);
     const [stock, setStock] = useState(10);
+    const [isUnlimited, setIsUnlimited] = useState(true);
     const [imageUrl, setImageUrl] = useState('');
     const [backgroundColor, setBackgroundColor] = useState('');
     const [loading, setLoading] = useState(false);
@@ -55,6 +56,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                 costZions,
                 zionsReward,
                 stock,
+                isUnlimited,
                 metadata: imageUrl ? { imageUrl } : undefined,
                 backgroundColor: backgroundColor || undefined
             };
@@ -67,6 +69,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
             setCostZions(100);
             setZionsReward(0);
             setStock(10);
+            setIsUnlimited(true);
             setImageUrl('');
             setBackgroundColor('');
 
@@ -185,6 +188,41 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 onChange={e => setStock(parseInt(e.target.value))}
                                 className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-500/50 outline-none transition-all font-mono text-lg"
                             />
+                        </div>
+                    </div>
+
+                    {/* Redemption Type Toggle */}
+                    <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/20">
+                        <label className="block text-xs text-blue-400 mb-3 uppercase tracking-wider font-bold">Tipo de Resgate</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => setIsUnlimited(true)}
+                                className={`p-4 rounded-xl text-sm font-bold border transition-all ${
+                                    isUnlimited
+                                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                                        : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5 hover:border-white/30'
+                                }`}
+                            >
+                                <div className="flex flex-col items-center gap-2">
+                                    <span className="text-2xl">🔄</span>
+                                    <span>Ilimitado</span>
+                                    <span className="text-[10px] text-center opacity-70">Pode resgatar a cada 1 hora</span>
+                                </div>
+                            </button>
+                            <button
+                                onClick={() => setIsUnlimited(false)}
+                                className={`p-4 rounded-xl text-sm font-bold border transition-all ${
+                                    !isUnlimited
+                                        ? 'bg-gold-500/20 border-gold-500 text-gold-400'
+                                        : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5 hover:border-white/30'
+                                }`}
+                            >
+                                <div className="flex flex-col items-center gap-2">
+                                    <span className="text-2xl">🎁</span>
+                                    <span>Único</span>
+                                    <span className="text-[10px] text-center opacity-70">Só pode resgatar uma vez</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
 

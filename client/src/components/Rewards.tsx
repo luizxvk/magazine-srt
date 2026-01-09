@@ -10,6 +10,7 @@ interface Reward {
     type: 'PRODUCT' | 'COUPON' | 'DIGITAL';
     costZions: number;
     stock: number;
+    isUnlimited: boolean;
     metadata: any;
     backgroundColor?: string;
 }
@@ -117,6 +118,7 @@ export default function Rewards() {
                     {rewards.map((reward) => {
                         const canAfford = (user?.zions || 0) >= reward.costZions;
                         const isRedeemed = redeemedCode?.id === reward.id;
+                        const alreadyRedeemedUnique = !reward.isUnlimited && redemptions.some(r => r.reward.id === reward.id);
 
                         return (
                             <div
@@ -126,6 +128,13 @@ export default function Rewards() {
                                     background: reward.backgroundColor || 'linear-gradient(to bottom right, #111827, #000000)'
                                 }}
                             >
+                                {/* Unique/Unlimited Badge */}
+                                {!reward.isUnlimited && (
+                                    <div className="absolute top-3 left-3 bg-gold-500/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-black shadow-lg z-10 uppercase tracking-wider">
+                                        🎁 Único
+                                    </div>
+                                )}
+                                
                                 {/* Image/Icon Area */}
                                 <div className="h-40 bg-black/50 flex items-center justify-center relative overflow-hidden">
                                     {reward.metadata?.imageUrl ? (
@@ -154,7 +163,12 @@ export default function Rewards() {
                                     </p>
 
                                     <div className="mt-auto space-y-3">
-                                        {isRedeemed ? (
+                                        {alreadyRedeemedUnique ? (
+                                            <div className="w-full py-2.5 rounded-lg bg-gray-500/10 border border-gray-500/20 text-gray-400 text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2">
+                                                <Lock className="w-4 h-4" />
+                                                Já Resgatado
+                                            </div>
+                                        ) : isRedeemed ? (
                                             <div className="w-full py-2.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2">
                                                 <Check className="w-4 h-4" />
                                                 {redeemedCode.code}

@@ -193,6 +193,7 @@ model Reward {
   costZions       Int          @default(0)
   zionsReward     Int?         @default(0)
   stock           Int
+  isUnlimited     Boolean      @default(true)
   metadata        Json?
   backgroundColor String?
   redemptions     Redemption[]

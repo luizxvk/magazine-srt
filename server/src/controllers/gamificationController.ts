@@ -163,21 +163,37 @@ export const redeemReward = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Insufficient Zions' });
         }
 
-        // Check 1h cooldown
-        const lastRedemption = await prisma.redemption.findFirst({
-            where: { userId },
-            orderBy: { redeemedAt: 'desc' }
-        });
+        // Check if reward is unique and user has already redeemed it
+        if (!reward.isUnlimited) {
+            const alreadyRedeemed = await prisma.redemption.findFirst({
+                where: { 
+                    userId, 
+                    rewardId 
+                }
+            });
 
-        if (lastRedemption) {
-            const now = new Date();
-            const lastDate = new Date(lastRedemption.redeemedAt);
-            const diff = now.getTime() - lastDate.getTime();
-            const hours = diff / (1000 * 60 * 60);
+            if (alreadyRedeemed) {
+                return res.status(400).json({ error: 'Você já resgatou esta recompensa única.' });
+            }
+        }
 
-            if (hours < 1) {
-                const minutesLeft = Math.ceil((1 - hours) * 60);
-                return res.status(400).json({ error: `Aguarde ${minutesLeft} minutos para resgatar outra recompensa.` });
+        // Check 1h cooldown (only for unlimited rewards)
+        if (reward.isUnlimited) {
+            const lastRedemption = await prisma.redemption.findFirst({
+                where: { userId },
+                orderBy: { redeemedAt: 'desc' }
+            });
+
+            if (lastRedemption) {
+                const now = new Date();
+                const lastDate = new Date(lastRedemption.redeemedAt);
+                const diff = now.getTime() - lastDate.getTime();
+                const hours = diff / (1000 * 60 * 60);
+
+                if (hours < 1) {
+                    const minutesLeft = Math.ceil((1 - hours) * 60);
+                    return res.status(400).json({ error: `Aguarde ${minutesLeft} minutos para resgatar outra recompensa.` });
+                }
             }
         }
 

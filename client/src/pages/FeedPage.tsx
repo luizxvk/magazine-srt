@@ -341,7 +341,7 @@ export default function FeedPage() {
                         <AnnouncementCard />
                     </div>
 
-                    {/* Photo Catalog Link */
+                    {/* Photo Catalog Link */}
                     <Link to="/catalog">
                         <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'border-gold-500/20 hover:border-gold-500/50'} transition-all duration-300 group cursor-pointer mb-6 relative overflow-hidden`}>
                             <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />

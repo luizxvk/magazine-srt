@@ -35,6 +35,32 @@
   }
 }
 
+/* Shimmer/Shine animation for text */
+@keyframes text-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #d4af37 0%,
+    #f4d03f 25%,
+    #fff9e6 50%,
+    #f4d03f 75%,
+    #d4af37 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 3s linear infinite;
+}
+
 .animate-wave-bg {
   animation: wave-bg 8s ease-in-out infinite;
   background-size: 200% 200%;

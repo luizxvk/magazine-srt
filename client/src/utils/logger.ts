@@ -60,19 +60,25 @@ class FrontendLogger {
 
             // Prevent infinite loops if API call fails and logs an error
             if (message.includes('/logs')) return;
+            
+            // Don't send logs for non-critical messages (only send errors)
+            if (level !== 'ERROR') return;
 
             // Send to backend
             // We use fetch directly to avoid circular dependency if api service uses logger
             // But here we imported api, let's use it carefully or just fetch
             // Using fetch to be safe and lightweight for logs
             const token = localStorage.getItem('token');
+            
+            // Don't try to send logs if no token (not authenticated)
+            if (!token) return;
 
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
             await fetch(`${apiUrl}/logs`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     level,
@@ -80,6 +86,8 @@ class FrontendLogger {
                     message,
                     metadata
                 })
+            }).catch(() => {
+                // Silently ignore logging errors to prevent blocking the app
             });
         } catch (error) {
             // Fail silently to avoid spamming console

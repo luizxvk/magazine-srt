@@ -11,6 +11,7 @@ import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewCard from './WhatsNewCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
+import logoMagazine from '../assets/logo-mgzn.png';
 
 interface HeaderProps {
     onOpenShop?: () => void;
@@ -127,11 +128,11 @@ export default function Header({ onOpenShop }: HeaderProps) {
                 {/* Logo */}
                 <div className="flex items-center gap-4 shrink-0">
                     <Link to="/feed" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        {isMGT ? (
-                            <img src={logoSrt} alt="SRT Logo" className={`h-16 sm:h-20 md:h-28 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} />
-                        ) : (
-                            <span className="text-lg sm:text-xl md:text-2xl font-bold tracking-widest font-serif text-gradient-magazine animate-shimmer">MAGAZINE</span>
-                        )}
+                        <img 
+                            src={isMGT ? logoSrt : logoMagazine} 
+                            alt={isMGT ? "MGT Logo" : "Magazine Logo"} 
+                            className={`h-10 sm:h-12 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
+                        />
                     </Link>
                 </div>
 

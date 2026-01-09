@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function VerificationPrompt() {
-    const { user, theme } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [dismissed, setDismissed] = useState(false);
@@ -16,7 +16,6 @@ export default function VerificationPrompt() {
     const bgGradient = isMGT 
         ? 'from-emerald-900/95 to-emerald-800/95' 
         : 'from-gold-900/95 to-gold-800/95';
-    const accentColor = isMGT ? 'emerald' : 'gold';
     const buttonBg = isMGT 
         ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
         : 'bg-gold-500 hover:bg-gold-400 text-black';

@@ -822,8 +822,7 @@ export const inviteMember = async (req: Request, res: Response) => {
         data: {
           userId: invitedUserId,
           type: 'GROUP_INVITE',
-          content: `${invite.inviter.name} convidou você para o grupo ${invite.group.name}`,
-          relatedId: invite.id
+          content: `${invite.inviter.name} convidou você para o grupo ${invite.group.name}`
         }
       });
     } catch (notifError) {
@@ -1040,8 +1039,7 @@ export const postImageMessage = async (req: Request, res: Response) => {
       data: {
         userId,
         amount: -10,
-        type: 'SPEND',
-        description: 'Imagem enviada no grupo'
+        reason: 'Imagem enviada no grupo'
       }
     });
 

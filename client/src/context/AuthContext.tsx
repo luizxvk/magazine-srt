@@ -156,6 +156,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Apply accent color as CSS variable
     useEffect(() => {
+        const root = document.documentElement;
+        
+        // Only apply custom colors if user is authenticated (not null, not visitor)
+        const isAuthenticated = user && user.role !== 'VISITOR';
+        
+        if (!isAuthenticated) {
+            // Reset to default colors when not authenticated
+            root.classList.remove('custom-accent');
+            root.classList.remove('rgb-dynamic');
+            
+            // Don't set any CSS variables - let the page use its own colors
+            root.style.removeProperty('--accent-color');
+            root.style.removeProperty('--accent-color-rgb');
+            root.style.removeProperty('--accent-50');
+            root.style.removeProperty('--accent-100');
+            root.style.removeProperty('--accent-200');
+            root.style.removeProperty('--accent-300');
+            root.style.removeProperty('--accent-400');
+            root.style.removeProperty('--accent-500');
+            root.style.removeProperty('--accent-600');
+            root.style.removeProperty('--accent-700');
+            return;
+        }
+        
         const mixHex = (hexA: string, hexB: string, weightA: number) => {
             const normalize = (hex: string) => hex.replace('#', '');
             const a = normalize(hexA);
@@ -178,7 +202,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return `#${toHex2(r)}${toHex2(g)}${toHex2(bCh)}`;
         };
 
-        const root = document.documentElement;
         root.style.setProperty('--accent-color', accentColor);
         root.style.setProperty('--accent-color-rgb', hexToRgb(accentColor));
         // Precompute accent shades in JS (avoids relying on CSS color-mix support)
@@ -206,22 +229,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             root.classList.remove('custom-accent');
             root.classList.remove('rgb-dynamic');
         }
-    }, [accentColor, user?.equippedColor]);
+    }, [accentColor, user?.equippedColor, user]);
 
     // Apply custom background
     useEffect(() => {
-        if (backgroundStyle) {
-            document.body.style.background = backgroundStyle;
-            document.body.style.backgroundSize = '200% 200%';
-            document.body.style.backgroundAttachment = 'fixed';
-            document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
-        } else {
+        // Only apply custom background if user is authenticated (not null, not visitor)
+        const isAuthenticated = user && user.role !== 'VISITOR';
+        
+        if (!isAuthenticated || !backgroundStyle) {
+            // Reset to default when not authenticated or no custom background
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
             document.body.style.animation = '';
+        } else {
+            document.body.style.background = backgroundStyle;
+            document.body.style.backgroundSize = '200% 200%';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
         }
-    }, [backgroundStyle]);
+    }, [backgroundStyle, user]);
 
     useEffect(() => {
         // Apply theme class to html element
@@ -376,12 +403,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('token');
         localStorage.removeItem('sessionMembershipType');
         setUser(null);
-
-        // Reset custom colors to default (gold for Magazine)
-        const root = document.documentElement;
-        root.style.setProperty('--accent-color', '#d4af37');
-        root.style.setProperty('--accent-color-rgb', '212, 175, 55');
-        root.classList.remove('custom-accent');
 
         // Force Dark Mode immediately and persist it
         setTheme('dark');

@@ -495,7 +495,6 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     <div className="md:hidden">
                                         <GroupChatCard />
                                     </div>
-                                    <WhatsNewCard />
                                 </div>
 
                                 {/* Menu Items */}

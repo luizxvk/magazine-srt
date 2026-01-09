@@ -105,10 +105,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                 {/* Header */}
                 <div className="p-4 flex justify-between items-center border-b border-white/10">
                     <div className="flex items-center gap-2">
-                        <div className="relative">
-                            <Wifi className={`w-4 h-4 ${themeAccent}`} />
-                            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        </div>
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         <h3 className={`font-serif text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                             Amigos Online
                         </h3>

@@ -277,6 +277,8 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             type="text"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onFocus={(e) => e.stopPropagation()}
                             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                             placeholder="Digite sua mensagem..."
                             className="flex-1 bg-transparent border-none px-4 text-white placeholder-gray-500 focus:outline-none text-sm"

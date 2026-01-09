@@ -210,16 +210,24 @@ const roadmapItems: RoadmapItem[] = [
     // ===== IN PROGRESS =====
     {
         id: '26',
-        title: 'Página MGT Log (Exclusiva)',
-        description: 'Catálogo exclusivo para membros MGT visualizarem modelos premium e reservarem ensaios.',
+        title: 'Sistema de Cores Personalizadas',
+        description: 'Cores de destaque personalizadas integradas em todo perfil. Categorização em Cores Básicas e Tom Pastel na loja de personalização.',
         status: 'in-progress',
-        icon: <Crown className="w-5 h-5" />,
+        icon: <Palette className="w-5 h-5" />,
         category: 'feature'
+    },
+    {
+        id: '27',
+        title: 'Navegação por Abas no Mercado',
+        description: 'Sistema de navegação com abas no MarketPage: Loja Zions, Personalização e Catálogo de Fotos com transições suaves.',
+        status: 'in-progress',
+        icon: <ShoppingBag className="w-5 h-5" />,
+        category: 'improvement'
     },
     
     // ===== PLANNED =====
     {
-        id: '27',
+        id: '28',
         title: 'Revista Digital com IA',
         description: 'Gere revistas digitais automáticas usando IA com base nas fotos do seu catálogo. Layouts profissionais em minutos.',
         status: 'planned',
@@ -227,7 +235,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '28',
+        id: '29',
         title: 'Integração com Discord',
         description: 'Sincronize seu perfil e receba notificações no Discord da comunidade.',
         status: 'planned',
@@ -235,7 +243,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '29',
+        id: '30',
         title: 'Integração com Reddit',
         description: 'Publique automaticamente seus highlights no Reddit e amplie seu alcance.',
         status: 'planned',
@@ -243,7 +251,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '30',
+        id: '31',
         title: 'Mercado de Itens P2P',
         description: 'Compre, venda e troque itens exclusivos com outros membros usando Zions.',
         status: 'planned',
@@ -251,7 +259,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '31',
+        id: '32',
         title: 'Sistema de Highlights',
         description: 'Marque seus melhores posts como highlights e organize em coleções temáticas.',
         status: 'planned',
@@ -259,7 +267,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '32',
+        id: '33',
         title: 'App Mobile Nativo',
         description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
         status: 'planned',
@@ -267,7 +275,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '33',
+        id: '34',
         title: 'Sistema de Prestígio',
         description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
         status: 'planned',
@@ -275,7 +283,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '34',
+        id: '35',
         title: 'Cards Animados (GIF)',
         description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
         status: 'planned',
@@ -283,7 +291,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '35',
+        id: '36',
         title: 'Hub de Comunidades Gamers',
         description: 'Expanda para maior rede social de comunidades gamers do Brasil. Torneios, clãs e eventos ao vivo.',
         status: 'planned',
@@ -291,7 +299,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'community'
     },
     {
-        id: '33',
+        id: '37',
         title: 'Sistema de Eventos e Torneios',
         description: 'Crie e participe de eventos exclusivos. Rankings, prêmios e transmissões ao vivo.',
         status: 'planned',
@@ -299,7 +307,7 @@ const roadmapItems: RoadmapItem[] = [
         category: 'community'
     },
     {
-        id: '35',
+        id: '38',
         title: 'Transmissões ao Vivo',
         description: 'Faça lives para seus seguidores com chat integrado e sistema de doações em Zions.',
         status: 'planned',

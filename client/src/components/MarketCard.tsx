@@ -40,8 +40,8 @@ export default function MarketCard() {
                     onClick={() => handleTabNavigation('browse')}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
-                    <div className="group-hover/btn:scale-110 transition-transform" style={{ color: accentColor }}>
-                        <TrendingUp className="w-4 h-4" />
+                    <div className="group-hover/btn:scale-110 transition-transform">
+                        <TrendingUp className="w-4 h-4" style={{ color: accentColor }} />
                     </div>
                     <span className="text-[10px] text-gray-400 font-medium">Navegar</span>
                 </button>
@@ -49,8 +49,8 @@ export default function MarketCard() {
                     onClick={() => handleTabNavigation('sell')}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
-                    <div className="group-hover/btn:scale-110 transition-transform" style={{ color: accentColor }}>
-                        <Package className="w-4 h-4" />
+                    <div className="group-hover/btn:scale-110 transition-transform">
+                        <Package className="w-4 h-4" style={{ color: accentColor }} />
                     </div>
                     <span className="text-[10px] text-gray-400 font-medium">Vender</span>
                 </button>
@@ -58,8 +58,8 @@ export default function MarketCard() {
                     onClick={() => handleTabNavigation('history')}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
-                    <div className="group-hover/btn:scale-110 transition-transform" style={{ color: accentColor }}>
-                        <History className="w-4 h-4" />
+                    <div className="group-hover/btn:scale-110 transition-transform">
+                        <History className="w-4 h-4" style={{ color: accentColor }} />
                     </div>
                     <span className="text-[10px] text-gray-400 font-medium">Histórico</span>
                 </button>

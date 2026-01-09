@@ -129,8 +129,12 @@ export default function GroupChatPage() {
       alert('Convite enviado com sucesso!');
       setShowInviteModal(false);
     } catch (error: any) {
-      console.error('Error inviting member:', error);
-      alert(error.response?.data?.error || 'Erro ao enviar convite');
+      const errorMessage = error.response?.data?.error || 'Erro ao enviar convite';
+      // Não logar como erro se for uma resposta esperada do servidor
+      if (error.response?.status !== 400) {
+        console.error('Error inviting member:', error);
+      }
+      alert(errorMessage);
     } finally {
       setInviting(false);
     }

@@ -23,7 +23,6 @@ import OnlineFriendsCard from '../components/OnlineFriendsCard';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
-import WhatsNewModal from '../components/WhatsNewModal';
 
 interface Post {
     id: string;
@@ -68,7 +67,6 @@ export default function FeedPage() {
     const [isNewMembersOpen, setIsNewMembersOpen] = useState(false);
     const [isEventsOpen, setIsEventsOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
-    const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
 
     const fetchPosts = async (silent = false) => {
         try {
@@ -243,22 +241,13 @@ export default function FeedPage() {
                                     {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
                                 </p>
                             </div>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setIsWhatsNewOpen(true)}
-                                    className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
-                                    title="O que há de novo"
-                                >
-                                    <Sparkles className="w-5 h-5" />
-                                </button>
-                                <Link
-                                    to="/settings"
-                                    className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
-                                    title="Configurações"
-                                >
-                                    <Settings className="w-5 h-5" />
-                                </Link>
-                            </div>
+                            <Link
+                                to="/settings"
+                                className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
+                                title="Configurações"
+                            >
+                                <Settings className="w-5 h-5" />
+                            </Link>
                         </div>
                     </div>
 
@@ -423,7 +412,6 @@ export default function FeedPage() {
             {/* Modals */}
             <NewMembersModal isOpen={isNewMembersOpen} onClose={() => setIsNewMembersOpen(false)} />
             <EventsModal isOpen={isEventsOpen} onClose={() => setIsEventsOpen(false)} />
-            <WhatsNewModal isOpen={isWhatsNewOpen} onClose={() => setIsWhatsNewOpen(false)} />
         </div>
     );
 }

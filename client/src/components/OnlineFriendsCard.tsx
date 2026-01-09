@@ -163,7 +163,10 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => setChatOpen(friend)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setChatOpen(friend);
+                                            }}
                                             className={`p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all ${friendMGT ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-gold-500/20 text-gold-400 hover:bg-gold-500/30'}`}
                                             title="Enviar mensagem"
                                         >

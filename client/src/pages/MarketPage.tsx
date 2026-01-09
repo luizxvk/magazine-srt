@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Store, Search, Tag, ShoppingCart, 
@@ -57,9 +58,18 @@ type SortType = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
 export default function MarketPage() {
   const { user, theme, updateUserZions } = useAuth();
+  const location = useLocation();
   const isMGT = user?.membershipType === 'MGT';
 
   const [activeTab, setActiveTab] = useState<TabType>('browse');
+  
+  // Set active tab from navigation state
+  useEffect(() => {
+    const state = location.state as { activeTab?: TabType };
+    if (state?.activeTab) {
+      setActiveTab(state.activeTab);
+    }
+  }, [location.state]);
   const [listings, setListings] = useState<Listing[]>([]);
   const [myListings, setMyListings] = useState<Listing[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -299,12 +309,12 @@ export default function MarketPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3">
             <Store className={`w-6 sm:w-8 h-6 sm:h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
-            <div className="flex flex-col">
+            <div>
               <div className="flex items-center gap-2">
                 <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                   Mercado
                 </h1>
-                <span className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse whitespace-nowrap`}>
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse`}>
                   BETA
                 </span>
               </div>

@@ -285,7 +285,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             onClick={handleSendMessage}
                             disabled={!newMessage.trim() || sending || cooldown > 0}
                             aria-label="Enviar mensagem"
-                            className={`p-2.5 text-black rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg relative ${isMeMGT ? 'bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/20' : 'bg-gold-500 hover:bg-gold-400 shadow-gold-500/20'}`}
+                            className={`p-2.5 text-white rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg relative ${isMeMGT ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/30' : 'bg-gold-600 hover:bg-gold-500 shadow-gold-500/30'}`}
                         >
                             {cooldown > 0 ? (
                                 <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold">{cooldown}</span>

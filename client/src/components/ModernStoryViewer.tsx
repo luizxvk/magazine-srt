@@ -333,7 +333,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
-                        className="absolute bottom-6 left-0 right-0 z-50 px-6"
+                        className="absolute bottom-6 left-4 right-4 z-50"
                     >
                         <div className="max-w-lg mx-auto">
                             <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-3 flex items-center gap-2">
@@ -344,7 +344,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                                     onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
                                     placeholder="Enviar mensagem..."
                                     autoFocus
-                                    className="flex-1 bg-transparent text-white placeholder-white/50 outline-none"
+                                    className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-sm min-w-0"
                                 />
                                 <button
                                     onClick={handleSendComment}

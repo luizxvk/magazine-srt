@@ -8,7 +8,6 @@ import SearchModal from './SearchModal';
 import BadgeDisplay from './BadgeDisplay';
 import DailyLoginCard from './DailyLoginCard';
 import OnlineFriendsCard from './OnlineFriendsCard';
-import WhatsNewCard from './WhatsNewCard';
 import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
 import api from '../services/api';

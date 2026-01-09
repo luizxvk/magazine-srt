@@ -20,7 +20,6 @@ import RecommendationsDrawer from '../components/RecommendationsDrawer';
 import NewMembersModal from '../components/NewMembersModal';
 import EventsModal from '../components/EventsModal';
 import OnlineFriendsCard from '../components/OnlineFriendsCard';
-import WhatsNewCard from '../components/WhatsNewCard';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
@@ -342,12 +341,7 @@ export default function FeedPage() {
                         <AnnouncementCard />
                     </div>
 
-                    {/* What's New Card */}
-                    <div className="mb-8">
-                        <WhatsNewCard />
-                    </div>
-
-                    {/* Photo Catalog Link */}
+                    {/* Photo Catalog Link */
                     <Link to="/catalog">
                         <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'border-gold-500/20 hover:border-gold-500/50'} transition-all duration-300 group cursor-pointer mb-6 relative overflow-hidden`}>
                             <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />

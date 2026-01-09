@@ -32,7 +32,9 @@ export default function ModernLogin() {
 
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
     const [showUserNotFoundPopup, setShowUserNotFoundPopup] = useState(false);
+    const [showPermissionDeniedPopup, setShowPermissionDeniedPopup] = useState(false);
     const [notFoundEmail, setNotFoundEmail] = useState('');
+    const [deniedMembershipType, setDeniedMembershipType] = useState<'MAGAZINE' | 'MGT'>('MAGAZINE');
 
     // Form hooks - Separate forms to avoid input registration conflicts
     const magazineForm = useForm<LoginFormValues>({
@@ -63,6 +65,24 @@ export default function ModernLogin() {
             console.log('Sending login request to server...');
             const response = await api.post('/auth/login', data);
             console.log('Login success:', response.data);
+            
+            // Validate membership type permission
+            const userMembershipType = response.data.user.membershipType;
+            
+            // Check if user is trying to access Magazine but is MGT member
+            if (membershipContext === 'MAGAZINE' && userMembershipType === 'MGT') {
+                setDeniedMembershipType('MAGAZINE');
+                setShowPermissionDeniedPopup(true);
+                return;
+            }
+            
+            // Check if user is trying to access MGT but is Magazine member
+            if (membershipContext === 'MGT' && userMembershipType === 'MAGAZINE') {
+                setDeniedMembershipType('MGT');
+                setShowPermissionDeniedPopup(true);
+                return;
+            }
+            
             login(response.data.token, response.data.user, membershipContext);
             navigate('/feed');
         } catch (error: any) {
@@ -315,6 +335,111 @@ export default function ModernLogin() {
                                             className="w-full py-3 rounded-xl border border-gold-500/50 text-gold-400 font-bold uppercase tracking-widest text-xs text-center hover:bg-gold-500/10 transition-all"
                                         >
                                             Solicitar Convite
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Permission Denied Popup */}
+            <AnimatePresence>
+                {showPermissionDeniedPopup && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setShowPermissionDeniedPopup(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`relative w-full max-w-md p-6 rounded-2xl border ${deniedMembershipType === 'MAGAZINE' ? 'bg-gold-950/90 border-gold-500/30' : 'bg-emerald-950/90 border-emerald-500/30'} shadow-2xl`}
+                        >
+                            <button
+                                onClick={() => setShowPermissionDeniedPopup(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            
+                            <div className="text-center">
+                                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${deniedMembershipType === 'MAGAZINE' ? 'bg-gold-500/20' : 'bg-emerald-500/20'}`}>
+                                    <AlertCircle className={`w-8 h-8 ${deniedMembershipType === 'MAGAZINE' ? 'text-gold-400' : 'text-emerald-400'}`} />
+                                </div>
+                                
+                                <h3 className="text-xl font-bold text-white mb-2">
+                                    Acesso Negado
+                                </h3>
+                                
+                                {deniedMembershipType === 'MAGAZINE' ? (
+                                    <>
+                                        <p className="text-gray-400 text-sm mb-4">
+                                            Você não tem permissão para acessar o <span className="font-semibold text-gold-400">MAGAZINE</span>.
+                                        </p>
+                                        
+                                        <p className="text-gray-500 text-xs mb-2">
+                                            Para se tornar membro Magazine, você precisa:
+                                        </p>
+                                        
+                                        <ul className="text-left text-gray-400 text-xs mb-6 space-y-2 bg-black/30 rounded-lg p-4">
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-gold-400 mt-0.5">1.</span>
+                                                <span>Solicitar um convite através do formulário oficial</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-gold-400 mt-0.5">2.</span>
+                                                <span>Aguardar análise e aprovação da administração</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-gold-400 mt-0.5">3.</span>
+                                                <span>Receber confirmação de aceitação</span>
+                                            </li>
+                                        </ul>
+                                        
+                                        <p className="text-gold-400/80 text-xs mb-6">
+                                            Atualmente você é membro <span className="font-bold text-emerald-400">MGT</span>.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="text-gray-400 text-sm mb-4">
+                                            Você não tem permissão para acessar o <span className="font-semibold text-emerald-400">MGT</span>.
+                                        </p>
+                                        
+                                        <p className="text-gray-500 text-xs mb-6">
+                                            Atualmente você é membro <span className="font-bold text-gold-400">MAGAZINE</span>. Cada conta tem acesso a apenas um tipo de assinatura.
+                                        </p>
+                                    </>
+                                )}
+                                
+                                <div className="flex flex-col gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowPermissionDeniedPopup(false);
+                                            // Switch to the correct membership type
+                                            setIsMGT(deniedMembershipType === 'MGT');
+                                        }}
+                                        className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all
+                                            ${deniedMembershipType === 'MAGAZINE' 
+                                                ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                                                : 'bg-gold-500 text-black hover:bg-gold-400'
+                                            }`}
+                                    >
+                                        Acessar {deniedMembershipType === 'MAGAZINE' ? 'MGT' : 'Magazine'}
+                                    </button>
+                                    
+                                    {deniedMembershipType === 'MAGAZINE' && (
+                                        <Link
+                                            to="/request-invite"
+                                            className="w-full py-3 rounded-xl border border-gold-500/50 text-gold-400 font-bold uppercase tracking-widest text-xs text-center hover:bg-gold-500/10 transition-all"
+                                        >
+                                            Solicitar Convite Magazine
                                         </Link>
                                     )}
                                 </div>

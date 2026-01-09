@@ -5,14 +5,14 @@ import { getContrastColor, getBackgroundColor } from '../utils/colorUtils';
 
 export default function MarketCard() {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, accentColor } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
-    // Use equipped color or fallback to theme colors
-    const equippedColor = user?.equippedColor;
+    // Use accentColor from context (already resolved from equippedColor key to hex)
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
-    const contrastAccent = equippedColor ? getContrastColor(equippedColor) : defaultColor;
-    const backgroundAccent = equippedColor ? getBackgroundColor(equippedColor) : defaultColor;
+    const activeColor = accentColor || defaultColor;
+    const contrastAccent = getContrastColor(activeColor);
+    const backgroundAccent = getBackgroundColor(activeColor);
     
     const handleTabNavigation = (tab: string) => {
         navigate('/market', { state: { activeTab: tab } });

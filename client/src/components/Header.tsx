@@ -11,7 +11,6 @@ import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewCard from './WhatsNewCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
-import logoMagazine from '../assets/logo-mgzn.png';
 
 interface HeaderProps {
     onOpenShop?: () => void;

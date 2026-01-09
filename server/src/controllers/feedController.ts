@@ -429,10 +429,23 @@ export const createStory = async (req: AuthRequest, res: Response) => {
 export const likeStory = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
-        const { storyUserId } = req.params; // The user who owns the story
+        const { id } = req.params; // Story ID
 
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-        if (userId === storyUserId) return res.status(400).json({ error: 'Cannot like own story' });
+
+        // Get the story to find the owner
+        const story = await prisma.story.findUnique({
+            where: { id },
+            select: { userId: true }
+        });
+
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+
+        if (userId === story.userId) {
+            return res.status(400).json({ error: 'Cannot like own story' });
+        }
 
         const actor = await prisma.user.findUnique({
             where: { id: userId },
@@ -451,7 +464,7 @@ export const likeStory = async (req: AuthRequest, res: Response) => {
 
         await prisma.notification.create({
             data: {
-                userId: storyUserId,
+                userId: story.userId,
                 type: 'LIKE',
                 content: notificationContent,
             }
@@ -616,8 +629,8 @@ export const markStoryAsViewed = async (req: any, res: any) => {
         const userId = req.user.userId;
 
         // Ignore local stories (they don't exist in DB yet)
-        if (storyId.startsWith('story-local-')) {
-            return res.json({ message: 'Local story, skipping view tracking' });
+        if (storyId.startsWith('story-local-') || storyId === 'undefined' || !storyId) {
+            return res.json({ message: 'Local or invalid story, skipping view tracking' });
         }
 
         // Check if story exists
@@ -626,7 +639,13 @@ export const markStoryAsViewed = async (req: any, res: any) => {
         });
 
         if (!story) {
+            console.log(`Story not found: ${storyId}`);
             return res.status(404).json({ error: 'Story not found' });
+        }
+
+        // Don't create view for own story
+        if (story.userId === userId) {
+            return res.json({ message: 'Own story, skipping view tracking' });
         }
 
         // Create or update story view

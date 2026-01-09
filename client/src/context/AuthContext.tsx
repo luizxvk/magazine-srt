@@ -44,6 +44,8 @@ interface AuthContextType {
     showAchievement: (title: string, description: string) => void;
     clearAchievement: () => void;
     achievement: { title: string; description: string } | null;
+    showToast: (message: string) => void;
+    toast: string | null;
     dailyLoginStatus: DailyLoginStatus | null;
     openDailyLoginModal: () => void;
     // Zions Modal
@@ -113,6 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [achievement, setAchievement] = useState<{ title: string; description: string } | null>(null);
+    const [toast, setToast] = useState<string | null>(null);
     const [dailyLoginStatus, setDailyLoginStatus] = useState<DailyLoginStatus | null>(null);
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
@@ -301,6 +304,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAchievement(null);
     };
 
+    const showToast = (message: string) => {
+        setToast(message);
+        setTimeout(() => setToast(null), 2000);
+    };
+
     const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {
         localStorage.setItem('token', token);
 
@@ -424,6 +432,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             showAchievement,
             clearAchievement,
             achievement,
+            showToast,
+            toast,
             dailyLoginStatus,
             openDailyLoginModal: () => setIsDailyLoginModalOpen(true),
             isZionsModalOpen,
@@ -449,6 +459,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 status={dailyLoginStatus}
                 onClaim={handleClaimDailyLogin}
             />
+            {toast && (
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[9999] animate-fade-in">
+                    <div className="bg-black/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl border border-white/10 font-medium">
+                        {toast}
+                    </div>
+                </div>
+            )}
         </AuthContext.Provider>
     );
 };

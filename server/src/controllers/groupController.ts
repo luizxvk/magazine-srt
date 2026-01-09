@@ -731,6 +731,10 @@ export const inviteMember = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
 
+    if (!invitedUserId) {
+      return res.status(400).json({ error: 'ID do usuário convidado é obrigatório' });
+    }
+
     // Verificar se o inviter é membro do grupo
     const member = await prisma.groupMember.findUnique({
       where: { groupId_userId: { groupId, userId } }

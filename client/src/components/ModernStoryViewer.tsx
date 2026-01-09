@@ -37,7 +37,7 @@ interface ModernStoryViewerProps {
 }
 
 export default function ModernStoryViewer({ stories, initialStoryIndex, onClose, onStoryViewed }: ModernStoryViewerProps) {
-    const { user } = useAuth();
+    const { user, showToast } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
     const [progress, setProgress] = useState(0);
@@ -93,8 +93,11 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         }
         try {
             await api.post(`/feed/stories/${storyId}/view`);
-        } catch (error) {
-            console.error('Error marking story as viewed:', error);
+        } catch (error: any) {
+            // Silently ignore 404 errors (story was deleted or doesn't exist)
+            if (error?.response?.status !== 404) {
+                console.error('Error marking story as viewed:', error);
+            }
         }
     };
 
@@ -148,7 +151,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
 
     const handleLike = async () => {
         try {
-            await api.post(`/feed/stories/${currentStory.user.id}/like`);
+            await api.post(`/feed/stories/${currentStory.id}/like`);
             setIsLiked(!isLiked);
         } catch (error) {
             console.error('Error liking story:', error);
@@ -182,7 +185,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         try {
             const shareUrl = `${window.location.origin}/story/${currentStory.id}`;
             await navigator.clipboard.writeText(shareUrl);
-            alert('Link copiado!');
+            showToast('Link Copiado!');
         } catch (error) {
             console.error('Error sharing story:', error);
         }
@@ -235,7 +238,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {isMyStory && (
+                        {(isMyStory || isAdmin) && (
                             <button
                                 onClick={() => setShowOptions(!showOptions)}
                                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -413,36 +416,47 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
             {/* Options Menu */}
             <AnimatePresence>
                 {showOptions && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        className="absolute right-4 top-20 bg-white rounded-2xl shadow-2xl overflow-hidden z-[70] min-w-[200px]"
-                    >
-                        {canDelete && (
-                            <button
-                                onClick={handleDelete}
-                                className="w-full px-6 py-3 text-left hover:bg-gray-50 text-red-600 font-medium"
-                            >
-                                {isAdmin && !isMyStory ? 'Delete (Admin)' : 'Delete'}
-                            </button>
-                        )}
-                        <button
-                            onClick={handleDownload}
-                            className="w-full px-6 py-3 text-left hover:bg-gray-50 text-gray-900"
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/20 z-[60]"
+                            onClick={() => setShowOptions(false)}
+                        />
+                        {/* Menu */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="absolute right-4 top-20 bg-black/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden z-[70] min-w-[200px] border border-white/10"
                         >
-                            Save Photo
-                        </button>
-                        <button className="w-full px-6 py-3 text-left hover:bg-gray-50 text-gray-900">
-                            Send to...
-                        </button>
-                        <button className="w-full px-6 py-3 text-left hover:bg-gray-50 text-gray-900">
-                            Share as Post...
-                        </button>
-                        <button className="w-full px-6 py-3 text-left hover:bg-gray-50 text-gray-900">
-                            Story Setting
-                        </button>
-                    </motion.div>
+                            {canDelete && (
+                                <button
+                                    onClick={handleDelete}
+                                    className="w-full px-6 py-3 text-left hover:bg-white/10 text-red-500 font-medium transition-colors"
+                                >
+                                    {isAdmin && !isMyStory ? 'Deletar (Admin)' : 'Deletar'}
+                                </button>
+                            )}
+                            <button
+                                onClick={handleDownload}
+                                className="w-full px-6 py-3 text-left hover:bg-white/10 text-white transition-colors"
+                            >
+                                Salvar Foto
+                            </button>
+                            <button className="w-full px-6 py-3 text-left hover:bg-white/10 text-white transition-colors">
+                                Enviar para...
+                            </button>
+                            <button className="w-full px-6 py-3 text-left hover:bg-white/10 text-white transition-colors">
+                                Compartilhar como Post...
+                            </button>
+                            <button className="w-full px-6 py-3 text-left hover:bg-white/10 text-white transition-colors">
+                                Configurações do Story
+                            </button>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
         </motion.div>

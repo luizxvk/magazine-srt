@@ -781,10 +781,14 @@ export const inviteMember = async (req: Request, res: Response) => {
     });
 
     if (existingInvite) {
-      if (existingInvite.status === 'PENDING') {
-        return res.status(400).json({ error: 'Convite já enviado' });
+      // Verificar se o convite expirou (3 minutos)
+      const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+      const isExpired = existingInvite.createdAt < threeMinutesAgo;
+
+      if (existingInvite.status === 'PENDING' && !isExpired) {
+        return res.status(400).json({ error: 'Convite já enviado. Aguarde 3 minutos para enviar novamente.' });
       }
-      // Se já existe mas não está pendente (ACCEPTED ou DECLINED), deletar e criar novo
+      // Se expirou ou não está pendente, deletar e criar novo
       await prisma.groupInvite.delete({
         where: { id: existingInvite.id }
       });
@@ -1081,10 +1085,16 @@ export const getMyInvites = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
 
+    // Convites expiram após 3 minutos
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+
     const invites = await prisma.groupInvite.findMany({
       where: {
         invitedId: userId,
-        status: 'PENDING'
+        status: 'PENDING',
+        createdAt: {
+          gte: threeMinutesAgo // Apenas convites não expirados
+        }
       },
       include: {
         group: {

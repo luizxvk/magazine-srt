@@ -1,12 +1,18 @@
 import { Router } from 'express';
 import { createAnnouncement, getAnnouncements, getActiveAnnouncement, deleteAnnouncement, toggleActive } from '../controllers/announcementController';
+import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
 
-router.post('/', createAnnouncement);
-router.get('/', getAnnouncements);
+// Public route - anyone can see active announcements
 router.get('/active', getActiveAnnouncement);
-router.delete('/:id', deleteAnnouncement);
-router.put('/:id/toggle', toggleActive);
+
+// Protected routes - require authentication
+router.get('/', authenticateToken, getAnnouncements);
+
+// Admin only routes
+router.post('/', authenticateToken, isAdmin, createAnnouncement);
+router.delete('/:id', authenticateToken, isAdmin, deleteAnnouncement);
+router.put('/:id/toggle', authenticateToken, isAdmin, toggleActive);
 
 export default router;

@@ -115,21 +115,15 @@ export const login = async (req: Request, res: Response) => {
             });
         }
 
-        console.log('Login attempt:', req.body); // Log request body
         const { email: parsedEmail, password } = loginSchema.parse(req.body);
-        console.log('Login schema parsed for:', parsedEmail);
 
         const user = await prisma.user.findUnique({ where: { email: parsedEmail } });
         if (!user) {
-            console.log('User not found:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
-        console.log('User found:', user.email);
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);
-        console.log('Password valid:', validPassword);
         if (!validPassword) {
-            console.log('Invalid password for:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
@@ -196,9 +190,8 @@ export const login = async (req: Request, res: Response) => {
                 where: { id: user.id },
                 data: { sessionToken }
             });
-            console.log('Session token updated successfully');
         } catch (err) {
-            console.error('Failed to update session token:', err);
+            console.error('Failed to update session token');
             // Continue even if session token update fails
         }
 
@@ -206,7 +199,6 @@ export const login = async (req: Request, res: Response) => {
             expiresIn: '7d',
         });
 
-        console.log('Login successful for:', user.email);
         res.json({
             token,
             user: {
@@ -222,11 +214,11 @@ export const login = async (req: Request, res: Response) => {
             }
         });
     } catch (error) {
-        console.error('Login error:', error); // Log the actual error
+        console.error('Login error');
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ error: (error as any).errors });
+            return res.status(400).json({ error: 'Invalid input' });
         }
-        res.status(500).json({ error: 'Internal server error', details: (error as Error).message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
@@ -281,8 +273,6 @@ export const resetPassword = async (req: Request, res: Response) => {
             newPassword: z.string().min(6)
         }).parse(req.body);
 
-        console.log('[Auth] Reset password attempt with token:', token.substring(0, 10) + '...');
-
         const user = await prisma.user.findFirst({
             where: {
                 resetToken: token,
@@ -291,11 +281,8 @@ export const resetPassword = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            console.log('[Auth] Reset failed - invalid or expired token');
             return res.status(400).json({ error: 'Token inválido ou expirado. Solicite um novo link.' });
         }
-
-        console.log('[Auth] Resetting password for user:', user.email);
 
         const passwordHash = await bcrypt.hash(newPassword, 10);
 
@@ -308,13 +295,11 @@ export const resetPassword = async (req: Request, res: Response) => {
             }
         });
 
-        console.log('[Auth] Password reset SUCCESS for:', user.email);
-
         res.json({ message: 'Senha redefinida com sucesso! Faça login com sua nova senha.' });
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ error: (error as any).errors });
+            return res.status(400).json({ error: 'Invalid input' });
         }
         res.status(500).json({ error: 'Internal server error' });
     }

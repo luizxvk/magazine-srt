@@ -155,10 +155,10 @@ export default function AdminDashboard() {
                 });
             }
 
-            console.log(`[Admin] Password for ${request.email}: ${password}`);
+            // Security: Do not log passwords
 
         } catch (error) {
-            console.error('Failed to approve request', error);
+            console.error('Failed to approve request');
             showToast('Erro ao aprovar solicitação', 'error');
         }
     };

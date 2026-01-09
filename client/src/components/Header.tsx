@@ -9,6 +9,7 @@ import BadgeDisplay from './BadgeDisplay';
 import DailyLoginCard from './DailyLoginCard';
 import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewCard from './WhatsNewCard';
+import GroupChatCard from './GroupChatCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 
@@ -474,6 +475,9 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 <div className="flex flex-col gap-4 mb-4">
                                     <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileDrawerOpen(false); openDailyLoginModal(); }} />
                                     <OnlineFriendsCard />
+                                    <div className="md:hidden">
+                                        <GroupChatCard />
+                                    </div>
                                     <WhatsNewCard />
                                 </div>
 

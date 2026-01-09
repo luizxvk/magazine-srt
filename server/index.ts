@@ -39,27 +39,27 @@ const PORT = process.env.PORT || 3000;
 // Enable gzip compression for all responses
 app.use(compression());
 
-// Security Headers
+// Permissive CORS Configuration - MUST be before security headers
+app.use(cors({
+    origin: '*', // Allow ALL origins
+    credentials: false, // Disable credentials (cookies) since we use Bearer tokens
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control']
+}));
+
+// Handle preflight for all routes
+app.options('*', cors({
+    origin: '*',
+    credentials: false,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control']
+}));
+
+// Security Headers (after CORS)
 app.use(securityHeaders);
 
 // Global Rate Limiting (100 requests per minute per IP)
 app.use(rateLimit({ windowMs: 60 * 1000, max: 100 }));
-
-// Permissive CORS Configuration
-app.use(cors({
-    origin: '*', // Allow ALL origins
-    credentials: false, // Disable credentials (cookies) since we use Bearer tokens
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-}));
-
-// Handle preflight for all routes
-app.options(/.*/, cors({
-    origin: '*',
-    credentials: false,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-}));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));

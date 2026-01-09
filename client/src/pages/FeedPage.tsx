@@ -302,8 +302,8 @@ export default function FeedPage() {
                     )}
                 </main>
 
-                {/* Right Sidebar (Desktop Only) */}
-                <aside className="w-full lg:w-80 space-y-6 lg:sticky lg:top-24 h-fit animate-fade-in-left">
+                {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
+                <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
                     {/* Daily Login Card */}
                     <div className="mb-10">
                         <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />

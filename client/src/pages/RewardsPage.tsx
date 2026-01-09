@@ -7,7 +7,6 @@ export default function RewardsPage() {
     const isMGT = user?.membershipType === 'MGT';
 
     const themeBg = theme === 'light' ? 'bg-gray-50' : 'bg-off-black';
-    const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
     return (

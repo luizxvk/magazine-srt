@@ -35,7 +35,6 @@ export default function Rewards() {
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
-    const themeCardBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
     const themeCardText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 

@@ -299,16 +299,16 @@ export default function MarketPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3">
             <Store className={`w-6 sm:w-8 h-6 sm:h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
-            <div>
+            <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                   Mercado
                 </h1>
-                <span className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse`}>
+                <span className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse whitespace-nowrap`}>
                   BETA
                 </span>
               </div>
-              <p className={`${themeSecondary} text-xs sm:text-sm`}>Compre e venda itens</p>
+              <p className={`${themeSecondary} text-xs sm:text-sm mt-0.5`}>Compre e venda itens</p>
             </div>
           </div>
           <div className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'} border ${themeBorder}`}>

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.9';
+const CURRENT_VERSION = '0.3.10';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,8 +33,26 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.9 - Mercado de Itens
+    // v0.3.10 - Recompensas Gratuitas e Card do Mercado
     const updates: UpdateItem[] = [
+        {
+            icon: <Gift className="w-5 h-5" />,
+            title: 'Recompensas Gratuitas!',
+            description: 'Admins podem criar recompensas com custo 0 (Gratuito) e dar Zions como prêmio ao resgatar!',
+            isNew: true
+        },
+        {
+            icon: <Coins className="w-5 h-5" />,
+            title: 'Zions de Recompensa',
+            description: 'Ao resgatar, usuários recebem Zions automaticamente + notificação "Parabéns por ter adquirido seus X zions"!',
+            isNew: true
+        },
+        {
+            icon: <Store className="w-5 h-5" />,
+            title: 'Card do Mercado no Feed',
+            description: 'Acesso rápido ao Mercado direto do feed com botões para Navegar, Vender e Histórico!',
+            isNew: true
+        },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Mercado de Customizações!',

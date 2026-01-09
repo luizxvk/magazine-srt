@@ -10,6 +10,7 @@ const createRewardSchema = z.object({
     title: z.string().min(1).max(200),
     type: z.enum(['RAFFLE_TICKET', 'BADGE', 'PHYSICAL', 'DIGITAL', 'CUSTOM']),
     costZions: z.number().int().min(0),
+    zionsReward: z.number().int().min(0).optional(),
     stock: z.number().int().min(-1).optional(), // -1 = unlimited
     metadata: z.record(z.any()).optional(),
     backgroundColor: z.string().max(50).optional(),
@@ -191,7 +192,12 @@ export const redeemReward = async (req: Request, res: Response) => {
         const transactionOperations = [
             prisma.user.update({
                 where: { id: userId },
-                data: { zions: { decrement: reward.costZions } }
+                data: { 
+                    zions: { 
+                        decrement: reward.costZions,
+                        ...(reward.zionsReward && reward.zionsReward > 0 ? { increment: reward.zionsReward } : {})
+                    } 
+                }
             }),
             prisma.reward.update({
                 where: { id: rewardId },
@@ -213,12 +219,32 @@ export const redeemReward = async (req: Request, res: Response) => {
                     reason: `Redeemed reward: ${reward.title}`
                 }
             }),
-            // Notify User
+        ];
+
+        // Add zionsReward history if applicable
+        if (reward.zionsReward && reward.zionsReward > 0) {
+            transactionOperations.push(
+                prisma.zionHistory.create({
+                    data: {
+                        userId,
+                        amount: reward.zionsReward,
+                        reason: `Recompensa: ${reward.title}`
+                    }
+                })
+            );
+        }
+
+        // Notify User
+        const userNotificationContent = reward.zionsReward && reward.zionsReward > 0
+            ? `Parabéns por ter adquirido seus ${reward.zionsReward} Zions! Ticket: ${ticketCode}`
+            : `Resgate confirmado! "${reward.title}" está sendo processado. Ticket: ${ticketCode}`;
+
+        transactionOperations.push(
             prisma.notification.create({
                 data: {
                     userId,
                     type: 'SYSTEM',
-                    content: `Resgate confirmado! "${reward.title}" está sendo processado. Ticket: ${ticketCode}`
+                    content: userNotificationContent
                 }
             }),
             // Notify Admins
@@ -229,7 +255,7 @@ export const redeemReward = async (req: Request, res: Response) => {
                     content: `NOVO RESGATE: ${user.name} resgatou "${reward.title}" (Ticket: ${ticketCode})`
                 }
             }))
-        ];
+        );
 
         await prisma.$transaction(transactionOperations);
 

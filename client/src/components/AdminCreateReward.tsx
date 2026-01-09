@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { Plus, Image as ImageIcon, X, Gift, Tag, Box } from 'lucide-react';
+import { Plus, Image as ImageIcon, X, Gift, Tag, Box, Coins } from 'lucide-react';
 import api from '../services/api';
 
 interface AdminCreateRewardProps {
@@ -12,6 +12,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
     const [title, setTitle] = useState('');
     const [type, setType] = useState<'PRODUCT' | 'COUPON' | 'DIGITAL'>('DIGITAL');
     const [costZions, setCostZions] = useState(100);
+    const [zionsReward, setZionsReward] = useState(0);
     const [stock, setStock] = useState(10);
     const [imageUrl, setImageUrl] = useState('');
     const [backgroundColor, setBackgroundColor] = useState('');
@@ -33,12 +34,16 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
             showToast('Preencha o título da recompensa', 'error');
             return;
         }
-        if (costZions <= 0) {
-            showToast('O custo deve ser maior que zero', 'error');
+        if (costZions < 0) {
+            showToast('O custo não pode ser negativo', 'error');
             return;
         }
         if (stock < 0) {
             showToast('O estoque não pode ser negativo', 'error');
+            return;
+        }
+        if (zionsReward < 0) {
+            showToast('Os Zions de recompensa não podem ser negativos', 'error');
             return;
         }
 
@@ -48,6 +53,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                 title,
                 type,
                 costZions,
+                zionsReward,
                 stock,
                 metadata: imageUrl ? { imageUrl } : undefined,
                 backgroundColor: backgroundColor || undefined
@@ -59,6 +65,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
             setTitle('');
             setType('DIGITAL');
             setCostZions(100);
+            setZionsReward(0);
             setStock(10);
             setImageUrl('');
             setBackgroundColor('');
@@ -155,13 +162,19 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                             <div className="relative">
                                 <input
                                     type="number"
-                                    min="1"
+                                    min="0"
                                     value={costZions}
-                                    onChange={e => setCostZions(parseInt(e.target.value))}
+                                    onChange={e => setCostZions(parseInt(e.target.value) || 0)}
                                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-500/50 outline-none transition-all font-mono text-lg"
                                 />
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gold-500/50 text-xs font-bold">Z</span>
                             </div>
+                            {costZions === 0 && (
+                                <p className="mt-1 text-xs text-emerald-400 flex items-center gap-1">
+                                    <Gift className="w-3 h-3" />
+                                    Recompensa gratuita
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-xs text-gray-400 mb-2 uppercase tracking-wider font-bold">Estoque</label>
@@ -173,6 +186,31 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-500/50 outline-none transition-all font-mono text-lg"
                             />
                         </div>
+                    </div>
+
+                    {/* Zions Reward Field */}
+                    <div className="p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/20">
+                        <label className="block text-xs text-emerald-400 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
+                            <Coins className="w-4 h-4" />
+                            Zions de Recompensa (Opcional)
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="number"
+                                min="0"
+                                value={zionsReward}
+                                onChange={e => setZionsReward(parseInt(e.target.value) || 0)}
+                                className="w-full bg-black/40 border border-emerald-500/30 rounded-xl px-4 py-3 text-white focus:border-emerald-500/50 outline-none transition-all font-mono text-lg"
+                                placeholder="0"
+                            />
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/50 text-xs font-bold">Z</span>
+                        </div>
+                        <p className="mt-2 text-xs text-gray-400">
+                            {zionsReward > 0 
+                                ? `O usuário receberá ${zionsReward} Zions ao resgatar esta recompensa.`
+                                : 'Deixe 0 se não quiser dar Zions como recompensa.'
+                            }
+                        </p>
                     </div>
 
                     {/* Background Color Picker */}
@@ -219,8 +257,12 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                     </div>
                                 )}
                                 {/* Cost Badge */}
-                                <div className="absolute top-3 right-3 bg-black/80 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-bold text-gold-400 border border-gold-500/20 shadow-lg">
-                                    {costZions} Z
+                                <div className="absolute top-3 right-3 bg-black/80 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-bold border shadow-lg">
+                                    {costZions === 0 ? (
+                                        <span className="text-emerald-400 border-emerald-500/20">Gratuito</span>
+                                    ) : (
+                                        <span className="text-gold-400 border-gold-500/20">{costZions} Z</span>
+                                    )}
                                 </div>
                             </div>
 

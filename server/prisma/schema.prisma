@@ -191,6 +191,7 @@ model Reward {
   title           String
   type            RewardType
   costZions       Int          @default(0)
+  zionsReward     Int?         @default(0)
   stock           Int
   metadata        Json?
   backgroundColor String?

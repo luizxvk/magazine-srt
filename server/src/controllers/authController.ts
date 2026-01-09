@@ -106,6 +106,8 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
+        console.log('Login attempt:', { email: req.body.email });
+        
         // Block login during maintenance (except admin)
         const { email } = req.body;
         if (MAINTENANCE_MODE && email !== 'admin@magazine.com') {
@@ -116,16 +118,23 @@ export const login = async (req: Request, res: Response) => {
         }
 
         const { email: parsedEmail, password } = loginSchema.parse(req.body);
+        console.log('Parsed email:', parsedEmail);
 
         const user = await prisma.user.findUnique({ where: { email: parsedEmail } });
         if (!user) {
+            console.log('User not found:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
+        console.log('User found:', user.id, user.email);
+
         const validPassword = await bcrypt.compare(password, user.passwordHash);
         if (!validPassword) {
+            console.log('Invalid password for user:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
+
+        console.log('Password valid, proceeding with login');
 
         // Award "Primeiros Passos" badge and 50 trophies (fail-safe)
         try {
@@ -213,8 +222,10 @@ export const login = async (req: Request, res: Response) => {
                 isVerified: user.isVerified
             }
         });
+        console.log('Login successful for:', user.email);
     } catch (error) {
         console.error('Login error:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: 'Invalid input' });
         }

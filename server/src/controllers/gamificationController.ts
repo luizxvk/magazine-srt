@@ -12,7 +12,7 @@ const createRewardSchema = z.object({
     costZions: z.number().int().min(0),
     zionsReward: z.number().int().min(0).optional(),
     stock: z.number().int().min(-1).optional(), // -1 = unlimited
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     backgroundColor: z.string().max(50).optional(),
 });
 
@@ -109,12 +109,12 @@ export const createReward = async (req: Request, res: Response) => {
 
         const data = createRewardSchema.parse(req.body);
         const reward = await prisma.reward.create({
-            data
+            data: data as any
         });
         res.status(201).json(reward);
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ error: 'Invalid input', details: error.errors });
+            return res.status(400).json({ error: 'Invalid input', details: error.issues });
         }
         res.status(500).json({ error: 'Failed to create reward' });
     }
@@ -261,7 +261,7 @@ export const redeemReward = async (req: Request, res: Response) => {
                     userId,
                     type: 'SYSTEM',
                     content: userNotificationContent
-                }
+                } as any
             }),
             // Notify Admins
             ...admins.map(admin => prisma.notification.create({

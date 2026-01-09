@@ -24,13 +24,13 @@ export const createAnnouncement = async (req: Request, res: Response) => {
             data: {
                 ...data,
                 active: true
-            }
+            } as any
         });
 
         res.status(201).json(announcement);
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ error: 'Invalid input', details: error.errors });
+            return res.status(400).json({ error: 'Invalid input', details: error.issues });
         }
         console.error('Error creating announcement:', error);
         res.status(500).json({ error: 'Failed to create announcement' });

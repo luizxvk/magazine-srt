@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from '../components/ModernLoader';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Friend {
     id: string;
@@ -51,6 +52,7 @@ export default function SocialPage() {
     const [groupInvites, setGroupInvites] = useState<GroupInvite[]>([]);
     const [recommended, setRecommended] = useState<Friend[]>([]);
     const [loading, setLoading] = useState(true);
+    const [joinedGroupPopup, setJoinedGroupPopup] = useState<{ show: boolean; groupName: string; groupId: string } | null>(null);
     const navigate = useNavigate();
 
     const isMGT = user?.membershipType === 'MGT';
@@ -118,17 +120,26 @@ export default function SocialPage() {
 
     const handleAcceptGroupInvite = async (inviteId: string) => {
         try {
-            await api.post(`/groups/invites/${inviteId}/accept`);
+            const invite = groupInvites.find(i => i.id === inviteId);
+            await api.post(`/groups/invites/${inviteId}/respond`, { accept: true });
             setGroupInvites(groupInvites.filter(i => i.id !== inviteId));
-            // Optional: Show toast
+            
+            if (invite) {
+                setJoinedGroupPopup({ 
+                    show: true, 
+                    groupName: invite.group.name,
+                    groupId: invite.group.id 
+                });
+            }
         } catch (error) {
             console.error('Failed to accept group invite', error);
+            alert('Erro ao aceitar convite');
         }
     };
 
     const handleRejectGroupInvite = async (inviteId: string) => {
         try {
-            await api.post(`/groups/invites/${inviteId}/reject`);
+            await api.post(`/groups/invites/${inviteId}/respond`, { accept: false });
             setGroupInvites(groupInvites.filter(i => i.id !== inviteId));
         } catch (error) {
             console.error('Failed to reject group invite', error);
@@ -367,6 +378,43 @@ export default function SocialPage() {
                     </div>
                 )}
             </div>
+
+            {/* Popup de entrada no grupo */}
+            <AnimatePresence>
+                {joinedGroupPopup?.show && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+                        onClick={() => {
+                            navigate(`/groups/${joinedGroupPopup.groupId}`);
+                        }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.8, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.8, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`${isMGT ? 'bg-gray-900 border-emerald-500/30' : 'bg-gray-900 border-gold-500/30'} border rounded-2xl p-8 max-w-md w-full text-center`}
+                        >
+                            <div className={`w-16 h-16 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} flex items-center justify-center mx-auto mb-4`}>
+                                <Check className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
+                            </div>
+                            <h2 className="text-xl font-bold text-white mb-2">Bem-vindo ao grupo!</h2>
+                            <p className="text-gray-400 mb-6">
+                                Você entrou no grupo <span className={`font-semibold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>"{joinedGroupPopup.groupName}"</span>
+                            </p>
+                            <button
+                                onClick={() => navigate(`/groups/${joinedGroupPopup.groupId}`)}
+                                className={`w-full py-3 rounded-xl font-semibold text-white ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500'} transition-colors`}
+                            >
+                                Ir para o grupo
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

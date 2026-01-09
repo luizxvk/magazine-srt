@@ -12,7 +12,7 @@ import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
-import { getContrastColor, getBackgroundColor } from '../utils/colorUtils';
+import { getContrastColor } from '../utils/colorUtils';
 
 interface HeaderProps {
     onOpenShop?: () => void;

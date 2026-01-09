@@ -11,7 +11,6 @@ export default function MarketCard() {
     // Use equipped color or fallback to theme colors
     const equippedColor = user?.equippedColor;
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
-    const accentColor = equippedColor || defaultColor;
     const contrastAccent = equippedColor ? getContrastColor(equippedColor) : defaultColor;
     const backgroundAccent = equippedColor ? getBackgroundColor(equippedColor) : defaultColor;
     

@@ -189,14 +189,14 @@ export const redeemReward = async (req: Request, res: Response) => {
         // Transaction to ensure atomicity
         const ticketCode = `TKT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${reward.id.slice(0, 4).toUpperCase()}-${reward.costZions}`;
 
+        // Calculate final zion change: cost minus reward
+        const zionChange = reward.costZions - (reward.zionsReward || 0);
+
         const transactionOperations = [
             prisma.user.update({
                 where: { id: userId },
                 data: { 
-                    zions: { 
-                        decrement: reward.costZions,
-                        ...(reward.zionsReward && reward.zionsReward > 0 ? { increment: reward.zionsReward } : {})
-                    } 
+                    zions: zionChange > 0 ? { decrement: zionChange } : zionChange < 0 ? { increment: Math.abs(zionChange) } : undefined
                 }
             }),
             prisma.reward.update({

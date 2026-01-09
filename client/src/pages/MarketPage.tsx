@@ -300,9 +300,14 @@ export default function MarketPage() {
           <div className="flex items-center gap-3">
             <Store className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
             <div>
-              <h1 className={`text-3xl sm:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                Mercado
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className={`text-3xl sm:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                  Mercado
+                </h1>
+                <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse`}>
+                  BETA
+                </span>
+              </div>
               <p className={themeSecondary}>Compre e venda itens de personalização</p>
             </div>
           </div>

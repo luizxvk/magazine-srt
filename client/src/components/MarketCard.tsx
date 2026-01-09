@@ -1,7 +1,6 @@
 import { Store, TrendingUp, Package, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getContrastColor, getBackgroundColor } from '../utils/colorUtils';
 
 export default function MarketCard() {
     const navigate = useNavigate();
@@ -10,9 +9,7 @@ export default function MarketCard() {
     
     // Use accentColor from context (already resolved from equippedColor key to hex)
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
-    const activeColor = accentColor || defaultColor;
-    const contrastAccent = getContrastColor(activeColor);
-    const backgroundAccent = getBackgroundColor(activeColor);
+    const backgroundAccent = accentColor || defaultColor;
     
     const handleTabNavigation = (tab: string) => {
         navigate('/market', { state: { activeTab: tab } });
@@ -38,7 +35,7 @@ export default function MarketCard() {
                     <Store className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                    <h3 className="text-lg font-bold" style={{ color: contrastAccent }}>Mercado</h3>
+                    <h3 className="text-lg font-bold text-white">Mercado</h3>
                     <p className="text-xs text-gray-400">Compre e venda itens</p>
                 </div>
             </div>
@@ -50,7 +47,7 @@ export default function MarketCard() {
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
                     <div className="group-hover/btn:scale-110 transition-transform">
-                        <TrendingUp className="w-4 h-4" style={{ color: contrastAccent }} />
+                        <TrendingUp className="w-4 h-4" style={{ color: backgroundAccent }} />
                     </div>
                     <span className="text-[10px] text-gray-400 font-medium">Navegar</span>
                 </button>
@@ -59,7 +56,7 @@ export default function MarketCard() {
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
                     <div className="group-hover/btn:scale-110 transition-transform">
-                        <Package className="w-4 h-4" style={{ color: contrastAccent }} />
+                        <Package className="w-4 h-4" style={{ color: backgroundAccent }} />
                     </div>
                     <span className="text-[10px] text-gray-400 font-medium">Vender</span>
                 </button>
@@ -68,7 +65,7 @@ export default function MarketCard() {
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
                     <div className="group-hover/btn:scale-110 transition-transform">
-                        <History className="w-4 h-4" style={{ color: contrastAccent }} />
+                        <History className="w-4 h-4" style={{ color: backgroundAccent }} />
                     </div>
                     <span className="text-[10px] text-gray-400 font-medium">Histórico</span>
                 </button>

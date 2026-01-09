@@ -754,8 +754,14 @@ export const inviteMember = async (req: Request, res: Response) => {
       where: { groupId_invitedId: { groupId, invitedId: invitedUserId } }
     });
 
-    if (existingInvite && existingInvite.status === 'PENDING') {
-      return res.status(400).json({ error: 'Convite já enviado' });
+    if (existingInvite) {
+      if (existingInvite.status === 'PENDING') {
+        return res.status(400).json({ error: 'Convite já enviado' });
+      }
+      // Se já existe mas não está pendente (ACCEPTED ou DECLINED), deletar e criar novo
+      await prisma.groupInvite.delete({
+        where: { id: existingInvite.id }
+      });
     }
 
     // Criar convite

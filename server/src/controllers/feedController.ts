@@ -683,9 +683,13 @@ export const getStoryViewers = async (req: any, res: any) => {
         }
 
         const viewers = story.views.map(view => ({
-            id: view.viewer.id,
-            name: view.viewer.name,
-            avatarUrl: view.viewer.avatarUrl,
+            id: view.id,
+            viewer: {
+                id: view.viewer.id,
+                name: view.viewer.name,
+                displayName: view.viewer.name,
+                avatarUrl: view.viewer.avatarUrl
+            },
             viewedAt: view.viewedAt
         }));
 

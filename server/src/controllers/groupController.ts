@@ -308,7 +308,7 @@ export const postMessage = async (req: Request, res: Response) => {
     }
 
     // Verificar se é membro e tem permissão
-    const member = await prisma.groupMember.findUnique({
+    let member = await prisma.groupMember.findUnique({
       where: {
         groupId_userId: {
           groupId: id,
@@ -324,8 +324,42 @@ export const postMessage = async (req: Request, res: Response) => {
       },
     });
 
+    // If not a member, check if group is public and auto-join
     if (!member) {
-      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+      const group = await prisma.group.findUnique({
+        where: { id },
+        include: { settings: true, members: true },
+      });
+
+      if (!group) {
+        return res.status(404).json({ error: 'Grupo não encontrado' });
+      }
+
+      // Auto-join public groups
+      if (!group.isPrivate) {
+        // Check if group is full
+        if (group.members.length >= group.maxMembers) {
+          return res.status(400).json({ error: 'Grupo está cheio' });
+        }
+
+        // Create membership
+        member = await prisma.groupMember.create({
+          data: {
+            groupId: id,
+            userId,
+            role: 'MEMBER',
+          },
+          include: {
+            group: {
+              include: {
+                settings: true,
+              },
+            },
+          },
+        });
+      } else {
+        return res.status(403).json({ error: 'Você não é membro deste grupo' });
+      }
     }
 
     if (!member.canPost && member.group.settings?.allowMemberPosts === false) {

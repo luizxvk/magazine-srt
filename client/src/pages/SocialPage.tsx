@@ -76,7 +76,7 @@ export default function SocialPage() {
             } else if (activeTab === 'requests') {
                 const [friendReqResponse, groupInvResponse] = await Promise.all([
                     api.get('/social/requests'),
-                    api.get('/groups/invites')
+                    api.get('/groups/invites/me')
                 ]);
                 setRequests(friendReqResponse.data);
                 setGroupInvites(groupInvResponse.data);

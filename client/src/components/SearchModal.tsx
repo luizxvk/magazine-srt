@@ -32,6 +32,10 @@ const NAVIGATION_PAGES = [
     { id: 'mgt-log', title: 'MGT Log', subtitle: 'Histórico de atividades', keywords: ['mgt', 'log', 'historico', 'atividades', 'registro'], icon: '📋', path: '/mgt-log' },
     { id: 'admin', title: 'Painel Admin', subtitle: 'Administração do sistema', keywords: ['admin', 'administração', 'painel', 'dashboard', 'gerenciar'], icon: '⚙️', path: '/admin' },
     { id: 'shop', title: 'Loja de Personalização', subtitle: 'Customize seu perfil', keywords: ['loja', 'shop', 'personalização', 'customização', 'comprar', 'badge', 'fundo', 'cor'], icon: '🛍️', path: '/feed', action: 'shop' },
+    { id: 'market', title: 'Mercado', subtitle: 'Compre e venda itens', keywords: ['mercado', 'market', 'comprar', 'vender', 'negociar', 'trading', 'marketplace', 'itens', 'customização'], icon: '🏪', path: '/market' },
+    { id: 'groups', title: 'Grupos', subtitle: 'Crie e participe de grupos', keywords: ['grupo', 'grupos', 'group', 'comunidade', 'chat', 'conversa'], icon: '👥', path: '/groups' },
+    { id: 'catalog', title: 'Catálogo de Fotos', subtitle: 'Galeria exclusiva de fotos', keywords: ['catalogo', 'catalog', 'fotos', 'galeria', 'imagens', 'foto'], icon: '📸', path: '/catalog' },
+    { id: 'stories', title: 'Stories', subtitle: 'Visualize stories dos membros', keywords: ['stories', 'story', 'historia', 'historias', 'visualizar'], icon: '📱', path: '/feed', action: 'stories' },
 ];
 
 // Fuzzy match function - checks if query matches any part of keywords

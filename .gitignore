@@ -9,3 +9,11 @@ coverage
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Debug scripts (security)
+debug_*.ts
+debug_*.js
+check_*.ts
+check_*.js
+verify-*.ts
+**/scripts/reset-*.ts

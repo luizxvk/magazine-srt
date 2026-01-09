@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { authenticateToken } from '../middleware/authMiddleware';
+import { validateImageContent } from '../middleware/fileValidationMiddleware';
 import { 
     uploadPostImage, 
     uploadStoryImage, 
@@ -18,7 +19,7 @@ const upload = multer({
         fileSize: 10 * 1024 * 1024, // 10MB
     },
     fileFilter: (req, file, cb) => {
-        // Accept images only
+        // Accept images only (preliminary check, further validated by magic bytes)
         if (!file.mimetype.startsWith('image/')) {
             return cb(new Error('Only image files are allowed'));
         }
@@ -26,11 +27,11 @@ const upload = multer({
     },
 });
 
-// All upload routes require authentication
-router.post('/post', authenticateToken, upload.single('image'), uploadPostImage);
-router.post('/story', authenticateToken, upload.single('image'), uploadStoryImage);
-router.post('/avatar', authenticateToken, upload.single('image'), uploadAvatar);
-router.post('/catalog', authenticateToken, upload.single('image'), uploadCatalogPhoto);
-router.post('/group', authenticateToken, upload.single('image'), uploadGroupImage);
+// All upload routes require authentication + magic bytes validation
+router.post('/post', authenticateToken, upload.single('image'), validateImageContent, uploadPostImage);
+router.post('/story', authenticateToken, upload.single('image'), validateImageContent, uploadStoryImage);
+router.post('/avatar', authenticateToken, upload.single('image'), validateImageContent, uploadAvatar);
+router.post('/catalog', authenticateToken, upload.single('image'), validateImageContent, uploadCatalogPhoto);
+router.post('/group', authenticateToken, upload.single('image'), validateImageContent, uploadGroupImage);
 
 export default router;

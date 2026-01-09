@@ -1,28 +1,37 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
+// Validation schemas
+const createAnnouncementSchema = z.object({
+    title: z.string().min(1).max(200),
+    logoUrl: z.string().url().optional().nullable(),
+    tag: z.string().max(50).optional().nullable(),
+    subscriptionType: z.enum(['MAGAZINE', 'MGT', 'ALL']).optional(),
+    description: z.string().max(1000).optional().nullable(),
+    backgroundImageUrl: z.string().url().optional().nullable(),
+    buttonText: z.string().max(50).optional().nullable(),
+    link: z.string().url().optional().nullable(),
+});
+
 export const createAnnouncement = async (req: Request, res: Response) => {
     try {
-        const { title, logoUrl, tag, subscriptionType, description, backgroundImageUrl, buttonText, link } = req.body;
+        const data = createAnnouncementSchema.parse(req.body);
 
         const announcement = await prisma.announcement.create({
             data: {
-                title,
-                logoUrl,
-                tag,
-                subscriptionType,
-                description,
-                backgroundImageUrl,
-                buttonText,
-                link,
+                ...data,
                 active: true
             }
         });
 
         res.status(201).json(announcement);
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: 'Invalid input', details: error.errors });
+        }
         console.error('Error creating announcement:', error);
         res.status(500).json({ error: 'Failed to create announcement' });
     }

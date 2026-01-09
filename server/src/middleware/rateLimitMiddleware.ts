@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
-// Simple in-memory rate limiter
-// For production, consider using Redis-based solution
+// In-memory rate limiter with automatic cleanup and memory protection
+// For high-traffic production, consider Redis: npm install rate-limit-redis
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const MAX_ENTRIES = 10000; // Prevent memory exhaustion
 
 interface RateLimitOptions {
     windowMs?: number;   // Time window in milliseconds
@@ -30,6 +31,16 @@ export const rateLimit = (options: RateLimitOptions = {}) => {
         const key = opts.keyGenerator!(req);
         const now = Date.now();
         const record = requestCounts.get(key);
+
+        // Memory protection: if too many entries, clean old ones
+        if (requestCounts.size > MAX_ENTRIES) {
+            const entriesToDelete: string[] = [];
+            for (const [k, v] of requestCounts.entries()) {
+                if (now > v.resetTime) entriesToDelete.push(k);
+                if (entriesToDelete.length >= 1000) break;
+            }
+            entriesToDelete.forEach(k => requestCounts.delete(k));
+        }
 
         if (!record || now > record.resetTime) {
             // New window

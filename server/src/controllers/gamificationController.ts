@@ -1,8 +1,19 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { sendRewardRedemptionEmail } from '../services/emailVerificationService';
+import { z } from 'zod';
 
 const prisma = new PrismaClient();
+
+// Validation schemas
+const createRewardSchema = z.object({
+    title: z.string().min(1).max(200),
+    type: z.enum(['RAFFLE_TICKET', 'BADGE', 'PHYSICAL', 'DIGITAL', 'CUSTOM']),
+    costZions: z.number().int().min(0),
+    stock: z.number().int().min(-1).optional(), // -1 = unlimited
+    metadata: z.record(z.any()).optional(),
+    backgroundColor: z.string().max(50).optional(),
+});
 
 export const getRanking = async (req: Request, res: Response) => {
     try {
@@ -95,19 +106,15 @@ export const createReward = async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        const { title, type, costZions, stock, metadata, backgroundColor } = req.body;
+        const data = createRewardSchema.parse(req.body);
         const reward = await prisma.reward.create({
-            data: {
-                title,
-                type,
-                costZions,
-                stock,
-                metadata,
-                backgroundColor
-            }
+            data
         });
         res.status(201).json(reward);
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: 'Invalid input', details: error.errors });
+        }
         res.status(500).json({ error: 'Failed to create reward' });
     }
 };

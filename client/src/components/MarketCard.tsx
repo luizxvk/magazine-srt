@@ -17,13 +17,20 @@ export default function MarketCard() {
     const handleTabNavigation = (tab: string) => {
         navigate('/market', { state: { activeTab: tab } });
     };
-    
-    const themeBorder = isMGT ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'border-gold-500/20 hover:border-gold-500/50';
-    const themeBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
 
     return (
-        <div className={`glass-panel rounded-xl p-5 border ${themeBorder} transition-all duration-300 group cursor-pointer relative overflow-hidden`}>
-            <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${themeBg}`} />
+        <div 
+            className="glass-panel rounded-xl p-5 border transition-all duration-300 group cursor-pointer relative overflow-hidden"
+            style={{ 
+                borderColor: `${backgroundAccent}33`,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = `${backgroundAccent}80`}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = `${backgroundAccent}33`}
+        >
+            <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
+                style={{ backgroundColor: backgroundAccent }}
+            />
             
             {/* Header */}
             <div className="flex items-center gap-3 mb-4 relative z-10">

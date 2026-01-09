@@ -119,36 +119,36 @@ export default function SettingsPage() {
 
                         {/* Sounds Toggle */}
                         <div className="flex items-center justify-between">
-                            <div>
+                            <div className="flex-1 min-w-0 pr-4">
                                 <p className={`font-medium ${textMain}`}>Sons de Notificação</p>
                                 <p className={`text-sm ${textSub}`}>Reproduzir som ao receber notificações</p>
                             </div>
                             <button
                                 onClick={handleToggleSounds}
-                                className={`relative w-14 h-8 rounded-full transition-colors ${
+                                className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
                                     soundsEnabled ? `bg-${themeColor}-500` : 'bg-gray-600'
                                 }`}
                             >
-                                <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                                    soundsEnabled ? 'translate-x-6' : 'translate-x-0'
+                                <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                                    soundsEnabled ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
                         </div>
 
                         {/* Do Not Disturb */}
                         <div className="flex items-center justify-between">
-                            <div>
+                            <div className="flex-1 min-w-0 pr-4">
                                 <p className={`font-medium ${textMain}`}>Não Perturbe</p>
                                 <p className={`text-sm ${textSub}`}>Desativar todas as notificações</p>
                             </div>
                             <button
                                 onClick={handleToggleDoNotDisturb}
-                                className={`relative w-14 h-8 rounded-full transition-colors ${
+                                className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
                                     doNotDisturb ? `bg-${themeColor}-500` : 'bg-gray-600'
                                 }`}
                             >
-                                <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                                    doNotDisturb ? 'translate-x-6' : 'translate-x-0'
+                                <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                                    doNotDisturb ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
                         </div>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
 
                         {/* Lite Mode Toggle */}
                         <div className="flex items-center justify-between">
-                            <div>
+                            <div className="flex-1 min-w-0 pr-4">
                                 <p className={`font-medium ${textMain} flex items-center gap-2`}>
                                     <Zap className="w-4 h-4" />
                                     Modo Lite
@@ -183,12 +183,12 @@ export default function SettingsPage() {
                             </div>
                             <button
                                 onClick={handleToggleLiteMode}
-                                className={`relative w-14 h-8 rounded-full transition-colors ${
+                                className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
                                     liteMode ? `bg-${themeColor}-500` : 'bg-gray-600'
                                 }`}
                             >
-                                <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                                    liteMode ? 'translate-x-6' : 'translate-x-0'
+                                <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                                    liteMode ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
                         </div>

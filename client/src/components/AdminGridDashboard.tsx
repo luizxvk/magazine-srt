@@ -16,7 +16,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity, GripVertical } from 'lucide-react';
+import { Users, TrendingUp, Shield, MessageSquare, Image as ImageIcon, Star, Zap, Activity, GripVertical, RefreshCw, RotateCcw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -100,7 +100,8 @@ function SortableWidget({ widget, cardBg, cardBorder, theme }: SortableWidgetPro
 }
 
 export default function AdminGridDashboard() {
-    const { theme } = useAuth();
+    const { user, theme } = useAuth();
+    const isMGT = user?.membershipType === 'MGT';
     const [stats, setStats] = useState<DashboardStats>({
         totalUsers: 0,
         activeUsers: 0,
@@ -111,10 +112,10 @@ export default function AdminGridDashboard() {
         onlineNow: 0,
         newUsersToday: 0
     });
+    const [refreshing, setRefreshing] = useState(false);
 
-    const [widgetOrder, setWidgetOrder] = useState<string[]>([
-        'users', 'activity', 'posts', 'online', 'messages', 'stories', 'comments'
-    ]);
+    const defaultOrder = ['users', 'activity', 'posts', 'online', 'messages', 'stories', 'comments'];
+    const [widgetOrder, setWidgetOrder] = useState<string[]>(defaultOrder);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -142,11 +143,19 @@ export default function AdminGridDashboard() {
 
     const fetchStats = async () => {
         try {
+            setRefreshing(true);
             const response = await api.get('/admin/dashboard/stats');
             setStats(response.data);
         } catch (error) {
             console.error('Failed to fetch dashboard stats', error);
+        } finally {
+            setRefreshing(false);
         }
+    };
+
+    const handleResetLayout = () => {
+        setWidgetOrder(defaultOrder);
+        localStorage.removeItem('adminDashboardOrder');
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -222,16 +231,36 @@ export default function AdminGridDashboard() {
 
     const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
     const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
+    const accentColor = isMGT ? 'emerald' : 'gold';
 
     return (
         <div className="mb-8">
-            <div className="mb-6">
-                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                    Dashboard Geral
-                </h2>
-                <p className="text-gray-400 text-sm mt-1">
-                    Arraste os cards para reorganizar • Layout salvo automaticamente • Atualização a cada 30s
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                        Dashboard Geral
+                    </h2>
+                    <p className="text-gray-400 text-sm mt-1">
+                        Arraste os cards para reorganizar • Layout salvo automaticamente • Atualização a cada 30s
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={fetchStats}
+                        disabled={refreshing}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-${accentColor}-500/10 text-${accentColor}-400 hover:bg-${accentColor}-500/20 transition-colors disabled:opacity-50`}
+                    >
+                        <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                        Atualizar
+                    </button>
+                    <button
+                        onClick={handleResetLayout}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors`}
+                    >
+                        <RotateCcw className="w-4 h-4" />
+                        Resetar Layout
+                    </button>
+                </div>
             </div>
 
             <DndContext

@@ -8,75 +8,62 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  passwordHash String
-  name         String
-  displayName  String?
-  avatarUrl    String?
-  bio          String?
-  role         Role          @default(MEMBER)
-  points       Int           @default(0)
-  trophies     Int           @default(0)
-  level        Int           @default(1)
-  xp           Int           @default(0)
-  zions        Int           @default(0)
-  membershipType MembershipType @default(MAGAZINE)
-  isOnline     Boolean       @default(false)
-  lastSeenAt   DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  resetToken   String?
-  resetTokenExpiry DateTime?
-  deletedAt    DateTime?
-  sessionToken String?       // For single device login - invalidates previous sessions
-  
-  // Email Verification
-  isVerified          Boolean   @default(false)
-  verificationCode    String?
-  verificationExpiry  DateTime?
-  verificationSentAt  DateTime?
-  
-  // Customization shop fields
-  ownedCustomizations String?   // JSON array of owned item IDs
-  equippedBackground  String?   // Currently equipped background ID
-  equippedBadge       String?   // Currently equipped badge ID
-  equippedColor       String?   // Currently equipped neon color ID
-  liteMode            Boolean   @default(false) // Disable animations/effects
-  doNotDisturb        Boolean   @default(false) // Do Not Disturb mode
-  
-  posts        Post[]
-  comments     Comment[]
-  likes        Like[]
-  badges       UserBadge[]
-  pointHistory PointHistory[]
-  zionHistory  ZionHistory[]
-  redemptions  Redemption[]
-  notifications Notification[]
-  
-  sentMessages   Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
-  
-  friendRequestsSent     Friendship[] @relation("FriendRequestsSent")
-  friendRequestsReceived Friendship[] @relation("FriendRequestsReceived")
+  id                     String         @id @default(uuid())
+  email                  String         @unique
+  passwordHash           String
+  name                   String
+  displayName            String?
+  avatarUrl              String?
+  bio                    String?
+  role                   Role           @default(MEMBER)
+  points                 Int            @default(0)
+  trophies               Int            @default(0)
+  level                  Int            @default(1)
+  xp                     Int            @default(0)
+  zions                  Int            @default(0)
+  membershipType         MembershipType @default(MAGAZINE)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  resetToken             String?
+  resetTokenExpiry       DateTime?
+  deletedAt              DateTime?
+  sessionToken           String?
+  isOnline               Boolean        @default(false)
+  lastSeenAt             DateTime?
+  equippedBackground     String?
+  equippedBadge          String?
+  equippedColor          String?
+  liteMode               Boolean        @default(false)
+  ownedCustomizations    String?
+  isVerified             Boolean        @default(false)
+  verificationCode       String?
+  verificationExpiry     DateTime?
+  verificationSentAt     DateTime?
+  doNotDisturb           Boolean        @default(false)
+  adminBadges            AdminBadge[]
+  catalogPhotos          CatalogPhoto[]
+  comments               Comment[]
+  friendRequestsReceived Friendship[]   @relation("FriendRequestsReceived")
+  friendRequestsSent     Friendship[]   @relation("FriendRequestsSent")
+  groupsCreated          Group[]        @relation("GroupCreator")
+  receivedGroupInvites   GroupInvite[]  @relation("ReceivedGroupInvites")
+  sentGroupInvites       GroupInvite[]  @relation("SentGroupInvites")
+  groupMemberships       GroupMember[]  @relation("UserGroupMemberships")
+  groupMessages          GroupMessage[] @relation("UserGroupMessages")
+  likes                  Like[]
+  receivedMessages       Message[]      @relation("ReceivedMessages")
+  sentMessages           Message[]      @relation("SentMessages")
+  notifications          Notification[]
+  pointHistory           PointHistory[]
+  posts                  Post[]
+  redemptions            Redemption[]
+  reportsSent            Report[]       @relation("ReportsSent")
+  stories                Story[]
+  storyViews             StoryView[]
+  badges                 UserBadge[]
+  zionHistory            ZionHistory[]
+  zionPurchases          ZionPurchase[]
 
-  stories      Story[]
-  storyViews   StoryView[]
-  catalogPhotos CatalogPhoto[]
-  zionPurchases ZionPurchase[]
-  reportsSent  Report[] @relation("ReportsSent")
-
-  // Grupos
-  groupsCreated    Group[] @relation("GroupCreator")
-  groupMemberships GroupMember[] @relation("UserGroupMemberships")
-  groupMessages    GroupMessage[] @relation("UserGroupMessages")
-  sentGroupInvites     GroupInvite[] @relation("SentGroupInvites")
-  receivedGroupInvites GroupInvite[] @relation("ReceivedGroupInvites")
-  
-  // Admin Badges
-  adminBadges AdminBadge[]
-
-  // Performance indexes
   @@index([membershipType])
   @@index([isOnline])
   @@index([createdAt])
@@ -85,13 +72,12 @@ model User {
 }
 
 model Story {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   userId    String
   imageUrl  String
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
   expiresAt DateTime
-
-  user      User     @relation(fields: [userId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
   views     StoryView[]
 
   @@index([userId])
@@ -100,13 +86,12 @@ model Story {
 }
 
 model StoryView {
-  id        String   @id @default(uuid())
-  storyId   String
-  viewerId  String
-  viewedAt  DateTime @default(now())
-
-  story     Story    @relation(fields: [storyId], references: [id])
-  viewer    User     @relation(fields: [viewerId], references: [id])
+  id       String   @id @default(uuid())
+  storyId  String
+  viewerId String
+  viewedAt DateTime @default(now())
+  story    Story    @relation(fields: [storyId], references: [id])
+  viewer   User     @relation(fields: [viewerId], references: [id])
 
   @@unique([storyId, viewerId])
 }
@@ -116,12 +101,11 @@ model Message {
   senderId      String
   receiverId    String
   content       String
-  storyImageUrl String?
   read          Boolean  @default(false)
   createdAt     DateTime @default(now())
-
-  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  storyImageUrl String?
+  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id])
 
   @@index([senderId])
   @@index([receiverId])
@@ -130,25 +114,24 @@ model Message {
 }
 
 model Post {
-  id          String    @id @default(uuid())
-  userId      String
-  imageUrl    String?
-  videoUrl    String?
-  caption     String?
-  likesCount  Int       @default(0)
-  commentsCount Int     @default(0)
-  reportsCount Int      @default(0)
-  isHighlight Boolean   @default(false)
-  isPublic    Boolean   @default(true)
-  isRemoved   Boolean   @default(false)
-  mediaType   MediaType @default(IMAGE)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  user        User      @relation(fields: [userId], references: [id])
-  comments    Comment[]
-  likes       Like[]
-  tags        PostTag[]
+  id            String    @id @default(uuid())
+  userId        String
+  imageUrl      String?
+  videoUrl      String?
+  caption       String?
+  likesCount    Int       @default(0)
+  commentsCount Int       @default(0)
+  isHighlight   Boolean   @default(false)
+  mediaType     MediaType @default(IMAGE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  isPublic      Boolean   @default(true)
+  isRemoved     Boolean   @default(false)
+  reportsCount  Int       @default(0)
+  comments      Comment[]
+  likes         Like[]
+  user          User      @relation(fields: [userId], references: [id])
+  tags          PostTag[]
 
   @@index([userId])
   @@index([createdAt])
@@ -162,7 +145,6 @@ model Comment {
   userId    String
   text      String
   createdAt DateTime @default(now())
-
   post      Post     @relation(fields: [postId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
@@ -176,7 +158,6 @@ model Like {
   postId    String
   userId    String
   createdAt DateTime @default(now())
-
   post      Post     @relation(fields: [postId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
@@ -196,36 +177,34 @@ model UserBadge {
   userId    String
   badgeId   String
   awardedAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
   badge     Badge    @relation(fields: [badgeId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@id([userId, badgeId])
 }
 
 model Reward {
-  id          String       @id @default(uuid())
-  title       String
-  type        RewardType
-  costZions   Int          @default(0)
-  stock       Int
-  metadata    Json?
+  id              String       @id @default(uuid())
+  title           String
+  type            RewardType
+  costZions       Int          @default(0)
+  stock           Int
+  metadata        Json?
   backgroundColor String?
-  redemptions Redemption[]
+  redemptions     Redemption[]
 }
 
 model Redemption {
-  id         String   @id @default(uuid())
-  userId     String
-  rewardId   String
-  cost       Int
-  redeemedAt DateTime @default(now())
-  status     String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, CANCELLED
+  id          String    @id @default(uuid())
+  userId      String
+  rewardId    String
+  cost        Int
+  redeemedAt  DateTime  @default(now())
   completedAt DateTime?
-  metadata   Json?
-
-  user       User     @relation(fields: [userId], references: [id])
-  reward     Reward   @relation(fields: [rewardId], references: [id])
+  metadata    Json?
+  status      String    @default("PENDING")
+  reward      Reward    @relation(fields: [rewardId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 }
 
 model PointHistory {
@@ -234,7 +213,6 @@ model PointHistory {
   amount    Int
   reason    String
   createdAt DateTime @default(now())
-
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -244,7 +222,6 @@ model ZionHistory {
   amount    Int
   reason    String
   createdAt DateTime @default(now())
-
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -255,11 +232,235 @@ model Friendship {
   status      FriendshipStatus @default(PENDING)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-
-  requester   User @relation("FriendRequestsSent", fields: [requesterId], references: [id])
-  addressee   User @relation("FriendRequestsReceived", fields: [addresseeId], references: [id])
+  addressee   User             @relation("FriendRequestsReceived", fields: [addresseeId], references: [id])
+  requester   User             @relation("FriendRequestsSent", fields: [requesterId], references: [id])
 
   @@unique([requesterId, addresseeId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  content   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([userId, read])
+}
+
+model PostTag {
+  id     String @id @default(uuid())
+  postId String
+  tag    String
+  post   Post   @relation(fields: [postId], references: [id])
+}
+
+model InviteRequest {
+  id        String        @id @default(uuid())
+  name      String
+  email     String        @unique
+  instagram String?
+  status    RequestStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Announcement {
+  id                 String   @id @default(uuid())
+  title              String
+  logoUrl            String
+  tag                String
+  subscriptionType   String
+  description        String
+  backgroundImageUrl String?
+  buttonText         String   @default("Conhecer Agora")
+  link               String   @default("/srt-log")
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model PageContent {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String
+  source    String
+  message   String
+  timestamp DateTime @default(now())
+  metadata  Json?
+}
+
+model CatalogPhoto {
+  id          String   @id @default(uuid())
+  userId      String
+  imageUrl    String
+  title       String?
+  description String?
+  category    String?
+  carValue    String?
+  eventType   String?
+  carBrand    String?
+  isPublic    Boolean  @default(true)
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model ZionPurchase {
+  id           String   @id @default(uuid())
+  userId       String
+  amount       Int
+  price        Float
+  paymentId    String?
+  preferenceId String?
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime
+  imageUrl    String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  category    String?
+  game        String?
+}
+
+model Report {
+  id         String       @id @default(uuid())
+  reporterId String
+  postId     String?
+  userId     String?
+  reason     String
+  status     ReportStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  resolvedAt DateTime?
+  resolvedBy String?
+  reporter   User         @relation("ReportsSent", fields: [reporterId], references: [id])
+}
+
+model Group {
+  id             String         @id @default(uuid())
+  name           String
+  description    String?
+  avatarUrl      String?
+  creatorId      String
+  membershipType MembershipType
+  isPrivate      Boolean        @default(false)
+  maxMembers     Int            @default(100)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  backgroundId   String?
+  nsfw           Boolean        @default(false)
+  creator        User           @relation("GroupCreator", fields: [creatorId], references: [id])
+  invites        GroupInvite[]
+  members        GroupMember[]
+  messages       GroupMessage[]
+  settings       GroupSettings?
+
+  @@index([creatorId])
+  @@index([membershipType])
+  @@index([isPrivate])
+  @@index([createdAt])
+}
+
+model GroupMember {
+  id          String    @id @default(uuid())
+  groupId     String
+  userId      String
+  role        GroupRole @default(MEMBER)
+  joinedAt    DateTime  @default(now())
+  canPost     Boolean   @default(true)
+  canInvite   Boolean   @default(false)
+  canModerate Boolean   @default(false)
+  isMuted     Boolean   @default(false)
+  nickname    String?
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserGroupMemberships", fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([role])
+}
+
+model GroupMessage {
+  id        String      @id @default(uuid())
+  groupId   String
+  senderId  String
+  content   String
+  imageUrl  String?
+  type      MessageType @default(TEXT)
+  createdAt DateTime    @default(now())
+  editedAt  DateTime?
+  deletedAt DateTime?
+  isNSFW    Boolean     @default(false)
+  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender    User        @relation("UserGroupMessages", fields: [senderId], references: [id])
+
+  @@index([groupId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model GroupSettings {
+  id                   String  @id @default(uuid())
+  groupId              String  @unique
+  requireApproval      Boolean @default(false)
+  allowMemberPosts     Boolean @default(true)
+  allowExternalInvites Boolean @default(false)
+  muteNotifications    Boolean @default(false)
+  group                Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model GroupInvite {
+  id          String       @id @default(uuid())
+  groupId     String
+  inviterId   String
+  invitedId   String
+  status      InviteStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  respondedAt DateTime?
+  group       Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  invited     User         @relation("ReceivedGroupInvites", fields: [invitedId], references: [id])
+  inviter     User         @relation("SentGroupInvites", fields: [inviterId], references: [id])
+
+  @@unique([groupId, invitedId])
+  @@index([invitedId])
+  @@index([inviterId])
+  @@index([status])
+}
+
+model AdminBadge {
+  id        String   @id @default(uuid())
+  text      String
+  color     String
+  userId    String
+  createdAt DateTime @default(now())
+  createdBy String
+  textColor String   @default("#FFFFFF")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdBy])
 }
 
 enum Role {
@@ -301,135 +502,10 @@ enum FriendshipStatus {
   REJECTED
 }
 
-model Notification {
-  id        String           @id @default(uuid())
-  userId    String
-  type      NotificationType
-  content   String
-  read      Boolean          @default(false)
-  createdAt DateTime         @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([read])
-  @@index([createdAt])
-  @@index([userId, read])
-}
-
-model PostTag {
-  id     String @id @default(uuid())
-  postId String
-  tag    String
-
-  post Post @relation(fields: [postId], references: [id])
-}
-
-model InviteRequest {
-  id        String        @id @default(uuid())
-  name      String
-  email     String        @unique
-  instagram String?
-  status    RequestStatus @default(PENDING)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-}
-
-model Announcement {
-  id               String   @id @default(uuid())
-  title            String
-  logoUrl          String
-  tag              String
-  subscriptionType String
-  description      String
-  backgroundImageUrl String?
-  buttonText       String   @default("Conhecer Agora")
-  link             String   @default("/srt-log")
-  active           Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-}
-
 enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
-}
-
-model PageContent {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  content   Json
-  updatedAt DateTime @updatedAt
-}
-
-model SystemLog {
-  id        String   @id @default(uuid())
-  level     String   // INFO, WARN, ERROR
-  source    String   // FRONTEND, BACKEND
-  message   String
-  timestamp DateTime @default(now())
-  metadata  Json?
-}
-
-model CatalogPhoto {
-  id          String   @id @default(uuid())
-  userId      String
-  imageUrl    String
-  title       String?
-  description String?
-  category    String?  // Sport, SUV, Sedan, Muscle, JDM, Euro, Classic
-  carValue    String?  // Budget, Mid, Premium, Supercar
-  eventType   String?  // Drift, Street, Meeting, Roleplay, Race
-  carBrand    String?  // BMW, Toyota, Nissan, Ford, Chevrolet...
-  isPublic    Boolean  @default(true)
-  isFavorite  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model ZionPurchase {
-  id            String   @id @default(uuid())
-  userId        String
-  amount        Int
-  price         Float
-  paymentId     String?
-  preferenceId  String?
-  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  date        DateTime
-  category    String?
-  game        String?
-  imageUrl    String?
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Report {
-  id          String       @id @default(uuid())
-  reporterId  String
-  postId      String?
-  userId      String?      // Reported user
-  reason      String
-  status      ReportStatus @default(PENDING)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  resolvedAt  DateTime?
-  resolvedBy  String?
-
-  reporter    User         @relation("ReportsSent", fields: [reporterId], references: [id])
 }
 
 enum ReportStatus {
@@ -439,78 +515,10 @@ enum ReportStatus {
   DISMISSED
 }
 
-// ===== SISTEMA DE GRUPOS =====
-
-model Group {
-  id              String         @id @default(uuid())
-  name            String
-  description     String?
-  avatarUrl       String?
-  backgroundId    String?        // Background from shop (user must own it)
-  creatorId       String
-  membershipType  MembershipType // MAGAZINE ou MGT
-  isPrivate       Boolean        @default(false)
-  maxMembers      Int            @default(100)
-  nsfw            Boolean        @default(false) // Contains +18 content
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  creator         User           @relation("GroupCreator", fields: [creatorId], references: [id])
-  members         GroupMember[]
-  messages        GroupMessage[]
-  settings        GroupSettings?
-  invites         GroupInvite[]
-
-  @@index([creatorId])
-  @@index([membershipType])
-  @@index([isPrivate])
-  @@index([createdAt])
-}
-
-model GroupMember {
-  id          String    @id @default(uuid())
-  groupId     String
-  userId      String
-  role        GroupRole @default(MEMBER)
-  nickname    String?   // Custom nickname in this group
-  joinedAt    DateTime  @default(now())
-  canPost     Boolean   @default(true)
-  canInvite   Boolean   @default(false)
-  canModerate Boolean   @default(false)
-  isMuted     Boolean   @default(false) // Member muted the group notifications
-
-  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user        User      @relation("UserGroupMemberships", fields: [userId], references: [id])
-
-  @@unique([groupId, userId])
-  @@index([userId])
-  @@index([role])
-}
-
 enum GroupRole {
   ADMIN
   MODERATOR
   MEMBER
-}
-
-model GroupMessage {
-  id        String      @id @default(uuid())
-  groupId   String
-  senderId  String
-  content   String
-  imageUrl  String?     // For IMAGE messages (costs 10 Zions)
-  type      MessageType @default(TEXT)
-  isNSFW    Boolean     @default(false) // Mark +18 content
-  createdAt DateTime    @default(now())
-  editedAt  DateTime?
-  deletedAt DateTime?
-
-  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  sender    User        @relation("UserGroupMessages", fields: [senderId], references: [id])
-
-  @@index([groupId])
-  @@index([senderId])
-  @@index([createdAt])
 }
 
 enum MessageType {
@@ -519,52 +527,8 @@ enum MessageType {
   ANNOUNCEMENT
 }
 
-model GroupSettings {
-  id                    String  @id @default(uuid())
-  groupId               String  @unique
-  requireApproval       Boolean @default(false)
-  allowMemberPosts      Boolean @default(true)
-  allowExternalInvites  Boolean @default(false)
-  muteNotifications     Boolean @default(false)
-
-  group                 Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
-}
-
-model GroupInvite {
-  id          String   @id @default(uuid())
-  groupId     String
-  inviterId   String   // Who sent the invite
-  invitedId   String   // Who was invited
-  status      InviteStatus @default(PENDING)
-  createdAt   DateTime @default(now())
-  respondedAt DateTime?
-
-  group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  inviter     User     @relation("SentGroupInvites", fields: [inviterId], references: [id])
-  invited     User     @relation("ReceivedGroupInvites", fields: [invitedId], references: [id])
-
-  @@unique([groupId, invitedId])
-  @@index([invitedId])
-  @@index([inviterId])
-  @@index([status])
-}
-
 enum InviteStatus {
   PENDING
   ACCEPTED
   DECLINED
-}
-
-model AdminBadge {
-  id        String   @id @default(uuid())
-  text      String   // e.g., "BETA", "DEV", "MGT"
-  color     String   // Background color hex (e.g., "#FF0000")
-  userId    String   // User who has this badge
-  createdAt DateTime @default(now())
-  createdBy String   // Admin who created it
-  
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([createdBy])
 }

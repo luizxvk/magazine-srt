@@ -7,6 +7,7 @@ interface AdminBadge {
     id: string;
     text: string;
     color: string;
+    textColor: string;
     userId: string;
     createdAt: string;
     user?: {
@@ -19,6 +20,7 @@ interface AdminBadge {
 interface BadgeTemplate {
     text: string;
     color: string;
+    textColor: string;
 }
 
 const BadgeManager: React.FC = () => {
@@ -31,6 +33,7 @@ const BadgeManager: React.FC = () => {
     // Form state
     const [badgeText, setBadgeText] = useState('');
     const [badgeColor, setBadgeColor] = useState('#3B82F6');
+    const [badgeTextColor, setBadgeTextColor] = useState('#FFFFFF');
     const [userId, setUserId] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -86,11 +89,13 @@ const BadgeManager: React.FC = () => {
             await api.post('/admin/badges', {
                 text: badgeText.toUpperCase(),
                 color: badgeColor,
+                textColor: badgeTextColor,
                 userId,
             });
 
             setBadgeText('');
             setBadgeColor('#3B82F6');
+            setBadgeTextColor('#FFFFFF');
             setUserId('');
             setSearchQuery('');
             setSearchResults([]);
@@ -117,6 +122,7 @@ const BadgeManager: React.FC = () => {
     const applyTemplate = (template: BadgeTemplate) => {
         setBadgeText(template.text);
         setBadgeColor(template.color);
+        setBadgeTextColor(template.textColor || '#FFFFFF');
     };
 
     if (loading) {
@@ -176,8 +182,8 @@ const BadgeManager: React.FC = () => {
                                     <div className="flex items-center gap-2">
                                         <span className="font-medium">{badge.user?.name || 'Usuário'}</span>
                                         <span
-                                            className="px-2 py-0.5 text-xs font-bold text-white rounded"
-                                            style={{ backgroundColor: badge.color }}
+                                            className="px-2 py-0.5 text-xs font-bold rounded"
+                                            style={{ backgroundColor: badge.color, color: badge.textColor || '#FFFFFF' }}
                                         >
                                             {badge.text}
                                         </span>
@@ -213,6 +219,7 @@ const BadgeManager: React.FC = () => {
                                     setShowCreateModal(false);
                                     setBadgeText('');
                                     setBadgeColor('#3B82F6');
+                                    setBadgeTextColor('#FFFFFF');
                                     setUserId('');
                                     setSearchQuery('');
                                     setSearchResults([]);
@@ -271,6 +278,29 @@ const BadgeManager: React.FC = () => {
                                     type="text"
                                     value={badgeColor}
                                     onChange={(e) => setBadgeColor(e.target.value)}
+                                    className={`flex-1 px-4 py-2 rounded-lg ${
+                                        theme === 'dark'
+                                            ? 'bg-gray-700 border-gray-600'
+                                            : 'bg-gray-100 border-gray-300'
+                                    } border focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Badge Text Color */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">Cor do Texto</label>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="color"
+                                    value={badgeTextColor}
+                                    onChange={(e) => setBadgeTextColor(e.target.value)}
+                                    className="w-16 h-10 rounded cursor-pointer"
+                                />
+                                <input
+                                    type="text"
+                                    value={badgeTextColor}
+                                    onChange={(e) => setBadgeTextColor(e.target.value)}
                                     className={`flex-1 px-4 py-2 rounded-lg ${
                                         theme === 'dark'
                                             ? 'bg-gray-700 border-gray-600'
@@ -343,8 +373,8 @@ const BadgeManager: React.FC = () => {
                                 <div className="flex items-center gap-2">
                                     <span className="font-medium">Nome do Usuário</span>
                                     <span
-                                        className="px-2 py-0.5 text-xs font-bold text-white rounded"
-                                        style={{ backgroundColor: badgeColor }}
+                                        className="px-2 py-0.5 text-xs font-bold rounded"
+                                        style={{ backgroundColor: badgeColor, color: badgeTextColor }}
                                     >
                                         {badgeText}
                                     </span>
@@ -359,6 +389,7 @@ const BadgeManager: React.FC = () => {
                                     setShowCreateModal(false);
                                     setBadgeText('');
                                     setBadgeColor('#3B82F6');
+                                    setBadgeTextColor('#FFFFFF');
                                     setUserId('');
                                     setSearchQuery('');
                                     setSearchResults([]);

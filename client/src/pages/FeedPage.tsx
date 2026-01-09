@@ -8,7 +8,7 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Users, Calendar } from 'lucide-react';
+import { Sparkles, Users, Calendar, Settings } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import DailyLoginCard from '../components/DailyLoginCard';
@@ -232,12 +232,23 @@ export default function FeedPage() {
                 <main className="flex-1 max-w-2xl mx-auto space-y-8">
                     {/* Welcome Header */}
                     <div className="mb-8 animate-fade-in-down">
-                        <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
-                            Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
-                        </h1>
-                        <p className="text-gray-400 text-lg font-light tracking-wide">
-                            {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
-                        </p>
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
+                                    Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                                </h1>
+                                <p className="text-gray-400 text-lg font-light tracking-wide">
+                                    {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
+                                </p>
+                            </div>
+                            <Link
+                                to="/settings"
+                                className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
+                                title="Configurações"
+                            >
+                                <Settings className="w-5 h-5" />
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Stories Bar */}

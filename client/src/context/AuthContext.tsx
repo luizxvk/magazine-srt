@@ -101,6 +101,17 @@ const ACCENT_COLORS: Record<string, string> = {
     'color_pink': '#ff69b4',
     'color_blue': '#0066ff',
     'color_red': '#ff0033',
+    // Pastel colors
+    'color_pastel_pink': '#ffb6c1',
+    'color_pastel_lavender': '#e6e6fa',
+    'color_pastel_mint': '#98fb98',
+    'color_pastel_peach': '#ffdab9',
+    'color_pastel_sky': '#87ceeb',
+    'color_pastel_coral': '#ffb5a7',
+    'color_pastel_lilac': '#dda0dd',
+    'color_pastel_sage': '#9dc183',
+    'color_pastel_butter': '#fffacd',
+    'color_pastel_periwinkle': '#ccccff',
 };
 
 // Helper to convert hex to rgb

@@ -75,6 +75,17 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'color_pink', name: 'Rosa Neon', description: 'Doce e marcante', price: 400, type: 'color', preview: '#ff69b4' },
     { id: 'color_blue', name: 'Azul Elétrico', description: 'Clássico e moderno', price: 400, type: 'color', preview: '#0066ff' },
     { id: 'color_red', name: 'Vermelho Neon', description: 'Intenso e poderoso', price: 400, type: 'color', preview: '#ff0033' },
+    // Pastel Colors
+    { id: 'color_pastel_pink', name: 'Rosa Pastel', description: 'Delicado e suave', price: 350, type: 'color', preview: '#ffb6c1' },
+    { id: 'color_pastel_lavender', name: 'Lavanda Pastel', description: 'Relaxante e elegante', price: 350, type: 'color', preview: '#e6e6fa' },
+    { id: 'color_pastel_mint', name: 'Menta Pastel', description: 'Fresco e natural', price: 350, type: 'color', preview: '#98fb98' },
+    { id: 'color_pastel_peach', name: 'Pêssego Pastel', description: 'Acolhedor e quente', price: 350, type: 'color', preview: '#ffdab9' },
+    { id: 'color_pastel_sky', name: 'Céu Pastel', description: 'Sereno e calmo', price: 350, type: 'color', preview: '#87ceeb' },
+    { id: 'color_pastel_coral', name: 'Coral Pastel', description: 'Vibrante mas suave', price: 350, type: 'color', preview: '#ffb5a7' },
+    { id: 'color_pastel_lilac', name: 'Lilás Pastel', description: 'Romântico e místico', price: 350, type: 'color', preview: '#dda0dd' },
+    { id: 'color_pastel_sage', name: 'Sálvia Pastel', description: 'Terroso e natural', price: 350, type: 'color', preview: '#9dc183' },
+    { id: 'color_pastel_butter', name: 'Manteiga Pastel', description: 'Amarelo suave', price: 350, type: 'color', preview: '#fffacd' },
+    { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', description: 'Azul-violeta delicado', price: 350, type: 'color', preview: '#ccccff' },
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {

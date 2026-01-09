@@ -5,6 +5,7 @@ interface AdminBadge {
     id: string;
     text: string;
     color: string;
+    textColor: string;
 }
 
 interface BadgeDisplayProps {
@@ -38,8 +39,8 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({ userId, className = '' }) =
             {badges.map((badge) => (
                 <span
                     key={badge.id}
-                    className={`px-2 py-0.5 text-xs font-bold text-white rounded ${className}`}
-                    style={{ backgroundColor: badge.color }}
+                    className={`px-2 py-0.5 text-xs font-bold rounded ${className}`}
+                    style={{ backgroundColor: badge.color, color: badge.textColor || '#FFFFFF' }}
                 >
                     {badge.text}
                 </span>

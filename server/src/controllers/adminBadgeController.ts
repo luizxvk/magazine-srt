@@ -5,7 +5,7 @@ import { AuthRequest } from '../middleware/authMiddleware';
 // Create badge for a user
 export const createBadge = async (req: AuthRequest, res: Response) => {
     try {
-        const { text, color, userId } = req.body;
+        const { text, color, textColor, userId } = req.body;
         const adminId = req.user?.userId;
 
         if (!text || !color || !userId) {
@@ -22,6 +22,7 @@ export const createBadge = async (req: AuthRequest, res: Response) => {
             data: {
                 text,
                 color,
+                textColor: textColor || '#FFFFFF',
                 userId,
                 createdBy: adminId!,
             },

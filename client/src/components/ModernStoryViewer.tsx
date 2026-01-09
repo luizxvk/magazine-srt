@@ -296,31 +296,33 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                         <div /> /* Empty spacer */
                     )}
 
-                    {/* Interaction buttons - for all stories */}
-                    <div className="flex items-center gap-3">
-                        <button 
-                            onClick={handleLike}
-                            className={`p-3 backdrop-blur-md rounded-full transition-all ${
-                                isLiked 
-                                    ? 'bg-red-500/80 hover:bg-red-500' 
-                                    : 'bg-white/10 hover:bg-white/20'
-                            }`}
-                        >
-                            <Heart className={`w-6 h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`} />
-                        </button>
-                        <button 
-                            onClick={handleComment}
-                            className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
-                        >
-                            <MessageCircle className="w-6 h-6 text-white" />
-                        </button>
-                        <button 
-                            onClick={handleShare}
-                            className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
-                        >
-                            <Send className="w-6 h-6 text-white" />
-                        </button>
-                    </div>
+                    {/* Interaction buttons - only show for other people's stories */}
+                    {!isMyStory && (
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={handleLike}
+                                className={`p-3 backdrop-blur-md rounded-full transition-all ${
+                                    isLiked 
+                                        ? 'bg-red-500/80 hover:bg-red-500' 
+                                        : 'bg-white/10 hover:bg-white/20'
+                                }`}
+                            >
+                                <Heart className={`w-6 h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`} />
+                            </button>
+                            <button 
+                                onClick={handleComment}
+                                className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                            >
+                                <MessageCircle className="w-6 h-6 text-white" />
+                            </button>
+                            <button 
+                                onClick={handleShare}
+                                className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+                            >
+                                <Send className="w-6 h-6 text-white" />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -375,44 +377,90 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
             <AnimatePresence>
                 {showViewers && (
                     <motion.div
-                        initial={{ opacity: 0, x: '100%' }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: '100%' }}
-                        className="absolute inset-0 bg-white z-[60] overflow-y-auto"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-[60] flex items-end justify-center"
+                        onClick={() => setShowViewers(false)}
                     >
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-gray-900">Visualizações</h2>
-                                <button onClick={() => setShowViewers(false)} className="p-2">
-                                    <X className="w-6 h-6" />
-                                </button>
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+                        
+                        {/* Modal Content */}
+                        <motion.div
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className={`relative w-full max-w-lg max-h-[70vh] bg-gradient-to-b ${isMGT ? 'from-zinc-900 to-black' : 'from-zinc-900 to-black'} rounded-t-3xl overflow-hidden border-t ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'}`}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Handle bar */}
+                            <div className="flex justify-center pt-3 pb-2">
+                                <div className={`w-12 h-1 rounded-full ${isMGT ? 'bg-emerald-500/50' : 'bg-gold-500/50'}`} />
                             </div>
-
-                            <p className="text-gray-500 mb-6">{viewers.length} visualizações</p>
-
-                            <div className="space-y-3">
-                                {viewers.map((viewer) => (
-                                    <div key={viewer.id} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <img
-                                                src={viewer.viewer.avatarUrl || '/default-avatar.png'}
-                                                alt={viewer.viewer.name}
-                                                className="w-12 h-12 rounded-full"
-                                            />
-                                            <div>
-                                                <p className="font-medium text-gray-900">
-                                                    {viewer.viewer.displayName || viewer.viewer.name}
-                                                </p>
-                                                <p className="text-sm text-gray-500">{timeAgo(viewer.viewedAt)}</p>
-                                            </div>
+                            
+                            {/* Header */}
+                            <div className="px-6 pb-4 border-b border-white/10">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`p-2 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
+                                            <Eye className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                                         </div>
-                                        <button className="p-2">
-                                            <Send className="w-5 h-5 text-gray-600" />
-                                        </button>
+                                        <div>
+                                            <h2 className="text-lg font-bold text-white">Visualizações</h2>
+                                            <p className="text-sm text-gray-400">{viewers.length} {viewers.length === 1 ? 'pessoa viu' : 'pessoas viram'}</p>
+                                        </div>
                                     </div>
-                                ))}
+                                    <button 
+                                        onClick={() => setShowViewers(false)} 
+                                        className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                                    >
+                                        <X className="w-5 h-5 text-white" />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+
+                            {/* Viewers List */}
+                            <div className="px-4 py-4 overflow-y-auto max-h-[50vh]">
+                                {viewers.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <Eye className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                                        <p className="text-gray-400">Nenhuma visualização ainda</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {viewers.map((viewer) => (
+                                            <motion.div 
+                                                key={viewer.id} 
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <img
+                                                        src={viewer.viewer.avatarUrl || '/default-avatar.png'}
+                                                        alt={viewer.viewer.name}
+                                                        className={`w-11 h-11 rounded-full object-cover ring-2 ${isMGT ? 'ring-emerald-500/30' : 'ring-gold-500/30'}`}
+                                                    />
+                                                    <div>
+                                                        <p className="font-medium text-white">
+                                                            {viewer.viewer.displayName || viewer.viewer.name}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">{timeAgo(viewer.viewedAt)}</p>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    className={`p-2 rounded-full ${isMGT ? 'bg-emerald-500/10 hover:bg-emerald-500/20' : 'bg-gold-500/10 hover:bg-gold-500/20'} transition-colors`}
+                                                >
+                                                    <Send className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                                </button>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

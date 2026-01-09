@@ -467,6 +467,17 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'color_blue', name: 'Azul Elétrico', price: 400, hex: '#0066FF' },
         { id: 'color_purple', name: 'Roxo Neon', price: 400, hex: '#9933FF' },
         { id: 'color_red', name: 'Vermelho Neon', price: 400, hex: '#FF0033' },
+        // Pastel colors
+        { id: 'color_pastel_pink', name: 'Rosa Pastel', price: 350, hex: '#ffb6c1' },
+        { id: 'color_pastel_lavender', name: 'Lavanda Pastel', price: 350, hex: '#e6e6fa' },
+        { id: 'color_pastel_mint', name: 'Menta Pastel', price: 350, hex: '#98fb98' },
+        { id: 'color_pastel_peach', name: 'Pêssego Pastel', price: 350, hex: '#ffdab9' },
+        { id: 'color_pastel_sky', name: 'Céu Pastel', price: 350, hex: '#87ceeb' },
+        { id: 'color_pastel_coral', name: 'Coral Pastel', price: 350, hex: '#ffb5a7' },
+        { id: 'color_pastel_lilac', name: 'Lilás Pastel', price: 350, hex: '#dda0dd' },
+        { id: 'color_pastel_sage', name: 'Sálvia Pastel', price: 350, hex: '#9dc183' },
+        { id: 'color_pastel_butter', name: 'Manteiga Pastel', price: 350, hex: '#fffacd' },
+        { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', price: 350, hex: '#ccccff' },
     ]
 };
 

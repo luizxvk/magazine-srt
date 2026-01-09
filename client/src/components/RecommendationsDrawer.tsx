@@ -126,15 +126,15 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                     <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                         <Sparkles className="w-5 h-5" />
                                     </div>
-                                    <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>O que há de novo</h4>
+                                    <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>O Que Há de Novo</h4>
                                 </div>
                                 <p className="text-sm text-gray-400 leading-relaxed">
-                                    Confira as últimas atualizações e novidades da plataforma.
+                                    Confira as últimas novidades e atualizações da plataforma.
                                 </p>
                             </div>
 
-                            {/* Photo Catalog Card - separado */}
-                            <div>
+                            {/* Photo Catalog Card - separado com espaçamento */}
+                            <div className="mt-4">
                                 <PhotoCatalogCard photos={catalogPhotos} />
                             </div>
 

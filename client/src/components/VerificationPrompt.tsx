@@ -5,10 +5,21 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function VerificationPrompt() {
-    const { user } = useAuth();
+    const { user, theme } = useAuth();
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [dismissed, setDismissed] = useState(false);
+    
+    const isMGT = user?.membershipType === 'MGT';
+    
+    // Theme-based colors
+    const bgGradient = isMGT 
+        ? 'from-emerald-900/95 to-emerald-800/95' 
+        : 'from-gold-900/95 to-gold-800/95';
+    const accentColor = isMGT ? 'emerald' : 'gold';
+    const buttonBg = isMGT 
+        ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+        : 'bg-gold-500 hover:bg-gold-400 text-black';
 
     useEffect(() => {
         // Show prompt if user is not verified and hasn't dismissed it
@@ -59,26 +70,26 @@ export default function VerificationPrompt() {
                 exit={{ opacity: 0, y: 50 }}
                 className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)]"
             >
-                <div className="bg-gradient-to-br from-purple-500/90 to-pink-500/90 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 p-6">
+                <div className={`bg-gradient-to-br ${bgGradient} backdrop-blur-xl rounded-xl shadow-2xl border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} p-6`}>
                     <button
                         onClick={handleDismiss}
-                        className="absolute top-3 right-3 p-1 hover:bg-white/20 rounded-lg transition-colors"
+                        className="absolute top-3 right-3 p-1 hover:bg-white/20 rounded-lg transition-colors text-white"
                     >
                         <X className="w-4 h-4" />
                     </button>
 
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                            <Shield className="w-6 h-6" />
+                        <div className={`w-12 h-12 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} flex items-center justify-center flex-shrink-0`}>
+                            <Shield className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-bold text-lg mb-1">Verifique seu Email</h3>
-                            <p className="text-sm text-white/90 mb-4">
+                            <h3 className="font-serif text-lg mb-1 text-white font-bold">Verifique seu Email</h3>
+                            <p className="text-sm text-white/90 mb-4 font-sans">
                                 Sua conta ainda não foi verificada. Você tem 3 dias para verificar ou sua conta será suspensa.
                             </p>
                             <button
                                 onClick={handleVerify}
-                                className="w-full bg-white text-purple-600 font-semibold py-2 px-4 rounded-lg hover:bg-white/90 transition-colors"
+                                className={`w-full ${buttonBg} font-semibold py-2.5 px-4 rounded-lg transition-colors font-sans`}
                             >
                                 Verificar Agora
                             </button>

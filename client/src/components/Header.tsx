@@ -332,7 +332,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         </div>
 
                         <div className="relative flex-shrink-0">
-                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black border border-emerald-500' : 'from-gold-400 to-gold-700'} p-[1px]`}>
+                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full p-[1px]`} style={{ background: user?.equippedColor ? `linear-gradient(135deg, ${user.equippedColor}, ${user.equippedColor}dd)` : (isMGT ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #d4af37, #b8941e)') }}>
                                 <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
                                     {user?.avatarUrl ? (
                                         <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
@@ -355,7 +355,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     {!isVisitor && (
                         <button
                             onClick={logout}
-                            className={`hidden md:block p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500/50 hover:text-red-500' : 'text-gold-500/50 hover:text-red-500')} transition-colors border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
+                            className={`hidden md:block p-2 transition-colors border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
+                            style={{ color: user?.equippedColor || (isMGT ? '#10b981' : '#d4af37') }}
                             title="Sair"
                         >
                             <LogOut className="w-5 h-5" />
@@ -407,7 +408,11 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     setIsMobileDrawerOpen(false);
                                                     logout();
                                                 }}
-                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-sm"
+                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-sm"
+                                                style={{ 
+                                                    backgroundColor: user?.equippedColor ? `${user.equippedColor}20` : (isMGT ? '#10b98120' : '#d4af3720'),
+                                                    color: user?.equippedColor || (isMGT ? '#10b981' : '#d4af37')
+                                                }}
                                             >
                                                 <LogOut className="w-4 h-4" />
                                                 <span>Sair</span>
@@ -429,7 +434,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         onClick={() => setIsMobileDrawerOpen(false)}
                                         className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors`}
                                     >
-                                        <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${isMGT ? 'from-emerald-600 to-black' : 'from-gold-400 to-gold-700'} p-[2px]`}>
+                                        <div className={`w-12 h-12 rounded-full p-[1px]`} style={{ background: user.equippedColor ? `linear-gradient(135deg, ${user.equippedColor}, ${user.equippedColor}dd)` : (isMGT ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #d4af37, #b8941e)') }}>
                                             <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
                                                 {user.avatarUrl ? (
                                                     <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />

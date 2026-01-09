@@ -134,7 +134,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 className={`h-10 sm:h-12 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
                             />
                         ) : (
-                            <span className="text-2xl sm:text-3xl font-black tracking-tight relative group select-none" style={{ fontFamily: 'Orbitron, sans-serif', letterSpacing: '-0.05em' }}>
+                            <span className="text-2xl sm:text-3xl font-serif tracking-tight relative group select-none" style={{ letterSpacing: '-0.05em' }}>
                                 {/* Glow layers */}
                                 <span className="absolute inset-0 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent blur-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500">
                                     MAGAZINE

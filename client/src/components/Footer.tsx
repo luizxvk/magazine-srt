@@ -3,7 +3,7 @@ import buildInfo from '../buildInfo.json';
 
 export default function Footer() {
     const { theme } = useAuth();
-    const version = 'v0.3.8-beta';
+    const version = 'v0.3.9-beta';
     
     // Parse build info
     const commitHash = buildInfo.commit || 'dev';

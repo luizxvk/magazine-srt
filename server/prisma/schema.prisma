@@ -63,6 +63,9 @@ model User {
   badges                 UserBadge[]
   zionHistory            ZionHistory[]
   zionPurchases          ZionPurchase[]
+  marketListings         MarketListing[] @relation("MarketSeller")
+  marketPurchases        MarketTransaction[] @relation("MarketBuyer")
+  marketSales            MarketTransaction[] @relation("MarketTransactionSeller")
 
   @@index([membershipType])
   @@index([isOnline])
@@ -461,6 +464,51 @@ model AdminBadge {
 
   @@index([userId])
   @@index([createdBy])
+}
+
+// ========== MARKET SYSTEM ==========
+
+model MarketListing {
+  id           String              @id @default(uuid())
+  sellerId     String
+  itemId       String              // The customization item ID (bg_aurora, badge_skull, etc.)
+  itemType     String              // 'background' | 'badge' | 'color'
+  price        Int                 // Price in Zions
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  status       MarketListingStatus @default(ACTIVE)
+  seller       User                @relation("MarketSeller", fields: [sellerId], references: [id])
+  transactions MarketTransaction[]
+
+  @@index([sellerId])
+  @@index([itemType])
+  @@index([status])
+  @@index([price])
+  @@index([createdAt])
+}
+
+model MarketTransaction {
+  id          String        @id @default(uuid())
+  listingId   String
+  buyerId     String
+  sellerId    String
+  itemId      String
+  itemType    String
+  price       Int
+  createdAt   DateTime      @default(now())
+  listing     MarketListing @relation(fields: [listingId], references: [id])
+  buyer       User          @relation("MarketBuyer", fields: [buyerId], references: [id])
+  seller      User          @relation("MarketTransactionSeller", fields: [sellerId], references: [id])
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([createdAt])
+}
+
+enum MarketListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
 }
 
 enum Role {

@@ -22,6 +22,7 @@ import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import GroupsPage from './pages/GroupsPage';
 import GroupChatPage from './pages/GroupChatPage';
+import MarketPage from './pages/MarketPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
@@ -64,6 +65,8 @@ function App() {
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
           <Route path="/groups/:id" element={<PrivateRoute><GroupChatPage /></PrivateRoute>} />
+          {/* Mercado */}
+          <Route path="/market" element={<PrivateRoute><MarketPage /></PrivateRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
 

@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCi
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.8';
+const CURRENT_VERSION = '0.3.9';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,25 +33,46 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.8 - Configurações de Grupo
+    // v0.3.9 - Mercado de Itens
     const updates: UpdateItem[] = [
+        {
+            icon: <Store className="w-5 h-5" />,
+            title: 'Mercado de Customizações!',
+            description: 'Compre e venda itens de customização com outros usuários! Acesse pelo menu "Mercado" e negocie Zions.',
+            isNew: true
+        },
+        {
+            icon: <Search className="w-5 h-5" />,
+            title: 'Navegação e Filtros',
+            description: 'Pesquise por nome, filtre por tipo (fundos, selos, cores) e ordene por preço ou data!',
+            isNew: true
+        },
+        {
+            icon: <Zap className="w-5 h-5" />,
+            title: 'Taxa de 5% nas Vendas',
+            description: 'Venda qualquer item não-padrão! O sistema cobra 5% de taxa e você recebe o resto em Zions.',
+            isNew: true
+        },
+        {
+            icon: <Trophy className="w-5 h-5" />,
+            title: 'Histórico de Transações',
+            description: 'Veja todas suas compras e vendas, quanto ganhou/gastou, e acompanhe suas negociações!',
+            isNew: true
+        },
         {
             icon: <VolumeX className="w-5 h-5" />,
             title: 'Silenciar Grupos',
             description: 'Mute notificações de grupos individuais! Ícone aparece no título do grupo quando silenciado.',
-            isNew: true
         },
         {
             icon: <Image className="w-5 h-5" />,
             title: 'Fundos de Chat em Grupos',
             description: 'Admins podem aplicar fundos da loja ao chat do grupo! Todos os membros veem o novo visual.',
-            isNew: true
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Gerenciamento de Membros',
             description: 'Modal de configurações do grupo com abas: Geral, Fundo e Membros. Admins podem promover/remover.',
-            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,

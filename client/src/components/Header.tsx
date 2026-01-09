@@ -12,6 +12,7 @@ import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
+import { getContrastColor, getBackgroundColor } from '../utils/colorUtils';
 
 interface HeaderProps {
     onOpenShop?: () => void;
@@ -355,7 +356,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         <button
                             onClick={logout}
                             className={`hidden md:block p-2 transition-colors border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
-                            style={{ color: user?.equippedColor || (isMGT ? '#10b981' : '#d4af37') }}
+                            style={{ color: user?.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#10b981' : '#d4af37') }}
                             title="Sair"
                         >
                             <LogOut className="w-5 h-5" />
@@ -443,8 +444,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                             </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-semibold truncate ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{user.displayName || user.name}</p>
-                                            <p className={`text-xs ${isMGT ? 'text-emerald-300' : 'text-gold-300'}`}>{user.zions || 0} Zions</p>
+                                            <p className="text-sm font-semibold truncate" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#10b981' : '#d4af37') }}>{user.displayName || user.name}</p>
+                                            <p className="text-xs" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#34d399' : '#e5c86d') }}>{user.zions || 0} Zions</p>
                                         </div>
                                     </Link>
                                 )}

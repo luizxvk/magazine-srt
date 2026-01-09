@@ -134,11 +134,14 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 className={`h-10 sm:h-12 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
                             />
                         ) : (
-                            <span className="text-2xl sm:text-3xl font-black tracking-tighter relative group">
-                                <span className="absolute inset-0 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent blur-xl opacity-80 group-hover:opacity-100 transition-opacity duration-500 animate-pulse">
+                            <span className="text-2xl sm:text-3xl font-bold tracking-wider relative group" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+                                <span className="absolute inset-0 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent blur-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500 animate-pulse">
                                     MAGAZINE
                                 </span>
-                                <span className="relative bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(218,165,32,0.5)]">
+                                <span className="absolute inset-0 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent blur-md opacity-70">
+                                    MAGAZINE
+                                </span>
+                                <span className="relative bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent" style={{ textShadow: '0 0 30px rgba(218,165,32,0.8), 0 0 60px rgba(218,165,32,0.4)' }}>
                                     MAGAZINE
                                 </span>
                             </span>

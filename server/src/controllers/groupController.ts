@@ -79,13 +79,23 @@ export const getMyGroups = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Usuário não autenticado' });
     }
 
+    // Get all groups where user is a member OR group is public
     const groups = await prisma.group.findMany({
       where: {
-        members: {
-          some: {
-            userId,
+        OR: [
+          // Groups where user is a member
+          {
+            members: {
+              some: {
+                userId,
+              },
+            },
           },
-        },
+          // Public groups (even if user is not a member)
+          {
+            isPrivate: false,
+          },
+        ],
       },
       include: {
         creator: {

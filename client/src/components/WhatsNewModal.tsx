@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.7';
+const CURRENT_VERSION = '0.3.8';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,37 +33,50 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.7 - Cores Pastel + Melhorias UI
+    // v0.3.8 - Configurações de Grupo
     const updates: UpdateItem[] = [
+        {
+            icon: <VolumeX className="w-5 h-5" />,
+            title: 'Silenciar Grupos',
+            description: 'Mute notificações de grupos individuais! Ícone aparece no título do grupo quando silenciado.',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Fundos de Chat em Grupos',
+            description: 'Admins podem aplicar fundos da loja ao chat do grupo! Todos os membros veem o novo visual.',
+            isNew: true
+        },
+        {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Gerenciamento de Membros',
+            description: 'Modal de configurações do grupo com abas: Geral, Fundo e Membros. Admins podem promover/remover.',
+            isNew: true
+        },
         {
             icon: <Palette className="w-5 h-5" />,
             title: '10 Novas Cores Pastel!',
-            description: 'Rosa, Lavanda, Menta, Pêssego, Céu, Coral, Lilás, Sálvia, Manteiga e Pervinca! Tons suaves para seu perfil.',
-            isNew: true
+            description: 'Rosa, Lavanda, Menta, Pêssego, Céu, Coral, Lilás, Sálvia, Manteiga e Pervinca! Tons suaves para seu perfil.'
         },
         {
             icon: <Eye className="w-5 h-5" />,
             title: 'Visualizadores de Stories',
-            description: 'Novo popup moderno mostra quem viu seus stories com animação slide-up e design temático!',
-            isNew: true
+            description: 'Novo popup moderno mostra quem viu seus stories com animação slide-up e design temático!'
         },
         {
             icon: <Award className="w-5 h-5" />,
             title: 'Cor de Texto nos Selos',
-            description: 'Admins agora podem definir a cor do texto dos selos, não apenas o fundo!',
-            isNew: true
+            description: 'Admins agora podem definir a cor do texto dos selos, não apenas o fundo!'
         },
         {
             icon: <Settings className="w-5 h-5" />,
             title: 'Botão Config no Feed',
-            description: 'Acesse configurações rapidamente pelo ícone no cabeçalho do feed!',
-            isNew: true
+            description: 'Acesse configurações rapidamente pelo ícone no cabeçalho do feed!'
         },
         {
             icon: <Wrench className="w-5 h-5" />,
             title: 'Switches Corrigidos',
-            description: 'Botões toggle das configurações com alinhamento e animação melhorados!',
-            isNew: true
+            description: 'Botões toggle das configurações com alinhamento e animação melhorados!'
         },
         {
             icon: <MessageCircle className="w-5 h-5" />,

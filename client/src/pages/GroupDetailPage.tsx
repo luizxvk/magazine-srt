@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Send, Settings, Crown, Shield } from 'lucide-react';
+import { ArrowLeft, Users, Send, Settings, Crown, Shield, VolumeX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import GroupSettingsModal from '../components/GroupSettingsModal';
 
 interface GroupMessage {
   id: string;
@@ -24,6 +25,7 @@ interface GroupMember {
   id: string;
   role: 'ADMIN' | 'MODERATOR' | 'MEMBER';
   joinedAt: string;
+  isMuted?: boolean;
   user: {
     id: string;
     name: string;
@@ -37,6 +39,7 @@ interface Group {
   name: string;
   description: string;
   avatarUrl: string;
+  backgroundId?: string;
   membershipType: 'MAGAZINE' | 'MGT';
   isPrivate: boolean;
   maxMembers: number;
@@ -67,6 +70,29 @@ export default function GroupDetailPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  // Background gradients map
+  const backgroundGradients: Record<string, string> = {
+    bg_default: 'linear-gradient(125deg, #0a0a0a 0%, #1a1a1a 100%)',
+    bg_aurora: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)',
+    bg_galaxy: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)',
+    bg_matrix: 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)',
+    bg_fire: 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)',
+    bg_ocean: 'linear-gradient(180deg, #0a1628 0%, #0c2340 50%, #0a1628 100%)',
+    bg_forest: 'linear-gradient(180deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)',
+    bg_city: 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)',
+    bg_space: 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)',
+    bg_sunset: 'linear-gradient(135deg, #1a0505 0%, #2a0a0a 25%, #3a1515 50%, #2a0a0a 75%, #1a0505 100%)',
+    bg_cyberpunk: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)',
+    bg_lava: 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)',
+    bg_ice: 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)',
+    bg_neon_grid: 'linear-gradient(135deg, #0d0d0d 0%, #1a0d1a 25%, #2a0d2a 50%, #1a0d1a 75%, #0d0d0d 100%)',
+    bg_emerald: 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)',
+    bg_royal: 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)',
+    bg_carbon: 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)',
+  };
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -94,6 +120,11 @@ export default function GroupDetailPage() {
     try {
       const response = await api.get(`/groups/${id}`);
       setGroup(response.data);
+      // Set muted status from membership
+      const myMember = response.data.members?.find((m: any) => m.user.id === user?.id);
+      if (myMember) {
+        setIsMuted(myMember.isMuted || false);
+      }
     } catch (error) {
       console.error('Error fetching group:', error);
     } finally {
@@ -158,6 +189,7 @@ export default function GroupDetailPage() {
   }
 
   const myMembership = group.members.find((m) => m.user.id === user?.id);
+  const chatBackground = group.backgroundId ? backgroundGradients[group.backgroundId] : backgroundGradients.bg_default;
 
   return (
     <div className={`h-screen ${themeBg} ${themeText} flex flex-col`}>
@@ -185,7 +217,14 @@ export default function GroupDetailPage() {
             )}
 
             <div>
-              <h2 className={`font-semibold ${themeText}`}>{group.name}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className={`font-semibold ${themeText}`}>{group.name}</h2>
+                {isMuted && (
+                  <span title="Notificações silenciadas">
+                    <VolumeX className="w-4 h-4 text-gray-400" />
+                  </span>
+                )}
+              </div>
               <p className={`text-xs ${themeSecondary}`}>
                 {group.members.length} {group.members.length === 1 ? 'membro' : 'membros'}
               </p>
@@ -199,11 +238,12 @@ export default function GroupDetailPage() {
             >
               <Users className="w-5 h-5" />
             </button>
-            {myMembership?.role === 'ADMIN' && (
-              <button className={`p-2 hover:bg-white/10 rounded-full transition-colors`}>
+            <button 
+              onClick={() => setShowSettings(true)}
+              className={`p-2 hover:bg-white/10 rounded-full transition-colors`}
+            >
                 <Settings className="w-5 h-5" />
               </button>
-            )}
           </div>
         </div>
       </div>
@@ -212,8 +252,11 @@ export default function GroupDetailPage() {
       <div className="flex flex-1 overflow-hidden max-w-7xl mx-auto w-full">
         {/* Messages Area */}
         <div className="flex-1 flex flex-col">
-          {/* Messages List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Messages List with custom background */}
+          <div 
+            className="flex-1 overflow-y-auto p-4 space-y-4"
+            style={{ background: chatBackground }}
+          >
             {messages.length === 0 ? (
               <div className="text-center py-16">
                 <p className={themeSecondary}>Nenhuma mensagem ainda. Seja o primeiro a falar!</p>
@@ -328,6 +371,35 @@ export default function GroupDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Settings Modal */}
+      <GroupSettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        groupId={group.id}
+        groupName={group.name}
+        currentBackground={group.backgroundId}
+        isMuted={isMuted}
+        isAdmin={myMembership?.role === 'ADMIN'}
+        members={group.members}
+        onMuteToggle={(muted) => setIsMuted(muted)}
+        onBackgroundChange={(bgId) => setGroup({ ...group, backgroundId: bgId })}
+        onMemberRemove={(memberId) => {
+          setGroup({
+            ...group,
+            members: group.members.filter(m => m.user.id !== memberId)
+          });
+        }}
+        onRoleChange={(memberId, role) => {
+          setGroup({
+            ...group,
+            members: group.members.map(m => 
+              m.user.id === memberId ? { ...m, role } : m
+            )
+          });
+        }}
+        onDeleteGroup={() => navigate('/groups')}
+      />
     </div>
   );
 }

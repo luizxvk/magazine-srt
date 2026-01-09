@@ -40,6 +40,7 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
                     where: { userId: req.user?.userId },
                     select: { userId: true },
                 },
+                tags: true,
             },
         });
 

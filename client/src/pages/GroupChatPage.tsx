@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Image, ArrowLeft, Users, Settings, LogOut,
-  Edit3, Volume2, VolumeX, Palette, Eye, EyeOff, X, Edit
+  Edit3, Volume2, VolumeX, Palette, Eye, EyeOff, X, Edit, Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -82,6 +82,7 @@ export default function GroupChatPage() {
   const [nickname, setNickname] = useState('');
   const [showNSFW, setShowNSFW] = useState(true);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEditNameModal, setShowEditNameModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [showEditAvatarModal, setShowEditAvatarModal] = useState(false);
@@ -103,6 +104,7 @@ export default function GroupChatPage() {
 
   const myMember = group?.members.find(m => m.userId === user?.id);
   const isAdmin = myMember?.role === 'ADMIN';
+  const isCreator = group?.creator?.id === user?.id;
 
   const fetchFriends = async () => {
     try {
@@ -316,6 +318,16 @@ export default function GroupChatPage() {
       } else {
         alert('Erro ao sair do grupo');
       }
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    try {
+      await api.delete(`/groups/${id}`);
+      navigate('/groups');
+    } catch (error: any) {
+      console.error('Error deleting group:', error);
+      alert('Erro ao deletar o grupo');
     }
   };
 
@@ -691,6 +703,19 @@ export default function GroupChatPage() {
                 <LogOut className="w-5 h-5" />
                 <span>Sair do Grupo</span>
               </button>
+
+              {isCreator && (
+                <button
+                  onClick={() => {
+                    setShowSettings(false);
+                    setShowDeleteConfirm(true);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-500/10 transition-colors text-red-600 font-medium"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  <span>Deletar Grupo</span>
+                </button>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -806,6 +831,17 @@ export default function GroupChatPage() {
         title="Sair do Grupo"
         message="Tem certeza que deseja sair deste grupo?"
         confirmText="Sair"
+        cancelText="Cancelar"
+      />
+
+      {/* Delete Group Confirm Modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteGroup}
+        title="Deletar Grupo"
+        message="Tem certeza que deseja deletar este grupo permanentemente? Esta ação não pode ser desfeita e todos os membros serão removidos."
+        confirmText="Deletar"
         cancelText="Cancelar"
       />
 

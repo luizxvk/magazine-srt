@@ -816,20 +816,28 @@ export const inviteMember = async (req: Request, res: Response) => {
       }
     });
 
-    // Criar notificação
-    await prisma.notification.create({
-      data: {
-        userId: invitedUserId,
-        type: 'GROUP_INVITE',
-        content: `${invite.inviter.name} convidou você para o grupo ${invite.group.name}`,
-        relatedId: invite.id
-      }
-    });
+    // Criar notificação (não bloqueia se falhar)
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: invitedUserId,
+          type: 'GROUP_INVITE',
+          content: `${invite.inviter.name} convidou você para o grupo ${invite.group.name}`,
+          relatedId: invite.id
+        }
+      });
+    } catch (notifError) {
+      console.error('Error creating notification for invite:', notifError);
+      // Continue - notification is not critical
+    }
 
     res.json(invite);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error inviting member:', error);
-    res.status(500).json({ error: 'Erro ao enviar convite' });
+    res.status(500).json({ 
+      error: 'Erro ao enviar convite',
+      details: error?.message || 'Erro desconhecido'
+    });
   }
 };
 

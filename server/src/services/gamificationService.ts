@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../utils/prisma';
 
 // XP Table: Level X requires XP_TABLE[X-1] total XP
 // Formula: Base 1000, increasing difficulty

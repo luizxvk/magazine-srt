@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import { sendRewardRedemptionEmail } from '../services/emailVerificationService';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Validation schemas
 const createRewardSchema = z.object({

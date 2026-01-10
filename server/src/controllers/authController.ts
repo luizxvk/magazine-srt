@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { generateVerificationCode, sendVerificationEmail, sendPasswordResetEmail } from '../services/emailVerificationService';
-
-const prisma = new PrismaClient();
 
 // Generate unique session token for single device login
 const generateSessionToken = (): string => {
@@ -136,7 +134,7 @@ export const login = async (req: Request, res: Response) => {
 
         console.log('Password valid, proceeding with login');
 
-        // Award "Primeiros Passos" badge and 50 trophies (fail-safe)
+        // Award "Primeiros Passos" badge and 10 trophies (fail-safe)
         try {
             const badge = await prisma.badge.findFirst({ where: { name: 'Primeiros Passos' } });
             if (badge) {
@@ -153,10 +151,11 @@ export const login = async (req: Request, res: Response) => {
                         }
                     });
 
-                    // Award Trophies (Only once)
+                    // Award Trophies from badge (10 trophies)
+                    const trophiesToAward = badge.trophies || 10;
                     const updatedUser = await prisma.user.update({
                         where: { id: user.id },
-                        data: { trophies: { increment: 50 } },
+                        data: { trophies: { increment: trophiesToAward } },
                     });
                     (user as any).trophies = updatedUser.trophies;
 
@@ -165,7 +164,7 @@ export const login = async (req: Request, res: Response) => {
                         data: {
                             userId: user.id,
                             type: 'BADGE',
-                            content: `Você desbloqueou a conquista: ${badge.name}! (+50 Troféus)`,
+                            content: `Você desbloqueou a conquista: ${badge.name}! (+${trophiesToAward} Troféus)`,
                         }
                     });
                 }

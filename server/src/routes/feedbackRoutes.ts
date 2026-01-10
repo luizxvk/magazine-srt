@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import { authenticateToken, requireAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 interface FeedbackRating {
     interfaceRating: number;

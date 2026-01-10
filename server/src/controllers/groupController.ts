@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import { PrismaClient, GroupRole, MessageType } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Response } from 'express';
+import { GroupRole, MessageType } from '@prisma/client';
+import prisma from '../utils/prisma';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 // In-memory storage for typing indicators (expires after 3 seconds)
 interface TypingUser {
@@ -26,7 +26,7 @@ const cleanExpiredTyping = (groupId: string) => {
 };
 
 // Criar novo grupo
-export const createGroup = async (req: Request, res: Response) => {
+export const createGroup = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -94,7 +94,7 @@ export const createGroup = async (req: Request, res: Response) => {
 };
 
 // Listar grupos do usuário
-export const getMyGroups = async (req: Request, res: Response) => {
+export const getMyGroups = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -159,7 +159,7 @@ export const getMyGroups = async (req: Request, res: Response) => {
 };
 
 // Buscar grupo por ID
-export const getGroupById = async (req: Request, res: Response) => {
+export const getGroupById = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -218,7 +218,7 @@ export const getGroupById = async (req: Request, res: Response) => {
 };
 
 // Entrar em um grupo
-export const joinGroup = async (req: Request, res: Response) => {
+export const joinGroup = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -277,7 +277,7 @@ export const joinGroup = async (req: Request, res: Response) => {
 };
 
 // Sair de um grupo
-export const leaveGroup = async (req: Request, res: Response) => {
+export const leaveGroup = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -319,7 +319,7 @@ export const leaveGroup = async (req: Request, res: Response) => {
 };
 
 // Postar mensagem no grupo
-export const postMessage = async (req: Request, res: Response) => {
+export const postMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -422,7 +422,7 @@ export const postMessage = async (req: Request, res: Response) => {
 };
 
 // Buscar mensagens do grupo
-export const getGroupMessages = async (req: Request, res: Response) => {
+export const getGroupMessages = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -492,7 +492,7 @@ export const getGroupMessages = async (req: Request, res: Response) => {
 };
 
 // Delete group message (sender or admin)
-export const deleteGroupMessage = async (req: Request, res: Response) => {
+export const deleteGroupMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id, messageId } = req.params;
@@ -550,7 +550,7 @@ export const deleteGroupMessage = async (req: Request, res: Response) => {
 };
 
 // Remover membro (apenas admin/moderador)
-export const removeMember = async (req: Request, res: Response) => {
+export const removeMember = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id, memberId } = req.params;
@@ -589,7 +589,7 @@ export const removeMember = async (req: Request, res: Response) => {
 };
 
 // Atualizar role do membro (apenas admin)
-export const updateMemberRole = async (req: Request, res: Response) => {
+export const updateMemberRole = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id, memberId } = req.params;
@@ -653,7 +653,7 @@ export const updateMemberRole = async (req: Request, res: Response) => {
 };
 
 // Deletar grupo (apenas criador)
-export const deleteGroup = async (req: Request, res: Response) => {
+export const deleteGroup = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -686,7 +686,7 @@ export const deleteGroup = async (req: Request, res: Response) => {
 };
 
 // Atualizar informações do grupo (nome, avatar)
-export const updateGroup = async (req: Request, res: Response) => {
+export const updateGroup = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
@@ -743,7 +743,7 @@ export const updateGroup = async (req: Request, res: Response) => {
 };
 
 // Convidar membro para o grupo
-export const inviteMember = async (req: Request, res: Response) => {
+export const inviteMember = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -845,7 +845,7 @@ export const inviteMember = async (req: Request, res: Response) => {
 };
 
 // Responder convite
-export const respondInvite = async (req: Request, res: Response) => {
+export const respondInvite = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { inviteId } = req.params;
@@ -900,7 +900,7 @@ export const respondInvite = async (req: Request, res: Response) => {
 };
 
 // Atualizar apelido no grupo
-export const updateNickname = async (req: Request, res: Response) => {
+export const updateNickname = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -923,7 +923,7 @@ export const updateNickname = async (req: Request, res: Response) => {
 };
 
 // Mutar/desmutar grupo
-export const toggleMute = async (req: Request, res: Response) => {
+export const toggleMute = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -953,7 +953,7 @@ export const toggleMute = async (req: Request, res: Response) => {
 };
 
 // Atualizar background do grupo
-export const updateGroupBackground = async (req: Request, res: Response) => {
+export const updateGroupBackground = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -996,7 +996,7 @@ export const updateGroupBackground = async (req: Request, res: Response) => {
 };
 
 // Enviar imagem no chat (custa 10 Zions)
-export const postImageMessage = async (req: Request, res: Response) => {
+export const postImageMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -1077,7 +1077,7 @@ export const postImageMessage = async (req: Request, res: Response) => {
 };
 
 // Listar convites pendentes do usuário
-export const getMyInvites = async (req: Request, res: Response) => {
+export const getMyInvites = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
 
@@ -1127,7 +1127,7 @@ export const getMyInvites = async (req: Request, res: Response) => {
 };
 
 // Set typing indicator
-export const setTyping = async (req: Request, res: Response) => {
+export const setTyping = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -1170,7 +1170,7 @@ export const setTyping = async (req: Request, res: Response) => {
 };
 
 // Get users currently typing
-export const getTypingUsers = async (req: Request, res: Response) => {
+export const getTypingUsers = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -1203,7 +1203,7 @@ export const getTypingUsers = async (req: Request, res: Response) => {
 };
 
 // Mark messages as read
-export const markMessagesRead = async (req: Request, res: Response) => {
+export const markMessagesRead = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
@@ -1230,7 +1230,7 @@ export const markMessagesRead = async (req: Request, res: Response) => {
 };
 
 // Get readers of a specific message (users who have read up to this message)
-export const getMessageReaders = async (req: Request, res: Response) => {
+export const getMessageReaders = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId, messageId } = req.params;

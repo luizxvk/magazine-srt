@@ -1,11 +1,9 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { uploadAvatar } from '../services/cloudinaryService';
-
-const prisma = new PrismaClient();
 
 // ... existing code ...
 
@@ -272,6 +270,9 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
                 trophies: true,
                 createdAt: true,
                 membershipType: true,
+                equippedBackground: true,
+                equippedBadge: true,
+                equippedColor: true,
             },
         });
 

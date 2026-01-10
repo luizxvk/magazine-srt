@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from './prisma';
 
 type LogLevel = 'INFO' | 'WARN' | 'ERROR';
 type LogSource = 'BACKEND' | 'FRONTEND';

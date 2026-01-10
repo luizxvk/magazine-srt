@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import MercadoPagoConfig, { Preference, Payment } from 'mercadopago';
-
-const prisma = new PrismaClient();
 
 // Packages configuration
 const ZION_PACKAGES: Record<number, number> = {

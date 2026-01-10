@@ -1,10 +1,8 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { awardTrophies, checkAndAwardBadges, awardZions, awardXP } from '../services/gamificationService';
-
-const prisma = new PrismaClient();
 
 const createPostSchema = z.object({
     caption: z.string().optional(),

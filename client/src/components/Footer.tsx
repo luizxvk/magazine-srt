@@ -1,9 +1,10 @@
 import { useAuth } from '../context/AuthContext';
 import buildInfo from '../buildInfo.json';
+import packageJson from '../../package.json';
 
 export default function Footer() {
     const { theme } = useAuth();
-    const version = 'v0.3.10-beta';
+    const version = `v${packageJson.version}`;
     
     // Parse build info
     const commitHash = buildInfo.commit || 'dev';

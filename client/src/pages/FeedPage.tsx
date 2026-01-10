@@ -23,6 +23,7 @@ import OnlineFriendsCard from '../components/OnlineFriendsCard';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
+import FeedbackFormCard from '../components/FeedbackFormCard';
 
 interface Post {
     id: string;
@@ -334,6 +335,11 @@ export default function FeedPage() {
                     {/* Market Card */}
                     <div className="mb-6">
                         <MarketCard />
+                    </div>
+
+                    {/* Feedback Form Card */}
+                    <div className="mb-6">
+                        <FeedbackFormCard />
                     </div>
 
                     {/* SRT LOG Promotion Card - Featured at Top */}

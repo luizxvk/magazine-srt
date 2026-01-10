@@ -66,6 +66,7 @@ model User {
   marketListings         MarketListing[] @relation("MarketSeller")
   marketPurchases        MarketTransaction[] @relation("MarketBuyer")
   marketSales            MarketTransaction[] @relation("MarketTransactionSeller")
+  feedbacks              Feedback[]
 
   @@index([membershipType])
   @@index([isOnline])
@@ -511,6 +512,39 @@ enum MarketListingStatus {
   ACTIVE
   SOLD
   CANCELLED
+}
+
+model Feedback {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  
+  // Ratings (1-5)
+  interfaceRating   Int      // Interface geral
+  navigationRating  Int      // Facilidade de navegação
+  performanceRating Int      // Velocidade/Performance
+  designRating      Int      // Design visual
+  featuresRating    Int      // Funcionalidades
+  
+  // Text answers
+  bugsFound         String?  @db.Text // Bugs encontrados
+  favoriteFeature   String?  // Funcionalidade favorita
+  missingFeature    String?  @db.Text // O que está faltando
+  wouldRecommend    Boolean  // Recomendaria?
+  overallExperience String?  @db.Text // Experiência geral
+  suggestions       String?  @db.Text // Sugestões de melhoria
+  
+  // Additional ratings
+  communityRating   Int      // Comunidade/Social
+  customizationRating Int    // Sistema de customização
+  supportRating     Int      // Suporte/Ajuda
+  
+  isRead            Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([isRead])
 }
 
 enum Role {

@@ -24,6 +24,7 @@ import dashboardRoutes from './src/routes/dashboard';
 import cronRoutes from './src/routes/cronRoutes';
 import uploadRoutes from './src/routes/uploadRoutes';
 import marketRoutes from './src/routes/marketRoutes';
+import feedbackRoutes from './src/routes/feedbackRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -92,6 +93,7 @@ apiRouter.use('/admin/dashboard', dashboardRoutes);
 apiRouter.use('/cron', cronRoutes);
 apiRouter.use('/uploads', uploadRoutes);
 apiRouter.use('/market', marketRoutes);
+apiRouter.use('/feedback', feedbackRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

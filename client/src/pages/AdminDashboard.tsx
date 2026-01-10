@@ -14,7 +14,6 @@ import AdminEditRewardModal from '../components/AdminEditRewardModal';
 import AdminCreateEvent from '../components/AdminCreateEvent';
 import BadgeManager from '../components/BadgeManager';
 import AdminFeedbackCard from '../components/AdminFeedbackCard';
-import { sendWelcomeEmail, isEmailJSConfigured } from '../services/emailjs';
 
 interface Reward {
     id: string;
@@ -126,33 +125,18 @@ export default function AdminDashboard() {
                 return;
             }
             
-            // For new users, handle password delivery
-            // Try to send email first
-            if (isEmailJSConfigured()) {
-                showToast('Enviando email com senha...', 'info');
-                
-                const emailSent = await sendWelcomeEmail({
-                    to_email: request.email,
-                    to_name: request.name,
-                    temp_password: password
-                });
-                
-                if (emailSent) {
-                    showToast(`✅ Email enviado para ${request.email} com a senha!`, 'success');
-                } else {
-                    // Fallback to clipboard if email fails
-                    showToast(`⚠️ Falha ao enviar email. Senha: ${password}`, 'error');
-                    navigator.clipboard.writeText(password).catch(() => {
-                        alert(`Usuário criado! A senha temporária é: ${password}\n\nPor favor, envie para o usuário.`);
-                    });
-                }
-            } else {
-                // Email not configured, use clipboard
-                showToast(`Aprovado! Senha gerada: ${password}`, 'success');
+            // For new users, server already sent the email with credentials
+            // Show success and copy password as backup
+            showToast(`✅ ${request.name} aprovado! Email com credenciais enviado para ${request.email}`, 'success');
+            
+            // Copy password to clipboard as backup
+            if (password) {
                 navigator.clipboard.writeText(password).then(() => {
-                    showToast(`Senha copiada para a área de transferência!`, 'success');
+                    setTimeout(() => {
+                        showToast(`📋 Senha copiada como backup: ${password}`, 'info');
+                    }, 2000);
                 }).catch(() => {
-                    alert(`Usuário criado! A senha temporária é: ${password}\n\nPor favor, envie para o usuário.`);
+                    console.log('[Admin] Clipboard not available');
                 });
             }
 

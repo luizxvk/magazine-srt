@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
-import { sendWelcomeToMagazineEmail } from '../services/emailService';
+import { sendWelcomeToMagazineEmail, sendNewMagazineMemberEmail } from '../services/emailService';
 
 export const createRequest = async (req: Request, res: Response) => {
     try {
@@ -140,6 +140,9 @@ export const approveRequest = async (req: Request, res: Response) => {
                     role: 'MEMBER'
                 }
             });
+
+            // Send welcome email with credentials to new Magazine member
+            await sendNewMagazineMemberEmail(user.email, user.name, generatedPassword);
         }
 
         // Update request status

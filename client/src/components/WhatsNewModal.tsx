@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins, Package, AtSign } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins, Package, AtSign, Mail, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.18';
+const CURRENT_VERSION = '0.3.19';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,37 +33,44 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.18 - Inventory, Mentions, Login Styles, Online Friends
+    // v0.3.19 - Email Fix, Page Refresh Fix
     const updates: UpdateItem[] = [
         {
-            icon: <Package className="w-5 h-5" />,
-            title: 'Card de Inventário!',
-            description: 'Veja todos os seus itens (fundos, selos, cores) diretamente no feed! Acesso rápido à loja de customização.',
+            icon: <Mail className="w-5 h-5" />,
+            title: 'Email de Boas-vindas Corrigido',
+            description: 'Novos membros Magazine agora recebem email de boas-vindas com credenciais, não mais email de reset de senha.',
             isNew: true
+        },
+        {
+            icon: <RefreshCw className="w-5 h-5" />,
+            title: 'Página Não Fica Mais em Branco',
+            description: 'Corrigido bug onde a página ficava em branco após atualizar (F5). Estilos personalizados carregam corretamente.',
+            isNew: true
+        },
+        {
+            icon: <Package className="w-5 h-5" />,
+            title: 'Card de Inventário',
+            description: 'Veja todos os seus itens (fundos, selos, cores) diretamente no feed! Acesso rápido à loja de customização.'
         },
         {
             icon: <AtSign className="w-5 h-5" />,
             title: 'Menções em Grupos @usuario',
-            description: 'Mencione membros nos grupos digitando @nome! Eles receberão notificação e o ícone de grupos pulsará vermelho.',
-            isNew: true
+            description: 'Mencione membros nos grupos digitando @nome! Eles receberão notificação e o ícone de grupos pulsará vermelho.'
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'Estilos Imediatos no Login',
-            description: 'Suas cores, fundos e badges agora aparecem instantaneamente ao logar, sem precisar atualizar!',
-            isNew: true
+            description: 'Suas cores, fundos e badges agora aparecem instantaneamente ao logar, sem precisar atualizar!'
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Amigos Online Atualizado',
-            description: 'Timeout de AFK aumentado para 1h. Usuários offline por mais tempo não aparecem como online.',
-            isNew: true
+            description: 'Timeout de AFK aumentado para 1h. Usuários offline por mais tempo não aparecem como online.'
         },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Indicadores de Convite/Menção',
-            description: 'Convites de grupo fazem o ícone Social pulsar vermelho. Menções fazem o ícone de Grupos pulsar.',
-            isNew: true
+            description: 'Convites de grupo fazem o ícone Social pulsar vermelho. Menções fazem o ícone de Grupos pulsar.'
         },
         {
             icon: <Image className="w-5 h-5" />,

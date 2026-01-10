@@ -165,6 +165,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return null; // Use default background
     }, [user?.equippedBackground]);
 
+    // Helper function to immediately apply accent color styles (used on login AND page load)
+    const applyAccentStyles = (userData: User) => {
+        const root = document.documentElement;
+        
+        // Determine accent color
+        let colorValue = userData.membershipType === 'MGT' ? '#50c878' : '#d4af37'; // defaults
+        if (userData.equippedColor && ACCENT_COLORS[userData.equippedColor]) {
+            const mapped = ACCENT_COLORS[userData.equippedColor];
+            if (mapped !== 'rgb-dynamic') {
+                colorValue = mapped;
+            }
+        }
+        
+        const mixHex = (hexA: string, hexB: string, weightA: number) => {
+            const normalize = (hex: string) => hex.replace('#', '');
+            const a = normalize(hexA);
+            const b = normalize(hexB);
+            const aRgb = { r: parseInt(a.slice(0, 2), 16), g: parseInt(a.slice(2, 4), 16), b: parseInt(a.slice(4, 6), 16) };
+            const bRgb = { r: parseInt(b.slice(0, 2), 16), g: parseInt(b.slice(2, 4), 16), b: parseInt(b.slice(4, 6), 16) };
+            const clamp = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
+            const r = clamp(aRgb.r * weightA + bRgb.r * (1 - weightA));
+            const g = clamp(aRgb.g * weightA + bRgb.g * (1 - weightA));
+            const bCh = clamp(aRgb.b * weightA + bRgb.b * (1 - weightA));
+            const toHex2 = (n: number) => n.toString(16).padStart(2, '0');
+            return `#${toHex2(r)}${toHex2(g)}${toHex2(bCh)}`;
+        };
+        
+        // Apply CSS variables immediately
+        root.style.setProperty('--accent-color', colorValue);
+        root.style.setProperty('--accent-color-rgb', hexToRgb(colorValue));
+        root.style.setProperty('--accent-50', mixHex(colorValue, '#ffffff', 0.10));
+        root.style.setProperty('--accent-100', mixHex(colorValue, '#ffffff', 0.20));
+        root.style.setProperty('--accent-200', mixHex(colorValue, '#ffffff', 0.40));
+        root.style.setProperty('--accent-300', mixHex(colorValue, '#ffffff', 0.60));
+        root.style.setProperty('--accent-400', colorValue);
+        root.style.setProperty('--accent-500', colorValue);
+        root.style.setProperty('--accent-600', mixHex(colorValue, '#000000', 0.80));
+        root.style.setProperty('--accent-700', mixHex(colorValue, '#000000', 0.60));
+        
+        // Apply classes
+        if (userData.equippedColor) {
+            root.classList.add('custom-accent');
+            if (userData.equippedColor === 'color_rgb') {
+                root.classList.add('rgb-dynamic');
+            } else {
+                root.classList.remove('rgb-dynamic');
+            }
+        }
+        
+        // Apply background immediately
+        if (userData.equippedBackground && BACKGROUND_STYLES[userData.equippedBackground]) {
+            document.body.style.background = BACKGROUND_STYLES[userData.equippedBackground];
+            document.body.style.backgroundSize = '200% 200%';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
+        }
+    };
+
     // Apply accent color as CSS variable
     useEffect(() => {
         const root = document.documentElement;
@@ -284,6 +342,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         localStorage.setItem('sessionMembershipType', userData.membershipType);
                     }
 
+                    // Apply styles IMMEDIATELY before setting user state (same as login)
+                    applyAccentStyles(userData);
+
                     setUser(userData);
 
 
@@ -345,64 +406,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const showToast = (message: string) => {
         setToast(message);
         setTimeout(() => setToast(null), 2000);
-    };
-
-    // Helper function to immediately apply accent color styles
-    const applyAccentStyles = (userData: User) => {
-        const root = document.documentElement;
-        
-        // Determine accent color
-        let colorValue = userData.membershipType === 'MGT' ? '#50c878' : '#d4af37'; // defaults
-        if (userData.equippedColor && ACCENT_COLORS[userData.equippedColor]) {
-            const mapped = ACCENT_COLORS[userData.equippedColor];
-            if (mapped !== 'rgb-dynamic') {
-                colorValue = mapped;
-            }
-        }
-        
-        const mixHex = (hexA: string, hexB: string, weightA: number) => {
-            const normalize = (hex: string) => hex.replace('#', '');
-            const a = normalize(hexA);
-            const b = normalize(hexB);
-            const aRgb = { r: parseInt(a.slice(0, 2), 16), g: parseInt(a.slice(2, 4), 16), b: parseInt(a.slice(4, 6), 16) };
-            const bRgb = { r: parseInt(b.slice(0, 2), 16), g: parseInt(b.slice(2, 4), 16), b: parseInt(b.slice(4, 6), 16) };
-            const clamp = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
-            const r = clamp(aRgb.r * weightA + bRgb.r * (1 - weightA));
-            const g = clamp(aRgb.g * weightA + bRgb.g * (1 - weightA));
-            const bCh = clamp(aRgb.b * weightA + bRgb.b * (1 - weightA));
-            const toHex2 = (n: number) => n.toString(16).padStart(2, '0');
-            return `#${toHex2(r)}${toHex2(g)}${toHex2(bCh)}`;
-        };
-        
-        // Apply CSS variables immediately
-        root.style.setProperty('--accent-color', colorValue);
-        root.style.setProperty('--accent-color-rgb', hexToRgb(colorValue));
-        root.style.setProperty('--accent-50', mixHex(colorValue, '#ffffff', 0.10));
-        root.style.setProperty('--accent-100', mixHex(colorValue, '#ffffff', 0.20));
-        root.style.setProperty('--accent-200', mixHex(colorValue, '#ffffff', 0.40));
-        root.style.setProperty('--accent-300', mixHex(colorValue, '#ffffff', 0.60));
-        root.style.setProperty('--accent-400', colorValue);
-        root.style.setProperty('--accent-500', colorValue);
-        root.style.setProperty('--accent-600', mixHex(colorValue, '#000000', 0.80));
-        root.style.setProperty('--accent-700', mixHex(colorValue, '#000000', 0.60));
-        
-        // Apply classes
-        if (userData.equippedColor) {
-            root.classList.add('custom-accent');
-            if (userData.equippedColor === 'color_rgb') {
-                root.classList.add('rgb-dynamic');
-            } else {
-                root.classList.remove('rgb-dynamic');
-            }
-        }
-        
-        // Apply background immediately
-        if (userData.equippedBackground && BACKGROUND_STYLES[userData.equippedBackground]) {
-            document.body.style.background = BACKGROUND_STYLES[userData.equippedBackground];
-            document.body.style.backgroundSize = '200% 200%';
-            document.body.style.backgroundAttachment = 'fixed';
-            document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
-        }
     };
 
     const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {

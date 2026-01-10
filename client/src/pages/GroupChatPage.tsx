@@ -94,6 +94,9 @@ export default function GroupChatPage() {
   const [showImageConfirm, setShowImageConfirm] = useState(false);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
+  const [mentionFilter, setMentionFilter] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -181,7 +184,21 @@ export default function GroupChatPage() {
   }, [id]);
 
   const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessageText(e.target.value);
+    const value = e.target.value;
+    setMessageText(value);
+    
+    // Detectar se está digitando uma menção (@)
+    const cursorPos = e.target.selectionStart || 0;
+    const textBeforeCursor = value.substring(0, cursorPos);
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    
+    if (mentionMatch) {
+      setShowMentionSuggestions(true);
+      setMentionFilter(mentionMatch[1].toLowerCase());
+    } else {
+      setShowMentionSuggestions(false);
+      setMentionFilter('');
+    }
     
     // Send typing indicator (debounced)
     if (typingTimeoutRef.current) {
@@ -190,6 +207,34 @@ export default function GroupChatPage() {
     typingTimeoutRef.current = setTimeout(() => {
       sendTypingIndicator();
     }, 300);
+  };
+
+  // Filtrar membros para sugestões de menção
+  const filteredMentionMembers = group?.members.filter(m => {
+    const name = (m.user.displayName || m.user.name).toLowerCase();
+    return name.includes(mentionFilter) && m.userId !== user?.id;
+  }) || [];
+
+  // Inserir menção selecionada
+  const insertMention = (member: GroupMember) => {
+    if (!inputRef.current) return;
+    
+    const cursorPos = inputRef.current.selectionStart || 0;
+    const textBeforeCursor = messageText.substring(0, cursorPos);
+    const textAfterCursor = messageText.substring(cursorPos);
+    
+    // Encontrar onde começa o @
+    const mentionStart = textBeforeCursor.lastIndexOf('@');
+    if (mentionStart === -1) return;
+    
+    const newText = textBeforeCursor.substring(0, mentionStart) + 
+                    `@${member.user.displayName || member.user.name} ` + 
+                    textAfterCursor;
+    
+    setMessageText(newText);
+    setShowMentionSuggestions(false);
+    setMentionFilter('');
+    inputRef.current.focus();
   };
 
   useEffect(() => {
@@ -603,37 +648,76 @@ export default function GroupChatPage() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 flex items-center gap-2 bg-black/20">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleSendImage}
-          className="hidden"
-          id="image-upload"
-        />
-        <label
-          htmlFor="image-upload"
-          className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-          title="Enviar imagem (10 Zions)"
-        >
-          <Image className="w-5 h-5" />
-        </label>
+      <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 bg-black/20 relative">
+        {/* Sugestões de menção */}
+        <AnimatePresence>
+          {showMentionSuggestions && filteredMentionMembers.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute bottom-full left-4 right-4 mb-2 bg-gray-900 border border-white/20 rounded-lg shadow-xl overflow-hidden max-h-48 overflow-y-auto"
+            >
+              <div className="p-2 text-xs text-gray-400 border-b border-white/10">Membros do grupo</div>
+              {filteredMentionMembers.slice(0, 5).map((member) => (
+                <button
+                  key={member.id}
+                  type="button"
+                  onClick={() => insertMention(member)}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+                    {member.user.avatarUrl ? (
+                      <img src={member.user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white/50">
+                        {(member.user.displayName || member.user.name).charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">{member.user.displayName || member.user.name}</p>
+                    <p className="text-xs text-gray-400">{member.role}</p>
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <input
-          type="text"
-          value={messageText}
-          onChange={handleMessageChange}
-          placeholder="Digite uma mensagem..."
-          className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
-        />
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleSendImage}
+            className="hidden"
+            id="image-upload"
+          />
+          <label
+            htmlFor="image-upload"
+            className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+            title="Enviar imagem (10 Zions)"
+          >
+            <Image className="w-5 h-5" />
+          </label>
 
-        <button
-          type="submit"
-          disabled={!messageText.trim() || sending}
-          className={`p-2 rounded-full ${accentBg} text-white disabled:opacity-50 transition-all hover:scale-110`}
-        >
-          <Send className="w-5 h-5" />
-        </button>
+          <input
+            ref={inputRef}
+            type="text"
+            value={messageText}
+            onChange={handleMessageChange}
+            placeholder="Digite uma mensagem... Use @ para mencionar"
+            className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
+          />
+
+          <button
+            type="submit"
+            disabled={!messageText.trim() || sending}
+            className={`p-2 rounded-full ${accentBg} text-white disabled:opacity-50 transition-all hover:scale-110`}
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
       </form>
         </div>
       </div>

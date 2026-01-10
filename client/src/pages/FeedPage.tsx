@@ -24,6 +24,7 @@ import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
+import InventoryCard from '../components/InventoryCard';
 
 interface Post {
     id: string;
@@ -317,6 +318,11 @@ export default function FeedPage() {
 
                 {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
                 <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
+                    {/* Inventory Card */}
+                    <div className="mb-6">
+                        <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
+                    </div>
+
                     {/* Daily Login Card */}
                     <div className="mb-10">
                         <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />

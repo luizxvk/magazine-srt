@@ -171,8 +171,8 @@ export const getOnlineFriends = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        // Consider a user online if they were active in the last 5 minutes
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        // Consider a user online if they were active in the last 1 hour (reduced from 5 minutes for better UX)
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
         const friendships = await prisma.friendship.findMany({
             where: {
@@ -194,7 +194,7 @@ export const getOnlineFriends = async (req: AuthRequest, res: Response) => {
 
         const onlineFriends = friendships
             .map(f => f.requesterId === userId ? f.addressee : f.requester)
-            .filter(friend => friend.isOnline || (friend.lastSeenAt && new Date(friend.lastSeenAt) > fiveMinutesAgo));
+            .filter(friend => friend.isOnline && friend.lastSeenAt && new Date(friend.lastSeenAt) > oneHourAgo);
 
         res.json(onlineFriends);
     } catch (error) {

@@ -36,6 +36,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen } = useAuth();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
+    const [hasGroupInvites, setHasGroupInvites] = useState(false);
+    const [hasGroupMentions, setHasGroupMentions] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isWhatsNewModalOpen, setIsWhatsNewModalOpen] = useState(false);
@@ -74,6 +76,14 @@ export default function Header({ onOpenShop }: HeaderProps) {
                 const notifications = response.data;
                 const unread = notifications.some((n: any) => !n.read);
                 setHasUnread(unread);
+
+                // Check for group invites (social icon should pulse)
+                const groupInvites = notifications.filter((n: any) => !n.read && n.type === 'GROUP_INVITE');
+                setHasGroupInvites(groupInvites.length > 0);
+
+                // Check for group mentions (group icon should pulse)
+                const groupMentions = notifications.filter((n: any) => !n.read && n.type === 'GROUP_MENTION');
+                setHasGroupMentions(groupMentions.length > 0);
 
                 // Check for new badges
                 const newBadges = notifications.filter((n: any) => !n.read && n.type === 'BADGE');
@@ -228,12 +238,18 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             </button>
                         )}
 
-                        <Link to="/social" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
+                        <Link to="/social" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
                             <Users className="w-5 h-5" />
+                            {hasGroupInvites && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                            )}
                         </Link>
 
-                        <Link to="/groups" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Grupos" title="Grupos">
+                        <Link to="/groups" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Grupos" title="Grupos">
                             <MessageCircle className="w-5 h-5" />
+                            {hasGroupMentions && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                            )}
                         </Link>
 
                         <Link to="/roadmap" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Roadmap" title="Roadmap">

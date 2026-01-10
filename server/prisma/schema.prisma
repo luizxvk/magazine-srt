@@ -572,6 +572,7 @@ enum NotificationType {
   FRIEND_REQUEST
   MESSAGE
   GROUP_INVITE
+  GROUP_MENTION
 }
 
 enum MediaType {

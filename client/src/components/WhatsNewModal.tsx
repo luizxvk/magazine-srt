@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins, Package, AtSign } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.10';
+const CURRENT_VERSION = '0.3.18';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,49 +33,78 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.10 - Recompensas Gratuitas e Card do Mercado
+    // v0.3.18 - Inventory, Mentions, Login Styles, Online Friends
     const updates: UpdateItem[] = [
+        {
+            icon: <Package className="w-5 h-5" />,
+            title: 'Card de Inventário!',
+            description: 'Veja todos os seus itens (fundos, selos, cores) diretamente no feed! Acesso rápido à loja de customização.',
+            isNew: true
+        },
+        {
+            icon: <AtSign className="w-5 h-5" />,
+            title: 'Menções em Grupos @usuario',
+            description: 'Mencione membros nos grupos digitando @nome! Eles receberão notificação e o ícone de grupos pulsará vermelho.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Estilos Imediatos no Login',
+            description: 'Suas cores, fundos e badges agora aparecem instantaneamente ao logar, sem precisar atualizar!',
+            isNew: true
+        },
+        {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Amigos Online Atualizado',
+            description: 'Timeout de AFK aumentado para 1h. Usuários offline por mais tempo não aparecem como online.',
+            isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Indicadores de Convite/Menção',
+            description: 'Convites de grupo fazem o ícone Social pulsar vermelho. Menções fazem o ícone de Grupos pulsar.',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Catálogo de Fotos Corrigido',
+            description: 'Rota do catálogo adicionada - não redireciona mais para login!',
+            isNew: true
+        },
         {
             icon: <Gift className="w-5 h-5" />,
             title: 'Recompensas Gratuitas!',
             description: 'Admins podem criar recompensas com custo 0 (Gratuito) e dar Zions como prêmio ao resgatar!',
-            isNew: true
         },
         {
             icon: <Coins className="w-5 h-5" />,
             title: 'Zions de Recompensa',
             description: 'Ao resgatar, usuários recebem Zions automaticamente + notificação "Parabéns por ter adquirido seus X zions"!',
-            isNew: true
         },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Card do Mercado no Feed',
             description: 'Acesso rápido ao Mercado direto do feed com botões para Navegar, Vender e Histórico!',
-            isNew: true
         },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Mercado de Customizações!',
             description: 'Compre e venda itens de customização com outros usuários! Acesse pelo menu "Mercado" e negocie Zions.',
-            isNew: true
         },
         {
             icon: <Search className="w-5 h-5" />,
             title: 'Navegação e Filtros',
             description: 'Pesquise por nome, filtre por tipo (fundos, selos, cores) e ordene por preço ou data!',
-            isNew: true
         },
         {
             icon: <Zap className="w-5 h-5" />,
             title: 'Taxa de 5% nas Vendas',
             description: 'Venda qualquer item não-padrão! O sistema cobra 5% de taxa e você recebe o resto em Zions.',
-            isNew: true
         },
         {
             icon: <Trophy className="w-5 h-5" />,
             title: 'Histórico de Transações',
             description: 'Veja todas suas compras e vendas, quanto ganhou/gastou, e acompanhe suas negociações!',
-            isNew: true
         },
         {
             icon: <VolumeX className="w-5 h-5" />,

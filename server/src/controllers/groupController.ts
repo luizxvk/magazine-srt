@@ -408,6 +408,48 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
       },
     });
 
+    // Detectar menções (@username) e criar notificações
+    if (content) {
+      const mentionRegex = /@(\w+)/g;
+      const mentions = content.match(mentionRegex);
+      
+      if (mentions && mentions.length > 0) {
+        // Buscar membros do grupo para encontrar os mencionados
+        const groupMembers = await prisma.groupMember.findMany({
+          where: { groupId: id },
+          include: {
+            user: {
+              select: { id: true, name: true, displayName: true }
+            }
+          }
+        });
+
+        // Para cada menção, verificar se corresponde a um membro
+        for (const mention of mentions) {
+          const username = mention.substring(1).toLowerCase(); // Remove @
+          const mentionedMember = groupMembers.find(m => 
+            m.user.name.toLowerCase() === username || 
+            (m.user.displayName && m.user.displayName.toLowerCase() === username)
+          );
+
+          if (mentionedMember && mentionedMember.userId !== userId) {
+            // Criar notificação para o usuário mencionado
+            try {
+              await prisma.notification.create({
+                data: {
+                  userId: mentionedMember.userId,
+                  type: 'GROUP_MENTION',
+                  content: `${message.sender.displayName || message.sender.name} mencionou você em ${member.group.name || 'um grupo'}`
+                }
+              });
+            } catch (notifError) {
+              console.error('Error creating mention notification:', notifError);
+            }
+          }
+        }
+      }
+    }
+
     // Atualizar updatedAt do grupo
     await prisma.group.update({
       where: { id },

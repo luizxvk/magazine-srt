@@ -214,12 +214,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         }
         
-        // Apply background immediately
+        // Apply background immediately OR clear if none equipped
         if (userData.equippedBackground && BACKGROUND_STYLES[userData.equippedBackground]) {
             document.body.style.background = BACKGROUND_STYLES[userData.equippedBackground];
             document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';
             document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
+        } else {
+            // Clear any previously applied background
+            document.body.style.background = '';
+            document.body.style.backgroundSize = '';
+            document.body.style.backgroundAttachment = '';
+            document.body.style.animation = '';
         }
     };
 

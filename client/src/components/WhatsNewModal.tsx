@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins, Package, AtSign, Mail, RefreshCw } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Coins, Package, AtSign, Mail, RefreshCw, Move } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.19';
+const CURRENT_VERSION = '0.3.20';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,70 +33,66 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.19 - Email Fix, Page Refresh Fix
+    // v0.3.20 - Mentions, Inventory, Background Crop, Accent Colors
     const updates: UpdateItem[] = [
         {
-            icon: <Mail className="w-5 h-5" />,
-            title: 'Email de Boas-vindas Corrigido',
-            description: 'Novos membros Magazine agora recebem email de boas-vindas com credenciais, não mais email de reset de senha.',
-            isNew: true
-        },
-        {
-            icon: <RefreshCw className="w-5 h-5" />,
-            title: 'Página Não Fica Mais em Branco',
-            description: 'Corrigido bug onde a página ficava em branco após atualizar (F5). Estilos personalizados carregam corretamente.',
+            icon: <AtSign className="w-5 h-5" />,
+            title: 'Menções no Widget de Post',
+            description: 'Agora você pode mencionar usuários @nome diretamente no widget de criar post do feed!',
             isNew: true
         },
         {
             icon: <Package className="w-5 h-5" />,
-            title: 'Card de Inventário',
-            description: 'Veja todos os seus itens (fundos, selos, cores) diretamente no feed! Acesso rápido à loja de customização.'
+            title: 'Inventário Corrigido',
+            description: 'O inventário agora mostra corretamente todos os itens (fundos, selos, cores) que você já comprou!',
+            isNew: true
+        },
+        {
+            icon: <Move className="w-5 h-5" />,
+            title: 'Ajuste de Background do Perfil',
+            description: 'Reposicione e ajuste o zoom da imagem de fundo do seu perfil! Clique no botão de ajuste ao editar.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Botão Criar Post com Cor Destaque',
+            description: 'O botão flutuante "Criar Post" agora segue sua cor de destaque personalizada!',
+            isNew: true
+        },
+        {
+            icon: <RefreshCw className="w-5 h-5" />,
+            title: 'Background Limpo ao Atualizar',
+            description: 'Corrigido bug onde o fundo da página persistia após atualizar, mesmo sem estar equipado.'
+        },
+        {
+            icon: <Mail className="w-5 h-5" />,
+            title: 'Email de Boas-vindas',
+            description: 'Novos membros Magazine agora recebem email de boas-vindas com credenciais corretas.'
         },
         {
             icon: <AtSign className="w-5 h-5" />,
             title: 'Menções em Grupos @usuario',
-            description: 'Mencione membros nos grupos digitando @nome! Eles receberão notificação e o ícone de grupos pulsará vermelho.'
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'Estilos Imediatos no Login',
-            description: 'Suas cores, fundos e badges agora aparecem instantaneamente ao logar, sem precisar atualizar!'
+            description: 'Mencione membros nos grupos digitando @nome! Eles receberão notificação.'
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Amigos Online Atualizado',
-            description: 'Timeout de AFK aumentado para 1h. Usuários offline por mais tempo não aparecem como online.'
+            description: 'Timeout de AFK aumentado para 1h. Status online mais preciso.'
         },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Indicadores de Convite/Menção',
-            description: 'Convites de grupo fazem o ícone Social pulsar vermelho. Menções fazem o ícone de Grupos pulsar.'
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Catálogo de Fotos Corrigido',
-            description: 'Rota do catálogo adicionada - não redireciona mais para login!',
-            isNew: true
+            description: 'Convites de grupo e menções fazem os ícones pulsarem vermelho para notificá-lo.'
         },
         {
             icon: <Gift className="w-5 h-5" />,
             title: 'Recompensas Gratuitas!',
-            description: 'Admins podem criar recompensas com custo 0 (Gratuito) e dar Zions como prêmio ao resgatar!',
-        },
-        {
-            icon: <Coins className="w-5 h-5" />,
-            title: 'Zions de Recompensa',
-            description: 'Ao resgatar, usuários recebem Zions automaticamente + notificação "Parabéns por ter adquirido seus X zions"!',
+            description: 'Admins podem criar recompensas com custo 0 (Gratuito) e dar Zions como prêmio!',
         },
         {
             icon: <Store className="w-5 h-5" />,
-            title: 'Card do Mercado no Feed',
-            description: 'Acesso rápido ao Mercado direto do feed com botões para Navegar, Vender e Histórico!',
-        },
-        {
-            icon: <Store className="w-5 h-5" />,
-            title: 'Mercado de Customizações!',
-            description: 'Compre e venda itens de customização com outros usuários! Acesse pelo menu "Mercado" e negocie Zions.',
+            title: 'Mercado de Customizações',
+            description: 'Compre e venda itens de customização com outros usuários! Acesse pelo menu "Mercado".',
         },
         {
             icon: <Search className="w-5 h-5" />,

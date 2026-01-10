@@ -8,7 +8,7 @@ interface CreatePostPillProps {
 }
 
 export default function CreatePostPill({ onClick }: CreatePostPillProps) {
-    const { user, isMobileDrawerOpen } = useAuth();
+    const { user, isMobileDrawerOpen, accentColor } = useAuth();
     const [isExpanded, setIsExpanded] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
     
@@ -27,6 +27,15 @@ export default function CreatePostPill({ onClick }: CreatePostPillProps) {
         setIsExpanded(false);
     };
     
+    // Dynamic button style based on accent color
+    const buttonStyle = isMGT 
+        ? {} 
+        : { backgroundColor: accentColor, boxShadow: `0 0 20px ${accentColor}50` };
+    
+    const hoverStyle = isMGT
+        ? {}
+        : { boxShadow: `0 0 30px ${accentColor}80` };
+    
     return (
         <>
             {/* Mobile: Opções Expandidas */}
@@ -44,10 +53,11 @@ export default function CreatePostPill({ onClick }: CreatePostPillProps) {
                             exit={{ scale: 0, y: 20 }}
                             transition={{ delay: 0.05 }}
                             onClick={handleOptionClick}
-                            className={`flex items-center gap-3 px-6 py-3 rounded-full shadow-lg backdrop-blur-xl ${
+                            style={buttonStyle}
+                            className={`flex items-center gap-3 px-6 py-3 rounded-full shadow-lg backdrop-blur-xl text-black ${
                                 isMGT 
-                                    ? 'bg-emerald-500/90 text-black border border-emerald-400/30'
-                                    : 'bg-accent/90 text-black border border-gold-400/30'
+                                    ? 'bg-emerald-500/90 border border-emerald-400/30'
+                                    : 'border border-white/20'
                             }`}
                         >
                             <Image className="w-4 h-4" />
@@ -60,10 +70,11 @@ export default function CreatePostPill({ onClick }: CreatePostPillProps) {
                             exit={{ scale: 0, y: 20 }}
                             transition={{ delay: 0.1 }}
                             onClick={handleOptionClick}
-                            className={`flex items-center gap-3 px-6 py-3 rounded-full shadow-lg backdrop-blur-xl ${
+                            style={buttonStyle}
+                            className={`flex items-center gap-3 px-6 py-3 rounded-full shadow-lg backdrop-blur-xl text-black ${
                                 isMGT 
-                                    ? 'bg-emerald-500/90 text-black border border-emerald-400/30'
-                                    : 'bg-accent/90 text-black border border-gold-400/30'
+                                    ? 'bg-emerald-500/90 border border-emerald-400/30'
+                                    : 'border border-white/20'
                             }`}
                         >
                             <Type className="w-4 h-4" />
@@ -76,10 +87,11 @@ export default function CreatePostPill({ onClick }: CreatePostPillProps) {
                             exit={{ scale: 0, y: 20 }}
                             transition={{ delay: 0.15 }}
                             onClick={handleOptionClick}
-                            className={`flex items-center gap-3 px-6 py-3 rounded-full shadow-lg backdrop-blur-xl ${
+                            style={buttonStyle}
+                            className={`flex items-center gap-3 px-6 py-3 rounded-full shadow-lg backdrop-blur-xl text-black ${
                                 isMGT 
-                                    ? 'bg-emerald-500/90 text-black border border-emerald-400/30'
-                                    : 'bg-accent/90 text-black border border-gold-400/30'
+                                    ? 'bg-emerald-500/90 border border-emerald-400/30'
+                                    : 'border border-white/20'
                             }`}
                         >
                             <Hash className="w-4 h-4" />
@@ -102,10 +114,12 @@ export default function CreatePostPill({ onClick }: CreatePostPillProps) {
                     stiffness: 300,
                     damping: 30
                 }}
-                className={`fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-full hover:scale-105 transition-all duration-300 group animate-fade-in-up ${
+                style={buttonStyle}
+                whileHover={hoverStyle}
+                className={`fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-full hover:scale-105 transition-all duration-300 group animate-fade-in-up text-black ${
                     isMGT 
-                        ? 'bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)]'
-                        : 'bg-accent text-black shadow-accent hover:shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.6)]'
+                        ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)]'
+                        : ''
                 }`}
             >
                 {/* Mobile: Apenas seta simples */}

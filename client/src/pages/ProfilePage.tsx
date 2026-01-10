@@ -7,7 +7,7 @@ import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
 import ModernLoader from '../components/ModernLoader';
-import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown } from 'lucide-react';
+import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown, ZoomIn, ZoomOut, Move } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import ToastNotification from '../components/ToastNotification';
@@ -51,11 +51,23 @@ export default function ProfilePage() {
     });
     const [bgImage, setBgImage] = useState<string | null>(null);
     const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' as 'success' | 'error' | 'info' });
+    
+    // Background image adjustment states
+    const [isBgAdjustOpen, setIsBgAdjustOpen] = useState(false);
+    const [tempBgImage, setTempBgImage] = useState<string | null>(null);
+    const [bgScale, setBgScale] = useState(1);
+    const [bgPosition, setBgPosition] = useState({ x: 50, y: 50 }); // Percentage position
 
     useEffect(() => {
         if (profileUser) {
             const savedBg = localStorage.getItem(`profile_bg_${profileUser.id}`);
+            const savedBgSettings = localStorage.getItem(`profile_bg_settings_${profileUser.id}`);
             if (savedBg) setBgImage(savedBg);
+            if (savedBgSettings) {
+                const settings = JSON.parse(savedBgSettings);
+                setBgScale(settings.scale || 1);
+                setBgPosition(settings.position || { x: 50, y: 50 });
+            }
 
             // Open chat if param is present
             if (searchParams.get('chat') === 'true' && !isOwnProfile) {
@@ -157,6 +169,130 @@ export default function ProfilePage() {
 
             {isOwnProfile && <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />}
 
+            {/* Background Image Adjustment Modal */}
+            {isBgAdjustOpen && tempBgImage && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsBgAdjustOpen(false)} />
+                    <div className={`relative w-full max-w-lg bg-[#0a0a0a] border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up`}>
+                        {/* Header */}
+                        <div className={`p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r ${isMGT ? 'from-emerald-900/10' : 'from-gold-900/10'} to-transparent`}>
+                            <h3 className="text-lg font-serif text-white">Ajustar Imagem de Fundo</h3>
+                            <button onClick={() => setIsBgAdjustOpen(false)} className="text-gray-400 hover:text-white">✕</button>
+                        </div>
+                        
+                        {/* Preview */}
+                        <div className="p-4">
+                            <div 
+                                className="w-full h-48 rounded-xl overflow-hidden border border-white/10 relative"
+                                style={{
+                                    backgroundImage: `url(${tempBgImage})`,
+                                    backgroundSize: `${bgScale * 100}%`,
+                                    backgroundPosition: `${bgPosition.x}% ${bgPosition.y}%`,
+                                    backgroundRepeat: 'no-repeat'
+                                }}
+                            >
+                                <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-emerald-900/20' : 'from-gold-500/10'} to-black/80`} />
+                                <div className="absolute bottom-2 left-2 text-xs text-white/50 flex items-center gap-1">
+                                    <Move className="w-3 h-3" />
+                                    Preview
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="px-4 pb-4 space-y-4">
+                            {/* Zoom */}
+                            <div className="flex items-center gap-3">
+                                <ZoomOut className="w-4 h-4 text-gray-400" />
+                                <input
+                                    type="range"
+                                    min="0.5"
+                                    max="3"
+                                    step="0.1"
+                                    value={bgScale}
+                                    onChange={(e) => setBgScale(parseFloat(e.target.value))}
+                                    className="flex-1 accent-gold-500"
+                                />
+                                <ZoomIn className="w-4 h-4 text-gray-400" />
+                                <span className="text-xs text-gray-400 w-12">{Math.round(bgScale * 100)}%</span>
+                            </div>
+
+                            {/* Position X */}
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-gray-400 w-16">Horizontal</span>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={bgPosition.x}
+                                    onChange={(e) => setBgPosition(prev => ({ ...prev, x: parseInt(e.target.value) }))}
+                                    className="flex-1 accent-gold-500"
+                                />
+                                <span className="text-xs text-gray-400 w-10">{bgPosition.x}%</span>
+                            </div>
+
+                            {/* Position Y */}
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-gray-400 w-16">Vertical</span>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={bgPosition.y}
+                                    onChange={(e) => setBgPosition(prev => ({ ...prev, y: parseInt(e.target.value) }))}
+                                    className="flex-1 accent-gold-500"
+                                />
+                                <span className="text-xs text-gray-400 w-10">{bgPosition.y}%</span>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-4 border-t border-white/10 flex justify-between gap-3">
+                            <button
+                                onClick={() => {
+                                    if (currentUser) {
+                                        localStorage.removeItem(`profile_bg_${currentUser.id}`);
+                                        localStorage.removeItem(`profile_bg_settings_${currentUser.id}`);
+                                        setBgImage(null);
+                                        setTempBgImage(null);
+                                        setIsBgAdjustOpen(false);
+                                        showToast('Imagem de fundo removida', 'info');
+                                    }
+                                }}
+                                className="px-4 py-2 rounded-full text-red-400 border border-red-500/30 hover:bg-red-500/10 text-sm"
+                            >
+                                Remover
+                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setIsBgAdjustOpen(false)}
+                                    className="px-4 py-2 rounded-full text-gray-400 border border-white/10 hover:bg-white/5 text-sm"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (currentUser && tempBgImage) {
+                                            localStorage.setItem(`profile_bg_${currentUser.id}`, tempBgImage);
+                                            localStorage.setItem(`profile_bg_settings_${currentUser.id}`, JSON.stringify({
+                                                scale: bgScale,
+                                                position: bgPosition
+                                            }));
+                                            setBgImage(tempBgImage);
+                                            setIsBgAdjustOpen(false);
+                                            showToast('Imagem de fundo atualizada!', 'success');
+                                        }
+                                    }}
+                                    className={`px-6 py-2 rounded-full text-black text-sm font-medium ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'}`}
+                                >
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {isChatOpen && !isOwnProfile && (
                 <ChatWindow
                     otherUserId={profileUser.id}
@@ -181,9 +317,14 @@ export default function ProfilePage() {
                 <div className={`glass-panel p-8 rounded-3xl border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} relative overflow-hidden transition-all duration-500 mb-8`}>
                     {bgImage && (
                         <div
-                            className="absolute inset-0 bg-cover bg-center z-0 opacity-50 blur-sm"
+                            className="absolute inset-0 z-0 opacity-50 blur-sm"
                             // eslint-disable-next-line react-dom/no-unsafe-inline-style
-                            style={{ backgroundImage: `url(${bgImage})` }}
+                            style={{ 
+                                backgroundImage: `url(${bgImage})`,
+                                backgroundSize: `${bgScale * 100}%`,
+                                backgroundPosition: `${bgPosition.x}% ${bgPosition.y}%`,
+                                backgroundRepeat: 'no-repeat'
+                            }}
                         />
                     )}
                     <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-red-900/20' : 'from-gold-500/10'} ${theme === 'light' ? 'to-white/80' : 'to-black/80'} z-0`} />
@@ -283,11 +424,11 @@ export default function ProfilePage() {
                                                             const reader = new FileReader();
                                                             reader.onloadend = () => {
                                                                 const result = reader.result as string;
-                                                                if (currentUser) {
-                                                                    localStorage.setItem(`profile_bg_${currentUser.id}`, result);
-                                                                    setBgImage(result);
-                                                                    showToast('Imagem de fundo atualizada!', 'success');
-                                                                }
+                                                                // Open adjustment modal instead of saving directly
+                                                                setTempBgImage(result);
+                                                                setBgScale(1);
+                                                                setBgPosition({ x: 50, y: 50 });
+                                                                setIsBgAdjustOpen(true);
                                                             };
                                                             reader.readAsDataURL(file);
                                                         }

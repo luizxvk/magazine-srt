@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check, AtSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +7,13 @@ import { compressImage, getBase64Size } from '../utils/imageCompression';
 
 interface CreatePostWidgetProps {
     onPostCreated: () => void;
+}
+
+interface MentionUser {
+    id: string;
+    name: string;
+    displayName: string;
+    imageUrl?: string;
 }
 
 export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProps) {
@@ -20,6 +27,12 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     const [isCarouselMode, setIsCarouselMode] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [showTagInput, setShowTagInput] = useState(false);
+    
+    // Mention system states
+    const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
+    const [mentionFilter, setMentionFilter] = useState('');
+    const [mentionUsers, setMentionUsers] = useState<MentionUser[]>([]);
+    const [cursorPosition, setCursorPosition] = useState(0);
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +75,87 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     const themeTagBg = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
     const themeTagBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeTagText = isMGT ? 'text-emerald-300' : 'text-gold-300';
+
+    // Load users for mention suggestions
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const response = await api.get('/users');
+                setMentionUsers(response.data.filter((u: MentionUser) => u.id !== user?.id));
+            } catch (error) {
+                console.error('Failed to load users for mentions', error);
+            }
+        };
+        loadUsers();
+    }, [user?.id]);
+
+    // Handle caption change to detect @ mentions
+    const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        const position = e.target.selectionStart || 0;
+        setCaption(value);
+        setCursorPosition(position);
+
+        // Check for @ mention
+        const textBeforeCursor = value.substring(0, position);
+        const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+        
+        if (mentionMatch) {
+            setMentionFilter(mentionMatch[1].toLowerCase());
+            setShowMentionSuggestions(true);
+        } else {
+            setShowMentionSuggestions(false);
+        }
+    };
+
+    // Insert mention into caption
+    const insertMention = (userToMention: MentionUser) => {
+        const textBeforeCursor = caption.substring(0, cursorPosition);
+        const textAfterCursor = caption.substring(cursorPosition);
+        const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+        
+        if (mentionMatch) {
+            const beforeMention = textBeforeCursor.substring(0, mentionMatch.index);
+            const mentionText = `@${userToMention.displayName || userToMention.name} `;
+            const newCaption = beforeMention + mentionText + textAfterCursor;
+            setCaption(newCaption);
+            
+            // Move cursor after mention
+            const newPosition = beforeMention.length + mentionText.length;
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                    inputRef.current.setSelectionRange(newPosition, newPosition);
+                }
+            }, 0);
+        }
+        
+        setShowMentionSuggestions(false);
+    };
+
+    // Handle @ button click
+    const handleMentionClick = () => {
+        const currentCaption = caption;
+        const position = inputRef.current?.selectionStart || currentCaption.length;
+        const newCaption = currentCaption.substring(0, position) + '@' + currentCaption.substring(position);
+        setCaption(newCaption);
+        setCursorPosition(position + 1);
+        setShowMentionSuggestions(true);
+        setMentionFilter('');
+        
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus();
+                inputRef.current.setSelectionRange(position + 1, position + 1);
+            }
+        }, 0);
+    };
+
+    // Filter mention users
+    const filteredMentionUsers = mentionUsers.filter(u => 
+        (u.displayName?.toLowerCase().includes(mentionFilter) || 
+         u.name?.toLowerCase().includes(mentionFilter))
+    ).slice(0, 5);
 
     const handleSubmit = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -284,6 +378,29 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
                 </div>
             )}
 
+            {/* Mention Suggestions Popup */}
+            {showMentionSuggestions && filteredMentionUsers.length > 0 && (
+                <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-xl border ${themeBorder} rounded-xl p-2 shadow-2xl w-64 animate-fade-in-up z-50 max-h-48 overflow-y-auto`}>
+                    <div className={`text-xs ${themeTagText} uppercase tracking-widest mb-2 px-2`}>Mencionar</div>
+                    {filteredMentionUsers.map(u => (
+                        <button
+                            key={u.id}
+                            onClick={() => insertMention(u)}
+                            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-left`}
+                        >
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center overflow-hidden">
+                                {u.imageUrl ? (
+                                    <img src={u.imageUrl} alt={u.displayName || u.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-xs text-white font-bold">{(u.displayName || u.name).charAt(0).toUpperCase()}</span>
+                                )}
+                            </div>
+                            <span className="text-white text-sm truncate">{u.displayName || u.name}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {/* The Liquid Glass Pill */}
             <div className={`
                 relative overflow-hidden
@@ -302,9 +419,9 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
                     <textarea
                         ref={inputRef}
                         value={caption}
-                        onChange={(e) => setCaption(e.target.value)}
+                        onChange={handleCaptionChange}
                         onFocus={() => setIsExpanded(true)}
-                        onBlur={() => !caption && setIsExpanded(false)}
+                        onBlur={() => { !caption && setIsExpanded(false); setTimeout(() => setShowMentionSuggestions(false), 200); }}
                         onKeyDown={handleKeyDown}
                         placeholder={isSuccess ? "Publicado!" : "Escreva aqui"}
                         rows={1}
@@ -339,6 +456,16 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
                         title="Adicionar Tag"
                     >
                         <Hash className="w-5 h-5 stroke-[1.5]" />
+                    </button>
+
+                    {/* Mention Button */}
+                    <button
+                        type="button"
+                        onClick={handleMentionClick}
+                        className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
+                        title="Mencionar usuário"
+                    >
+                        <AtSign className="w-5 h-5 stroke-[1.5]" />
                     </button>
 
                     {/* Media Icons */}

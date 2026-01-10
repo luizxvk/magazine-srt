@@ -195,7 +195,15 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 
         if (!user) return res.status(404).json({ error: 'User not found' });
 
-        res.json(user);
+        // Parse ownedCustomizations from JSON string to array
+        const userData = {
+            ...user,
+            ownedCustomizations: user.ownedCustomizations 
+                ? JSON.parse(user.ownedCustomizations) 
+                : []
+        };
+
+        res.json(userData);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

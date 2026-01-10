@@ -6,6 +6,7 @@ import DailyLoginCard from './DailyLoginCard';
 import PhotoCatalogCard from './PhotoCatalogCard';
 import WhatsNewModal from './WhatsNewModal';
 import MgtLogCard from './MgtLogCard';
+import FeedbackFormCard from './FeedbackFormCard';
 import api from '../services/api';
 
 interface CatalogPhoto {
@@ -116,6 +117,9 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
 
                             {/* MGT Log Card */}
                             <MgtLogCard />
+
+                            {/* Feedback Card */}
+                            <FeedbackFormCard />
 
                             {/* O que há de novo - card separado */}
                             <div 

@@ -169,9 +169,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         setPurchasing(item.id);
         try {
             const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
-            await api.post('/users/customizations/purchase', { 
-                itemId: item.id, 
-                category: categoryMap[item.type] 
+            await api.post('/users/customizations/purchase', {
+                itemId: item.id,
+                category: categoryMap[item.type]
             });
             setOwnedItems(prev => [...prev, item.id]);
             updateUserZions(-item.price); // Subtract price from zions
@@ -188,17 +188,17 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const handleEquip = async (item: Omit<ShopItem, 'owned' | 'equipped'>) => {
         try {
             const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
-            const payload = { 
-                itemId: item.id, 
-                category: categoryMap[item.type] 
+            const payload = {
+                itemId: item.id,
+                category: categoryMap[item.type]
             };
             console.log('[CustomizationShop] Equipping item:', payload);
-            
+
             const response = await api.post('/users/customizations/equip', payload);
             console.log('[CustomizationShop] Equip response:', response.data);
-            
+
             setEquippedItems(prev => ({ ...prev, [item.type]: item.id }));
-            
+
             // Update user state with the equipped item so it applies globally
             if (item.type === 'background') {
                 updateUser({ ...user!, equippedBackground: item.id });
@@ -207,7 +207,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             } else if (item.type === 'color') {
                 updateUser({ ...user!, equippedColor: item.id });
             }
-            
+
             setNotification({ type: 'success', message: `${item.name} equipado!` });
         } catch (error: any) {
             console.error('[CustomizationShop] Equip error:', error.response?.data || error.message);
@@ -222,7 +222,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
             await api.post('/users/customizations/unequip', { category: categoryMap[type] });
             setEquippedItems(prev => ({ ...prev, [type]: undefined }));
-            
+
             // Update user state to remove the equipped item
             if (type === 'background') {
                 updateUser({ ...user!, equippedBackground: null });
@@ -231,7 +231,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             } else if (type === 'color') {
                 updateUser({ ...user!, equippedColor: null });
             }
-            
+
             setNotification({ type: 'success', message: 'Item desequipado!' });
         } catch (error) {
             console.error('Failed to unequip', error);
@@ -244,8 +244,12 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         try {
             const response = await api.post(`/theme-packs/${packId}/purchase`);
             setNotification({ type: 'success', message: response.data.message });
-            fetchThemePacks(); // Refresh packs
-            fetchUserCustomizations(); // Refresh zions
+
+            // Optimistically update owned packs to reflect change immediately
+            setUserPacks(prev => [...prev, { themePackId: packId }]);
+
+            fetchThemePacks(); // Refresh packs data for stock counts etc
+            fetchUserCustomizations(); // Refresh zions balance
         } catch (error: any) {
             const message = error.response?.data?.error || 'Erro ao comprar pack';
             setNotification({ type: 'error', message });
@@ -263,8 +267,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             // Update user state with equipped items from pack
             const pack = response.data.pack;
             if (pack) {
-                updateUser({ 
-                    ...user!, 
+                updateUser({
+                    ...user!,
                     equippedBackground: pack.background,
                     equippedColor: pack.color
                 });
@@ -363,9 +367,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 50 }}
-                                className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl z-[200] shadow-xl backdrop-blur-md ${
-                                    notification.type === 'success' ? 'bg-green-500/30 text-green-300 border border-green-500/40' : 'bg-red-500/30 text-red-300 border border-red-500/40'
-                                }`}
+                                className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl z-[200] shadow-xl backdrop-blur-md ${notification.type === 'success' ? 'bg-green-500/30 text-green-300 border border-green-500/40' : 'bg-red-500/30 text-red-300 border border-red-500/40'
+                                    }`}
                             >
                                 <span className="font-medium">{notification.message}</span>
                             </motion.div>
@@ -378,11 +381,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-                                    activeTab === tab.id
+                                className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
                                         ? `text-${themeColor}-400 border-b-2 border-${themeColor}-400 bg-${themeColor}-500/5`
                                         : `${textSub} ${isDarkMode ? 'hover:text-white hover:bg-white/5' : 'hover:text-gray-900 hover:bg-gray-100'}`
-                                }`}
+                                    }`}
                             >
                                 <tab.icon className="w-4 h-4" />
                                 {tab.label}
@@ -416,9 +418,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {themePacks.map(pack => {
                                             const isOwned = userPacks.some(up => up.themePackId === pack.id);
-                                            const isEquipped = user?.equippedBackground === pack.backgroundUrl && 
-                                                             user?.equippedColor === pack.accentColor;
-                                            
+                                            const isEquipped = user?.equippedBackground === pack.backgroundUrl &&
+                                                user?.equippedColor === pack.accentColor;
+
                                             return (
                                                 <ThemePackCard
                                                     key={pack.id}
@@ -452,17 +454,16 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         <motion.div
                                                             key={item.id}
                                                             whileHover={{ scale: 1.02 }}
-                                                            className={`relative rounded-xl overflow-hidden border ${
-                                                                equipped ? `border-${themeColor}-500` : borderColor
-                                                            } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
                                                         >
                                                             <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                                                 {item.preview === 'rgb-dynamic' ? (
                                                                     <div className="w-16 h-16 rounded-full shadow-lg animate-rgb-cycle" />
                                                                 ) : (
-                                                                    <div 
+                                                                    <div
                                                                         className="w-16 h-16 rounded-full shadow-lg"
-                                                                        style={{ 
+                                                                        style={{
                                                                             backgroundColor: item.preview,
                                                                             boxShadow: `0 0 30px ${item.preview}50`
                                                                         }}
@@ -481,11 +482,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     {owned ? (
                                                                         <button
                                                                             onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                                                                equipped
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
                                                                                     ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
                                                                                     : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
-                                                                            }`}
+                                                                                }`}
                                                                         >
                                                                             {equipped ? 'Desequipar' : 'Equipar'}
                                                                         </button>
@@ -493,11 +493,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         <button
                                                                             onClick={() => handlePurchase(item)}
                                                                             disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
-                                                                                (user?.zions || 0) < item.price
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
                                                                                     ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
                                                                                     : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
-                                                                            }`}
+                                                                                }`}
                                                                         >
                                                                             {purchasing === item.id ? (
                                                                                 <span className="animate-spin">⏳</span>
@@ -535,17 +534,16 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         <motion.div
                                                             key={item.id}
                                                             whileHover={{ scale: 1.02 }}
-                                                            className={`relative rounded-xl overflow-hidden border ${
-                                                                equipped ? `border-${themeColor}-500` : borderColor
-                                                            } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
                                                         >
                                                             <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                                                 {item.preview === 'rgb-dynamic' ? (
                                                                     <div className="w-16 h-16 rounded-full shadow-lg animate-rgb-cycle" />
                                                                 ) : (
-                                                                    <div 
+                                                                    <div
                                                                         className="w-16 h-16 rounded-full shadow-lg"
-                                                                        style={{ 
+                                                                        style={{
                                                                             backgroundColor: item.preview,
                                                                             boxShadow: `0 0 30px ${item.preview}50`
                                                                         }}
@@ -564,11 +562,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     {owned ? (
                                                                         <button
                                                                             onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                                                                equipped
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
                                                                                     ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
                                                                                     : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
-                                                                            }`}
+                                                                                }`}
                                                                         >
                                                                             {equipped ? 'Desequipar' : 'Equipar'}
                                                                         </button>
@@ -576,11 +573,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         <button
                                                                             onClick={() => handlePurchase(item)}
                                                                             disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
-                                                                                (user?.zions || 0) < item.price
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
                                                                                     ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
                                                                                     : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
-                                                                            }`}
+                                                                                }`}
                                                                         >
                                                                             {purchasing === item.id ? (
                                                                                 <span className="animate-spin">⏳</span>
@@ -608,106 +604,103 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 );
                             })()
                         ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {(getItems() as typeof backgrounds | typeof badges).map(item => {
-                                const owned = isOwned(item.id);
-                                const equipped = isEquipped(item);
-                                const isFree = item.price === 0;
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {(getItems() as typeof backgrounds | typeof badges).map(item => {
+                                    const owned = isOwned(item.id);
+                                    const equipped = isEquipped(item);
+                                    const isFree = item.price === 0;
 
-                                return (
-                                    <motion.div
-                                        key={item.id}
-                                        whileHover={{ scale: 1.02 }}
-                                        className={`relative rounded-xl overflow-hidden border ${
-                                            equipped ? `border-${themeColor}-500` : borderColor
-                                        } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
-                                    >
-                                        {/* Preview */}
-                                        <div className="aspect-square relative flex items-center justify-center overflow-hidden">
-                                            {item.type === 'background' && (
-                                                <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
-                                            )}
-                                            {item.type === 'badge' && (
-                                                <span className="text-5xl">{item.preview}</span>
-                                            )}
-                                            {item.type === 'color' && (
-                                                item.preview === 'rgb-dynamic' ? (
-                                                    <div className="w-16 h-16 rounded-full shadow-lg animate-rgb-cycle" />
-                                                ) : (
-                                                    <div 
-                                                        className="w-16 h-16 rounded-full shadow-lg"
-                                                        style={{ 
-                                                            backgroundColor: item.preview,
-                                                            boxShadow: `0 0 30px ${item.preview}50`
-                                                        }}
-                                                    />
-                                                )
-                                            )}
-                                            
-                                            {/* Equipped badge */}
-                                            {equipped && (
-                                                <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
-                                                    <Check className="w-3 h-3 text-black" />
-                                                </div>
-                                            )}
-                                            
-                                            {/* Free badge for default items - Only show for Magazine Classico for Magazine members */}
-                                            {isFree && !(isMGT && item.id === 'bg_default') && (
-                                                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
-                                                    <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
-                                                </div>
-                                            )}
-                                        </div>
+                                    return (
+                                        <motion.div
+                                            key={item.id}
+                                            whileHover={{ scale: 1.02 }}
+                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                        >
+                                            {/* Preview */}
+                                            <div className="aspect-square relative flex items-center justify-center overflow-hidden">
+                                                {item.type === 'background' && (
+                                                    <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
+                                                )}
+                                                {item.type === 'badge' && (
+                                                    <span className="text-5xl">{item.preview}</span>
+                                                )}
+                                                {item.type === 'color' && (
+                                                    item.preview === 'rgb-dynamic' ? (
+                                                        <div className="w-16 h-16 rounded-full shadow-lg animate-rgb-cycle" />
+                                                    ) : (
+                                                        <div
+                                                            className="w-16 h-16 rounded-full shadow-lg"
+                                                            style={{
+                                                                backgroundColor: item.preview,
+                                                                boxShadow: `0 0 30px ${item.preview}50`
+                                                            }}
+                                                        />
+                                                    )
+                                                )}
 
-                                        {/* Info */}
-                                        <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
-                                            <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
-                                            <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
-                                            
-                                            {/* Action */}
-                                            <div className="mt-2">
-                                                {owned ? (
-                                                    <button
-                                                        onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
-                                                        className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                                            equipped
-                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
-                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
-                                                        }`}
-                                                    >
-                                                        {equipped ? 'Desequipar' : 'Equipar'}
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => handlePurchase(item)}
-                                                        disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                        className={`w-full py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${
-                                                            (user?.zions || 0) < item.price
-                                                                ? `${isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-300 text-gray-400'} cursor-not-allowed`
-                                                                : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
-                                                        }`}
-                                                    >
-                                                        {purchasing === item.id ? (
-                                                            <span className="animate-spin">⏳</span>
-                                                        ) : (user?.zions || 0) < item.price ? (
-                                                            <>
-                                                                <Lock className="w-3 h-3" />
-                                                                {item.price}
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Zap className="w-3 h-3" />
-                                                                {item.price}
-                                                            </>
-                                                        )}
-                                                    </button>
+                                                {/* Equipped badge */}
+                                                {equipped && (
+                                                    <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
+                                                        <Check className="w-3 h-3 text-black" />
+                                                    </div>
+                                                )}
+
+                                                {/* Free badge for default items - Only show for Magazine Classico for Magazine members */}
+                                                {isFree && !(isMGT && item.id === 'bg_default') && (
+                                                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
+                                                        <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
+                                                    </div>
                                                 )}
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
+
+                                            {/* Info */}
+                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                                <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
+
+                                                {/* Action */}
+                                                <div className="mt-2">
+                                                    {owned ? (
+                                                        <button
+                                                            onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
+                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
+                                                                    ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                    : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                }`}
+                                                        >
+                                                            {equipped ? 'Desequipar' : 'Equipar'}
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handlePurchase(item)}
+                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
+                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${(user?.zions || 0) < item.price
+                                                                    ? `${isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-300 text-gray-400'} cursor-not-allowed`
+                                                                    : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
+                                                                }`}
+                                                        >
+                                                            {purchasing === item.id ? (
+                                                                <span className="animate-spin">⏳</span>
+                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                <>
+                                                                    <Lock className="w-3 h-3" />
+                                                                    {item.price}
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Zap className="w-3 h-3" />
+                                                                    {item.price}
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
                         )}
                     </div>
                 </motion.div>

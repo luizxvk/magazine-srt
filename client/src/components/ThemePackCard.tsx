@@ -43,15 +43,14 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
     };
 
     return (
-        <div className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${
-            theme === 'light' 
-                ? 'bg-white border-gray-200 hover:shadow-xl' 
-                : 'bg-white/5 border-white/10 hover:border-white/20'
-        } ${pack.isEquipped ? 'ring-2 ring-offset-2 ring-offset-zinc-900' : ''}`}
-            style={{ 
-                ...(pack.isEquipped && { 
+        <div className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${theme === 'light'
+            ? 'bg-white border-gray-200 hover:shadow-xl'
+            : 'bg-white/5 border-white/10 hover:border-white/20'
+            } ${pack.isEquipped ? 'ring-2 ring-offset-2 ring-offset-zinc-900' : ''}`}
+            style={{
+                ...(pack.isEquipped && {
                     borderColor: pack.accentColor,
-                    ringColor: pack.accentColor 
+                    ringColor: pack.accentColor
                 })
             }}
         >
@@ -67,14 +66,26 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
-                    <img
-                        src={pack.previewUrl || pack.backgroundUrl}
-                        alt={pack.name}
-                        className={`w-full h-full object-cover transition-all duration-500 ${
-                            imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
-                        }`}
-                        onLoad={() => setImageLoaded(true)}
-                    />
+                    <div
+                        className={`w-full h-full transition-all duration-500 bg-center bg-cover ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
+                            }`}
+                        style={{
+                            backgroundImage: imageLoaded ? `url(${pack.previewUrl || pack.backgroundUrl})` : undefined,
+                            backgroundColor: pack.accentColor // Fallback color while loading/error
+                        }}
+                    >
+                        <img
+                            src={pack.previewUrl || pack.backgroundUrl}
+                            alt={pack.name}
+                            className="hidden" // Hidden img for loading event
+                            onLoad={() => setImageLoaded(true)}
+                            onError={(e) => {
+                                // Fallback to gradient if image fails
+                                e.currentTarget.parentElement!.style.backgroundImage = `linear-gradient(135deg, ${pack.accentColor} 30%, #000 100%)`;
+                                setImageLoaded(true);
+                            }}
+                        />
+                    </div>
                 )}
 
                 {/* Overlay gradiente */}
@@ -109,10 +120,20 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                 )}
 
                 {/* Game Title no bottom */}
-                <div className="absolute bottom-3 left-3">
-                    <p className="text-white/60 text-xs uppercase tracking-widest font-medium">
+                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                    <p className="text-white/60 text-xs uppercase tracking-widest font-medium text-shadow-sm">
                         {pack.gameTitle}
                     </p>
+
+                    {/* Visual Color Swatch in Preview */}
+                    <div
+                        className="w-6 h-6 rounded-full shadow-lg ring-2 ring-white/20 relative group/color cursor-help"
+                        style={{ backgroundColor: pack.accentColor }}
+                    >
+                        <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-black/80 text-white text-[10px] rounded opacity-0 group-hover/color:opacity-100 whitespace-nowrap transition-opacity pointer-events-none">
+                            {pack.accentColor}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -144,14 +165,24 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                     <div>
                         {!pack.isOwned && (
                             <div className="flex items-center gap-1.5">
-                                <img 
-                                    src="/assets/zions/zion-50.png" 
-                                    alt="Zions Points" 
-                                    className="w-5 h-5"
-                                />
+                                <div className={`p-1 rounded-full ${theme === 'light' ? 'bg-yellow-100' : 'bg-yellow-500/20'}`}>
+                                    <Sparkles className={`w-3.5 h-3.5 ${theme === 'light' ? 'text-yellow-600' : 'text-yellow-400'}`} />
+                                </div>
                                 <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                                     {pack.price.toLocaleString('pt-BR')} Points
                                 </span>
+                            </div>
+                        )}
+                        {pack.isOwned && (
+                            <div className="flex items-center gap-2">
+                                <div className="h-6 w-full flex items-center gap-1">
+                                    <div
+                                        className="h-4 w-4 rounded-full shadow-sm ring-1 ring-white/20"
+                                        style={{ backgroundColor: pack.accentColor }}
+                                        title={`Cor: ${pack.accentColor}`}
+                                    />
+                                    <span className="text-xs text-gray-500">Cor do tema</span>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -159,17 +190,16 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                     <button
                         onClick={handleAction}
                         disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
-                            pack.isOwned
-                                ? pack.isEquipped
-                                    ? 'bg-green-500/20 text-green-400 cursor-default'
-                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                : isOutOfStock
-                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                    : !canAfford
-                                        ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
-                                        : 'bg-gradient-to-r hover:opacity-90 text-white'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${pack.isOwned
+                            ? pack.isEquipped
+                                ? 'bg-green-500/20 text-green-400 cursor-default'
+                                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            : isOutOfStock
+                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                : !canAfford
+                                    ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
+                                    : 'bg-gradient-to-r hover:opacity-90 text-white'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
                         style={{
                             ...(pack.isOwned && !pack.isEquipped && { backgroundColor: pack.accentColor }),
                             ...(!pack.isOwned && canAfford && !isOutOfStock && {

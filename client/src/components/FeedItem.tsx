@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import BadgeDisplay from './BadgeDisplay';
+import VisitorBlockPopup from './VisitorBlockPopup';
 
 interface FeedItemProps {
     id: string | number;
@@ -90,13 +91,15 @@ export default function FeedItem({
     onShare,
     isExpanded = false
 }: FeedItemProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, isVisitor } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
     const [isReporting, setIsReporting] = useState(false);
     const [showCopiedFeedback, setShowCopiedFeedback] = useState(false);
     const [isPressed, setIsPressed] = useState(false);
+    const [showVisitorBlock, setShowVisitorBlock] = useState(false);
+    const [visitorBlockFeature, setVisitorBlockFeature] = useState('');
     const isOwner = user?.id === authorId;
     const isAdmin = user?.role === 'ADMIN';
     const canDelete = isOwner || isAdmin;
@@ -104,6 +107,12 @@ export default function FeedItem({
 
 
     const handleShare = async () => {
+        if (isVisitor) {
+            setVisitorBlockFeature('compartilhar posts');
+            setShowVisitorBlock(true);
+            return;
+        }
+        
         // Generate public share link
         const shareUrl = `${window.location.origin}/post/${id}`;
         
@@ -325,7 +334,15 @@ export default function FeedItem({
                         </motion.button>
                         <motion.button
                             whileTap={{ scale: 0.9 }}
-                            onClick={(e) => { e.stopPropagation(); onComment && onComment(id); }}
+                            onClick={(e) => { 
+                                e.stopPropagation(); 
+                                if (isVisitor) {
+                                    setVisitorBlockFeature('comentar');
+                                    setShowVisitorBlock(true);
+                                } else {
+                                    onComment && onComment(id);
+                                }
+                            }}
                             className={`flex items-center gap-2 text-gray-500 transition-colors ${isMGT ? 'hover:text-white' : 'hover:text-gold-400'}`}
                         >
                             <MessageCircle className="w-4 h-4" />
@@ -347,6 +364,13 @@ export default function FeedItem({
             {showMenu && (
                 <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
             )}
+
+            {/* Visitor Block Popup */}
+            <VisitorBlockPopup 
+                isOpen={showVisitorBlock} 
+                onClose={() => setShowVisitorBlock(false)} 
+                featureName={visitorBlockFeature}
+            />
         </motion.div>
     );
 }

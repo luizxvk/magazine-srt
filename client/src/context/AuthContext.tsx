@@ -548,14 +548,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             bio: 'Explorando o Clube Magazine'
         });
         setTheme('dark');
-        // Mock Daily Login for Visitor
-        setDailyLoginStatus({
-            claimed: false,
-            streak: 1,
-            nextReward: 100,
-            rewards: [100, 200, 300, 400, 500, 1000, 2000]
-        });
-        setTimeout(() => setIsDailyLoginModalOpen(true), 1500);
+        // Don't show any modals for visitors
+        setDailyLoginStatus(null);
     };
 
     const logout = () => {

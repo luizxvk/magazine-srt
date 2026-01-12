@@ -1,7 +1,7 @@
 import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle, Sparkles, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
 import SearchModal from './SearchModal';
@@ -11,6 +11,7 @@ import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
 import CustomizationShop from './CustomizationShop';
+import VisitorBlockPopup from './VisitorBlockPopup';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 import { getContrastColor } from '../utils/colorUtils';

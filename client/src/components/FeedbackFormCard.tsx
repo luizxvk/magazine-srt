@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { MessageSquare, Star, Send, CheckCircle, Clock, Bug, Heart, Lightbulb, Users, Palette, HelpCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import VisitorBlockPopup from './VisitorBlockPopup';
 
 interface FeedbackFormCardProps {
     onClose?: () => void;
 }
 
 export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
-    const { user, theme, accentColor } = useAuth();
+    const { user, theme, accentColor, isVisitor } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
     const [canSubmit, setCanSubmit] = useState(true);
@@ -17,6 +18,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
+    const [showVisitorBlock, setShowVisitorBlock] = useState(false);
     const totalSteps = 3;
     
     // Form data
@@ -150,6 +152,29 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
                     <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: activeColor }} />
                 </div>
             </div>
+        );
+    }
+
+    // Block visitors
+    if (isVisitor) {
+        return (
+            <>
+                <button
+                    onClick={() => setShowVisitorBlock(true)}
+                    className={`w-full rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6 text-center hover:border-opacity-50 transition-all`}
+                >
+                    <MessageSquare className="w-12 h-12 mx-auto mb-3" style={{ color: activeColor }} />
+                    <h3 className={`text-lg font-bold ${themeText} mb-2`}>Enviar Feedback</h3>
+                    <p className={`${themeSecondary} text-sm`}>
+                        Compartilhe sua opinião sobre a plataforma
+                    </p>
+                </button>
+                <VisitorBlockPopup 
+                    isOpen={showVisitorBlock} 
+                    onClose={() => setShowVisitorBlock(false)} 
+                    featureName="enviar feedback"
+                />
+            </>
         );
     }
     

@@ -138,8 +138,8 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                 </div>
 
                 {/* Price & Action */}
-                <div className="flex items-center justify-between gap-3">
-                    <div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex-shrink-0">
                         {!pack.isOwned && (
                             pack.rarity === 'LEGENDARY' ? (
                                 <div className="flex items-center gap-1.5">
@@ -157,9 +157,12 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                                     <img 
                                         src="/assets/zions/zion-50.png" 
                                         alt="Zions Points" 
-                                        className="w-5 h-5"
+                                        className="w-5 h-5 object-contain flex-shrink-0"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                        }}
                                     />
-                                    <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                    <span className={`font-bold text-sm sm:text-base ${theme === 'light' ? 'text-gray-900' : 'text-white'} whitespace-nowrap`}>
                                         {pack.price.toLocaleString('pt-BR')} Points
                                     </span>
                                 </div>
@@ -172,7 +175,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                         <button
                             onClick={handleAction}
                             disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
-                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                            className={`w-full sm:w-auto px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 flex-shrink-0 ${
                                 pack.isOwned
                                     ? pack.isEquipped
                                         ? 'bg-gray-500/20 text-gray-400 hover:bg-red-500/20 hover:text-red-400'
@@ -198,15 +201,15 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                                 'Equipar'
                             ) : isOutOfStock ? (
                                 <>
-                                    <Lock className="w-4 h-4" /> Esgotado
+                                    <Lock className="w-4 h-4 flex-shrink-0" /> <span>Esgotado</span>
                                 </>
                             ) : !canAfford ? (
                                 <>
-                                    <Lock className="w-4 h-4" /> Sem Zions
+                                    <Lock className="w-4 h-4 flex-shrink-0" /> <span>Sem Zions</span>
                                 </>
                             ) : (
                                 <>
-                                    <ShoppingBag className="w-4 h-4" /> Comprar
+                                    <ShoppingBag className="w-4 h-4 flex-shrink-0" /> <span>Comprar</span>
                                 </>
                             )}
                         </button>

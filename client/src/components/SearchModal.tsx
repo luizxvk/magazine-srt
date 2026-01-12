@@ -31,23 +31,27 @@ const NAVIGATION_PAGES = [
     { id: 'social', title: 'Social', subtitle: 'Amigos e conexões', keywords: ['social', 'amigos', 'amigo', 'conexões', 'conexao', 'seguir', 'seguidores'], icon: '👥', path: '/social' },
     { id: 'mgt-log', title: 'MGT Log', subtitle: 'Histórico de atividades', keywords: ['mgt', 'log', 'historico', 'atividades', 'registro'], icon: '📋', path: '/mgt-log' },
     { id: 'admin', title: 'Painel Admin', subtitle: 'Administração do sistema', keywords: ['admin', 'administração', 'painel', 'dashboard', 'gerenciar'], icon: '⚙️', path: '/admin' },
-    { id: 'shop', title: 'Loja de Personalização', subtitle: 'Customize seu perfil', keywords: ['loja', 'shop', 'personalização', 'customização', 'comprar', 'badge', 'fundo', 'cor'], icon: '🛍️', path: '/feed', action: 'shop' },
+    { id: 'shop', title: 'Loja de Personalização', subtitle: 'Customize seu perfil', keywords: ['loja', 'shop', 'personalização', 'customização', 'comprar', 'badge', 'fundo', 'cor', 'tema', 'theme'], icon: '🛍️', path: '/feed', action: 'shop' },
     { id: 'market', title: 'Mercado', subtitle: 'Compre e venda itens', keywords: ['mercado', 'market', 'comprar', 'vender', 'negociar', 'trading', 'marketplace', 'itens', 'customização'], icon: '🏪', path: '/market' },
     { id: 'groups', title: 'Grupos', subtitle: 'Crie e participe de grupos', keywords: ['grupo', 'grupos', 'group', 'comunidade', 'chat', 'conversa'], icon: '👥', path: '/groups' },
     { id: 'catalog', title: 'Catálogo de Fotos', subtitle: 'Galeria exclusiva de fotos', keywords: ['catalogo', 'catalog', 'fotos', 'galeria', 'imagens', 'foto'], icon: '📸', path: '/catalog' },
     { id: 'stories', title: 'Stories', subtitle: 'Visualize stories dos membros', keywords: ['stories', 'story', 'historia', 'historias', 'visualizar'], icon: '📱', path: '/feed', action: 'stories' },
+    { id: 'feedback', title: 'Feedback', subtitle: 'Envie sugestões e feedback', keywords: ['feedback', 'sugestão', 'sugestao', 'sugestões', 'opnião', 'opiniao', 'bug', 'reportar', 'melhoria', 'melhorias'], icon: '💬', path: '/feedback' },
+    { id: 'store', title: 'Loja de Produtos', subtitle: 'Produtos físicos exclusivos', keywords: ['loja', 'store', 'produtos', 'produto', 'merch', 'merchandise', 'camiseta', 'adesivo', 'físico', 'fisico', 'comprar'], icon: '🛒', path: '/store' },
+    { id: 'radio', title: 'Rádio', subtitle: 'Ouça a rádio ao vivo', keywords: ['radio', 'rádio', 'musica', 'música', 'som', 'audio', 'ouvir', 'live', 'ao vivo'], icon: '📻', path: '/feed', action: 'radio' },
+    { id: 'roadmap', title: 'Roadmap', subtitle: 'Próximas atualizações', keywords: ['roadmap', 'atualização', 'atualizacoes', 'futuro', 'novidades', 'próximo', 'proximo', 'plano', 'planejamento'], icon: '🗺️', path: '/roadmap' },
 ];
 
 // Fuzzy match function - checks if query matches any part of keywords
 const fuzzyMatch = (query: string, keywords: string[]): boolean => {
     const q = query.toLowerCase().trim();
     if (q.length < 2) return false;
-    
+
     return keywords.some(keyword => {
         // Check if keyword contains query or query contains keyword
-        return keyword.includes(q) || q.includes(keyword) || 
-               // Check for partial match (at least 70% of characters match)
-               (q.length >= 3 && keyword.startsWith(q.substring(0, Math.ceil(q.length * 0.7))));
+        return keyword.includes(q) || q.includes(keyword) ||
+            // Check for partial match (at least 70% of characters match)
+            (q.length >= 3 && keyword.startsWith(q.substring(0, Math.ceil(q.length * 0.7))));
     });
 };
 
@@ -98,18 +102,18 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         try {
             const formattedResults: SearchResult[] = [];
             const searchLower = query.toLowerCase().trim();
-            
+
             // First, search navigation pages locally using fuzzy matching
-            const matchingPages = NAVIGATION_PAGES.filter(page => 
+            const matchingPages = NAVIGATION_PAGES.filter(page =>
                 fuzzyMatch(searchLower, page.keywords) ||
                 page.title.toLowerCase().includes(searchLower) ||
                 searchLower.includes(page.title.toLowerCase().substring(0, Math.min(searchLower.length, page.title.length)))
             );
-            
+
             matchingPages.forEach(page => {
                 // Skip admin page for non-admins
                 if (page.id === 'admin' && user?.role !== 'ADMIN') return;
-                
+
                 formattedResults.push({
                     id: page.id,
                     type: 'page',
@@ -119,11 +123,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     path: page.path
                 });
             });
-            
+
             // Then search users and posts from API
             const response = await api.get(`/users/search?q=${encodeURIComponent(query)}`);
             const { users, posts } = response.data;
-            
+
             // Filter by active tab
             if (activeTab === 'all' || activeTab === 'users') {
                 users?.forEach((u: any) => {
@@ -138,7 +142,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     });
                 });
             }
-            
+
             if (activeTab === 'all' || activeTab === 'posts') {
                 posts?.forEach((p: any) => {
                     const authorName = p.user?.displayName || p.user?.name || 'Usuário';
@@ -151,7 +155,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     });
                 });
             }
-            
+
             setResults(formattedResults);
         } catch (error) {
             console.error('Search failed', error);
@@ -163,7 +167,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
     const handleResultClick = (result: SearchResult) => {
         // Prevent default and stop propagation to avoid logout
-        
+
         // Save to recent searches
         const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
         setRecentSearches(updated);
@@ -171,7 +175,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         // Close modal first
         onClose();
-        
+
         // Use setTimeout to ensure modal is closed before navigation
         setTimeout(() => {
             switch (result.type) {
@@ -268,11 +272,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                                    activeTab === tab
+                                className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === tab
                                         ? `text-${themeColor}-400 border-b-2 border-${themeColor}-400`
                                         : theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                                }`}
+                                    }`}
                             >
                                 {tab === 'all' ? 'Todos' : tab === 'users' ? 'Usuários' : 'Posts'}
                             </button>
@@ -298,11 +301,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             <button
                                                 key={s.label}
                                                 onClick={() => handleSuggestionClick(s.label)}
-                                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors ${
-                                                    theme === 'light' 
-                                                        ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
+                                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors ${theme === 'light'
+                                                        ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                                                         : 'bg-white/5 hover:bg-white/10 text-white'
-                                                }`}
+                                                    }`}
                                             >
                                                 <span>{s.icon}</span>
                                                 {s.label}
@@ -319,7 +321,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                 <Clock className="w-3 h-3 inline mr-1" />
                                                 Buscas recentes
                                             </h3>
-                                            <button 
+                                            <button
                                                 onClick={clearRecentSearches}
                                                 className={`text-xs ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-white'}`}
                                             >
@@ -331,9 +333,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                 <button
                                                     key={i}
                                                     onClick={() => setQuery(search)}
-                                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                                                        theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'
-                                                    }`}
+                                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'
+                                                        }`}
                                                 >
                                                     <Clock className={`w-4 h-4 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`} />
                                                     <span className={theme === 'light' ? 'text-gray-700' : 'text-white'}>{search}</span>
@@ -354,9 +355,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                     <button
                                         key={`${result.type}-${result.id}`}
                                         onClick={() => handleResultClick(result)}
-                                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
-                                            theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'
-                                        }`}
+                                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'
+                                            }`}
                                     >
                                         {result.imageUrl ? (
                                             <img src={result.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
@@ -375,11 +375,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                 </p>
                                             )}
                                         </div>
-                                        <span className={`text-xs px-2 py-1 rounded-full ${
-                                            result.type === 'page' 
+                                        <span className={`text-xs px-2 py-1 rounded-full ${result.type === 'page'
                                                 ? (isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400')
                                                 : (theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/5 text-gray-400')
-                                        }`}>
+                                            }`}>
                                             {getResultTypeLabel(result.type)}
                                         </span>
                                     </button>

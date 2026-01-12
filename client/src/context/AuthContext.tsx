@@ -149,13 +149,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Compute accent color from user's equipped customization
     const accentColor = React.useMemo(() => {
-        if (user?.equippedColor && ACCENT_COLORS[user.equippedColor]) {
-            const colorValue = ACCENT_COLORS[user.equippedColor];
-            // If RGB dynamic, return default color for CSS variables (animation handled separately)
-            if (colorValue === 'rgb-dynamic') {
-                return '#ff0000'; // Red as default for RGB cycle
+        if (user?.equippedColor) {
+            // Check if it's a direct HEX value (from theme packs)
+            if (user.equippedColor.startsWith('#')) {
+                return user.equippedColor;
             }
-            return colorValue;
+            // Check if it's a color ID from the shop
+            if (ACCENT_COLORS[user.equippedColor]) {
+                const colorValue = ACCENT_COLORS[user.equippedColor];
+                // If RGB dynamic, return default color for CSS variables (animation handled separately)
+                if (colorValue === 'rgb-dynamic') {
+                    return '#ff0000'; // Red as default for RGB cycle
+                }
+                return colorValue;
+            }
         }
         // Default colors based on membership
         return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
@@ -180,10 +187,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Determine accent color
         let colorValue = userData.membershipType === 'MGT' ? '#50c878' : '#d4af37'; // defaults
-        if (userData.equippedColor && ACCENT_COLORS[userData.equippedColor]) {
-            const mapped = ACCENT_COLORS[userData.equippedColor];
-            if (mapped !== 'rgb-dynamic') {
-                colorValue = mapped;
+        if (userData.equippedColor) {
+            // Check if it's a direct HEX value (from theme packs)
+            if (userData.equippedColor.startsWith('#')) {
+                colorValue = userData.equippedColor;
+            } else if (ACCENT_COLORS[userData.equippedColor]) {
+                // It's a color ID from the shop
+                const mapped = ACCENT_COLORS[userData.equippedColor];
+                if (mapped !== 'rgb-dynamic') {
+                    colorValue = mapped;
+                }
             }
         }
 

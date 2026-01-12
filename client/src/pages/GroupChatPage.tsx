@@ -308,7 +308,7 @@ export default function GroupChatPage() {
         type: 'TEXT'
       });
       setMessageText('');
-      fetchMessages();
+      fetchNewMessages();
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
@@ -354,7 +354,7 @@ export default function GroupChatPage() {
         isNSFW: false
       });
 
-      fetchMessages();
+      fetchNewMessages();
     } catch (error) {
       console.error('Error sending image:', error);
       showAchievement('Erro', 'Não foi possível enviar a imagem');

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, X, Sparkles, Gift } from 'lucide-react';
 import api from '../services/api';
@@ -15,6 +15,23 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
     const [opening, setOpening] = useState(false);
     const [reward, setReward] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
+    const [cost, setCost] = useState<number>(0);
+    // const [nextCost, setNextCost] = useState<number>(0); // Unused for now
+    const [loadingCost, setLoadingCost] = useState(false);
+
+    // Fetch cost when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            setLoadingCost(true);
+            api.get('/supply-box/status')
+                .then(res => {
+                    setCost(res.data.cost);
+                    // setNextCost(res.data.nextCost);
+                })
+                .catch(err => console.error('Error fetching box status:', err))
+                .finally(() => setLoadingCost(false));
+        }
+    }, [isOpen]);
 
     const handleOpen = async () => {
         setOpening(true);
@@ -25,6 +42,9 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
 
             const res = await api.post('/supply-box/open');
             setReward(res.data);
+
+            // Update local cost for next time (though next time is effectively next open)
+            // But we display the result screen now.
 
             // Trigger parent update independently of UI state
             if (onSuccess) onSuccess();
@@ -102,7 +122,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
 
                             <button
                                 onClick={handleOpen}
-                                disabled={opening}
+                                disabled={opening || loadingCost}
                                 className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                                 {opening ? (
@@ -113,7 +133,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 ) : (
                                     <>
                                         <Gift className="w-5 h-5" />
-                                        Abrir Grátis
+                                        {loadingCost ? 'Carregando...' : (cost === 0 ? 'Abrir Grátis' : `Abrir por ${cost} Cash`)}
                                     </>
                                 )}
                             </button>

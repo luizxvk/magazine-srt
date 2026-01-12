@@ -287,6 +287,46 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
             },
         });
 
+        // Check and award "Identidade Revelada" badge (First Profile Edit)
+        try {
+            const badgeName = 'Identidade Revelada';
+            const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+
+            if (badge) {
+                const alreadyHas = await prisma.userBadge.findUnique({
+                    where: {
+                        userId_badgeId: {
+                            userId,
+                            badgeId: badge.id
+                        }
+                    }
+                });
+
+                if (!alreadyHas) {
+                    await prisma.$transaction([
+                        prisma.userBadge.create({
+                            data: { userId, badgeId: badge.id }
+                        }),
+                        prisma.user.update({
+                            where: { id: userId },
+                            data: { trophies: { increment: badge.trophies } }
+                        }),
+                        prisma.notification.create({
+                            data: {
+                                userId,
+                                type: 'BADGE',
+                                content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)`
+                            }
+                        })
+                    ]);
+                    console.log(`[updateMe] Awarded badge: ${badgeName}`);
+                }
+            }
+        } catch (badgeError) {
+            console.error('[updateMe] Error checking badge:', badgeError);
+            // Non-blocking error
+        }
+
         res.json(user);
     } catch (error) {
         if (error instanceof z.ZodError) {

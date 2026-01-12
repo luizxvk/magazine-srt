@@ -34,19 +34,20 @@ async function main() {
         { name: 'Primeiros Passos', description: 'Completou o primeiro login na plataforma', iconUrl: 'icon:Star', trophies: 10 },
         { name: 'Comentador', description: 'Fez seu primeiro comentário', iconUrl: 'icon:MessageCircle', trophies: 15 },
         { name: 'Colecionador de Zions', description: 'Acumulou 100 Zions', iconUrl: 'icon:Coins', trophies: 25 },
-        
+        { name: 'Identidade Revelada', description: 'Atualizou seu perfil pela primeira vez', iconUrl: 'icon:User', trophies: 15 },
+
         // Content Creation
         { name: 'Primeira Voz', description: 'Fez a primeira postagem', iconUrl: 'icon:PenTool', trophies: 100 },
         { name: 'Criador de Conteúdo', description: 'Fez 5 postagens', iconUrl: 'icon:FileText', trophies: 200 },
         { name: 'Blogueiro', description: 'Fez 20 postagens', iconUrl: 'icon:FileText', trophies: 50 },
         { name: 'Editor Chefe', description: 'Fez 50 postagens', iconUrl: 'icon:Megaphone', trophies: 200 },
-        
+
         // Engagement
         { name: 'Socialite', description: 'Fez 10 comentários', iconUrl: 'icon:MessageCircle', trophies: 50 },
         { name: 'Debatedor', description: 'Fez 50 comentários', iconUrl: 'icon:MessageCircle', trophies: 50 },
         { name: 'Engajado', description: 'Deu 50 likes', iconUrl: 'icon:Heart', trophies: 50 },
         { name: 'Super Fã', description: 'Deu 100 likes', iconUrl: 'icon:Heart', trophies: 50 },
-        
+
         // Popularity
         { name: 'Influenciador', description: 'Recebeu 50 likes', iconUrl: 'icon:ThumbsUp', trophies: 500 },
         { name: 'Ícone', description: 'Recebeu 100 likes', iconUrl: 'icon:ThumbsUp', trophies: 150 },
@@ -58,10 +59,10 @@ async function main() {
         { name: 'Popular', description: 'Alcançou 50 amigos', iconUrl: 'icon:Star', trophies: 100 },
         { name: 'Celebridade', description: 'Alcançou 100 amigos', iconUrl: 'icon:Crown', trophies: 500 },
         { name: 'Anfitrião', description: 'Convidou 5 amigos para a plataforma', iconUrl: 'icon:UserPlus', trophies: 100 },
-        
+
         // Stories
         { name: 'Storyteller', description: 'Postou 10 stories', iconUrl: 'icon:Camera', trophies: 50 },
-        
+
         // Loyalty
         { name: 'Veterano', description: 'Está na plataforma há 30 dias', iconUrl: 'icon:Award', trophies: 75 },
         { name: 'Dedicado', description: 'Fez login por 7 dias seguidos', iconUrl: 'icon:Calendar', trophies: 50 },

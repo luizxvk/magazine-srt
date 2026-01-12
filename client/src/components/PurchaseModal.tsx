@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    X, 
-    ShoppingCart, 
-    Coins, 
-    CreditCard, 
-    Package, 
-    Gamepad2, 
-    Gift, 
+import {
+    X,
+    ShoppingCart,
+    Coins,
+    CreditCard,
+    Package,
+    Gamepad2,
+    Gift,
     Sparkles,
     Loader2,
     Check,
@@ -64,7 +64,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
 
-    const canBuyWithZions = product.priceZions && user && user.zions >= (product.priceZions * quantity);
+    const canBuyWithZions = product.priceZions && user && user.zionsCash >= (product.priceZions * quantity);
     const totalZions = product.priceZions ? product.priceZions * quantity : 0;
     const totalBRL = product.priceBRL ? product.priceBRL * quantity : 0;
 
@@ -72,7 +72,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
 
     const handlePurchase = async () => {
         if (!paymentMethod) return;
-        
+
         setIsPurchasing(true);
         setError(null);
 
@@ -131,15 +131,15 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                     onClick={e => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div 
+                    <div
                         className="p-5 border-b flex items-center justify-between"
-                        style={{ 
+                        style={{
                             borderColor: `${color}30`,
                             background: `linear-gradient(135deg, ${color}10, transparent)`
                         }}
                     >
                         <div className="flex items-center gap-3">
-                            <div 
+                            <div
                                 className="p-2 rounded-xl"
                                 style={{ backgroundColor: `${color}20` }}
                             >
@@ -168,7 +168,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="text-center py-6 space-y-4"
                             >
-                                <div 
+                                <div
                                     className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
                                     style={{ backgroundColor: `${color}20` }}
                                 >
@@ -180,7 +180,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                         Sua(s) key(s) foram enviadas para seu email.
                                     </p>
                                 </div>
-                                <div 
+                                <div
                                     className="flex items-center gap-2 justify-center text-sm p-3 rounded-lg"
                                     style={{ backgroundColor: `${color}10` }}
                                 >
@@ -202,13 +202,13 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                             <>
                                 {/* Product Preview */}
                                 <div className="flex gap-4 p-4 rounded-xl bg-black/40 border border-white/5">
-                                    <div 
+                                    <div
                                         className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
                                         style={{ backgroundColor: `${color}10` }}
                                     >
                                         {product.imageUrl ? (
-                                            <img 
-                                                src={product.imageUrl} 
+                                            <img
+                                                src={product.imageUrl}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover"
                                             />
@@ -220,7 +220,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-bold text-white truncate">{product.name}</h3>
-                                        <div 
+                                        <div
                                             className="inline-flex items-center gap-1 text-xs mt-1 px-2 py-0.5 rounded"
                                             style={{ backgroundColor: `${color}20`, color }}
                                         >
@@ -270,25 +270,24 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                         {product.priceZions && (
                                             <button
                                                 onClick={() => setPaymentMethod('zions')}
-                                                className={`p-4 rounded-xl border-2 transition-all text-left ${
-                                                    paymentMethod === 'zions' 
-                                                        ? 'border-opacity-100' 
-                                                        : 'border-opacity-30 hover:border-opacity-50'
-                                                }`}
-                                                style={{ 
+                                                className={`p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === 'zions'
+                                                    ? 'border-opacity-100'
+                                                    : 'border-opacity-30 hover:border-opacity-50'
+                                                    }`}
+                                                style={{
                                                     borderColor: paymentMethod === 'zions' ? color : `${color}`,
                                                     backgroundColor: paymentMethod === 'zions' ? `${color}15` : 'transparent'
                                                 }}
                                             >
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <Coins className="w-5 h-5" style={{ color }} />
-                                                    <span className="text-white font-medium">Zions</span>
+                                                    <span className="text-white font-medium">Zions Cash</span>
                                                 </div>
                                                 <p className="text-lg font-bold" style={{ color }}>
-                                                    {totalZions.toLocaleString()}
+                                                    R$ {totalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                 </p>
                                                 <p className="text-xs text-gray-500 mt-1">
-                                                    Saldo: {user?.zions?.toLocaleString() || 0}
+                                                    Saldo: R$ {user?.zionsCash?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
                                                 </p>
                                                 {!canBuyWithZions && (
                                                     <p className="text-xs text-red-400 mt-1">
@@ -302,12 +301,11 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                         {product.priceBRL && (
                                             <button
                                                 onClick={() => setPaymentMethod('brl')}
-                                                className={`p-4 rounded-xl border-2 transition-all text-left ${
-                                                    paymentMethod === 'brl'
-                                                        ? 'border-green-500'
-                                                        : 'border-green-500/30 hover:border-green-500/50'
-                                                }`}
-                                                style={{ 
+                                                className={`p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === 'brl'
+                                                    ? 'border-green-500'
+                                                    : 'border-green-500/30 hover:border-green-500/50'
+                                                    }`}
+                                                style={{
                                                     backgroundColor: paymentMethod === 'brl' ? 'rgba(34, 197, 94, 0.15)' : 'transparent'
                                                 }}
                                             >
@@ -335,7 +333,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                 )}
 
                                 {/* Email Notice */}
-                                <div 
+                                <div
                                     className="flex items-start gap-2 p-3 rounded-lg text-sm"
                                     style={{ backgroundColor: `${color}10` }}
                                 >
@@ -355,7 +353,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                     onClick={handlePurchase}
                                     disabled={!paymentMethod || isPurchasing || (paymentMethod === 'zions' && !canBuyWithZions)}
                                     className="w-full py-3.5 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                                    style={{ 
+                                    style={{
                                         background: paymentMethod ? `linear-gradient(135deg, ${color}, ${color}dd)` : '#374151'
                                     }}
                                 >

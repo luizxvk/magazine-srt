@@ -20,6 +20,9 @@ const DUPLICATE_COMPENSATION = {
     [ThemePackRarity.LEGENDARY]: 1500
 };
 
+// Progressive costs
+const COSTS = [0, 500, 1000, 2500, 5000];
+
 export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
@@ -27,25 +30,65 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             return res.status(401).json({ error: 'Usuário não autenticado' });
         }
 
-        // Check if user already opened box today
-        // For now, allow infinite for testing/demo or use a Redis/DB flag
-        // Let's assume free unlimited for now as requested "manda bala" implicitly implies simple first
-        // But user asked for "Supply Box Diário". I should check last claim time.
-        // Adding lastDailyBoxClaim to User model would be ideal, but schema change is expensive turn-wise.
-        // I will use a simple "luck" logic for now and maybe skip the daily check to let them test freely, 
-        // OR check if I can add a check easily.
-        // Let's implement the DROP logic first.
+        // Get user info including supply box usage
+        // Note: For now we'll use a simple counter in memory or just check logs?
+        // Ideally we need to store "supplyBoxOpenedCount" in User.
+        // Let's assume we can add it or infer from logs. 
+        // Inferring is safer without schema change: count UserThemePack createdToday?
+        // But user might get duplicates which aren't stored in UserThemePack.
+        // Let's check if User has a field for this or if we should just modify the User model.
+        // The user prompt is "always free first, then...".
+        // Let's use a "supplyBoxOpens" field if it exists, or create a count based on ZionHistory "Supply Box" entries.
+
+        // Count today's opens via ZionHistory (assuming every cost-incurring open is logged)
+        // But the first one is free (cost 0), so it might not be in ZionHistory if we only log spend.
+        // We should start logging 0 cost entries too.
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const opensToday = await prisma.zionHistory.count({
+            where: {
+                userId,
+                reason: { startsWith: 'Supply Box Open' },
+                createdAt: { gte: today }
+            }
+        });
+
+        const costIndex = Math.min(opensToday, COSTS.length - 1);
+        const cost = COSTS[costIndex];
+
+        // Check balance if cost > 0
+        if (cost > 0) {
+            const user = await prisma.user.findUnique({ where: { id: userId }, select: { zionsCash: true } });
+            if (!user || user.zionsCash < cost) {
+                return res.status(400).json({
+                    error: `Saldo insuficiente. Custo: ${cost} Zions Cash.`,
+                    nextCost: cost
+                });
+            }
+
+            // Deduct cost
+            await prisma.user.update({
+                where: { id: userId },
+                data: { zionsCash: { decrement: cost } }
+            });
+        }
+
+        // Log the attempt (even if free) to track count
+        await prisma.zionHistory.create({
+            data: {
+                userId,
+                amount: -cost,
+                reason: `Supply Box Open #${opensToday + 1}`
+            }
+        });
 
         // 1. Determine Rarity
         const rand = Math.random();
         let selectedRarity = ThemePackRarity.COMMON;
 
         // Accumulative probability
-        // Common: 0 - 0.60
-        // Rare: 0.60 - 0.85
-        // Epic: 0.85 - 0.97
-        // Leg: 0.97 - 1.00
-
         if (rand > 0.97) selectedRarity = ThemePackRarity.LEGENDARY;
         else if (rand > 0.85) selectedRarity = ThemePackRarity.EPIC;
         else if (rand > 0.60) selectedRarity = ThemePackRarity.RARE;
@@ -56,7 +99,6 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
         });
 
         if (packs.length === 0) {
-            // Fallback if no packs of that rarity
             return res.status(500).json({ error: 'Erro ao gerar loot: Sem packs disponíveis' });
         }
 
@@ -77,27 +119,30 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             rarity: selectedRarity,
             item: selectedPack,
             compensation: 0,
-            message: `Você ganhou: ${selectedPack.name}!`
+            message: `Você ganhou: ${selectedPack.name}!`,
+            nextCost: COSTS[Math.min(opensToday + 1, COSTS.length - 1)]
         };
 
         if (existingOwnership) {
             // Duplicate! Give Zions
             const compensation = DUPLICATE_COMPENSATION[selectedRarity];
+            // Update user balance (Points or Cash? Usually Points for dupes, Cash for purchases)
+            // Let's stick to Points (zions) as per previous logic
             await prisma.user.update({
                 where: { id: userId },
-                data: { zions: { increment: compensation } }
+                data: { zionsPoints: { increment: compensation } } // Changed to zionsPoints as per "zions" usually refers to points
             });
 
             result.type = 'DUPLICATE';
             result.compensation = compensation;
-            result.message = `Duplicata: ${selectedPack.name}! Você recebeu ${compensation} Zions.`;
+            result.message = `Duplicata: ${selectedPack.name}! Você recebeu ${compensation} Pontos.`;
         } else {
             // New Item! Add to collection
             await prisma.userThemePack.create({
                 data: {
                     userId,
                     packId: selectedPack.id,
-                    price: 0 // Free
+                    price: cost
                 }
             });
         }

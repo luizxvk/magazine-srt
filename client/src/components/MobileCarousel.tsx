@@ -115,13 +115,20 @@ export default function MobileCarousel({
 
         const handleScroll = () => {
             const cardWidth = 160 + 12; // card width + gap
-            const newIndex = Math.round(carousel.scrollLeft / cardWidth);
-            setCurrentIndex(Math.min(newIndex, cards.length - 1));
+            const scrollPosition = carousel.scrollLeft;
+            const newIndex = Math.round(scrollPosition / cardWidth);
+            // Clamp between 0 and cards.length - 1
+            const clampedIndex = Math.max(0, Math.min(newIndex, cards.length - 1));
+            if (clampedIndex !== currentIndex) {
+                setCurrentIndex(clampedIndex);
+            }
         };
 
         carousel.addEventListener('scroll', handleScroll);
+        // Call once to set initial index
+        handleScroll();
         return () => carousel.removeEventListener('scroll', handleScroll);
-    }, [cards.length]);
+    }, [cards.length, currentIndex]);
 
     // Mouse/Touch drag handlers
     const handleMouseDown = (e: React.MouseEvent) => {

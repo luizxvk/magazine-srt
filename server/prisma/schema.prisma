@@ -760,6 +760,13 @@ enum InviteStatus {
   DECLINED
 }
 
+enum ThemePackRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
 model ThemePack {
   id              String          @id @default(uuid())
   name            String          // "Arc Raiders Pack"
@@ -773,12 +780,14 @@ model ThemePack {
   soldCount       Int             @default(0)
   isActive        Boolean         @default(true)
   isLimited       Boolean         @default(false) // Edição limitada?
+  rarity          ThemePackRarity @default(COMMON) // Raridade do pack
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   owners          UserThemePack[]
 
   @@index([isActive])
   @@index([gameTitle])
+  @@index([rarity])
 }
 
 model UserThemePack {

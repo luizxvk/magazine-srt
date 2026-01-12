@@ -650,7 +650,7 @@ export default function MarketPage() {
 
       {/* Sell Modal */}
       <AnimatePresence>
-        {showSellModal && selectedItem && ITEM_DATA[selectedItem] && (
+        {showSellModal && selectedItem && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -672,14 +672,20 @@ export default function MarketPage() {
                 </button>
               </div>
 
-              {/* Item Preview */}
-              <div className="flex items-center gap-4 mb-6">
-                {renderItemPreview({ itemType: ITEM_DATA[selectedItem].type, itemPreview: ITEM_DATA[selectedItem].preview }, 'md')}
-                <div>
-                  <h3 className={`font-semibold ${themeText}`}>{ITEM_DATA[selectedItem].name}</h3>
-                  <p className={`text-sm ${themeSecondary} capitalize`}>{ITEM_DATA[selectedItem].type}</p>
-                </div>
-              </div>
+              {(() => {
+                const itemToSell = sellableItems.find(i => i.id === selectedItem);
+                if (!itemToSell) return null;
+
+                return (
+                  <div className="flex items-center gap-4 mb-6">
+                    {renderItemPreview({ itemType: itemToSell.type, itemPreview: itemToSell.preview }, 'md')}
+                    <div>
+                      <h3 className={`font-semibold ${themeText}`}>{itemToSell.name}</h3>
+                      <p className={`text-sm ${themeSecondary} capitalize`}>{itemToSell.type === 'theme_pack' ? 'Theme Pack' : itemToSell.type}</p>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Price Input */}
               <div className="mb-6">

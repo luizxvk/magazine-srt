@@ -4,6 +4,7 @@ import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen } fro
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
+import SupplyBoxModal from './SupplyBoxModal';
 
 interface ShopItem {
     id: string;
@@ -98,6 +99,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [themePacks, setThemePacks] = useState<any[]>([]);
     const [userPacks, setUserPacks] = useState<any[]>([]);
+    const [showSupplyBox, setShowSupplyBox] = useState(false);
     const [loadingPacks, setLoadingPacks] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
@@ -350,6 +352,13 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => setShowSupplyBox(true)}
+                                className={`px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transition-all flex items-center gap-1`}
+                            >
+                                <PackageOpen className="w-3 h-3" />
+                                Supply Box
+                            </button>
                             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-${themeColor}-500/20 border border-${themeColor}-500/30`}>
                                 <Zap className={`w-4 h-4 text-${themeColor}-400`} />
                                 <span className={`text-sm font-bold text-${themeColor}-400`}>{user?.zions || 0}</span>
@@ -441,6 +450,17 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 const { basicColors, pastelColors } = getItems() as { basicColors: typeof colors; pastelColors: typeof colors };
                                 return (
                                     <>
+                                        {/* Shop Header */}
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div>
+                                                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
+                                                    Loja de Personalização
+                                                </h2>
+                                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                                                    Compre itens para personalizar seu perfil
+                                                </p>
+                                            </div>
+                                        </div>
                                         {/* Basic Colors */}
                                         <div className="mb-6">
                                             <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>

@@ -14,6 +14,7 @@ interface ThemePack {
     maxStock?: number;
     soldCount: number;
     isLimited: boolean;
+    rarity?: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
     isOwned?: boolean;
     isEquipped?: boolean;
 }
@@ -42,11 +43,22 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
         }
     };
 
+    const getRarityColor = (rarity?: string) => {
+        switch (rarity) {
+            case 'LEGENDARY': return 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]';
+            case 'EPIC': return 'border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)]';
+            case 'RARE': return 'border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]';
+            default: return theme === 'light' ? 'border-gray-200' : 'border-white/10';
+        }
+    };
+
+    const rarityClass = getRarityColor(pack.rarity);
+
     return (
         <div className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 flex flex-col ${theme === 'light'
-            ? 'bg-white border-gray-200 hover:shadow-xl'
-            : 'bg-white/5 border-white/10 hover:border-white/20'
-            } ${pack.isEquipped ? 'ring-2 ring-offset-2 ring-offset-zinc-900' : ''}`}
+            ? 'bg-white hover:shadow-xl'
+            : 'bg-white/5 hover:border-white/20'
+            } ${pack.isEquipped ? 'ring-2 ring-offset-2 ring-offset-zinc-900' : ''} ${rarityClass}`}
             style={{
                 ...(pack.isEquipped && {
                     borderColor: pack.accentColor,
@@ -94,6 +106,16 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                                 />
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* Rarity Badge */}
+                {pack.rarity && pack.rarity !== 'COMMON' && (
+                    <div className={`absolute top-2 right-2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md border ${pack.rarity === 'LEGENDARY' ? 'bg-amber-500/20 border-amber-500/50 text-amber-200' :
+                            pack.rarity === 'EPIC' ? 'bg-purple-500/20 border-purple-500/50 text-purple-200' :
+                                'bg-blue-500/20 border-blue-500/50 text-blue-200'
+                        }`}>
+                        {pack.rarity === 'LEGENDARY' ? '✨ Legendary' : pack.rarity}
                     </div>
                 )}
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'lucide-react';
+import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins, PackageOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -33,8 +33,33 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.36 - THEME PACKS OVERHAUL
+    // v0.3.37 - RARITY & SUPPLY BOX
     const updates: UpdateItem[] = [
+        {
+            icon: <Sparkles className="w-5 h-5 text-amber-500" />,
+            title: '✨ Sistema de Raridades',
+            description: 'Theme Packs agora têm raridades: Comum, Raro, Épico e Lendário! Confira as bordas especiais.',
+            isNew: true
+        },
+        {
+            icon: <PackageOpen className="w-5 h-5 text-blue-500" />,
+            title: '🎁 Supply Box Diário',
+            description: 'Abra sua caixa diária na Loja de Personalização para ganhar Packs ou Zions!',
+            isNew: true
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5 text-green-500" />,
+            title: '🏷️ Mercado Corrigido',
+            description: 'Correções na venda de itens e visualização de raridades no mercado.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: '🎨 Novos Wallpapers',
+            description: 'Sunset Vibes e Mystic Hunter receberam backgrounds exclusivos em alta definição!',
+            isNew: true
+        },
+        // v0.3.36 - THEME PACKS OVERHAUL
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: '🎨 Theme Packs Renovados!',

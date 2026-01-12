@@ -111,12 +111,12 @@ export default function ProductStore() {
         <div className="min-h-screen">
             <LuxuriousBackground />
             <Header />
-            
+
             <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24 pb-24">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div className="flex items-center gap-4">
-                        <button 
+                        <button
                             onClick={() => navigate('/')}
                             className="p-2 rounded-xl hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: `${color}15`, color }}
@@ -134,10 +134,10 @@ export default function ProductStore() {
                         </div>
                     </div>
 
-                    {/* Zions Balance */}
-                    <div 
+                    {/* Zions Cash Balance */}
+                    <div
                         className="flex items-center gap-2 px-4 py-2 rounded-xl"
-                        style={{ 
+                        style={{
                             backgroundColor: `${color}15`,
                             borderWidth: '1px',
                             borderStyle: 'solid',
@@ -146,8 +146,10 @@ export default function ProductStore() {
                     >
                         <Coins className="w-6 h-6" style={{ color }} />
                         <div>
-                            <p className="text-xs text-gray-400">Seu saldo</p>
-                            <p className="font-bold" style={{ color }}>{user?.zions?.toLocaleString() || 0} Zions</p>
+                            <p className="text-xs text-gray-400">Seu saldo (Cash)</p>
+                            <p className="font-bold" style={{ color }}>
+                                R$ {user?.zionsCash?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -157,7 +159,7 @@ export default function ProductStore() {
                     <button
                         onClick={() => setActiveTab('store')}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium text-white"
-                        style={{ 
+                        style={{
                             background: activeTab === 'store' ? `linear-gradient(135deg, ${color}, ${color}dd)` : 'transparent',
                             color: activeTab === 'store' ? 'white' : '#9ca3af'
                         }}
@@ -168,7 +170,7 @@ export default function ProductStore() {
                     <button
                         onClick={() => setActiveTab('orders')}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium"
-                        style={{ 
+                        style={{
                             background: activeTab === 'orders' ? `linear-gradient(135deg, ${color}, ${color}dd)` : 'transparent',
                             color: activeTab === 'orders' ? 'white' : '#9ca3af'
                         }}
@@ -197,7 +199,7 @@ export default function ProductStore() {
                                         onChange={(e) => setSearch(e.target.value)}
                                         placeholder="Buscar produtos..."
                                         className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 text-white focus:outline-none focus:ring-2"
-                                        style={{ 
+                                        style={{
                                             borderWidth: '1px',
                                             borderStyle: 'solid',
                                             borderColor: `${color}30`,
@@ -211,7 +213,7 @@ export default function ProductStore() {
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
                                     className="flex items-center gap-2 px-4 py-3 rounded-xl transition-all"
-                                    style={{ 
+                                    style={{
                                         backgroundColor: `${color}15`,
                                         borderWidth: '1px',
                                         borderStyle: 'solid',
@@ -234,9 +236,9 @@ export default function ProductStore() {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="overflow-hidden mb-6"
                                     >
-                                        <div 
+                                        <div
                                             className="p-4 rounded-xl bg-white/5"
-                                            style={{ 
+                                            style={{
                                                 borderWidth: '1px',
                                                 borderStyle: 'solid',
                                                 borderColor: `${color}30`
@@ -251,7 +253,7 @@ export default function ProductStore() {
                                                             key={cat.value}
                                                             onClick={() => setCategory(cat.value as Category)}
                                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
-                                                            style={{ 
+                                                            style={{
                                                                 background: category === cat.value ? `linear-gradient(135deg, ${color}, ${color}dd)` : `${color}15`,
                                                                 color: category === cat.value ? 'white' : color
                                                             }}
@@ -271,7 +273,7 @@ export default function ProductStore() {
                                                         value={sortBy}
                                                         onChange={(e) => setSortBy(e.target.value as SortBy)}
                                                         className="px-3 py-2 rounded-lg bg-white/10 text-white"
-                                                        style={{ 
+                                                        style={{
                                                             borderWidth: '1px',
                                                             borderStyle: 'solid',
                                                             borderColor: `${color}30`
@@ -289,7 +291,7 @@ export default function ProductStore() {
                                                         value={sortOrder}
                                                         onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
                                                         className="px-3 py-2 rounded-lg bg-white/10 text-white"
-                                                        style={{ 
+                                                        style={{
                                                             borderWidth: '1px',
                                                             borderStyle: 'solid',
                                                             borderColor: `${color}30`
@@ -319,8 +321,8 @@ export default function ProductStore() {
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {products.map(product => (
-                                        <ProductCard 
-                                            key={product.id} 
+                                        <ProductCard
+                                            key={product.id}
                                             product={product}
                                             onPurchase={() => fetchProducts()}
                                         />
@@ -354,7 +356,7 @@ export default function ProductStore() {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             className="p-4 rounded-xl bg-white/5"
-                                            style={{ 
+                                            style={{
                                                 borderWidth: '1px',
                                                 borderStyle: 'solid',
                                                 borderColor: `${color}30`
@@ -362,7 +364,7 @@ export default function ProductStore() {
                                         >
                                             <div className="flex items-start gap-4">
                                                 {/* Product Image */}
-                                                <div 
+                                                <div
                                                     className="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
                                                     style={{ backgroundColor: `${color}15` }}
                                                 >
@@ -387,7 +389,7 @@ export default function ProductStore() {
                                                             minute: '2-digit'
                                                         })}
                                                     </p>
-                                                    
+
                                                     {/* Price */}
                                                     <div className="flex items-center gap-2 mt-1">
                                                         {order.totalZions && (
@@ -405,15 +407,14 @@ export default function ProductStore() {
                                                 </div>
 
                                                 {/* Status */}
-                                                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                    order.paymentStatus === 'COMPLETED' 
-                                                        ? 'bg-green-500/20 text-green-400' 
+                                                <div className={`px-3 py-1 rounded-full text-xs font-medium ${order.paymentStatus === 'COMPLETED'
+                                                        ? 'bg-green-500/20 text-green-400'
                                                         : order.paymentStatus === 'PENDING'
                                                             ? 'bg-yellow-500/20 text-yellow-400'
                                                             : 'bg-red-500/20 text-red-400'
-                                                }`}>
-                                                    {order.paymentStatus === 'COMPLETED' ? 'Concluído' : 
-                                                     order.paymentStatus === 'PENDING' ? 'Pendente' : 'Falhou'}
+                                                    }`}>
+                                                    {order.paymentStatus === 'COMPLETED' ? 'Concluído' :
+                                                        order.paymentStatus === 'PENDING' ? 'Pendente' : 'Falhou'}
                                                 </div>
                                             </div>
 
@@ -426,7 +427,7 @@ export default function ProductStore() {
                                                     </p>
                                                     <div className="space-y-2">
                                                         {order.deliveredKeys.map((k, i) => (
-                                                            <div 
+                                                            <div
                                                                 key={i}
                                                                 className="bg-black/30 px-3 py-2 rounded-lg font-mono text-sm text-green-300 break-all select-all"
                                                             >
@@ -444,7 +445,7 @@ export default function ProductStore() {
                     )}
                 </AnimatePresence>
             </main>
-            
+
             <Footer />
         </div>
     );

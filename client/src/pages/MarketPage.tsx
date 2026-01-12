@@ -343,20 +343,20 @@ export default function MarketPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Store className={`w-6 sm:w-8 h-6 sm:h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+              <div className="flex items-center gap-3">
+                <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'} leading-none`}>
                   Mercado
                 </h1>
-                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse`}>
+                <span className={`flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse translate-y-1`}>
                   BETA
                 </span>
               </div>
-              <p className={`${themeSecondary} text-xs sm:text-sm mt-0.5`}>Compre e venda itens</p>
+              <p className={`${themeSecondary} text-xs sm:text-sm mt-1`}>Compre e venda itens</p>
             </div>
           </div>
           <div className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'} border ${themeBorder}`}>
             <Zap className={`w-4 sm:w-5 h-4 sm:h-5 text-${themeColor}-400`} />
-            <span className={`font-bold text-${themeColor}-400 text-sm sm:text-base`}>{user?.zions || 0} Zions</span>
+            <span className={`font-bold text-${themeColor}-400 text-sm sm:text-base`}>{user?.zions?.toLocaleString() || 0} Zions</span>
           </div>
         </div>
 

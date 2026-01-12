@@ -431,7 +431,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     }
 
     // Perform transaction
-    const transactionOperations = [
+    const transactionOperations: any[] = [
       // Deduct from buyer
       prisma.user.update({
         where: { id: userId },

@@ -86,7 +86,7 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
 
         // 1. Determine Rarity
         const rand = Math.random();
-        let selectedRarity = ThemePackRarity.COMMON;
+        let selectedRarity: ThemePackRarity = ThemePackRarity.COMMON;
 
         // Accumulative probability
         if (rand > 0.97) selectedRarity = ThemePackRarity.LEGENDARY;
@@ -152,5 +152,37 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error opening supply box:', error);
         res.status(500).json({ error: 'Erro ao abrir Supply Box' });
+    }
+};
+
+export const getSupplyBoxStatus = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const opensToday = await prisma.zionHistory.count({
+            where: {
+                userId,
+                reason: { startsWith: 'Supply Box Open' },
+                createdAt: { gte: today }
+            }
+        });
+
+        const costIndex = Math.min(opensToday, COSTS.length - 1);
+        const cost = COSTS[costIndex];
+        const nextCost = COSTS[Math.min(opensToday + 1, COSTS.length - 1)];
+
+        res.json({
+            opensToday,
+            cost,
+            nextCost,
+            isFree: cost === 0
+        });
+    } catch (error) {
+        console.error('Error fetching supply box status:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };

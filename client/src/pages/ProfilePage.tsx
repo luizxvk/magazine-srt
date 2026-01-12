@@ -7,7 +7,7 @@ import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
 import ModernLoader from '../components/ModernLoader';
-import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown, ZoomIn, ZoomOut, Move } from 'lucide-react';
+import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, Crown, ZoomIn, ZoomOut, Move, BadgeCheck } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import ToastNotification from '../components/ToastNotification';
@@ -379,6 +379,20 @@ export default function ProfilePage() {
                                 <div>
                                     <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start mb-1">
                                         <h2 className={`text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{profileUser.displayName || profileUser.name}</h2>
+                                        {profileUser.isVerified && (
+                                            <div 
+                                                className="relative group cursor-pointer"
+                                                title="Email Verificado"
+                                            >
+                                                <BadgeCheck 
+                                                    className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-blue-500'} fill-current`}
+                                                    strokeWidth={2.5}
+                                                />
+                                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                    Email Verificado
+                                                </div>
+                                            </div>
+                                        )}
                                         <BadgeDisplay userId={profileUser.id} />
                                     </div>
                                     <p className={`text-sm uppercase tracking-widest mb-2 font-medium ${isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold'}`}>

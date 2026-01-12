@@ -190,6 +190,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 equippedBackground: true,
                 equippedBadge: true,
                 equippedColor: true,
+                isVerified: true,
             },
         });
 

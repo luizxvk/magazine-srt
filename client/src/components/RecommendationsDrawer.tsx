@@ -7,6 +7,7 @@ import PhotoCatalogCard from './PhotoCatalogCard';
 import WhatsNewModal from './WhatsNewModal';
 import MgtLogCard from './MgtLogCard';
 import FeedbackFormCard from './FeedbackFormCard';
+import InventoryCard from './InventoryCard';
 import api from '../services/api';
 
 interface CatalogPhoto {
@@ -111,6 +112,9 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                     <X className="w-6 h-6" />
                                 </button>
                             </div>
+
+                            {/* Inventory Card */}
+                            <InventoryCard onOpenShop={() => {}} />
 
                             {/* Daily Login Card */}
                             <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />

@@ -279,7 +279,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 <Sparkles className={`w-5 h-5 text-${themeColor}-400`} />
                             </div>
                             <div>
-                                <h2 className={`text-lg font-bold ${textMain}`}>Loja de Personalização</h2>
+                                <h2 className={`text-lg font-bold ${textMain}`}>Meu Estilo</h2>
                                 <p className={`text-xs ${textSub}`}>Customize seu perfil</p>
                             </div>
                         </div>

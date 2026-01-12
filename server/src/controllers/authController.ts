@@ -217,8 +217,13 @@ export const login = async (req: Request, res: Response) => {
                 trophies: user.trophies || 0,
                 zions: user.zions || 0,
                 avatarUrl: user.avatarUrl,
-                membershipType: user.membershipType || 'MAGAZINE', // Use default from schema
-                isVerified: user.isVerified
+                membershipType: user.membershipType || 'MAGAZINE',
+                isVerified: user.isVerified,
+                // Customization fields for immediate style application
+                equippedBackground: user.equippedBackground,
+                equippedBadge: user.equippedBadge,
+                equippedColor: user.equippedColor,
+                ownedCustomizations: user.ownedCustomizations ? JSON.parse(user.ownedCustomizations) : []
             }
         });
         console.log('Login successful for:', user.email);

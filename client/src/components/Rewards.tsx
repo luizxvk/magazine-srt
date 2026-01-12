@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Gift, Lock, Check, Clock, Box, Tag } from 'lucide-react';
+import { Gift, Lock, Check, Clock, Box, Tag, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from './ModernLoader';
@@ -32,6 +33,7 @@ export default function Rewards() {
     const [loading, setLoading] = useState(true);
     const [redeeming, setRedeeming] = useState<string | null>(null);
     const [redeemedCode, setRedeemedCode] = useState<{ id: string, code: string } | null>(null);
+    const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
@@ -97,7 +99,8 @@ export default function Rewards() {
         } catch (error: any) {
             console.error('Redemption failed', error);
             const errorMessage = error.response?.data?.error || 'Falha ao resgatar prêmio.';
-            alert(errorMessage);
+            setNotification({ type: 'error', message: errorMessage });
+            setTimeout(() => setNotification(null), 5000);
         } finally {
             setRedeeming(null);
         }
@@ -106,7 +109,44 @@ export default function Rewards() {
     if (loading) return <ModernLoader />;
 
     return (
-        <div className="space-y-12">
+        <div className="space-y-12 relative">
+            {/* Styled Notification Popup */}
+            <AnimatePresence>
+                {notification && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] max-w-md w-full px-4"
+                    >
+                        <div className={`relative backdrop-blur-xl rounded-2xl border shadow-2xl p-4 pr-12 ${
+                            notification.type === 'error' 
+                                ? 'bg-red-500/10 border-red-500/30 text-red-300' 
+                                : notification.type === 'success'
+                                    ? 'bg-green-500/10 border-green-500/30 text-green-300'
+                                    : 'bg-blue-500/10 border-blue-500/30 text-blue-300'
+                        }`}>
+                            <button
+                                onClick={() => setNotification(null)}
+                                className="absolute top-3 right-3 p-1 hover:bg-white/10 rounded-lg transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-start gap-3">
+                                <div className={`p-2 rounded-lg ${
+                                    notification.type === 'error' ? 'bg-red-500/20' : 
+                                    notification.type === 'success' ? 'bg-green-500/20' : 'bg-blue-500/20'
+                                }`}>
+                                    <Clock className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-sm">{notification.message}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* Available Rewards */}
             <div className="space-y-4">
                 <h3 className={`text-xl font-serif ${themeCardText} mb-6 flex items-center gap-2`}>

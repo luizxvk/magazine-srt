@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Gift, Package, AtSign, Mail, RefreshCw, Move } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Package, AtSign, Move, BadgeCheck, Clock, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.20';
+const CURRENT_VERSION = '0.3.21';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,66 +33,64 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.20 - Mentions, Inventory, Background Crop, Accent Colors
+    // v0.3.21 - Verificação, Mobile Fixes, Personalização
     const updates: UpdateItem[] = [
         {
-            icon: <AtSign className="w-5 h-5" />,
-            title: 'Menções no Widget de Post',
-            description: 'Agora você pode mencionar usuários @nome diretamente no widget de criar post do feed!',
+            icon: <Clock className="w-5 h-5" />,
+            title: 'Popup de Cooldown Estilizado',
+            description: 'O aviso de espera para resgatar recompensas agora é um popup bonito ao invés de alerta do navegador!',
+            isNew: true
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Fotos em Retrato no Mobile',
+            description: 'Fotos postadas no mobile agora ocupam melhor o card, respeitando orientação retrato!',
+            isNew: true
+        },
+        {
+            icon: <BadgeCheck className="w-5 h-5" />,
+            title: 'Selo de Email Verificado',
+            description: 'Usuários com email verificado agora exibem um selo azul ao lado do nome no perfil!',
+            isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Popup Verificação Corrigido',
+            description: 'O popup de verificar email não aparece mais para quem já verificou. Bug corrigido!',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Cores Instantâneas no Login',
+            description: 'Suas cores e fundos personalizados são aplicados imediatamente ao fazer login!',
             isNew: true
         },
         {
             icon: <Package className="w-5 h-5" />,
-            title: 'Inventário Corrigido',
-            description: 'O inventário agora mostra corretamente todos os itens (fundos, selos, cores) que você já comprou!',
+            title: 'Inventário no Mobile',
+            description: 'O card de Inventário agora aparece no drawer de Recomendações para mobile!',
+            isNew: true
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5" />,
+            title: 'Loja Renomeada',
+            description: '"Loja de Customização" agora é "Meu Estilo" para diferenciar do Mercado de itens.',
             isNew: true
         },
         {
             icon: <Move className="w-5 h-5" />,
             title: 'Ajuste de Background do Perfil',
-            description: 'Reposicione e ajuste o zoom da imagem de fundo do seu perfil! Clique no botão de ajuste ao editar.',
-            isNew: true
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'Botão Criar Post com Cor Destaque',
-            description: 'O botão flutuante "Criar Post" agora segue sua cor de destaque personalizada!',
-            isNew: true
-        },
-        {
-            icon: <RefreshCw className="w-5 h-5" />,
-            title: 'Background Limpo ao Atualizar',
-            description: 'Corrigido bug onde o fundo da página persistia após atualizar, mesmo sem estar equipado.'
-        },
-        {
-            icon: <Mail className="w-5 h-5" />,
-            title: 'Email de Boas-vindas',
-            description: 'Novos membros Magazine agora recebem email de boas-vindas com credenciais corretas.'
+            description: 'Reposicione e ajuste o zoom da imagem de fundo do seu perfil!'
         },
         {
             icon: <AtSign className="w-5 h-5" />,
-            title: 'Menções em Grupos @usuario',
-            description: 'Mencione membros nos grupos digitando @nome! Eles receberão notificação.'
-        },
-        {
-            icon: <Users className="w-5 h-5" />,
-            title: 'Amigos Online Atualizado',
-            description: 'Timeout de AFK aumentado para 1h. Status online mais preciso.'
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Indicadores de Convite/Menção',
-            description: 'Convites de grupo e menções fazem os ícones pulsarem vermelho para notificá-lo.'
-        },
-        {
-            icon: <Gift className="w-5 h-5" />,
-            title: 'Recompensas Gratuitas!',
-            description: 'Admins podem criar recompensas com custo 0 (Gratuito) e dar Zions como prêmio!',
+            title: 'Menções @usuario',
+            description: 'Mencione usuários no widget de post e em grupos! Eles receberão notificação.'
         },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Mercado de Customizações',
-            description: 'Compre e venda itens de customização com outros usuários! Acesse pelo menu "Mercado".',
+            description: 'Compre e venda itens de customização com outros usuários!'
         },
         {
             icon: <Search className="w-5 h-5" />,

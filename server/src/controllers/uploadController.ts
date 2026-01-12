@@ -1,16 +1,16 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
-import { 
-    uploadPostImageR2, 
-    uploadStoryImageR2, 
-    uploadAvatarR2, 
+import {
+    uploadPostImageR2,
+    uploadStoryImageR2,
+    uploadAvatarR2,
     uploadCatalogPhotoR2,
     uploadGroupImageR2,
-    isR2Configured 
+    isR2Configured
 } from '../services/r2Service';
-import { 
-    uploadPostImage as uploadPostImageCloudinary, 
-    uploadStoryImage as uploadStoryImageCloudinary 
+import {
+    uploadPostImage as uploadPostImageCloudinary,
+    uploadStoryImage as uploadStoryImageCloudinary
 } from '../services/cloudinaryService';
 
 // Upload post image
@@ -20,7 +20,7 @@ export const uploadPostImage = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        let imageUrl: string;
+        let imageUrl: string | null = null;
         const r2Config = isR2Configured();
         console.log(`[uploadPostImage] R2 configured: ${r2Config}, file size: ${req.file.size} bytes`);
 
@@ -30,7 +30,12 @@ export const uploadPostImage = async (req: AuthRequest, res: Response) => {
             imageUrl = await uploadPostImageR2(req.file.buffer, req.file.mimetype);
         } else {
             console.log('[uploadPostImage] Using Cloudinary fallback');
-            imageUrl = await uploadPostImageCloudinary(req.file.buffer);
+            const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            imageUrl = await uploadPostImageCloudinary(base64Data);
+        }
+
+        if (!imageUrl) {
+            throw new Error('Upload returned null');
         }
 
         console.log(`[uploadPostImage] Upload successful: ${imageUrl}`);
@@ -48,7 +53,7 @@ export const uploadStoryImage = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        let imageUrl: string;
+        let imageUrl: string | null = null;
         const r2Config = isR2Configured();
         console.log(`[uploadStoryImage] R2 configured: ${r2Config}, file size: ${req.file.size} bytes`);
 
@@ -57,7 +62,12 @@ export const uploadStoryImage = async (req: AuthRequest, res: Response) => {
             imageUrl = await uploadStoryImageR2(req.file.buffer, req.file.mimetype);
         } else {
             console.log('[uploadStoryImage] Using Cloudinary fallback');
-            imageUrl = await uploadStoryImageCloudinary(req.file.buffer);
+            const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            imageUrl = await uploadStoryImageCloudinary(base64Data);
+        }
+
+        if (!imageUrl) {
+            throw new Error('Upload returned null');
         }
 
         console.log(`[uploadStoryImage] Upload successful: ${imageUrl}`);
@@ -75,7 +85,7 @@ export const uploadAvatar = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        let imageUrl: string;
+        let imageUrl: string | null = null;
         const r2Config = isR2Configured();
         console.log(`[uploadAvatar] R2 configured: ${r2Config}, file size: ${req.file.size} bytes`);
 
@@ -85,6 +95,10 @@ export const uploadAvatar = async (req: AuthRequest, res: Response) => {
         } else {
             console.log('[uploadAvatar] Avatar upload - R2 not configured, returning error');
             return res.status(503).json({ error: 'Storage service not configured' });
+        }
+
+        if (!imageUrl) {
+            throw new Error('Upload returned null');
         }
 
         console.log(`[uploadAvatar] Upload successful: ${imageUrl}`);
@@ -102,12 +116,17 @@ export const uploadCatalogPhoto = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        let imageUrl: string;
+        let imageUrl: string | null = null;
 
         if (isR2Configured()) {
             imageUrl = await uploadCatalogPhotoR2(req.file.buffer, req.file.mimetype);
         } else {
-            imageUrl = await uploadPostImageCloudinary(req.file.buffer);
+            const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            imageUrl = await uploadPostImageCloudinary(base64Data);
+        }
+
+        if (!imageUrl) {
+            throw new Error('Upload returned null');
         }
 
         res.json({ imageUrl });
@@ -124,12 +143,17 @@ export const uploadGroupImage = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        let imageUrl: string;
+        let imageUrl: string | null = null;
 
         if (isR2Configured()) {
             imageUrl = await uploadGroupImageR2(req.file.buffer, req.file.mimetype);
         } else {
-            imageUrl = await uploadPostImageCloudinary(req.file.buffer);
+            const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            imageUrl = await uploadPostImageCloudinary(base64Data);
+        }
+
+        if (!imageUrl) {
+            throw new Error('Upload returned null');
         }
 
         res.json({ imageUrl });

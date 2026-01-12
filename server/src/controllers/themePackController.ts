@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 const prisma = new PrismaClient();
 
@@ -30,7 +30,7 @@ export const getUserThemePacks = async (req: AuthRequest, res: Response) => {
         const userPacks = await prisma.userThemePack.findMany({
             where: { userId },
             include: {
-                themePack: true
+                pack: true
             }
         });
 
@@ -64,7 +64,7 @@ export const purchaseThemePack = async (req: AuthRequest, res: Response) => {
         const existingPurchase = await prisma.userThemePack.findFirst({
             where: {
                 userId,
-                themePackId: packId
+                packId: packId
             }
         });
 
@@ -99,10 +99,11 @@ export const purchaseThemePack = async (req: AuthRequest, res: Response) => {
             const purchase = await tx.userThemePack.create({
                 data: {
                     userId,
-                    themePackId: packId
+                    packId: packId,
+                    price: pack.price
                 },
                 include: {
-                    themePack: true
+                    pack: true
                 }
             });
 
@@ -149,10 +150,10 @@ export const equipThemePack = async (req: AuthRequest, res: Response) => {
         const userPack = await prisma.userThemePack.findFirst({
             where: {
                 userId,
-                themePackId: packId
+                packId: packId
             },
             include: {
-                themePack: true
+                pack: true
             }
         });
 
@@ -160,7 +161,7 @@ export const equipThemePack = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ error: 'You do not own this pack' });
         }
 
-        const pack = userPack.themePack;
+        const pack = userPack.pack;
 
         // Update user's equipped items
         await prisma.user.update({

@@ -269,11 +269,11 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     }
 
     // Get buyer
-    const buyer = await prisma.user.findUnique({ 
+    const buyer = await prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, zionsCash: true, zionsPoints: true, ownedCustomizations: true }
     });
-    
+
     if (!buyer) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
@@ -287,11 +287,11 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     // Check if buyer has enough balance
     const price = listing.price;
     const priceInPoints = paymentMethod === 'POINTS' ? price * 100 : price; // 1 Cash = 100 Points
-    
+
     if (paymentMethod === 'CASH' && buyer.zionsCash < price) {
       return res.status(400).json({ error: 'Zions Cash insuficiente' });
     }
-    
+
     if (paymentMethod === 'POINTS' && buyer.zionsPoints < priceInPoints) {
       return res.status(400).json({ error: 'Zions Points insuficientes' });
     }
@@ -315,7 +315,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     // Prepare buyer update based on payment method
     const buyerUpdate = {
       ownedCustomizations: JSON.stringify([...buyerOwned, listing.itemId]),
-      ...(paymentMethod === 'CASH' 
+      ...(paymentMethod === 'CASH'
         ? { zionsCash: { decrement: price } }
         : { zionsPoints: { decrement: priceInPoints } }
       )
@@ -389,7 +389,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
       const adminFeeUpdate = paymentMethod === 'CASH'
         ? { zionsCash: { increment: fee } }
         : { zionsPoints: { increment: fee } };
-        
+
       transactionOperations.push(
         // Add fee to admin
         prisma.user.update({
@@ -412,7 +412,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     res.json({
       success: true,
       message: 'Item comprado com sucesso!',
-      newBalance: buyer.zions - listing.price,
+      newBalance: paymentMethod === 'CASH' ? buyer.zionsCash - listing.price : buyer.zionsPoints - (paymentMethod === 'POINTS' ? listing.price * 100 : listing.price),
       itemId: listing.itemId,
     });
   } catch (error) {

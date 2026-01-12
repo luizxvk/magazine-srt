@@ -36,7 +36,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
                 priceBRL: priceBRL || null,
                 stock: stock || 0,
                 isUnlimited: isUnlimited || false,
-                createdById: userId
+                createdById: userId!
             }
         });
 
@@ -114,11 +114,11 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
         }
 
         // Check if product exists
-        const product = await prisma.product.findUnique({ 
+        const product = await prisma.product.findUnique({
             where: { id },
             include: { orders: true }
         });
-        
+
         if (!product) {
             return res.status(404).json({ error: 'Produto não encontrado' });
         }
@@ -127,7 +127,7 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
         await prisma.$transaction(async (tx: any) => {
             // Delete all keys associated with this product (cascade should handle this, but being explicit)
             await tx.productKey.deleteMany({ where: { productId: id } });
-            
+
             // Update orders to remove product reference (set productId to null or handle appropriately)
             // Since we can't set productId to null (required field), we need to delete orders too
             // Or we can just delete the product if there are no orders
@@ -140,7 +140,7 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
                 // Delete orders
                 await tx.order.deleteMany({ where: { productId: id } });
             }
-            
+
             // Finally delete the product
             await tx.product.delete({ where: { id } });
         });
@@ -188,7 +188,7 @@ export const addProductKeys = async (req: AuthRequest, res: Response) => {
             }
         });
 
-        res.json({ 
+        res.json({
             message: `${createdKeys.count} keys adicionadas com sucesso`,
             newStock: product.stock + keys.length
         });
@@ -208,11 +208,11 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         const { category, search, sortBy = 'createdAt', order = 'desc' } = req.query;
 
         const where: any = { isActive: true };
-        
+
         if (category) {
             where.category = category;
         }
-        
+
         if (search) {
             where.OR = [
                 { name: { contains: search as string, mode: 'insensitive' } },
@@ -326,11 +326,11 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
         const totalCost = product.priceZions * quantity;
 
         // Get user
-        const user = await prisma.user.findUnique({ 
+        const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { id: true, zionsCash: true, email: true, displayName: true, name: true }
         });
-        
+
         if (!user || user.zionsCash < totalCost) {
             return res.status(400).json({ error: 'Zions Cash insuficiente' });
         }
@@ -345,7 +345,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             // Deduct Zions Cash and add cashback Points
             await tx.user.update({
                 where: { id: userId },
-                data: { 
+                data: {
                     zionsCash: { decrement: totalCost },
                     zionsPoints: { increment: cashbackPoints }
                 }
@@ -354,7 +354,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             // Record Zion history for Cash spent
             await tx.zionHistory.create({
                 data: {
-                    userId,
+                    userId: userId!,
                     amount: -totalCost,
                     reason: `Compra: ${product.name} (Cash)`
                 }
@@ -363,7 +363,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             // Record Zion history for Points cashback
             await tx.zionHistory.create({
                 data: {
-                    userId,
+                    userId: userId!,
                     amount: cashbackPoints,
                     reason: `Cashback: ${product.name} (10%)`
                 }
@@ -372,7 +372,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             // Create order
             const newOrder = await tx.order.create({
                 data: {
-                    buyerId: userId,
+                    buyerId: userId!,
                     productId,
                     quantity,
                     totalZions: totalCost,

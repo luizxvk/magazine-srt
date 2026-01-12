@@ -726,6 +726,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     </div>
                 </motion.div>
             </motion.div>
-        </AnimatePresence>
+            <SupplyBoxModal isOpen={showSupplyBox} onClose={() => setShowSupplyBox(false)} />
+        </AnimatePresence >
     );
 }

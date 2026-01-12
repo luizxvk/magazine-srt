@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, X, Sparkles, Gift } from 'lucide-react';
 import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext';
 import ThemePackCard from './ThemePackCard';
 
 interface SupplyBoxModalProps {
@@ -11,7 +11,7 @@ interface SupplyBoxModalProps {
 }
 
 export default function SupplyBoxModal({ isOpen, onClose }: SupplyBoxModalProps) {
-    const { updateUserZios } = useAuth(); // Assuming this function exists or similar
+    // const { updateUserZions } = useAuth();
     const [opening, setOpening] = useState(false);
     const [reward, setReward] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);

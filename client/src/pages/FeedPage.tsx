@@ -23,6 +23,7 @@ import OnlineFriendsCard from '../components/OnlineFriendsCard';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
+import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 
@@ -341,6 +342,11 @@ export default function FeedPage() {
                     {/* Market Card */}
                     <div className="mb-6">
                         <MarketCard />
+                    </div>
+
+                    {/* Product Store Card */}
+                    <div className="mb-6">
+                        <ProductStoreCard />
                     </div>
 
                     {/* Feedback Form Card */}

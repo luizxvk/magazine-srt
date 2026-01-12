@@ -11,6 +11,7 @@ import logoMgt from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import LoginErrorPopup from '../components/LoginErrorPopup';
 
 const loginSchema = z.object({
     email: z.string().trim().email('Email inválido'),
@@ -33,6 +34,8 @@ export default function ModernLogin() {
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
     const [showUserNotFoundPopup, setShowUserNotFoundPopup] = useState(false);
     const [showPermissionDeniedPopup, setShowPermissionDeniedPopup] = useState(false);
+    const [showLoginErrorPopup, setShowLoginErrorPopup] = useState(false);
+    const [loginErrorMessage, setLoginErrorMessage] = useState('');
     const [notFoundEmail, setNotFoundEmail] = useState('');
     const [deniedMembershipType, setDeniedMembershipType] = useState<'MAGAZINE' | 'MGT'>('MAGAZINE');
 
@@ -96,6 +99,11 @@ export default function ModernLogin() {
                 error.response?.status === 404) {
                 setNotFoundEmail(data.email);
                 setShowUserNotFoundPopup(true);
+            } else if (errorMessage.toLowerCase().includes('invalid credentials') ||
+                       errorMessage.toLowerCase().includes('credenciais inválidas')) {
+                // Show styled popup for invalid credentials
+                setLoginErrorMessage('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
+                setShowLoginErrorPopup(true);
             } else {
                 setError('root', { message: errorMessage });
             }
@@ -261,6 +269,15 @@ export default function ModernLogin() {
             >
                 Entrar como Visitante
             </button>
+
+            {/* Login Error Popup */}
+            {showLoginErrorPopup && (
+                <LoginErrorPopup
+                    message={loginErrorMessage}
+                    onClose={() => setShowLoginErrorPopup(false)}
+                    autoCloseDuration={5000}
+                />
+            )}
 
             <ForgotPasswordModal
                 isOpen={isForgotPasswordOpen}

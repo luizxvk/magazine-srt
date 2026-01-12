@@ -9,7 +9,6 @@ import {
     Gift,
     Sparkles,
     Loader2,
-    Check,
     Mail,
     AlertCircle,
     Banknote

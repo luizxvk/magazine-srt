@@ -37,6 +37,7 @@ export default function MobileCarousel({
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
+    const [hasMoved, setHasMoved] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
@@ -60,7 +61,7 @@ export default function MobileCarousel({
             subtitle: 'Explore as fotos da comunidade',
             icon: <Camera className="w-6 h-6" />,
             gradient: 'from-pink-500 to-rose-600',
-            onClick: () => navigate('/photos')
+            onClick: () => navigate('/catalog')
         },
         {
             id: 'events',
@@ -114,6 +115,7 @@ export default function MobileCarousel({
     // Mouse/Touch drag handlers
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
+        setHasMoved(false);
         setStartX(e.pageX - (carouselRef.current?.offsetLeft || 0));
         setScrollLeft(carouselRef.current?.scrollLeft || 0);
     };
@@ -123,6 +125,9 @@ export default function MobileCarousel({
         e.preventDefault();
         const x = e.pageX - (carouselRef.current?.offsetLeft || 0);
         const walk = (x - startX) * 1.5;
+        if (Math.abs(walk) > 5) {
+            setHasMoved(true);
+        }
         if (carouselRef.current) {
             carouselRef.current.scrollLeft = scrollLeft - walk;
         }
@@ -191,8 +196,15 @@ export default function MobileCarousel({
                     {cards.map((card) => (
                         <button
                             key={card.id}
-                            onClick={card.onClick}
-                            className={`flex-shrink-0 w-32 sm:w-36 snap-start transition-opacity duration-300 ${isDragging ? 'pointer-events-none' : ''}`}
+                            onClick={(e) => {
+                                if (hasMoved) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    return;
+                                }
+                                card.onClick?.();
+                            }}
+                            className="flex-shrink-0 w-32 sm:w-36 snap-start transition-opacity duration-300"
                         >
                             <div
                                 className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/20 active:scale-95 transition-transform`}

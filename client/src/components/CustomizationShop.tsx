@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap } from 'lucide-react';
+import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -90,7 +90,7 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {
     const { user, updateUserZions, updateUser, theme } = useAuth();
-    const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color'>('background');
+    const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color' | 'packs'>('background');
     const [purchasing, setPurchasing] = useState<string | null>(null);
     const [ownedItems, setOwnedItems] = useState<string[]>([]);
     const [equippedItems, setEquippedItems] = useState<{ background?: string; badge?: string; color?: string }>({});
@@ -246,6 +246,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         { id: 'background' as const, label: 'Fundos', icon: Image },
         { id: 'badge' as const, label: 'Badges', icon: Award },
         { id: 'color' as const, label: 'Cores', icon: Palette },
+        { id: 'packs' as const, label: 'Packs', icon: PackageOpen },
     ];
 
     if (!isOpen) return null;
@@ -330,7 +331,21 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
                     {/* Items Grid */}
                     <div className="p-4 overflow-y-auto max-h-[calc(85vh-180px)] custom-scrollbar">
-                        {activeTab === 'color' ? (
+                        {activeTab === 'packs' ? (
+                            // Packs Tab - Placeholder
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className={`p-6 rounded-full bg-${themeColor}-500/10 mb-4`}>
+                                    <PackageOpen className={`w-16 h-16 text-${themeColor}-400`} />
+                                </div>
+                                <h3 className={`text-xl font-bold ${textMain} mb-2`}>Packs de Tema</h3>
+                                <p className={`${textSub} max-w-md mb-4`}>
+                                    Pacotes temáticos exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.
+                                </p>
+                                <div className={`px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm`}>
+                                    🚀 Em breve! Aguarde os primeiros packs...
+                                </div>
+                            </div>
+                        ) : activeTab === 'color' ? (
                             // Render color categories
                             (() => {
                                 const { basicColors, pastelColors } = getItems() as { basicColors: typeof colors; pastelColors: typeof colors };

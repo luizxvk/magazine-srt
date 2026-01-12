@@ -27,6 +27,7 @@ import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
+import RadioCard from '../components/RadioCard';
 
 interface Post {
     id: string;
@@ -328,6 +329,11 @@ export default function FeedPage() {
 
                 {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
                 <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
+                    {/* Radio Card - 24/7 Waves Music */}
+                    <div className="mb-6">
+                        <RadioCard />
+                    </div>
+
                     {/* Inventory Card */}
                     <div className="mb-6">
                         <InventoryCard onOpenShop={() => setIsShopOpen(true)} />

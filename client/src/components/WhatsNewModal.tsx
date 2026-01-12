@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Wallet, ShoppingBag, Key, Gamepad2, Mail, Shield, Coins } from 'lucide-react';
+import { X, Sparkles, Check, Store, ShoppingBag, Mail, Radio, Palette } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.26';
+const CURRENT_VERSION = '0.3.27';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,13 +33,29 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.26 - CARROSSEL MOBILE!
+    // v0.3.27 - PACKS DE TEMA & RÁDIO!
     const updates: UpdateItem[] = [
         {
-            icon: <ShoppingBag className="w-5 h-5" />,
-            title: '🎠 CARROSSEL MOBILE!',
-            description: 'Novo carrossel de acesso rápido no celular! Bônus Diário, Eventos, Fotos e mais na ponta dos dedos.',
+            icon: <Palette className="w-5 h-5" />,
+            title: '🎨 PACKS DE TEMA!',
+            description: 'Compre pacotes exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.',
             isNew: true
+        },
+        {
+            icon: <Radio className="w-5 h-5" />,
+            title: '📻 Rádio 24/7 Waves!',
+            description: 'Ouça synthwave, darksynth, chillwave e spacesynth enquanto navega no feed! 4 estações disponíveis.',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'Carrossel Otimizado',
+            description: 'Cards mais compactos e navegação corrigida - agora você consegue ver todos os 6 cards!'
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5" />,
+            title: 'Carrossel Mobile',
+            description: 'Acesso rápido no celular! Bônus Diário, Eventos, Fotos e mais na ponta dos dedos.'
         },
         {
             icon: <Mail className="w-5 h-5" />,
@@ -50,31 +66,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Store className="w-5 h-5" />,
             title: 'Loja de Produtos',
             description: 'Compre keys de jogos, gift cards e muito mais usando Zions ou dinheiro real!'
-        },
-        {
-            icon: <Gamepad2 className="w-5 h-5" />,
-            title: 'Keys de Jogos',
-            description: 'Compre keys de Steam, Epic, Xbox, PlayStation e mais!'
-        },
-        {
-            icon: <Wallet className="w-5 h-5" />,
-            title: 'Sacar Zions em PIX',
-            description: 'Converta seus Zions em dinheiro real via PIX! Taxa: 100 Zions = R$ 1,00'
-        },
-        {
-            icon: <Key className="w-5 h-5" />,
-            title: 'Sistema de Keys',
-            description: 'Admin pode cadastrar keys de produtos que são entregues automaticamente!'
-        },
-        {
-            icon: <Shield className="w-5 h-5" />,
-            title: 'Conformidade LGPD',
-            description: 'Termos completos de privacidade e proteção de dados conforme legislação brasileira.'
-        },
-        {
-            icon: <Coins className="w-5 h-5" />,
-            title: 'Taxa de Mercado',
-            description: 'A taxa de 5% das vendas no mercado vai para a conta do administrador!'
         }
     ];
 

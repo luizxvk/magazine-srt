@@ -1,0 +1,221 @@
+import { useState } from 'react';
+import { Sparkles, Check, Lock, ShoppingBag } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+interface ThemePack {
+    id: string;
+    name: string;
+    description?: string;
+    gameTitle: string;
+    backgroundUrl: string;
+    accentColor: string;
+    previewUrl?: string;
+    price: number;
+    maxStock?: number;
+    soldCount: number;
+    isLimited: boolean;
+    isOwned?: boolean;
+    isEquipped?: boolean;
+}
+
+interface ThemePackCardProps {
+    pack: ThemePack;
+    onPurchase: (packId: string) => void;
+    onEquip?: (packId: string) => void;
+    loading?: boolean;
+}
+
+export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: ThemePackCardProps) {
+    const { user, theme } = useAuth();
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    const isOutOfStock = pack.maxStock && pack.soldCount >= pack.maxStock;
+    const stockLeft = pack.maxStock ? pack.maxStock - pack.soldCount : null;
+    const isLowStock = stockLeft && stockLeft <= 3;
+    const canAfford = user && user.zions >= pack.price;
+
+    const handleAction = () => {
+        if (pack.isOwned && onEquip) {
+            onEquip(pack.id);
+        } else if (!pack.isOwned && !isOutOfStock) {
+            onPurchase(pack.id);
+        }
+    };
+
+    return (
+        <div className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${
+            theme === 'light' 
+                ? 'bg-white border-gray-200 hover:shadow-xl' 
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+        } ${pack.isEquipped ? 'ring-2 ring-offset-2 ring-offset-zinc-900' : ''}`}
+            style={{ 
+                ...(pack.isEquipped && { 
+                    borderColor: pack.accentColor,
+                    ringColor: pack.accentColor 
+                })
+            }}
+        >
+            {/* Preview Image/Video */}
+            <div className="relative aspect-video overflow-hidden bg-black">
+                {pack.backgroundUrl.endsWith('.mp4') || pack.backgroundUrl.endsWith('.webm') ? (
+                    <video
+                        src={pack.backgroundUrl}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                ) : (
+                    <img
+                        src={pack.previewUrl || pack.backgroundUrl}
+                        alt={pack.name}
+                        className={`w-full h-full object-cover transition-all duration-500 ${
+                            imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
+                        }`}
+                        onLoad={() => setImageLoaded(true)}
+                    />
+                )}
+
+                {/* Overlay gradiente */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60" />
+
+                {/* Badges no topo */}
+                <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                    {pack.isLimited && (
+                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-purple-500 text-white rounded">
+                            Edição Limitada
+                        </span>
+                    )}
+                    {pack.isEquipped && (
+                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-green-500 text-white rounded flex items-center gap-1">
+                            <Check className="w-3 h-3" /> Equipado
+                        </span>
+                    )}
+                    {pack.isOwned && !pack.isEquipped && (
+                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-blue-500 text-white rounded">
+                            Adquirido
+                        </span>
+                    )}
+                </div>
+
+                {/* Stock info */}
+                {isLowStock && !isOutOfStock && !pack.isOwned && (
+                    <div className="absolute top-3 right-3">
+                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white rounded animate-pulse">
+                            {stockLeft} restantes!
+                        </span>
+                    </div>
+                )}
+
+                {/* Game Title no bottom */}
+                <div className="absolute bottom-3 left-3">
+                    <p className="text-white/60 text-xs uppercase tracking-widest font-medium">
+                        {pack.gameTitle}
+                    </p>
+                </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-4">
+                <h3 className={`text-lg font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                    {pack.name}
+                </h3>
+                {pack.description && (
+                    <p className={`text-xs mb-3 line-clamp-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                        {pack.description}
+                    </p>
+                )}
+
+                {/* Included Items */}
+                <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <Sparkles className="w-4 h-4" style={{ color: pack.accentColor }} />
+                        <span>Fundo Animado Exclusivo</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <div className="w-4 h-4 rounded-full border-2 border-white/20" style={{ backgroundColor: pack.accentColor }} />
+                        <span>Cor Destaque: {pack.accentColor}</span>
+                    </div>
+                </div>
+
+                {/* Price & Action */}
+                <div className="flex items-center justify-between gap-3">
+                    <div>
+                        {!pack.isOwned && (
+                            <div className="flex items-center gap-1.5">
+                                <img 
+                                    src="/assets/zions/zion-50.png" 
+                                    alt="Zions" 
+                                    className="w-5 h-5"
+                                />
+                                <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                    {pack.price.toLocaleString('pt-BR')}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={handleAction}
+                        disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
+                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                            pack.isOwned
+                                ? pack.isEquipped
+                                    ? 'bg-green-500/20 text-green-400 cursor-default'
+                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                : isOutOfStock
+                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                    : !canAfford
+                                        ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
+                                        : 'bg-gradient-to-r hover:opacity-90 text-white'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        style={{
+                            ...(pack.isOwned && !pack.isEquipped && { backgroundColor: pack.accentColor }),
+                            ...(!pack.isOwned && canAfford && !isOutOfStock && {
+                                backgroundImage: `linear-gradient(to right, ${pack.accentColor}, ${adjustBrightness(pack.accentColor, -20)})`
+                            })
+                        }}
+                    >
+                        {loading ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : pack.isEquipped ? (
+                            <>
+                                <Check className="w-4 h-4" /> Equipado
+                            </>
+                        ) : pack.isOwned ? (
+                            'Equipar'
+                        ) : isOutOfStock ? (
+                            <>
+                                <Lock className="w-4 h-4" /> Esgotado
+                            </>
+                        ) : !canAfford ? (
+                            <>
+                                <Lock className="w-4 h-4" /> Sem Zions
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingBag className="w-4 h-4" /> Comprar
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Utility para ajustar brilho da cor hex
+function adjustBrightness(hex: string, percent: number): string {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return '#' + (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+    ).toString(16).slice(1);
+}

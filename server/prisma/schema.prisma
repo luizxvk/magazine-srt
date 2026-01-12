@@ -69,6 +69,7 @@ model User {
   feedbacks              Feedback[]
   withdrawalRequests     WithdrawalRequest[]
   createdProducts        Product[]  @relation("ProductCreator")
+  themePacks             UserThemePack[]
 
   @@index([membershipType])
   @@index([isOnline])
@@ -755,4 +756,42 @@ enum InviteStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+model ThemePack {
+  id              String          @id @default(uuid())
+  name            String          // "Arc Raiders Pack"
+  description     String?
+  gameTitle       String          // "Arc Raiders"
+  backgroundUrl   String          // URL do fundo animado (video/gif/webm)
+  accentColor     String          // Hex da cor destaque "#FF6B35"
+  previewUrl      String?         // Thumbnail estática para preview
+  price           Int             // Preço em Zions
+  maxStock        Int?            // Estoque máximo (null = ilimitado)
+  soldCount       Int             @default(0)
+  isActive        Boolean         @default(true)
+  isLimited       Boolean         @default(false) // Edição limitada?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  owners          UserThemePack[]
+
+  @@index([isActive])
+  @@index([gameTitle])
+}
+
+model UserThemePack {
+  id          String    @id @default(uuid())
+  userId      String
+  packId      String
+  purchasedAt DateTime  @default(now())
+  isEquipped  Boolean   @default(false)
+  price       Int       // Preço pago (para histórico)
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pack        ThemePack @relation(fields: [packId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, packId])
+  @@index([userId])
+  @@index([packId])
+  @@index([isEquipped])
 }

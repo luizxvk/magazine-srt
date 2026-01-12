@@ -113,7 +113,38 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
             return res.status(403).json({ error: 'Apenas administradores podem deletar produtos' });
         }
 
-        await prisma.product.delete({ where: { id } });
+        // Check if product exists
+        const product = await prisma.product.findUnique({ 
+            where: { id },
+            include: { orders: true }
+        });
+        
+        if (!product) {
+            return res.status(404).json({ error: 'Produto não encontrado' });
+        }
+
+        // Use transaction to delete related records first
+        await prisma.$transaction(async (tx: any) => {
+            // Delete all keys associated with this product (cascade should handle this, but being explicit)
+            await tx.productKey.deleteMany({ where: { productId: id } });
+            
+            // Update orders to remove product reference (set productId to null or handle appropriately)
+            // Since we can't set productId to null (required field), we need to delete orders too
+            // Or we can just delete the product if there are no orders
+            if (product.orders.length > 0) {
+                // Delete delivered keys from orders first
+                await tx.productKey.updateMany({
+                    where: { orderId: { in: product.orders.map((o: any) => o.id) } },
+                    data: { orderId: null }
+                });
+                // Delete orders
+                await tx.order.deleteMany({ where: { productId: id } });
+            }
+            
+            // Finally delete the product
+            await tx.product.delete({ where: { id } });
+        });
+
         res.json({ message: 'Produto deletado com sucesso' });
     } catch (error) {
         console.error('Error deleting product:', error);

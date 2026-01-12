@@ -21,25 +21,42 @@
 ## ✅ Recentemente Implementado (v0.3.25 - v0.3.27)
 
 ### v0.3.27 (Atual - Janeiro 2026)
-- 🎨 **Packs de Tema** - Sistema completo de pacotes temáticos
-  - Schema Prisma com ThemePack e UserThemePack
-  - Componente ThemePackCard com preview animado
-  - Suporte para fundos em vídeo/GIF
-  - Sistema de estoque limitado e edição limitada
-  - Preview de cor destaque (hex)
+- 💰 **Sistema de Moeda Dual** - Economia completa
+  - zionsPoints (Int) - Para customizações (100 points = 1 cash)
+  - zionsCash (Float) - Para produtos reais (1 cash = R$ 1,00)
+  - Migração Prisma aplicada no Supabase
+  - Campos antigos mantidos para compatibilidade
+
+- 🎨 **10 Packs de Tema Completos**
+  - Arc Raiders, Cyberpunk 2077, Red Dead Redemption
+  - The Witcher, Resident Evil, Valorant
+  - Elden Ring, God of War, Stray, Hollow Knight
+  - Schema completo com ThemePack e UserThemePack
+  - Sistema de estoque e edição limitada
   
 - 📻 **Rádio 24/7 Waves** - Música ambiente integrada
   - 4 estações: Synthwave, Chillwave, Darksynth, Spacesynth
   - Componente RadioCard com controles completos
-  - Volume, mute, troca de estação
   - Streaming via Nightride FM
-  - Visualizador animado ao vivo
+
+- 💸 **Cashback System** - 10% em Points
+  - Toda compra de produto retorna 10% em Points
+  - Histórico separado para Cash e Points
+  - Daily Login agora concede Points
+
+- 🏪 **Mercado Dual Currency**
+  - Aceita Zions Cash ou Zions Points
+  - Conversão: 1 Cash = 100 Points
+  - Taxa de 5% vai para admin
+
+- 🎨 **LoginErrorPopup Estilizado**
+  - Design moderno com gradiente vermelho
+  - Animação slideDown + progress bar
+  - Auto-close de 5 segundos
 
 - 🎠 **Carrossel Mobile Otimizado**
   - Cards reduzidos (w-36, h-20) para melhor UX
-  - Navegação corrigida - agora alcança todos os 6 cards
-  - Padding dinâmico para último card
-  - Espaçamento otimizado (space-y-6)
+  - Navegação corrigida - todos os 6 cards acessíveis
 
 ### v0.3.26 (Janeiro 2026)
 - 🎠 **Carrossel Mobile** - Acesso rápido no feed

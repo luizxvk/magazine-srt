@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, ShoppingBag, Mail, Radio, Palette } from 'lucide-react';
+import { X, Sparkles, Check, Store, ShoppingBag, Mail, Radio, Palette, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -33,12 +33,18 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.27 - PACKS DE TEMA & RÁDIO!
+    // v0.3.27 - SISTEMA DE MOEDA DUAL & PACKS DE TEMA
     const updates: UpdateItem[] = [
         {
+            icon: <Coins className="w-5 h-5" />,
+            title: '💰 Sistema de Moeda Dual!',
+            description: 'Zions Cash para produtos reais e Zions Points para customizações. Ganhe 10% cashback em Points!',
+            isNew: true
+        },
+        {
             icon: <Palette className="w-5 h-5" />,
-            title: '🎨 PACKS DE TEMA!',
-            description: 'Compre pacotes exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.',
+            title: '🎨 10 Packs de Tema!',
+            description: 'Arc Raiders, Cyberpunk, Red Dead, Witcher, Resident Evil, Valorant, Elden Ring, God of War, Stray e Hollow Knight!',
             isNew: true
         },
         {
@@ -48,24 +54,19 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             isNew: true
         },
         {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'Carrossel Otimizado',
-            description: 'Cards mais compactos e navegação corrigida - agora você consegue ver todos os 6 cards!'
-        },
-        {
             icon: <ShoppingBag className="w-5 h-5" />,
-            title: 'Carrossel Mobile',
-            description: 'Acesso rápido no celular! Bônus Diário, Eventos, Fotos e mais na ponta dos dedos.'
+            title: 'Mercado Dual Currency',
+            description: 'Compre itens no mercado usando Cash ou Points! Conversão: 1 Cash = 100 Points.'
         },
         {
-            icon: <Mail className="w-5 h-5" />,
-            title: 'Keys por Email',
-            description: 'As keys compradas na loja agora são enviadas diretamente para seu email cadastrado!'
+            icon: <Sparkles className="w-5 h-5" />,
+            title: 'Daily Login Points',
+            description: 'Bônus diário agora concede Zions Points em vez de Zions antigos!'
         },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Loja de Produtos',
-            description: 'Compre keys de jogos, gift cards e muito mais usando Zions ou dinheiro real!'
+            description: 'Compre keys de jogos com Cash e ganhe 10% de volta em Points. Keys enviadas por email!'
         }
     ];
 

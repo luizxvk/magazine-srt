@@ -72,7 +72,7 @@ const corsOptions = {
 };
 
 // Handle OPTIONS explicitly
-app.options('*', cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(cors(corsOptions));
 
 // Security Headers (after CORS)

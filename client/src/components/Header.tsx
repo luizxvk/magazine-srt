@@ -1,7 +1,7 @@
 import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle, Sparkles, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
 import SearchModal from './SearchModal';

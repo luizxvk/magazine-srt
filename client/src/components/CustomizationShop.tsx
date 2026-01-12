@@ -452,24 +452,76 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {themePacks.map(pack => {
-                                            // Check both packId (server) and themePackId (legacy/optimistic)
-                                            const isOwned = userPacks.some(up => (up.packId === pack.id) || (up.themePackId === pack.id));
-                                            const isEquipped = user?.equippedBackground === pack.backgroundUrl &&
-                                                user?.equippedColor === pack.accentColor;
+                                    <div>
+                                        {/* Legendary Packs Carousel */}
+                                        {(() => {
+                                            const legendaryPacks = themePacks.filter(p => p.rarity === 'LEGENDARY');
+                                            if (legendaryPacks.length > 0) {
+                                                return (
+                                                    <div className="mb-8">
+                                                        <h3 className={`text-lg font-bold ${textMain} mb-4 flex items-center gap-2`}>
+                                                            <span className="text-2xl">🏆</span>
+                                                            Packs Legendários
+                                                        </h3>
+                                                        <div className="relative">
+                                                            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory">
+                                                                {legendaryPacks.map(pack => {
+                                                                    const isOwned = userPacks.some(up => (up.packId === pack.id) || (up.themePackId === pack.id));
+                                                                    const isEquipped = user?.equippedBackground === pack.backgroundUrl &&
+                                                                        user?.equippedColor === pack.accentColor;
 
-                                            return (
-                                                <ThemePackCard
-                                                    key={pack.id}
-                                                    pack={{ ...pack, isOwned, isEquipped }}
-                                                    onPurchase={handlePurchaseThemePack}
-                                                    onEquip={handleEquipThemePack}
-                                                    onUnequip={handleUnequipThemePack}
-                                                    loading={purchasing === pack.id || purchasing === 'unequip'}
-                                                />
-                                            );
-                                        })}
+                                                                    return (
+                                                                        <div key={pack.id} className="flex-shrink-0 w-80 snap-center">
+                                                                            <ThemePackCard
+                                                                                pack={{ ...pack, isOwned, isEquipped }}
+                                                                                onPurchase={handlePurchaseThemePack}
+                                                                                onEquip={handleEquipThemePack}
+                                                                                onUnequip={handleUnequipThemePack}
+                                                                                loading={purchasing === pack.id || purchasing === 'unequip'}
+                                                                            />
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+
+                                        {/* Other Packs Grid */}
+                                        {(() => {
+                                            const otherPacks = themePacks.filter(p => p.rarity !== 'LEGENDARY');
+                                            if (otherPacks.length > 0) {
+                                                return (
+                                                    <div>
+                                                        <h3 className={`text-lg font-bold ${textMain} mb-4`}>
+                                                            Outros Packs
+                                                        </h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                            {otherPacks.map(pack => {
+                                                                const isOwned = userPacks.some(up => (up.packId === pack.id) || (up.themePackId === pack.id));
+                                                                const isEquipped = user?.equippedBackground === pack.backgroundUrl &&
+                                                                    user?.equippedColor === pack.accentColor;
+
+                                                                return (
+                                                                    <ThemePackCard
+                                                                        key={pack.id}
+                                                                        pack={{ ...pack, isOwned, isEquipped }}
+                                                                        onPurchase={handlePurchaseThemePack}
+                                                                        onEquip={handleEquipThemePack}
+                                                                        onUnequip={handleUnequipThemePack}
+                                                                        loading={purchasing === pack.id || purchasing === 'unequip'}
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
                                     </div>
                                 )}
                             </div>
@@ -479,17 +531,6 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 const { basicColors, pastelColors } = getItems() as { basicColors: typeof colors; pastelColors: typeof colors };
                                 return (
                                     <>
-                                        {/* Shop Header */}
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div>
-                                                <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
-                                                    Loja de Personalização
-                                                </h2>
-                                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                                                    Compre itens para personalizar seu perfil
-                                                </p>
-                                            </div>
-                                        </div>
                                         {/* Basic Colors */}
                                         <div className="mb-6">
                                             <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>

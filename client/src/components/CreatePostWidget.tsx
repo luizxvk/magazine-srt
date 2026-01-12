@@ -51,7 +51,6 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     const themeBgActive = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
     const themeTextActive = isMGT ? 'text-emerald-300' : 'text-gold-300';
     const themeButton = isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-400 hover:bg-gold-300';
-    const themeButtonShadow = isMGT ? 'hover:shadow-[0_0_15px_rgba(16,185,129,0.6)]' : 'hover:shadow-[0_0_15px_rgba(252,246,186,0.6)]';
 
     const themePillBg = isMGT
         ? (theme === 'light' ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-900/20')

@@ -1,6 +1,6 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.3.39 (Beta)  
+> **Versão Atual:** v0.4.0 (Beta)  
 > **Última Atualização:** 12 de Janeiro de 2026
 
 ---
@@ -13,14 +13,62 @@
 ├─ Features Sociais: 95% ✅
 ├─ Gamificação: 90% ✅
 ├─ E-commerce: 85% 🔄
-└─ Personalização: 70% 🔄
+└─ Personalização: 75% 🔄
 ```
 
 ---
 
-## ✅ Recentemente Implementado (v0.3.25 - v0.3.39)
+## ✅ Recentemente Implementado (v0.3.25 - v0.4.0)
 
-### v0.3.39 (Atual - Janeiro 2026)
+### v0.4.0 (Atual - Janeiro 2026)
+- 🔒 **Sistema de Visitante Aprimorado**
+  - Visitantes não recebem mais popups intrusivos (welcome/daily login)
+  - Componente centralizado `VisitorBlockPopup` para bloqueios consistentes
+  - Bloqueios implementados: comentários, compartilhamento, feedback, notificações, compra de Zions, Social, Market
+  - Visitantes não têm mais crown badge no perfil
+  - Experiência de navegação mais limpa para convidados
+
+- 🎨 **Melhorias no Header**
+  - Logo MAGAZINE agora segue a cor personalizada do usuário (accentColor)
+  - Logo MGT aumentado 40% (h-12/h-14/h-16) para maior destaque
+  - Pulse de notificação movido do ícone Social para Grupos
+  - Botão Settings removido do desktop header (ainda em drawer)
+  - Design mais limpo e intuitivo
+
+- ☀️ **Correções de Modo Claro**
+  - Títulos do MobileCarousel agora visíveis (text-white + drop-shadow-md)
+  - Ranking component adaptado para light mode (bg-white/80 vs bg-white/5)
+  - Ícone verificado com stroke 2.5 e drop-shadow para melhor contraste
+
+- 📻 **Rádio Totalmente Funcional**
+  - Badge "AO VIVO" movido para canto superior direito
+  - Volume automático: unmute ao aumentar slider de 0
+  - Busca agora redireciona e faz scroll para rádio com animação highlight
+  - Event listener 'openRadio' implementado no FeedPage
+
+- 🏆 **Sistema de Conquistas Expandido**
+  - 7 novas conquistas implementadas:
+    * Blogueiro (20 posts)
+    * Editor Chefe (50 posts)
+    * Comentador (first comment)
+    * Debatedor (50 comments)
+    * Super Fã (100 likes given)
+    * Ícone (100 likes received)
+    * Viral (50 comments received)
+  - Agora 12/25 conquistas têm lógica funcional
+
+- 🎠 **Carrossel Contador Corrigido**
+  - Melhor cálculo de scroll position
+  - Clamping (0 to cards.length-1) para evitar índices inválidos
+  - Contador atualiza suavemente durante toda a rolagem
+
+- 🎭 **Desequipar Theme Packs**
+  - Novo botão "Desequipar" para packs equipados
+  - Desequipa background e color simultaneamente
+  - Feedback visual com hover (gray → red)
+  - Retorna ao tema padrão facilmente
+
+### v0.3.39 (Janeiro 2026)
 - ⭐ **Card "O Que Há de Novo" no Acesso Rápido**
   - Novo card no carrossel mobile para acesso direto às novidades
   - Gradiente azul/indigo distinto

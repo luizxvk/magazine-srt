@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, PackageOpen, Coins, Star } from 'lucide-react';
+import { X, Sparkles, Check, Store, PackageOpen, Coins, Star, ShieldCheck, Sun, Radio, Trophy, Palette, Navigation } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.39';
+const CURRENT_VERSION = '0.4.0';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,13 +33,56 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.39 - QUICK ACCESS IMPROVEMENTS
+    // v0.4.0 - MAJOR FIXES & IMPROVEMENTS
     const updates: UpdateItem[] = [
+        {
+            icon: <ShieldCheck className="w-5 h-5 text-purple-500" />,
+            title: '🔒 Sessão Visitante Aprimorada',
+            description: 'Visitantes agora têm bloqueios adequados: sem popups intrusivos, sem acesso a notificações/mercado/social. Experiência mais limpa!',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5 text-emerald-500" />,
+            title: '🎨 Header Modernizado',
+            description: 'Logo MAGAZINE agora segue sua cor personalizada! Logo MGT aumentado, pulse de notificação movido para Grupos, configurações removidas do header.',
+            isNew: true
+        },
+        {
+            icon: <Sun className="w-5 h-5 text-yellow-500" />,
+            title: '☀️ Modo Claro Corrigido',
+            description: 'Títulos do carrossel, ranking e ícone verificado agora têm contraste perfeito em modo claro!',
+            isNew: true
+        },
+        {
+            icon: <Radio className="w-5 h-5 text-pink-500" />,
+            title: '📻 Rádio 100% Funcional',
+            description: 'Badge "AO VIVO" à direita, volume automático, busca redireciona e scroll animado ao clicar!',
+            isNew: true
+        },
+        {
+            icon: <Trophy className="w-5 h-5 text-amber-500" />,
+            title: '🏆 Conquistas Expandidas',
+            description: '7 novas conquistas implementadas! Agora temos 12 com lógica funcional (Blogueiro, Editor Chefe, Ícone, Viral e mais).',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5 text-blue-500" />,
+            title: '🎭 Desequipar Theme Packs',
+            description: 'Agora você pode remover packs equipados e voltar ao tema padrão com um clique!',
+            isNew: true
+        },
+        {
+            icon: <Navigation className="w-5 h-5 text-cyan-500" />,
+            title: '🔧 Correções Gerais',
+            description: 'Contador do carrossel corrigido, ícone verificado com mais contraste. Mais de 30 bugs resolvidos!',
+            isNew: true
+        },
+        // v0.3.39 - QUICK ACCESS IMPROVEMENTS
         {
             icon: <Star className="w-5 h-5 text-blue-500" />,
             title: '⭐ Acesso Rápido Aprimorado',
             description: 'Novo card "O Que Há de Novo" no carrossel para você ficar por dentro de tudo!',
-            isNew: true
+            isNew: false
         },
         // v0.3.38 - PROGRESSIVE PRICING & ACHIEVEMENTS
         {

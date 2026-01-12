@@ -120,7 +120,7 @@ export default function AdminDashboard() {
 
             const password = response.data.generatedPassword;
             const wasConversion = response.data.wasConversion;
-            
+
             // If this was an MGT conversion, no password was generated
             // The server already sent the welcome email
             if (wasConversion) {
@@ -128,11 +128,11 @@ export default function AdminDashboard() {
                 console.log(`[Admin] MGT user ${request.email} converted to Magazine`);
                 return;
             }
-            
+
             // For new users, server already sent the email with credentials
             // Show success and copy password as backup
             showToast(`✅ ${request.name} aprovado! Email com credenciais enviado para ${request.email}`, 'success');
-            
+
             // Copy password to clipboard as backup
             if (password) {
                 navigator.clipboard.writeText(password).then(() => {
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
         if (!window.confirm(`Tem certeza que deseja enviar uma nova senha por email para ${userName}?`)) return;
         try {
             const response = await api.post(`/users/${userId}/reset-password`);
-            
+
             if (response.data.success) {
                 showToast(response.data.message, 'success');
             } else {
@@ -314,29 +314,52 @@ export default function AdminDashboard() {
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-xs text-gray-400 mb-1">Meus Zions</label>
+                                    <label className="block text-xs text-gray-400 mb-1">Meus Zions Points</label>
                                     <input
                                         type="number"
-                                        defaultValue={user?.zions || 0}
+                                        defaultValue={user?.zionsPoints || 0}
                                         min="0"
                                         className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        aria-label="Editar meus zions"
+                                        aria-label="Editar meus zions points"
                                         onBlur={async (e) => {
-                                            const newZions = parseInt(e.target.value);
-                                            if (!isNaN(newZions) && newZions >= 0) {
+                                            const newPoints = parseInt(e.target.value);
+                                            if (!isNaN(newPoints) && newPoints >= 0) {
                                                 try {
-                                                    await api.put('/users/me', { zions: newZions });
-                                                    showToast('Zions atualizados!', 'success');
+                                                    await api.put('/users/me', { zionsPoints: newPoints });
+                                                    showToast('Zions Points atualizados!', 'success');
                                                     window.location.reload();
                                                 } catch (error) {
-                                                    console.error('Failed to update zions', error);
-                                                    showToast('Erro ao atualizar zions.', 'error');
+                                                    console.error('Failed to update zions points', error);
+                                                    showToast('Erro ao atualizar zions points.', 'error');
                                                 }
                                             }
                                         }}
                                     />
                                 </div>
-                                <div className="text-xs text-gray-500 pb-3">
+                                <div className="flex-1">
+                                    <label className="block text-xs text-gray-400 mb-1">Meus Zions Cash</label>
+                                    <input
+                                        type="number"
+                                        defaultValue={user?.zionsCash || 0}
+                                        min="0"
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
+                                        aria-label="Editar meus zions cash"
+                                        onBlur={async (e) => {
+                                            const newCash = parseInt(e.target.value);
+                                            if (!isNaN(newCash) && newCash >= 0) {
+                                                try {
+                                                    await api.put('/users/me', { zionsCash: newCash });
+                                                    showToast('Zions Cash atualizados!', 'success');
+                                                    window.location.reload();
+                                                } catch (error) {
+                                                    console.error('Failed to update zions cash', error);
+                                                    showToast('Erro ao atualizar zions cash.', 'error');
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div className="text-xs text-gray-500 pb-3 flex items-end">
                                     *Edição em tempo real (Admin)
                                 </div>
                             </div>

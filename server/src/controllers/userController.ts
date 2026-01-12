@@ -167,13 +167,13 @@ export const resetUserPassword = async (req: AuthRequest, res: Response) => {
         );
 
         if (emailSent) {
-            res.json({ 
+            res.json({
                 success: true,
                 message: 'Nova senha enviada para o email do usuário'
             });
         } else {
             // Password was changed but email failed - still don't expose the password
-            res.json({ 
+            res.json({
                 success: true,
                 message: 'Senha alterada. O email não pôde ser enviado, peça ao usuário para usar "Esqueci minha senha".'
             });
@@ -192,6 +192,8 @@ const updateProfileSchema = z.object({
     trophies: z.number().optional(),
     level: z.number().min(1).max(30).optional(),
     zions: z.number().min(0).optional(),
+    zionsPoints: z.number().min(0).optional(),
+    zionsCash: z.number().min(0).optional(),
 });
 
 export const getMe = async (req: AuthRequest, res: Response) => {
@@ -230,8 +232,8 @@ export const getMe = async (req: AuthRequest, res: Response) => {
         // Parse ownedCustomizations from JSON string to array
         const userData = {
             ...user,
-            ownedCustomizations: user.ownedCustomizations 
-                ? JSON.parse(user.ownedCustomizations) 
+            ownedCustomizations: user.ownedCustomizations
+                ? JSON.parse(user.ownedCustomizations)
                 : []
         };
 
@@ -259,7 +261,7 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
         }
 
         // Security Check: Only ADMIN can update level, trophies, zions
-        if ((data.level !== undefined || data.zions !== undefined) && req.user?.role !== 'ADMIN') {
+        if ((data.level !== undefined || data.zions !== undefined || data.zionsPoints !== undefined || data.zionsCash !== undefined) && req.user?.role !== 'ADMIN') {
             // Strip them or throw error? Let's strip them to be safe or throw.
             // Given the context, throwing might be better to signal unauthorized attempt if someone tries.
             return res.status(403).json({ error: 'You are not authorized to update level or zions.' });
@@ -525,7 +527,7 @@ const CUSTOMIZATION_ITEMS = {
 export const getCustomizations = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
-        
+
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: {
@@ -611,11 +613,11 @@ export const purchaseCustomization = async (req: AuthRequest, res: Response) => 
             }
         });
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: `${item.name} purchased successfully!`,
             newBalance: user.zionsPoints - item.price,
-            owned 
+            owned
         });
     } catch (error) {
         console.error('Error purchasing customization:', error);
@@ -652,7 +654,7 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
 
         // Default items (free) that don't require ownership - available for all users
         const defaultItemIds = ['bg_default', 'badge_crown', 'color_gold'];
-        
+
         // Check if user owns this item (skip check for default items)
         if (!defaultItemIds.includes(itemId)) {
             const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
@@ -729,7 +731,7 @@ export const unequipCustomization = async (req: AuthRequest, res: Response) => {
 export const searchAll = async (req: AuthRequest, res: Response) => {
     try {
         const { q } = req.query;
-        
+
         if (!q || typeof q !== 'string') {
             return res.status(400).json({ error: 'Search query required' });
         }

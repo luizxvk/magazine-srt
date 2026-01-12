@@ -133,7 +133,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 ) : (
                                     <>
                                         <Gift className="w-5 h-5" />
-                                        {loadingCost ? 'Carregando...' : (cost === 0 ? 'Abrir Grátis' : `Abrir por ${cost} Cash`)}
+                                        {loadingCost ? 'Carregando...' : (cost === 0 ? 'Abrir Grátis' : `Abrir por ${cost} Points`)}
                                     </>
                                 )}
                             </button>

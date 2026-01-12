@@ -60,10 +60,10 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
 
         // Check balance if cost > 0
         if (cost > 0) {
-            const user = await prisma.user.findUnique({ where: { id: userId }, select: { zionsCash: true } });
-            if (!user || user.zionsCash < cost) {
+            const user = await prisma.user.findUnique({ where: { id: userId }, select: { zionsPoints: true } });
+            if (!user || user.zionsPoints < cost) {
                 return res.status(400).json({
-                    error: `Saldo insuficiente. Custo: ${cost} Zions Cash.`,
+                    error: `Saldo insuficiente. Custo: ${cost} Zions Points.`,
                     nextCost: cost
                 });
             }
@@ -71,7 +71,7 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             // Deduct cost
             await prisma.user.update({
                 where: { id: userId },
-                data: { zionsCash: { decrement: cost } }
+                data: { zionsPoints: { decrement: cost } }
             });
         }
 

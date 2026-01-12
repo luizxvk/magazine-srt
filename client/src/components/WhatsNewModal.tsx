@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'l
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.31';
+const CURRENT_VERSION = '0.3.32';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -57,6 +57,18 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Palette className="w-5 h-5" />,
             title: '🎨 10 Packs de Tema!',
             description: 'Arc Raiders, Cyberpunk, Red Dead, Witcher, Resident Evil, Valorant, Elden Ring, God of War, Stray e Hollow Knight!',
+            isNew: true
+        },
+        {
+            icon: <Store className="w-5 h-5" />,
+            title: '📦 Mercado de Packs',
+            description: 'Agora você pode VENDER e COMPRAR Theme Packs de outros jogadores no Mercado!',
+            isNew: true
+        },
+        {
+            icon: <Check className="w-5 h-5" />,
+            title: '🔧 Correções',
+            description: 'Corrigido bug onde Packs comprados apareciam como disponíveis. Melhorias na UI dos cartões.',
             isNew: true
         },
         {

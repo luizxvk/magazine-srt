@@ -151,7 +151,7 @@ export default function MobileCarousel({
     };
 
     return (
-        <div className="xl:hidden mb-6">
+        <div className="xl:hidden mb-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="text-sm font-medium text-gray-400">Acesso Rápido</h3>
@@ -166,7 +166,7 @@ export default function MobileCarousel({
                     <button 
                         onClick={handleNext}
                         className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-30"
-                        disabled={currentIndex >= cards.length - 2}
+                        disabled={currentIndex >= cards.length - 1}
                     >
                         <ChevronRight className="w-4 h-4 text-gray-400" />
                     </button>
@@ -176,7 +176,7 @@ export default function MobileCarousel({
             {/* Carousel Container */}
             <div 
                 ref={carouselRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 cursor-grab active:cursor-grabbing"
+                className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 cursor-grab active:cursor-grabbing -mx-3 px-3"
                 style={{ 
                     scrollbarWidth: 'none', 
                     msOverflowStyle: 'none',
@@ -187,18 +187,18 @@ export default function MobileCarousel({
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
             >
-                {cards.map((card) => (
+                {cards.map((card, idx) => (
                     <button
                         key={card.id}
                         onClick={card.onClick}
-                        className="flex-shrink-0 w-40 snap-start"
+                        className={`flex-shrink-0 w-36 snap-start ${idx === cards.length - 1 ? 'mr-3' : ''}`}
                     >
                         <div 
-                            className={`relative h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-3 flex flex-col justify-between transition-transform active:scale-95`}
+                            className={`relative h-20 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between transition-transform active:scale-95`}
                         >
                             {/* Badge */}
                             {card.badge && (
-                                <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-bold text-white">
+                                <div className="absolute top-1.5 right-1.5 bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white">
                                     {card.badge}
                                 </div>
                             )}
@@ -210,10 +210,10 @@ export default function MobileCarousel({
                             
                             {/* Text */}
                             <div className="text-left">
-                                <p className="text-white font-semibold text-sm leading-tight truncate">
+                                <p className="text-white font-semibold text-xs leading-tight truncate">
                                     {card.title}
                                 </p>
-                                <p className="text-white/70 text-[10px] leading-tight truncate">
+                                <p className="text-white/70 text-[9px] leading-tight truncate">
                                     {card.subtitle}
                                 </p>
                             </div>
@@ -223,7 +223,7 @@ export default function MobileCarousel({
             </div>
 
             {/* Dots Indicator */}
-            <div className="flex justify-center gap-1.5 mt-3">
+            <div className="flex justify-center gap-1.5 mt-2">
                 {cards.map((_, idx) => (
                     <button
                         key={idx}

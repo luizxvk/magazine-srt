@@ -84,18 +84,6 @@ async function seedThemePacks() {
             },
             // LEGENDARY Packs - 3% drop rate
             {
-                name: 'Night City Neon',
-                description: 'Mergulhe na estética cyberpunk com neon pulsante. Rosa e ciano vibrantes em harmonia.',
-                gameTitle: 'Tema Cyberpunk',
-                backgroundUrl: 'anim-night-city',
-                accentColor: '#FF00C3',
-                previewUrl: '/packs/cyberpunk.jpg',
-                price: 1200,
-                isActive: true,
-                isLimited: false,
-                rarity: ThemePackRarity.LEGENDARY
-            },
-            {
                 name: 'Nordic Frost',
                 description: 'Gelo nórdico e tons de azul profundo. Força e serenidade do norte.',
                 gameTitle: 'Tema Nórdico',
@@ -106,18 +94,6 @@ async function seedThemePacks() {
                 isActive: true,
                 isLimited: false,
                 rarity: ThemePackRarity.LEGENDARY
-            },
-            {
-                name: 'Sunset Vibes',
-                description: 'Pôr do sol tropical com tons de azul, roxo e salmão. Perfeito para relaxar.',
-                gameTitle: 'Tema Tropical',
-                backgroundUrl: 'anim-sunset-vibes',
-                accentColor: '#9B7EAC',
-                previewUrl: '/packs/gta6.jpg',
-                price: 1500,
-                isActive: true,
-                isLimited: true,
-                rarity: ThemePackRarity.LEGENDARY
             }
         ];
 
@@ -125,7 +101,15 @@ async function seedThemePacks() {
         await prisma.themePack.deleteMany({
             where: {
                 name: {
-                    in: ['Arc Raiders Pack', 'Elden Ring Pack']
+                    in: [
+                        'Arc Raiders Pack',
+                        'Elden Ring Pack',
+                        'Arc Raiders Starter',
+                        'Neon Night City',
+                        'Sunset Vibes',
+                        'Elden Lord',
+                        'Night City Neon'
+                    ]
                 }
             }
         });

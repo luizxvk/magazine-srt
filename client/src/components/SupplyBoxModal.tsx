@@ -8,10 +8,10 @@ import ThemePackCard from './ThemePackCard';
 interface SupplyBoxModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export default function SupplyBoxModal({ isOpen, onClose }: SupplyBoxModalProps) {
-    // const { updateUserZions } = useAuth();
+export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBoxModalProps) {
     const [opening, setOpening] = useState(false);
     const [reward, setReward] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
@@ -26,15 +26,8 @@ export default function SupplyBoxModal({ isOpen, onClose }: SupplyBoxModalProps)
             const res = await api.post('/supply-box/open');
             setReward(res.data);
 
-            // If it was a duplicate/Zions reward
-            if (res.data.type === 'DUPLICATE' && res.data.compensation > 0) {
-                // Update zions context if possible, or force refresh
-                // Ideally useAuth provides a way to refetch user data
-                window.location.reload(); // Simple fallback if context update is hard
-            } else if (res.data.type === 'NEW_ITEM') {
-                // Maybe refresh packs?
-                window.location.reload();
-            }
+            // Trigger parent update independently of UI state
+            if (onSuccess) onSuccess();
 
         } catch (err: any) {
             setError(err.response?.data?.error || 'Erro ao abrir Supply Box');

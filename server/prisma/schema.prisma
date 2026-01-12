@@ -776,6 +776,7 @@ model ThemePack {
   accentColor     String          // Hex da cor destaque "#FF6B35"
   previewUrl      String?         // Thumbnail estática para preview
   price           Int             // Preço em Zions
+  fontFamily      String?         // Fonte customizada para título
   maxStock        Int?            // Estoque máximo (null = ilimitado)
   soldCount       Int             @default(0)
   isActive        Boolean         @default(true)

@@ -259,17 +259,22 @@ export const redeemReward = async (req: Request, res: Response) => {
                     userId,
                     type: 'SYSTEM',
                     content: userNotificationContent
-                } as any
-            }),
-            // Notify Admins
-            ...admins.map(admin => prisma.notification.create({
-                data: {
-                    userId: admin.id,
-                    type: 'SYSTEM',
-                    content: `NOVO RESGATE: ${user.name} resgatou "${reward.title}" (Ticket: ${ticketCode})`
                 }
-            }))
+            }) as any
         );
+        
+        // Notify Admins
+        for (const admin of admins) {
+            transactionOperations.push(
+                prisma.notification.create({
+                    data: {
+                        userId: admin.id,
+                        type: 'SYSTEM',
+                        content: `NOVO RESGATE: ${user.name} resgatou "${reward.title}" (Ticket: ${ticketCode})`
+                    }
+                }) as any
+            );
+        }
 
         await prisma.$transaction(transactionOperations);
 

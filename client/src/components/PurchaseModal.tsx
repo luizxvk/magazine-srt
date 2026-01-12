@@ -12,7 +12,8 @@ import {
     Loader2,
     Check,
     Mail,
-    AlertCircle
+    AlertCircle,
+    Banknote
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -280,7 +281,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                                 }}
                                             >
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <Coins className="w-5 h-5" style={{ color }} />
+                                                    <Banknote className="w-5 h-5" style={{ color }} />
                                                     <span className="text-white font-medium">Zions Cash</span>
                                                 </div>
                                                 <p className="text-lg font-bold" style={{ color }}>

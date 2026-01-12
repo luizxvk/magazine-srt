@@ -6,127 +6,115 @@ async function seedThemePacks() {
     try {
         const themePacks = [
             {
-                name: 'Arc Raiders Pack',
-                description: 'Pack inspirado no universo futurista de Arc Raiders. Listras coloridas animadas vibrantes.',
-                gameTitle: 'Arc Raiders',
-                backgroundUrl: 'anim-arc-raiders-stripes',
-                accentColor: '#00D9FF',
-                previewUrl: '/packs/arc-raiders.jpg',
-                price: 500,
-                isActive: true,
-                isLimited: false
-            },
-            {
-                name: 'Cyberpunk 2077 Pack',
-                description: 'Entre no futuro de Night City. Neon pulsante rosa magenta e ciano.',
-                gameTitle: 'Cyberpunk 2077',
-                backgroundUrl: 'anim-cyberpunk-grid',
+                name: 'Night City Neon',
+                description: 'Mergulhe na estética cyberpunk com neon pulsante. Rosa e ciano vibrantes em harmonia.',
+                gameTitle: 'Tema Cyberpunk',
+                backgroundUrl: 'anim-night-city',
                 accentColor: '#FF00C3',
                 previewUrl: '/packs/cyberpunk.jpg',
-                price: 600,
+                price: 1200,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'GTA 6 (Vice City) Pack',
-                description: 'Pack temático de Vice City. Sunset vibes com cores azul, roxo e salmão.',
-                gameTitle: 'GTA 6',
-                backgroundUrl: 'anim-vice-city-sunset',
+                name: 'Sunset Vibes',
+                description: 'Pôr do sol tropical com tons de azul, roxo e salmão. Perfeito para relaxar.',
+                gameTitle: 'Tema Tropical',
+                backgroundUrl: 'anim-sunset-vibes',
                 accentColor: '#9B7EAC',
                 previewUrl: '/packs/gta6.jpg',
-                price: 700,
+                price: 1500,
                 isActive: true,
                 isLimited: true
             },
             {
-                name: 'Red Dead Redemption Pack',
-                description: 'Viva o velho oeste com este pack temático. Fundo desértico + cor destaque vermelho terra.',
-                gameTitle: 'Red Dead Redemption',
-                backgroundUrl: 'bg-desert-sunset',
-                accentColor: '#dc2626',
+                name: 'Wild West Dust',
+                description: 'Poeira do deserto e tons terrosos do velho oeste. Aventura rústica.',
+                gameTitle: 'Tema Faroeste',
+                backgroundUrl: 'anim-wild-west',
+                accentColor: '#F37031',
                 previewUrl: '/packs/red-dead.jpg',
-                price: 450,
+                price: 1100,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'The Witcher Pack',
-                description: 'Pack inspirado no mundo de Geralt de Rivia. Fundo medieval + cor destaque prata mística.',
-                gameTitle: 'The Witcher',
-                backgroundUrl: 'bg-medieval-castle',
-                accentColor: '#6b7280',
+                name: 'Mystic Hunter',
+                description: 'Atmosfera medieval mística com tons de prata e mistério. Para caçadores lendários.',
+                gameTitle: 'Tema Medieval',
+                backgroundUrl: 'anim-mystic-hunter',
+                accentColor: '#81A1C1',
                 previewUrl: '/packs/witcher.jpg',
-                price: 550,
+                price: 1000,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'Resident Evil Pack',
-                description: 'Sobreviva ao horror com este pack sombrio. Fundo apocalíptico + cor destaque verde bioazard.',
-                gameTitle: 'Resident Evil',
-                backgroundUrl: 'bg-zombie-outbreak',
+                name: 'Biohazard Zone',
+                description: 'Verde tóxico e atmosfera sombria de sobrevivência. Para os corajosos.',
+                gameTitle: 'Tema Horror',
+                backgroundUrl: 'anim-biohazard',
                 accentColor: '#22c55e',
                 previewUrl: '/packs/resident-evil.jpg',
-                price: 480,
+                price: 950,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'Valorant Pack',
-                description: 'Pack tático inspirado em Valorant. Fundo geométrico futurista + cor destaque vermelho tactical.',
-                gameTitle: 'Valorant',
-                backgroundUrl: 'bg-tactical-grid',
+                name: 'Tactical Strike',
+                description: 'Grid tático futurista com vermelho intenso. Precisão e estratégia.',
+                gameTitle: 'Tema Tático',
+                backgroundUrl: 'anim-tactical',
                 accentColor: '#f43f5e',
                 previewUrl: '/packs/valorant.jpg',
-                price: 520,
+                price: 900,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'Elden Ring Pack',
-                description: 'Pack inspirado nas Terras Intermédias. Tons terrosos e dourados místicos.',
-                gameTitle: 'Elden Ring',
-                backgroundUrl: 'anim-elden-earthy',
-                accentColor: '#D97F3E',
-                previewUrl: '/packs/elden-ring.jpg',
-                price: 650,
-                isActive: true,
-                isLimited: false
-            },
-            {
-                name: 'God of War Pack',
-                description: 'Pack épico inspirado na mitologia nórdica. Fundo nevado + cor destaque azul gélido.',
-                gameTitle: 'God of War',
-                backgroundUrl: 'bg-nordic-frost',
-                accentColor: '#3b82f6',
+                name: 'Nordic Frost',
+                description: 'Gelo nórdico e tons de azul profundo. Força e serenidade do norte.',
+                gameTitle: 'Tema Nórdico',
+                backgroundUrl: 'anim-nordic-frost',
+                accentColor: '#88C0D0',
                 previewUrl: '/packs/god-of-war.jpg',
-                price: 580,
+                price: 1300,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'Stray Pack',
-                description: 'Pack inspirado na jornada do gatinho cyberpunk. Fundo neon urbano + cor destaque laranja quente.',
-                gameTitle: 'Stray',
-                backgroundUrl: 'bg-neon-alley',
+                name: 'Neon Alley Cat',
+                description: 'Becos urbanos iluminados por neon laranja. Aventura independente.',
+                gameTitle: 'Tema Urbano',
+                backgroundUrl: 'anim-neon-alley',
                 accentColor: '#f97316',
                 previewUrl: '/packs/stray.jpg',
-                price: 420,
+                price: 850,
                 isActive: true,
                 isLimited: false
             },
             {
-                name: 'Hollow Knight Pack',
-                description: 'Pack inspirado em Hallownest. Fundo sombrio subterrâneo + cor destaque branco espectral.',
-                gameTitle: 'Hollow Knight',
-                backgroundUrl: 'bg-dark-cavern',
-                accentColor: '#64748b',
+                name: 'Void Depths',
+                description: 'Profundezas sombrias com tons de roxo e cinza. Mistério subterrâneo.',
+                gameTitle: 'Tema Underground',
+                backgroundUrl: 'anim-void-depths',
+                accentColor: '#6b7280',
                 previewUrl: '/packs/hollow-knight.jpg',
-                price: 490,
+                price: 950,
                 isActive: true,
                 isLimited: false
             }
         ];
+
+        // First, delete old packs that we're removing
+        await prisma.themePack.deleteMany({
+            where: {
+                name: {
+                    in: ['Arc Raiders Pack', 'Elden Ring Pack']
+                }
+            }
+        });
+        console.log('🗑️ Removed old packs');
 
         for (const pack of themePacks) {
             const existing = await prisma.themePack.findFirst({
@@ -147,7 +135,7 @@ async function seedThemePacks() {
             }
         }
 
-        console.log('\n🎨 All theme packs restored!');
+        console.log('\n🎨 Theme packs v0.3.36 ready!');
     } catch (error) {
         console.error('Error seeding theme packs:', error);
     } finally {

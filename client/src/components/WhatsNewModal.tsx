@@ -33,12 +33,12 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.31 - MIGRAÇÃO DE SERVIDOR & RESET
+    // v0.3.36 - THEME PACKS OVERHAUL
     const updates: UpdateItem[] = [
         {
-            icon: <div className="text-red-500 font-bold">⚠️</div>,
-            title: 'RESET DE SERVIDOR NECESSÁRIO',
-            description: 'Devido a problemas técnicos, migramos para um banco de dados mais potente. É necessário criar uma nova conta. Pedimos desculpas!',
+            icon: <Sparkles className="w-5 h-5" />,
+            title: '🎨 Theme Packs Renovados!',
+            description: 'Novos nomes, paletas de 5 cores autênticas, animações suaves e preços ajustados. Personalize seu perfil!',
             isNew: true
         },
         {

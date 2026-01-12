@@ -76,8 +76,8 @@ export default function ProductStore() {
         }
     }, [category, sortBy, sortOrder, search, activeTab]);
 
-    const fetchProducts = async () => {
-        setLoading(true);
+    const fetchProducts = async (isRefresh = false) => {
+        if (!isRefresh) setLoading(true);
         try {
             const params: any = {
                 sortBy,
@@ -117,7 +117,7 @@ export default function ProductStore() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/feed')}
                             className="p-2 rounded-xl hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: `${color}15`, color }}
                         >
@@ -324,7 +324,7 @@ export default function ProductStore() {
                                         <ProductCard
                                             key={product.id}
                                             product={product}
-                                            onPurchase={() => fetchProducts()}
+                                            onPurchase={() => fetchProducts(true)}
                                             onGoToOrders={() => setActiveTab('orders')}
                                         />
                                     ))}

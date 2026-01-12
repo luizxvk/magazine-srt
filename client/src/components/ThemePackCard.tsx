@@ -154,22 +154,36 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                 <div className="flex items-center justify-between gap-3">
                     <div>
                         {!pack.isOwned && (
-                            <div className="flex items-center gap-1.5">
-                                <img 
-                                    src="/assets/zions/zion-50.png" 
-                                    alt="Zions Points" 
-                                    className="w-5 h-5"
-                                />
-                                <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                    {pack.price.toLocaleString('pt-BR')} Points
-                                </span>
-                            </div>
+                            pack.rarity === 'LEGENDARY' ? (
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-2xl">🎁</span>
+                                    <div className="flex flex-col">
+                                        <span className={`font-bold text-sm ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                            Supply Box
+                                        </span>
+                                        <span className="text-xs text-amber-500">
+                                            Exclusivo
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1.5">
+                                    <img 
+                                        src="/assets/zions/zion-50.png" 
+                                        alt="Zions Points" 
+                                        className="w-5 h-5"
+                                    />
+                                    <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                        {pack.price.toLocaleString('pt-BR')} Points
+                                    </span>
+                                </div>
+                            )
                         )}
                     </div>
 
                     <button
                         onClick={handleAction}
-                        disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
+                        disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford || pack.rarity === 'LEGENDARY'))}
                         className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
                             pack.isOwned
                                 ? pack.isEquipped
@@ -194,6 +208,10 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                             'Desequipar'
                         ) : pack.isOwned ? (
                             'Equipar'
+                        ) : pack.rarity === 'LEGENDARY' ? (
+                            <>
+                                <Lock className="w-4 h-4" /> Supply Box
+                            </>
                         ) : isOutOfStock ? (
                             <>
                                 <Lock className="w-4 h-4" /> Esgotado

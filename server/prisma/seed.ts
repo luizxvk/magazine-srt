@@ -53,6 +53,17 @@ async function main() {
         { name: 'Beta Tester', description: 'Participou da fase beta da plataforma', iconUrl: 'icon:Zap', trophies: 999 },
     ];
 
+    // DELETE old badges that are NOT in the essential list
+    const badgeNames = badges.map(b => b.name);
+    const deletedBadges = await prisma.badge.deleteMany({
+        where: {
+            name: {
+                notIn: badgeNames
+            }
+        }
+    });
+    console.log(`Deleted ${deletedBadges.count} old badges`);
+
     for (const badge of badges) {
         console.log(`Processing badge: ${badge.name}`);
         const existingBadge = await prisma.badge.findFirst({ where: { name: badge.name } });

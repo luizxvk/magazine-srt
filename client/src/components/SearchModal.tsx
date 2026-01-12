@@ -13,6 +13,7 @@ interface SearchResult {
     imageUrl?: string;
     icon?: string;
     path?: string;
+    action?: string;
 }
 
 interface SearchModalProps {
@@ -120,7 +121,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     title: page.title,
                     subtitle: page.subtitle,
                     icon: page.icon,
-                    path: page.path
+                    path: page.path,
+                    action: page.action
                 });
             });
 
@@ -188,6 +190,19 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     break;
                 case 'page':
                     if (result.path) {
+                        // Trigger action if specified (for modals/drawers that open on feed page)
+                        if (result.action) {
+                            setTimeout(() => {
+                                const event = new CustomEvent(
+                                    result.action === 'shop' ? 'openShop' :
+                                    result.action === 'radio' ? 'openRadio' :
+                                    result.action === 'events' ? 'openEvents' :
+                                    result.action === 'stories' ? 'openStories' :
+                                    result.action
+                                );
+                                window.dispatchEvent(event);
+                            }, 100);
+                        }
                         navigate(result.path);
                     }
                     break;

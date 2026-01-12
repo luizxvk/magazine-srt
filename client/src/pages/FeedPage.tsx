@@ -108,7 +108,26 @@ export default function FeedPage() {
         const interval = setInterval(() => {
             fetchPosts(true);
         }, 60000); // Reduced from 15s to 60s to save bandwidth
-        return () => clearInterval(interval);
+
+        // Event listener for opening radio from search
+        const handleOpenRadio = () => {
+            const radioElement = document.getElementById('radio-card');
+            if (radioElement) {
+                radioElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Add a highlight animation
+                radioElement.classList.add('ring-4', 'ring-gold-500/50');
+                setTimeout(() => {
+                    radioElement.classList.remove('ring-4', 'ring-gold-500/50');
+                }, 2000);
+            }
+        };
+
+        window.addEventListener('openRadio', handleOpenRadio);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('openRadio', handleOpenRadio);
+        };
     }, []);
 
     const handlePostCreated = () => {
@@ -330,7 +349,7 @@ export default function FeedPage() {
                 {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
                 <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
                     {/* Radio Card - 24/7 Waves Music */}
-                    <div className="mb-6">
+                    <div id="radio-card" className="mb-6 transition-all duration-300 rounded-2xl">
                         <RadioCard />
                     </div>
 

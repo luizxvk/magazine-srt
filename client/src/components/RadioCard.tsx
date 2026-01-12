@@ -127,6 +127,11 @@ export default function RadioCard() {
         setVolume(newVolume);
         if (audioRef.current) {
             audioRef.current.volume = newVolume;
+            // Unmute if volume is increased from 0
+            if (newVolume > 0 && isMuted) {
+                audioRef.current.muted = false;
+                setIsMuted(false);
+            }
         }
     };
 
@@ -134,9 +139,9 @@ export default function RadioCard() {
         <div className={`w-full ${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} transition-all duration-300 overflow-hidden`}>
             {/* Header */}
             <div className="relative p-4">
-                {/* Badge "AO VIVO" no canto superior esquerdo */}
+                {/* Badge "AO VIVO" no canto superior direito */}
                 {isPlaying && (
-                    <div className="absolute top-4 left-4 z-10">
+                    <div className="absolute top-4 right-4 z-10">
                         <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse">
                             AO VIVO
                         </span>

@@ -325,6 +325,7 @@ export default function ProductStore() {
                                             key={product.id}
                                             product={product}
                                             onPurchase={() => fetchProducts()}
+                                            onGoToOrders={() => setActiveTab('orders')}
                                         />
                                     ))}
                                 </div>
@@ -408,10 +409,10 @@ export default function ProductStore() {
 
                                                 {/* Status */}
                                                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${order.paymentStatus === 'COMPLETED'
-                                                        ? 'bg-green-500/20 text-green-400'
-                                                        : order.paymentStatus === 'PENDING'
-                                                            ? 'bg-yellow-500/20 text-yellow-400'
-                                                            : 'bg-red-500/20 text-red-400'
+                                                    ? 'bg-green-500/20 text-green-400'
+                                                    : order.paymentStatus === 'PENDING'
+                                                        ? 'bg-yellow-500/20 text-yellow-400'
+                                                        : 'bg-red-500/20 text-red-400'
                                                     }`}>
                                                     {order.paymentStatus === 'COMPLETED' ? 'Concluído' :
                                                         order.paymentStatus === 'PENDING' ? 'Pendente' : 'Falhou'}

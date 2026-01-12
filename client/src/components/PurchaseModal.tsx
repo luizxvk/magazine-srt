@@ -34,6 +34,7 @@ interface PurchaseModalProps {
     isOpen: boolean;
     onClose: () => void;
     onPurchaseComplete?: () => void;
+    onGoToOrders?: () => void;
 }
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -52,7 +53,7 @@ const categoryLabels: Record<string, string> = {
     SERVICE: 'Serviço'
 };
 
-export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComplete }: PurchaseModalProps) {
+export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComplete, onGoToOrders }: PurchaseModalProps) {
     const { user, accentColor, updateUserZions } = useAuth();
     const [paymentMethod, setPaymentMethod] = useState<'zions' | 'brl' | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -108,6 +109,11 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
             setError(null);
             onClose();
         }
+    };
+
+    const handleGoToOrders = () => {
+        handleClose();
+        onGoToOrders?.();
     };
 
     if (!isOpen) return null;
@@ -169,34 +175,42 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                 className="text-center py-6 space-y-4"
                             >
                                 <div
-                                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
+                                    className="w-20 h-20 mx-auto rounded-full flex items-center justify-center relative"
                                     style={{ backgroundColor: `${color}20` }}
                                 >
-                                    <Check className="w-8 h-8" style={{ color }} />
+                                    <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ backgroundColor: color }} />
+                                    <Sparkles className="w-10 h-10" style={{ color }} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-white mb-2">Compra Realizada!</h3>
-                                    <p className="text-gray-400 text-sm">
-                                        Sua(s) key(s) foram enviadas para seu email.
+                                    <h3 className="text-2xl font-bold text-white mb-2">Parabéns pela Compra!</h3>
+                                    <p className="text-gray-300 text-base">
+                                        Você adquiriu <strong style={{ color }}>{product.name}</strong> com sucesso.
+                                    </p>
+                                    <p className="text-gray-500 text-sm mt-1">
+                                        Sua key foi enviada para seu email e está disponível na aba <strong className="text-white">Minhas Compras</strong>.
                                     </p>
                                 </div>
-                                <div
-                                    className="flex items-center gap-2 justify-center text-sm p-3 rounded-lg"
-                                    style={{ backgroundColor: `${color}10` }}
-                                >
-                                    <Mail className="w-4 h-4" style={{ color }} />
-                                    <span className="text-gray-300">{user?.email}</span>
+
+                                <div className="pt-4 flex flex-col gap-3">
+                                    {onGoToOrders && (
+                                        <button
+                                            onClick={handleGoToOrders}
+                                            className="w-full py-3 rounded-xl font-bold text-white transition-all shadow-lg hover:brightness-110"
+                                            style={{
+                                                background: `linear-gradient(135deg, ${color}, ${color}dd)`,
+                                                boxShadow: `0 8px 20px -4px ${color}66`
+                                            }}
+                                        >
+                                            Ver Meus Produtos
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={handleClose}
+                                        className="w-full py-3 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                                    >
+                                        Continuar Comprando
+                                    </button>
                                 </div>
-                                <p className="text-xs text-gray-500">
-                                    Verifique também sua pasta de spam.
-                                </p>
-                                <button
-                                    onClick={handleClose}
-                                    className="mt-4 px-6 py-2.5 rounded-lg font-medium text-white transition-all"
-                                    style={{ background: `linear-gradient(135deg, ${color}, ${color}dd)` }}
-                                >
-                                    Fechar
-                                </button>
                             </motion.div>
                         ) : (
                             <>

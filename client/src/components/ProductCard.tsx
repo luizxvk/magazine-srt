@@ -19,6 +19,7 @@ interface Product {
 interface ProductCardProps {
     product: Product;
     onPurchase?: () => void;
+    onGoToOrders?: () => void;
 }
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -37,7 +38,7 @@ const categoryLabels: Record<string, string> = {
     SERVICE: 'Serviço'
 };
 
-export default function ProductCard({ product, onPurchase }: ProductCardProps) {
+export default function ProductCard({ product, onPurchase, onGoToOrders }: ProductCardProps) {
     const { user, theme, accentColor } = useAuth();
     const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
@@ -46,7 +47,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
     const color = accentColor || defaultColor;
 
     const isOutOfStock = !product.isUnlimited && product.availableStock <= 0;
-    const canBuyWithZions = product.priceZions && user && user.zions >= product.priceZions && !isOutOfStock;
+    const canBuyWithZions = product.priceZions && user && user.zionsCash >= product.priceZions && !isOutOfStock;
 
     const handleBuyClick = () => {
         setShowPurchaseModal(true);
@@ -62,7 +63,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-panel relative rounded-xl overflow-hidden group transition-all duration-300"
-                style={{ 
+                style={{
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: `${color}33`
@@ -71,13 +72,13 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = `${color}33`)}
             >
                 {/* Product Image or Placeholder - 16:9 aspect ratio */}
-                <div 
+                <div
                     className="aspect-video flex items-center justify-center relative overflow-hidden"
                     style={{ backgroundColor: `${color}10` }}
                 >
                     {product.imageUrl ? (
-                        <img 
-                            src={product.imageUrl} 
+                        <img
+                            src={product.imageUrl}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -86,11 +87,11 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                             <Package className="w-16 h-16" />
                         </div>
                     )}
-                    
+
                     {/* Category Badge */}
-                    <div 
+                    <div
                         className="absolute top-3 left-3 px-2.5 py-1 rounded-lg backdrop-blur-sm flex items-center gap-1.5 text-xs font-medium"
-                        style={{ 
+                        style={{
                             backgroundColor: `${color}20`,
                             borderWidth: '1px',
                             borderStyle: 'solid',
@@ -104,13 +105,12 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
 
                     {/* Stock Badge */}
                     {!product.isUnlimited && (
-                        <div className={`absolute top-3 right-3 px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm ${
-                            isOutOfStock 
-                                ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
-                                : product.availableStock <= 5 
+                        <div className={`absolute top-3 right-3 px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm ${isOutOfStock
+                                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                : product.availableStock <= 5
                                     ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                                     : 'bg-green-500/20 text-green-400 border border-green-500/30'
-                        }`}>
+                            }`}>
                             {isOutOfStock ? 'Esgotado' : `${product.availableStock} disponíveis`}
                         </div>
                     )}
@@ -121,7 +121,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                     <h3 className={`font-bold text-base ${theme === 'light' ? 'text-gray-900' : 'text-white'} line-clamp-1`}>
                         {product.name}
                     </h3>
-                    
+
                     <p className={`text-sm line-clamp-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
                         {product.description}
                     </p>
@@ -129,7 +129,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                     {/* Prices */}
                     <div className="flex items-center gap-2 flex-wrap">
                         {product.priceZions && (
-                            <div 
+                            <div
                                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg"
                                 style={{ backgroundColor: `${color}15` }}
                             >
@@ -139,7 +139,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                                 </span>
                             </div>
                         )}
-                        
+
                         {product.priceBRL && (
                             <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-green-500/10">
                                 <span className="font-bold text-sm text-green-400">
@@ -155,7 +155,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                             onClick={handleBuyClick}
                             disabled={isOutOfStock}
                             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg font-medium text-sm transition-all text-white disabled:opacity-40 disabled:cursor-not-allowed"
-                            style={{ 
+                            style={{
                                 background: !isOutOfStock ? `linear-gradient(135deg, ${color}, ${color}dd)` : '#374151'
                             }}
                         >
@@ -167,7 +167,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                     {/* User Zions balance hint */}
                     {product.priceZions && user && !canBuyWithZions && !isOutOfStock && (
                         <p className="text-xs text-center text-gray-500">
-                            Faltam {(product.priceZions - user.zions).toLocaleString()} Zions
+                            Faltam {(product.priceZions - user.zionsCash).toLocaleString()} Zions
                         </p>
                     )}
                 </div>
@@ -179,6 +179,7 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
                 isOpen={showPurchaseModal}
                 onClose={() => setShowPurchaseModal(false)}
                 onPurchaseComplete={handlePurchaseComplete}
+                onGoToOrders={onGoToOrders}
             />
         </>
     );

@@ -218,7 +218,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                 {/* Price & Action - Column Layout for better fit */}
                 <div className="flex flex-col gap-3 mt-auto">
                     <div className="flex items-center justify-between">
-                        {!pack.isOwned ? (
+                        {!pack.isOwned && pack.rarity !== 'LEGENDARY' ? (
                             <div className="flex flex-col">
                                 <span className="text-[10px] text-gray-500 uppercase font-bold">Preço</span>
                                 <div className="flex items-center gap-1.5">
@@ -228,10 +228,15 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                                     </span>
                                 </div>
                             </div>
-                        ) : (
+                        ) : pack.isOwned ? (
                             <div className="flex flex-col">
                                 <span className="text-[10px] text-green-500 uppercase font-bold">Adquirido</span>
                                 <span className="text-xs text-gray-500">Pronto para usar</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-amber-500 uppercase font-bold">Exclusivo</span>
+                                <span className="text-xs text-gray-500">Item Lendário</span>
                             </div>
                         )}
                     </div>

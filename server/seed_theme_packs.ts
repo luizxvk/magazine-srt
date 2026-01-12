@@ -13,7 +13,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-neon-alley',
                 accentColor: '#f97316',
                 previewUrl: '/packs/stray.jpg',
-                price: 850,
+                price: 1000,
                 isActive: true,
                 isLimited: false,
                 rarity: ThemePackRarity.COMMON
@@ -25,7 +25,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-biohazard',
                 accentColor: '#22c55e',
                 previewUrl: '/packs/resident-evil.jpg',
-                price: 950,
+                price: 1000,
                 isActive: true,
                 isLimited: false,
                 rarity: ThemePackRarity.COMMON
@@ -38,7 +38,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-wild-west',
                 accentColor: '#F37031',
                 previewUrl: '/packs/red-dead.jpg',
-                price: 1100,
+                price: 2500,
                 isActive: true,
                 isLimited: false,
                 rarity: ThemePackRarity.RARE
@@ -50,7 +50,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-tactical',
                 accentColor: '#f43f5e',
                 previewUrl: '/packs/valorant.jpg',
-                price: 900,
+                price: 2500,
                 isActive: true,
                 isLimited: false,
                 rarity: ThemePackRarity.RARE
@@ -63,7 +63,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-mystic-hunter',
                 accentColor: '#fbbf24',
                 previewUrl: '/packs/witcher.jpg',
-                price: 8000,
+                price: 5000,
                 isActive: true,
                 isLimited: true,
                 rarity: ThemePackRarity.EPIC
@@ -75,7 +75,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-void-depths',
                 accentColor: '#6b7280',
                 previewUrl: '/packs/hollow-knight.jpg',
-                price: 950,
+                price: 5000,
                 isActive: true,
                 isLimited: false,
                 rarity: ThemePackRarity.EPIC
@@ -88,7 +88,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-night-city',
                 accentColor: '#FF00C3',
                 previewUrl: '/packs/cyberpunk.jpg',
-                price: 2500, // Price acts as value, but not purchasable directly
+                price: 0,
                 isActive: true,
                 isLimited: true,
                 rarity: ThemePackRarity.LEGENDARY
@@ -100,7 +100,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-nordic-frost',
                 accentColor: '#88C0D0',
                 previewUrl: '/packs/god-of-war.jpg',
-                price: 2500,
+                price: 0,
                 isActive: true,
                 isLimited: true,
                 rarity: ThemePackRarity.LEGENDARY
@@ -112,7 +112,7 @@ async function seedThemePacks() {
                 backgroundUrl: 'anim-sunset-vibes',
                 accentColor: '#9B7EAC',
                 previewUrl: '/packs/gta-vice.jpg',
-                price: 2500,
+                price: 0,
                 isActive: true,
                 isLimited: true,
                 rarity: ThemePackRarity.LEGENDARY

@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'l
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.30';
+const CURRENT_VERSION = '0.3.31';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,12 +33,18 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.30 - OTIMIZAÇÃO DE CHAT & STORAGE
+    // v0.3.31 - MIGRAÇÃO DE SERVIDOR & RESET
     const updates: UpdateItem[] = [
         {
+            icon: <div className="text-red-500 font-bold">⚠️</div>,
+            title: 'RESET DE SERVIDOR NECESSÁRIO',
+            description: 'Devido a problemas técnicos, migramos para um banco de dados mais potente. É necessário criar uma nova conta. Pedimos desculpas!',
+            isNew: true
+        },
+        {
             icon: <Sparkles className="w-5 h-5" />,
-            title: '⚡ Chat 10x Mais Rápido',
-            description: 'Novo sistema de "Delta Updates" consome 90% menos dados e bateria.',
+            title: '⚡ Chat Ultra Rápido',
+            description: 'Novo sistema otimizado está live! Mais rápido e economiza bateria.',
             isNew: true
         },
         {

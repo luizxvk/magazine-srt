@@ -1,6 +1,6 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.3.30 (Beta)  
+> **Versão Atual:** v0.3.31 (Beta)  
 > **Última Atualização:** 12 de Janeiro de 2026
 
 ---

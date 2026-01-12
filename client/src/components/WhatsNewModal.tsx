@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'l
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.27';
+const CURRENT_VERSION = '0.3.28';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -23,7 +23,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const location = useLocation();
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
-    
+
     // Use external state if provided, otherwise use internal state
     const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
 
@@ -73,10 +73,10 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     useEffect(() => {
         // Only auto-show if using internal state (no external control)
         if (externalIsOpen !== undefined) return;
-        
+
         // Só mostrar se: usuário logado E NÃO está na tela de login/register
         const isAuthPage = ['/', '/login', '/register', '/request-invite'].includes(location.pathname);
-        
+
         if (user && !isAuthPage) {
             const lastSeenVersion = localStorage.getItem('whatsNewVersion');
             if (lastSeenVersion !== CURRENT_VERSION) {
@@ -101,7 +101,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const modalContent = (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div 
+            <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
                 onClick={handleClose}
             />
@@ -116,7 +116,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
                     >
                         <X className="w-5 h-5 text-white" />
                     </button>
-                    
+
                     <div className="flex items-center gap-3">
                         <div className="p-3 bg-white/20 rounded-xl">
                             <Sparkles className="w-8 h-8 text-white" />
@@ -135,7 +135,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
                 <div className="p-6 -mt-6">
                     <div className="bg-zinc-800/50 rounded-xl p-4 space-y-2 max-h-[50vh] overflow-y-auto custom-scrollbar">
                         {updates.map((update, index) => (
-                            <div 
+                            <div
                                 key={index}
                                 className={`flex items-center gap-3 p-3 rounded-xl ${bgAccent} border ${borderAccent}`}
                             >
@@ -171,6 +171,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             </div>
         </div>
     );
-    
+
     return createPortal(modalContent, document.body);
 }

@@ -47,11 +47,11 @@ app.use(compression());
 // Permissive CORS Configuration - MUST be before security headers
 const corsOptions = {
     origin: true, // Reflect request origin
-    credentials: false, // Disable credentials (cookies) since we use Bearer tokens
+    credentials: true, // Allow cookies if needed (often safest to true even if using tokens)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control'],
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
@@ -123,16 +123,16 @@ const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTI
 if (!isServerless) {
     const server = app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
-        
+
         // Run verification cron job every hour
         setInterval(() => {
-            runVerificationCronJobs().catch(err => 
+            runVerificationCronJobs().catch(err =>
                 console.error('Cron job error:', err)
             );
         }, 60 * 60 * 1000); // 1 hour
-        
+
         // Run immediately on startup
-        runVerificationCronJobs().catch(err => 
+        runVerificationCronJobs().catch(err =>
             console.error('Initial cron job error:', err)
         );
     });

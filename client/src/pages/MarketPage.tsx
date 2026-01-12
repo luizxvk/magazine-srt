@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
+import VisitorBlockPopup from '../components/VisitorBlockPopup';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -57,7 +58,7 @@ type FilterType = 'all' | 'background' | 'badge' | 'color';
 type SortType = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
 export default function MarketPage() {
-  const { user, theme, updateUser } = useAuth();
+  const { user, theme, updateUser, isVisitor } = useAuth();
   const location = useLocation();
   const isMGT = user?.membershipType === 'MGT';
 
@@ -93,6 +94,7 @@ export default function MarketPage() {
 
   // Notification
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showVisitorBlock, setShowVisitorBlock] = useState(false);
 
   const isDarkMode = theme === 'dark';
   const themeColor = isMGT ? 'emerald' : 'gold';
@@ -139,6 +141,11 @@ export default function MarketPage() {
   const handleBuy = async (listing: Listing) => {
     if (!user || buyingId) return;
 
+    if (isVisitor) {
+      setShowVisitorBlock(true);
+      return;
+    }
+
     if ((user?.zionsPoints || 0) < listing.price) {
       showNotification('error', 'Points insuficientes!');
       return;
@@ -162,6 +169,11 @@ export default function MarketPage() {
 
   const handleCreateListing = async () => {
     if (!selectedItem || !sellPrice || creating) return;
+
+    if (isVisitor) {
+      setShowVisitorBlock(true);
+      return;
+    }
 
     const price = parseInt(sellPrice);
     if (isNaN(price) || price < 10 || price > 10000) {
@@ -756,6 +768,13 @@ export default function MarketPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Visitor Block Popup */}
+      <VisitorBlockPopup 
+        isOpen={showVisitorBlock} 
+        onClose={() => setShowVisitorBlock(false)} 
+        featureName="interagir com o mercado"
+      />
     </div>
   );
 }

@@ -35,7 +35,8 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
-    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen } = useAuth();
+    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor } = useAuth();
+    const navigate = useNavigate();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [hasGroupInvites, setHasGroupInvites] = useState(false);
@@ -45,6 +46,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isWhatsNewModalOpen, setIsWhatsNewModalOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
+    const [showVisitorBlock, setShowVisitorBlock] = useState(false);
+    const [visitorBlockFeature, setVisitorBlockFeature] = useState('');
     const [displayMode, setDisplayMode] = useState<'trophies' | 'points' | 'cash' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
@@ -52,6 +55,9 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
     // Get badge icon - default crown for Magazine
     const getBadgeIcon = () => {
+        // Visitors don't get badges
+        if (isVisitor) return null;
+        
         if (equippedBadge && BADGE_ICONS[equippedBadge]) {
             return BADGE_ICONS[equippedBadge];
         }
@@ -165,23 +171,23 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <img 
                                 src={logoSrt} 
                                 alt="MGT Logo" 
-                                className={`h-10 sm:h-12 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
+                                className={`h-12 sm:h-14 md:h-16 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
                             />
                         ) : (
                             <span 
                                 className="text-2xl sm:text-3xl font-serif tracking-wider relative group select-none"
-                                style={{ '--user-accent': 'var(--accent-color, #d4af37)' } as React.CSSProperties}
+                                style={{ '--user-accent': accentColor || '#d4af37' } as React.CSSProperties}
                             >
                                 {/* Glow layers - use CSS variable for custom accent */}
                                 <span 
                                     className="absolute inset-0 blur-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500"
-                                    style={{ color: 'var(--accent-color, #d4af37)' }}
+                                    style={{ color: accentColor || '#d4af37' }}
                                 >
                                     MAGAZINE
                                 </span>
                                 <span 
                                     className="absolute inset-0 blur-md opacity-70"
-                                    style={{ color: 'var(--accent-color, #d4af37)' }}
+                                    style={{ color: accentColor || '#d4af37' }}
                                 >
                                     MAGAZINE
                                 </span>
@@ -189,8 +195,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 <span 
                                     className="relative animate-text-shimmer"
                                     style={{ 
-                                        color: 'var(--accent-color, #d4af37)',
-                                        filter: 'drop-shadow(0 0 30px var(--accent-color, rgba(218,165,32,0.8))) drop-shadow(0 0 60px var(--accent-color, rgba(218,165,32,0.4)))'
+                                        color: accentColor || '#d4af37',
+                                        filter: `drop-shadow(0 0 30px ${accentColor || 'rgba(218,165,32,0.8)'}) drop-shadow(0 0 60px ${accentColor || 'rgba(218,165,32,0.4)'})`
                                     }}
                                 >
                                     MAGAZINE
@@ -255,16 +261,24 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <Store className="w-5 h-5" />
                         </button>
 
-                        <Link to="/social" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
+                        <Link 
+                            to="/social" 
+                            onClick={(e) => {
+                                if (isVisitor) {
+                                    e.preventDefault();
+                                    setVisitorBlockFeature('acessar a área social');
+                                    setShowVisitorBlock(true);
+                                }
+                            }}
+                            className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} 
+                            aria-label="Social"
+                        >
                             <Users className="w-5 h-5" />
-                            {hasGroupInvites && (
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                            )}
                         </Link>
 
                         <Link to="/groups" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Grupos" title="Grupos">
                             <MessageCircle className="w-5 h-5" />
-                            {(hasGroupMentions || hasGroupMessages) && (
+                            {(hasGroupInvites || hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}
                         </Link>
@@ -275,20 +289,34 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
                         <div className="relative">
                             <button
-                                onClick={() => setShowNotifications(!showNotifications)}
+                                onClick={() => {
+                                    if (isVisitor) {
+                                        setVisitorBlockFeature('acessar notificações');
+                                        setShowVisitorBlock(true);
+                                    } else {
+                                        setShowNotifications(!showNotifications);
+                                    }
+                                }}
                                 className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors relative`}
                                 aria-label="Notifications"
                             >
                                 <Bell className="w-5 h-5" />
-                                {hasUnread && (
+                                {!isVisitor && hasUnread && (
                                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                                 )}
                             </button>
-                            {showNotifications && <Notifications />}
+                            {showNotifications && !isVisitor && <Notifications />}
                         </div>
 
                         <button
-                            onClick={openZionsModal}
+                            onClick={() => {
+                                if (isVisitor) {
+                                    setVisitorBlockFeature('comprar Zions');
+                                    setShowVisitorBlock(true);
+                                } else {
+                                    openZionsModal();
+                                }
+                            }}
                             className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
                             title="Adquirir Zions"
                         >
@@ -302,10 +330,6 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         >
                             <Sparkles className="w-5 h-5" />
                         </button>
-
-                        <Link to="/settings" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Configurações" title="Configurações">
-                            <Settings className="w-5 h-5" />
-                        </Link>
                     </div>
 
                     {/* Profile Link - Both Mobile & Desktop */}
@@ -569,6 +593,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
             {isShopOpen && (
                 <CustomizationShop isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
             )}
+
+            {/* Visitor Block Popup */}
+            <VisitorBlockPopup 
+                isOpen={showVisitorBlock} 
+                onClose={() => setShowVisitorBlock(false)} 
+                featureName={visitorBlockFeature}
+            />
         </header>
     );
 }

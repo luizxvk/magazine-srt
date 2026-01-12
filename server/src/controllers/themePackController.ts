@@ -176,8 +176,8 @@ export const equipThemePack = async (req: AuthRequest, res: Response) => {
             success: true,
             message: 'Theme pack equipped successfully!',
             pack: {
-                background: pack.backgroundUrl,
-                color: pack.accentColor
+                backgroundUrl: pack.backgroundUrl,
+                accentColor: pack.accentColor
             }
         });
     } catch (error) {

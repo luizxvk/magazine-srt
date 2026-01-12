@@ -180,9 +180,29 @@ export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | '
             await awardBadge('Criador de Conteúdo');
         }
 
+        // Blogueiro (20 Posts)
+        if (actionType === 'POST' && user.posts.length === 20) {
+            await awardBadge('Blogueiro');
+        }
+
+        // Editor Chefe (50 Posts)
+        if (actionType === 'POST' && user.posts.length === 50) {
+            await awardBadge('Editor Chefe');
+        }
+
         // 3. Socialite (10 Comments)
         if (actionType === 'COMMENT' && user.comments.length === 10) {
             await awardBadge('Socialite');
+        }
+
+        // Debatedor (50 Comments)
+        if (actionType === 'COMMENT' && user.comments.length === 50) {
+            await awardBadge('Debatedor');
+        }
+
+        // Comentador (First Comment)
+        if (actionType === 'COMMENT' && user.comments.length === 1) {
+            await awardBadge('Comentador');
         }
 
         // 4. Engajado (50 Likes given)
@@ -190,17 +210,36 @@ export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | '
             await awardBadge('Engajado');
         }
 
-        // 5. Influenciador (50 Likes received) - This is harder to check efficiently here without aggregation, 
-        // but for now let's check on login or specific triggers if needed. 
-        // Or we can query aggregate here.
-        if (actionType === 'LOGIN' || actionType === 'POST') {
+        // Super Fã (100 Likes given)
+        if (actionType === 'LIKE' && user.likes.length === 100) {
+            await awardBadge('Super Fã');
+        }
+
+        // 5. Influenciador (50 Likes received) & popularity badges
+        if (actionType === 'LOGIN' || actionType === 'POST' || actionType === 'LIKE') {
             const totalLikesReceived = await prisma.post.aggregate({
                 where: { userId },
                 _sum: { likesCount: true }
             });
 
-            if ((totalLikesReceived._sum.likesCount || 0) >= 50) {
+            const likesReceived = totalLikesReceived._sum.likesCount || 0;
+
+            if (likesReceived >= 50) {
                 await awardBadge('Influenciador');
+            }
+
+            if (likesReceived >= 100) {
+                await awardBadge('Ícone');
+            }
+
+            // Viral (50 comments received on posts)
+            const totalCommentsReceived = await prisma.post.aggregate({
+                where: { userId },
+                _sum: { commentsCount: true }
+            });
+
+            if ((totalCommentsReceived._sum.commentsCount || 0) >= 50) {
+                await awardBadge('Viral');
             }
         }
 

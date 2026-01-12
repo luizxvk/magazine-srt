@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Menu, Palette, Zap, Image, MessageCircle, Trophy, Bell, Wrench, Award, Settings, Eye, VolumeX, Users, Package, AtSign, Move, BadgeCheck, Clock, ShoppingBag } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Palette, Zap, Image, MessageCircle, Trophy, Bell, VolumeX, Users, Package, AtSign, Move, BadgeCheck, Clock, ChevronUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.21';
+const CURRENT_VERSION = '0.3.22';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,49 +33,75 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.21 - Verificação, Mobile Fixes, Personalização
+    // v0.3.22 - UI/UX Improvements, Accent Colors, Group Notifications
     const updates: UpdateItem[] = [
         {
-            icon: <Clock className="w-5 h-5" />,
-            title: 'Popup de Cooldown Estilizado',
-            description: 'O aviso de espera para resgatar recompensas agora é um popup bonito ao invés de alerta do navegador!',
+            icon: <Store className="w-5 h-5" />,
+            title: 'Botão Loja Sempre Visível',
+            description: 'O botão de "Meu Estilo" agora aparece no header de todas as páginas, não só no feed!',
             isNew: true
         },
         {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Fotos em Retrato no Mobile',
-            description: 'Fotos postadas no mobile agora ocupam melhor o card, respeitando orientação retrato!',
-            isNew: true
-        },
-        {
-            icon: <BadgeCheck className="w-5 h-5" />,
-            title: 'Selo de Email Verificado',
-            description: 'Usuários com email verificado agora exibem um selo azul ao lado do nome no perfil!',
-            isNew: true
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Popup Verificação Corrigido',
-            description: 'O popup de verificar email não aparece mais para quem já verificou. Bug corrigido!',
+            icon: <ChevronUp className="w-5 h-5" />,
+            title: 'PostPill Mobile Expansível',
+            description: 'No mobile, clique na seta para mostrar/esconder os ícones de ação do widget de post!',
             isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
-            title: 'Cores Instantâneas no Login',
-            description: 'Suas cores e fundos personalizados são aplicados imediatamente ao fazer login!',
+            title: 'PostPill com Cor Destaque',
+            description: 'O widget de criar post agora segue a cor de destaque personalizada do Magazine!',
             isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Notificações com Fundo Sólido',
+            description: 'O card de notificações agora tem fundo preto sólido para melhor legibilidade!',
+            isNew: true
+        },
+        {
+            icon: <MessageCircle className="w-5 h-5" />,
+            title: 'Pulse em Grupos para Mensagens',
+            description: 'O ícone de Grupos no header agora pulsa vermelho para mensagens novas, não só menções!',
+            isNew: true
+        },
+        {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Popup Convite Estilizado',
+            description: 'Convites de grupo agora mostram popup bonito ao invés de alert do navegador!',
+            isNew: true
+        },
+        {
+            icon: <BadgeCheck className="w-5 h-5" />,
+            title: 'Selo Verificado Corrigido',
+            description: 'O ícone de email verificado agora aparece corretamente com sua cor!',
+            isNew: true
+        },
+        {
+            icon: <Zap className="w-5 h-5" />,
+            title: 'Botão Criar Grupo Dinâmico',
+            description: 'O botão "Criar Grupo" agora segue a cor de destaque do usuário!',
+            isNew: true
+        },
+        {
+            icon: <Clock className="w-5 h-5" />,
+            title: 'Popup de Cooldown Estilizado',
+            description: 'O aviso de espera para resgatar recompensas agora é um popup bonito ao invés de alerta do navegador!'
+        },
+        {
+            icon: <Image className="w-5 h-5" />,
+            title: 'Fotos em Retrato no Mobile',
+            description: 'Fotos postadas no mobile agora ocupam melhor o card, respeitando orientação retrato!'
+        },
+        {
+            icon: <BadgeCheck className="w-5 h-5" />,
+            title: 'Selo de Email Verificado',
+            description: 'Usuários com email verificado agora exibem um selo azul ao lado do nome no perfil!'
         },
         {
             icon: <Package className="w-5 h-5" />,
             title: 'Inventário no Mobile',
-            description: 'O card de Inventário agora aparece no drawer de Recomendações para mobile!',
-            isNew: true
-        },
-        {
-            icon: <ShoppingBag className="w-5 h-5" />,
-            title: 'Loja Renomeada',
-            description: '"Loja de Customização" agora é "Meu Estilo" para diferenciar do Mercado de itens.',
-            isNew: true
+            description: 'O card de Inventário agora aparece no drawer de Recomendações para mobile!'
         },
         {
             icon: <Move className="w-5 h-5" />,
@@ -95,57 +121,32 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         {
             icon: <Search className="w-5 h-5" />,
             title: 'Navegação e Filtros',
-            description: 'Pesquise por nome, filtre por tipo (fundos, selos, cores) e ordene por preço ou data!',
+            description: 'Pesquise por nome, filtre por tipo (fundos, selos, cores) e ordene por preço ou data!'
         },
         {
             icon: <Zap className="w-5 h-5" />,
             title: 'Taxa de 5% nas Vendas',
-            description: 'Venda qualquer item não-padrão! O sistema cobra 5% de taxa e você recebe o resto em Zions.',
+            description: 'Venda qualquer item não-padrão! O sistema cobra 5% de taxa e você recebe o resto em Zions.'
         },
         {
             icon: <Trophy className="w-5 h-5" />,
             title: 'Histórico de Transações',
-            description: 'Veja todas suas compras e vendas, quanto ganhou/gastou, e acompanhe suas negociações!',
+            description: 'Veja todas suas compras e vendas, quanto ganhou/gastou, e acompanhe suas negociações!'
         },
         {
             icon: <VolumeX className="w-5 h-5" />,
             title: 'Silenciar Grupos',
-            description: 'Mute notificações de grupos individuais! Ícone aparece no título do grupo quando silenciado.',
+            description: 'Mute notificações de grupos individuais! Ícone aparece no título do grupo quando silenciado.'
         },
         {
             icon: <Image className="w-5 h-5" />,
             title: 'Fundos de Chat em Grupos',
-            description: 'Admins podem aplicar fundos da loja ao chat do grupo! Todos os membros veem o novo visual.',
+            description: 'Admins podem aplicar fundos da loja ao chat do grupo! Todos os membros veem o novo visual.'
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Gerenciamento de Membros',
-            description: 'Modal de configurações do grupo com abas: Geral, Fundo e Membros. Admins podem promover/remover.',
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: '10 Novas Cores Pastel!',
-            description: 'Rosa, Lavanda, Menta, Pêssego, Céu, Coral, Lilás, Sálvia, Manteiga e Pervinca! Tons suaves para seu perfil.'
-        },
-        {
-            icon: <Eye className="w-5 h-5" />,
-            title: 'Visualizadores de Stories',
-            description: 'Novo popup moderno mostra quem viu seus stories com animação slide-up e design temático!'
-        },
-        {
-            icon: <Award className="w-5 h-5" />,
-            title: 'Cor de Texto nos Selos',
-            description: 'Admins agora podem definir a cor do texto dos selos, não apenas o fundo!'
-        },
-        {
-            icon: <Settings className="w-5 h-5" />,
-            title: 'Botão Config no Feed',
-            description: 'Acesse configurações rapidamente pelo ícone no cabeçalho do feed!'
-        },
-        {
-            icon: <Wrench className="w-5 h-5" />,
-            title: 'Switches Corrigidos',
-            description: 'Botões toggle das configurações com alinhamento e animação melhorados!'
+            description: 'Modal de configurações do grupo com abas: Geral, Fundo e Membros. Admins podem promover/remover.'
         },
         {
             icon: <MessageCircle className="w-5 h-5" />,

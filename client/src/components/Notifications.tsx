@@ -42,7 +42,7 @@ export default function Notifications({ onClose }: NotificationsProps) {
     // Container Styles
     const containerStyle = theme === 'light'
         ? 'bg-white/90 border-gray-200 shadow-xl'
-        : 'bg-black/60 border-white/10 shadow-2xl';
+        : 'bg-black border-white/10 shadow-2xl';
     const headerBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
     const titleColor = theme === 'light' ? 'text-gray-800' : 'text-white';
     const itemBorder = theme === 'light' ? 'border-gray-100 hover:bg-gray-50' : 'border-white/5 hover:bg-white/5';

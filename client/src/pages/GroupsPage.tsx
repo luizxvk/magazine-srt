@@ -30,7 +30,7 @@ interface Group {
 }
 
 export default function GroupsPage() {
-  const { user, theme } = useAuth();
+  const { user, theme, accentColor } = useAuth();
   const navigate = useNavigate();
   const isMGT = user?.membershipType === 'MGT';
 
@@ -41,7 +41,11 @@ export default function GroupsPage() {
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-  const accentColor = isMGT ? 'emerald-500' : 'gold-500';
+
+  // Dynamic button style based on accent color
+  const buttonStyle = isMGT 
+    ? {} 
+    : { background: `linear-gradient(to right, ${accentColor}, ${accentColor})`, boxShadow: `0 10px 25px ${accentColor}40` };
 
   useEffect(() => {
     fetchGroups();
@@ -100,7 +104,8 @@ export default function GroupsPage() {
             onClick={handleCreateGroup}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-emerald-500/50' : 'bg-gradient-to-r from-gold-600 to-gold-500 hover:shadow-gold-500/50'} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-xl transition-all`}
+            style={buttonStyle}
+            className={`${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-emerald-500/50' : ''} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-xl transition-all`}
           >
             <Plus className="w-5 h-5" />
             Criar Grupo
@@ -117,7 +122,8 @@ export default function GroupsPage() {
               onClick={handleCreateGroup}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500'} text-white px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg transition-colors`}
+              style={buttonStyle}
+              className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : ''} text-white px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg transition-colors`}
             >
               <Plus className="w-5 h-5" />
               Criar Primeiro Grupo

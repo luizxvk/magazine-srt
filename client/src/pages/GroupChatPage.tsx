@@ -67,7 +67,7 @@ interface TypingUser {
 export default function GroupChatPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, theme } = useAuth();
+  const { user, theme, showAchievement } = useAuth();
   const isMGT = user?.membershipType === 'MGT';
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +129,7 @@ export default function GroupChatPage() {
     setInviting(true);
     try {
       await api.post(`/groups/${id}/invite`, { invitedUserId: friendId });
-      alert('Convite enviado com sucesso!');
+      showAchievement('Convite Enviado!', 'O usuário receberá uma notificação do convite');
       setShowInviteModal(false);
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || 'Erro ao enviar convite';
@@ -137,7 +137,7 @@ export default function GroupChatPage() {
       if (error.response?.status !== 400) {
         console.error('Error inviting member:', error);
       }
-      alert(errorMessage);
+      showAchievement('Erro', errorMessage);
     } finally {
       setInviting(false);
     }
@@ -296,7 +296,7 @@ export default function GroupChatPage() {
 
     // Check Zion balance
     if ((user?.zions || 0) < 10) {
-      alert('Você precisa de 10 Zions para enviar uma imagem');
+      showAchievement('Zions Insuficientes', 'Você precisa de 10 Zions para enviar uma imagem');
       return;
     }
 
@@ -331,7 +331,7 @@ export default function GroupChatPage() {
       fetchMessages();
     } catch (error) {
       console.error('Error sending image:', error);
-      alert('Erro ao enviar imagem');
+      showAchievement('Erro', 'Não foi possível enviar a imagem');
     } finally {
       setPendingImageFile(null);
     }
@@ -363,9 +363,9 @@ export default function GroupChatPage() {
     } catch (error: any) {
       console.error('Error leaving group:', error);
       if (error.response?.status === 400) {
-        alert('O criador do grupo não pode sair. Você precisa transferir a propriedade ou deletar o grupo.');
+        showAchievement('Não Permitido', 'O criador do grupo não pode sair. Transfira a propriedade ou delete o grupo.');
       } else {
-        alert('Erro ao sair do grupo');
+        showAchievement('Erro', 'Não foi possível sair do grupo');
       }
     }
   };
@@ -376,7 +376,7 @@ export default function GroupChatPage() {
       navigate('/groups');
     } catch (error: any) {
       console.error('Error deleting group:', error);
-      alert('Erro ao deletar o grupo');
+      showAchievement('Erro', 'Não foi possível deletar o grupo');
     }
   };
 
@@ -389,7 +389,7 @@ export default function GroupChatPage() {
       fetchGroup();
     } catch (error) {
       console.error('Error updating group name:', error);
-      alert('Erro ao atualizar nome do grupo');
+      showAchievement('Erro', 'Não foi possível atualizar o nome do grupo');
     }
   };
 
@@ -412,7 +412,7 @@ export default function GroupChatPage() {
       fetchGroup();
     } catch (error) {
       console.error('Error updating group avatar:', error);
-      alert('Erro ao atualizar foto do grupo');
+      showAchievement('Erro', 'Não foi possível atualizar a foto do grupo');
     } finally {
       setUploading(false);
     }

@@ -10,6 +10,7 @@ import DailyLoginCard from './DailyLoginCard';
 import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
+import CustomizationShop from './CustomizationShop';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 import { getContrastColor } from '../utils/colorUtils';
@@ -38,9 +39,11 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const [hasUnread, setHasUnread] = useState(false);
     const [hasGroupInvites, setHasGroupInvites] = useState(false);
     const [hasGroupMentions, setHasGroupMentions] = useState(false);
+    const [hasGroupMessages, setHasGroupMessages] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isWhatsNewModalOpen, setIsWhatsNewModalOpen] = useState(false);
+    const [isShopOpen, setIsShopOpen] = useState(false);
     const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
@@ -84,6 +87,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                 // Check for group mentions (group icon should pulse)
                 const groupMentions = notifications.filter((n: any) => !n.read && n.type === 'GROUP_MENTION');
                 setHasGroupMentions(groupMentions.length > 0);
+
+                // Check for group messages (group icon should pulse)
+                const groupMessages = notifications.filter((n: any) => !n.read && n.type === 'GROUP_MESSAGE');
+                setHasGroupMessages(groupMessages.length > 0);
 
                 // Check for new badges
                 const newBadges = notifications.filter((n: any) => !n.read && n.type === 'BADGE');
@@ -226,17 +233,15 @@ export default function Header({ onOpenShop }: HeaderProps) {
                 <div className="flex items-center gap-2 md:gap-4 shrink-0">
                     {/* Desktop Actions */}
                     <div className="hidden md:flex items-center gap-2 md:gap-4">
-                        {/* Shop Button */}
-                        {onOpenShop && (
-                            <button
-                                onClick={onOpenShop}
-                                className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
-                                aria-label="Loja"
-                                title="Loja de Personalização"
-                            >
-                                <Store className="w-5 h-5" />
-                            </button>
-                        )}
+                        {/* Shop Button - Always visible */}
+                        <button
+                            onClick={() => onOpenShop ? onOpenShop() : setIsShopOpen(true)}
+                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                            aria-label="Loja"
+                            title="Loja de Personalização"
+                        >
+                            <Store className="w-5 h-5" />
+                        </button>
 
                         <Link to="/social" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Social">
                             <Users className="w-5 h-5" />
@@ -247,7 +252,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
                         <Link to="/groups" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Grupos" title="Grupos">
                             <MessageCircle className="w-5 h-5" />
-                            {hasGroupMentions && (
+                            {(hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}
                         </Link>
@@ -479,18 +484,16 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     <Search className="w-4 h-4" />
                                     <span className="text-sm">Buscar</span>
                                 </button>
-                                {onOpenShop && (
-                                    <button
-                                        onClick={() => {
-                                            setIsMobileDrawerOpen(false);
-                                            onOpenShop();
-                                        }}
-                                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
-                                    >
-                                        <Store className="w-4 h-4" />
-                                        <span className="text-sm">Loja</span>
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => {
+                                        setIsMobileDrawerOpen(false);
+                                        onOpenShop ? onOpenShop() : setIsShopOpen(true);
+                                    }}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
+                                >
+                                    <Store className="w-4 h-4" />
+                                    <span className="text-sm">Loja</span>
+                                </button>
                                 <button
                                     onClick={() => {
                                         setIsMobileDrawerOpen(false);
@@ -535,6 +538,11 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     </>
                 )}
             </AnimatePresence>
+
+            {/* Internal Shop Modal */}
+            {isShopOpen && (
+                <CustomizationShop isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
+            )}
         </header>
     );
 }

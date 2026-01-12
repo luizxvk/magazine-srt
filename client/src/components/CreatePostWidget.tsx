@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check, AtSign } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check, AtSign, ChevronUp, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
@@ -17,7 +17,7 @@ interface MentionUser {
 }
 
 export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProps) {
-    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen } = useAuth();
+    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen, accentColor } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -27,6 +27,7 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     const [isCarouselMode, setIsCarouselMode] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [showTagInput, setShowTagInput] = useState(false);
+    const [mobileActionsExpanded, setMobileActionsExpanded] = useState(false);
     
     // Mention system states
     const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
@@ -402,17 +403,26 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
             )}
 
             {/* The Liquid Glass Pill */}
-            <div className={`
-                relative overflow-hidden
-                ${themePillBg} backdrop-blur-2xl
-                border ${themePillBorder}
-                rounded-full ${themePillShadow}
-                p-2 flex items-center gap-4 transition-all duration-500 ease-out
-                group ${themePillHoverShadow} ${themePillHoverBorder}
-                ${isExpanded ? `scale-105 ${themePillExpandedBg}` : 'scale-100'}
-            `}>
+            <div 
+                className={`
+                    relative overflow-hidden
+                    ${themePillBg} backdrop-blur-2xl
+                    border ${themePillBorder}
+                    rounded-full ${themePillShadow}
+                    p-2 flex items-center gap-4 transition-all duration-500 ease-out
+                    group ${themePillHoverShadow} ${themePillHoverBorder}
+                    ${isExpanded ? `scale-105 ${themePillExpandedBg}` : 'scale-100'}
+                `}
+                style={{
+                    background: isMGT ? undefined : `linear-gradient(135deg, ${accentColor}15, ${accentColor}08)`,
+                    borderColor: isMGT ? undefined : `${accentColor}30`
+                }}
+            >
                 {/* Subtle internal glow */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${themeGlow} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
+                <div 
+                    className={`absolute inset-0 ${isMGT ? `bg-gradient-to-r ${themeGlow} to-transparent` : ''} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}
+                    style={!isMGT ? { background: `linear-gradient(to right, transparent, ${accentColor}15, transparent)` } : undefined}
+                />
 
                 {/* Input Area */}
                 <div className="flex-1 flex items-center px-4">
@@ -433,60 +443,83 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
 
                 {/* Actions Group */}
                 <div className="flex items-center gap-3 pr-2 relative z-10">
-                    {/* Carousel Mode Toggle */}
+                    {/* Mobile Expand Button */}
                     <button
                         type="button"
-                        onClick={() => canUseCarousel && setIsCarouselMode(!isCarouselMode)}
-                        className={`
-                            rounded-full p-2 transition-all duration-300 flex items-center gap-1
-                            ${isCarouselMode ? `${themeBgActive} ${themeTextActive}` : `${themeTextMuted} ${themeTextHover} ${themeBgHover}`}
-                            ${!canUseCarousel ? 'opacity-50 cursor-not-allowed' : ''}
-                        `}
-                        title={canUseCarousel ? "Modo Carrossel (Destaque - 300 Zions)" : "Modo Carrossel (Requer 300 Zions)"}
+                        onClick={() => setMobileActionsExpanded(!mobileActionsExpanded)}
+                        className={`md:hidden ${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
+                        title={mobileActionsExpanded ? "Recolher" : "Expandir opções"}
                     >
-                        {!canUseCarousel && <Lock className="w-3 h-3" />}
-                        <Layers className="w-5 h-5 stroke-[1.5]" />
+                        {mobileActionsExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
                     </button>
 
-                    {/* Tag Button */}
-                    <button
-                        type="button"
-                        onClick={handleAddTag}
-                        className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
-                        title="Adicionar Tag"
-                    >
-                        <Hash className="w-5 h-5 stroke-[1.5]" />
-                    </button>
+                    {/* Desktop: Always visible | Mobile: Expandable */}
+                    <AnimatePresence>
+                        {(mobileActionsExpanded || window.innerWidth >= 768) && (
+                            <motion.div 
+                                className="flex items-center gap-1 md:gap-3"
+                                initial={{ width: 0, opacity: 0 }}
+                                animate={{ width: 'auto', opacity: 1 }}
+                                exit={{ width: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {/* Carousel Mode Toggle */}
+                                <button
+                                    type="button"
+                                    onClick={() => canUseCarousel && setIsCarouselMode(!isCarouselMode)}
+                                    className={`
+                                        rounded-full p-2 transition-all duration-300 flex items-center gap-1
+                                        ${isCarouselMode ? `${themeBgActive} ${themeTextActive}` : `${themeTextMuted} ${themeTextHover} ${themeBgHover}`}
+                                        ${!canUseCarousel ? 'opacity-50 cursor-not-allowed' : ''}
+                                    `}
+                                    title={canUseCarousel ? "Modo Carrossel (Destaque - 300 Zions)" : "Modo Carrossel (Requer 300 Zions)"}
+                                >
+                                    {!canUseCarousel && <Lock className="w-3 h-3" />}
+                                    <Layers className="w-5 h-5 stroke-[1.5]" />
+                                </button>
 
-                    {/* Mention Button */}
-                    <button
-                        type="button"
-                        onClick={handleMentionClick}
-                        className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
-                        title="Mencionar usuário"
-                    >
-                        <AtSign className="w-5 h-5 stroke-[1.5]" />
-                    </button>
+                                {/* Tag Button */}
+                                <button
+                                    type="button"
+                                    onClick={handleAddTag}
+                                    className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
+                                    title="Adicionar Tag"
+                                >
+                                    <Hash className="w-5 h-5 stroke-[1.5]" />
+                                </button>
 
-                    {/* Media Icons */}
-                    <div className="flex items-center gap-1">
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleFileSelect}
-                            aria-label="Selecionar imagem"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
-                            title="Adicionar Imagem"
-                        >
-                            <ImageIcon className="w-5 h-5 stroke-[1.5]" />
-                        </button>
-                    </div>
+                                {/* Mention Button */}
+                                <button
+                                    type="button"
+                                    onClick={handleMentionClick}
+                                    className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
+                                    title="Mencionar usuário"
+                                >
+                                    <AtSign className="w-5 h-5 stroke-[1.5]" />
+                                </button>
+
+                                {/* Media Icons */}
+                                <div className="flex items-center gap-1">
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleFileSelect}
+                                        aria-label="Selecionar imagem"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
+                                        title="Adicionar Imagem"
+                                    >
+                                        <ImageIcon className="w-5 h-5 stroke-[1.5]" />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* Send Button */}
                     <button
@@ -494,11 +527,14 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
                         onClick={() => handleSubmit()}
                         disabled={loading || (!caption.trim() && !mediaUrl)}
                         className={`
-                            ${themeButton} text-black rounded-full p-2.5 
+                            ${isMGT ? themeButton : ''} text-black rounded-full p-2.5 
                             transition-all duration-300 transform hover:scale-110 active:scale-95
-                            ${themeButtonShadow}
                             disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
                         `}
+                        style={!isMGT ? {
+                            background: accentColor,
+                            boxShadow: `0 0 15px ${accentColor}60`
+                        } : undefined}
                         title="Publicar"
                     >
                         {isSuccess ? <Check className="w-5 h-5" /> : <Send className="w-5 h-5 stroke-[2]" />}

@@ -52,7 +52,7 @@ const categoryOptions = [
 ];
 
 export default function ProductStore() {
-    const { user, theme, accentColor } = useAuth();
+    const { user, accentColor } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ export default function ProductStore() {
     };
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen">
             <LuxuriousBackground />
             <Header />
             

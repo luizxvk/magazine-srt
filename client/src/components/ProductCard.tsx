@@ -83,15 +83,15 @@ export default function ProductCard({ product, onPurchase }: ProductCardProps) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`relative rounded-2xl border ${borderColor} ${theme === 'light' ? 'bg-white/90' : 'bg-white/5'} backdrop-blur-xl overflow-hidden`}
+            className={`relative rounded-2xl border ${borderColor} ${theme === 'light' ? 'bg-white/90' : 'bg-white/5'} backdrop-blur-xl overflow-hidden group`}
         >
-            {/* Product Image or Placeholder */}
-            <div className={`h-40 ${bgAccent} flex items-center justify-center relative overflow-hidden`}>
+            {/* Product Image or Placeholder - 16:9 aspect ratio */}
+            <div className={`aspect-video ${bgAccent} flex items-center justify-center relative overflow-hidden`}>
                 {product.imageUrl ? (
                     <img 
                         src={product.imageUrl} 
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
                     <div className={`${textAccent} opacity-30`}>

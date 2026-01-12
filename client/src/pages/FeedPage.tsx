@@ -254,14 +254,6 @@ export default function FeedPage() {
             <div className="max-w-7xl mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-4 sm:px-6 md:px-8 flex gap-8 relative z-10">
                 {/* Main Feed Column */}
                 <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
-                    {/* Mobile Carousel - Quick Access Cards */}
-                    <MobileCarousel
-                        dailyLoginStatus={dailyLoginStatus}
-                        onDailyLoginClick={openDailyLoginModal}
-                        onNewMembersClick={() => setIsNewMembersOpen(true)}
-                        onEventsClick={() => setIsEventsOpen(true)}
-                    />
-
                     {/* Welcome Header */}
                     <div className="mb-8 animate-fade-in-down">
                         <div className="flex items-start justify-between">
@@ -284,12 +276,22 @@ export default function FeedPage() {
                     </div>
 
                     {/* Stories Bar */}
-                    <div className="mb-8 animate-fade-in">
+                    <div className="mb-6 animate-fade-in">
                         <StoriesBar
                             viewingStoryId={viewingStoryId}
                             onViewStory={setViewingStoryId}
                             onCloseStory={() => setViewingStoryId(null)}
                             onEditorStateChange={setIsStoryEditorOpen}
+                        />
+                    </div>
+
+                    {/* Mobile Carousel - Quick Access Cards (below Stories) */}
+                    <div className="mb-8">
+                        <MobileCarousel
+                            dailyLoginStatus={dailyLoginStatus}
+                            onDailyLoginClick={openDailyLoginModal}
+                            onNewMembersClick={() => setIsNewMembersOpen(true)}
+                            onEventsClick={() => setIsEventsOpen(true)}
                         />
                     </div>
 

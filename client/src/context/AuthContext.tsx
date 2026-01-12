@@ -121,7 +121,7 @@ const ACCENT_COLORS: Record<string, string> = {
 // Helper to convert hex to rgb
 const hexToRgb = (hex: string): string => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result 
+    return result
         ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
         : '212, 175, 55';
 };
@@ -163,6 +163,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Compute background style from user's equipped customization
     const backgroundStyle = React.useMemo(() => {
+        // Check if it's an animated background (class-based)
+        if (user?.equippedBackground?.startsWith('anim-')) {
+            return `class:${user.equippedBackground}`; // Special marker for class-based
+        }
+        // Traditional gradient backgrounds
         if (user?.equippedBackground && BACKGROUND_STYLES[user.equippedBackground]) {
             return BACKGROUND_STYLES[user.equippedBackground];
         }
@@ -172,7 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Helper function to immediately apply accent color styles (used on login AND page load)
     const applyAccentStyles = (userData: User) => {
         const root = document.documentElement;
-        
+
         // Determine accent color
         let colorValue = userData.membershipType === 'MGT' ? '#50c878' : '#d4af37'; // defaults
         if (userData.equippedColor && ACCENT_COLORS[userData.equippedColor]) {
@@ -181,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 colorValue = mapped;
             }
         }
-        
+
         const mixHex = (hexA: string, hexB: string, weightA: number) => {
             const normalize = (hex: string) => hex.replace('#', '');
             const a = normalize(hexA);
@@ -195,7 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const toHex2 = (n: number) => n.toString(16).padStart(2, '0');
             return `#${toHex2(r)}${toHex2(g)}${toHex2(bCh)}`;
         };
-        
+
         // Apply CSS variables immediately
         root.style.setProperty('--accent-color', colorValue);
         root.style.setProperty('--accent-color-rgb', hexToRgb(colorValue));
@@ -207,7 +212,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         root.style.setProperty('--accent-500', colorValue);
         root.style.setProperty('--accent-600', mixHex(colorValue, '#000000', 0.80));
         root.style.setProperty('--accent-700', mixHex(colorValue, '#000000', 0.60));
-        
+
         // Apply classes
         if (userData.equippedColor) {
             root.classList.add('custom-accent');
@@ -217,15 +222,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 root.classList.remove('rgb-dynamic');
             }
         }
-        
+
+
         // Apply background immediately OR clear if none equipped
-        if (userData.equippedBackground && BACKGROUND_STYLES[userData.equippedBackground]) {
-            document.body.style.background = BACKGROUND_STYLES[userData.equippedBackground];
-            document.body.style.backgroundSize = '200% 200%';
-            document.body.style.backgroundAttachment = 'fixed';
-            document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
+        if (userData.equippedBackground) {
+            // Check if it's an animated background (class-based)
+            if (userData.equippedBackground.startsWith('anim-')) {
+                // Remove any previous animation classes
+                const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
+                existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
+
+                // Add the new animation class
+                document.body.classList.add(userData.equippedBackground);
+
+                // Clear inline styles that might conflict
+                document.body.style.background = '';
+                document.body.style.backgroundSize = '';
+                document.body.style.backgroundAttachment = '';
+                document.body.style.animation = '';
+            } else if (BACKGROUND_STYLES[userData.equippedBackground]) {
+                // Traditional gradient background (inline style)
+                // Remove any animation classes
+                const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
+                existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
+
+                document.body.style.background = BACKGROUND_STYLES[userData.equippedBackground];
+                document.body.style.backgroundSize = '200% 200%';
+                document.body.style.backgroundAttachment = 'fixed';
+                document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
+            }
         } else {
-            // Clear any previously applied background
+            // Clear any previously applied background (both classes and styles)
+            const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
+            existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
+
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
@@ -236,15 +266,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Apply accent color as CSS variable
     useEffect(() => {
         const root = document.documentElement;
-        
+
         // Only apply custom colors if user is authenticated (not null, not visitor)
         const isAuthenticated = user && user.role !== 'VISITOR';
-        
+
         if (!isAuthenticated) {
             // Reset to default colors when not authenticated
             root.classList.remove('custom-accent');
             root.classList.remove('rgb-dynamic');
-            
+
             // Don't set any CSS variables - let the page use its own colors
             root.style.removeProperty('--accent-color');
             root.style.removeProperty('--accent-color-rgb');
@@ -258,7 +288,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             root.style.removeProperty('--accent-700');
             return;
         }
-        
+
         const mixHex = (hexA: string, hexB: string, weightA: number) => {
             const normalize = (hex: string) => hex.replace('#', '');
             const a = normalize(hexA);
@@ -292,7 +322,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         root.style.setProperty('--accent-500', accentColor);
         root.style.setProperty('--accent-600', mixHex(accentColor, '#000000', 0.80));
         root.style.setProperty('--accent-700', mixHex(accentColor, '#000000', 0.60));
-        
+
         // Add class when custom color is equipped to enable global color replacement
         if (user?.equippedColor) {
             root.classList.add('custom-accent');
@@ -314,7 +344,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         // Only apply custom background if user is authenticated (not null, not visitor)
         const isAuthenticated = user && user.role !== 'VISITOR';
-        
+
         if (!isAuthenticated || !backgroundStyle) {
             // Reset to default when not authenticated or no custom background
             document.body.style.background = '';
@@ -364,7 +394,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             api.get('/gamification/daily-login/status', {
                                 headers: { Authorization: `Bearer ${token}` }
                             }),
-                            new Promise((_, reject) => 
+                            new Promise((_, reject) =>
                                 setTimeout(() => reject(new Error('Timeout')), 5000)
                             )
                         ]);
@@ -373,7 +403,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         // Auto-open modal if not claimed AND not already shown this session
                         const today = new Date().toDateString();
                         const lastModalShown = localStorage.getItem('dailyLoginModalShown');
-                        
+
                         if (!(statusRes as any).data.claimed && lastModalShown !== today) {
                             localStorage.setItem('dailyLoginModalShown', today);
                             setTimeout(() => setIsDailyLoginModalOpen(true), 1500);
@@ -428,7 +458,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Apply styles IMMEDIATELY before setting user state
         applyAccentStyles(userData);
-        
+
         setUser(userData);
     };
 
@@ -448,28 +478,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updateUserZions = (amount: number) => {
         // DEPRECATED - mantido para compatibilidade, atualiza zionsPoints
         if (user) {
-            setUser({ 
-                ...user, 
+            setUser({
+                ...user,
                 zions: (user.zions || 0) + amount,
-                zionsPoints: (user.zionsPoints || 0) + amount 
+                zionsPoints: (user.zionsPoints || 0) + amount
             });
         }
     };
 
     const updateUserPoints = (amount: number) => {
         if (user) {
-            setUser({ 
-                ...user, 
-                zionsPoints: (user.zionsPoints || 0) + amount 
+            setUser({
+                ...user,
+                zionsPoints: (user.zionsPoints || 0) + amount
             });
         }
     };
 
     const updateUserCash = (amount: number) => {
         if (user) {
-            setUser({ 
-                ...user, 
-                zionsCash: (user.zionsCash || 0) + amount 
+            setUser({
+                ...user,
+                zionsCash: (user.zionsCash || 0) + amount
             });
         }
     };
@@ -529,15 +559,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (response.data.awarded > 0) {
                 // Update user zions (Points para daily login)
                 if (user) {
-                    setUser({ 
-                        ...user, 
+                    setUser({
+                        ...user,
                         zions: (user.zions || 0) + response.data.awarded,
-                        zionsPoints: (user.zionsPoints || 0) + response.data.awarded 
+                        zionsPoints: (user.zionsPoints || 0) + response.data.awarded
                     });
                 }
                 // Update status with new streak from backend
-                setDailyLoginStatus(prev => prev ? { 
-                    ...prev, 
+                setDailyLoginStatus(prev => prev ? {
+                    ...prev,
                     claimed: true,
                     streak: response.data.streak || prev.streak
                 } : null);

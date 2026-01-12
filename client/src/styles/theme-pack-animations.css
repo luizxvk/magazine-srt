@@ -1,0 +1,273 @@
+/* ========================================
+   THEME PACK ANIMATED BACKGROUNDS
+   Unique CSS animations for each game theme
+   ======================================== */
+
+/* Arc Raiders - Rainbow Stripes Animation */
+@keyframes arc-raiders-stripes {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.anim-arc-raiders-stripes {
+    background: repeating-linear-gradient(45deg,
+            #00D9FF 0px,
+            #00D9FF 40px,
+            #00FF8C 40px,
+            #00FF8C 80px,
+            #FFDE59 80px,
+            #FFDE59 120px,
+            #FF3E5E 120px,
+            #FF3E5E 160px);
+    background-size: 400% 400%;
+    animation: arc-raiders-stripes 20s ease infinite;
+}
+
+/* Cyberpunk - Pulsing Grid */
+@keyframes cyberpunk-pulse {
+
+    0%,
+    100% {
+        background-position: 0% 0%, 0% 0%;
+        opacity: 1;
+    }
+
+    50% {
+        background-position: 100% 100%, 100% 100%;
+        opacity: 0.85;
+    }
+}
+
+.anim-cyberpunk-grid {
+    background:
+        linear-gradient(0deg, transparent 24%, rgba(255, 0, 195, 0.3) 25%, rgba(255, 0, 195, 0.3) 26%, transparent 27%, transparent 74%, rgba(0, 229, 255, 0.3) 75%, rgba(0, 229, 255, 0.3) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255, 0, 195, 0.3) 25%, rgba(255, 0, 195, 0.3) 26%, transparent 27%, transparent 74%, rgba(0, 229, 255, 0.3) 75%, rgba(0, 229, 255, 0.3) 76%, transparent 77%, transparent),
+        linear-gradient(135deg, #1a0a2e 0%, #FF00C3 50%, #00E5FF 100%);
+    background-size: 50px 50px, 50px 50px, 400% 400%;
+    animation: cyberpunk-pulse 8s ease-in-out infinite;
+}
+
+/* GTA 6 - Vice City Sunset */
+@keyframes vice-city-waves {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.anim-vice-city-sunset {
+    background: linear-gradient(135deg,
+            #6B8CAE 0%,
+            #9B7EAC 35%,
+            #FFA98A 70%,
+            #FFD4C3 100%);
+    background-size: 200% 200%;
+    animation: vice-city-waves 15s ease infinite;
+}
+
+/* Elden Ring - Earthy Glow */
+@keyframes elden-glow {
+
+    0%,
+    100% {
+        filter: brightness(1) saturate(1);
+    }
+
+    50% {
+        filter: brightness(1.2) saturate(1.3);
+    }
+}
+
+.anim-elden-earthy {
+    background: linear-gradient(180deg,
+            #6B3E2E 0%,
+            #8B5439 25%,
+            #D97F3E 50%,
+            #EAB464 75%,
+            #F4E4C1 100%);
+    animation: elden-glow 6s ease-in-out infinite;
+}
+
+/* Additional unique animations for other packs */
+
+/* Red Dead - Dusty Desert */
+@keyframes desert-dust {
+
+    0%,
+    100% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+}
+
+.anim-desert-dust {
+    background: linear-gradient(160deg,
+            #8B4513 0%,
+            #CD853F 25%,
+            #DEB887 50%,
+            #F4A460 75%,
+            #D2691E 100%);
+    background-size: 200% 200%;
+    animation: desert-dust 18s ease infinite;
+}
+
+/* Witcher - Mystical Silver */
+@keyframes mystical-shimmer {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+        filter: hue-rotate(0deg);
+    }
+
+    50% {
+        background-position: 100% 50%;
+        filter: hue-rotate(15deg);
+    }
+}
+
+.anim-mystical-silver {
+    background: linear-gradient(120deg,
+            #2C3E50 0%,
+            #4A5F7F 30%,
+            #6b7280 50%,
+            #9CA3AF 70%,
+            #D1D5DB 100%);
+    background-size: 200% 200%;
+    animation: mystical-shimmer 12s ease infinite;
+}
+
+/* Resident Evil - Biohazard Green */
+@keyframes biohazard-pulse {
+
+    0%,
+    100% {
+        box-shadow: inset 0 0 60px rgba(34, 197, 94, 0.4);
+    }
+
+    50% {
+        box-shadow: inset 0 0 80px rgba(34, 197, 94, 0.7);
+    }
+}
+
+.anim-biohazard-green {
+    background: linear-gradient(135deg,
+            #0A2E0A 0%,
+            #1E3A1E 30%,
+            #22c55e 60%,
+            #4ADE80 80%,
+            #86EFAC 100%);
+    animation: biohazard-pulse 5s ease infinite;
+}
+
+/* Valorant - Tactical Grid */
+@keyframes tactical-shift {
+
+    0%,
+    100% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+}
+
+.anim-tactical-grid {
+    background:
+        repeating-linear-gradient(0deg, #f43f5e 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, #f43f5e 0px, transparent 1px, transparent 20px),
+        linear-gradient(135deg, #1F1B24 0%, #2D1B2E 50%, #f43f5e 100%);
+    background-size: 20px 20px, 20px 20px, 200% 200%;
+    animation: tactical-shift 15s linear infinite;
+}
+
+/* God of War - Nordic Frost */
+@keyframes frost-flow {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.anim-nordic-frost {
+    background: linear-gradient(160deg,
+            #1E3A5F 0%,
+            #2C5F8D 25%,
+            #3b82f6 50%,
+            #60A5FA 75%,
+            #DBEAFE 100%);
+    background-size: 200% 200%;
+    animation: frost-flow 14s ease infinite;
+}
+
+/* Stray - Neon Alley */
+@keyframes neon-flicker {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.85;
+    }
+
+    75% {
+        opacity: 0.95;
+    }
+}
+
+.anim-neon-alley {
+    background: linear-gradient(90deg,
+            #EA580C 0%,
+            #f97316 30%,
+            #FB923C 60%,
+            #FDBA74 100%);
+    animation: neon-flicker 3s ease-in-out infinite;
+}
+
+/* Hollow Knight - Dark Cavern */
+@keyframes cavern-shadow {
+
+    0%,
+    100% {
+        filter: brightness(0.8);
+    }
+
+    50% {
+        filter: brightness(1.1);
+    }
+}
+
+.anim-dark-cavern {
+    background: linear-gradient(180deg,
+            #0F172A 0%,
+            #1E293B 25%,
+            #334155 50%,
+            #64748b 75%,
+            #94A3B8 100%);
+    animation: cavern-shadow 10s ease infinite;
+}

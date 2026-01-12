@@ -7,10 +7,10 @@ async function seedThemePacks() {
         const themePacks = [
             {
                 name: 'Arc Raiders Pack',
-                description: 'Pack inspirado no universo futurista de Arc Raiders. Inclui fundo animado sci-fi e cor destaque azul neon.',
+                description: 'Pack inspirado no universo futurista de Arc Raiders. Listras coloridas animadas vibrantes.',
                 gameTitle: 'Arc Raiders',
-                backgroundUrl: 'bg-tech-grid',
-                accentColor: '#06b6d4',
+                backgroundUrl: 'anim-arc-raiders-stripes',
+                accentColor: '#00D9FF',
                 previewUrl: '/packs/arc-raiders.jpg',
                 price: 500,
                 isActive: true,
@@ -18,14 +18,25 @@ async function seedThemePacks() {
             },
             {
                 name: 'Cyberpunk 2077 Pack',
-                description: 'Entre no futuro de Night City com este pack vibrante. Fundo cyberpunk + cor destaque amarelo neon.',
+                description: 'Entre no futuro de Night City. Neon pulsante rosa magenta e ciano.',
                 gameTitle: 'Cyberpunk 2077',
-                backgroundUrl: 'bg-neon-city',
-                accentColor: '#f59e0b',
+                backgroundUrl: 'anim-cyberpunk-grid',
+                accentColor: '#FF00C3',
                 previewUrl: '/packs/cyberpunk.jpg',
                 price: 600,
                 isActive: true,
                 isLimited: false
+            },
+            {
+                name: 'GTA 6 (Vice City) Pack',
+                description: 'Pack temático de Vice City. Sunset vibes com cores azul, roxo e salmão.',
+                gameTitle: 'GTA 6',
+                backgroundUrl: 'anim-vice-city-sunset',
+                accentColor: '#9B7EAC',
+                previewUrl: '/packs/gta6.jpg',
+                price: 700,
+                isActive: true,
+                isLimited: true
             },
             {
                 name: 'Red Dead Redemption Pack',
@@ -73,10 +84,10 @@ async function seedThemePacks() {
             },
             {
                 name: 'Elden Ring Pack',
-                description: 'Pack inspirado nas Terras Intermédias. Fundo místico dourado + cor destaque ouro ancestral.',
+                description: 'Pack inspirado nas Terras Intermédias. Tons terrosos e dourados místicos.',
                 gameTitle: 'Elden Ring',
-                backgroundUrl: 'bg-golden-tree',
-                accentColor: '#f59e0b',
+                backgroundUrl: 'anim-elden-earthy',
+                accentColor: '#D97F3E',
                 previewUrl: '/packs/elden-ring.jpg',
                 price: 650,
                 isActive: true,

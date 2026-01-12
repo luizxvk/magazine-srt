@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'l
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.34';
+const CURRENT_VERSION = '0.3.35';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -67,8 +67,8 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         },
         {
             icon: <Check className="w-5 h-5" />,
-            title: '🔧 Correções v0.3.34',
-            description: 'Theme Packs agora equipam corretamente! Previews melhorados com gradientes vibrantes.',
+            title: '🎨 Theme Packs v0.3.35',
+            description: 'Cores corrigidas! Arc Raiders, GTA 6, Elden Ring e Cyberpunk com animações únicas. NOVO: Pack GTA 6 Vice City!',
             isNew: true
         },
         {

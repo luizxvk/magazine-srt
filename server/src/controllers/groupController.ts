@@ -16,7 +16,7 @@ const typingUsers: Map<string, Map<string, TypingUser>> = new Map(); // groupId 
 const cleanExpiredTyping = (groupId: string) => {
   const groupTyping = typingUsers.get(groupId);
   if (!groupTyping) return;
-  
+
   const now = Date.now();
   for (const [userId, data] of groupTyping.entries()) {
     if (data.expiresAt < now) {
@@ -412,7 +412,7 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
     if (content) {
       const mentionRegex = /@(\w+)/g;
       const mentions = content.match(mentionRegex);
-      
+
       if (mentions && mentions.length > 0) {
         // Buscar membros do grupo para encontrar os mencionados
         const groupMembers = await prisma.groupMember.findMany({
@@ -427,8 +427,8 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
         // Para cada menção, verificar se corresponde a um membro
         for (const mention of mentions) {
           const username = mention.substring(1).toLowerCase(); // Remove @
-          const mentionedMember = groupMembers.find(m => 
-            m.user.name.toLowerCase() === username || 
+          const mentionedMember = groupMembers.find(m =>
+            m.user.name.toLowerCase() === username ||
             (m.user.displayName && m.user.displayName.toLowerCase() === username)
           );
 
@@ -468,7 +468,7 @@ export const getGroupMessages = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
-    const { limit = 50, before } = req.query;
+    const { limit = 50, before, after } = req.query;
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
@@ -507,6 +507,11 @@ export const getGroupMessages = async (req: AuthRequest, res: Response) => {
         ...(before && {
           createdAt: {
             lt: new Date(before as string),
+          },
+        }),
+        ...(after && {
+          createdAt: {
+            gt: new Date(after as string),
           },
         }),
       },
@@ -879,7 +884,7 @@ export const inviteMember = async (req: AuthRequest, res: Response) => {
     res.json(invite);
   } catch (error: any) {
     console.error('Error inviting member:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Erro ao enviar convite',
       details: error?.message || 'Erro desconhecido'
     });
@@ -1196,7 +1201,7 @@ export const setTyping = async (req: AuthRequest, res: Response) => {
     if (!typingUsers.has(groupId)) {
       typingUsers.set(groupId, new Map());
     }
-    
+
     typingUsers.get(groupId)!.set(userId, {
       id: userId,
       name: member.user.displayName || member.user.name,
@@ -1258,7 +1263,7 @@ export const markMessagesRead = async (req: AuthRequest, res: Response) => {
     // Update member's last read message
     await prisma.groupMember.update({
       where: { groupId_userId: { groupId, userId } },
-      data: { 
+      data: {
         // Store the last read message ID in a JSON field or use a relation
         // For now, we'll use the updatedAt timestamp
       }
@@ -1293,7 +1298,7 @@ export const getMessageReaders = async (req: AuthRequest, res: Response) => {
     // Get all members who joined before this message was sent
     // For a simple implementation, return members who are active
     const members = await prisma.groupMember.findMany({
-      where: { 
+      where: {
         groupId,
         userId: { not: message.senderId } // Exclude sender
       },

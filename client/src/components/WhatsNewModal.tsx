@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'l
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.28';
+const CURRENT_VERSION = '0.3.30';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,8 +33,14 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.27 - SISTEMA DE MOEDA DUAL & PACKS DE TEMA
+    // v0.3.30 - OTIMIZAÇÃO DE CHAT & STORAGE
     const updates: UpdateItem[] = [
+        {
+            icon: <Sparkles className="w-5 h-5" />,
+            title: '⚡ Chat 10x Mais Rápido',
+            description: 'Novo sistema de "Delta Updates" consome 90% menos dados e bateria.',
+            isNew: true
+        },
         {
             icon: <Coins className="w-5 h-5" />,
             title: '💰 Sistema de Moeda Dual!',

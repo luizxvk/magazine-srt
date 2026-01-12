@@ -114,7 +114,7 @@ export default function GroupChatPage() {
       const response = await api.get('/social/friends');
       // Filter out users already in the group
       const currentMemberIds = group?.members.map(m => m.userId) || [];
-      const availableFriends = response.data.filter((friend: any) => 
+      const availableFriends = response.data.filter((friend: any) =>
         !currentMemberIds.includes(friend.id)
       );
       setFriends(availableFriends);
@@ -125,7 +125,7 @@ export default function GroupChatPage() {
 
   const handleInviteMember = async (friendId: string) => {
     if (!id) return;
-    
+
     setInviting(true);
     try {
       await api.post(`/groups/${id}/invite`, { invitedUserId: friendId });
@@ -148,50 +148,98 @@ export default function GroupChatPage() {
     setShowInviteModal(true);
   };
 
+  // State to track the last message timestamp for delta updates
+  const lastMessageDateRef = useRef<string | null>(null);
+
   useEffect(() => {
-    fetchGroup();
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 3000); // Poll messages every 3s
+    // Reset state when group changes
+    setMessages([]);
+    lastMessageDateRef.current = null;
+    fetchInitialMessages();
+
+    // Poll for new messages (delta updates) every 5 seconds
+    const interval = setInterval(fetchNewMessages, 5000);
     return () => clearInterval(interval);
   }, [id]);
 
-  // Poll for typing users
+  const fetchInitialMessages = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/groups/${id}/messages?limit=50`);
+      const initialMessages = response.data;
+      setMessages(initialMessages);
+
+      if (initialMessages.length > 0) {
+        lastMessageDateRef.current = initialMessages[initialMessages.length - 1].createdAt;
+      }
+    } catch (error) {
+      console.error('Error fetching initial messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchNewMessages = async () => {
+    if (!id) return;
+    try {
+      const url = lastMessageDateRef.current
+        ? `/groups/${id}/messages?after=${lastMessageDateRef.current}`
+        : `/groups/${id}/messages?limit=50`;
+
+      const response = await api.get(url);
+      const newMessages = response.data;
+
+      if (newMessages.length > 0) {
+        setMessages(prev => {
+          // Prevent duplicates by checking IDs
+          const existingIds = new Set(prev.map(m => m.id));
+          const uniqueNewMessages = newMessages.filter((m: Message) => !existingIds.has(m.id));
+
+          if (uniqueNewMessages.length === 0) return prev;
+
+          return [...prev, ...uniqueNewMessages];
+        });
+
+        lastMessageDateRef.current = newMessages[newMessages.length - 1].createdAt;
+      }
+    } catch (error) {
+      // Sliently fail for background polling to avoid console spam
+    }
+  };
+
+  // Fetch group data on mount or ID change
+  useEffect(() => {
+    fetchGroup();
+  }, [id]);
+
+  // Poll for typing users (every 3s instead of 2s)
   useEffect(() => {
     if (!id) return;
-    
     const fetchTypingUsers = async () => {
       try {
         const response = await api.get(`/groups/${id}/typing`);
         setTypingUsers(response.data);
-      } catch (error) {
-        // Silently ignore errors
-      }
+      } catch (error) { /* Silent */ }
     };
-    
     fetchTypingUsers();
-    const typingInterval = setInterval(fetchTypingUsers, 2000);
+    const typingInterval = setInterval(fetchTypingUsers, 3000);
     return () => clearInterval(typingInterval);
   }, [id]);
 
-  // Send typing indicator when user types
+  // Re-add sendTypingIndicator and handleMessageChange that were removed in the bulk replacement
   const sendTypingIndicator = useCallback(async () => {
     if (!id) return;
-    try {
-      await api.post(`/groups/${id}/typing`);
-    } catch (error) {
-      // Silently ignore
-    }
+    try { await api.post(`/groups/${id}/typing`); } catch (error) { /* Silent */ }
   }, [id]);
 
   const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setMessageText(value);
-    
-    // Detectar se está digitando uma menção (@)
+
     const cursorPos = e.target.selectionStart || 0;
     const textBeforeCursor = value.substring(0, cursorPos);
     const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
-    
+
     if (mentionMatch) {
       setShowMentionSuggestions(true);
       setMentionFilter(mentionMatch[1].toLowerCase());
@@ -199,38 +247,28 @@ export default function GroupChatPage() {
       setShowMentionSuggestions(false);
       setMentionFilter('');
     }
-    
-    // Send typing indicator (debounced)
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    typingTimeoutRef.current = setTimeout(() => {
-      sendTypingIndicator();
-    }, 300);
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(sendTypingIndicator, 500);
   };
 
-  // Filtrar membros para sugestões de menção
+  // Re-add mention logic
   const filteredMentionMembers = group?.members.filter(m => {
     const name = (m.user.displayName || m.user.name).toLowerCase();
     return name.includes(mentionFilter) && m.userId !== user?.id;
   }) || [];
 
-  // Inserir menção selecionada
   const insertMention = (member: GroupMember) => {
     if (!inputRef.current) return;
-    
     const cursorPos = inputRef.current.selectionStart || 0;
     const textBeforeCursor = messageText.substring(0, cursorPos);
     const textAfterCursor = messageText.substring(cursorPos);
-    
-    // Encontrar onde começa o @
     const mentionStart = textBeforeCursor.lastIndexOf('@');
     if (mentionStart === -1) return;
-    
-    const newText = textBeforeCursor.substring(0, mentionStart) + 
-                    `@${member.user.displayName || member.user.name} ` + 
-                    textAfterCursor;
-    
+
+    const newText = textBeforeCursor.substring(0, mentionStart) +
+      `@${member.user.displayName || member.user.name} ` +
+      textAfterCursor;
     setMessageText(newText);
     setShowMentionSuggestions(false);
     setMentionFilter('');
@@ -249,25 +287,13 @@ export default function GroupChatPage() {
     try {
       const response = await api.get(`/groups/${id}`);
       setGroup(response.data);
-      
       const myMember = response.data.members.find((m: GroupMember) => m.userId === user?.id);
-      if (myMember?.nickname) {
-        setNickname(myMember.nickname);
-      }
+      if (myMember?.nickname) setNickname(myMember.nickname);
     } catch (error) {
       console.error('Error fetching group:', error);
       navigate('/groups');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchMessages = async () => {
-    try {
-      const response = await api.get(`/groups/${id}/messages`);
-      setMessages(response.data);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
     }
   };
 
@@ -303,14 +329,14 @@ export default function GroupChatPage() {
     // Store file and show custom confirmation modal
     setPendingImageFile(file);
     setShowImageConfirm(true);
-    
+
     // Clear the input so user can select same file again if needed
     e.target.value = '';
   };
 
   const handleConfirmSendImage = async () => {
     if (!pendingImageFile) return;
-    
+
     setShowImageConfirm(false);
 
     try {
@@ -382,7 +408,7 @@ export default function GroupChatPage() {
 
   const handleUpdateGroupName = async () => {
     if (!newGroupName.trim() || !isAdmin) return;
-    
+
     try {
       await api.put(`/groups/${id}`, { name: newGroupName });
       setShowEditNameModal(false);
@@ -442,283 +468,282 @@ export default function GroupChatPage() {
     <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
       <LuxuriousBackground />
       <Header />
-      
+
       {/* Centralized Chat Container */}
       <div className="max-w-5xl mx-auto px-4 pt-48 pb-6 relative z-10">
         <div className={`h-[calc(100vh-180px)] flex flex-col glass-panel rounded-xl overflow-hidden border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-      {/* Header */}
-      <div className="border-b border-white/10 p-4 flex items-center justify-between bg-black/20">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/groups')}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          
-          <div
-            onClick={isAdmin ? () => setShowEditAvatarModal(true) : undefined}
-            className={`relative ${isAdmin ? 'cursor-pointer group' : ''}`}
-          >
-            {group.avatarUrl ? (
-              <img
-                src={group.avatarUrl}
-                alt={group.name}
-                className="w-10 h-10 rounded-full"
-              />
-            ) : (
-              <div className={`w-10 h-10 rounded-full ${accentBg} flex items-center justify-center`}>
-                <Users className="w-5 h-5 text-white" />
-              </div>
-            )}
-            {isAdmin && (
-              <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Edit className="w-4 h-4 text-white" />
-              </div>
-            )}
-          </div>
-          
-          <div
-            onClick={isAdmin ? () => { setNewGroupName(group.name); setShowEditNameModal(true); } : undefined}
-            className={isAdmin ? 'cursor-pointer group' : ''}
-          >
-            <h1 className="font-semibold text-white flex items-center gap-2">
-              {group.name}
-              {isAdmin && <Edit className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />}
-            </h1>
-            <p className="text-sm text-gray-400">{group.members.length} membros</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {showNSFW ? (
-            <button
-              onClick={() => setShowNSFW(false)}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
-              title="Ocultar conteúdo +18"
-            >
-              <Eye className="w-5 h-5" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowNSFW(true)}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
-              title="Mostrar conteúdo +18"
-            >
-              <EyeOff className="w-5 h-5" />
-            </button>
-          )}
-          
-          <button
-            onClick={() => setShowMembers(true)}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <Users className="w-5 h-5" />
-          </button>
-          
-          <button
-            onClick={() => setShowSettings(true)}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/10">
-        {messages
-          .filter(msg => showNSFW || !msg.isNSFW)
-          .map((msg) => {
-            const isMe = msg.sender.id === user?.id;
-            const displayName = getDisplayName(msg);
-
-            return (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+          {/* Header */}
+          <div className="border-b border-white/10 p-4 flex items-center justify-between bg-black/20">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/groups')}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
               >
-                <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
-                  {!isMe && (
-                    <span className={`text-xs ${themeSecondary} mb-1 ml-2`}>{displayName}</span>
-                  )}
-                  
-                  <div
-                    className={`rounded-2xl px-4 py-2 ${
-                      isMe
-                        ? `${accentBg} text-white`
-                        : `${theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'} ${themeText}`
-                    }`}
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+
+              <div
+                onClick={isAdmin ? () => setShowEditAvatarModal(true) : undefined}
+                className={`relative ${isAdmin ? 'cursor-pointer group' : ''}`}
+              >
+                {group.avatarUrl ? (
+                  <img
+                    src={group.avatarUrl}
+                    alt={group.name}
+                    className="w-10 h-10 rounded-full"
+                  />
+                ) : (
+                  <div className={`w-10 h-10 rounded-full ${accentBg} flex items-center justify-center`}>
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                )}
+                {isAdmin && (
+                  <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Edit className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </div>
+
+              <div
+                onClick={isAdmin ? () => { setNewGroupName(group.name); setShowEditNameModal(true); } : undefined}
+                className={isAdmin ? 'cursor-pointer group' : ''}
+              >
+                <h1 className="font-semibold text-white flex items-center gap-2">
+                  {group.name}
+                  {isAdmin && <Edit className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                </h1>
+                <p className="text-sm text-gray-400">{group.members.length} membros</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {showNSFW ? (
+                <button
+                  onClick={() => setShowNSFW(false)}
+                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                  title="Ocultar conteúdo +18"
+                >
+                  <Eye className="w-5 h-5" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowNSFW(true)}
+                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                  title="Mostrar conteúdo +18"
+                >
+                  <EyeOff className="w-5 h-5" />
+                </button>
+              )}
+
+              <button
+                onClick={() => setShowMembers(true)}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <Users className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setShowSettings(true)}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/10">
+            {messages
+              .filter(msg => showNSFW || !msg.isNSFW)
+              .map((msg) => {
+                const isMe = msg.sender.id === user?.id;
+                const displayName = getDisplayName(msg);
+
+                return (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                   >
-                    {msg.type === 'IMAGE' && msg.imageUrl ? (
-                      <div>
-                        {msg.isNSFW && !showNSFW ? (
-                          <div className="p-4 text-sm opacity-60">
-                            [Conteúdo +18 oculto]
+                    <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
+                      {!isMe && (
+                        <span className={`text-xs ${themeSecondary} mb-1 ml-2`}>{displayName}</span>
+                      )}
+
+                      <div
+                        className={`rounded-2xl px-4 py-2 ${isMe
+                          ? `${accentBg} text-white`
+                          : `${theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'} ${themeText}`
+                          }`}
+                      >
+                        {msg.type === 'IMAGE' && msg.imageUrl ? (
+                          <div>
+                            {msg.isNSFW && !showNSFW ? (
+                              <div className="p-4 text-sm opacity-60">
+                                [Conteúdo +18 oculto]
+                              </div>
+                            ) : (
+                              <img
+                                src={msg.imageUrl}
+                                alt="Shared image"
+                                className="max-w-full rounded-lg"
+                              />
+                            )}
+                            {msg.content && <p className="mt-2">{msg.content}</p>}
                           </div>
                         ) : (
-                          <img
-                            src={msg.imageUrl}
-                            alt="Shared image"
-                            className="max-w-full rounded-lg"
-                          />
+                          <p>{msg.content}</p>
                         )}
-                        {msg.content && <p className="mt-2">{msg.content}</p>}
                       </div>
-                    ) : (
-                      <p>{msg.content}</p>
-                    )}
-                  </div>
-                  
-                  <span className="text-xs text-gray-400 mt-1 ${isMe ? 'mr-2' : 'ml-2'}">
-                    {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
 
-                  {/* Read receipts - small avatars for who has seen the message */}
-                  {isMe && (
-                    <div className="flex -space-x-1 mt-1 mr-2">
-                      {group?.members
-                        .filter(m => m.userId !== user?.id)
-                        .slice(0, 3)
-                        .map((member) => (
-                          <img
-                            key={member.id}
-                            src={member.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.user.name)}&size=16`}
-                            alt={member.user.name}
-                            className="w-4 h-4 rounded-full border border-gray-800"
-                            title={member.user.displayName || member.user.name}
-                          />
-                        ))
-                      }
-                      {(group?.members.length || 0) > 4 && (
-                        <div className="w-4 h-4 rounded-full bg-gray-700 flex items-center justify-center text-[8px] text-white border border-gray-800">
-                          +{(group?.members.length || 0) - 4}
+                      <span className="text-xs text-gray-400 mt-1 ${isMe ? 'mr-2' : 'ml-2'}">
+                        {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+
+                      {/* Read receipts - small avatars for who has seen the message */}
+                      {isMe && (
+                        <div className="flex -space-x-1 mt-1 mr-2">
+                          {group?.members
+                            .filter(m => m.userId !== user?.id)
+                            .slice(0, 3)
+                            .map((member) => (
+                              <img
+                                key={member.id}
+                                src={member.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.user.name)}&size=16`}
+                                alt={member.user.name}
+                                className="w-4 h-4 rounded-full border border-gray-800"
+                                title={member.user.displayName || member.user.name}
+                              />
+                            ))
+                          }
+                          {(group?.members.length || 0) > 4 && (
+                            <div className="w-4 h-4 rounded-full bg-gray-700 flex items-center justify-center text-[8px] text-white border border-gray-800">
+                              +{(group?.members.length || 0) - 4}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
+                  </motion.div>
+                );
+              })}
 
-        {/* Typing Indicator */}
-        <AnimatePresence>
-          {typingUsers.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="flex items-center gap-2 px-4 py-2"
-            >
-              <div className="flex -space-x-2">
-                {typingUsers.slice(0, 3).map((typingUser) => (
-                  <img
-                    key={typingUser.id}
-                    src={typingUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(typingUser.name)}&size=24`}
-                    alt={typingUser.name}
-                    className="w-6 h-6 rounded-full border-2 border-gray-900"
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-sm text-gray-400">
-                  {typingUsers.length === 1 
-                    ? `${typingUsers[0].name} está digitando`
-                    : `${typingUsers.length} pessoas estão digitando`
-                  }
-                </span>
-                {/* Typing dots animation */}
-                <div className="flex gap-0.5">
-                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 bg-black/20 relative">
-        {/* Sugestões de menção */}
-        <AnimatePresence>
-          {showMentionSuggestions && filteredMentionMembers.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-full left-4 right-4 mb-2 bg-gray-900 border border-white/20 rounded-lg shadow-xl overflow-hidden max-h-48 overflow-y-auto"
-            >
-              <div className="p-2 text-xs text-gray-400 border-b border-white/10">Membros do grupo</div>
-              {filteredMentionMembers.slice(0, 5).map((member) => (
-                <button
-                  key={member.id}
-                  type="button"
-                  onClick={() => insertMention(member)}
-                  className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
+            {/* Typing Indicator */}
+            <AnimatePresence>
+              {typingUsers.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="flex items-center gap-2 px-4 py-2"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
-                    {member.user.avatarUrl ? (
-                      <img src={member.user.avatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white/50">
-                        {(member.user.displayName || member.user.name).charAt(0).toUpperCase()}
+                  <div className="flex -space-x-2">
+                    {typingUsers.slice(0, 3).map((typingUser) => (
+                      <img
+                        key={typingUser.id}
+                        src={typingUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(typingUser.name)}&size=24`}
+                        alt={typingUser.name}
+                        className="w-6 h-6 rounded-full border-2 border-gray-900"
+                      />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-gray-400">
+                      {typingUsers.length === 1
+                        ? `${typingUsers[0].name} está digitando`
+                        : `${typingUsers.length} pessoas estão digitando`
+                      }
+                    </span>
+                    {/* Typing dots animation */}
+                    <div className="flex gap-0.5">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 bg-black/20 relative">
+            {/* Sugestões de menção */}
+            <AnimatePresence>
+              {showMentionSuggestions && filteredMentionMembers.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute bottom-full left-4 right-4 mb-2 bg-gray-900 border border-white/20 rounded-lg shadow-xl overflow-hidden max-h-48 overflow-y-auto"
+                >
+                  <div className="p-2 text-xs text-gray-400 border-b border-white/10">Membros do grupo</div>
+                  {filteredMentionMembers.slice(0, 5).map((member) => (
+                    <button
+                      key={member.id}
+                      type="button"
+                      onClick={() => insertMention(member)}
+                      className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
+                    >
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+                        {member.user.avatarUrl ? (
+                          <img src={member.user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white/50">
+                            {(member.user.displayName || member.user.name).charAt(0).toUpperCase()}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">{member.user.displayName || member.user.name}</p>
-                    <p className="text-xs text-gray-400">{member.role}</p>
-                  </div>
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      <div>
+                        <p className="text-white font-medium">{member.user.displayName || member.user.name}</p>
+                        <p className="text-xs text-gray-400">{member.role}</p>
+                      </div>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        <div className="flex items-center gap-2">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleSendImage}
-            className="hidden"
-            id="image-upload"
-          />
-          <label
-            htmlFor="image-upload"
-            className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-            title="Enviar imagem (10 Zions)"
-          >
-            <Image className="w-5 h-5" />
-          </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleSendImage}
+                className="hidden"
+                id="image-upload"
+              />
+              <label
+                htmlFor="image-upload"
+                className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                title="Enviar imagem (10 Zions)"
+              >
+                <Image className="w-5 h-5" />
+              </label>
 
-          <input
-            ref={inputRef}
-            type="text"
-            value={messageText}
-            onChange={handleMessageChange}
-            placeholder="Digite uma mensagem... Use @ para mencionar"
-            className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
-          />
+              <input
+                ref={inputRef}
+                type="text"
+                value={messageText}
+                onChange={handleMessageChange}
+                placeholder="Digite uma mensagem... Use @ para mencionar"
+                className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
+              />
 
-          <button
-            type="submit"
-            disabled={!messageText.trim() || sending}
-            className={`p-2 rounded-full ${accentBg} text-white disabled:opacity-50 transition-all hover:scale-110`}
-          >
-            <Send className="w-5 h-5" />
-          </button>
-        </div>
-      </form>
+              <button
+                type="submit"
+                disabled={!messageText.trim() || sending}
+                className={`p-2 rounded-full ${accentBg} text-white disabled:opacity-50 transition-all hover:scale-110`}
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -832,9 +857,8 @@ export default function GroupChatPage() {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="Digite seu apelido"
-                className={`w-full px-4 py-2 rounded-lg ${
-                  theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'
-                } ${themeText} border-0 focus:outline-none focus:ring-2 focus:ring-${accentColor} mb-4`}
+                className={`w-full px-4 py-2 rounded-lg ${theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'
+                  } ${themeText} border-0 focus:outline-none focus:ring-2 focus:ring-${accentColor} mb-4`}
               />
               <div className="flex gap-2">
                 <button
@@ -876,7 +900,7 @@ export default function GroupChatPage() {
                 <h2 className={`text-xl font-semibold ${themeText}`}>Membros ({group.members.length})</h2>
                 <div className="flex items-center gap-2">
                   {isAdmin && (
-                    <button 
+                    <button
                       onClick={openInviteModal}
                       className={`px-3 py-1.5 rounded-lg ${accentBg} text-white text-sm hover:opacity-90 transition-opacity`}
                     >

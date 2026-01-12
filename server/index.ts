@@ -45,15 +45,34 @@ const PORT = process.env.PORT || 3000;
 app.use(compression());
 
 // Permissive CORS Configuration - MUST be before security headers
+const allowedOrigins = [
+    'https://magazine-frontend.vercel.app',
+    'https://magazine-srt.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
 const corsOptions = {
-    origin: true, // Reflect request origin
-    credentials: true, // Allow cookies if needed (often safest to true even if using tokens)
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        } else {
+            console.log('Blocked by CORS:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control'],
     preflightContinue: false,
     optionsSuccessStatus: 200
 };
 
+// Handle OPTIONS explicitly
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
 // Security Headers (after CORS)

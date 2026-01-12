@@ -137,13 +137,13 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                     </div>
                 </div>
 
-                {/* Price & Action - Horizontal Layout */}
-                <div className="flex items-center justify-between gap-3 mt-4">
-                    {/* Price Display */}
+                {/* Price & Action - Vertical Layout like Color Cards */}
+                <div className="flex flex-col gap-2 mt-4">
+                    {/* Price Display - Centered */}
                     {!pack.isOwned && (
                         pack.rarity === 'LEGENDARY' ? (
-                            <div className="flex items-center gap-1.5">
-                                <div className="flex flex-col">
+                            <div className="flex items-center justify-center gap-1.5">
+                                <div className="flex flex-col text-center">
                                     <span className="text-xs font-medium text-amber-400">
                                         Exclusivo
                                     </span>
@@ -153,7 +153,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center gap-2">
                                 <img 
                                     src="/assets/zions/zion-50.png" 
                                     alt="Zions Points" 
@@ -169,31 +169,30 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                         )
                     )}
 
-                    {/* Action Button */}
+                    {/* Action Button - Full Width */}
                     {(pack.isOwned || pack.rarity !== 'LEGENDARY') && (
                         <button
                             onClick={handleAction}
                             disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
-                            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 flex-shrink-0 ${
+                            className={`w-full py-2.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
                                 pack.isOwned
                                     ? pack.isEquipped
                                         ? 'bg-gray-500/20 text-gray-400 hover:bg-red-500/20 hover:text-red-400'
-                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        : 'text-black'
                                     : isOutOfStock
                                         ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                         : !canAfford
                                             ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
-                                            : 'bg-gradient-to-r hover:opacity-90 text-white'
+                                            : 'text-black'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                             style={{
-                                ...(pack.isOwned && !pack.isEquipped && { backgroundColor: pack.accentColor || '#d4af37' }),
-                                ...(!pack.isOwned && canAfford && !isOutOfStock && {
-                                    backgroundImage: `linear-gradient(to right, ${pack.accentColor || '#d4af37'}, ${adjustBrightness(pack.accentColor || '#d4af37', -20)})`
-                                })
+                                backgroundColor: pack.isOwned 
+                                    ? (pack.isEquipped ? undefined : (pack.accentColor || '#d4af37'))
+                                    : (canAfford && !isOutOfStock ? (pack.accentColor || '#d4af37') : undefined)
                             }}
                         >
                             {loading ? (
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                             ) : pack.isEquipped ? (
                                 'Desequipar'
                             ) : pack.isOwned ? (
@@ -207,9 +206,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                                     <Lock className="w-4 h-4" /> Sem Zions
                                 </>
                             ) : (
-                                <>
-                                    <ShoppingBag className="w-4 h-4" /> Comprar
-                                </>
+                                'Comprar'
                             )}
                         </button>
                     )}

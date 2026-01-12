@@ -138,44 +138,43 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                 </div>
 
                 {/* Price & Action */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex-shrink-0">
-                        {!pack.isOwned && (
-                            pack.rarity === 'LEGENDARY' ? (
-                                <div className="flex items-center gap-1.5">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-medium text-amber-400">
-                                            Exclusivo
-                                        </span>
-                                        <span className={`font-bold text-sm ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                            Supply Box
-                                        </span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-1.5">
-                                    <img 
-                                        src="/assets/zions/zion-50.png" 
-                                        alt="Zions Points" 
-                                        className="w-5 h-5 object-contain flex-shrink-0"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = 'none';
-                                        }}
-                                    />
-                                    <span className={`font-bold text-sm sm:text-base ${theme === 'light' ? 'text-gray-900' : 'text-white'} whitespace-nowrap`}>
-                                        {pack.price.toLocaleString('pt-BR')} Points
+                <div className="flex flex-col gap-3 mt-4">
+                    {/* Price Display */}
+                    {!pack.isOwned && (
+                        pack.rarity === 'LEGENDARY' ? (
+                            <div className="flex items-center justify-center gap-1.5">
+                                <div className="flex flex-col text-center">
+                                    <span className="text-xs font-medium text-amber-400">
+                                        Exclusivo
+                                    </span>
+                                    <span className={`font-bold text-sm ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                        Supply Box
                                     </span>
                                 </div>
-                            )
-                        )}
-                    </div>
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center gap-2">
+                                <img 
+                                    src="/assets/zions/zion-50.png" 
+                                    alt="Zions Points" 
+                                    className="w-5 h-5 object-contain"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                />
+                                <span className={`font-bold text-base ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                    {pack.price.toLocaleString('pt-BR')}
+                                </span>
+                            </div>
+                        )
+                    )}
 
-                    {/* Botão só aparece se NÃO for legendário OU se for owned */}
+                    {/* Action Button - Full Width */}
                     {(pack.isOwned || pack.rarity !== 'LEGENDARY') && (
                         <button
                             onClick={handleAction}
                             disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
-                            className={`w-full sm:w-auto px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 flex-shrink-0 ${
+                            className={`w-full px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
                                 pack.isOwned
                                     ? pack.isEquipped
                                         ? 'bg-gray-500/20 text-gray-400 hover:bg-red-500/20 hover:text-red-400'
@@ -201,15 +200,15 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                                 'Equipar'
                             ) : isOutOfStock ? (
                                 <>
-                                    <Lock className="w-4 h-4 flex-shrink-0" /> <span>Esgotado</span>
+                                    <Lock className="w-4 h-4" /> Esgotado
                                 </>
                             ) : !canAfford ? (
                                 <>
-                                    <Lock className="w-4 h-4 flex-shrink-0" /> <span>Sem Zions</span>
+                                    <Lock className="w-4 h-4" /> Sem Zions
                                 </>
                             ) : (
                                 <>
-                                    <ShoppingBag className="w-4 h-4 flex-shrink-0" /> <span>Comprar</span>
+                                    <ShoppingBag className="w-4 h-4" /> Comprar
                                 </>
                             )}
                         </button>

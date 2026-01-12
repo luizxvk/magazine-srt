@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins, PackageO
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.35';
+const CURRENT_VERSION = '0.3.38';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,89 +33,63 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.37 - RARITY & SUPPLY BOX
+    // v0.3.38 - PROGRESSIVE PRICING & ACHIEVEMENTS
     const updates: UpdateItem[] = [
+        {
+            icon: <PackageOpen className="w-5 h-5 text-blue-500" />,
+            title: '🎁 Supply Box Progressivo',
+            description: '1º do dia é GRÁTIS! Depois: 500, 1000, 2500... Reseta à meia-noite.',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5 text-amber-500" />,
+            title: '🏆 Nova Conquista',
+            description: 'Identidade Revelada: Atualize seu perfil para desbloquear uma nova medalha!',
+            isNew: true
+        },
+        {
+            icon: <Coins className="w-5 h-5 text-green-500" />,
+            title: '💰 Zions Cash',
+            description: 'Melhoria na exibição e uso do seu saldo de Cash ao comprar itens.',
+            isNew: true
+        },
+        // v0.3.37 - RARITY & SUPPLY BOX
         {
             icon: <Sparkles className="w-5 h-5 text-amber-500" />,
             title: '✨ Sistema de Raridades',
-            description: 'Theme Packs agora têm raridades: Comum, Raro, Épico e Lendário! Confira as bordas especiais.',
-            isNew: true
+            description: 'Theme Packs agora têm raridades: Comum, Raro, Épico e Lendário!',
+            // isNew: false
         },
         {
             icon: <PackageOpen className="w-5 h-5 text-blue-500" />,
             title: '🎁 Supply Box Diário',
-            description: 'Abra sua caixa diária na Loja de Personalização para ganhar Packs ou Zions!',
-            isNew: true
-        },
-        {
-            icon: <ShoppingBag className="w-5 h-5 text-green-500" />,
-            title: '🏷️ Mercado Corrigido',
-            description: 'Correções na venda de itens e visualização de raridades no mercado.',
-            isNew: true
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: '🎨 Novos Wallpapers',
-            description: 'Sunset Vibes e Mystic Hunter receberam backgrounds exclusivos em alta definição!',
-            isNew: true
+            description: 'Abra sua caixa diária na Loja de Personalização.',
+            // isNew: false
         },
         // v0.3.36 - THEME PACKS OVERHAUL
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: '🎨 Theme Packs Renovados!',
-            description: 'Novos nomes, paletas de 5 cores autênticas, animações suaves e preços ajustados. Personalize seu perfil!',
-            isNew: true
+            description: 'Novos nomes, paletas de 5 cores autênticas e animações suaves.',
+            // isNew: false
         },
         {
             icon: <Sparkles className="w-5 h-5" />,
             title: '⚡ Chat Ultra Rápido',
-            description: 'Novo sistema otimizado está live! Mais rápido e economiza bateria.',
-            isNew: true
+            description: 'Novo sistema otimizado está live!',
+            // isNew: false
         },
         {
             icon: <Coins className="w-5 h-5" />,
             title: '💰 Sistema de Moeda Dual!',
-            description: 'Zions Cash para produtos reais e Zions Points para customizações. Ganhe 10% cashback em Points!',
-            isNew: true
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: '🎨 10 Packs de Tema!',
-            description: 'Arc Raiders, Cyberpunk, Red Dead, Witcher, Resident Evil, Valorant, Elden Ring, God of War, Stray e Hollow Knight!',
-            isNew: true
+            description: 'Zions Cash para produtos reais e Zions Points para customizações.',
+            // isNew: false
         },
         {
             icon: <Store className="w-5 h-5" />,
             title: '📦 Mercado de Packs',
-            description: 'Agora você pode VENDER e COMPRAR Theme Packs de outros jogadores no Mercado!',
-            isNew: true
-        },
-        {
-            icon: <Check className="w-5 h-5" />,
-            title: '🎨 Theme Packs v0.3.35',
-            description: 'Cores corrigidas! Arc Raiders, GTA 6, Elden Ring e Cyberpunk com animações únicas. NOVO: Pack GTA 6 Vice City!',
-            isNew: true
-        },
-        {
-            icon: <Radio className="w-5 h-5" />,
-            title: '📻 Rádio 24/7 Waves!',
-            description: 'Ouça synthwave, darksynth, chillwave e spacesynth enquanto navega no feed! 4 estações disponíveis.',
-            isNew: true
-        },
-        {
-            icon: <ShoppingBag className="w-5 h-5" />,
-            title: 'Mercado Dual Currency',
-            description: 'Compre itens no mercado usando Cash ou Points! Conversão: 1 Cash = 100 Points.'
-        },
-        {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'Daily Login Points',
-            description: 'Bônus diário agora concede Zions Points em vez de Zions antigos!'
-        },
-        {
-            icon: <Store className="w-5 h-5" />,
-            title: 'Loja de Produtos',
-            description: 'Compre keys de jogos com Cash e ganhe 10% de volta em Points. Keys enviadas por email!'
+            description: 'Agora você pode VENDER e COMPRAR Theme Packs de outros jogadores!',
+            // isNew: false
         }
     ];
 

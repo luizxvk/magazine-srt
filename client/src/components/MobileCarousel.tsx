@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 interface MobileCarouselProps {
@@ -30,6 +31,7 @@ export default function MobileCarousel({
     onEventsClick 
 }: MobileCarouselProps) {
     const { user, accentColor } = useAuth();
+    const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -58,7 +60,7 @@ export default function MobileCarousel({
             subtitle: 'Explore as fotos da comunidade',
             icon: <Camera className="w-6 h-6" />,
             gradient: 'from-pink-500 to-rose-600',
-            onClick: () => window.location.href = '/photos'
+            onClick: () => navigate('/photos')
         },
         {
             id: 'events',
@@ -82,7 +84,7 @@ export default function MobileCarousel({
             subtitle: 'Os melhores momentos',
             icon: <Star className="w-6 h-6" />,
             gradient: 'from-yellow-500 to-amber-600',
-            onClick: () => {} // TODO: Implementar modal de destaques
+            onClick: () => navigate('/highlights')
         },
         {
             id: 'feedback',
@@ -90,7 +92,7 @@ export default function MobileCarousel({
             subtitle: 'Sua opinião importa!',
             icon: <MessageSquare className="w-6 h-6" />,
             gradient: 'from-emerald-500 to-teal-600',
-            onClick: () => {} // Scroll to feedback card or open modal
+            onClick: () => navigate('/feedback')
         }
     ];
 

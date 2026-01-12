@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle, Sparkles } from 'lucide-react';
+import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle, Sparkles, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -128,6 +128,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const menuItems = [
         { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
         { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
+        { icon: <ShoppingBag className="w-5 h-5" />, label: 'Loja de Produtos', path: '/store' },
         { icon: <Trophy className="w-5 h-5" />, label: 'Ranking', path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
         { icon: <MessageCircle className="w-5 h-5" />, label: 'Grupos', path: '/groups' },

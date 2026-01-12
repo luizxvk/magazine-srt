@@ -25,6 +25,7 @@ import GroupChatPage from './pages/GroupChatPage';
 import MarketPage from './pages/MarketPage';
 import PhotoCatalogPage from './pages/PhotoCatalogPage';
 import ProductStore from './pages/ProductStore';
+import FeedbackPage from './pages/FeedbackPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
@@ -73,6 +74,8 @@ function App() {
           <Route path="/store" element={<PrivateRoute><ProductStore /></PrivateRoute>} />
           {/* Catálogo de Fotos */}
           <Route path="/catalog" element={<PrivateRoute><PhotoCatalogPage /></PrivateRoute>} />
+          {/* Feedback */}
+          <Route path="/feedback" element={<PrivateRoute><FeedbackPage /></PrivateRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/devtools" element={<AdminRoute><DevToolsPage /></AdminRoute>} />
 

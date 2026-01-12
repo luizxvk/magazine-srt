@@ -52,6 +52,9 @@ export default function RadioCard() {
     const [volume, setVolume] = useState(0.5);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Use user's equipped color or fallback to station color
+    const accentColor = user?.equippedColor || currentStation.color || (isMGT ? '#10b981' : '#d4af37');
+
     // Theme colors - consistent with other cards
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT 
@@ -123,6 +126,7 @@ export default function RadioCard() {
     };
 
     const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation(); // Prevent any bubbling that might stop playback
         const newVolume = parseFloat(e.target.value);
         setVolume(newVolume);
         if (audioRef.current) {
@@ -139,22 +143,13 @@ export default function RadioCard() {
         <div className={`w-full ${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} transition-all duration-300 overflow-hidden`}>
             {/* Header */}
             <div className="relative p-4">
-                {/* Badge "AO VIVO" no canto superior direito */}
-                {isPlaying && (
-                    <div className="absolute top-4 right-4 z-10">
-                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse">
-                            AO VIVO
-                        </span>
-                    </div>
-                )}
-
                 {/* Animated Background Effect */}
                 {isPlaying && (
                     <div className="absolute inset-0 opacity-10 pointer-events-none">
                         <div 
                             className="absolute inset-0 animate-pulse"
                             style={{
-                                background: `radial-gradient(circle at 30% 50%, ${currentStation.color}40 0%, transparent 50%)`
+                                background: `radial-gradient(circle at 30% 50%, ${accentColor}40 0%, transparent 50%)`
                             }}
                         />
                     </div>
@@ -164,14 +159,14 @@ export default function RadioCard() {
                     {/* Radio Icon */}
                     <div 
                         className="relative w-14 h-14 rounded-xl flex items-center justify-center backdrop-blur-sm"
-                        style={{ backgroundColor: `${currentStation.color}15` }}
+                        style={{ backgroundColor: `${accentColor}15` }}
                     >
                         <Radio 
                             className="w-7 h-7" 
-                            style={{ color: currentStation.color }}
+                            style={{ color: accentColor }}
                         />
                         {isPlaying && (
-                            <div className="absolute inset-0 rounded-xl animate-ping opacity-20" style={{ backgroundColor: currentStation.color }} />
+                            <div className="absolute inset-0 rounded-xl animate-ping opacity-20" style={{ backgroundColor: accentColor }} />
                         )}
                     </div>
 
@@ -184,6 +179,16 @@ export default function RadioCard() {
                             {currentStation.genre}
                         </p>
                     </div>
+
+                    {/* Badge "AO VIVO" no canto direito */}
+                    {isPlaying && (
+                        <div className="flex-shrink-0">
+                            <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                Ao Vivo
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -202,7 +207,7 @@ export default function RadioCard() {
                                         ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         : 'bg-white/5 text-gray-400 hover:bg-white/10'
                             }`}
-                            style={currentStation.id === station.id ? { backgroundColor: station.color } : {}}
+                            style={currentStation.id === station.id ? { backgroundColor: accentColor } : {}}
                         >
                             {station.name.split(' ')[0]}
                         </button>
@@ -216,7 +221,7 @@ export default function RadioCard() {
                         onClick={togglePlay}
                         disabled={isLoading}
                         className="relative w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
-                        style={{ backgroundColor: currentStation.color }}
+                        style={{ backgroundColor: accentColor }}
                     >
                         {isLoading ? (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -251,9 +256,11 @@ export default function RadioCard() {
                             step="0.01"
                             value={volume}
                             onChange={handleVolumeChange}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
                             className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
                             style={{
-                                background: `linear-gradient(to right, ${currentStation.color} 0%, ${currentStation.color} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} 100%)`
+                                background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} 100%)`
                             }}
                         />
 

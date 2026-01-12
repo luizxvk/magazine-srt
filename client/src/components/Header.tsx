@@ -12,6 +12,7 @@ import WhatsNewModal from './WhatsNewModal';
 import GroupChatCard from './GroupChatCard';
 import CustomizationShop from './CustomizationShop';
 import VisitorBlockPopup from './VisitorBlockPopup';
+import RadioCard from './RadioCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 import { getContrastColor } from '../utils/colorUtils';
@@ -559,6 +560,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <div className="flex-1 overflow-y-auto px-4 py-2">
                                 <div className="flex flex-col gap-4 mb-4">
                                     <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileDrawerOpen(false); openDailyLoginModal(); }} />
+                                    <RadioCard />
                                     <OnlineFriendsCard />
                                     <div className="md:hidden">
                                         <GroupChatCard />

@@ -246,7 +246,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             setNotification({ type: 'success', message: response.data.message });
 
             // Optimistically update owned packs to reflect change immediately
-            setUserPacks(prev => [...prev, { themePackId: packId }]);
+            setUserPacks(prev => [...prev, { packId: packId }]);
 
             fetchThemePacks(); // Refresh packs data for stock counts etc
             fetchUserCustomizations(); // Refresh zions balance
@@ -382,8 +382,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
-                                        ? `text-${themeColor}-400 border-b-2 border-${themeColor}-400 bg-${themeColor}-500/5`
-                                        : `${textSub} ${isDarkMode ? 'hover:text-white hover:bg-white/5' : 'hover:text-gray-900 hover:bg-gray-100'}`
+                                    ? `text-${themeColor}-400 border-b-2 border-${themeColor}-400 bg-${themeColor}-500/5`
+                                    : `${textSub} ${isDarkMode ? 'hover:text-white hover:bg-white/5' : 'hover:text-gray-900 hover:bg-gray-100'}`
                                     }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -417,7 +417,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {themePacks.map(pack => {
-                                            const isOwned = userPacks.some(up => up.themePackId === pack.id);
+                                            // Check both packId (server) and themePackId (legacy/optimistic)
+                                            const isOwned = userPacks.some(up => (up.packId === pack.id) || (up.themePackId === pack.id));
                                             const isEquipped = user?.equippedBackground === pack.backgroundUrl &&
                                                 user?.equippedColor === pack.accentColor;
 
@@ -483,8 +484,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         <button
                                                                             onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
                                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
-                                                                                    ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
-                                                                                    : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {equipped ? 'Desequipar' : 'Equipar'}
@@ -494,8 +495,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                             onClick={() => handlePurchase(item)}
                                                                             disabled={purchasing === item.id || (user?.zions || 0) < item.price}
                                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
-                                                                                    ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
-                                                                                    : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
@@ -563,8 +564,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         <button
                                                                             onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
                                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
-                                                                                    ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
-                                                                                    : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {equipped ? 'Desequipar' : 'Equipar'}
@@ -574,8 +575,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                             onClick={() => handlePurchase(item)}
                                                                             disabled={purchasing === item.id || (user?.zions || 0) < item.price}
                                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
-                                                                                    ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
-                                                                                    : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
@@ -665,8 +666,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         <button
                                                             onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
-                                                                    ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
-                                                                    : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                 }`}
                                                         >
                                                             {equipped ? 'Desequipar' : 'Equipar'}
@@ -676,8 +677,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                             onClick={() => handlePurchase(item)}
                                                             disabled={purchasing === item.id || (user?.zions || 0) < item.price}
                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${(user?.zions || 0) < item.price
-                                                                    ? `${isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-300 text-gray-400'} cursor-not-allowed`
-                                                                    : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
+                                                                ? `${isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-300 text-gray-400'} cursor-not-allowed`
+                                                                : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
                                                                 }`}
                                                         >
                                                             {purchasing === item.id ? (

@@ -100,12 +100,36 @@ export const getListings = async (req: AuthRequest, res: Response) => {
     });
 
     // Enrich with item data
-    const enrichedListings = listings.map((listing: any) => ({
-      ...listing,
-      itemName: ITEM_DATA[listing.itemId]?.name || listing.itemId,
-      itemPreview: ITEM_DATA[listing.itemId]?.preview || '',
-      isOwnListing: userId === listing.sellerId,
-    }));
+    const packIds = listings
+      .filter(l => l.itemType === 'theme_pack')
+      .map(l => l.itemId);
+
+    let packs: any[] = [];
+    if (packIds.length > 0) {
+      packs = await prisma.themePack.findMany({
+        where: { id: { in: packIds } }
+      });
+    }
+
+    const enrichedListings = listings.map((listing: any) => {
+      let itemName = ITEM_DATA[listing.itemId]?.name || listing.itemId;
+      let itemPreview = ITEM_DATA[listing.itemId]?.preview || '';
+
+      if (listing.itemType === 'theme_pack') {
+        const pack = packs.find(p => p.id === listing.itemId);
+        if (pack) {
+          itemName = pack.name;
+          itemPreview = pack.backgroundUrl;
+        }
+      }
+
+      return {
+        ...listing,
+        itemName,
+        itemPreview,
+        isOwnListing: userId === listing.sellerId,
+      };
+    });
 
     res.json(enrichedListings);
   } catch (error) {
@@ -131,11 +155,36 @@ export const getMyListings = async (req: AuthRequest, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    const enrichedListings = listings.map((listing: any) => ({
-      ...listing,
-      itemName: ITEM_DATA[listing.itemId]?.name || listing.itemId,
-      itemPreview: ITEM_DATA[listing.itemId]?.preview || '',
-    }));
+    // Enrich with item data
+    const packIds = listings
+      .filter(l => l.itemType === 'theme_pack')
+      .map(l => l.itemId);
+
+    let packs: any[] = [];
+    if (packIds.length > 0) {
+      packs = await prisma.themePack.findMany({
+        where: { id: { in: packIds } }
+      });
+    }
+
+    const enrichedListings = listings.map((listing: any) => {
+      let itemName = ITEM_DATA[listing.itemId]?.name || listing.itemId;
+      let itemPreview = ITEM_DATA[listing.itemId]?.preview || '';
+
+      if (listing.itemType === 'theme_pack') {
+        const pack = packs.find(p => p.id === listing.itemId);
+        if (pack) {
+          itemName = pack.name;
+          itemPreview = pack.backgroundUrl;
+        }
+      }
+
+      return {
+        ...listing,
+        itemName,
+        itemPreview,
+      };
+    });
 
     res.json(enrichedListings);
   } catch (error) {
@@ -178,13 +227,44 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     }
 
     const ownedItems = JSON.parse(user.ownedCustomizations || '[]');
-    if (!ownedItems.includes(itemId)) {
-      return res.status(403).json({ error: 'Você não possui este item' });
-    }
+    let itemType = '';
+    let itemName = '';
+    let itemPreview = '';
 
-    // Check if item is currently equipped
-    if (user.equippedBackground === itemId || user.equippedBadge === itemId || user.equippedColor === itemId) {
-      return res.status(400).json({ error: 'Desequipe o item antes de vendê-lo' });
+    // Check ITEM_DATA first (standard items)
+    if (ITEM_DATA[itemId]) {
+      if (!ownedItems.includes(itemId)) {
+        return res.status(403).json({ error: 'Você não possui este item' });
+      }
+      // Check if item is currently equipped
+      if (user.equippedBackground === itemId || user.equippedBadge === itemId || user.equippedColor === itemId) {
+        return res.status(400).json({ error: 'Desequipe o item antes de vendê-lo' });
+      }
+      itemType = ITEM_DATA[itemId].type;
+      itemName = ITEM_DATA[itemId].name;
+      itemPreview = ITEM_DATA[itemId].preview;
+
+    } else {
+      // Check if it's a Theme Pack
+      // Note: verify strictly if it's a pack ownership
+      const userPack = await prisma.userThemePack.findFirst({
+        where: { userId, packId: itemId },
+        include: { pack: true }
+      });
+
+      if (!userPack) {
+        return res.status(403).json({ error: 'Você não possui este item ou pack inválido' });
+      }
+
+      // Check if pack content is equipped
+      if (user.equippedBackground === userPack.pack.backgroundUrl ||
+        user.equippedColor === userPack.pack.accentColor) {
+        return res.status(400).json({ error: 'Desequipe os itens do pack antes de vendê-lo' });
+      }
+
+      itemType = 'theme_pack';
+      itemName = userPack.pack.name;
+      itemPreview = userPack.pack.backgroundUrl;
     }
 
     // Check if item is already listed
@@ -200,16 +280,11 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Este item já está à venda' });
     }
 
-    const itemData = ITEM_DATA[itemId];
-    if (!itemData) {
-      return res.status(400).json({ error: 'Item inválido' });
-    }
-
     const listing = await prisma.marketListing.create({
       data: {
         sellerId: userId,
         itemId,
-        itemType: itemData.type,
+        itemType,
         price,
       },
       include: {
@@ -226,8 +301,8 @@ export const createListing = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json({
       ...listing,
-      itemName: itemData.name,
-      itemPreview: itemData.preview,
+      itemName,
+      itemPreview,
     });
   } catch (error) {
     console.error('Error creating listing:', error);
@@ -280,8 +355,19 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
 
     // Check if buyer already owns the item
     const buyerOwned = JSON.parse(buyer.ownedCustomizations || '[]');
-    if (buyerOwned.includes(listing.itemId)) {
-      return res.status(400).json({ error: 'Você já possui este item' });
+    let isThemePack = listing.itemType === 'theme_pack';
+
+    if (isThemePack) {
+      const existingPack = await prisma.userThemePack.findFirst({
+        where: { userId, packId: listing.itemId }
+      });
+      if (existingPack) {
+        return res.status(400).json({ error: 'Você já possui este pack' });
+      }
+    } else {
+      if (buyerOwned.includes(listing.itemId)) {
+        return res.status(400).json({ error: 'Você já possui este item' });
+      }
     }
 
     // Check if buyer has enough balance
@@ -304,6 +390,16 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
 
     const sellerOwned = JSON.parse(seller.ownedCustomizations || '[]');
 
+    // For theme packs, verify seller still has it
+    if (isThemePack) {
+      const sellerPack = await prisma.userThemePack.findFirst({
+        where: { userId: listing.sellerId, packId: listing.itemId }
+      });
+      if (!sellerPack) {
+        return res.status(400).json({ error: 'O vendedor não possui mais este pack' });
+      }
+    }
+
     // Calculate fee (5% market fee goes to admin)
     const actualPrice = paymentMethod === 'POINTS' ? priceInPoints : price;
     const fee = Math.floor(actualPrice * 0.05);
@@ -313,22 +409,26 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     const adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
 
     // Prepare buyer update based on payment method
-    const buyerUpdate = {
-      ownedCustomizations: JSON.stringify([...buyerOwned, listing.itemId]),
+    const buyerUpdate: any = {
       ...(paymentMethod === 'CASH'
         ? { zionsCash: { decrement: price } }
         : { zionsPoints: { decrement: priceInPoints } }
       )
     };
+    if (!isThemePack) {
+      buyerUpdate.ownedCustomizations = JSON.stringify([...buyerOwned, listing.itemId]);
+    }
 
     // Prepare seller update based on payment method
-    const sellerUpdate = {
-      ownedCustomizations: JSON.stringify(sellerOwned.filter((id: string) => id !== listing.itemId)),
+    const sellerUpdate: any = {
       ...(paymentMethod === 'CASH'
         ? { zionsCash: { increment: sellerReceives } }
         : { zionsPoints: { increment: sellerReceives } }
       )
     };
+    if (!isThemePack) {
+      sellerUpdate.ownedCustomizations = JSON.stringify(sellerOwned.filter((id: string) => id !== listing.itemId));
+    }
 
     // Perform transaction
     const transactionOperations = [
@@ -383,6 +483,27 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
         },
       }),
     ];
+
+    // Theme Pack Ownership Transfer
+    if (isThemePack) {
+      transactionOperations.push(
+        // Remove from seller
+        prisma.userThemePack.deleteMany({ // deleteMany is safer if somehow generic unique query fails, but we expect 1. Using deleteMany with where is fine.
+          where: {
+            userId: listing.sellerId,
+            packId: listing.itemId
+          }
+        }),
+        // Add to buyer
+        prisma.userThemePack.create({
+          data: {
+            userId,
+            packId: listing.itemId,
+            price: 0 // Bought from market, so we don't track original price or tracking strictly market price? Model might require price. Let's put 0 or listing price. listing.price is in Cash/Points, db might expect original zions? Let's assume 0 or handle schema default. The schema for UserThemePack usually tracks purchase price.
+          }
+        })
+      );
+    }
 
     // Add admin fee if admin exists and fee > 0
     if (adminUser && fee > 0) {

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Store, Search, Tag, ShoppingCart, 
-  X, Zap, History, Package, 
+import {
+  Store, Search, Tag, ShoppingCart,
+  X, Zap, History, Package,
   Image, Award, Palette, Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -62,7 +62,7 @@ export default function MarketPage() {
   const isMGT = user?.membershipType === 'MGT';
 
   const [activeTab, setActiveTab] = useState<TabType>('browse');
-  
+
   // Set active tab from navigation state
   useEffect(() => {
     const state = location.state as { activeTab?: TabType };
@@ -76,6 +76,8 @@ export default function MarketPage() {
   const [stats, setStats] = useState<MarketStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState<string | null>(null);
+
+  const [userPacks, setUserPacks] = useState<any[]>([]);
 
   // Filters
   const [filterType, setFilterType] = useState<FilterType>('all');
@@ -120,8 +122,12 @@ export default function MarketPage() {
         const res = await api.get('/market/transactions');
         setTransactions(res.data);
       } else if (activeTab === 'sell') {
-        const res = await api.get('/users/customizations');
-        setOwnedItems(res.data.owned || []);
+        const [itemsRes, packsRes] = await Promise.all([
+          api.get('/users/customizations'),
+          api.get('/theme-packs/my-packs')
+        ]);
+        setOwnedItems(itemsRes.data.owned || []);
+        setUserPacks(packsRes.data || []);
       }
     } catch (error) {
       console.error('Error fetching market data:', error);
@@ -132,7 +138,7 @@ export default function MarketPage() {
 
   const handleBuy = async (listing: Listing) => {
     if (!user || buyingId) return;
-    
+
     if (user.zions < listing.price) {
       showNotification('error', 'Zions insuficientes!');
       return;
@@ -191,7 +197,7 @@ export default function MarketPage() {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  const filteredListings = listings.filter(l => 
+  const filteredListings = listings.filter(l =>
     l.itemName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -213,10 +219,24 @@ export default function MarketPage() {
 
     if (item.itemType === 'background') {
       return (
-        <div 
-          className={`${sizeClasses[size]} rounded-lg`} 
-          style={{ background: item.itemPreview }} 
+        <div
+          className={`${sizeClasses[size]} rounded-lg shadow-sm`}
+          style={{ background: item.itemPreview, backgroundSize: 'cover', backgroundPosition: 'center' }}
         />
+      );
+    } else if (item.itemType === 'theme_pack') {
+      return (
+        <div
+          className={`${sizeClasses[size]} rounded-lg shadow-sm relative overflow-hidden`}
+        >
+          {/* Background base */}
+          <div className="absolute inset-0" style={{ background: item.itemPreview.split('|')[0] || item.itemPreview }} />
+
+          {/* Accent overlay or badge */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <Package className={`${size === 'sm' ? 'w-5 h-5' : size === 'md' ? 'w-8 h-8' : 'w-10 h-10'} text-white drop-shadow-md`} />
+          </div>
+        </div>
       );
     } else if (item.itemType === 'badge') {
       return (
@@ -226,12 +246,12 @@ export default function MarketPage() {
       );
     } else if (item.itemType === 'color') {
       return (
-        <div 
+        <div
           className={`${sizeClasses[size]} rounded-lg border-4 ${themeBorder}`}
-          style={{ 
-            background: item.itemPreview === 'rgb-dynamic' 
-              ? 'linear-gradient(90deg, #ff0000, #00ff00, #0000ff)' 
-              : item.itemPreview 
+          style={{
+            background: item.itemPreview === 'rgb-dynamic'
+              ? 'linear-gradient(90deg, #ff0000, #00ff00, #0000ff)'
+              : item.itemPreview
           }}
         />
       );
@@ -295,9 +315,22 @@ export default function MarketPage() {
   };
 
   const DEFAULT_ITEMS = ['bg_default', 'badge_crown', 'color_gold'];
-  const sellableItems = ownedItems
+
+  const standardSellableItems = ownedItems
     .filter(id => !DEFAULT_ITEMS.includes(id) && ITEM_DATA[id])
     .map(id => ({ id, ...ITEM_DATA[id] }));
+
+  // Map theme packs to sellable item format
+  // Using pack.id as the ID for the listing. 
+  // IMPORTANT: Backend must distinguish between standard item IDs (strings in JSON) and theme pack IDs (UUIDs)
+  const themePackItems = userPacks.map(up => ({
+    id: up.pack.id,
+    name: up.pack.name,
+    type: 'theme_pack',
+    preview: up.pack.backgroundUrl
+  }));
+
+  const sellableItems = [...standardSellableItems, ...themePackItems];
 
   return (
     <div className={`min-h-screen font-sans selection:${isMGT ? 'bg-emerald-500/30' : 'bg-gold-500/30'} relative`}>
@@ -355,11 +388,10 @@ export default function MarketPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
-                activeTab === tab.id
-                  ? `bg-${themeColor}-500 text-white`
-                  : `${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-gray-100 hover:bg-gray-200'} ${themeText}`
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${activeTab === tab.id
+                ? `bg-${themeColor}-500 text-white`
+                : `${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-gray-100 hover:bg-gray-200'} ${themeText}`
+                }`}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -430,7 +462,7 @@ export default function MarketPage() {
                     <div className={`aspect-square flex items-center justify-center ${isDarkMode ? 'bg-black/20' : 'bg-gray-50'} p-4`}>
                       {renderItemPreview({ itemType: listing.itemType, itemPreview: listing.itemPreview }, 'lg')}
                     </div>
-                    
+
                     {/* Item Info */}
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-1">
@@ -439,8 +471,8 @@ export default function MarketPage() {
                       </div>
                       <h3 className={`font-semibold ${themeText} truncate`}>{listing.itemName}</h3>
                       <div className="flex items-center gap-2 mt-2">
-                        <img 
-                          src={listing.seller.avatarUrl || '/default-avatar.png'} 
+                        <img
+                          src={listing.seller.avatarUrl || '/default-avatar.png'}
                           alt={listing.seller.displayName || listing.seller.name}
                           className="w-5 h-5 rounded-full"
                         />
@@ -448,13 +480,13 @@ export default function MarketPage() {
                           {listing.seller.displayName || listing.seller.name}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
                         <div className="flex items-center gap-1">
                           <Zap className={`w-4 h-4 text-${themeColor}-400`} />
                           <span className={`font-bold text-${themeColor}-400`}>{listing.price}</span>
                         </div>
-                        
+
                         {listing.isOwnListing ? (
                           <span className={`text-xs ${themeSecondary}`}>Seu anúncio</span>
                         ) : (
@@ -489,7 +521,7 @@ export default function MarketPage() {
             <p className={`${themeSecondary} mb-6`}>
               Coloque seus itens à venda e ganhe Zions! Taxa de 5% sobre cada venda.
             </p>
-            
+
             {sellableItems.length === 0 ? (
               <div className="text-center py-8">
                 <Package className={`w-12 h-12 mx-auto mb-3 ${themeSecondary}`} />
@@ -545,11 +577,10 @@ export default function MarketPage() {
                     <div className="flex items-center gap-4 mt-1">
                       <span className={`text-sm ${themeSecondary} capitalize`}>{listing.itemType}</span>
                       <span className={`text-sm font-medium text-${themeColor}-400`}>{listing.price} Zions</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        listing.status === 'ACTIVE' 
-                          ? 'bg-green-500/20 text-green-400' 
-                          : 'bg-gray-500/20 text-gray-400'
-                      }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${listing.status === 'ACTIVE'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-gray-500/20 text-gray-400'
+                        }`}>
                         {listing.status === 'ACTIVE' ? 'Ativo' : 'Vendido'}
                       </span>
                     </div>
@@ -591,11 +622,10 @@ export default function MarketPage() {
                   <div className="flex-1">
                     <h3 className={`font-semibold ${themeText}`}>{tx.itemName}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        tx.type === 'purchase'
-                          ? 'bg-blue-500/20 text-blue-400'
-                          : 'bg-green-500/20 text-green-400'
-                      }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${tx.type === 'purchase'
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : 'bg-green-500/20 text-green-400'
+                        }`}>
                         {tx.type === 'purchase' ? 'Compra' : 'Venda'}
                       </span>
                       <span className={`text-sm ${themeSecondary}`}>
@@ -710,9 +740,8 @@ export default function MarketPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl z-[200] shadow-xl backdrop-blur-md ${
-              notification.type === 'success' ? 'bg-green-500/30 text-green-300 border border-green-500/40' : 'bg-red-500/30 text-red-300 border border-red-500/40'
-            }`}
+            className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl z-[200] shadow-xl backdrop-blur-md ${notification.type === 'success' ? 'bg-green-500/30 text-green-300 border border-green-500/40' : 'bg-red-500/30 text-red-300 border border-red-500/40'
+              }`}
           >
             <span className="font-medium">{notification.message}</span>
           </motion.div>

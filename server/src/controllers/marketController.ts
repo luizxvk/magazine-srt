@@ -240,9 +240,14 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { listingId } = req.params;
+    const { paymentMethod = 'CASH' } = req.body; // 'CASH' or 'POINTS'
 
     if (!userId) {
       return res.status(401).json({ error: 'Não autenticado' });
+    }
+
+    if (!['CASH', 'POINTS'].includes(paymentMethod)) {
+      return res.status(400).json({ error: 'Método de pagamento inválido' });
     }
 
     // Get listing
@@ -264,7 +269,11 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     }
 
     // Get buyer
-    const buyer = await prisma.user.findUnique({ where: { id: userId } });
+    const buyer = await prisma.user.findUnique({ 
+      where: { id: userId },
+      select: { id: true, zionsCash: true, zionsPoints: true, ownedCustomizations: true }
+    });
+    
     if (!buyer) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
@@ -275,9 +284,16 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Você já possui este item' });
     }
 
-    // Check if buyer has enough zions
-    if (buyer.zions < listing.price) {
-      return res.status(400).json({ error: 'Zions insuficientes' });
+    // Check if buyer has enough balance
+    const price = listing.price;
+    const priceInPoints = paymentMethod === 'POINTS' ? price * 100 : price; // 1 Cash = 100 Points
+    
+    if (paymentMethod === 'CASH' && buyer.zionsCash < price) {
+      return res.status(400).json({ error: 'Zions Cash insuficiente' });
+    }
+    
+    if (paymentMethod === 'POINTS' && buyer.zionsPoints < priceInPoints) {
+      return res.status(400).json({ error: 'Zions Points insuficientes' });
     }
 
     // Get seller
@@ -289,29 +305,42 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     const sellerOwned = JSON.parse(seller.ownedCustomizations || '[]');
 
     // Calculate fee (5% market fee goes to admin)
-    const fee = Math.floor(listing.price * 0.05);
-    const sellerReceives = listing.price - fee;
+    const actualPrice = paymentMethod === 'POINTS' ? priceInPoints : price;
+    const fee = Math.floor(actualPrice * 0.05);
+    const sellerReceives = actualPrice - fee;
 
     // Find admin user to receive the fee
     const adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+
+    // Prepare buyer update based on payment method
+    const buyerUpdate = {
+      ownedCustomizations: JSON.stringify([...buyerOwned, listing.itemId]),
+      ...(paymentMethod === 'CASH' 
+        ? { zionsCash: { decrement: price } }
+        : { zionsPoints: { decrement: priceInPoints } }
+      )
+    };
+
+    // Prepare seller update based on payment method
+    const sellerUpdate = {
+      ownedCustomizations: JSON.stringify(sellerOwned.filter((id: string) => id !== listing.itemId)),
+      ...(paymentMethod === 'CASH'
+        ? { zionsCash: { increment: sellerReceives } }
+        : { zionsPoints: { increment: sellerReceives } }
+      )
+    };
 
     // Perform transaction
     const transactionOperations = [
       // Deduct from buyer
       prisma.user.update({
         where: { id: userId },
-        data: {
-          zions: { decrement: listing.price },
-          ownedCustomizations: JSON.stringify([...buyerOwned, listing.itemId]),
-        },
+        data: buyerUpdate,
       }),
       // Add to seller (minus fee)
       prisma.user.update({
         where: { id: listing.sellerId },
-        data: {
-          zions: { increment: sellerReceives },
-          ownedCustomizations: JSON.stringify(sellerOwned.filter((id: string) => id !== listing.itemId)),
-        },
+        data: sellerUpdate,
       }),
       // Mark listing as sold
       prisma.marketListing.update({
@@ -333,8 +362,8 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
       prisma.zionHistory.create({
         data: {
           userId,
-          amount: -listing.price,
-          reason: `Compra no mercado: ${ITEM_DATA[listing.itemId]?.name || listing.itemId}`,
+          amount: -actualPrice,
+          reason: `Compra no mercado: ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
         },
       }),
       // Record zion history for seller
@@ -342,7 +371,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
         data: {
           userId: listing.sellerId,
           amount: sellerReceives,
-          reason: `Venda no mercado: ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (taxa: ${fee} Zions)`,
+          reason: `Venda no mercado: ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (taxa: ${fee} ${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
         },
       }),
       // Create notification for seller
@@ -350,25 +379,29 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
         data: {
           userId: listing.sellerId,
           type: 'SYSTEM',
-          content: `Seu item "${ITEM_DATA[listing.itemId]?.name || listing.itemId}" foi vendido por ${listing.price} Zions! Você recebeu ${sellerReceives} Zions (taxa de 5%).`,
+          content: `Seu item "${ITEM_DATA[listing.itemId]?.name || listing.itemId}" foi vendido por ${actualPrice} ${paymentMethod === 'CASH' ? 'Zions Cash' : 'Zions Points'}! Você recebeu ${sellerReceives} (taxa de 5%).`,
         },
       }),
     ];
 
     // Add admin fee if admin exists and fee > 0
     if (adminUser && fee > 0) {
+      const adminFeeUpdate = paymentMethod === 'CASH'
+        ? { zionsCash: { increment: fee } }
+        : { zionsPoints: { increment: fee } };
+        
       transactionOperations.push(
         // Add fee to admin
         prisma.user.update({
           where: { id: adminUser.id },
-          data: { zions: { increment: fee } },
+          data: adminFeeUpdate,
         }),
         // Record admin fee history
         prisma.zionHistory.create({
           data: {
             userId: adminUser.id,
             amount: fee,
-            reason: `Taxa de mercado (5%): ${ITEM_DATA[listing.itemId]?.name || listing.itemId}`,
+            reason: `Taxa de mercado (5%): ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
           },
         })
       );

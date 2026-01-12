@@ -315,7 +315,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
         }
 
         if (!product.priceZions) {
-            return res.status(400).json({ error: 'Este produto não aceita pagamento em Zions' });
+            return res.status(400).json({ error: 'Este produto não aceita pagamento em Zions Cash' });
         }
 
         // Check stock
@@ -326,27 +326,46 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
         const totalCost = product.priceZions * quantity;
 
         // Get user
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (!user || user.zions < totalCost) {
-            return res.status(400).json({ error: 'Zions insuficientes' });
+        const user = await prisma.user.findUnique({ 
+            where: { id: userId },
+            select: { id: true, zionsCash: true, email: true, displayName: true, name: true }
+        });
+        
+        if (!user || user.zionsCash < totalCost) {
+            return res.status(400).json({ error: 'Zions Cash insuficiente' });
         }
+
+        // Calculate 10% cashback in Points
+        const cashbackPoints = Math.floor(totalCost * 10);
 
         // Execute transaction
         const keysToDeliver = product.keys.slice(0, quantity);
 
         const order = await prisma.$transaction(async (tx) => {
-            // Deduct Zions
+            // Deduct Zions Cash and add cashback Points
             await tx.user.update({
                 where: { id: userId },
-                data: { zions: { decrement: totalCost } }
+                data: { 
+                    zionsCash: { decrement: totalCost },
+                    zionsPoints: { increment: cashbackPoints }
+                }
             });
 
-            // Record Zion history
+            // Record Zion history for Cash spent
             await tx.zionHistory.create({
                 data: {
                     userId,
                     amount: -totalCost,
-                    reason: `Compra: ${product.name}`
+                    reason: `Compra: ${product.name} (Cash)`
+                }
+            });
+
+            // Record Zion history for Points cashback
+            await tx.zionHistory.create({
+                data: {
+                    userId,
+                    amount: cashbackPoints,
+                    reason: `Cashback: ${product.name} (10%)`
                 }
             });
 
@@ -413,6 +432,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
                 quantity,
                 totalZions: totalCost
             },
+            cashbackPoints,
             emailSent: !!user.email
         });
     } catch (error) {

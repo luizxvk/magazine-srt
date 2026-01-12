@@ -580,16 +580,16 @@ export const purchaseCustomization = async (req: AuthRequest, res: Response) => 
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { zions: true, ownedCustomizations: true }
+            select: { zionsPoints: true, ownedCustomizations: true }
         });
 
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Check if user has enough Zions
-        if (user.zions < item.price) {
-            return res.status(400).json({ error: 'Not enough Zions' });
+        // Check if user has enough Zions Points
+        if (user.zionsPoints < item.price) {
+            return res.status(400).json({ error: 'Not enough Zions Points' });
         }
 
         // Check if already owned
@@ -598,13 +598,13 @@ export const purchaseCustomization = async (req: AuthRequest, res: Response) => 
             return res.status(400).json({ error: 'Item already owned' });
         }
 
-        // Purchase: deduct Zions and add to owned
+        // Purchase: deduct Zions Points and add to owned
         owned.push(itemId);
 
         await prisma.user.update({
             where: { id: userId },
             data: {
-                zions: { decrement: item.price },
+                zionsPoints: { decrement: item.price },
                 ownedCustomizations: JSON.stringify(owned)
             }
         });
@@ -612,7 +612,7 @@ export const purchaseCustomization = async (req: AuthRequest, res: Response) => 
         res.json({ 
             success: true, 
             message: `${item.name} purchased successfully!`,
-            newBalance: user.zions - item.price,
+            newBalance: user.zionsPoints - item.price,
             owned 
         });
     } catch (error) {

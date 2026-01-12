@@ -342,7 +342,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                     Pacotes temáticos exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.
                                 </p>
                                 <div className={`px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm`}>
-                                    🚀 Em breve! Aguarde os primeiros packs...
+                                    Em breve mais packs de temas
                                 </div>
                             </div>
                         ) : activeTab === 'color' ? (

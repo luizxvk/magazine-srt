@@ -460,7 +460,7 @@ export const dailyLogin = async (req: Request, res: Response) => {
         await prisma.$transaction([
             prisma.user.update({
                 where: { id: userId },
-                data: { zions: { increment: amount } }
+                data: { zionsPoints: { increment: amount } }
             }),
             prisma.zionHistory.create({
                 data: {

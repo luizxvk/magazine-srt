@@ -49,7 +49,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        imageUrl: '',
+        imageFile: null as File | null,
+        imagePreview: '',
+        existingImageUrl: '',
         category: 'GAME_KEY',
         priceZions: '',
         priceBRL: '',
@@ -78,10 +80,20 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
         setSubmitting(true);
 
         try {
+            // Convert image to base64 if file selected
+            let imageBase64: string | undefined;
+            if (formData.imageFile) {
+                imageBase64 = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.readAsDataURL(formData.imageFile!);
+                });
+            }
+
             const data = {
                 name: formData.name,
                 description: formData.description,
-                imageUrl: formData.imageUrl || undefined,
+                imageBase64: imageBase64,
                 category: formData.category,
                 priceZions: formData.priceZions ? parseInt(formData.priceZions) : undefined,
                 priceBRL: formData.priceBRL ? parseFloat(formData.priceBRL) : undefined,
@@ -149,7 +161,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
         setFormData({
             name: '',
             description: '',
-            imageUrl: '',
+            imageFile: null,
+            imagePreview: '',
+            existingImageUrl: '',
             category: 'GAME_KEY',
             priceZions: '',
             priceBRL: '',
@@ -163,7 +177,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
         setFormData({
             name: product.name,
             description: product.description,
-            imageUrl: product.imageUrl || '',
+            imageFile: null,
+            imagePreview: '',
+            existingImageUrl: product.imageUrl || '',
             category: product.category,
             priceZions: product.priceZions?.toString() || '',
             priceBRL: product.priceBRL?.toString() || '',
@@ -392,16 +408,57 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                     />
                                 </div>
 
-                                {/* Image URL */}
+                                {/* Image Upload */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">URL da Imagem (opcional)</label>
-                                    <input
-                                        type="url"
-                                        value={formData.imageUrl}
-                                        onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                                        placeholder="https://..."
-                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-                                    />
+                                    <label className="block text-sm font-medium text-gray-400 mb-1">Imagem do Produto (16:9 - 800x450)</label>
+                                    <div className="space-y-3">
+                                        {/* Preview */}
+                                        {(formData.imagePreview || formData.existingImageUrl) && (
+                                            <div className="relative aspect-video w-full max-w-[300px] rounded-lg overflow-hidden bg-white/5">
+                                                <img 
+                                                    src={formData.imagePreview || formData.existingImageUrl} 
+                                                    alt="Preview" 
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, imageFile: null, imagePreview: '', existingImageUrl: '' })}
+                                                    className="absolute top-2 right-2 p-1 bg-red-500/80 hover:bg-red-500 rounded-full transition-colors"
+                                                >
+                                                    <X className="w-4 h-4 text-white" />
+                                                </button>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Upload Button */}
+                                        <label className={`flex items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-white/20 hover:border-emerald-500/50 cursor-pointer transition-colors ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
+                                            <Upload className="w-5 h-5 text-emerald-500" />
+                                            <span className="text-sm text-gray-400">
+                                                {formData.imageFile ? formData.imageFile.name : 'Clique para selecionar imagem'}
+                                            </span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onload = () => {
+                                                            setFormData({ 
+                                                                ...formData, 
+                                                                imageFile: file,
+                                                                imagePreview: reader.result as string,
+                                                                existingImageUrl: ''
+                                                            });
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                        <p className="text-xs text-gray-500">Recomendado: 800x450px (16:9). A imagem será redimensionada automaticamente.</p>
+                                    </div>
                                 </div>
 
                                 {/* Category */}

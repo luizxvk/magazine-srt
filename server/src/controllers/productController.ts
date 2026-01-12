@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
+import { uploadProductImage } from '../services/cloudinaryService';
 
 // ===================== PRODUCT MANAGEMENT (Admin) =====================
 
@@ -8,13 +9,19 @@ import prisma from '../utils/prisma';
  */
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { name, description, imageUrl, category, priceZions, priceBRL, stock, isUnlimited } = req.body;
+        const { name, description, imageBase64, category, priceZions, priceBRL, stock, isUnlimited } = req.body;
         const userId = (req as any).userId;
 
         // Verify admin
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user || user.role !== 'ADMIN') {
             return res.status(403).json({ error: 'Apenas administradores podem criar produtos' });
+        }
+
+        // Upload image if provided
+        let imageUrl: string | null = null;
+        if (imageBase64) {
+            imageUrl = await uploadProductImage(imageBase64);
         }
 
         const product = await prisma.product.create({
@@ -44,7 +51,7 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { name, description, imageUrl, category, priceZions, priceBRL, stock, isUnlimited, isActive } = req.body;
+        const { name, description, imageBase64, category, priceZions, priceBRL, stock, isUnlimited, isActive } = req.body;
         const userId = (req as any).userId;
 
         // Verify admin
@@ -53,19 +60,34 @@ export const updateProduct = async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Apenas administradores podem editar produtos' });
         }
 
+        // Upload new image if provided
+        let imageUrl: string | undefined = undefined;
+        if (imageBase64) {
+            const uploadedUrl = await uploadProductImage(imageBase64);
+            if (uploadedUrl) {
+                imageUrl = uploadedUrl;
+            }
+        }
+
+        const updateData: any = {
+            name,
+            description,
+            category,
+            priceZions,
+            priceBRL,
+            stock,
+            isUnlimited,
+            isActive
+        };
+
+        // Only update imageUrl if a new image was uploaded
+        if (imageUrl) {
+            updateData.imageUrl = imageUrl;
+        }
+
         const product = await prisma.product.update({
             where: { id },
-            data: {
-                name,
-                description,
-                imageUrl,
-                category,
-                priceZions,
-                priceBRL,
-                stock,
-                isUnlimited,
-                isActive
-            }
+            data: updateData
         });
 
         res.json(product);

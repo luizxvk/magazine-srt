@@ -4,6 +4,7 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { uploadAvatar } from '../services/cloudinaryService';
+import { sendAdminPasswordResetEmail } from '../services/emailService';
 
 // ... existing code ...
 
@@ -138,6 +139,16 @@ export const resetUserPassword = async (req: AuthRequest, res: Response) => {
 
         const { id } = req.params;
 
+        // Get user to reset
+        const targetUser = await prisma.user.findUnique({
+            where: { id },
+            select: { email: true, name: true }
+        });
+
+        if (!targetUser) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
         // Generate random password
         const generatedPassword = Math.random().toString(36).slice(-8);
         const salt = await bcrypt.genSalt(10);
@@ -148,10 +159,28 @@ export const resetUserPassword = async (req: AuthRequest, res: Response) => {
             data: { passwordHash }
         });
 
-        res.json({ message: 'Password reset successfully', generatedPassword });
+        // Send password via email - NEVER return the password to the admin
+        const emailSent = await sendAdminPasswordResetEmail(
+            targetUser.email,
+            generatedPassword,
+            targetUser.name
+        );
+
+        if (emailSent) {
+            res.json({ 
+                success: true,
+                message: 'Nova senha enviada para o email do usuário'
+            });
+        } else {
+            // Password was changed but email failed - still don't expose the password
+            res.json({ 
+                success: true,
+                message: 'Senha alterada. O email não pôde ser enviado, peça ao usuário para usar "Esqueci minha senha".'
+            });
+        }
     } catch (error) {
         console.error('Error resetting password:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Erro ao resetar senha' });
     }
 };
 

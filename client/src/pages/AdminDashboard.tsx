@@ -165,21 +165,18 @@ export default function AdminDashboard() {
     };
 
     const handleResetPassword = async (userId: string, userName: string) => {
-        if (!window.confirm(`Tem certeza que deseja gerar uma nova senha para ${userName}?`)) return;
+        if (!window.confirm(`Tem certeza que deseja enviar uma nova senha por email para ${userName}?`)) return;
         try {
             const response = await api.post(`/users/${userId}/reset-password`);
-            const password = response.data.generatedPassword;
-
-            showToast(`Senha gerada para ${userName}: ${password} (Copie agora!)`, 'success');
-
-            navigator.clipboard.writeText(password).then(() => {
-                showToast(`Senha copiada!`, 'success');
-            }).catch(() => {
-                alert(`Senha gerada para ${userName}: ${password}`);
-            });
+            
+            if (response.data.success) {
+                showToast(response.data.message, 'success');
+            } else {
+                showToast('Erro ao resetar senha', 'error');
+            }
         } catch (error) {
             console.error('Failed to reset password', error);
-            showToast('Erro ao gerar senha', 'error');
+            showToast('Erro ao enviar nova senha', 'error');
         }
     };
 
@@ -493,9 +490,9 @@ export default function AdminDashboard() {
                                             <button
                                                 onClick={() => handleResetPassword(u.id, u.name)}
                                                 className="text-gray-500 hover:text-white transition-colors p-1"
-                                                title="Resetar Senha"
+                                                title="Enviar Nova Senha por Email"
                                             >
-                                                Resetar Senha
+                                                Enviar Nova Senha
                                             </button>
                                         </td>
                                     </tr>

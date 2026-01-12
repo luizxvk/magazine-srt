@@ -302,3 +302,81 @@ export const sendNewMagazineMemberEmail = async (to: string, userName: string, t
         html
     });
 };
+
+/**
+ * Send admin-generated password reset email
+ * This is used when an admin resets a user's password
+ */
+export const sendAdminPasswordResetEmail = async (to: string, newPassword: string, userName: string): Promise<boolean> => {
+    const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+    
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h1 style="color: #d4af37; font-size: 32px; margin: 0; letter-spacing: 3px;">MAGAZINE</h1>
+                    <p style="color: #666; font-size: 12px; margin-top: 8px; letter-spacing: 2px;">A ELITE DO SUCESSO</p>
+                </div>
+
+                <!-- Content -->
+                <div style="background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-radius: 16px; padding: 40px; border: 1px solid rgba(212, 175, 55, 0.2);">
+                    <h2 style="color: #d4af37; font-size: 24px; margin: 0 0 20px 0; text-align: center;">🔐 Sua Senha Foi Redefinida</h2>
+                    
+                    <p style="color: #ccc; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+                        Olá <strong style="color: #d4af37;">${userName}</strong>,
+                    </p>
+                    
+                    <p style="color: #ccc; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+                        Um administrador redefiniu sua senha de acesso. Use as credenciais abaixo para fazer login:
+                    </p>
+
+                    <!-- Credentials Box -->
+                    <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 24px; margin: 24px 0;">
+                        <p style="color: #888; font-size: 14px; margin: 0 0 8px 0;">Nova Senha:</p>
+                        <p style="color: #d4af37; font-size: 24px; font-family: monospace; margin: 0; letter-spacing: 2px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center;">
+                            ${newPassword}
+                        </p>
+                    </div>
+
+                    <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 16px; margin: 24px 0;">
+                        <p style="color: #ffc107; font-size: 14px; margin: 0;">
+                            ⚠️ <strong>Recomendação de Segurança:</strong> Altere sua senha assim que fizer login através das configurações da sua conta.
+                        </p>
+                    </div>
+
+                    <!-- Login Button -->
+                    <div style="text-align: center; margin-top: 32px;">
+                        <a href="${frontendUrl}" 
+                           style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8962d 100%); color: #000; text-decoration: none; padding: 14px 40px; border-radius: 8px; font-weight: bold; font-size: 16px; letter-spacing: 1px;">
+                            ACESSAR MAGAZINE
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align: center; margin-top: 40px;">
+                    <p style="color: #666; font-size: 12px; margin-bottom: 8px;">
+                        Se você não solicitou esta alteração, entre em contato com o suporte imediatamente.
+                    </p>
+                    <p style="color: #444; font-size: 12px;">
+                        © ${new Date().getFullYear()} Magazine/MGT. Todos os direitos reservados.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    return sendEmail({
+        to,
+        subject: '🔐 Sua senha foi redefinida - Magazine',
+        html
+    });
+};

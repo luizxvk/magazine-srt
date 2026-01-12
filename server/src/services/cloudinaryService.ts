@@ -122,6 +122,20 @@ export const isCloudinaryUrl = (url: string): boolean => {
 };
 
 /**
+ * Upload product image with optimization (16:9 aspect ratio)
+ */
+export const uploadProductImage = async (base64Data: string): Promise<string | null> => {
+    return uploadToCloudinary(base64Data, {
+        folder: 'magazine-srt/products',
+        transformation: [
+            { width: 800, height: 450, crop: 'fill' }, // 16:9 aspect ratio
+            { quality: 'auto:good' },
+            { fetch_format: 'auto' },
+        ],
+    });
+};
+
+/**
  * Extract public ID from Cloudinary URL
  */
 export const getPublicIdFromUrl = (url: string): string | null => {

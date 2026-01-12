@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Palette, Zap, Image, MessageCircle, Trophy, Bell, VolumeX, Users, Package, AtSign, Move, BadgeCheck, ChevronUp, Wrench, Award, Menu, ScrollText, Shield, Coins, Wallet, ShoppingBag, Key, CreditCard, Gamepad2 } from 'lucide-react';
+import { X, Sparkles, Check, Store, Wallet, ShoppingBag, Key, CreditCard, Gamepad2, ScrollText, Shield, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.0';
+const CURRENT_VERSION = '0.3.24';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,7 +33,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.0 - LOJA DE PRODUTOS & MONETIZAÇÃO!
+    // v0.3.24 - LOJA DE PRODUTOS & MONETIZAÇÃO!
     const updates: UpdateItem[] = [
         {
             icon: <ShoppingBag className="w-5 h-5" />,
@@ -68,7 +68,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         {
             icon: <ScrollText className="w-5 h-5" />,
             title: 'Termos de Serviço',
-            description: 'Ao criar conta, agora você precisa ler e aceitar os Termos de Uso e Política de Privacidade (LGPD)!'
+            description: 'Ao criar conta, agora você precisa aceitar os Termos de Uso e Política de Privacidade (LGPD)!'
         },
         {
             icon: <Coins className="w-5 h-5" />,
@@ -84,192 +84,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Store className="w-5 h-5" />,
             title: 'Botão Loja Sempre Visível',
             description: 'O botão de "Meu Estilo" agora aparece no header de todas as páginas!'
-        },
-        {
-            icon: <ChevronUp className="w-5 h-5" />,
-            title: 'PostPill Mobile Expansível',
-            description: 'No mobile, clique na seta para mostrar/esconder os ícones de ação do widget de post!'
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'PostPill com Cor Destaque',
-            description: 'O widget de criar post agora segue a cor de destaque personalizada!'
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Notificações com Fundo Sólido',
-            description: 'O card de notificações agora tem fundo preto sólido para melhor legibilidade!'
-        },
-        {
-            icon: <Users className="w-5 h-5" />,
-            title: 'Popup Convite Estilizado',
-            description: 'Convites de grupo agora mostram popup bonito ao invés de alert do navegador!'
-        },
-        {
-            icon: <BadgeCheck className="w-5 h-5" />,
-            title: 'Selo Verificado Corrigido',
-            description: 'O ícone de email verificado agora aparece corretamente com sua cor!'
-        },
-        {
-            icon: <Zap className="w-5 h-5" />,
-            title: 'Botão Criar Grupo Dinâmico',
-            description: 'O botão "Criar Grupo" agora segue a cor de destaque do usuário!'
-        },
-        {
-            icon: <Package className="w-5 h-5" />,
-            title: 'Inventário no Mobile',
-            description: 'O card de Inventário agora aparece no drawer de Recomendações para mobile!'
-        },
-        {
-            icon: <Move className="w-5 h-5" />,
-            title: 'Ajuste de Background do Perfil',
-            description: 'Reposicione e ajuste o zoom da imagem de fundo do seu perfil!'
-        },
-        {
-            icon: <AtSign className="w-5 h-5" />,
-            title: 'Menções @usuario',
-            description: 'Mencione usuários no widget de post e em grupos! Eles receberão notificação.'
-        },
-        {
-            icon: <Store className="w-5 h-5" />,
-            title: 'Mercado de Customizações',
-            description: 'Compre e venda itens de customização com outros usuários!'
-        },
-        {
-            icon: <Search className="w-5 h-5" />,
-            title: 'Navegação e Filtros',
-            description: 'Pesquise por nome, filtre por tipo (fundos, selos, cores) e ordene por preço ou data!'
-        },
-        {
-            icon: <Trophy className="w-5 h-5" />,
-            title: 'Histórico de Transações',
-            description: 'Veja todas suas compras e vendas, quanto ganhou/gastou, e acompanhe suas negociações!'
-        },
-        {
-            icon: <VolumeX className="w-5 h-5" />,
-            title: 'Silenciar Grupos',
-            description: 'Mute notificações de grupos individuais! Ícone aparece no título do grupo quando silenciado.'
-        },
-        {
-            icon: <MessageCircle className="w-5 h-5" />,
-            title: 'Sistema de GRUPOS Completo!',
-            description: 'Crie grupos públicos/privados, convide amigos, chat em tempo real, envie imagens!'
-        },
-        {
-            icon: <Award className="w-5 h-5" />,
-            title: 'Selos nos Perfis e Amigos',
-            description: 'Selos de admin agora aparecem nos amigos online e cards de perfil de usuários!',
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'Wallpapers Corrigidos',
-            description: 'Todos os 8 novos fundos (Cyberpunk, Lava, Gelo, etc) agora funcionam corretamente!',
-        },
-        {
-            icon: <Trophy className="w-5 h-5" />,
-            title: 'Conquistas de Outros Usuários',
-            description: 'Ao visitar perfis, agora você vê as conquistas reais daquele usuário!',
-        },
-        {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'RGB Dinâmico Funcional',
-            description: 'Cor RGB agora realmente alterna entre as cores ao invés de ficar travada no vermelho!',
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Editor Stories Apple Vision Pro',
-            description: 'Interface glassmorphism com botão POSTAR redesenhado e loading visual!',
-        },
-        {
-            icon: <Trophy className="w-5 h-5" />,
-            title: 'Timeline de Níveis Corrigida',
-            description: 'Números duplicados removidos - agora aparece apenas no círculo!',
-        },
-        {
-            icon: <MessageCircle className="w-5 h-5" />,
-            title: 'MGT Log no Drawer',
-            description: 'Card do MGT Log agora aparece na barra lateral de recomendações!',
-        },
-        {
-            icon: <Wrench className="w-5 h-5" />,
-            title: 'Grid AdminDashboard',
-            description: 'Dependências instaladas (react-grid-layout). Implementação completa em breve!',
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: '8 Novos Fundos Animados',
-            description: 'Pôr do Sol, Cyberpunk, Lava, Gelo Ártico, Grade Neon e mais!',
-        },
-        {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'Cor RGB Dinâmica',
-            description: 'Cor especial que muda entre Red, Green e Blue automaticamente! (1000 Zions)',
-        },
-        {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'Cores Personalizadas',
-            description: 'Post pill, loading e todos elementos respeitam sua cor escolhida!',
-        },
-        {
-            icon: <Zap className="w-5 h-5" />,
-            title: 'MAGAZINE Animado',
-            description: 'Logo com animação mais rápida e brilhante para maior exclusividade!',
-        },
-        {
-            icon: <Wrench className="w-5 h-5" />,
-            title: 'Textos Originais',
-            description: 'Posts mantêm formatação original sem uppercase forçado.',
-        },
-        {
-            icon: <Wrench className="w-5 h-5" />,
-            title: 'Logout Corrigido',
-            description: 'Cores voltam ao padrão Magazine ao deslogar.',
-        },
-        {
-            icon: <Store className="w-5 h-5" />,
-            title: 'Loja de Personalização',
-            description: 'Compre fundos, badges e cores com Zions para customizar seu perfil!',
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'Temas Personalizados',
-            description: 'Escolha cores de destaque e fundos únicos para sua experiência.',
-        },
-        {
-            icon: <Search className="w-5 h-5" />,
-            title: 'Busca Inteligente',
-            description: 'Nova busca global: encontre páginas, usuários e posts facilmente.',
-        },
-        {
-            icon: <Menu className="w-5 h-5" />,
-            title: 'Menu Mobile Renovado',
-            description: 'Header mais limpo com menu hambúrguer no celular.',
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Editor de Stories',
-            description: 'Adicione textos e stickers aos seus stories antes de postar.',
-        },
-        {
-            icon: <Zap className="w-5 h-5" />,
-            title: 'Modo Lite',
-            description: 'Desative animações para melhor performance em dispositivos mais lentos.',
-        },
-        {
-            icon: <MessageCircle className="w-5 h-5" />,
-            title: 'Chat Estilo Messenger',
-            description: 'Mensagens aparecem no canto da tela como no Facebook.',
-        },
-        {
-            icon: <Trophy className="w-5 h-5" />,
-            title: '12 Conquistas',
-            description: 'Novas conquistas para desbloquear conforme você usa o app.',
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Bônus Diário',
-            description: 'Ganhe Zions todos os dias ao fazer login.',
-        },
+        }
     ];
 
     useEffect(() => {

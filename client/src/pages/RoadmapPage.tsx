@@ -206,28 +206,56 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Users className="w-5 h-5" />,
         category: 'community'
     },
+    {
+        id: '26',
+        title: 'Mercado P2P de Customizações',
+        description: 'Compre e venda itens de personalização (fundos, selos, cores) com outros usuários. Taxa de 5% vai para o admin.',
+        status: 'completed',
+        version: 'v0.3.20',
+        icon: <ShoppingBag className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '27',
+        title: 'Termos de Serviço e LGPD',
+        description: 'Termos de uso e política de privacidade obrigatórios no cadastro, em conformidade com a legislação brasileira.',
+        status: 'completed',
+        version: 'v0.3.23',
+        icon: <Shield className="w-5 h-5" />,
+        category: 'security'
+    },
+    {
+        id: '28',
+        title: 'Loja de Produtos Digitais',
+        description: 'Nova loja para comprar keys de jogos, gift cards, assinaturas usando Zions ou dinheiro real. Keys entregues automaticamente!',
+        status: 'completed',
+        version: 'v0.3.24',
+        icon: <Gamepad2 className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29',
+        title: 'Sistema de Saque de Zions',
+        description: 'Converta Zions em dinheiro real via PIX! Taxa: 100 Zions = R$ 1,00. Min R$10, Max R$1000.',
+        status: 'completed',
+        version: 'v0.3.24',
+        icon: <Zap className="w-5 h-5" />,
+        category: 'feature'
+    },
     
     // ===== IN PROGRESS =====
     {
-        id: '26',
+        id: '30',
         title: 'Sistema de Cores Personalizadas',
         description: 'Cores de destaque personalizadas integradas em todo perfil. Categorização em Cores Básicas e Tom Pastel na loja de personalização.',
         status: 'in-progress',
         icon: <Palette className="w-5 h-5" />,
         category: 'feature'
     },
-    {
-        id: '27',
-        title: 'Navegação por Abas no Mercado',
-        description: 'Sistema de navegação com abas no MarketPage: Loja Zions, Personalização e Catálogo de Fotos com transições suaves.',
-        status: 'in-progress',
-        icon: <ShoppingBag className="w-5 h-5" />,
-        category: 'improvement'
-    },
     
     // ===== PLANNED =====
     {
-        id: '28',
+        id: '31',
         title: 'Revista Digital com IA',
         description: 'Gere revistas digitais automáticas usando IA com base nas fotos do seu catálogo. Layouts profissionais em minutos.',
         status: 'planned',
@@ -235,35 +263,11 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '29',
+        id: '32',
         title: 'Integração com Discord',
         description: 'Sincronize seu perfil e receba notificações no Discord da comunidade.',
         status: 'planned',
         icon: <MessageSquare className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '30',
-        title: 'Integração com Reddit',
-        description: 'Publique automaticamente seus highlights no Reddit e amplie seu alcance.',
-        status: 'planned',
-        icon: <Sparkles className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '31',
-        title: 'Mercado de Itens P2P',
-        description: 'Compre, venda e troque itens exclusivos com outros membros usando Zions.',
-        status: 'planned',
-        icon: <ShoppingBag className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '32',
-        title: 'Sistema de Highlights',
-        description: 'Marque seus melhores posts como highlights e organize em coleções temáticas.',
-        status: 'planned',
-        icon: <Star className="w-5 h-5" />,
         category: 'feature'
     },
     {

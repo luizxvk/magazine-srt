@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, Wallet, ShoppingBag, Key, CreditCard, Gamepa
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.25';
+const CURRENT_VERSION = '0.3.26';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,30 +33,28 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.25 - MELHORIAS NA LOJA DE PRODUTOS!
+    // v0.3.26 - CARROSSEL MOBILE!
     const updates: UpdateItem[] = [
         {
-            icon: <Mail className="w-5 h-5" />,
-            title: '📧 KEYS POR EMAIL!',
-            description: 'Agora as keys compradas são enviadas diretamente para seu email cadastrado! Mais seguro e prático.',
+            icon: <ShoppingBag className="w-5 h-5" />,
+            title: '🎠 CARROSSEL MOBILE!',
+            description: 'Novo carrossel de acesso rápido no celular! Bônus Diário, Eventos, Fotos e mais na ponta dos dedos.',
             isNew: true
         },
         {
-            icon: <ShoppingBag className="w-5 h-5" />,
-            title: 'Modal de Compra',
-            description: 'Nova tela de confirmação de compra com preview do produto, seleção de quantidade e forma de pagamento.',
-            isNew: true
+            icon: <Mail className="w-5 h-5" />,
+            title: 'Keys por Email',
+            description: 'As keys compradas na loja agora são enviadas diretamente para seu email cadastrado!'
         },
         {
             icon: <Store className="w-5 h-5" />,
-            title: 'Carrossel no Feed',
-            description: 'Card da Loja no feed agora mostra um carrossel com os produtos disponíveis!',
-            isNew: true
+            title: 'Loja de Produtos',
+            description: 'Compre keys de jogos, gift cards e muito mais usando Zions ou dinheiro real!'
         },
         {
             icon: <Gamepad2 className="w-5 h-5" />,
             title: 'Keys de Jogos',
-            description: 'Compre keys de Steam, Epic, Xbox, PlayStation e mais! A key é entregue por email após a compra.'
+            description: 'Compre keys de Steam, Epic, Xbox, PlayStation e mais!'
         },
         {
             icon: <Wallet className="w-5 h-5" />,
@@ -64,24 +62,19 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             description: 'Converta seus Zions em dinheiro real via PIX! Taxa: 100 Zions = R$ 1,00'
         },
         {
-            icon: <CreditCard className="w-5 h-5" />,
-            title: 'Pagamento em Reais',
-            description: 'Produtos podem ter preço em Zions E em Reais. Escolha como quer pagar!'
-        },
-        {
             icon: <Key className="w-5 h-5" />,
             title: 'Sistema de Keys',
-            description: 'Admin pode cadastrar keys de produtos que são entregues automaticamente ao comprador!'
+            description: 'Admin pode cadastrar keys de produtos que são entregues automaticamente!'
         },
         {
             icon: <Shield className="w-5 h-5" />,
             title: 'Conformidade LGPD',
-            description: 'Termos completos de privacidade, proteção de dados e direitos do usuário conforme legislação brasileira.'
+            description: 'Termos completos de privacidade e proteção de dados conforme legislação brasileira.'
         },
         {
             icon: <Coins className="w-5 h-5" />,
             title: 'Taxa de Mercado',
-            description: 'A taxa de 5% das vendas no mercado vai diretamente para a conta do administrador!'
+            description: 'A taxa de 5% das vendas no mercado vai para a conta do administrador!'
         }
     ];
 

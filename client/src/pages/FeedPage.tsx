@@ -26,6 +26,7 @@ import MarketCard from '../components/MarketCard';
 import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
+import MobileCarousel from '../components/MobileCarousel';
 
 interface Post {
     id: string;
@@ -233,6 +234,14 @@ export default function FeedPage() {
             <div className="max-w-7xl mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-3 sm:px-4 md:px-6 flex gap-8 relative z-10">
                 {/* Main Feed Column */}
                 <main className="flex-1 max-w-2xl mx-auto space-y-8">
+                    {/* Mobile Carousel - Quick Access Cards */}
+                    <MobileCarousel
+                        dailyLoginStatus={dailyLoginStatus}
+                        onDailyLoginClick={openDailyLoginModal}
+                        onNewMembersClick={() => setIsNewMembersOpen(true)}
+                        onEventsClick={() => setIsEventsOpen(true)}
+                    />
+
                     {/* Welcome Header */}
                     <div className="mb-8 animate-fade-in-down">
                         <div className="flex items-start justify-between">

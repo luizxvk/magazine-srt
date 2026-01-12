@@ -2,32 +2,28 @@
 
 ## 🚀 Features Planejadas
 
-### 🎠 Carrossel Mobile (Feed - Acima do "Bem-vindo")
-**Status:** Pendente  
+### ✅ Carrossel Mobile (Feed - Acima do "Bem-vindo")
+**Status:** ✅ CONCLUÍDO (v0.3.26)  
 **Prioridade:** Alta  
 
-Implementar um carrossel horizontal no modo responsivo/mobile que aparecerá **acima** do espaço "Bem-vindo, usuário" no feed.
+Implementado carrossel horizontal no modo responsivo/mobile que aparece **acima** do espaço "Bem-vindo, usuário" no feed.
 
-#### Cards que devem aparecer no carrossel:
-1. **Bônus Diário** - DailyLoginCard
-2. **Catálogo de Fotos** - PhotoCatalogCard
-3. **Eventos Exclusivos** - EventsCard
-4. **Membros Novos** - NewMembersCard (modal)
-5. **Destaques da Semana** - (criar novo componente)
-6. **Feedback** - FeedbackFormCard
+#### Cards incluídos no carrossel:
+1. ✅ **Bônus Diário** - Com badge de Zions ou checkmark
+2. ✅ **Catálogo de Fotos** - Link para /photos
+3. ✅ **Eventos Exclusivos** - Abre EventsModal
+4. ✅ **Membros Novos** - Abre NewMembersModal
+5. ✅ **Destaques da Semana** - Placeholder (TODO: modal)
+6. ✅ **Feedback** - Placeholder (TODO: scroll ou modal)
 
-#### Requisitos:
-- [ ] Criar componente `MobileCarousel.tsx`
-- [ ] Mostrar apenas em telas mobile (< 768px ou < 1024px)
-- [ ] Swipe horizontal nativo
-- [ ] Indicadores de posição (dots)
-- [ ] Auto-play opcional
-- [ ] Cards adaptados para formato carrossel (mais compactos)
-
-#### Notas:
-- NÃO incluir outros cards além dos listados
-- O carrossel substitui a sidebar no mobile
-- Deve ser suave e performático
+#### Funcionalidades implementadas:
+- ✅ Componente `MobileCarousel.tsx`
+- ✅ Visível apenas em telas < xl (1280px)
+- ✅ Swipe horizontal com drag
+- ✅ Indicadores de posição (dots) com cor do accentColor
+- ✅ Botões de navegação prev/next
+- ✅ Cards compactos com gradientes coloridos
+- ✅ Snap scroll suave
 
 ---
 
@@ -113,6 +109,16 @@ model UserThemePack {
 - Fundos e cores dos packs são EXCLUSIVOS (não aparecem nas opções avulsas)
 - Usuário pode equipar pack OU itens avulsos (não misturar)
 - Considerar animações especiais para fundos de pack
+- **EDIÇÃO LIMITADA**: Cada pack tem estoque limitado (ex: 10 cópias)
+- Quando esgotar, mostrar botão "ESGOTADO" desabilitado
+- **REVENDÍVEL NO MERCADO**: Usuário pode vender pack no mercado para outros
+
+#### Fluxo de Compra/Venda:
+1. Admin cria pack com `maxStock: 10`
+2. Usuários compram até esgotar
+3. Pack esgotado = botão desabilitado
+4. Usuário pode listar pack no Mercado (preço livre)
+5. Outro usuário compra do Mercado (transferência de posse)
 
 ---
 

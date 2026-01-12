@@ -36,7 +36,6 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 
 export default function Header({ onOpenShop }: HeaderProps) {
     const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor } = useAuth();
-    const navigate = useNavigate();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [hasGroupInvites, setHasGroupInvites] = useState(false);

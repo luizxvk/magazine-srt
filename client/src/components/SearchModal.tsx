@@ -193,12 +193,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         // Trigger action if specified (for modals/drawers that open on feed page)
                         if (result.action) {
                             setTimeout(() => {
+                                const actionName = result.action!;
                                 const event = new CustomEvent(
-                                    result.action === 'shop' ? 'openShop' :
-                                    result.action === 'radio' ? 'openRadio' :
-                                    result.action === 'events' ? 'openEvents' :
-                                    result.action === 'stories' ? 'openStories' :
-                                    result.action
+                                    actionName === 'shop' ? 'openShop' :
+                                    actionName === 'radio' ? 'openRadio' :
+                                    actionName === 'events' ? 'openEvents' :
+                                    actionName === 'stories' ? 'openStories' :
+                                    actionName
                                 );
                                 window.dispatchEvent(event);
                             }, 100);

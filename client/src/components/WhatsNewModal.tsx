@@ -4,7 +4,7 @@ import { X, Sparkles, Check, Store, ShoppingBag, Radio, Palette, Coins } from 'l
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.32';
+const CURRENT_VERSION = '0.3.33';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -68,7 +68,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         {
             icon: <Check className="w-5 h-5" />,
             title: '🔧 Correções',
-            description: 'Corrigido bug onde Packs comprados apareciam como disponíveis. Melhorias na UI dos cartões.',
+            description: 'Bugs corrigidos: Packs mostrando "Comprar" novamente, cores não aplicando ao equipar pack.',
             isNew: true
         },
         {

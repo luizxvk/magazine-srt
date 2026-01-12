@@ -43,7 +43,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
     };
 
     return (
-        <div className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${theme === 'light'
+        <div className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 flex flex-col ${theme === 'light'
             ? 'bg-white border-gray-200 hover:shadow-xl'
             : 'bg-white/5 border-white/10 hover:border-white/20'
             } ${pack.isEquipped ? 'ring-2 ring-offset-2 ring-offset-zinc-900' : ''}`}
@@ -55,7 +55,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
             }}
         >
             {/* Preview Image/Video */}
-            <div className="relative aspect-video overflow-hidden bg-black">
+            <div className="relative aspect-video overflow-hidden bg-black flex-shrink-0">
                 {pack.backgroundUrl.endsWith('.mp4') || pack.backgroundUrl.endsWith('.webm') ? (
                     <video
                         src={pack.backgroundUrl}
@@ -125,64 +125,82 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                         {pack.gameTitle}
                     </p>
 
-                    {/* Visual Color Swatch in Preview */}
-                    <div
-                        className="w-6 h-6 rounded-full shadow-lg ring-2 ring-white/20 relative group/color cursor-help"
-                        style={{ backgroundColor: pack.accentColor }}
-                    >
-                        <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-black/80 text-white text-[10px] rounded opacity-0 group-hover/color:opacity-100 whitespace-nowrap transition-opacity pointer-events-none">
-                            {pack.accentColor}
-                        </div>
+                    {/* Visual Color Palette in Preview */}
+                    <div className="flex -space-x-2">
+                        <div
+                            className="w-6 h-6 rounded-full shadow-lg ring-2 ring-black/50 z-30"
+                            style={{ backgroundColor: pack.accentColor }}
+                            title="Cor Principal"
+                        />
+                        <div
+                            className="w-6 h-6 rounded-full shadow-lg ring-2 ring-black/50 z-20"
+                            style={{ backgroundColor: adjustBrightness(pack.accentColor, 20) }}
+                            title="Tom Claro"
+                        />
+                        <div
+                            className="w-6 h-6 rounded-full shadow-lg ring-2 ring-black/50 z-10"
+                            style={{ backgroundColor: adjustBrightness(pack.accentColor, -20) }}
+                            title="Tom Escuro"
+                        />
                     </div>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="p-4">
-                <h3 className={`text-lg font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                    {pack.name}
-                </h3>
-                {pack.description && (
-                    <p className={`text-xs mb-3 line-clamp-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
-                        {pack.description}
-                    </p>
-                )}
+            <div className="p-4 flex flex-col flex-1">
+                <div className="flex-1">
+                    <h3 className={`text-lg font-bold mb-1 leading-tight ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                        {pack.name}
+                    </h3>
+                    {pack.description && (
+                        <p className={`text-xs mb-4 line-clamp-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                            {pack.description}
+                        </p>
+                    )}
 
-                {/* Included Items */}
-                <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <Sparkles className="w-4 h-4" style={{ color: pack.accentColor }} />
-                        <span>Fundo Animado Exclusivo</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <div className="w-4 h-4 rounded-full border-2 border-white/20" style={{ backgroundColor: pack.accentColor }} />
-                        <span>Cor Destaque: {pack.accentColor}</span>
+                    {/* Included Items - Detailed List */}
+                    <div className={`mb-4 rounded-lg p-3 ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}>
+                        <p className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            O Pack Inclui:
+                        </p>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-xs">
+                                <div className={`p-1 rounded ${theme === 'light' ? 'bg-white shadow-sm' : 'bg-black/20'}`}>
+                                    <Sparkles className="w-3 h-3" style={{ color: pack.accentColor }} />
+                                </div>
+                                <span className={theme === 'light' ? 'text-gray-700' : 'text-gray-300'}>
+                                    Fundo Animado Exclusivo
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs">
+                                <div className={`p-1 rounded ${theme === 'light' ? 'bg-white shadow-sm' : 'bg-black/20'}`}>
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: pack.accentColor }} />
+                                </div>
+                                <span className={theme === 'light' ? 'text-gray-700' : 'text-gray-300'}>
+                                    Esquema de Cores: {pack.accentColor}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Price & Action */}
-                <div className="flex items-center justify-between gap-3">
-                    <div>
-                        {!pack.isOwned && (
-                            <div className="flex items-center gap-1.5">
-                                <div className={`p-1 rounded-full ${theme === 'light' ? 'bg-yellow-100' : 'bg-yellow-500/20'}`}>
-                                    <Sparkles className={`w-3.5 h-3.5 ${theme === 'light' ? 'text-yellow-600' : 'text-yellow-400'}`} />
+                {/* Price & Action - Column Layout for better fit */}
+                <div className="flex flex-col gap-3 mt-auto">
+                    <div className="flex items-center justify-between">
+                        {!pack.isOwned ? (
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-gray-500 uppercase font-bold">Preço</span>
+                                <div className="flex items-center gap-1.5">
+                                    <Sparkles className="w-4 h-4 text-yellow-500" />
+                                    <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                        {pack.price.toLocaleString('pt-BR')}
+                                    </span>
                                 </div>
-                                <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                    {pack.price.toLocaleString('pt-BR')} Points
-                                </span>
                             </div>
-                        )}
-                        {pack.isOwned && (
-                            <div className="flex items-center gap-2">
-                                <div className="h-6 w-full flex items-center gap-1">
-                                    <div
-                                        className="h-4 w-4 rounded-full shadow-sm ring-1 ring-white/20"
-                                        style={{ backgroundColor: pack.accentColor }}
-                                        title={`Cor: ${pack.accentColor}`}
-                                    />
-                                    <span className="text-xs text-gray-500">Cor do tema</span>
-                                </div>
+                        ) : (
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-green-500 uppercase font-bold">Adquirido</span>
+                                <span className="text-xs text-gray-500">Pronto para usar</span>
                             </div>
                         )}
                     </div>
@@ -190,20 +208,22 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                     <button
                         onClick={handleAction}
                         disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${pack.isOwned
+                        className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] ${pack.isOwned
                             ? pack.isEquipped
-                                ? 'bg-green-500/20 text-green-400 cursor-default'
-                                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-default'
+                                : 'bg-blue-600 hover:bg-blue-500 text-white'
                             : isOutOfStock
                                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                 : !canAfford
-                                    ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
-                                    : 'bg-gradient-to-r hover:opacity-90 text-white'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    ? 'bg-red-500/10 text-red-400 border border-red-500/20 cursor-not-allowed'
+                                    : 'text-white'
+                            } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none`}
                         style={{
-                            ...(pack.isOwned && !pack.isEquipped && { backgroundColor: pack.accentColor }),
-                            ...(!pack.isOwned && canAfford && !isOutOfStock && {
+                            ...(!pack.isOwned && !isOutOfStock && canAfford && {
                                 backgroundImage: `linear-gradient(to right, ${pack.accentColor}, ${adjustBrightness(pack.accentColor, -20)})`
+                            }),
+                            ...(pack.isOwned && !pack.isEquipped && {
+                                backgroundColor: pack.accentColor
                             })
                         }}
                     >
@@ -214,18 +234,18 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                                 <Check className="w-4 h-4" /> Equipado
                             </>
                         ) : pack.isOwned ? (
-                            'Equipar'
+                            'Equipar Tema'
                         ) : isOutOfStock ? (
                             <>
                                 <Lock className="w-4 h-4" /> Esgotado
                             </>
                         ) : !canAfford ? (
                             <>
-                                <Lock className="w-4 h-4" /> Sem Zions
+                                <Lock className="w-4 h-4" /> Saldo Insuficiente
                             </>
                         ) : (
                             <>
-                                <ShoppingBag className="w-4 h-4" /> Comprar
+                                <ShoppingBag className="w-4 h-4" /> Comprar Agora
                             </>
                         )}
                     </button>

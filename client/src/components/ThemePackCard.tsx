@@ -112,8 +112,8 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                 {/* Rarity Badge */}
                 {pack.rarity && pack.rarity !== 'COMMON' && (
                     <div className={`absolute top-2 right-2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md border ${pack.rarity === 'LEGENDARY' ? 'bg-amber-500/20 border-amber-500/50 text-amber-200' :
-                            pack.rarity === 'EPIC' ? 'bg-purple-500/20 border-purple-500/50 text-purple-200' :
-                                'bg-blue-500/20 border-blue-500/50 text-blue-200'
+                        pack.rarity === 'EPIC' ? 'bg-purple-500/20 border-purple-500/50 text-purple-200' :
+                            'bg-blue-500/20 border-blue-500/50 text-blue-200'
                         }`}>
                         {pack.rarity === 'LEGENDARY' ? '✨ Legendary' : pack.rarity}
                     </div>
@@ -238,19 +238,21 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
 
                     <button
                         onClick={handleAction}
-                        disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
+                        disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford || pack.rarity === 'LEGENDARY'))}
                         className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] ${pack.isOwned
                             ? pack.isEquipped
                                 ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-default'
                                 : 'bg-blue-600 hover:bg-blue-500 text-white'
-                            : isOutOfStock
-                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                : !canAfford
-                                    ? 'bg-red-500/10 text-red-400 border border-red-500/20 cursor-not-allowed'
-                                    : 'text-white'
+                            : pack.rarity === 'LEGENDARY'
+                                ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20 cursor-not-allowed'
+                                : isOutOfStock
+                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                    : !canAfford
+                                        ? 'bg-red-500/10 text-red-400 border border-red-500/20 cursor-not-allowed'
+                                        : 'text-white'
                             } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none`}
                         style={{
-                            ...(!pack.isOwned && !isOutOfStock && canAfford && {
+                            ...(!pack.isOwned && !isOutOfStock && canAfford && pack.rarity !== 'LEGENDARY' && {
                                 backgroundImage: `linear-gradient(to right, ${pack.accentColor}, ${adjustBrightness(pack.accentColor, -20)})`
                             }),
                             ...(pack.isOwned && !pack.isEquipped && {
@@ -266,6 +268,10 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                             </>
                         ) : pack.isOwned ? (
                             'Equipar Tema'
+                        ) : pack.rarity === 'LEGENDARY' ? (
+                            <>
+                                <Sparkles className="w-4 h-4" /> Supply Box
+                            </>
                         ) : isOutOfStock ? (
                             <>
                                 <Lock className="w-4 h-4" /> Esgotado

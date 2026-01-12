@@ -188,7 +188,7 @@ export default function MobileCarousel({
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
                 >
-                    {cards.map((card, idx) => (
+                    {cards.map((card) => (
                         <button
                             key={card.id}
                             onClick={card.onClick}
@@ -235,8 +235,8 @@ export default function MobileCarousel({
                         key={idx}
                         onClick={() => scrollToIndex(idx)}
                         className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex
-                                ? 'w-4'
-                                : 'w-1.5 bg-white/10 hover:bg-white/20'
+                            ? 'w-4'
+                            : 'w-1.5 bg-white/10 hover:bg-white/20'
                             }`}
                         style={{
                             backgroundColor: idx === currentIndex ? color : undefined

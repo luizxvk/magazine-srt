@@ -56,6 +56,17 @@ export default function MobileCarousel({
             badge: dailyLoginStatus?.claimed ? '✓' : dailyLoginStatus?.nextReward
         },
         {
+            id: 'whatsnew',
+            title: 'O Que Há de Novo',
+            subtitle: 'Novidades e atualizações',
+            icon: <Star className="w-6 h-6" />,
+            gradient: 'from-blue-500 to-indigo-600',
+            onClick: () => {
+                const event = new CustomEvent('openWhatsNew');
+                window.dispatchEvent(event);
+            }
+        },
+        {
             id: 'photos',
             title: 'Catálogo de Fotos',
             subtitle: 'Explore as fotos da comunidade',

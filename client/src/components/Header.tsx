@@ -71,6 +71,15 @@ export default function Header({ onOpenShop }: HeaderProps) {
         return () => clearInterval(interval);
     }, [isVisitor]);
 
+    // Listen for WhatsNew open event from carousel
+    useEffect(() => {
+        const handleOpenWhatsNew = () => {
+            setIsWhatsNewModalOpen(true);
+        };
+        window.addEventListener('openWhatsNew', handleOpenWhatsNew);
+        return () => window.removeEventListener('openWhatsNew', handleOpenWhatsNew);
+    }, []);
+
     useEffect(() => {
         if (isVisitor) return;
 

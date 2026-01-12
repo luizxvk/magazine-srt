@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, PackageOpen, Coins } from 'lucide-react';
+import { X, Sparkles, Check, Store, PackageOpen, Coins, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.38';
+const CURRENT_VERSION = '0.3.39';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,25 +33,32 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.38 - PROGRESSIVE PRICING & ACHIEVEMENTS
+    // v0.3.39 - QUICK ACCESS IMPROVEMENTS
     const updates: UpdateItem[] = [
+        {
+            icon: <Star className="w-5 h-5 text-blue-500" />,
+            title: '⭐ Acesso Rápido Aprimorado',
+            description: 'Novo card "O Que Há de Novo" no carrossel para você ficar por dentro de tudo!',
+            isNew: true
+        },
+        // v0.3.38 - PROGRESSIVE PRICING & ACHIEVEMENTS
         {
             icon: <PackageOpen className="w-5 h-5 text-blue-500" />,
             title: '🎁 Supply Box Progressivo',
             description: '1º do dia é GRÁTIS! Depois: 500, 1000, 2500... Reseta à meia-noite.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Sparkles className="w-5 h-5 text-amber-500" />,
             title: '🏆 Nova Conquista',
             description: 'Identidade Revelada: Atualize seu perfil para desbloquear uma nova medalha!',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Coins className="w-5 h-5 text-green-500" />,
             title: '💰 Zions Cash',
             description: 'Melhoria na exibição e uso do seu saldo de Cash ao comprar itens.',
-            isNew: true
+            isNew: false
         },
         // v0.3.37 - RARITY & SUPPLY BOX
         {

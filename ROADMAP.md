@@ -1,6 +1,6 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.3.31 (Beta)  
+> **Versão Atual:** v0.3.39 (Beta)  
 > **Última Atualização:** 12 de Janeiro de 2026
 
 ---
@@ -18,9 +18,33 @@
 
 ---
 
-## ✅ Recentemente Implementado (v0.3.25 - v0.3.27)
+## ✅ Recentemente Implementado (v0.3.25 - v0.3.39)
 
-### v0.3.27 (Atual - Janeiro 2026)
+### v0.3.39 (Atual - Janeiro 2026)
+- ⭐ **Card "O Que Há de Novo" no Acesso Rápido**
+  - Novo card no carrossel mobile para acesso direto às novidades
+  - Gradiente azul/indigo distinto
+  - Dispara evento para abrir WhatsNewModal
+  - Melhor visibilidade das atualizações da plataforma
+
+### v0.3.38 (Janeiro 2026)
+- 🎁 **Supply Box com Preço Progressivo**
+  - Primeira caixa do dia é GRÁTIS!
+  - Preços aumentam progressivamente: 500, 1000, 2500...
+  - Reset automático à meia-noite
+  - Incentivo para login diário
+
+- 🏆 **Nova Conquista: Identidade Revelada**
+  - Desbloqueada ao atualizar o perfil pela primeira vez
+  - Badge especial com ícone de ID
+  - 50 Zions de recompensa
+
+- 💰 **Melhorias no Zions Cash**
+  - Exibição aprimorada do saldo
+  - Melhor feedback visual nas transações
+  - Separação clara entre Cash e Points
+
+### v0.3.27 (Janeiro 2026)
 - 💰 **Sistema de Moeda Dual** - Economia completa
   - zionsPoints (Int) - Para customizações (100 points = 1 cash)
   - zionsCash (Float) - Para produtos reais (1 cash = R$ 1,00)

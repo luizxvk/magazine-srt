@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Sparkles, Check, Lock, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,7 +28,6 @@ interface ThemePackCardProps {
 
 export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, loading }: ThemePackCardProps) {
     const { user, theme } = useAuth();
-    const [imageLoaded, setImageLoaded] = useState(false);
 
     const isOutOfStock = pack.maxStock && pack.soldCount >= pack.maxStock;
     const stockLeft = pack.maxStock ? pack.maxStock - pack.soldCount : null;
@@ -59,27 +57,13 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                 })
             }}
         >
-            {/* Preview Image/Video */}
+            {/* Preview - Animated Background with CSS class */}
             <div className="relative aspect-video overflow-hidden bg-black">
-                {pack.backgroundUrl.endsWith('.mp4') || pack.backgroundUrl.endsWith('.webm') ? (
-                    <video
-                        src={pack.backgroundUrl}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                ) : (
-                    <img
-                        src={pack.previewUrl || pack.backgroundUrl}
-                        alt={pack.name}
-                        className={`w-full h-full object-cover transition-all duration-500 ${
-                            imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
-                        }`}
-                        onLoad={() => setImageLoaded(true)}
-                    />
-                )}
+                {/* Background Animation Preview using CSS class */}
+                <div 
+                    className={`w-full h-full ${pack.backgroundUrl} group-hover:scale-105 transition-transform duration-500`}
+                    style={{ backgroundSize: '200% 200%' }}
+                />
 
                 {/* Overlay gradiente */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60" />

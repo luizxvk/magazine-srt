@@ -182,7 +182,7 @@ export default function FeedPage() {
 
 
     return (
-        <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
+        <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative overflow-x-hidden">
             <LuxuriousBackground />
             {!viewingStoryId && <Header onOpenShop={() => setIsShopOpen(true)} />}
 

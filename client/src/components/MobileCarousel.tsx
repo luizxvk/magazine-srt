@@ -24,11 +24,11 @@ interface CarouselCard {
     badge?: string | number;
 }
 
-export default function MobileCarousel({ 
-    dailyLoginStatus, 
-    onDailyLoginClick, 
-    onNewMembersClick, 
-    onEventsClick 
+export default function MobileCarousel({
+    dailyLoginStatus,
+    onDailyLoginClick,
+    onNewMembersClick,
+    onEventsClick
 }: MobileCarouselProps) {
     const { user, accentColor } = useAuth();
     const navigate = useNavigate();
@@ -46,8 +46,8 @@ export default function MobileCarousel({
         {
             id: 'daily',
             title: 'Bônus Diário',
-            subtitle: dailyLoginStatus?.claimed 
-                ? `Sequência: ${dailyLoginStatus.streak} dias` 
+            subtitle: dailyLoginStatus?.claimed
+                ? `Sequência: ${dailyLoginStatus.streak} dias`
                 : `Resgate ${dailyLoginStatus?.nextReward || 0} Zions`,
             icon: <Gift className="w-6 h-6" />,
             gradient: 'from-amber-500 to-orange-600',
@@ -151,19 +151,19 @@ export default function MobileCarousel({
     };
 
     return (
-        <div className="xl:hidden mb-4">
-            {/* Header */}
+        <div className="xl:hidden mb-6 relative group">
+            {/* Header - Arrows only visible on larger tablets (sm+) */}
             <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="text-sm font-medium text-gray-400">Acesso Rápido</h3>
-                <div className="flex gap-1">
-                    <button 
+                <div className="hidden sm:flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
                         onClick={handlePrev}
                         className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-30"
                         disabled={currentIndex === 0}
                     >
                         <ChevronLeft className="w-4 h-4 text-gray-400" />
                     </button>
-                    <button 
+                    <button
                         onClick={handleNext}
                         className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-30"
                         disabled={currentIndex >= cards.length - 1}
@@ -174,67 +174,72 @@ export default function MobileCarousel({
             </div>
 
             {/* Carousel Container */}
-            <div 
-                ref={carouselRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 cursor-grab active:cursor-grabbing -mx-3 px-3"
-                style={{ 
-                    scrollbarWidth: 'none', 
-                    msOverflowStyle: 'none',
-                    WebkitOverflowScrolling: 'touch'
-                }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-            >
-                {cards.map((card, idx) => (
-                    <button
-                        key={card.id}
-                        onClick={card.onClick}
-                        className={`flex-shrink-0 w-36 snap-start ${idx === cards.length - 1 ? 'mr-3' : ''}`}
-                    >
-                        <div 
-                            className={`relative h-20 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between transition-transform active:scale-95`}
+            <div className="relative -mx-4 sm:mx-0">
+                <div
+                    ref={carouselRef}
+                    className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 sm:px-0 pb-4 cursor-grab active:cursor-grabbing"
+                    style={{
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        WebkitOverflowScrolling: 'touch'
+                    }}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                >
+                    {cards.map((card, idx) => (
+                        <button
+                            key={card.id}
+                            onClick={card.onClick}
+                            className={`flex-shrink-0 w-32 sm:w-36 snap-start transition-opacity duration-300 ${isDragging ? 'pointer-events-none' : ''}`}
                         >
-                            {/* Badge */}
-                            {card.badge && (
-                                <div className="absolute top-1.5 right-1.5 bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white">
-                                    {card.badge}
+                            <div
+                                className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/20 active:scale-95 transition-transform`}
+                            >
+                                {/* Badge */}
+                                {card.badge && (
+                                    <div className="absolute top-1.5 right-1.5 bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm">
+                                        {card.badge}
+                                    </div>
+                                )}
+
+                                {/* Icon */}
+                                <div className="text-white/90 drop-shadow-md">
+                                    {card.icon}
                                 </div>
-                            )}
-                            
-                            {/* Icon */}
-                            <div className="text-white/90">
-                                {card.icon}
+
+                                {/* Text */}
+                                <div className="text-left">
+                                    <p className="text-white font-bold text-[11px] sm:text-xs leading-tight truncate drop-shadow-sm">
+                                        {card.title}
+                                    </p>
+                                    <p className="text-white/80 text-[9px] leading-tight truncate drop-shadow-sm mt-0.5">
+                                        {card.subtitle}
+                                    </p>
+                                </div>
                             </div>
-                            
-                            {/* Text */}
-                            <div className="text-left">
-                                <p className="text-white font-semibold text-xs leading-tight truncate">
-                                    {card.title}
-                                </p>
-                                <p className="text-white/70 text-[9px] leading-tight truncate">
-                                    {card.subtitle}
-                                </p>
-                            </div>
-                        </div>
-                    </button>
-                ))}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Fade Gradients for edge indication */}
+                <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/20 to-transparent pointer-events-none sm:hidden" />
+                <div className="absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-black/20 to-transparent pointer-events-none sm:hidden" />
             </div>
 
             {/* Dots Indicator */}
-            <div className="flex justify-center gap-1.5 mt-2">
+            <div className="flex justify-center gap-1.5 mt-[-8px]">
                 {cards.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => scrollToIndex(idx)}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                            idx === currentIndex 
-                                ? 'w-4' 
-                                : 'w-1.5 bg-white/20 hover:bg-white/30'
-                        }`}
-                        style={{ 
-                            backgroundColor: idx === currentIndex ? color : undefined 
+                        className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex
+                                ? 'w-4'
+                                : 'w-1.5 bg-white/10 hover:bg-white/20'
+                            }`}
+                        style={{
+                            backgroundColor: idx === currentIndex ? color : undefined
                         }}
                     />
                 ))}

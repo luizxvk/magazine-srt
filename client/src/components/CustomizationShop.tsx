@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -324,7 +325,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
     const textSub = isDarkMode ? 'text-gray-400' : 'text-gray-600';
 
-    return (
+    return createPortal(
         <AnimatePresence>
             <motion.div
                 initial={{ opacity: 0 }}
@@ -736,5 +737,5 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                 }}
             />
         </AnimatePresence >
-    );
+        , document.body);
 }

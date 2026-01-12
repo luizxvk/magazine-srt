@@ -151,7 +151,7 @@ export default function MobileCarousel({
     };
 
     return (
-        <div className="xl:hidden mb-6 relative group">
+        <div className="xl:hidden mb-6 relative group w-full">
             {/* Header - Arrows only visible on larger tablets (sm+) */}
             <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="text-sm font-medium text-gray-400">Acesso Rápido</h3>
@@ -174,10 +174,10 @@ export default function MobileCarousel({
             </div>
 
             {/* Carousel Container */}
-            <div className="relative -mx-4 sm:mx-0">
+            <div className="relative w-full overflow-visible">
                 <div
                     ref={carouselRef}
-                    className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 sm:px-0 pb-4 cursor-grab active:cursor-grabbing"
+                    className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing -mx-1 px-1"
                     style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -223,9 +223,7 @@ export default function MobileCarousel({
                     ))}
                 </div>
 
-                {/* Fade Gradients for edge indication */}
-                <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/20 to-transparent pointer-events-none sm:hidden" />
-                <div className="absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-black/20 to-transparent pointer-events-none sm:hidden" />
+                {/* Fade Gradients for edge indication - Removed to prevent overflow issues */}
             </div>
 
             {/* Dots Indicator */}

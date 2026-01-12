@@ -148,7 +148,7 @@ export default function FeedItem({
             onMouseLeave={() => setIsPressed(false)}
             onTouchStart={() => setIsPressed(true)}
             onTouchEnd={() => setIsPressed(false)}
-            className={`glass-panel rounded-xl overflow-hidden group h-full flex flex-col relative transition-all duration-200 ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'} ${isPressed && theme === 'light' ? 'shadow-[0_0_30px_rgba(0,0,0,0.15)] ring-2 ring-gray-300' : ''}`}
+            className={`glass-panel rounded-xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-200 ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'} ${isPressed && theme === 'light' ? 'shadow-[0_0_30px_rgba(0,0,0,0.15)] ring-2 ring-gray-300' : ''}`}
         >
             {(image || video) && (
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-square md:aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>

@@ -232,9 +232,9 @@ export default function FeedPage() {
                 onClose={() => setIsShopOpen(false)}
             />
 
-            <div className="max-w-7xl mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-3 sm:px-4 md:px-6 flex gap-8 relative z-10">
+            <div className="max-w-7xl mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-4 sm:px-6 md:px-8 flex gap-8 relative z-10">
                 {/* Main Feed Column */}
-                <main className="flex-1 max-w-2xl mx-auto space-y-8">
+                <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
                     {/* Mobile Carousel - Quick Access Cards */}
                     <MobileCarousel
                         dailyLoginStatus={dailyLoginStatus}

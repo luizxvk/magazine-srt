@@ -48,7 +48,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
     const currentPost = posts[currentIndex];
 
     return (
-        <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-12 group">
+        <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] rounded-2xl overflow-hidden mb-12 group">
             {/* Background Blur */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0" />
 
@@ -93,7 +93,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
                         {/* Content */}
-                        <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
+                        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-10">
                             <div className="flex items-center gap-2 mb-4">
                                 <span className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isMGT ? 'bg-emerald-500/20 border-red-500/30 text-white' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
                                     <Sparkles className="w-3 h-3" />
@@ -104,7 +104,7 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                                 </span>
                             </div>
 
-                            <h2 className="text-3xl md:text-4xl font-serif !text-white mb-4 leading-tight max-w-3xl drop-shadow-lg">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif !text-white mb-4 leading-tight max-w-3xl drop-shadow-lg">
                                 {currentPost.title}
                             </h2>
 
@@ -130,21 +130,21 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                 <>
                     <button
                         onClick={prevSlide}
-                        className={`absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isMGT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
+                        className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isMGT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
                         aria-label="Slide anterior"
                     >
-                        <ChevronLeft className="w-6 h-6" />
+                        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                     <button
                         onClick={nextSlide}
-                        className={`absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isMGT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
+                        className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white transition-all opacity-0 group-hover:opacity-100 z-20 ${isMGT ? 'hover:bg-red-500/20 hover:border-red-500/50' : 'hover:bg-gold-500/20 hover:border-gold-500/50'}`}
                         aria-label="Próximo slide"
                     >
-                        <ChevronRight className="w-6 h-6" />
+                        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
 
                     {/* Indicators */}
-                    <div className="absolute bottom-8 right-8 flex gap-2 z-20">
+                    <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 right-4 sm:right-6 md:right-8 flex gap-2 z-20">
                         {posts.map((_, idx) => (
                             <button
                                 key={idx}

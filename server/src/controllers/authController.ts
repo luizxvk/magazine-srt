@@ -129,6 +129,7 @@ export const login = async (req: Request, res: Response) => {
         }
 
         console.log('User found:', user.id, user.email);
+        console.log('User currency fields:', { zions: user.zions, zionsPoints: user.zionsPoints, zionsCash: user.zionsCash });
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);
         if (!validPassword) {

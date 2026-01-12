@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     X,
     ShoppingCart,
-    Coins,
     CreditCard,
     Package,
     Gamepad2,

@@ -56,7 +56,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
         >
             {/* Preview Image/Video */}
             <div className="relative aspect-video overflow-hidden bg-black flex-shrink-0">
-                {pack.backgroundUrl.endsWith('.mp4') || pack.backgroundUrl.endsWith('.webm') ? (
+                {pack.backgroundUrl && (pack.backgroundUrl.endsWith('.mp4') || pack.backgroundUrl.endsWith('.webm')) ? (
                     <video
                         src={pack.backgroundUrl}
                         autoPlay
@@ -67,24 +67,33 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                     />
                 ) : (
                     <div
-                        className={`w-full h-full transition-all duration-500 bg-center bg-cover ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
-                            }`}
+                        className="w-full h-full transition-all duration-500 bg-center bg-cover group-hover:scale-105"
                         style={{
-                            backgroundImage: imageLoaded ? `url(${pack.previewUrl || pack.backgroundUrl})` : undefined,
-                            backgroundColor: pack.accentColor // Fallback color while loading/error
+                            background: `linear-gradient(135deg, ${adjustBrightness(pack.accentColor, -30)} 0%, ${pack.accentColor} 50%, ${adjustBrightness(pack.accentColor, 30)} 100%)`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
                         }}
                     >
-                        <img
-                            src={pack.previewUrl || pack.backgroundUrl}
-                            alt={pack.name}
-                            className="hidden" // Hidden img for loading event
-                            onLoad={() => setImageLoaded(true)}
-                            onError={(e) => {
-                                // Fallback to gradient if image fails
-                                e.currentTarget.parentElement!.style.backgroundImage = `linear-gradient(135deg, ${pack.accentColor} 30%, #000 100%)`;
-                                setImageLoaded(true);
-                            }}
-                        />
+                        {/* Optional image overlay if previewUrl exists */}
+                        {(pack.previewUrl || pack.backgroundUrl) && (
+                            <div
+                                className={`w-full h-full ${imageLoaded ? 'opacity-60' : 'opacity-0'} transition-opacity duration-500`}
+                                style={{
+                                    backgroundImage: `url(${pack.previewUrl || pack.backgroundUrl})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    mixBlendMode: 'overlay'
+                                }}
+                            >
+                                <img
+                                    src={pack.previewUrl || pack.backgroundUrl}
+                                    alt={pack.name}
+                                    className="hidden"
+                                    onLoad={() => setImageLoaded(true)}
+                                    onError={() => setImageLoaded(false)}
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
 

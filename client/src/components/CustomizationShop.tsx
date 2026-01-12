@@ -269,8 +269,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             if (pack) {
                 updateUser({
                     ...user!,
-                    equippedBackground: pack.background,
-                    equippedColor: pack.color
+                    equippedBackground: pack.backgroundUrl,
+                    equippedColor: pack.accentColor
                 });
             }
             fetchThemePacks(); // Refresh to update equipped status

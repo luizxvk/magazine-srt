@@ -21,6 +21,7 @@ export default function Ranking() {
     const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
     const themeTitle = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeName = theme === 'light' ? 'text-gray-900' : 'text-white';
+    const glassPanel = theme === 'light' ? 'bg-white/80 backdrop-blur-md' : 'bg-white/5 backdrop-blur-xl';
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,7 +40,7 @@ export default function Ranking() {
 
     return (
         <>
-            <div className={`glass-panel rounded-xl p-6 border ${themeBorder}`}>
+            <div className={`${glassPanel} rounded-xl p-6 border ${themeBorder}`}>
                 <div className="flex items-center gap-3 mb-6">
                     <Trophy className={`w-6 h-6 ${themeColor}`} />
                     <h3 className={`text-xl font-serif ${themeTitle} tracking-wider uppercase`}>Ranking Elite</h3>

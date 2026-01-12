@@ -234,10 +234,10 @@ export default function MobileCarousel({
 
                                 {/* Text */}
                                 <div className="text-left">
-                                    <p className="text-white font-bold text-[11px] sm:text-xs leading-tight truncate drop-shadow-sm">
+                                    <p className="text-white drop-shadow-md font-bold text-[11px] sm:text-xs leading-tight truncate">
                                         {card.title}
                                     </p>
-                                    <p className="text-white/80 text-[9px] leading-tight truncate drop-shadow-sm mt-0.5">
+                                    <p className="text-white/90 drop-shadow-md text-[9px] leading-tight truncate mt-0.5">
                                         {card.subtitle}
                                     </p>
                                 </div>

@@ -385,8 +385,8 @@ export default function ProfilePage() {
                                                 title="Email Verificado"
                                             >
                                                 <BadgeCheck 
-                                                    className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-blue-500'}`}
-                                                    strokeWidth={2}
+                                                    className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-blue-500'} drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]`}
+                                                    strokeWidth={2.5}
                                                     fill={isMGT ? '#10b981' : '#3b82f6'}
                                                 />
                                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">

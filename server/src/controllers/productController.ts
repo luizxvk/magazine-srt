@@ -1,16 +1,17 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import prisma from '../utils/prisma';
 import { uploadProductImage } from '../services/cloudinaryService';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 // ===================== PRODUCT MANAGEMENT (Admin) =====================
 
 /**
  * Create a new product (Admin only)
  */
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { name, description, imageBase64, category, priceZions, priceBRL, stock, isUnlimited } = req.body;
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         // Verify admin
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -48,11 +49,11 @@ export const createProduct = async (req: Request, res: Response) => {
 /**
  * Update a product (Admin only)
  */
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
         const { name, description, imageBase64, category, priceZions, priceBRL, stock, isUnlimited, isActive } = req.body;
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         // Verify admin
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -100,10 +101,10 @@ export const updateProduct = async (req: Request, res: Response) => {
 /**
  * Delete a product (Admin only)
  */
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         // Verify admin
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -122,11 +123,11 @@ export const deleteProduct = async (req: Request, res: Response) => {
 /**
  * Add keys to a product (Admin only)
  */
-export const addProductKeys = async (req: Request, res: Response) => {
+export const addProductKeys = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
         const { keys } = req.body; // Array of key strings
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         // Verify admin
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -170,7 +171,7 @@ export const addProductKeys = async (req: Request, res: Response) => {
 /**
  * Get all active products
  */
-export const getProducts = async (req: Request, res: Response) => {
+export const getProducts = async (req: AuthRequest, res: Response) => {
     try {
         const { category, search, sortBy = 'createdAt', order = 'desc' } = req.query;
 
@@ -225,7 +226,7 @@ export const getProducts = async (req: Request, res: Response) => {
 /**
  * Get single product details
  */
-export const getProduct = async (req: Request, res: Response) => {
+export const getProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
 
@@ -261,10 +262,10 @@ export const getProduct = async (req: Request, res: Response) => {
 /**
  * Purchase a product with Zions
  */
-export const purchaseWithZions = async (req: Request, res: Response) => {
+export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
     try {
         const { productId, quantity = 1 } = req.body;
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         // Get product
         const product = await prisma.product.findUnique({
@@ -378,9 +379,9 @@ export const purchaseWithZions = async (req: Request, res: Response) => {
 /**
  * Get user's purchase history
  */
-export const getUserOrders = async (req: Request, res: Response) => {
+export const getUserOrders = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         const orders = await prisma.order.findMany({
             where: { buyerId: userId },
@@ -414,9 +415,9 @@ export const getUserOrders = async (req: Request, res: Response) => {
 /**
  * Get all orders (Admin only)
  */
-export const getAllOrders = async (req: Request, res: Response) => {
+export const getAllOrders = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
         const { status, limit = 50 } = req.query;
 
         // Verify admin
@@ -455,9 +456,9 @@ export const getAllOrders = async (req: Request, res: Response) => {
 /**
  * Get admin products with full details
  */
-export const getAdminProducts = async (req: Request, res: Response) => {
+export const getAdminProducts = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = (req as any).userId;
+        const userId = req.user?.userId;
 
         // Verify admin
         const user = await prisma.user.findUnique({ where: { id: userId } });

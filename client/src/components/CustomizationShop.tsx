@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import ThemePackCard from './ThemePackCard';
 
 interface ShopItem {
     id: string;
@@ -95,6 +96,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const [ownedItems, setOwnedItems] = useState<string[]>([]);
     const [equippedItems, setEquippedItems] = useState<{ background?: string; badge?: string; color?: string }>({});
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [themePacks, setThemePacks] = useState<any[]>([]);
+    const [userPacks, setUserPacks] = useState<any[]>([]);
+    const [loadingPacks, setLoadingPacks] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'emerald' : 'gold';
@@ -106,8 +110,25 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     useEffect(() => {
         if (isOpen) {
             fetchUserCustomizations();
+            fetchThemePacks();
         }
     }, [isOpen]);
+
+    const fetchThemePacks = async () => {
+        try {
+            setLoadingPacks(true);
+            const [packsRes, userPacksRes] = await Promise.all([
+                api.get('/theme-packs'),
+                api.get('/theme-packs/my-packs')
+            ]);
+            setThemePacks(packsRes.data);
+            setUserPacks(userPacksRes.data);
+        } catch (error) {
+            console.error('Error fetching theme packs:', error);
+        } finally {
+            setLoadingPacks(false);
+        }
+    };
 
     const fetchUserCustomizations = async () => {
         try {
@@ -216,6 +237,46 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             console.error('Failed to unequip', error);
         }
         setTimeout(() => setNotification(null), 3000);
+    };
+
+    const handlePurchaseThemePack = async (packId: string) => {
+        setPurchasing(packId);
+        try {
+            const response = await api.post(`/theme-packs/${packId}/purchase`);
+            setNotification({ type: 'success', message: response.data.message });
+            fetchThemePacks(); // Refresh packs
+            fetchUserCustomizations(); // Refresh zions
+        } catch (error: any) {
+            const message = error.response?.data?.error || 'Erro ao comprar pack';
+            setNotification({ type: 'error', message });
+        } finally {
+            setPurchasing(null);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
+    const handleEquipThemePack = async (packId: string) => {
+        setPurchasing(packId);
+        try {
+            const response = await api.post(`/theme-packs/${packId}/equip`);
+            setNotification({ type: 'success', message: response.data.message });
+            // Update user state with equipped items from pack
+            const pack = response.data.pack;
+            if (pack) {
+                updateUser({ 
+                    ...user!, 
+                    equippedBackground: pack.background,
+                    equippedColor: pack.color
+                });
+            }
+            fetchThemePacks(); // Refresh to update equipped status
+        } catch (error: any) {
+            const message = error.response?.data?.error || 'Erro ao equipar pack';
+            setNotification({ type: 'error', message });
+        } finally {
+            setPurchasing(null);
+            setTimeout(() => setNotification(null), 3000);
+        }
     };
 
     const isOwned = (itemId: string) => ownedItems.includes(itemId);
@@ -332,18 +393,44 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     {/* Items Grid */}
                     <div className="p-4 overflow-y-auto max-h-[calc(85vh-180px)] custom-scrollbar">
                         {activeTab === 'packs' ? (
-                            // Packs Tab - Placeholder
-                            <div className="flex flex-col items-center justify-center py-20 text-center">
-                                <div className={`p-6 rounded-full bg-${themeColor}-500/10 mb-4`}>
-                                    <PackageOpen className={`w-16 h-16 text-${themeColor}-400`} />
-                                </div>
-                                <h3 className={`text-xl font-bold ${textMain} mb-2`}>Packs de Tema</h3>
-                                <p className={`${textSub} max-w-md mb-4`}>
-                                    Pacotes temáticos exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.
-                                </p>
-                                <div className={`px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm`}>
-                                    Em breve mais packs de temas
-                                </div>
+                            // Packs Tab - Real implementation
+                            <div>
+                                {loadingPacks ? (
+                                    <div className="flex items-center justify-center py-20">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400"></div>
+                                    </div>
+                                ) : themePacks.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                                        <div className={`p-6 rounded-full bg-${themeColor}-500/10 mb-4`}>
+                                            <PackageOpen className={`w-16 h-16 text-${themeColor}-400`} />
+                                        </div>
+                                        <h3 className={`text-xl font-bold ${textMain} mb-2`}>Packs de Tema</h3>
+                                        <p className={`${textSub} max-w-md mb-4`}>
+                                            Pacotes temáticos exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.
+                                        </p>
+                                        <div className={`px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm`}>
+                                            Nenhum pack disponível no momento
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {themePacks.map(pack => {
+                                            const isOwned = userPacks.some(up => up.themePackId === pack.id);
+                                            const isEquipped = user?.equippedBackground === pack.backgroundUrl && 
+                                                             user?.equippedColor === pack.accentColor;
+                                            
+                                            return (
+                                                <ThemePackCard
+                                                    key={pack.id}
+                                                    pack={{ ...pack, isOwned, isEquipped }}
+                                                    onPurchase={handlePurchaseThemePack}
+                                                    onEquip={handleEquipThemePack}
+                                                    loading={purchasing === pack.id}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         ) : activeTab === 'color' ? (
                             // Render color categories

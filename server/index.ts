@@ -27,6 +27,7 @@ import marketRoutes from './src/routes/marketRoutes';
 import feedbackRoutes from './src/routes/feedbackRoutes';
 import productRoutes from './src/routes/productRoutes';
 import withdrawalRoutes from './src/routes/withdrawalRoutes';
+import themePackRoutes from './src/routes/themePackRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -98,6 +99,7 @@ apiRouter.use('/market', marketRoutes);
 apiRouter.use('/feedback', feedbackRoutes);
 apiRouter.use('/products', productRoutes);
 apiRouter.use('/withdrawals', withdrawalRoutes);
+apiRouter.use('/theme-packs', themePackRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

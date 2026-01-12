@@ -32,7 +32,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
     const isOutOfStock = pack.maxStock && pack.soldCount >= pack.maxStock;
     const stockLeft = pack.maxStock ? pack.maxStock - pack.soldCount : null;
     const isLowStock = stockLeft && stockLeft <= 3;
-    const canAfford = user && user.zions >= pack.price;
+    const canAfford = user && (user.zionsPoints || 0) >= pack.price;
 
     const handleAction = () => {
         if (pack.isOwned && onEquip) {
@@ -146,11 +146,11 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, loading }: Th
                             <div className="flex items-center gap-1.5">
                                 <img 
                                     src="/assets/zions/zion-50.png" 
-                                    alt="Zions" 
+                                    alt="Zions Points" 
                                     className="w-5 h-5"
                                 />
                                 <span className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                    {pack.price.toLocaleString('pt-BR')}
+                                    {pack.price.toLocaleString('pt-BR')} Points
                                 </span>
                             </div>
                         )}

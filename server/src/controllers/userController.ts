@@ -212,6 +212,8 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 points: true,
                 trophies: true,
                 zions: true,
+                zionsPoints: true,
+                zionsCash: true,
                 level: true,
                 createdAt: true,
                 membershipType: true,

@@ -9,7 +9,9 @@ interface User {
     role: string;
     points: number;
     trophies: number;
-    zions: number;
+    zions: number; // DEPRECATED - manter para compatibilidade
+    zionsPoints: number; // Moeda para customizações (100 points = 1 cash)
+    zionsCash: number; // Moeda real (1 cash = R$ 1,00)
     level: number;
     membershipType?: 'MAGAZINE' | 'MGT';
     avatarUrl?: string;
@@ -35,7 +37,9 @@ interface AuthContextType {
     user: User | null;
     login: (token: string, user: User, membershipContext?: 'MAGAZINE' | 'MGT') => void;
     updateUser: (user: User) => void;
-    updateUserZions: (amount: number) => void;
+    updateUserZions: (amount: number) => void; // DEPRECATED - usa updateUserPoints ou updateUserCash
+    updateUserPoints: (amount: number) => void; // Atualiza Zions Points
+    updateUserCash: (amount: number) => void; // Atualiza Zions Cash
     loginAsVisitor: (membershipType?: 'MAGAZINE' | 'MGT') => void;
     logout: () => void;
     isAuthenticated: boolean;
@@ -442,8 +446,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const updateUserZions = (amount: number) => {
+        // DEPRECATED - mantido para compatibilidade, atualiza zionsPoints
         if (user) {
-            setUser({ ...user, zions: (user.zions || 0) + amount });
+            setUser({ 
+                ...user, 
+                zions: (user.zions || 0) + amount,
+                zionsPoints: (user.zionsPoints || 0) + amount 
+            });
+        }
+    };
+
+    const updateUserPoints = (amount: number) => {
+        if (user) {
+            setUser({ 
+                ...user, 
+                zionsPoints: (user.zionsPoints || 0) + amount 
+            });
+        }
+    };
+
+    const updateUserCash = (amount: number) => {
+        if (user) {
+            setUser({ 
+                ...user, 
+                zionsCash: (user.zionsCash || 0) + amount 
+            });
         }
     };
 
@@ -456,6 +483,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             points: 0,
             trophies: 0,
             zions: 0,
+            zionsPoints: 0,
+            zionsCash: 0,
             level: 0,
             membershipType: membershipType,
             displayName: 'Visitante',
@@ -498,9 +527,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await api.post('/gamification/daily-login');
             if (response.data.awarded > 0) {
-                // Update user zions
+                // Update user zions (Points para daily login)
                 if (user) {
-                    setUser({ ...user, zions: (user.zions || 0) + response.data.awarded });
+                    setUser({ 
+                        ...user, 
+                        zions: (user.zions || 0) + response.data.awarded,
+                        zionsPoints: (user.zionsPoints || 0) + response.data.awarded 
+                    });
                 }
                 // Update status with new streak from backend
                 setDailyLoginStatus(prev => prev ? { 
@@ -526,6 +559,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             login,
             updateUser,
             updateUserZions,
+            updateUserPoints,
+            updateUserCash,
             loginAsVisitor,
             logout,
             isAuthenticated: !!user,

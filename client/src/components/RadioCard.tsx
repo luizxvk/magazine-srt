@@ -42,7 +42,8 @@ const RADIO_STATIONS: RadioStation[] = [
 ];
 
 export default function RadioCard() {
-    const { theme } = useAuth();
+    const { user, theme } = useAuth();
+    const isMGT = user?.membershipType === 'MGT';
     const audioRef = useRef<HTMLAudioElement | null>(null);
     
     const [currentStation, setCurrentStation] = useState<RadioStation>(RADIO_STATIONS[0]);
@@ -50,6 +51,17 @@ export default function RadioCard() {
     const [isMuted, setIsMuted] = useState(false);
     const [volume, setVolume] = useState(0.5);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Theme colors - consistent with other cards
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeGlow = isMGT 
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.25)]' 
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_20px_rgba(212,175,55,0.25)]';
+    const themeBg = theme === 'light' 
+        ? 'bg-white/80' 
+        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
+    const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
     useEffect(() => {
         const audio = new Audio(currentStation.streamUrl);
@@ -119,21 +131,21 @@ export default function RadioCard() {
     };
 
     return (
-        <div className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
-            theme === 'light' 
-                ? 'bg-white border-gray-200 shadow-lg' 
-                : 'bg-gradient-to-br from-zinc-900 to-zinc-800 border-white/10'
-        }`}>
-            {/* Header com visualizador */}
-            <div 
-                className="relative p-6 overflow-hidden"
-                style={{
-                    background: `linear-gradient(135deg, ${currentStation.color}15 0%, transparent 100%)`
-                }}
-            >
-                {/* Animated Background */}
+        <div className={`w-full ${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} transition-all duration-300 overflow-hidden`}>
+            {/* Header */}
+            <div className="relative p-4">
+                {/* Badge "AO VIVO" no canto superior esquerdo */}
                 {isPlaying && (
-                    <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-4 left-4 z-10">
+                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse">
+                            AO VIVO
+                        </span>
+                    </div>
+                )}
+
+                {/* Animated Background Effect */}
+                {isPlaying && (
+                    <div className="absolute inset-0 opacity-10 pointer-events-none">
                         <div 
                             className="absolute inset-0 animate-pulse"
                             style={{
@@ -146,11 +158,11 @@ export default function RadioCard() {
                 <div className="relative flex items-center gap-4">
                     {/* Radio Icon */}
                     <div 
-                        className="relative w-16 h-16 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${currentStation.color}20` }}
+                        className="relative w-14 h-14 rounded-xl flex items-center justify-center backdrop-blur-sm"
+                        style={{ backgroundColor: `${currentStation.color}15` }}
                     >
                         <Radio 
-                            className="w-8 h-8" 
+                            className="w-7 h-7" 
                             style={{ color: currentStation.color }}
                         />
                         {isPlaying && (
@@ -160,25 +172,18 @@ export default function RadioCard() {
 
                     {/* Station Info */}
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                            <h3 className={`font-bold text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                {currentStation.name}
-                            </h3>
-                            {isPlaying && (
-                                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse">
-                                    AO VIVO
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-xs text-gray-400 truncate">
+                        <h3 className={`font-bold text-base ${textMain} truncate`}>
+                            {currentStation.name}
+                        </h3>
+                        <p className={`text-xs ${textSub} truncate`}>
                             {currentStation.genre}
                         </p>
                     </div>
                 </div>
             </div>
 
-            {/* Controls */}
-            <div className={`p-4 border-t ${theme === 'light' ? 'border-gray-200 bg-gray-50' : 'border-white/10 bg-black/20'}`}>
+            {/* Controls Section */}
+            <div className={`p-4 pt-0 border-t ${themeBorder}`}>
                 {/* Station Selector */}
                 <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-2">
                     {RADIO_STATIONS.map((station) => (
@@ -187,9 +192,9 @@ export default function RadioCard() {
                             onClick={() => changeStation(station)}
                             className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                                 currentStation.id === station.id
-                                    ? 'text-white'
+                                    ? 'text-white shadow-md'
                                     : theme === 'light'
-                                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         : 'bg-white/5 text-gray-400 hover:bg-white/10'
                             }`}
                             style={currentStation.id === station.id ? { backgroundColor: station.color } : {}}
@@ -205,7 +210,7 @@ export default function RadioCard() {
                     <button
                         onClick={togglePlay}
                         disabled={isLoading}
-                        className="relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                        className="relative w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
                         style={{ backgroundColor: currentStation.color }}
                     >
                         {isLoading ? (
@@ -223,7 +228,7 @@ export default function RadioCard() {
                             onClick={toggleMute}
                             className={`p-2 rounded-lg transition-colors ${
                                 theme === 'light' 
-                                    ? 'hover:bg-gray-200 text-gray-700' 
+                                    ? 'hover:bg-gray-100 text-gray-700' 
                                     : 'hover:bg-white/5 text-gray-400'
                             }`}
                         >
@@ -243,7 +248,7 @@ export default function RadioCard() {
                             onChange={handleVolumeChange}
                             className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
                             style={{
-                                background: `linear-gradient(to right, ${currentStation.color} 0%, ${currentStation.color} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : '#ffffff10'} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : '#ffffff10'} 100%)`
+                                background: `linear-gradient(to right, ${currentStation.color} 0%, ${currentStation.color} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} 100%)`
                             }}
                         />
 
@@ -253,10 +258,11 @@ export default function RadioCard() {
                     </div>
                 </div>
 
-                {/* Info */}
-                <div className="mt-3 pt-3 border-t border-white/5">
-                    <p className="text-[10px] text-gray-500 text-center uppercase tracking-wider">
-                        🎵 Rádio 24/7 • Waves Music
+                {/* Footer Info */}
+                <div className={`mt-3 pt-3 border-t ${themeBorder}`}>
+                    <p className={`text-[10px] ${textSub} text-center uppercase tracking-wider flex items-center justify-center gap-1`}>
+                        <Radio className="w-3 h-3" />
+                        Rádio 24/7 • Waves Music
                     </p>
                 </div>
             </div>

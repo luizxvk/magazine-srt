@@ -44,7 +44,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isWhatsNewModalOpen, setIsWhatsNewModalOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
-    const [displayMode, setDisplayMode] = useState<'trophies' | 'zions' | 'membership'>('trophies');
+    const [displayMode, setDisplayMode] = useState<'trophies' | 'points' | 'cash' | 'membership'>('trophies');
 
     const isMGT = user?.membershipType === 'MGT';
     const headerBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
@@ -62,8 +62,9 @@ export default function Header({ onOpenShop }: HeaderProps) {
         if (isVisitor) return;
         const interval = setInterval(() => {
             setDisplayMode(prev => {
-                if (prev === 'trophies') return 'zions';
-                if (prev === 'zions') return 'membership';
+                if (prev === 'trophies') return 'points';
+                if (prev === 'points') return 'cash';
+                if (prev === 'cash') return 'membership';
                 return 'trophies';
             });
         }, 4000);
@@ -324,16 +325,28 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 {user?.trophies !== undefined ? `${user.trophies} Troféus` : '0 Troféus'}
                                             </motion.p>
                                         )}
-                                        {displayMode === 'zions' && (
+                                        {displayMode === 'points' && (
                                             <motion.p
-                                                key="zions"
+                                                key="points"
                                                 initial={{ opacity: 0, x: 20 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: -20 }}
                                                 transition={{ duration: 0.5 }}
                                                 className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
                                             >
-                                                {user?.zions ? `${user.zions} Zions` : '0 Zions'}
+                                                {user?.zionsPoints ? `${user.zionsPoints.toLocaleString('pt-BR')} Points` : '0 Points'}
+                                            </motion.p>
+                                        )}
+                                        {displayMode === 'cash' && (
+                                            <motion.p
+                                                key="cash"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.5 }}
+                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
+                                            >
+                                                {user?.zionsCash ? `Z$ ${user.zionsCash.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Z$ 0,00'}
                                             </motion.p>
                                         )}
                                         {displayMode === 'membership' && (
@@ -467,7 +480,9 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-semibold truncate" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#10b981' : '#d4af37') }}>{user.displayName || user.name}</p>
-                                            <p className="text-xs" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#34d399' : '#e5c86d') }}>{user.zions || 0} Zions</p>
+                                            <p className="text-xs" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#34d399' : '#e5c86d') }}>
+                                                {user.zionsPoints || 0} Points • Z$ {(user.zionsCash || 0).toFixed(2)}
+                                            </p>
                                         </div>
                                     </Link>
                                 )}
@@ -503,7 +518,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
                                 >
                                     <Coins className="w-4 h-4" />
-                                    <span className="text-sm">Zions</span>
+                                    <span className="text-sm">Zions Cash</span>
                                 </button>
                             </div>
 

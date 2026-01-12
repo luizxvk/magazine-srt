@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Loader2 } from 'lucide-react';
+import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Loader2, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
@@ -52,7 +52,7 @@ const categoryOptions = [
 ];
 
 export default function ProductStore() {
-    const { user, theme } = useAuth();
+    const { user, theme, accentColor } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,11 +64,8 @@ export default function ProductStore() {
     const [activeTab, setActiveTab] = useState<Tab>('store');
 
     const isMGT = user?.membershipType === 'MGT';
-    const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
-    const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
-    const textAccent = isMGT ? 'text-emerald-400' : 'text-yellow-400';
-    const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
-    const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
+    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const color = accentColor || defaultColor;
 
     useEffect(() => {
         if (activeTab === 'store') {
@@ -110,7 +107,7 @@ export default function ProductStore() {
     };
 
     return (
-        <div className={`min-h-screen ${theme === 'light' ? 'bg-gray-50' : 'bg-black'}`}>
+        <div className="min-h-screen bg-black">
             <LuxuriousBackground />
             <Header />
             
@@ -120,51 +117,60 @@ export default function ProductStore() {
                     <div className="flex items-center gap-4">
                         <Link 
                             to="/"
-                            className={`p-2 rounded-xl ${bgAccent} ${textAccent} hover:opacity-80 transition-opacity`}
+                            className="p-2 rounded-xl hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: `${color}15`, color }}
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1 className={`text-3xl font-bold bg-gradient-to-r ${gradientFrom} ${gradientTo} bg-clip-text text-transparent flex items-center gap-3`}>
-                                <Store className="w-8 h-8" />
+                            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                                <Store className="w-8 h-8" style={{ color }} />
                                 Loja de Produtos
                             </h1>
-                            <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} mt-1`}>
-                                Compre keys, gift cards e muito mais com Zions ou dinheiro real
+                            <p className="text-gray-400 mt-1">
+                                Compre keys, gift cards e muito mais com Zions
                             </p>
                         </div>
                     </div>
 
                     {/* Zions Balance */}
-                    <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${bgAccent} border ${borderAccent}`}>
-                        <span className="text-2xl">💎</span>
+                    <div 
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl"
+                        style={{ 
+                            backgroundColor: `${color}15`,
+                            borderWidth: '1px',
+                            borderStyle: 'solid',
+                            borderColor: `${color}30`
+                        }}
+                    >
+                        <Coins className="w-6 h-6" style={{ color }} />
                         <div>
                             <p className="text-xs text-gray-400">Seu saldo</p>
-                            <p className={`font-bold ${textAccent}`}>{user?.zions?.toLocaleString() || 0} Zions</p>
+                            <p className="font-bold" style={{ color }}>{user?.zions?.toLocaleString() || 0} Zions</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Tabs */}
-                <div className={`flex gap-2 p-1 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} mb-6 w-fit`}>
+                <div className="flex gap-2 p-1 rounded-xl bg-white/5 mb-6 w-fit">
                     <button
                         onClick={() => setActiveTab('store')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium
-                            ${activeTab === 'store' 
-                                ? `bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white` 
-                                : `${theme === 'light' ? 'text-gray-600 hover:text-gray-900' : 'text-gray-400 hover:text-white'}`
-                            }`}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium text-white"
+                        style={{ 
+                            background: activeTab === 'store' ? `linear-gradient(135deg, ${color}, ${color}dd)` : 'transparent',
+                            color: activeTab === 'store' ? 'white' : '#9ca3af'
+                        }}
                     >
                         <ShoppingBag className="w-4 h-4" />
                         Loja
                     </button>
                     <button
                         onClick={() => setActiveTab('orders')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium
-                            ${activeTab === 'orders' 
-                                ? `bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white` 
-                                : `${theme === 'light' ? 'text-gray-600 hover:text-gray-900' : 'text-gray-400 hover:text-white'}`
-                            }`}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium"
+                        style={{ 
+                            background: activeTab === 'orders' ? `linear-gradient(135deg, ${color}, ${color}dd)` : 'transparent',
+                            color: activeTab === 'orders' ? 'white' : '#9ca3af'
+                        }}
                     >
                         <History className="w-4 h-4" />
                         Minhas Compras
@@ -183,20 +189,34 @@ export default function ProductStore() {
                             <div className="flex flex-col sm:flex-row gap-4 mb-6">
                                 {/* Search */}
                                 <div className="relative flex-1">
-                                    <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                                     <input
                                         type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         placeholder="Buscar produtos..."
-                                        className={`w-full pl-12 pr-4 py-3 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/5 text-white'} focus:outline-none focus:ring-2 focus:ring-opacity-50 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-yellow-500'}`}
+                                        className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 text-white focus:outline-none focus:ring-2"
+                                        style={{ 
+                                            borderWidth: '1px',
+                                            borderStyle: 'solid',
+                                            borderColor: `${color}30`,
+                                            // @ts-ignore
+                                            '--tw-ring-color': color
+                                        }}
                                     />
                                 </div>
 
                                 {/* Filter Toggle */}
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className={`flex items-center gap-2 px-4 py-3 rounded-xl border ${borderAccent} ${bgAccent} ${textAccent} transition-all`}
+                                    className="flex items-center gap-2 px-4 py-3 rounded-xl transition-all"
+                                    style={{ 
+                                        backgroundColor: `${color}15`,
+                                        borderWidth: '1px',
+                                        borderStyle: 'solid',
+                                        borderColor: `${color}30`,
+                                        color
+                                    }}
                                 >
                                     <Filter className="w-5 h-5" />
                                     <span>Filtros</span>
@@ -213,20 +233,27 @@ export default function ProductStore() {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="overflow-hidden mb-6"
                                     >
-                                        <div className={`p-4 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white' : 'bg-white/5'}`}>
+                                        <div 
+                                            className="p-4 rounded-xl bg-white/5"
+                                            style={{ 
+                                                borderWidth: '1px',
+                                                borderStyle: 'solid',
+                                                borderColor: `${color}30`
+                                            }}
+                                        >
                                             {/* Categories */}
                                             <div className="mb-4">
-                                                <p className={`text-sm font-medium mb-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Categoria</p>
+                                                <p className="text-sm font-medium mb-2 text-gray-300">Categoria</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {categoryOptions.map(cat => (
                                                         <button
                                                             key={cat.value}
                                                             onClick={() => setCategory(cat.value as Category)}
-                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all
-                                                                ${category === cat.value 
-                                                                    ? `bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white` 
-                                                                    : `${bgAccent} ${textAccent} hover:opacity-80`
-                                                                }`}
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
+                                                            style={{ 
+                                                                background: category === cat.value ? `linear-gradient(135deg, ${color}, ${color}dd)` : `${color}15`,
+                                                                color: category === cat.value ? 'white' : color
+                                                            }}
                                                         >
                                                             {cat.icon}
                                                             {cat.label}
@@ -238,11 +265,16 @@ export default function ProductStore() {
                                             {/* Sort */}
                                             <div className="flex flex-wrap gap-4">
                                                 <div>
-                                                    <p className={`text-sm font-medium mb-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Ordenar por</p>
+                                                    <p className="text-sm font-medium mb-2 text-gray-300">Ordenar por</p>
                                                     <select
                                                         value={sortBy}
                                                         onChange={(e) => setSortBy(e.target.value as SortBy)}
-                                                        className={`px-3 py-2 rounded-lg border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/10 text-white'}`}
+                                                        className="px-3 py-2 rounded-lg bg-white/10 text-white"
+                                                        style={{ 
+                                                            borderWidth: '1px',
+                                                            borderStyle: 'solid',
+                                                            borderColor: `${color}30`
+                                                        }}
                                                     >
                                                         <option value="createdAt">Data</option>
                                                         <option value="priceZions">Preço (Zions)</option>
@@ -251,11 +283,16 @@ export default function ProductStore() {
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <p className={`text-sm font-medium mb-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Ordem</p>
+                                                    <p className="text-sm font-medium mb-2 text-gray-300">Ordem</p>
                                                     <select
                                                         value={sortOrder}
                                                         onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-                                                        className={`px-3 py-2 rounded-lg border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/10 text-white'}`}
+                                                        className="px-3 py-2 rounded-lg bg-white/10 text-white"
+                                                        style={{ 
+                                                            borderWidth: '1px',
+                                                            borderStyle: 'solid',
+                                                            borderColor: `${color}30`
+                                                        }}
                                                     >
                                                         <option value="desc">Decrescente</option>
                                                         <option value="asc">Crescente</option>
@@ -270,10 +307,10 @@ export default function ProductStore() {
                             {/* Products Grid */}
                             {loading ? (
                                 <div className="flex items-center justify-center py-20">
-                                    <Loader2 className={`w-8 h-8 animate-spin ${textAccent}`} />
+                                    <Loader2 className="w-8 h-8 animate-spin" style={{ color }} />
                                 </div>
                             ) : products.length === 0 ? (
-                                <div className={`text-center py-20 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                                <div className="text-center py-20 text-gray-400">
                                     <Package className="w-16 h-16 mx-auto mb-4 opacity-50" />
                                     <p className="text-lg">Nenhum produto encontrado</p>
                                     <p className="text-sm mt-1">Tente mudar os filtros ou volte mais tarde</p>
@@ -300,10 +337,10 @@ export default function ProductStore() {
                             {/* Orders List */}
                             {loading ? (
                                 <div className="flex items-center justify-center py-20">
-                                    <Loader2 className={`w-8 h-8 animate-spin ${textAccent}`} />
+                                    <Loader2 className="w-8 h-8 animate-spin" style={{ color }} />
                                 </div>
                             ) : orders.length === 0 ? (
-                                <div className={`text-center py-20 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                                <div className="text-center py-20 text-gray-400">
                                     <History className="w-16 h-16 mx-auto mb-4 opacity-50" />
                                     <p className="text-lg">Nenhuma compra realizada</p>
                                     <p className="text-sm mt-1">Suas compras aparecerão aqui</p>
@@ -315,21 +352,29 @@ export default function ProductStore() {
                                             key={order.id}
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className={`p-4 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white' : 'bg-white/5'}`}
+                                            className="p-4 rounded-xl bg-white/5"
+                                            style={{ 
+                                                borderWidth: '1px',
+                                                borderStyle: 'solid',
+                                                borderColor: `${color}30`
+                                            }}
                                         >
                                             <div className="flex items-start gap-4">
                                                 {/* Product Image */}
-                                                <div className={`w-16 h-16 rounded-lg ${bgAccent} flex items-center justify-center overflow-hidden flex-shrink-0`}>
+                                                <div 
+                                                    className="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
+                                                    style={{ backgroundColor: `${color}15` }}
+                                                >
                                                     {order.product.imageUrl ? (
                                                         <img src={order.product.imageUrl} alt="" className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <Package className={`w-8 h-8 ${textAccent} opacity-50`} />
+                                                        <Package className="w-8 h-8 opacity-50" style={{ color }} />
                                                     )}
                                                 </div>
 
                                                 {/* Order Details */}
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className={`font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                    <h3 className="font-medium text-white">
                                                         {order.product.name}
                                                     </h3>
                                                     <p className="text-sm text-gray-400">
@@ -345,8 +390,9 @@ export default function ProductStore() {
                                                     {/* Price */}
                                                     <div className="flex items-center gap-2 mt-1">
                                                         {order.totalZions && (
-                                                            <span className={`text-sm ${textAccent}`}>
-                                                                💎 {order.totalZions.toLocaleString()} Zions
+                                                            <span className="text-sm flex items-center gap-1" style={{ color }}>
+                                                                <Coins className="w-4 h-4" />
+                                                                {order.totalZions.toLocaleString()} Zions
                                                             </span>
                                                         )}
                                                         {order.totalBRL && (

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Palette, Zap, Image, MessageCircle, Trophy, Bell, VolumeX, Users, Package, AtSign, Move, BadgeCheck, ChevronUp, Wrench, Award, Menu, ScrollText, Shield, Coins } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Palette, Zap, Image, MessageCircle, Trophy, Bell, VolumeX, Users, Package, AtSign, Move, BadgeCheck, ChevronUp, Wrench, Award, Menu, ScrollText, Shield, Coins, Wallet, ShoppingBag, Key, CreditCard, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.23';
+const CURRENT_VERSION = '0.4.0';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,25 +33,52 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.23 - Termos de Serviço, Taxa de Mercado, Melhorias
+    // v0.4.0 - LOJA DE PRODUTOS & MONETIZAÇÃO!
     const updates: UpdateItem[] = [
+        {
+            icon: <ShoppingBag className="w-5 h-5" />,
+            title: '🎮 LOJA DE PRODUTOS!',
+            description: 'Nova loja para comprar keys de jogos, gift cards, assinaturas e muito mais usando Zions ou dinheiro real!',
+            isNew: true
+        },
+        {
+            icon: <Gamepad2 className="w-5 h-5" />,
+            title: 'Keys de Jogos',
+            description: 'Compre keys de Steam, Epic, Xbox, PlayStation e mais! A key é entregue instantaneamente após a compra.',
+            isNew: true
+        },
+        {
+            icon: <Wallet className="w-5 h-5" />,
+            title: '💰 SACAR ZIONS EM PIX!',
+            description: 'Agora você pode converter seus Zions em dinheiro real via PIX! Taxa: 100 Zions = R$ 1,00',
+            isNew: true
+        },
+        {
+            icon: <CreditCard className="w-5 h-5" />,
+            title: 'Pagamento em Reais',
+            description: 'Produtos agora podem ter preço em Zions E em Reais. Escolha como quer pagar!',
+            isNew: true
+        },
+        {
+            icon: <Key className="w-5 h-5" />,
+            title: 'Sistema de Keys',
+            description: 'Admin pode cadastrar keys de produtos que são entregues automaticamente ao comprador!',
+            isNew: true
+        },
         {
             icon: <ScrollText className="w-5 h-5" />,
             title: 'Termos de Serviço',
-            description: 'Ao criar conta, agora você precisa ler e aceitar os Termos de Uso e Política de Privacidade (LGPD)!',
-            isNew: true
+            description: 'Ao criar conta, agora você precisa ler e aceitar os Termos de Uso e Política de Privacidade (LGPD)!'
         },
         {
             icon: <Coins className="w-5 h-5" />,
             title: 'Taxa de Mercado para Admin',
-            description: 'A taxa de 5% das vendas no mercado agora vai diretamente para a conta do administrador!',
-            isNew: true
+            description: 'A taxa de 5% das vendas no mercado agora vai diretamente para a conta do administrador!'
         },
         {
             icon: <Shield className="w-5 h-5" />,
             title: 'Conformidade LGPD',
-            description: 'Termos completos de privacidade, proteção de dados e direitos do usuário conforme legislação brasileira.',
-            isNew: true
+            description: 'Termos completos de privacidade, proteção de dados e direitos do usuário conforme legislação brasileira.'
         },
         {
             icon: <Store className="w-5 h-5" />,

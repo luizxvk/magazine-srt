@@ -4,7 +4,7 @@ import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import AdminGridDashboard from '../components/AdminGridDashboard';
-import { Trash2, Gift, Edit2, User as UserIcon, Check, X } from 'lucide-react';
+import { Trash2, Gift, Edit2, User as UserIcon, Check, X, Package, Wallet } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import AdminCreatePost from '../components/AdminCreatePost';
@@ -14,6 +14,8 @@ import AdminEditRewardModal from '../components/AdminEditRewardModal';
 import AdminCreateEvent from '../components/AdminCreateEvent';
 import BadgeManager from '../components/BadgeManager';
 import AdminFeedbackCard from '../components/AdminFeedbackCard';
+import AdminProducts from './admin/AdminProducts';
+import AdminWithdrawals from './admin/AdminWithdrawals';
 
 interface Reward {
     id: string;
@@ -52,6 +54,8 @@ export default function AdminDashboard() {
     const [requests, setRequests] = useState<InviteRequest[]>([]);
     const [usersList, setUsersList] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showProducts, setShowProducts] = useState(false);
+    const [showWithdrawals, setShowWithdrawals] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; rewardId: string | null }>({
         isOpen: false,
         rewardId: null
@@ -228,6 +232,24 @@ export default function AdminDashboard() {
 
                 {/* Grid Dashboard */}
                 <AdminGridDashboard />
+
+                {/* Quick Access Buttons */}
+                <div className="flex flex-wrap gap-4 mb-8">
+                    <button
+                        onClick={() => setShowProducts(true)}
+                        className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-xl hover:from-purple-500/30 hover:to-purple-600/30 transition-all text-white font-medium"
+                    >
+                        <Package className="w-5 h-5 text-purple-400" />
+                        <span>Gerenciar Produtos</span>
+                    </button>
+                    <button
+                        onClick={() => setShowWithdrawals(true)}
+                        className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 rounded-xl hover:from-green-500/30 hover:to-green-600/30 transition-all text-white font-medium"
+                    >
+                        <Wallet className="w-5 h-5 text-green-400" />
+                        <span>Gerenciar Saques</span>
+                    </button>
+                </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     {/* Actions */}
@@ -483,6 +505,24 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* Products Modal */}
+            {showProducts && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-gray-900/95 border border-white/10 rounded-2xl">
+                        <AdminProducts onClose={() => setShowProducts(false)} />
+                    </div>
+                </div>
+            )}
+
+            {/* Withdrawals Modal */}
+            {showWithdrawals && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-gray-900/95 border border-white/10 rounded-2xl">
+                        <AdminWithdrawals onClose={() => setShowWithdrawals(false)} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

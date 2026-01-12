@@ -25,6 +25,8 @@ import cronRoutes from './src/routes/cronRoutes';
 import uploadRoutes from './src/routes/uploadRoutes';
 import marketRoutes from './src/routes/marketRoutes';
 import feedbackRoutes from './src/routes/feedbackRoutes';
+import productRoutes from './src/routes/productRoutes';
+import withdrawalRoutes from './src/routes/withdrawalRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -94,6 +96,8 @@ apiRouter.use('/cron', cronRoutes);
 apiRouter.use('/uploads', uploadRoutes);
 apiRouter.use('/market', marketRoutes);
 apiRouter.use('/feedback', feedbackRoutes);
+apiRouter.use('/products', productRoutes);
+apiRouter.use('/withdrawals', withdrawalRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

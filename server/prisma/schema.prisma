@@ -67,6 +67,7 @@ model User {
   marketPurchases        MarketTransaction[] @relation("MarketBuyer")
   marketSales            MarketTransaction[] @relation("MarketTransactionSeller")
   feedbacks              Feedback[]
+  withdrawalRequests     WithdrawalRequest[]
 
   @@index([membershipType])
   @@index([isOnline])
@@ -421,10 +422,24 @@ model GroupMessage {
   isNSFW    Boolean     @default(false)
   group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
   sender    User        @relation("UserGroupMessages", fields: [senderId], references: [id])
+  readBy    GroupMessageRead[]
 
   @@index([groupId])
   @@index([senderId])
   @@index([createdAt])
+}
+
+// Track which users have read which messages
+model GroupMessageRead {
+  id        String       @id @default(uuid())
+  messageId String
+  userId    String
+  readAt    DateTime     @default(now())
+  message   GroupMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
 }
 
 model GroupSettings {
@@ -512,6 +527,128 @@ enum MarketListingStatus {
   ACTIVE
   SOLD
   CANCELLED
+}
+
+// ========== PRODUCT STORE SYSTEM ==========
+
+model Product {
+  id            String          @id @default(uuid())
+  name          String
+  description   String          @db.Text
+  imageUrl      String?
+  category      ProductCategory
+  priceZions    Int?            // Price in Zions (optional)
+  priceBRL      Float?          // Price in BRL (optional)
+  stock         Int             @default(0)
+  isUnlimited   Boolean         @default(false)
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  createdById   String
+  keys          ProductKey[]
+  orders        Order[]
+  
+  @@index([category])
+  @@index([isActive])
+  @@index([priceZions])
+  @@index([priceBRL])
+}
+
+model ProductKey {
+  id          String    @id @default(uuid())
+  productId   String
+  key         String    // The actual game key/code (encrypted in production)
+  isUsed      Boolean   @default(false)
+  usedAt      DateTime?
+  usedById    String?
+  orderId     String?
+  createdAt   DateTime  @default(now())
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order       Order?    @relation(fields: [orderId], references: [id])
+  
+  @@index([productId])
+  @@index([isUsed])
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  buyerId       String
+  productId     String
+  quantity      Int           @default(1)
+  totalZions    Int?          // Total paid in Zions
+  totalBRL      Float?        // Total paid in BRL
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(PENDING)
+  paymentId     String?       // External payment ID (Stripe/MercadoPago)
+  deliveredKeys ProductKey[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  product       Product       @relation(fields: [productId], references: [id])
+  
+  @@index([buyerId])
+  @@index([productId])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+// ========== WITHDRAWAL SYSTEM ==========
+
+model WithdrawalRequest {
+  id            String           @id @default(uuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  amountZions   Int              // Zions to convert
+  amountBRL     Float            // BRL to receive
+  pixKey        String           // PIX key for payment
+  pixKeyType    PixKeyType
+  status        WithdrawalStatus @default(PENDING)
+  processedAt   DateTime?
+  processedById String?
+  rejectionNote String?
+  createdAt     DateTime         @default(now())
+  
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ProductCategory {
+  GAME_KEY
+  GIFT_CARD
+  SUBSCRIPTION
+  DIGITAL_ITEM
+  SERVICE
+}
+
+enum PaymentMethod {
+  ZIONS
+  PIX
+  CREDIT_CARD
+  MERCADO_PAGO
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PixKeyType {
+  CPF
+  CNPJ
+  EMAIL
+  PHONE
+  RANDOM
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  COMPLETED
+  REJECTED
 }
 
 model Feedback {

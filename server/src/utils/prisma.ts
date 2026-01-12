@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 // Singleton pattern to prevent multiple PrismaClient instances
 // This is especially important in serverless environments like Vercel
 // where each function invocation could create a new connection
+// Updated: v0.4.0
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;

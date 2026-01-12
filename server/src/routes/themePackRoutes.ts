@@ -1,17 +1,17 @@
 import express from 'express';
-import { 
-    getAllThemePacks, 
-    purchaseThemePack, 
+import {
+    getAllThemePacks,
+    purchaseThemePack,
     getUserThemePacks,
-    equipThemePack 
+    equipThemePack
 } from '../controllers/themePackController';
-import { authenticate } from '../middleware/auth';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 router.get('/', getAllThemePacks);
-router.get('/my-packs', authenticate, getUserThemePacks);
-router.post('/:packId/purchase', authenticate, purchaseThemePack);
-router.post('/:packId/equip', authenticate, equipThemePack);
+router.get('/my-packs', authenticateToken, getUserThemePacks);
+router.post('/:packId/purchase', authenticateToken, purchaseThemePack);
+router.post('/:packId/equip', authenticateToken, equipThemePack);
 
 export default router;

@@ -14,6 +14,7 @@ interface ThemePack {
     maxStock?: number;
     soldCount: number;
     isLimited: boolean;
+    rarity?: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
     isOwned?: boolean;
     isEquipped?: boolean;
 }
@@ -85,9 +86,16 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
 
                 {/* Badges no topo */}
                 <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    {pack.isLimited && (
-                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-purple-500 text-white rounded">
-                            Edição Limitada
+                    {pack.rarity && (
+                        <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white rounded ${
+                            pack.rarity === 'LEGENDARY' ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600' :
+                            pack.rarity === 'EPIC' ? 'bg-gradient-to-r from-purple-500 to-purple-600' :
+                            pack.rarity === 'RARE' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                            'bg-gray-500'
+                        }`}>
+                            {pack.rarity === 'LEGENDARY' ? 'Lendário' :
+                             pack.rarity === 'EPIC' ? 'Épico' :
+                             pack.rarity === 'RARE' ? 'Raro' : 'Comum'}
                         </span>
                     )}
                     {pack.isEquipped && (

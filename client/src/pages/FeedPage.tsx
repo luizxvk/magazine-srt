@@ -324,6 +324,11 @@ export default function FeedPage() {
                         <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
                     </div>
 
+                    {/* Product Store Card */}
+                    <div className="mb-6">
+                        <ProductStoreCard />
+                    </div>
+
                     {/* Daily Login Card */}
                     <div className="mb-10">
                         <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
@@ -342,11 +347,6 @@ export default function FeedPage() {
                     {/* Market Card */}
                     <div className="mb-6">
                         <MarketCard />
-                    </div>
-
-                    {/* Product Store Card */}
-                    <div className="mb-6">
-                        <ProductStoreCard />
                     </div>
 
                     {/* Feedback Form Card */}

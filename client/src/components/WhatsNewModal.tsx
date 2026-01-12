@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Wallet, ShoppingBag, Key, CreditCard, Gamepad2, ScrollText, Shield, Coins } from 'lucide-react';
+import { X, Sparkles, Check, Store, Wallet, ShoppingBag, Key, CreditCard, Gamepad2, Mail, Shield, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.24';
+const CURRENT_VERSION = '0.3.25';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,47 +33,45 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.24 - LOJA DE PRODUTOS & MONETIZAÇÃO!
+    // v0.3.25 - MELHORIAS NA LOJA DE PRODUTOS!
     const updates: UpdateItem[] = [
         {
+            icon: <Mail className="w-5 h-5" />,
+            title: '📧 KEYS POR EMAIL!',
+            description: 'Agora as keys compradas são enviadas diretamente para seu email cadastrado! Mais seguro e prático.',
+            isNew: true
+        },
+        {
             icon: <ShoppingBag className="w-5 h-5" />,
-            title: '🎮 LOJA DE PRODUTOS!',
-            description: 'Nova loja para comprar keys de jogos, gift cards, assinaturas e muito mais usando Zions ou dinheiro real!',
+            title: 'Modal de Compra',
+            description: 'Nova tela de confirmação de compra com preview do produto, seleção de quantidade e forma de pagamento.',
+            isNew: true
+        },
+        {
+            icon: <Store className="w-5 h-5" />,
+            title: 'Carrossel no Feed',
+            description: 'Card da Loja no feed agora mostra um carrossel com os produtos disponíveis!',
             isNew: true
         },
         {
             icon: <Gamepad2 className="w-5 h-5" />,
             title: 'Keys de Jogos',
-            description: 'Compre keys de Steam, Epic, Xbox, PlayStation e mais! A key é entregue instantaneamente após a compra.',
-            isNew: true
+            description: 'Compre keys de Steam, Epic, Xbox, PlayStation e mais! A key é entregue por email após a compra.'
         },
         {
             icon: <Wallet className="w-5 h-5" />,
-            title: '💰 SACAR ZIONS EM PIX!',
-            description: 'Agora você pode converter seus Zions em dinheiro real via PIX! Taxa: 100 Zions = R$ 1,00',
-            isNew: true
+            title: 'Sacar Zions em PIX',
+            description: 'Converta seus Zions em dinheiro real via PIX! Taxa: 100 Zions = R$ 1,00'
         },
         {
             icon: <CreditCard className="w-5 h-5" />,
             title: 'Pagamento em Reais',
-            description: 'Produtos agora podem ter preço em Zions E em Reais. Escolha como quer pagar!',
-            isNew: true
+            description: 'Produtos podem ter preço em Zions E em Reais. Escolha como quer pagar!'
         },
         {
             icon: <Key className="w-5 h-5" />,
             title: 'Sistema de Keys',
-            description: 'Admin pode cadastrar keys de produtos que são entregues automaticamente ao comprador!',
-            isNew: true
-        },
-        {
-            icon: <ScrollText className="w-5 h-5" />,
-            title: 'Termos de Serviço',
-            description: 'Ao criar conta, agora você precisa aceitar os Termos de Uso e Política de Privacidade (LGPD)!'
-        },
-        {
-            icon: <Coins className="w-5 h-5" />,
-            title: 'Taxa de Mercado para Admin',
-            description: 'A taxa de 5% das vendas no mercado agora vai diretamente para a conta do administrador!'
+            description: 'Admin pode cadastrar keys de produtos que são entregues automaticamente ao comprador!'
         },
         {
             icon: <Shield className="w-5 h-5" />,
@@ -81,9 +79,9 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             description: 'Termos completos de privacidade, proteção de dados e direitos do usuário conforme legislação brasileira.'
         },
         {
-            icon: <Store className="w-5 h-5" />,
-            title: 'Botão Loja Sempre Visível',
-            description: 'O botão de "Meu Estilo" agora aparece no header de todas as páginas!'
+            icon: <Coins className="w-5 h-5" />,
+            title: 'Taxa de Mercado',
+            description: 'A taxa de 5% das vendas no mercado vai diretamente para a conta do administrador!'
         }
     ];
 

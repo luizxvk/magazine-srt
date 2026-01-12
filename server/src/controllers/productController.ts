@@ -2,6 +2,7 @@ import { Response } from 'express';
 import prisma from '../utils/prisma';
 import { uploadProductImage } from '../services/cloudinaryService';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { sendProductKeysEmail } from '../services/emailService';
 
 // ===================== PRODUCT MANAGEMENT (Admin) =====================
 
@@ -360,15 +361,28 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             select: { key: true }
         });
 
+        // Send keys via email
+        const keys = deliveredKeys.map(k => k.key);
+        if (user.email && keys.length > 0) {
+            await sendProductKeysEmail(
+                user.email,
+                user.displayName || user.name,
+                product.name,
+                keys,
+                order.id
+            );
+        }
+
         res.json({
             success: true,
+            message: 'Compra realizada com sucesso! As keys foram enviadas para seu email.',
             order: {
                 id: order.id,
                 product: product.name,
                 quantity,
                 totalZions: totalCost
             },
-            keys: deliveredKeys.map(k => k.key)
+            emailSent: !!user.email
         });
     } catch (error) {
         console.error('Error purchasing with Zions:', error);

@@ -380,3 +380,107 @@ export const sendAdminPasswordResetEmail = async (to: string, newPassword: strin
         html
     });
 };
+
+/**
+ * Send product purchase keys via email
+ */
+export const sendProductKeysEmail = async (
+    to: string,
+    userName: string,
+    productName: string,
+    keys: string[],
+    orderId: string
+): Promise<boolean> => {
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    
+    const keysList = keys.map((key, idx) => `
+        <div style="background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+            <p style="color: #888; font-size: 12px; margin: 0 0 4px 0;">Key ${idx + 1}</p>
+            <code style="color: #d4af37; font-family: 'Courier New', monospace; font-size: 16px; letter-spacing: 1px; word-break: break-all;">
+                ${key}
+            </code>
+        </div>
+    `).join('');
+
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h1 style="color: #d4af37; font-size: 28px; margin: 0; letter-spacing: 2px;">
+                        🛒 COMPRA REALIZADA!
+                    </h1>
+                    <p style="color: #888; font-size: 14px; margin-top: 8px;">
+                        Pedido #${orderId.slice(0, 8).toUpperCase()}
+                    </p>
+                </div>
+
+                <!-- Main Content -->
+                <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 32px;">
+                    <p style="color: #fff; font-size: 16px; margin: 0 0 8px 0;">
+                        Olá, <strong>${userName}</strong>!
+                    </p>
+                    <p style="color: #aaa; font-size: 14px; margin: 0 0 24px 0;">
+                        Sua compra foi processada com sucesso. Confira abaixo suas keys para o produto:
+                    </p>
+
+                    <!-- Product Info -->
+                    <div style="background: linear-gradient(135deg, #d4af3722, #b8962d22); border: 1px solid #d4af37; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                        <p style="color: #d4af37; font-weight: bold; font-size: 18px; margin: 0;">
+                            ${productName}
+                        </p>
+                        <p style="color: #888; font-size: 12px; margin: 4px 0 0 0;">
+                            Quantidade: ${keys.length} key(s)
+                        </p>
+                    </div>
+
+                    <!-- Keys -->
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="color: #fff; font-size: 14px; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px;">
+                            🔑 Suas Keys
+                        </h3>
+                        ${keysList}
+                    </div>
+
+                    <!-- Warning -->
+                    <div style="background: #332200; border-left: 4px solid #d4af37; padding: 12px 16px; border-radius: 0 8px 8px 0;">
+                        <p style="color: #d4af37; margin: 0; font-size: 13px;">
+                            ⚠️ <strong>Importante:</strong> Guarde suas keys em local seguro. Por questões de segurança, não compartilhe este email.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- View Order Button -->
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="${frontendUrl}/store" 
+                       style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8962d 100%); color: #000; text-decoration: none; padding: 14px 40px; border-radius: 8px; font-weight: bold; font-size: 16px; letter-spacing: 1px;">
+                        VER MINHAS COMPRAS
+                    </a>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align: center; margin-top: 40px;">
+                    <p style="color: #666; font-size: 12px; margin-bottom: 8px;">
+                        Obrigado por comprar conosco!
+                    </p>
+                    <p style="color: #444; font-size: 12px;">
+                        © ${new Date().getFullYear()} Magazine/MGT. Todos os direitos reservados.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    return sendEmail({
+        to,
+        subject: `🛒 Sua compra: ${productName} - Magazine`,
+        html
+    });
+};

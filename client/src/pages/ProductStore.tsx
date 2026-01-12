@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Loader2, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -53,6 +53,7 @@ const categoryOptions = [
 
 export default function ProductStore() {
     const { user, accentColor } = useAuth();
+    const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -115,13 +116,13 @@ export default function ProductStore() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div className="flex items-center gap-4">
-                        <Link 
-                            to="/"
+                        <button 
+                            onClick={() => navigate('/')}
                             className="p-2 rounded-xl hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: `${color}15`, color }}
                         >
                             <ArrowLeft className="w-5 h-5" />
-                        </Link>
+                        </button>
                         <div>
                             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
                                 <Store className="w-8 h-8" style={{ color }} />

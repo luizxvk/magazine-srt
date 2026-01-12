@@ -141,12 +141,15 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                 {/* Included Items */}
                 <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <Sparkles className="w-4 h-4" style={{ color: pack.accentColor }} />
+                        <Sparkles className="w-4 h-4" style={{ color: pack.accentColor || '#d4af37' }} />
                         <span>Fundo Animado Exclusivo</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <div className="w-4 h-4 rounded-full border-2 border-white/20" style={{ backgroundColor: pack.accentColor }} />
-                        <span>Cor Destaque: {pack.accentColor}</span>
+                        <div 
+                            className="w-4 h-4 rounded-full border-2 border-white/30" 
+                            style={{ backgroundColor: pack.accentColor || '#d4af37' }} 
+                        />
+                        <span>Cor Destaque: {pack.accentColor || '#d4af37'}</span>
                     </div>
                 </div>
 
@@ -156,13 +159,12 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                         {!pack.isOwned && (
                             pack.rarity === 'LEGENDARY' ? (
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-2xl">🎁</span>
                                     <div className="flex flex-col">
+                                        <span className="text-xs font-medium text-amber-400">
+                                            Exclusivo
+                                        </span>
                                         <span className={`font-bold text-sm ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                                             Supply Box
-                                        </span>
-                                        <span className="text-xs text-amber-500">
-                                            Exclusivo
                                         </span>
                                     </div>
                                 </div>
@@ -181,51 +183,50 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                         )}
                     </div>
 
-                    <button
-                        onClick={handleAction}
-                        disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford || pack.rarity === 'LEGENDARY'))}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
-                            pack.isOwned
-                                ? pack.isEquipped
-                                    ? 'bg-gray-500/20 text-gray-400 hover:bg-red-500/20 hover:text-red-400'
-                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                : isOutOfStock
-                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                    : !canAfford
-                                        ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
-                                        : 'bg-gradient-to-r hover:opacity-90 text-white'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
-                        style={{
-                            ...(pack.isOwned && !pack.isEquipped && { backgroundColor: pack.accentColor }),
-                            ...(!pack.isOwned && canAfford && !isOutOfStock && {
-                                backgroundImage: `linear-gradient(to right, ${pack.accentColor}, ${adjustBrightness(pack.accentColor, -20)})`
-                            })
-                        }}
-                    >
-                        {loading ? (
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : pack.isEquipped ? (
-                            'Desequipar'
-                        ) : pack.isOwned ? (
-                            'Equipar'
-                        ) : pack.rarity === 'LEGENDARY' ? (
-                            <>
-                                <Lock className="w-4 h-4" /> Supply Box
-                            </>
-                        ) : isOutOfStock ? (
-                            <>
-                                <Lock className="w-4 h-4" /> Esgotado
-                            </>
-                        ) : !canAfford ? (
-                            <>
-                                <Lock className="w-4 h-4" /> Sem Zions
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingBag className="w-4 h-4" /> Comprar
-                            </>
-                        )}
-                    </button>
+                    {/* Botão só aparece se NÃO for legendário OU se for owned */}
+                    {(pack.isOwned || pack.rarity !== 'LEGENDARY') && (
+                        <button
+                            onClick={handleAction}
+                            disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}
+                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                                pack.isOwned
+                                    ? pack.isEquipped
+                                        ? 'bg-gray-500/20 text-gray-400 hover:bg-red-500/20 hover:text-red-400'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    : isOutOfStock
+                                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                        : !canAfford
+                                            ? 'bg-red-500/20 text-red-400 cursor-not-allowed'
+                                            : 'bg-gradient-to-r hover:opacity-90 text-white'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            style={{
+                                ...(pack.isOwned && !pack.isEquipped && { backgroundColor: pack.accentColor || '#d4af37' }),
+                                ...(!pack.isOwned && canAfford && !isOutOfStock && {
+                                    backgroundImage: `linear-gradient(to right, ${pack.accentColor || '#d4af37'}, ${adjustBrightness(pack.accentColor || '#d4af37', -20)})`
+                                })
+                            }}
+                        >
+                            {loading ? (
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : pack.isEquipped ? (
+                                'Desequipar'
+                            ) : pack.isOwned ? (
+                                'Equipar'
+                            ) : isOutOfStock ? (
+                                <>
+                                    <Lock className="w-4 h-4" /> Esgotado
+                                </>
+                            ) : !canAfford ? (
+                                <>
+                                    <Lock className="w-4 h-4" /> Sem Zions
+                                </>
+                            ) : (
+                                <>
+                                    <ShoppingBag className="w-4 h-4" /> Comprar
+                                </>
+                            )}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

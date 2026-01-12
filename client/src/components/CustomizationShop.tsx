@@ -459,9 +459,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                             if (legendaryPacks.length > 0) {
                                                 return (
                                                     <div className="mb-8">
-                                                        <h3 className={`text-lg font-bold ${textMain} mb-4 flex items-center gap-2`}>
-                                                            <span className="text-2xl">🏆</span>
-                                                            Packs Legendários
+                                                        <h3 className={`text-lg font-bold ${textMain} mb-4`}>
+                                                            Packs Lendários
                                                         </h3>
                                                         <div className="relative">
                                                             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory">

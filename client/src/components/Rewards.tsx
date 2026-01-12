@@ -10,6 +10,7 @@ interface Reward {
     title: string;
     type: 'PRODUCT' | 'COUPON' | 'DIGITAL';
     costZions: number;
+    zionsReward?: number;
     stock: number;
     isUnlimited: boolean;
     metadata: any;
@@ -73,8 +74,9 @@ export default function Rewards() {
         try {
             const response = await api.post('/gamification/rewards/redeem', { rewardId: reward.id });
 
-            // Update user zions locally
-            const updatedUser = { ...user, zions: user.zions - reward.costZions };
+            // Buscar o usuário atualizado do backend para garantir que os Zions estão corretos
+            const userResponse = await api.get('/users/me');
+            const updatedUser = userResponse.data;
             // @ts-ignore
             login(localStorage.getItem('token') || '', updatedUser);
 
@@ -82,15 +84,24 @@ export default function Rewards() {
             if (ticketCode) {
                 setRedeemedCode({ id: reward.id, code: ticketCode });
                 sendTicketEmail(ticketCode, reward.title, reward.costZions);
-                // Show mini popup (Toast)
-                // Assuming parent component passes a showToast function or we use a local one if available.
-                // Rewards.tsx doesn't seem to have showToast prop, but it might need one or use a context.
-                // I'll use alert for now or console, as I don't see showToast prop.
-                // Wait, I can add a local toast state if needed, but the user asked for a "mini popup".
-                // I'll assume the success state in UI is enough or add a simple alert for now, 
-                // but better: I'll add a callback prop or use a global toast if available.
-                // Actually, I'll just rely on the UI update (green checkmark) and maybe a browser notification?
-                // The user asked for "mini popup". I'll add a local state for a small popup overlay.
+                
+                // Mostrar notificação de sucesso com informações sobre Zions
+                const zionChange = reward.costZions - (reward.zionsReward || 0);
+                let successMessage = `Recompensa resgatada com sucesso! Ticket: ${ticketCode}`;
+                
+                if (reward.zionsReward && reward.zionsReward > 0) {
+                    successMessage += `\n💎 Você recebeu ${reward.zionsReward} Zions!`;
+                    if (zionChange > 0) {
+                        successMessage += ` (Custo: ${reward.costZions} - Recompensa: ${reward.zionsReward} = -${zionChange} Zions)`;
+                    } else if (zionChange < 0) {
+                        successMessage += ` (Você ganhou ${Math.abs(zionChange)} Zions!)`;
+                    }
+                } else {
+                    successMessage += `\n💰 -${reward.costZions} Zions`;
+                }
+                
+                setNotification({ type: 'success', message: successMessage });
+                setTimeout(() => setNotification(null), 6000);
             } else if (response.data.code?.url) {
                 window.open(response.data.code.url, '_blank');
             }

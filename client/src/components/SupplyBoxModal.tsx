@@ -131,7 +131,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 </h2>
                             </div>
 
-                            {reward.item && reward.type === 'NEW_ITEM' && (
+                            {reward.item && (
                                 <div className="w-full max-w-sm mb-6 pointer-events-none">
                                     <ThemePackCard
                                         pack={reward.item}

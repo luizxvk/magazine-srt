@@ -57,7 +57,7 @@ type FilterType = 'all' | 'background' | 'badge' | 'color';
 type SortType = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
 export default function MarketPage() {
-  const { user, theme, updateUserZions } = useAuth();
+  const { user, theme, updateUser } = useAuth();
   const location = useLocation();
   const isMGT = user?.membershipType === 'MGT';
 
@@ -139,8 +139,8 @@ export default function MarketPage() {
   const handleBuy = async (listing: Listing) => {
     if (!user || buyingId) return;
 
-    if (user.zions < listing.price) {
-      showNotification('error', 'Zions insuficientes!');
+    if ((user?.zionsPoints || 0) < listing.price) {
+      showNotification('error', 'Points insuficientes!');
       return;
     }
 
@@ -148,7 +148,10 @@ export default function MarketPage() {
     try {
       const res = await api.post(`/market/buy/${listing.id}`);
       showNotification('success', res.data.message);
-      updateUserZions(res.data.newBalance);
+      showNotification('success', res.data.message);
+      // Removed updateUserZions, use logic to refresh user if needed or assume backend/context handles it
+      // updateUserZions(res.data.newBalance); // Deprecated
+      api.get('/users/me').then(res => updateUser(res.data)); // Refresh user data to get new points
       fetchData();
     } catch (error: any) {
       showNotification('error', error.response?.data?.error || 'Erro ao comprar');
@@ -356,7 +359,7 @@ export default function MarketPage() {
           </div>
           <div className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'} border ${themeBorder}`}>
             <Zap className={`w-4 sm:w-5 h-4 sm:h-5 text-${themeColor}-400`} />
-            <span className={`font-bold text-${themeColor}-400 text-sm sm:text-base`}>{user?.zions?.toLocaleString() || 0} Zions</span>
+            <span className={`font-bold text-${themeColor}-400 text-sm sm:text-base`}>{user?.zionsPoints?.toLocaleString() || 0} Points</span>
           </div>
         </div>
 

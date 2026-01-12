@@ -362,7 +362,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                             </button>
                             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-${themeColor}-500/20 border border-${themeColor}-500/30`}>
                                 <Zap className={`w-4 h-4 text-${themeColor}-400`} />
-                                <span className={`text-sm font-bold text-${themeColor}-400`}>{user?.zions?.toLocaleString() || 0} Zions</span>
+                                <span className={`text-sm font-bold text-${themeColor}-400`}>{user?.zionsPoints?.toLocaleString() || 0} Points</span>
                             </div>
                             <button onClick={onClose} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>
                                 <X className={`w-5 h-5 ${textSub}`} />

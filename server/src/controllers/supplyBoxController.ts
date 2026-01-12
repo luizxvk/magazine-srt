@@ -90,7 +90,7 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
 
             result.type = 'DUPLICATE';
             result.compensation = compensation;
-            result.message = `Duplicata! Você recebeu ${compensation} Zions.`;
+            result.message = `Duplicata: ${selectedPack.name}! Você recebeu ${compensation} Zions.`;
         } else {
             // New Item! Add to collection
             await prisma.userThemePack.create({

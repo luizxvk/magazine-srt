@@ -287,6 +287,32 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         }
     };
 
+    const handleUnequipThemePack = async () => {
+        setPurchasing('unequip');
+        try {
+            // Unequip background and color
+            await api.post('/users/customizations/unequip', { category: 'backgrounds' });
+            await api.post('/users/customizations/unequip', { category: 'colors' });
+            
+            setNotification({ type: 'success', message: 'Pack desequipado com sucesso!' });
+            
+            // Update user state to remove equipped items
+            updateUser({
+                ...user!,
+                equippedBackground: null,
+                equippedColor: null
+            });
+            
+            fetchThemePacks(); // Refresh to update equipped status
+        } catch (error: any) {
+            const message = error.response?.data?.error || 'Erro ao desequipar pack';
+            setNotification({ type: 'error', message });
+        } finally {
+            setPurchasing(null);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
     const isOwned = (itemId: string) => ownedItems.includes(itemId);
     const isEquipped = (item: Omit<ShopItem, 'owned' | 'equipped'>) => equippedItems[item.type] === item.id;
 
@@ -439,7 +465,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                     pack={{ ...pack, isOwned, isEquipped }}
                                                     onPurchase={handlePurchaseThemePack}
                                                     onEquip={handleEquipThemePack}
-                                                    loading={purchasing === pack.id}
+                                                    onUnequip={handleUnequipThemePack}
+                                                    loading={purchasing === pack.id || purchasing === 'unequip'}
                                                 />
                                             );
                                         })}

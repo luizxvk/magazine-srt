@@ -20,7 +20,58 @@
 
 ## ✅ Recentemente Implementado (v0.3.25 - v0.4.0)
 
-### v0.4.0 (Atual - Janeiro 2026)
+### v0.4.0 (Atual - Janeiro 2026) 🎉
+**MAJOR UPDATE - 30+ Bug Fixes & Improvements**
+
+- 🔒 **Sistema de Visitante Aprimorado**
+  - 9 bloqueios implementados (comentários, share, feedback, notificações, zions, social, market, badge)
+  - Popup centralizado e reutilizável (VisitorBlockPopup)
+  - Sem popups intrusivos (daily login/welcome removidos)
+  - Experiência mais limpa para guests
+
+- 🎨 **Header Modernizado**
+  - Logo MAGAZINE agora segue cor personalizada do usuário (accentColor)
+  - Logo MGT aumentado 40% (h-12/h-14/h-16)
+  - Pulse de notificação movido de Social para Grupos
+  - Botão Settings removido do desktop (ainda no drawer)
+
+- ☀️ **Modo Claro 100% Funcional**
+  - Títulos do carrossel móvel com contraste perfeito
+  - Background do Ranking adaptado (bg-white/80 vs bg-white/5)
+  - Ícone verificado com stroke 2.5 + drop-shadow
+
+- 📻 **Rádio Totalmente Operacional**
+  - Badge "AO VIVO" movido para canto direito
+  - Volume automático (unmute ao aumentar de 0)
+  - Busca redireciona e scroll animado com highlight
+  - Event listener 'openRadio' no FeedPage
+
+- 🏆 **Sistema de Conquistas Expandido**
+  - 7 novas conquistas implementadas:
+    * Blogueiro (20 posts)
+    * Editor Chefe (50 posts)
+    * Comentador (first comment)
+    * Debatedor (50 comments)
+    * Super Fã (100 likes given)
+    * Ícone (100 likes received)
+    * Viral (50 comments received)
+  - Agora 12/25 conquistas têm lógica funcional
+
+- 🎭 **Personalização Melhorada**
+  - Botão "Desequipar" para theme packs equipados
+  - Remove background + cor ao desequipar
+  - Volta ao tema padrão com um clique
+
+- 🔧 **Correções Gerais**
+  - Contador do carrossel com clamping correto
+  - Scroll tracking suave (handleScroll initial call)
+  - Ícone verificado com maior contraste
+  - SearchModal processa actions (radio, shop, events)
+
+**Commits:** 8 progressivos + 1 release  
+**Branch:** beta (pronto para merge)
+
+### v0.3.39 (Janeiro 2026)
 - 🔒 **Sistema de Visitante Aprimorado**
   - Visitantes não recebem mais popups intrusivos (welcome/daily login)
   - Componente centralizado `VisitorBlockPopup` para bloqueios consistentes

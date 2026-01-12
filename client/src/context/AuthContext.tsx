@@ -345,13 +345,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Only apply custom background if user is authenticated (not null, not visitor)
         const isAuthenticated = user && user.role !== 'VISITOR';
 
+        // First, remove any existing animation classes from body
+        const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
+        existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
+
         if (!isAuthenticated || !backgroundStyle) {
             // Reset to default when not authenticated or no custom background
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
             document.body.style.animation = '';
+        } else if (backgroundStyle.startsWith('class:')) {
+            // Class-based animated background (from theme packs)
+            const className = backgroundStyle.replace('class:', '');
+            document.body.classList.add(className);
+            // Clear inline styles
+            document.body.style.background = '';
+            document.body.style.backgroundSize = '';
+            document.body.style.backgroundAttachment = '';
+            document.body.style.animation = '';
         } else {
+            // Traditional gradient (inline style)
             document.body.style.background = backgroundStyle;
             document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';

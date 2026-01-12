@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Store, Search, Palette, Zap, Image, MessageCircle, Trophy, Bell, VolumeX, Users, Package, AtSign, Move, BadgeCheck, Clock, ChevronUp, Wrench, Award, Menu } from 'lucide-react';
+import { X, Sparkles, Check, Store, Search, Palette, Zap, Image, MessageCircle, Trophy, Bell, VolumeX, Users, Package, AtSign, Move, BadgeCheck, ChevronUp, Wrench, Award, Menu, ScrollText, Shield, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.3.22';
+const CURRENT_VERSION = '0.3.23';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,70 +33,60 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.3.22 - UI/UX Improvements, Accent Colors, Group Notifications
+    // v0.3.23 - Termos de Serviço, Taxa de Mercado, Melhorias
     const updates: UpdateItem[] = [
+        {
+            icon: <ScrollText className="w-5 h-5" />,
+            title: 'Termos de Serviço',
+            description: 'Ao criar conta, agora você precisa ler e aceitar os Termos de Uso e Política de Privacidade (LGPD)!',
+            isNew: true
+        },
+        {
+            icon: <Coins className="w-5 h-5" />,
+            title: 'Taxa de Mercado para Admin',
+            description: 'A taxa de 5% das vendas no mercado agora vai diretamente para a conta do administrador!',
+            isNew: true
+        },
+        {
+            icon: <Shield className="w-5 h-5" />,
+            title: 'Conformidade LGPD',
+            description: 'Termos completos de privacidade, proteção de dados e direitos do usuário conforme legislação brasileira.',
+            isNew: true
+        },
         {
             icon: <Store className="w-5 h-5" />,
             title: 'Botão Loja Sempre Visível',
-            description: 'O botão de "Meu Estilo" agora aparece no header de todas as páginas, não só no feed!',
-            isNew: true
+            description: 'O botão de "Meu Estilo" agora aparece no header de todas as páginas!'
         },
         {
             icon: <ChevronUp className="w-5 h-5" />,
             title: 'PostPill Mobile Expansível',
-            description: 'No mobile, clique na seta para mostrar/esconder os ícones de ação do widget de post!',
-            isNew: true
+            description: 'No mobile, clique na seta para mostrar/esconder os ícones de ação do widget de post!'
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'PostPill com Cor Destaque',
-            description: 'O widget de criar post agora segue a cor de destaque personalizada do Magazine!',
-            isNew: true
+            description: 'O widget de criar post agora segue a cor de destaque personalizada!'
         },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Notificações com Fundo Sólido',
-            description: 'O card de notificações agora tem fundo preto sólido para melhor legibilidade!',
-            isNew: true
-        },
-        {
-            icon: <MessageCircle className="w-5 h-5" />,
-            title: 'Pulse em Grupos para Mensagens',
-            description: 'O ícone de Grupos no header agora pulsa vermelho para mensagens novas, não só menções!',
-            isNew: true
+            description: 'O card de notificações agora tem fundo preto sólido para melhor legibilidade!'
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Popup Convite Estilizado',
-            description: 'Convites de grupo agora mostram popup bonito ao invés de alert do navegador!',
-            isNew: true
+            description: 'Convites de grupo agora mostram popup bonito ao invés de alert do navegador!'
         },
         {
             icon: <BadgeCheck className="w-5 h-5" />,
             title: 'Selo Verificado Corrigido',
-            description: 'O ícone de email verificado agora aparece corretamente com sua cor!',
-            isNew: true
+            description: 'O ícone de email verificado agora aparece corretamente com sua cor!'
         },
         {
             icon: <Zap className="w-5 h-5" />,
             title: 'Botão Criar Grupo Dinâmico',
-            description: 'O botão "Criar Grupo" agora segue a cor de destaque do usuário!',
-            isNew: true
-        },
-        {
-            icon: <Clock className="w-5 h-5" />,
-            title: 'Popup de Cooldown Estilizado',
-            description: 'O aviso de espera para resgatar recompensas agora é um popup bonito ao invés de alerta do navegador!'
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Fotos em Retrato no Mobile',
-            description: 'Fotos postadas no mobile agora ocupam melhor o card, respeitando orientação retrato!'
-        },
-        {
-            icon: <BadgeCheck className="w-5 h-5" />,
-            title: 'Selo de Email Verificado',
-            description: 'Usuários com email verificado agora exibem um selo azul ao lado do nome no perfil!'
+            description: 'O botão "Criar Grupo" agora segue a cor de destaque do usuário!'
         },
         {
             icon: <Package className="w-5 h-5" />,
@@ -124,11 +114,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             description: 'Pesquise por nome, filtre por tipo (fundos, selos, cores) e ordene por preço ou data!'
         },
         {
-            icon: <Zap className="w-5 h-5" />,
-            title: 'Taxa de 5% nas Vendas',
-            description: 'Venda qualquer item não-padrão! O sistema cobra 5% de taxa e você recebe o resto em Zions.'
-        },
-        {
             icon: <Trophy className="w-5 h-5" />,
             title: 'Histórico de Transações',
             description: 'Veja todas suas compras e vendas, quanto ganhou/gastou, e acompanhe suas negociações!'
@@ -139,64 +124,9 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             description: 'Mute notificações de grupos individuais! Ícone aparece no título do grupo quando silenciado.'
         },
         {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Fundos de Chat em Grupos',
-            description: 'Admins podem aplicar fundos da loja ao chat do grupo! Todos os membros veem o novo visual.'
-        },
-        {
-            icon: <Users className="w-5 h-5" />,
-            title: 'Gerenciamento de Membros',
-            description: 'Modal de configurações do grupo com abas: Geral, Fundo e Membros. Admins podem promover/remover.'
-        },
-        {
             icon: <MessageCircle className="w-5 h-5" />,
             title: 'Sistema de GRUPOS Completo!',
-            description: 'Crie grupos públicos/privados, convide amigos via notificação, chat em tempo real, envie imagens (10 Zions), apelidos personalizados por grupo!',
-        },
-        {
-            icon: <Wrench className="w-5 h-5" />,
-            title: 'Múltiplas Correções de Bugs',
-            description: 'Corrigido erro de CORS no upload de imagens, botão de fechar stories reposicionado, botão configurações adicionado no header desktop.',
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Convites de Grupo via Notificação',
-            description: 'Receba e responda convites de grupo direto pelo sistema de notificações! Aceite ou recuse com um clique.',
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'Backgrounds Customizáveis',
-            description: 'Admins podem mudar o fundo do grupo usando wallpapers comprados da loja!',
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Enviar Imagens no Chat',
-            description: 'Compartilhe imagens dentro dos grupos! Custa 10 Zions por imagem enviada.',
-        },
-        {
-            icon: <Award className="w-5 h-5" />,
-            title: 'Apelidos Personalizados',
-            description: 'Defina um apelido único para cada grupo que você participa! Apareça com nomes diferentes em cada comunidade.',
-        },
-        {
-            icon: <Menu className="w-5 h-5" />,
-            title: 'Filtro de Conteúdo +18',
-            description: 'Marque conteúdo sensível nos grupos e ative/desative visualização com o botão de olhinho no chat!',
-        },
-        {
-            icon: <Sparkles className="w-5 h-5" />,
-            title: 'Modo Silencioso Individual',
-            description: 'Silencie grupos específicos sem sair! Você não receberá popups de notificação daquele grupo.',
-        },
-        {
-            icon: <Image className="w-5 h-5" />,
-            title: 'Stories - IDs Corrigidos',
-            description: 'Stories agora salvam ID real do backend após criação! Não mais erros 404.',
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Sistema Não Perturbe',
-            description: 'Ative para bloquear popups de notificações e exibir ícone vermelho de "Ocupado" para amigos!',
+            description: 'Crie grupos públicos/privados, convide amigos, chat em tempo real, envie imagens!'
         },
         {
             icon: <Award className="w-5 h-5" />,

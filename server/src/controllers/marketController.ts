@@ -288,12 +288,15 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
 
     const sellerOwned = JSON.parse(seller.ownedCustomizations || '[]');
 
-    // Calculate fee (5% market fee)
+    // Calculate fee (5% market fee goes to admin)
     const fee = Math.floor(listing.price * 0.05);
     const sellerReceives = listing.price - fee;
 
+    // Find admin user to receive the fee
+    const adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+
     // Perform transaction
-    await prisma.$transaction([
+    const transactionOperations = [
       // Deduct from buyer
       prisma.user.update({
         where: { id: userId },
@@ -350,7 +353,28 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
           content: `Seu item "${ITEM_DATA[listing.itemId]?.name || listing.itemId}" foi vendido por ${listing.price} Zions! Você recebeu ${sellerReceives} Zions (taxa de 5%).`,
         },
       }),
-    ]);
+    ];
+
+    // Add admin fee if admin exists and fee > 0
+    if (adminUser && fee > 0) {
+      transactionOperations.push(
+        // Add fee to admin
+        prisma.user.update({
+          where: { id: adminUser.id },
+          data: { zions: { increment: fee } },
+        }),
+        // Record admin fee history
+        prisma.zionHistory.create({
+          data: {
+            userId: adminUser.id,
+            amount: fee,
+            reason: `Taxa de mercado (5%): ${ITEM_DATA[listing.itemId]?.name || listing.itemId}`,
+          },
+        })
+      );
+    }
+
+    await prisma.$transaction(transactionOperations);
 
     res.json({
       success: true,

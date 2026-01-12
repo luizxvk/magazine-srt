@@ -8,6 +8,7 @@ import logoMgt from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import TermsOfServiceModal from '../components/TermsOfServiceModal';
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -26,6 +27,9 @@ export default function Register() {
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [avatarBase64, setAvatarBase64] = useState<string>('');
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [pendingSubmitData, setPendingSubmitData] = useState<RegisterForm | null>(null);
     
     const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<RegisterForm>({
         resolver: zodResolver(registerSchema),
@@ -60,6 +64,17 @@ export default function Register() {
     };
 
     const onSubmit = async (data: RegisterForm) => {
+        // If terms not accepted, show modal first
+        if (!acceptedTerms) {
+            setPendingSubmitData(data);
+            setShowTermsModal(true);
+            return;
+        }
+
+        await performRegistration(data);
+    };
+
+    const performRegistration = async (data: RegisterForm) => {
         try {
             const response = await api.post('/auth/register', {
                 ...data,
@@ -77,6 +92,15 @@ export default function Register() {
             } else {
                 setError('root', { message: errorMessage });
             }
+        }
+    };
+
+    const handleTermsAccepted = async () => {
+        setAcceptedTerms(true);
+        setShowTermsModal(false);
+        if (pendingSubmitData) {
+            await performRegistration(pendingSubmitData);
+            setPendingSubmitData(null);
         }
     };
 
@@ -286,6 +310,17 @@ export default function Register() {
                     </div>
                 </div>
             </div>
+
+            {/* Terms of Service Modal */}
+            <TermsOfServiceModal
+                isOpen={showTermsModal}
+                onAccept={handleTermsAccepted}
+                onClose={() => {
+                    setShowTermsModal(false);
+                    setPendingSubmitData(null);
+                }}
+                isMGT={isMGT}
+            />
         </div>
     );
 }

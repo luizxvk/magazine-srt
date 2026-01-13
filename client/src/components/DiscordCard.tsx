@@ -54,12 +54,20 @@ export default function DiscordCard() {
 
     const handleConnect = async () => {
         try {
+            if (!user?.id) {
+                console.error('User not logged in');
+                alert('Você precisa estar logado para conectar o Discord');
+                return;
+            }
+
             const response = await api.get('/social/discord/auth');
             // Adicionar userId como state parameter
-            const authUrl = `${response.data.authUrl}&state=${user?.id}`;
+            const authUrl = `${response.data.authUrl}&state=${user.id}`;
+            console.log('Redirecting to Discord OAuth:', authUrl);
             window.location.href = authUrl;
         } catch (error) {
             console.error('Error initiating Discord auth:', error);
+            alert('Erro ao iniciar autenticação com Discord');
         }
     };
 

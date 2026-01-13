@@ -351,17 +351,27 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
         const { code, state } = req.query;
         const userId = state as string; // Passado como state parameter
 
+        console.log('Discord callback - code:', code ? 'present' : 'missing');
+        console.log('Discord callback - state (userId):', userId);
+
         if (!userId) {
-            return res.redirect('/settings?social=discord&status=error');
+            console.error('Discord callback - Missing userId in state parameter');
+            return res.redirect('/settings?social=discord&status=error&message=missing_user_id');
         }
 
         if (!code) {
-            return res.redirect('/settings?social=discord&status=error');
+            console.error('Discord callback - Missing authorization code');
+            return res.redirect('/settings?social=discord&status=error&message=missing_code');
         }
 
         const clientId = process.env.DISCORD_CLIENT_ID;
         const clientSecret = process.env.DISCORD_CLIENT_SECRET;
         const redirectUri = process.env.DISCORD_REDIRECT_URI || 'http://localhost:5000/api/social/discord/callback';
+
+        if (!clientId || !clientSecret) {
+            console.error('Discord credentials not configured');
+            return res.redirect('/settings?social=discord&status=error&message=not_configured');
+        }
 
         // Trocar código por token
         const tokenResponse = await axios.post(
@@ -426,9 +436,11 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
         });
 
         res.redirect('/settings?social=discord&status=connected');
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in Discord callback:', error);
-        res.redirect('/settings?social=discord&status=error');
+        console.error('Error details:', error.response?.data || error.message);
+        const errorMsg = error.response?.data?.error || 'unknown';
+        res.redirect(`/settings?social=discord&status=error&message=${errorMsg}`);
     }
 };
 

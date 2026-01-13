@@ -4,16 +4,5 @@
             "source": "/(.*)",
             "destination": "/index.html"
         }
-    ],
-    "headers": [
-        {
-            "source": "/(.*)",
-            "headers": [
-                {
-                    "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src * data: blob:; connect-src 'self' https://*.vercel.app https://vercel.live wss://*.vercel.live https://discord.com https://api.twitch.tv https://api.steampowered.com; frame-src 'self' https://vercel.live;"
-                }
-            ]
-        }
     ]
 }

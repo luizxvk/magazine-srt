@@ -336,7 +336,12 @@ export const initiateDiscordAuth = async (req: AuthRequest, res: Response) => {
             return res.status(500).json({ message: 'Discord client ID não configurado' });
         }
 
-        const authUrl = `${OAUTH_URLS.discord.authorize}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify%20guilds%20relationships.read`;
+        // Escopos básicos que não requerem aprovação especial
+        const scopes = 'identify guilds';
+        const authUrl = `${OAUTH_URLS.discord.authorize}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}`;
+        
+        console.log('Discord auth URL generated:', authUrl);
+        console.log('Redirect URI being used:', redirectUri);
         
         res.json({ authUrl });
     } catch (error) {
@@ -348,11 +353,21 @@ export const initiateDiscordAuth = async (req: AuthRequest, res: Response) => {
 // Callback OAuth Discord
 export const discordCallback = async (req: AuthRequest, res: Response) => {
     try {
-        const { code, state } = req.query;
-        const userId = state as string; // Passado como state parameter
-
         // URL base do frontend
         const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        
+        // Log all query params for debugging
+        console.log('Discord callback - Full query:', JSON.stringify(req.query));
+        
+        const { code, state, error, error_description } = req.query;
+        
+        // Check if Discord returned an error
+        if (error) {
+            console.error('Discord OAuth error:', error, error_description);
+            return res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=${error}`);
+        }
+        
+        const userId = state as string; // Passado como state parameter
 
         console.log('Discord callback - code:', code ? 'present' : 'missing');
         console.log('Discord callback - state (userId):', userId);

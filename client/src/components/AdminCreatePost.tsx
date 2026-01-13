@@ -92,7 +92,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
                 videoUrl: mediaType === 'VIDEO' ? mediaUrl : undefined,
                 tags: ['OFFICIAL', 'ADMIN'],
                 isHighlight: isHighlight,
-                linkedProductId: selectedProduct?.id || null
+                ...(selectedProduct?.id && { linkedProductId: selectedProduct.id })
             });
 
             setCaption('');
@@ -238,7 +238,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
 
                             {/* Product Dropdown */}
                             {showProductDropdown && (
-                                <div className="absolute left-0 top-full mt-2 w-72 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+                                <div className="absolute left-0 bottom-full mb-2 w-80 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
                                     {loadingProducts ? (
                                         <div className="p-4 text-center text-gray-400">
                                             Carregando produtos...

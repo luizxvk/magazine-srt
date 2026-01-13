@@ -21,7 +21,6 @@ import EventsModal from '../components/EventsModal';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
-import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
@@ -327,11 +326,6 @@ export default function FeedPage() {
                                         linkedProduct: p.linkedProduct
                                     }))} />
                                 )}
-
-                                {/* Product Store Card - Below Destaque for visibility */}
-                                <div className="my-6">
-                                    <ProductStoreCard />
-                                </div>
 
                                 {posts.length === 0 ? (
                                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, ExternalLink, Loader2, CheckCircle, LogOut } from 'lucide-react';
+import { ExternalLink, Loader2, CheckCircle, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -90,19 +90,6 @@ export default function DiscordCard() {
         }
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'online':
-                return 'bg-green-500';
-            case 'idle':
-                return 'bg-yellow-500';
-            case 'dnd':
-                return 'bg-red-500';
-            default:
-                return 'bg-gray-500';
-        }
-    };
-
     const getGuildIcon = (guild: DiscordGuild) => {
         if (!guild.icon) return null;
         return `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
@@ -144,8 +131,6 @@ export default function DiscordCard() {
             </div>
         );
     }
-
-    const onlineFriends = guilds; // usando guilds agora
 
     return (
         <div className={`${bgCard} ${borderColor} border rounded-xl p-6`}>

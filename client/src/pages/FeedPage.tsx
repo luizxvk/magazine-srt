@@ -21,6 +21,7 @@ import EventsModal from '../components/EventsModal';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
+import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
@@ -374,6 +375,9 @@ export default function FeedPage() {
                         <div className="transform hover:scale-105 transition-transform duration-500">
                             <AnnouncementCard />
                         </div>
+
+                        {/* Product Store Card - Strategic placement for sales */}
+                        <ProductStoreCard />
                     </aside>
                 </div>
             </div>

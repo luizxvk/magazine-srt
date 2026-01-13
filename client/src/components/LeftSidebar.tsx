@@ -2,7 +2,6 @@ import { Gift, Users, Camera, Calendar, UserPlus, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
-import ProductStoreCard from './ProductStoreCard';
 
 interface LeftSidebarProps {
     onDailyLoginClick: () => void;
@@ -122,11 +121,6 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             {/* Online Friends Card */}
             <div className="mt-4">
                 <OnlineFriendsCard maxDisplay={4} />
-            </div>
-
-            {/* Product Store Card - Strategic placement for sales */}
-            <div className="mt-4">
-                <ProductStoreCard />
             </div>
         </aside>
     );

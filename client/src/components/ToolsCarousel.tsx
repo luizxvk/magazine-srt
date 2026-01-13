@@ -187,9 +187,11 @@ export default function ToolsCarousel() {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                className="relative overflow-hidden min-h-[200px]"
+                className="relative overflow-hidden"
             >
-                {renderCurrentTool()}
+                <div className="max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                    {renderCurrentTool()}
+                </div>
             </div>
 
             {/* Dots Indicator */}

@@ -298,3 +298,446 @@ export const getFriendshipStatus = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// ========== Integrações Sociais (Discord, Steam, Twitch) ==========
+
+import axios from 'axios';
+import { SocialPlatform } from '@prisma/client';
+
+// OAuth URLs
+const OAUTH_URLS = {
+    discord: {
+        authorize: 'https://discord.com/api/oauth2/authorize',
+        token: 'https://discord.com/api/oauth2/token',
+        userInfo: 'https://discord.com/api/users/@me',
+        friends: 'https://discord.com/api/users/@me/relationships',
+    },
+    steam: {
+        openid: 'https://steamcommunity.com/openid/login',
+        playerSummaries: 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/',
+        friendsList: 'https://api.steampowered.com/ISteamUser/GetFriendList/v1/',
+        recentlyPlayed: 'https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/',
+    },
+    twitch: {
+        authorize: 'https://id.twitch.tv/oauth2/authorize',
+        token: 'https://id.twitch.tv/oauth2/token',
+        userInfo: 'https://api.twitch.tv/helix/users',
+        streams: 'https://api.twitch.tv/helix/streams',
+    },
+};
+
+// Iniciar OAuth para Discord
+export const initiateDiscordAuth = async (req: AuthRequest, res: Response) => {
+    try {
+        const clientId = process.env.DISCORD_CLIENT_ID;
+        const redirectUri = process.env.DISCORD_REDIRECT_URI || 'http://localhost:5000/api/social/discord/callback';
+        
+        if (!clientId) {
+            return res.status(500).json({ message: 'Discord client ID não configurado' });
+        }
+
+        const authUrl = `${OAUTH_URLS.discord.authorize}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify%20guilds%20relationships.read`;
+        
+        res.json({ authUrl });
+    } catch (error) {
+        console.error('Error initiating Discord auth:', error);
+        res.status(500).json({ message: 'Erro ao iniciar autenticação Discord' });
+    }
+};
+
+// Callback OAuth Discord
+export const discordCallback = async (req: AuthRequest, res: Response) => {
+    try {
+        const { code, state } = req.query;
+        const userId = state as string; // Passado como state parameter
+
+        if (!userId) {
+            return res.redirect('/settings?social=discord&status=error');
+        }
+
+        if (!code) {
+            return res.redirect('/settings?social=discord&status=error');
+        }
+
+        const clientId = process.env.DISCORD_CLIENT_ID;
+        const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+        const redirectUri = process.env.DISCORD_REDIRECT_URI || 'http://localhost:5000/api/social/discord/callback';
+
+        // Trocar código por token
+        const tokenResponse = await axios.post(
+            OAUTH_URLS.discord.token,
+            new URLSearchParams({
+                client_id: clientId!,
+                client_secret: clientSecret!,
+                grant_type: 'authorization_code',
+                code: code as string,
+                redirect_uri: redirectUri,
+            }),
+            {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            }
+        );
+
+        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+
+        // Buscar informações do usuário Discord
+        const userResponse = await axios.get(OAUTH_URLS.discord.userInfo, {
+            headers: { Authorization: `Bearer ${access_token}` },
+        });
+
+        const discordUser = userResponse.data;
+
+        // Salvar conexão no banco
+        await prisma.socialConnection.upsert({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: SocialPlatform.DISCORD,
+                },
+            },
+            update: {
+                platformId: discordUser.id,
+                platformUsername: `${discordUser.username}`,
+                accessToken: access_token,
+                refreshToken: refresh_token,
+                expiresAt: new Date(Date.now() + expires_in * 1000),
+                isActive: true,
+                lastSynced: new Date(),
+                metadata: {
+                    avatar: discordUser.avatar,
+                    email: discordUser.email,
+                },
+            },
+            create: {
+                userId,
+                platform: SocialPlatform.DISCORD,
+                platformId: discordUser.id,
+                platformUsername: `${discordUser.username}`,
+                accessToken: access_token,
+                refreshToken: refresh_token,
+                expiresAt: new Date(Date.now() + expires_in * 1000),
+                isActive: true,
+                lastSynced: new Date(),
+                metadata: {
+                    avatar: discordUser.avatar,
+                    email: discordUser.email,
+                },
+            },
+        });
+
+        res.redirect('/settings?social=discord&status=connected');
+    } catch (error) {
+        console.error('Error in Discord callback:', error);
+        res.redirect('/settings?social=discord&status=error');
+    }
+};
+
+// Buscar amigos do Discord
+export const getDiscordFriends = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
+        const connection = await prisma.socialConnection.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: SocialPlatform.DISCORD,
+                },
+            },
+        });
+
+        if (!connection || !connection.accessToken) {
+            return res.status(404).json({ message: 'Discord não conectado' });
+        }
+
+        // Buscar relacionamentos (amigos)
+        const friendsResponse = await axios.get(OAUTH_URLS.discord.friends, {
+            headers: { Authorization: `Bearer ${connection.accessToken}` },
+        });
+
+        const friends = friendsResponse.data
+            .filter((rel: any) => rel.type === 1) // type 1 = friends
+            .map((friend: any) => ({
+                id: friend.user.id,
+                username: friend.user.username,
+                avatar: friend.user.avatar,
+                status: friend.user.status || 'offline',
+            }));
+
+        res.json({ friends });
+    } catch (error: any) {
+        console.error('Error fetching Discord friends:', error.response?.data || error.message);
+        
+        if (error.response?.status === 401) {
+            return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.' });
+        }
+        
+        res.status(500).json({ message: 'Erro ao buscar amigos do Discord' });
+    }
+};
+
+// Iniciar OAuth para Steam (OpenID)
+export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
+    try {
+        const realm = process.env.STEAM_REALM || 'http://localhost:5000';
+        const returnTo = `${realm}/api/social/steam/callback`;
+        
+        const params = new URLSearchParams({
+            'openid.ns': 'http://specs.openid.net/auth/2.0',
+            'openid.mode': 'checkid_setup',
+            'openid.return_to': returnTo,
+            'openid.realm': realm,
+            'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
+            'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
+        });
+
+        const authUrl = `${OAUTH_URLS.steam.openid}?${params.toString()}`;
+        
+        res.json({ authUrl });
+    } catch (error) {
+        console.error('Error initiating Steam auth:', error);
+        res.status(500).json({ message: 'Erro ao iniciar autenticação Steam' });
+    }
+};
+
+// Callback OAuth Steam
+export const steamCallback = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.query.state as string;
+
+        if (!userId) {
+            return res.redirect('/settings?social=steam&status=error');
+        }
+
+        const { 'openid.claimed_id': claimedId } = req.query;
+
+        if (!claimedId) {
+            return res.redirect('/settings?social=steam&status=error');
+        }
+
+        // Extrair Steam ID do claimed_id
+        const steamId = (claimedId as string).split('/').pop();
+
+        if (!steamId) {
+            return res.redirect('/settings?social=steam&status=error');
+        }
+
+        const apiKey = process.env.STEAM_API_KEY;
+
+        // Buscar informações do usuário Steam
+        const userResponse = await axios.get(OAUTH_URLS.steam.playerSummaries, {
+            params: {
+                key: apiKey,
+                steamids: steamId,
+            },
+        });
+
+        const steamUser = userResponse.data.response.players[0];
+
+        // Salvar conexão no banco
+        await prisma.socialConnection.upsert({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: SocialPlatform.STEAM,
+                },
+            },
+            update: {
+                platformId: steamId,
+                platformUsername: steamUser.personaname,
+                isActive: true,
+                lastSynced: new Date(),
+                metadata: {
+                    avatar: steamUser.avatarfull,
+                    profileUrl: steamUser.profileurl,
+                },
+            },
+            create: {
+                userId,
+                platform: SocialPlatform.STEAM,
+                platformId: steamId,
+                platformUsername: steamUser.personaname,
+                isActive: true,
+                lastSynced: new Date(),
+                metadata: {
+                    avatar: steamUser.avatarfull,
+                    profileUrl: steamUser.profileurl,
+                },
+            },
+        });
+
+        res.redirect('/settings?social=steam&status=connected');
+    } catch (error) {
+        console.error('Error in Steam callback:', error);
+        res.redirect('/settings?social=steam&status=error');
+    }
+};
+
+// Buscar atividades da Steam (jogos dos amigos)
+export const getSteamActivities = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
+        const connection = await prisma.socialConnection.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: SocialPlatform.STEAM,
+                },
+            },
+        });
+
+        if (!connection) {
+            return res.status(404).json({ message: 'Steam não conectado' });
+        }
+
+        const apiKey = process.env.STEAM_API_KEY;
+        const steamId = connection.platformId;
+
+        // Buscar lista de amigos
+        const friendsResponse = await axios.get(OAUTH_URLS.steam.friendsList, {
+            params: {
+                key: apiKey,
+                steamid: steamId,
+            },
+        });
+
+        const friendIds = friendsResponse.data.friendslist?.friends?.map((f: any) => f.steamid) || [];
+
+        if (friendIds.length === 0) {
+            return res.json({ activities: [] });
+        }
+
+        // Buscar informações dos amigos (incluindo jogo atual)
+        const summariesResponse = await axios.get(OAUTH_URLS.steam.playerSummaries, {
+            params: {
+                key: apiKey,
+                steamids: friendIds.slice(0, 100).join(','), // Steam API limita a 100
+            },
+        });
+
+        const activities = summariesResponse.data.response.players
+            .filter((player: any) => player.gameextrainfo) // Apenas jogando agora
+            .map((player: any) => ({
+                steamId: player.steamid,
+                username: player.personaname,
+                avatar: player.avatarfull,
+                gameName: player.gameextrainfo,
+                gameId: player.gameid,
+                status: 'playing',
+            }));
+
+        res.json({ activities });
+    } catch (error) {
+        console.error('Error fetching Steam activities:', error);
+        res.status(500).json({ message: 'Erro ao buscar atividades da Steam' });
+    }
+};
+
+// Buscar streams da Twitch
+export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
+    try {
+        const { usernames } = req.query; // Lista de usernames separados por vírgula
+
+        if (!usernames) {
+            return res.status(400).json({ message: 'Forneça usernames da Twitch' });
+        }
+
+        const clientId = process.env.TWITCH_CLIENT_ID;
+        const accessToken = process.env.TWITCH_ACCESS_TOKEN; // App access token
+
+        if (!clientId || !accessToken) {
+            return res.status(500).json({ message: 'Credenciais Twitch não configuradas' });
+        }
+
+        const usernameList = (usernames as string).split(',');
+
+        // Buscar streams ao vivo
+        const streamsResponse = await axios.get(OAUTH_URLS.twitch.streams, {
+            params: {
+                user_login: usernameList,
+            },
+            headers: {
+                'Client-ID': clientId,
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        const streams = streamsResponse.data.data.map((stream: any) => ({
+            userId: stream.user_id,
+            username: stream.user_login,
+            displayName: stream.user_name,
+            gameName: stream.game_name,
+            title: stream.title,
+            viewerCount: stream.viewer_count,
+            thumbnailUrl: stream.thumbnail_url.replace('{width}', '400').replace('{height}', '225'),
+            isLive: true,
+            streamUrl: `https://twitch.tv/${stream.user_login}`,
+        }));
+
+        res.json({ streams });
+    } catch (error) {
+        console.error('Error fetching Twitch streams:', error);
+        res.status(500).json({ message: 'Erro ao buscar streams da Twitch' });
+    }
+};
+
+// Desconectar plataforma social
+export const disconnectSocial = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { platform } = req.params;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
+        const platformEnum = platform.toUpperCase() as SocialPlatform;
+
+        await prisma.socialConnection.deleteMany({
+            where: {
+                userId,
+                platform: platformEnum,
+            },
+        });
+
+        res.json({ message: `${platform} desconectado com sucesso` });
+    } catch (error) {
+        console.error('Error disconnecting social:', error);
+        res.status(500).json({ message: 'Erro ao desconectar plataforma' });
+    }
+};
+
+// Listar conexões sociais do usuário
+export const getSocialConnections = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
+        const connections = await prisma.socialConnection.findMany({
+            where: { userId, isActive: true },
+            select: {
+                platform: true,
+                platformUsername: true,
+                lastSynced: true,
+                metadata: true,
+            },
+        });
+
+        res.json({ connections });
+    } catch (error) {
+        console.error('Error fetching social connections:', error);
+        res.status(500).json({ message: 'Erro ao buscar conexões sociais' });
+    }
+};

@@ -28,6 +28,9 @@ import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
 import RadioCard from '../components/RadioCard';
+import DiscordCard from '../components/DiscordCard';
+import SteamCard from '../components/SteamCard';
+import TwitchCard from '../components/TwitchCard';
 
 interface Post {
     id: string;
@@ -353,6 +356,18 @@ export default function FeedPage() {
                     {/* Radio Card - 24/7 Waves Music */}
                     <div id="radio-card" className="mb-6 transition-all duration-300 rounded-2xl">
                         <RadioCard />
+                    </div>
+
+                    {/* Social Integration Cards */}
+                    <div className="space-y-6 mb-6">
+                        {/* Discord Card */}
+                        <DiscordCard />
+                        
+                        {/* Steam Card */}
+                        <SteamCard />
+                        
+                        {/* Twitch Card */}
+                        <TwitchCard usernames={['gaules', 'alanzoka', 'loud_coringa', 'nobru']} />
                     </div>
 
                     {/* Inventory Card */}

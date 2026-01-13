@@ -352,7 +352,7 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
         const userId = state as string; // Passado como state parameter
 
         // URL base do frontend
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
 
         console.log('Discord callback - code:', code ? 'present' : 'missing');
         console.log('Discord callback - state (userId):', userId);
@@ -442,7 +442,7 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
     } catch (error: any) {
         console.error('Error in Discord callback:', error);
         console.error('Error details:', error.response?.data || error.message);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
         const errorMsg = error.response?.data?.error || 'unknown';
         res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=${errorMsg}`);
     }
@@ -524,7 +524,7 @@ export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
 export const steamCallback = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.query.state as string;
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
 
         if (!userId) {
             return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
@@ -590,7 +590,7 @@ export const steamCallback = async (req: AuthRequest, res: Response) => {
         res.redirect(`${frontendUrl}/settings?social=steam&status=connected`);
     } catch (error) {
         console.error('Error in Steam callback:', error);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
         res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
     }
 };

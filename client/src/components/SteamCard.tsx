@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gamepad2, ExternalLink, Loader2, Users } from 'lucide-react';
+import { Gamepad2, ExternalLink, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -57,7 +57,6 @@ export default function SteamCard() {
     const handleConnect = async () => {
         try {
             const response = await api.get('/social/steam/auth');
-            const authUrl = `${response.data.authUrl}&openid.return_to=${response.data.authUrl.split('openid.return_to=')[1]}&state=${user?.id}`;
             window.location.href = response.data.authUrl;
         } catch (error) {
             console.error('Error initiating Steam auth:', error);

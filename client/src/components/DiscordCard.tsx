@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Activity, ExternalLink, Loader2 } from 'lucide-react';
+import { Users, ExternalLink, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 

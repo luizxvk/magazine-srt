@@ -351,17 +351,20 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
         const { code, state } = req.query;
         const userId = state as string; // Passado como state parameter
 
+        // URL base do frontend
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+
         console.log('Discord callback - code:', code ? 'present' : 'missing');
         console.log('Discord callback - state (userId):', userId);
 
         if (!userId) {
             console.error('Discord callback - Missing userId in state parameter');
-            return res.redirect('/settings?social=discord&status=error&message=missing_user_id');
+            return res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=missing_user_id`);
         }
 
         if (!code) {
             console.error('Discord callback - Missing authorization code');
-            return res.redirect('/settings?social=discord&status=error&message=missing_code');
+            return res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=missing_code`);
         }
 
         const clientId = process.env.DISCORD_CLIENT_ID;
@@ -370,7 +373,7 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
 
         if (!clientId || !clientSecret) {
             console.error('Discord credentials not configured');
-            return res.redirect('/settings?social=discord&status=error&message=not_configured');
+            return res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=not_configured`);
         }
 
         // Trocar código por token
@@ -435,12 +438,13 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
             },
         });
 
-        res.redirect('/settings?social=discord&status=connected');
+        res.redirect(`${frontendUrl}/settings?social=discord&status=connected`);
     } catch (error: any) {
         console.error('Error in Discord callback:', error);
         console.error('Error details:', error.response?.data || error.message);
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
         const errorMsg = error.response?.data?.error || 'unknown';
-        res.redirect(`/settings?social=discord&status=error&message=${errorMsg}`);
+        res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=${errorMsg}`);
     }
 };
 
@@ -520,22 +524,23 @@ export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
 export const steamCallback = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.query.state as string;
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
 
         if (!userId) {
-            return res.redirect('/settings?social=steam&status=error');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
         }
 
         const { 'openid.claimed_id': claimedId } = req.query;
 
         if (!claimedId) {
-            return res.redirect('/settings?social=steam&status=error');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
         }
 
         // Extrair Steam ID do claimed_id
         const steamId = (claimedId as string).split('/').pop();
 
         if (!steamId) {
-            return res.redirect('/settings?social=steam&status=error');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
         }
 
         const apiKey = process.env.STEAM_API_KEY;
@@ -582,10 +587,11 @@ export const steamCallback = async (req: AuthRequest, res: Response) => {
             },
         });
 
-        res.redirect('/settings?social=steam&status=connected');
+        res.redirect(`${frontendUrl}/settings?social=steam&status=connected`);
     } catch (error) {
         console.error('Error in Steam callback:', error);
-        res.redirect('/settings?social=steam&status=error');
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+        res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
     }
 };
 

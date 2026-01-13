@@ -131,12 +131,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// 404 handler for API routes
-app.use('/api/*', (req, res) => {
-    console.log(`[404] API route not found: ${req.method} ${req.path}`);
-    res.status(404).json({ error: 'API route not found', path: req.path });
-});
-
 // Health check route
 app.get('/', (req, res) => {
     res.json({ message: 'MAGAZINE API is running', status: 'active' });

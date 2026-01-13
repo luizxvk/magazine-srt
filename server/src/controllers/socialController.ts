@@ -483,7 +483,7 @@ export const getDiscordFriends = async (req: AuthRequest, res: Response) => {
 // Iniciar OAuth para Steam (OpenID)
 export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
     try {
-        const realm = process.env.STEAM_REALM || 'http://localhost:5000';
+        const realm = process.env.STEAM_REALM || 'https://magazine-srt.vercel.app';
         const returnTo = `${realm}/api/social/steam/callback`;
         
         const params = new URLSearchParams({

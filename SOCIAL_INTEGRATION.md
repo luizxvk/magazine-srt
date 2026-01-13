@@ -18,7 +18,7 @@ O Magazine SRT agora possui integração com Discord, Steam e Twitch para exibir
 
 1. Acesse [Discord Developer Portal](https://discord.com/developers/applications)
 2. Crie uma nova aplicação
-3. Na seção OAuth2, adicione a redirect URI: `http://localhost:5000/api/social/discord/callback`
+3. Na seção OAuth2, adicione a redirect URI: `https://magazine-srt.vercel.app/api/social/discord/callback`
 4. Copie o **Client ID** e **Client Secret**
 5. Em OAuth2 > URL Generator, selecione os scopes:
    - `identify`
@@ -29,7 +29,7 @@ O Magazine SRT agora possui integração com Discord, Steam e Twitch para exibir
 ```env
 DISCORD_CLIENT_ID=seu_client_id
 DISCORD_CLIENT_SECRET=seu_client_secret
-DISCORD_REDIRECT_URI=http://localhost:5000/api/social/discord/callback
+DISCORD_REDIRECT_URI=https://magazine-srt.vercel.app/api/social/discord/callback
 ```
 
 ### 2. Steam API

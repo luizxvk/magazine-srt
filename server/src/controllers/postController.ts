@@ -51,6 +51,17 @@ export const createPost = async (req: AuthRequest, res: Response) => {
             }
         }
 
+        // Validate linkedProductId if provided
+        let validLinkedProductId: string | null = null;
+        if (data.linkedProductId) {
+            const product = await prisma.product.findUnique({
+                where: { id: data.linkedProductId }
+            });
+            if (product) {
+                validLinkedProductId = data.linkedProductId;
+            }
+        }
+
         const post = await prisma.post.create({
             data: {
                 userId,
@@ -59,7 +70,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                 videoUrl: data.videoUrl,
                 isHighlight: data.isHighlight || false,
                 mediaType: data.mediaType,
-                linkedProductId: data.linkedProductId || null,
+                linkedProductId: validLinkedProductId,
                 tags: {
                     create: data.tags?.map(tag => ({ tag })) || [],
                 },

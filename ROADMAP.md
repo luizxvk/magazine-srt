@@ -1,6 +1,6 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.4.0 (Beta)  
+> **Versão Atual:** v0.4.1 (Beta)  
 > **Última Atualização:** 12 de Janeiro de 2026
 
 ---
@@ -13,14 +13,45 @@
 ├─ Features Sociais: 95% ✅
 ├─ Gamificação: 90% ✅
 ├─ E-commerce: 85% 🔄
-└─ Personalização: 75% 🔄
+└─ Personalização: 80% 🔄
 ```
 
 ---
 
-## ✅ Recentemente Implementado (v0.3.25 - v0.4.0)
+## ✅ Recentemente Implementado (v0.3.25 - v0.4.1)
 
-### v0.4.0 (Atual - Janeiro 2026) 🎉
+### v0.4.1 (Atual - Janeiro 2026) 🎉
+**LAYOUT FACEBOOK-STYLE & TOOLS CAROUSEL**
+
+- 📱 **Sidebar Esquerda Estilo Facebook**
+  - Nova barra lateral com acesso rápido
+  - Links: Bônus Diário, Grupos, Catálogo, Eventos, Novos Membros, Destaques
+  - Barra de progresso de XP do usuário
+  - Estilização com cor personalizada do usuário
+  - Oculta em telas menores que lg (1024px)
+
+- 🎛️ **Carrossel de Ferramentas (ToolsCarousel)**
+  - Rádio, Discord, Steam e Twitch em carrossel único
+  - Navegação por tabs coloridas (Música/Azul/Verde/Roxo)
+  - Setas de navegação laterais
+  - Indicadores de ponto (dots) na parte inferior
+  - Suporte a gestos de swipe para mobile
+
+- 🖥️ **Layout 3 Colunas Redesenhado**
+  - Sidebar Esquerda (260px) | Feed Central (max 2xl) | Sidebar Direita (320px)
+  - Container expandido de max-w-7xl para max-w-[1600px]
+  - MobileCarousel agora apenas visível abaixo de lg
+  - Sidebar direita reorganizada: Tools → Store → Market → Inventory → etc
+
+- 🧹 **Limpeza de Código**
+  - Cards sociais removidos da sidebar direita (agora no carrossel)
+  - Links duplicados removidos (já estão na sidebar esquerda)
+  - Imports otimizados no FeedPage
+
+**Commits:** 3 progressivos + 1 release  
+**Branch:** beta
+
+### v0.4.0 (Janeiro 2026)
 **MAJOR UPDATE - 30+ Bug Fixes & Improvements**
 
 - 🔒 **Sistema de Visitante Aprimorado**

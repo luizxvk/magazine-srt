@@ -8,7 +8,7 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Users, Calendar, Settings } from 'lucide-react';
+import { Sparkles, Settings } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import DailyLoginCard from '../components/DailyLoginCard';
@@ -27,10 +27,8 @@ import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
-import RadioCard from '../components/RadioCard';
-import DiscordCard from '../components/DiscordCard';
-import SteamCard from '../components/SteamCard';
-import TwitchCard from '../components/TwitchCard';
+import LeftSidebar from '../components/LeftSidebar';
+import ToolsCarousel from '../components/ToolsCarousel';
 
 interface Post {
     id: string;
@@ -200,8 +198,6 @@ export default function FeedPage() {
     const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
     const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
 
-    const themeTextHover = isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
-
 
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative overflow-x-hidden">
@@ -254,225 +250,158 @@ export default function FeedPage() {
                 onClose={() => setIsShopOpen(false)}
             />
 
-            <div className="max-w-7xl mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-4 sm:px-6 md:px-8 flex gap-8 relative z-10">
-                {/* Main Feed Column */}
-                <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
-                    {/* Welcome Header */}
-                    <div className="mb-8 animate-fade-in-down">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
-                                    Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
-                                </h1>
-                                <p className="text-gray-400 text-lg font-light tracking-wide">
-                                    {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
-                                </p>
-                            </div>
-                            <Link
-                                to="/settings"
-                                className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
-                                title="Configurações"
-                            >
-                                <Settings className="w-5 h-5" />
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Stories Bar */}
-                    <div className="mb-6 animate-fade-in">
-                        <StoriesBar
-                            viewingStoryId={viewingStoryId}
-                            onViewStory={setViewingStoryId}
-                            onCloseStory={() => setViewingStoryId(null)}
-                            onEditorStateChange={setIsStoryEditorOpen}
-                        />
-                    </div>
-
-                    {/* Mobile Carousel - Quick Access Cards (below Stories) */}
-                    <div className="mb-8">
-                        <MobileCarousel
-                            dailyLoginStatus={dailyLoginStatus}
-                            onDailyLoginClick={openDailyLoginModal}
-                            onNewMembersClick={() => setIsNewMembersOpen(true)}
-                            onEventsClick={() => setIsEventsOpen(true)}
-                        />
-                    </div>
-
-                    {/* SRT Log Card - Mobile Only (Below Stories) */}
-                    <div className="lg:hidden mb-8 transform active:scale-95 transition-transform duration-300">
-                        <AnnouncementCard />
-                    </div>
-
-                    {/* Feed Carousel & Feed Items */}
-                    {loading ? (
-                        <ModernLoader />
-                    ) : (
-                        <>
-                            {highlightedPosts.length > 0 && (
-                                <FeedCarousel posts={highlightedPosts.map(p => ({
-                                    id: p.id,
-                                    title: p.content,
-                                    image: p.image,
-                                    category: p.tags[0] || 'DESTAQUE',
-                                    author: p.author
-                                }))} />
-                            )}
-
-                            {posts.length === 0 ? (
-                                <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
-                                    <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
-                                    <p className="text-gray-400 font-serif text-xl">Nenhuma postagem no momento</p>
-                                    <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
+            <div className="max-w-[1600px] mx-auto pt-40 sm:pt-44 md:pt-48 pb-32 px-4 sm:px-6 md:px-8 relative z-10">
+                <div className="flex gap-6">
+                    {/* Left Sidebar - Facebook Style */}
+                    <LeftSidebar
+                        onDailyLoginClick={openDailyLoginModal}
+                        onNewMembersClick={() => setIsNewMembersOpen(true)}
+                        onEventsClick={() => setIsEventsOpen(true)}
+                    />
+                    {/* Main Feed Column */}
+                    <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
+                        {/* Welcome Header */}
+                        <div className="mb-8 animate-fade-in-down">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
+                                        Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                                    </h1>
+                                    <p className="text-gray-400 text-lg font-light tracking-wide">
+                                        {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
+                                    </p>
                                 </div>
-                            ) : (
-                                <div className="space-y-6">
-                                    {regularPosts.map(post => (
-                                        <FeedItem
-                                            key={post.id}
-                                            id={post.id}
-                                            image={post.image || post.video}
-                                            title={post.content}
-                                            category={post.tags[0] || 'GERAL'}
-                                            author={post.author.name}
-                                            authorAvatar={post.author.avatarUrl}
-                                            authorId={post.author.id}
-                                            likes={post.likes}
-                                            comments={post.comments}
-                                            isLiked={post.isLiked}
-                                            onLike={() => handleLike(post.id)}
-                                            onComment={() => setActiveCommentPostId(post.id)}
-                                            onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}
-                                            onShare={() => handleShare(post.id)}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    )}
-                </main>
-
-                {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
-                <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
-                    {/* Radio Card - 24/7 Waves Music */}
-                    <div id="radio-card" className="mb-6 transition-all duration-300 rounded-2xl">
-                        <RadioCard />
-                    </div>
-
-                    {/* Social Integration Cards */}
-                    <div className="space-y-6 mb-6">
-                        {/* Discord Card */}
-                        <DiscordCard />
-                        
-                        {/* Steam Card */}
-                        <SteamCard />
-                        
-                        {/* Twitch Card */}
-                        <TwitchCard usernames={['gaules', 'alanzoka', 'loud_coringa', 'nobru']} />
-                    </div>
-
-                    {/* Inventory Card */}
-                    <div className="mb-6">
-                        <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
-                    </div>
-
-                    {/* Product Store Card */}
-                    <div className="mb-6">
-                        <ProductStoreCard />
-                    </div>
-
-                    {/* Daily Login Card */}
-                    <div className="mb-10">
-                        <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
-                    </div>
-
-                    {/* Online Friends Card */}
-                    <div className="mb-6">
-                        <OnlineFriendsCard maxDisplay={5} />
-                    </div>
-
-                    {/* Group Chat Card */}
-                    <div className="mb-6">
-                        <GroupChatCard />
-                    </div>
-
-                    {/* Market Card */}
-                    <div className="mb-6">
-                        <MarketCard />
-                    </div>
-
-                    {/* Feedback Form Card */}
-                    <div className="mb-6">
-                        <FeedbackFormCard />
-                    </div>
-
-                    {/* SRT LOG Promotion Card - Featured at Top */}
-                    <div className="mb-8 transform hover:scale-105 transition-transform duration-500">
-                        <AnnouncementCard />
-                    </div>
-
-                    {/* Photo Catalog Link */}
-                    <Link to="/catalog">
-                        <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'border-gold-500/20 hover:border-gold-500/50'} transition-all duration-300 group cursor-pointer mb-6 relative overflow-hidden`}>
-                            <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />
-                            <div className="flex items-center gap-3 mb-2 relative z-10">
-                                <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                    <Sparkles className="w-5 h-5" />
-                                </div>
-                                <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Catálogo de Fotos</h4>
+                                <Link
+                                    to="/settings"
+                                    className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
+                                    title="Configurações"
+                                >
+                                    <Settings className="w-5 h-5" />
+                                </Link>
                             </div>
-                            <p className="text-sm text-gray-400 leading-relaxed relative z-10">
-                                Explore a galeria exclusiva e baixe fotos em alta resolução.
-                            </p>
                         </div>
-                    </Link>
 
-                    {/* Highlights Link */}
-                    <Link to="/highlights">
-                        <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                    <Sparkles className="w-5 h-5" />
-                                </div>
-                                <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Destaques da Semana</h4>
-                            </div>
-                            <p className="text-sm text-gray-400 leading-relaxed">
-                                Confira os posts mais curtidos e comentados pelos membros da elite.
-                            </p>
+                        {/* Stories Bar */}
+                        <div className="mb-6 animate-fade-in">
+                            <StoriesBar
+                                viewingStoryId={viewingStoryId}
+                                onViewStory={setViewingStoryId}
+                                onCloseStory={() => setViewingStoryId(null)}
+                                onEditorStateChange={setIsStoryEditorOpen}
+                            />
                         </div>
-                    </Link>
 
-                    {/* New Members Button */}
-                    <div
-                        onClick={() => setIsNewMembersOpen(true)}
-                        className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
-                    >
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                <Users className="w-5 h-5" />
-                            </div>
-                            <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Novos Membros</h4>
+                        {/* Mobile Carousel - Quick Access Cards (below Stories) */}
+                        <div className="mb-8 lg:hidden">
+                            <MobileCarousel
+                                dailyLoginStatus={dailyLoginStatus}
+                                onDailyLoginClick={openDailyLoginModal}
+                                onNewMembersClick={() => setIsNewMembersOpen(true)}
+                                onEventsClick={() => setIsEventsOpen(true)}
+                            />
                         </div>
-                        <p className="text-sm text-gray-400 leading-relaxed">
-                            Dê as boas-vindas aos novos integrantes da nossa comunidade exclusiva.
-                        </p>
-                    </div>
 
-                    {/* Events Button */}
-                    <div
-                        onClick={() => setIsEventsOpen(true)}
-                        className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 hover:border-white/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
-                    >
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
-                                <Calendar className="w-5 h-5" />
-                            </div>
-                            <h4 className={`font-medium text-white ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Eventos Exclusivos</h4>
+                        {/* SRT Log Card - Mobile Only (Below Stories) */}
+                        <div className="xl:hidden mb-8 transform active:scale-95 transition-transform duration-300">
+                            <AnnouncementCard />
                         </div>
-                        <p className="text-sm text-gray-400 leading-relaxed">
-                            Fique por dentro dos próximos encontros e experiências {isMGT ? 'MGT' : 'Magazine'}.
-                        </p>
-                    </div>
-                </aside>
+
+                        {/* Feed Carousel & Feed Items */}
+                        {loading ? (
+                            <ModernLoader />
+                        ) : (
+                            <>
+                                {highlightedPosts.length > 0 && (
+                                    <FeedCarousel posts={highlightedPosts.map(p => ({
+                                        id: p.id,
+                                        title: p.content,
+                                        image: p.image,
+                                        category: p.tags[0] || 'DESTAQUE',
+                                        author: p.author
+                                    }))} />
+                                )}
+
+                                {posts.length === 0 ? (
+                                    <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
+                                        <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
+                                        <p className="text-gray-400 font-serif text-xl">Nenhuma postagem no momento</p>
+                                        <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-6">
+                                        {regularPosts.map(post => (
+                                            <FeedItem
+                                                key={post.id}
+                                                id={post.id}
+                                                image={post.image || post.video}
+                                                title={post.content}
+                                                category={post.tags[0] || 'GERAL'}
+                                                author={post.author.name}
+                                                authorAvatar={post.author.avatarUrl}
+                                                authorId={post.author.id}
+                                                likes={post.likes}
+                                                comments={post.comments}
+                                                isLiked={post.isLiked}
+                                                onLike={() => handleLike(post.id)}
+                                                onComment={() => setActiveCommentPostId(post.id)}
+                                                onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}
+                                                onShare={() => handleShare(post.id)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </main>
+
+                    {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
+                    <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
+                        {/* Tools Carousel - Radio, Discord, Steam, Twitch */}
+                        <div id="radio-card" className="mb-6 transition-all duration-300 rounded-2xl">
+                            <ToolsCarousel />
+                        </div>
+
+                        {/* Product Store Card */}
+                        <div className="mb-6">
+                            <ProductStoreCard />
+                        </div>
+
+                        {/* Market Card */}
+                        <div className="mb-6">
+                            <MarketCard />
+                        </div>
+
+                        {/* Inventory Card */}
+                        <div className="mb-6">
+                            <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
+                        </div>
+
+                        {/* Daily Login Card */}
+                        <div className="mb-6">
+                            <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+                        </div>
+
+                        {/* Online Friends Card */}
+                        <div className="mb-6">
+                            <OnlineFriendsCard maxDisplay={5} />
+                        </div>
+
+                        {/* Group Chat Card */}
+                        <div className="mb-6">
+                            <GroupChatCard />
+                        </div>
+
+                        {/* Feedback Form Card */}
+                        <div className="mb-6">
+                            <FeedbackFormCard />
+                        </div>
+
+                        {/* SRT LOG Promotion Card */}
+                        <div className="mb-6 transform hover:scale-105 transition-transform duration-500">
+                            <AnnouncementCard />
+                        </div>
+                    </aside>
+                </div>
             </div>
 
             {/* Create Post Widget (Fixed Bottom) - Hide when viewing stories or editing story */}

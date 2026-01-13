@@ -135,11 +135,11 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                                         </span>
                                     </div>
                                     <Link
-                                        to="/loja"
+                                        to={`/loja/${currentPost.linkedProduct.id}`}
                                         className="px-3 py-1.5 bg-gold-500 text-black text-xs font-bold rounded-lg hover:bg-gold-400 transition-colors"
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        Ver na Loja
+                                        Comprar
                                     </Link>
                                 </div>
                             )}

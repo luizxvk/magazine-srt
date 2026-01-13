@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Plus, Edit2, Trash2, Key, Loader2, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Key, Loader2, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
@@ -9,12 +9,18 @@ interface Product {
     name: string;
     description: string;
     imageUrl?: string;
+    screenshots?: string[];
     category: string;
     priceZions?: number;
     priceBRL?: number;
     stock: number;
     isUnlimited: boolean;
     isActive: boolean;
+    developer?: string;
+    releaseDate?: string;
+    sizeGB?: number;
+    platform?: string;
+    tags?: { tag: string }[];
     availableKeys: number;
     totalKeys: number;
     totalOrders: number;
@@ -52,11 +58,19 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
         imageFile: null as File | null,
         imagePreview: '',
         existingImageUrl: '',
+        screenshots: [] as string[],
+        newScreenshots: [] as File[],
+        screenshotPreviews: [] as string[],
         category: 'GAME_KEY',
         priceZions: '',
         priceBRL: '',
         isUnlimited: false,
-        isActive: true
+        isActive: true,
+        developer: '',
+        releaseDate: '',
+        sizeGB: '',
+        platform: '',
+        tags: ''
     });
 
     useEffect(() => {
@@ -90,15 +104,36 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                 });
             }
 
+            // Convert screenshots to base64
+            const screenshotBase64: string[] = [];
+            for (const file of formData.newScreenshots) {
+                const base64 = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.readAsDataURL(file);
+                });
+                screenshotBase64.push(base64);
+            }
+
+            // Parse tags
+            const tagsArray = formData.tags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
             const data = {
                 name: formData.name,
                 description: formData.description,
                 imageBase64: imageBase64,
+                screenshotBase64: screenshotBase64.length > 0 ? screenshotBase64 : undefined,
+                existingScreenshots: formData.screenshots,
                 category: formData.category,
                 priceZions: formData.priceZions ? parseInt(formData.priceZions) : undefined,
                 priceBRL: formData.priceBRL ? parseFloat(formData.priceBRL) : undefined,
                 isUnlimited: formData.isUnlimited,
-                isActive: formData.isActive
+                isActive: formData.isActive,
+                developer: formData.developer || undefined,
+                releaseDate: formData.releaseDate || undefined,
+                sizeGB: formData.sizeGB ? parseFloat(formData.sizeGB) : undefined,
+                platform: formData.platform || undefined,
+                tags: tagsArray.length > 0 ? tagsArray : undefined
             };
 
             if (editingProduct) {
@@ -164,11 +199,19 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             imageFile: null,
             imagePreview: '',
             existingImageUrl: '',
+            screenshots: [],
+            newScreenshots: [],
+            screenshotPreviews: [],
             category: 'GAME_KEY',
             priceZions: '',
             priceBRL: '',
             isUnlimited: false,
-            isActive: true
+            isActive: true,
+            developer: '',
+            releaseDate: '',
+            sizeGB: '',
+            platform: '',
+            tags: ''
         });
     };
 
@@ -180,11 +223,19 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             imageFile: null,
             imagePreview: '',
             existingImageUrl: product.imageUrl || '',
+            screenshots: product.screenshots || [],
+            newScreenshots: [],
+            screenshotPreviews: [],
             category: product.category,
             priceZions: product.priceZions?.toString() || '',
             priceBRL: product.priceBRL?.toString() || '',
             isUnlimited: product.isUnlimited,
-            isActive: product.isActive
+            isActive: product.isActive,
+            developer: product.developer || '',
+            releaseDate: product.releaseDate || '',
+            sizeGB: product.sizeGB?.toString() || '',
+            platform: product.platform || '',
+            tags: product.tags?.map(t => t.tag).join(', ') || ''
         });
         setShowModal(true);
     };
@@ -461,6 +512,87 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                     </div>
                                 </div>
 
+                                {/* Screenshots */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                                        <span className="flex items-center gap-2">
+                                            <Image className="w-4 h-4" /> Screenshots adicionais
+                                        </span>
+                                    </label>
+                                    <div className="space-y-3">
+                                        {/* Existing Screenshots */}
+                                        {formData.screenshots.length > 0 && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {formData.screenshots.map((url, idx) => (
+                                                    <div key={idx} className="relative w-20 h-12 rounded-lg overflow-hidden bg-white/5">
+                                                        <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormData({
+                                                                ...formData,
+                                                                screenshots: formData.screenshots.filter((_, i) => i !== idx)
+                                                            })}
+                                                            className="absolute top-0.5 right-0.5 p-0.5 bg-red-500/80 rounded-full"
+                                                        >
+                                                            <X className="w-3 h-3 text-white" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        
+                                        {/* New Screenshot Previews */}
+                                        {formData.screenshotPreviews.length > 0 && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {formData.screenshotPreviews.map((preview, idx) => (
+                                                    <div key={idx} className="relative w-20 h-12 rounded-lg overflow-hidden bg-white/5 border-2 border-emerald-500/50">
+                                                        <img src={preview} alt="" className="w-full h-full object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    newScreenshots: formData.newScreenshots.filter((_, i) => i !== idx),
+                                                                    screenshotPreviews: formData.screenshotPreviews.filter((_, i) => i !== idx)
+                                                                });
+                                                            }}
+                                                            className="absolute top-0.5 right-0.5 p-0.5 bg-red-500/80 rounded-full"
+                                                        >
+                                                            <X className="w-3 h-3 text-white" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Upload Button for Screenshots */}
+                                        <label className={`flex items-center gap-3 px-4 py-2 rounded-lg border border-dashed border-white/20 hover:border-emerald-500/50 cursor-pointer transition-colors ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
+                                            <Upload className="w-4 h-4 text-emerald-500" />
+                                            <span className="text-xs text-gray-400">Adicionar screenshots</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files || []);
+                                                    files.forEach(file => {
+                                                        const reader = new FileReader();
+                                                        reader.onload = () => {
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                newScreenshots: [...prev.newScreenshots, file],
+                                                                screenshotPreviews: [...prev.screenshotPreviews, reader.result as string]
+                                                            }));
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    });
+                                                }}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+
                                 {/* Category */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
@@ -522,6 +654,86 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         />
                                         <span className="text-sm text-gray-400">Ativo</span>
                                     </label>
+                                </div>
+
+                                {/* Separator */}
+                                <div className="border-t border-white/10 pt-4">
+                                    <p className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                                        <Gamepad2 className="w-4 h-4" /> Informações do Jogo (opcional)
+                                    </p>
+                                </div>
+
+                                {/* Developer & Platform */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                            <User className="w-3 h-3" /> Desenvolvedor
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.developer}
+                                            onChange={e => setFormData({ ...formData, developer: e.target.value })}
+                                            placeholder="Activision"
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                            <Monitor className="w-3 h-3" /> Plataforma
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.platform}
+                                            onChange={e => setFormData({ ...formData, platform: e.target.value })}
+                                            placeholder="PC, Xbox, PS5"
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Size & Release Date */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                            <HardDrive className="w-3 h-3" /> Tamanho (GB)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={formData.sizeGB}
+                                            onChange={e => setFormData({ ...formData, sizeGB: e.target.value })}
+                                            placeholder="120"
+                                            min="0"
+                                            step="0.1"
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" /> Data de Lançamento
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.releaseDate}
+                                            onChange={e => setFormData({ ...formData, releaseDate: e.target.value })}
+                                            placeholder="25 Out, 2025"
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Tags */}
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                        <Tag className="w-3 h-3" /> Tags (separadas por vírgula)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.tags}
+                                        onChange={e => setFormData({ ...formData, tags: e.target.value })}
+                                        placeholder="FPS, Multiplayer, Action, CallOfDuty"
+                                        className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Ex: FPS, Multiplayer, Action</p>
                                 </div>
 
                                 {/* Submit */}

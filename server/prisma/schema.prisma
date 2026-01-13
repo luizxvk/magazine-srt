@@ -545,12 +545,19 @@ model Product {
   name          String
   description   String          @db.Text
   imageUrl      String?
+  screenshots   String[]        // Array of additional screenshot URLs
   category      ProductCategory
   priceZions    Int?            // Price in Zions (optional)
   priceBRL      Float?          // Price in BRL (optional)
   stock         Int             @default(0)
   isUnlimited   Boolean         @default(false)
   isActive      Boolean         @default(true)
+  // Game/Product Info
+  developer     String?         // Developer/Publisher
+  releaseDate   String?         // Release date
+  sizeGB        Float?          // Size in GB
+  platform      String?         // Platform (PC, Xbox, PS, etc)
+  tags          ProductTag[]    // Tags relationship
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   createdById   String
@@ -563,6 +570,16 @@ model Product {
   @@index([isActive])
   @@index([priceZions])
   @@index([priceBRL])
+}
+
+model ProductTag {
+  id        String   @id @default(uuid())
+  productId String
+  tag       String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([productId, tag])
+  @@index([tag])
 }
 
 model ProductKey {

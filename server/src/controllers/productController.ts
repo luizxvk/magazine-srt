@@ -11,7 +11,11 @@ import { sendProductKeysEmail } from '../services/emailService';
  */
 export const createProduct = async (req: AuthRequest, res: Response) => {
     try {
-        const { name, description, imageBase64, category, priceZions, priceBRL, stock, isUnlimited } = req.body;
+        const { 
+            name, description, imageBase64, screenshotBase64, category, 
+            priceZions, priceBRL, stock, isUnlimited,
+            developer, releaseDate, sizeGB, platform, tags 
+        } = req.body;
         const userId = req.user?.userId;
 
         // Verify admin
@@ -26,17 +30,37 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
             imageUrl = await uploadProductImage(imageBase64);
         }
 
+        // Upload screenshots if provided
+        const screenshots: string[] = [];
+        if (screenshotBase64 && Array.isArray(screenshotBase64)) {
+            for (const base64 of screenshotBase64) {
+                const url = await uploadProductImage(base64);
+                if (url) screenshots.push(url);
+            }
+        }
+
         const product = await prisma.product.create({
             data: {
                 name,
                 description,
                 imageUrl,
+                screenshots,
                 category,
                 priceZions: priceZions || null,
                 priceBRL: priceBRL || null,
                 stock: stock || 0,
                 isUnlimited: isUnlimited || false,
-                createdById: userId!
+                developer: developer || null,
+                releaseDate: releaseDate || null,
+                sizeGB: sizeGB || null,
+                platform: platform || null,
+                createdById: userId!,
+                tags: tags && tags.length > 0 ? {
+                    create: tags.map((tag: string) => ({ tag }))
+                } : undefined
+            },
+            include: {
+                tags: true
             }
         });
 
@@ -53,7 +77,11 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 export const updateProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
-        const { name, description, imageBase64, category, priceZions, priceBRL, stock, isUnlimited, isActive } = req.body;
+        const { 
+            name, description, imageBase64, screenshotBase64, category, 
+            priceZions, priceBRL, stock, isUnlimited, isActive,
+            developer, releaseDate, sizeGB, platform, tags 
+        } = req.body;
         const userId = req.user?.userId;
 
         // Verify admin
@@ -71,6 +99,16 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
             }
         }
 
+        // Upload new screenshots if provided
+        let screenshots: string[] | undefined = undefined;
+        if (screenshotBase64 && Array.isArray(screenshotBase64) && screenshotBase64.length > 0) {
+            screenshots = [];
+            for (const base64 of screenshotBase64) {
+                const url = await uploadProductImage(base64);
+                if (url) screenshots.push(url);
+            }
+        }
+
         const updateData: any = {
             name,
             description,
@@ -79,7 +117,11 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
             priceBRL,
             stock,
             isUnlimited,
-            isActive
+            isActive,
+            developer: developer || null,
+            releaseDate: releaseDate || null,
+            sizeGB: sizeGB || null,
+            platform: platform || null
         };
 
         // Only update imageUrl if a new image was uploaded
@@ -87,12 +129,39 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
             updateData.imageUrl = imageUrl;
         }
 
+        // Only update screenshots if new ones were uploaded
+        if (screenshots !== undefined) {
+            // Get existing product to merge screenshots
+            const existingProduct = await prisma.product.findUnique({ where: { id } });
+            updateData.screenshots = [...(existingProduct?.screenshots || []), ...screenshots];
+        }
+
+        // Update product
         const product = await prisma.product.update({
             where: { id },
             data: updateData
         });
 
-        res.json(product);
+        // Update tags if provided
+        if (tags !== undefined) {
+            // Delete existing tags
+            await prisma.productTag.deleteMany({ where: { productId: id } });
+            
+            // Create new tags
+            if (tags && tags.length > 0) {
+                await prisma.productTag.createMany({
+                    data: tags.map((tag: string) => ({ productId: id, tag }))
+                });
+            }
+        }
+
+        // Return product with tags
+        const productWithTags = await prisma.product.findUnique({
+            where: { id },
+            include: { tags: true }
+        });
+
+        res.json(productWithTags);
     } catch (error) {
         console.error('Error updating product:', error);
         res.status(500).json({ error: 'Erro ao atualizar produto' });
@@ -228,12 +297,20 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
                 name: true,
                 description: true,
                 imageUrl: true,
+                screenshots: true,
                 category: true,
                 priceZions: true,
                 priceBRL: true,
                 stock: true,
                 isUnlimited: true,
+                developer: true,
+                releaseDate: true,
+                sizeGB: true,
+                platform: true,
                 createdAt: true,
+                tags: {
+                    select: { tag: true }
+                },
                 _count: {
                     select: {
                         keys: { where: { isUsed: false } }
@@ -265,6 +342,7 @@ export const getProduct = async (req: AuthRequest, res: Response) => {
         const product = await prisma.product.findUnique({
             where: { id },
             include: {
+                tags: true,
                 _count: {
                     select: {
                         keys: { where: { isUsed: false } },
@@ -534,6 +612,7 @@ export const getAdminProducts = async (req: AuthRequest, res: Response) => {
         const products = await prisma.product.findMany({
             orderBy: { createdAt: 'desc' },
             include: {
+                tags: true,
                 _count: {
                     select: {
                         keys: true,

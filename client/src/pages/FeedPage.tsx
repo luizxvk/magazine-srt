@@ -319,6 +319,11 @@ export default function FeedPage() {
                                     }))} />
                                 )}
 
+                                {/* Product Store Card - Below Destaque for visibility */}
+                                <div className="my-6">
+                                    <ProductStoreCard />
+                                </div>
+
                                 {posts.length === 0 ? (
                                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
                                         <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
@@ -375,9 +380,6 @@ export default function FeedPage() {
                         <div className="transform hover:scale-105 transition-transform duration-500">
                             <AnnouncementCard />
                         </div>
-
-                        {/* Product Store Card - Strategic placement for sales */}
-                        <ProductStoreCard />
                     </aside>
                 </div>
             </div>

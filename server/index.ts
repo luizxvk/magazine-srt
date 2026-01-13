@@ -124,14 +124,18 @@ apiRouter.use('/theme-packs', themePackRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);
+
+// Log all requests (after routes for debugging)
 app.use((req, res, next) => {
     console.log(`[REQUEST] ${req.method} ${req.path}`);
     next();
 });
 
-
-
-
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
+    console.log(`[404] API route not found: ${req.method} ${req.path}`);
+    res.status(404).json({ error: 'API route not found', path: req.path });
+});
 
 // Health check route
 app.get('/', (req, res) => {

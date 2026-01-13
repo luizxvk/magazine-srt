@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Users, ExternalLink, Loader2 } from 'lucide-react';
+import { Users, ExternalLink, Loader2, CheckCircle, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
-interface DiscordFriend {
+interface DiscordGuild {
     id: string;
-    username: string;
-    avatar: string | null;
-    status: 'online' | 'idle' | 'dnd' | 'offline';
+    name: string;
+    icon: string | null;
+}
+
+interface DiscordConnection {
+    platformUsername: string;
+    metadata?: {
+        avatar?: string;
+    };
 }
 
 export default function DiscordCard() {
     const { user, theme } = useAuth();
-    const [friends, setFriends] = useState<DiscordFriend[]>([]);
+    const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
+    const [connection, setConnection] = useState<DiscordConnection | null>(null);
     const [loading, setLoading] = useState(true);
     const [connected, setConnected] = useState(false);
 
@@ -34,7 +41,8 @@ export default function DiscordCard() {
             
             if (discordConnection) {
                 setConnected(true);
-                await loadFriends();
+                setConnection(discordConnection);
+                await loadGuilds();
             }
         } catch (error) {
             console.error('Error checking Discord connection:', error);
@@ -43,12 +51,23 @@ export default function DiscordCard() {
         }
     };
 
-    const loadFriends = async () => {
+    const loadGuilds = async () => {
         try {
-            const response = await api.get('/social/discord/friends');
-            setFriends(response.data.friends);
+            const response = await api.get('/social/discord/guilds');
+            setGuilds(response.data.guilds || []);
         } catch (error) {
-            console.error('Error loading Discord friends:', error);
+            console.error('Error loading Discord guilds:', error);
+        }
+    };
+
+    const handleDisconnect = async () => {
+        try {
+            await api.delete('/social/disconnect/DISCORD');
+            setConnected(false);
+            setConnection(null);
+            setGuilds([]);
+        } catch (error) {
+            console.error('Error disconnecting Discord:', error);
         }
     };
 
@@ -84,9 +103,9 @@ export default function DiscordCard() {
         }
     };
 
-    const getAvatarUrl = (friend: DiscordFriend) => {
-        if (!friend.avatar) return 'https://cdn.discordapp.com/embed/avatars/0.png';
-        return `https://cdn.discordapp.com/avatars/${friend.id}/${friend.avatar}.png`;
+    const getGuildIcon = (guild: DiscordGuild) => {
+        if (!guild.icon) return null;
+        return `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
     };
 
     if (loading) {
@@ -126,7 +145,7 @@ export default function DiscordCard() {
         );
     }
 
-    const onlineFriends = friends.filter(f => f.status !== 'offline');
+    const onlineFriends = guilds; // usando guilds agora
 
     return (
         <div className={`${bgCard} ${borderColor} border rounded-xl p-6`}>
@@ -140,42 +159,56 @@ export default function DiscordCard() {
                     <div>
                         <h3 className={`text-lg font-bold ${textMain}`}>Discord</h3>
                         <p className={`text-sm ${textSub}`}>
-                            {onlineFriends.length} amigos online
+                            @{connection?.platformUsername || 'Conectado'}
                         </p>
                     </div>
                 </div>
+                <button
+                    onClick={handleDisconnect}
+                    className="p-2 hover:bg-white/10 rounded-lg transition-colors text-red-400 hover:text-red-300"
+                    title="Desconectar"
+                >
+                    <LogOut className="w-4 h-4" />
+                </button>
             </div>
 
-            {onlineFriends.length === 0 ? (
-                <div className={`text-center py-8 ${textSub}`}>
-                    <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>Nenhum amigo online no momento</p>
-                </div>
-            ) : (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                    {onlineFriends.map((friend) => (
-                        <div
-                            key={friend.id}
-                            className={`flex items-center gap-3 p-3 rounded-lg ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} hover:bg-white/10 transition-colors`}
-                        >
-                            <div className="relative">
-                                <img
-                                    src={getAvatarUrl(friend)}
-                                    alt={friend.username}
-                                    className="w-10 h-10 rounded-full"
-                                />
-                                <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ${getStatusColor(friend.status)} border-2 ${theme === 'light' ? 'border-white' : 'border-gray-900'}`} />
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20 mb-4">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span className={`text-sm ${textMain}`}>Conta conectada com sucesso!</span>
+            </div>
+
+            {guilds.length > 0 && (
+                <div>
+                    <p className={`text-xs ${textSub} mb-2`}>Seus servidores ({guilds.length})</p>
+                    <div className="flex flex-wrap gap-2">
+                        {guilds.slice(0, 8).map((guild) => (
+                            <div
+                                key={guild.id}
+                                className={`flex items-center gap-2 px-2 py-1 rounded-lg ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}
+                                title={guild.name}
+                            >
+                                {getGuildIcon(guild) ? (
+                                    <img
+                                        src={getGuildIcon(guild)!}
+                                        alt={guild.name}
+                                        className="w-5 h-5 rounded-full"
+                                    />
+                                ) : (
+                                    <div className="w-5 h-5 rounded-full bg-[#5865F2] flex items-center justify-center text-white text-xs">
+                                        {guild.name.charAt(0)}
+                                    </div>
+                                )}
+                                <span className={`text-xs ${textMain} truncate max-w-[80px]`}>
+                                    {guild.name}
+                                </span>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium ${textMain} truncate`}>
-                                    {friend.username}
-                                </p>
-                                <p className={`text-xs ${textSub} capitalize`}>
-                                    {friend.status === 'dnd' ? 'Não perturbe' : friend.status === 'idle' ? 'Ausente' : 'Online'}
-                                </p>
+                        ))}
+                        {guilds.length > 8 && (
+                            <div className={`px-2 py-1 rounded-lg ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-xs ${textSub}`}>
+                                +{guilds.length - 8} mais
                             </div>
-                        </div>
-                    ))}
+                        )}
+                    </div>
                 </div>
             )}
         </div>

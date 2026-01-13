@@ -511,11 +511,62 @@ export const getDiscordFriends = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// Buscar servidores (guilds) do Discord
+export const getDiscordGuilds = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
+        const connection = await prisma.socialConnection.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: SocialPlatform.DISCORD,
+                },
+            },
+        });
+
+        if (!connection || !connection.accessToken) {
+            return res.status(404).json({ message: 'Discord não conectado' });
+        }
+
+        // Buscar guilds do usuário
+        const guildsResponse = await axios.get('https://discord.com/api/users/@me/guilds', {
+            headers: { Authorization: `Bearer ${connection.accessToken}` },
+        });
+
+        const guilds = guildsResponse.data.map((guild: any) => ({
+            id: guild.id,
+            name: guild.name,
+            icon: guild.icon,
+        }));
+
+        res.json({ guilds });
+    } catch (error: any) {
+        console.error('Error fetching Discord guilds:', error.response?.data || error.message);
+        
+        if (error.response?.status === 401) {
+            return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.' });
+        }
+        
+        res.status(500).json({ message: 'Erro ao buscar servidores do Discord' });
+    }
+};
+
 // Iniciar OAuth para Steam (OpenID)
 export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
     try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
         const realm = process.env.STEAM_REALM || 'https://magazine-srt.vercel.app';
-        const returnTo = `${realm}/api/social/steam/callback`;
+        // Adicionar userId como parâmetro para recuperar no callback
+        const returnTo = `${realm}/api/social/steam/callback?state=${userId}`;
         
         const params = new URLSearchParams({
             'openid.ns': 'http://specs.openid.net/auth/2.0',
@@ -527,6 +578,9 @@ export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
         });
 
         const authUrl = `${OAUTH_URLS.steam.openid}?${params.toString()}`;
+        
+        console.log('Steam auth URL:', authUrl);
+        console.log('Steam return_to:', returnTo);
         
         res.json({ authUrl });
     } catch (error) {
@@ -541,24 +595,37 @@ export const steamCallback = async (req: AuthRequest, res: Response) => {
         const userId = req.query.state as string;
         const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
 
+        console.log('Steam callback - query:', JSON.stringify(req.query));
+        console.log('Steam callback - userId:', userId);
+
         if (!userId) {
-            return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
+            console.error('Steam callback - Missing userId');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error&message=missing_user_id`);
         }
 
         const { 'openid.claimed_id': claimedId } = req.query;
 
         if (!claimedId) {
-            return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
+            console.error('Steam callback - Missing claimed_id');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error&message=missing_claimed_id`);
         }
 
         // Extrair Steam ID do claimed_id
         const steamId = (claimedId as string).split('/').pop();
 
         if (!steamId) {
-            return res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
+            console.error('Steam callback - Could not extract Steam ID');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error&message=invalid_steam_id`);
         }
 
+        console.log('Steam callback - Steam ID:', steamId);
+
         const apiKey = process.env.STEAM_API_KEY;
+        
+        if (!apiKey) {
+            console.error('Steam callback - STEAM_API_KEY not configured');
+            return res.redirect(`${frontendUrl}/settings?social=steam&status=error&message=not_configured`);
+        }
 
         // Buscar informações do usuário Steam
         const userResponse = await axios.get(OAUTH_URLS.steam.playerSummaries, {

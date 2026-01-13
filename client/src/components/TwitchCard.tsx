@@ -24,10 +24,12 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
     const [streams, setStreams] = useState<TwitchStream[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Theme styles - consistent with RadioCard pattern
+    const themeBorder = 'border-[#9146FF]/30';
+    const themeGlow = 'shadow-[0_0_15px_rgba(145,70,255,0.15)] hover:shadow-[0_0_20px_rgba(145,70,255,0.25)]';
+    const themeBg = theme === 'light' ? 'bg-white/80' : 'bg-[#9146FF]/5';
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const bgCard = theme === 'light' ? 'bg-white' : 'bg-white/5';
-    const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
 
     useEffect(() => {
         loadStreams();
@@ -51,18 +53,18 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
 
     if (loading) {
         return (
-            <div className={`${bgCard} ${borderColor} border rounded-xl p-6 flex items-center justify-center`}>
+            <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-6 flex items-center justify-center transition-all duration-300`}>
                 <Loader2 className="w-6 h-6 animate-spin text-[#9146FF]" />
             </div>
         );
     }
 
     return (
-        <div className={`${bgCard} ${borderColor} border rounded-xl p-6`}>
+        <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-6 transition-all duration-300`}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#9146FF] flex items-center justify-center">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <div className="w-10 h-10 rounded-xl bg-[#9146FF]/20 backdrop-blur-sm flex items-center justify-center border border-[#9146FF]/30">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#9146FF">
                             <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
                         </svg>
                     </div>
@@ -77,7 +79,7 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
 
             {streams.length === 0 ? (
                 <div className={`text-center py-8 ${textSub}`}>
-                    <Tv className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <Tv className="w-12 h-12 mx-auto mb-2 opacity-50 text-[#9146FF]" />
                     <p>Nenhuma stream ao vivo no momento</p>
                 </div>
             ) : (
@@ -88,7 +90,7 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
                             href={stream.streamUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`block rounded-lg overflow-hidden ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} hover:bg-white/10 transition-colors group`}
+                            className={`block rounded-xl overflow-hidden ${theme === 'light' ? 'bg-gray-50/80' : 'bg-white/5'} border border-[#9146FF]/10 hover:border-[#9146FF]/30 transition-all duration-300 group`}
                         >
                             {/* Thumbnail */}
                             <div className="relative aspect-video">

@@ -11,7 +11,8 @@ import {
     Loader2,
     Mail,
     AlertCircle,
-    Banknote
+    Banknote,
+    Percent
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -26,6 +27,7 @@ interface Product {
     priceBRL?: number;
     availableStock: number;
     isUnlimited: boolean;
+    magazineDiscount?: boolean;
 }
 
 interface PurchaseModalProps {
@@ -61,12 +63,24 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
     const [error, setError] = useState<string | null>(null);
 
     const isMGT = user?.membershipType === 'MGT';
+    const isMagazine = user?.membershipType === 'MAGAZINE';
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
 
-    const canBuyWithZions = product.priceZions && user && user.zionsCash >= (product.priceZions * quantity);
-    const totalZions = product.priceZions ? product.priceZions * quantity : 0;
-    const totalBRL = product.priceBRL ? product.priceBRL * quantity : 0;
+    // Discount calculation for MAGAZINE members
+    const hasDiscount = product.magazineDiscount && isMagazine;
+    const discountedPriceZions = hasDiscount && product.priceZions 
+        ? Math.floor(product.priceZions * 0.9) 
+        : product.priceZions;
+    const discountedPriceBRL = hasDiscount && product.priceBRL 
+        ? Number((product.priceBRL * 0.9).toFixed(2)) 
+        : product.priceBRL;
+
+    const canBuyWithZions = discountedPriceZions && user && user.zionsCash >= (discountedPriceZions * quantity);
+    const totalZions = discountedPriceZions ? discountedPriceZions * quantity : 0;
+    const totalBRL = discountedPriceBRL ? discountedPriceBRL * quantity : 0;
+    const originalTotalZions = product.priceZions ? product.priceZions * quantity : 0;
+    const originalTotalBRL = product.priceBRL ? product.priceBRL * quantity : 0;
 
     const maxQuantity = product.isUnlimited ? 10 : Math.min(product.availableStock, 10);
 
@@ -278,6 +292,15 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                 {/* Payment Method Selection */}
                                 <div className="space-y-2">
                                     <label className="text-sm text-gray-400">Forma de Pagamento</label>
+                                    
+                                    {/* Discount Banner */}
+                                    {hasDiscount && (
+                                        <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 mb-3">
+                                            <Percent className="w-4 h-4 text-amber-400" />
+                                            <span className="text-amber-400 text-sm font-medium">-10% de desconto MAGAZINE aplicado!</span>
+                                        </div>
+                                    )}
+                                    
                                     <div className="grid grid-cols-2 gap-3">
                                         {/* Zions Payment */}
                                         {product.priceZions && (
@@ -296,9 +319,20 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                                     <Banknote className="w-5 h-5" style={{ color }} />
                                                     <span className="text-white font-medium">Zions Cash</span>
                                                 </div>
-                                                <p className="text-lg font-bold" style={{ color }}>
-                                                    R$ {totalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                </p>
+                                                {hasDiscount ? (
+                                                    <div>
+                                                        <p className="text-sm text-gray-500 line-through">
+                                                            R$ {originalTotalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                        </p>
+                                                        <p className="text-lg font-bold text-amber-400">
+                                                            R$ {totalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-lg font-bold" style={{ color }}>
+                                                        R$ {totalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                    </p>
+                                                )}
                                                 <p className="text-xs text-gray-500 mt-1">
                                                     Saldo: R$ {user?.zionsCash?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
                                                 </p>
@@ -326,9 +360,20 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                                     <CreditCard className="w-5 h-5 text-green-400" />
                                                     <span className="text-white font-medium">BRL</span>
                                                 </div>
-                                                <p className="text-lg font-bold text-green-400">
-                                                    R$ {totalBRL.toFixed(2)}
-                                                </p>
+                                                {hasDiscount ? (
+                                                    <div>
+                                                        <p className="text-sm text-gray-500 line-through">
+                                                            R$ {originalTotalBRL.toFixed(2)}
+                                                        </p>
+                                                        <p className="text-lg font-bold text-amber-400">
+                                                            R$ {totalBRL.toFixed(2)}
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-lg font-bold text-green-400">
+                                                        R$ {totalBRL.toFixed(2)}
+                                                    </p>
+                                                )}
                                                 <p className="text-xs text-gray-500 mt-1">
                                                     Em breve
                                                 </p>

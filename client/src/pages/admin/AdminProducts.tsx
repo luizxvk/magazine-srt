@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Plus, Edit2, Trash2, Key, Loader2, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Key, Loader2, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
@@ -16,6 +16,7 @@ interface Product {
     stock: number;
     isUnlimited: boolean;
     isActive: boolean;
+    magazineDiscount?: boolean;
     developer?: string;
     releaseDate?: string;
     sizeGB?: number;
@@ -66,6 +67,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
         priceBRL: '',
         isUnlimited: false,
         isActive: true,
+        magazineDiscount: false,
         developer: '',
         releaseDate: '',
         sizeGB: '',
@@ -129,6 +131,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                 priceBRL: formData.priceBRL ? parseFloat(formData.priceBRL) : undefined,
                 isUnlimited: formData.isUnlimited,
                 isActive: formData.isActive,
+                magazineDiscount: formData.magazineDiscount,
                 developer: formData.developer || undefined,
                 releaseDate: formData.releaseDate || undefined,
                 sizeGB: formData.sizeGB ? parseFloat(formData.sizeGB) : undefined,
@@ -207,6 +210,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             priceBRL: '',
             isUnlimited: false,
             isActive: true,
+            magazineDiscount: false,
             developer: '',
             releaseDate: '',
             sizeGB: '',
@@ -231,6 +235,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             priceBRL: product.priceBRL?.toString() || '',
             isUnlimited: product.isUnlimited,
             isActive: product.isActive,
+            magazineDiscount: product.magazineDiscount || false,
             developer: product.developer || '',
             releaseDate: product.releaseDate || '',
             sizeGB: product.sizeGB?.toString() || '',
@@ -635,7 +640,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                 </div>
 
                                 {/* Toggles */}
-                                <div className="flex items-center gap-6">
+                                <div className="flex flex-wrap items-center gap-4">
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
                                             type="checkbox"
@@ -653,6 +658,18 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             className="w-4 h-4 rounded border-white/20 text-emerald-500 focus:ring-emerald-500"
                                         />
                                         <span className="text-sm text-gray-400">Ativo</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.magazineDiscount}
+                                            onChange={e => setFormData({ ...formData, magazineDiscount: e.target.checked })}
+                                            className="w-4 h-4 rounded border-white/20 text-yellow-500 focus:ring-yellow-500"
+                                        />
+                                        <span className="text-sm text-yellow-400 flex items-center gap-1">
+                                            <Percent className="w-3 h-3" />
+                                            10% Desconto MAGAZINE
+                                        </span>
                                     </label>
                                 </div>
 

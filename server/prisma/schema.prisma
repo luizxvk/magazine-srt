@@ -552,6 +552,7 @@ model Product {
   stock         Int             @default(0)
   isUnlimited   Boolean         @default(false)
   isActive      Boolean         @default(true)
+  magazineDiscount Boolean      @default(false) // 10% discount for MAGAZINE members
   // Game/Product Info
   developer     String?         // Developer/Publisher
   releaseDate   String?         // Release date

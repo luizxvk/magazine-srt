@@ -39,29 +39,57 @@ const RADIO_STATIONS: RadioStation[] = [
         id: 'synthwave',
         name: 'Synthwave FM',
         genre: 'Synthwave / Retrowave',
-        streamUrl: 'https://stream.nightride.fm/nightride.m4a', // Nightride FM - Synthwave 24/7
+        streamUrl: 'https://stream.nightride.fm/nightride.m4a',
         color: '#FF6B9D'
     },
     {
         id: 'chillwave',
-        name: 'Chillwave Radio',
-        genre: 'Chillwave / Vaporwave',
-        streamUrl: 'https://stream.nightride.fm/chillsynth.m4a', // Nightride FM - Chillsynth
+        name: 'Chillsynth',
+        genre: 'Chillwave / Lo-Fi',
+        streamUrl: 'https://stream.nightride.fm/chillsynth.m4a',
         color: '#00D9FF'
     },
     {
         id: 'darksynth',
-        name: 'Darksynth FM',
+        name: 'Darksynth',
         genre: 'Darksynth / Cyberpunk',
-        streamUrl: 'https://stream.nightride.fm/darksynth.m4a', // Nightride FM - Darksynth
+        streamUrl: 'https://stream.nightride.fm/darksynth.m4a',
         color: '#B026FF'
     },
     {
         id: 'spacesynth',
-        name: 'Spacesynth Radio',
+        name: 'Spacesynth',
         genre: 'Spacesynth / Cosmic',
-        streamUrl: 'https://stream.nightride.fm/spacesynth.m4a', // Nightride FM - Spacesynth
+        streamUrl: 'https://stream.nightride.fm/spacesynth.m4a',
         color: '#FFD700'
+    },
+    {
+        id: 'lofi',
+        name: 'Lo-Fi Hip Hop',
+        genre: 'Lo-Fi / Chill Beats',
+        streamUrl: 'https://streams.ilovemusic.de/iloveradio17.mp3',
+        color: '#98D8AA'
+    },
+    {
+        id: 'jazz',
+        name: 'Smooth Jazz',
+        genre: 'Jazz / Relaxing',
+        streamUrl: 'https://strm112.1.fm/smoothjazz_mobile_mp3',
+        color: '#F97316'
+    },
+    {
+        id: 'electronic',
+        name: 'Electronic',
+        genre: 'EDM / House',
+        streamUrl: 'https://streams.ilovemusic.de/iloveradio2.mp3',
+        color: '#EC4899'
+    },
+    {
+        id: 'rock',
+        name: 'Classic Rock',
+        genre: 'Rock / Classic',
+        streamUrl: 'https://strm112.1.fm/classicrock_mobile_mp3',
+        color: '#EF4444'
     }
 ];
 
@@ -174,8 +202,8 @@ export default function RadioCard() {
 
     return (
         <div className={`w-full ${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} transition-all duration-300 overflow-hidden`}>
-            {/* Header */}
-            <div className="relative p-4">
+            {/* Header with Station Info */}
+            <div className="relative p-4 pb-3">
                 {/* Animated Background Effect */}
                 {isPlaying && (
                     <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -188,72 +216,12 @@ export default function RadioCard() {
                     </div>
                 )}
 
-                <div className="relative flex items-center gap-4">
-                    {/* Radio Icon */}
-                    <div 
-                        className="relative w-14 h-14 rounded-xl flex items-center justify-center backdrop-blur-sm"
-                        style={{ backgroundColor: `${accentColor}15` }}
-                    >
-                        <Radio 
-                            className="w-7 h-7" 
-                            style={{ color: accentColor }}
-                        />
-                        {isPlaying && (
-                            <div className="absolute inset-0 rounded-xl animate-ping opacity-20" style={{ backgroundColor: accentColor }} />
-                        )}
-                    </div>
-
-                    {/* Station Info */}
-                    <div className="flex-1 min-w-0">
-                        <h3 className={`font-bold text-base ${textMain} truncate`}>
-                            {currentStation.name}
-                        </h3>
-                        <p className={`text-xs ${textSub} truncate`}>
-                            {currentStation.genre}
-                        </p>
-                    </div>
-
-                    {/* Badge "AO VIVO" no canto direito */}
-                    {isPlaying && (
-                        <div className="flex-shrink-0">
-                            <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                                Ao Vivo
-                            </span>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Controls Section */}
-            <div className={`p-4 pt-0 border-t ${themeBorder}`}>
-                {/* Station Selector */}
-                <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-2">
-                    {RADIO_STATIONS.map((station) => (
-                        <button
-                            key={station.id}
-                            onClick={() => changeStation(station)}
-                            className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                                currentStation.id === station.id
-                                    ? 'text-white shadow-md'
-                                    : theme === 'light'
-                                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                            }`}
-                            style={currentStation.id === station.id ? { backgroundColor: accentColor } : {}}
-                        >
-                            {station.name.split(' ')[0]}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Play Controls & Volume */}
-                <div className="flex items-center gap-3">
-                    {/* Play/Pause Button */}
+                <div className="relative flex items-center gap-3">
+                    {/* Radio Icon with Play Button */}
                     <button
                         onClick={togglePlay}
                         disabled={isLoading}
-                        className="relative w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                        className="relative w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                         style={{ backgroundColor: accentColor }}
                     >
                         {isLoading ? (
@@ -263,15 +231,36 @@ export default function RadioCard() {
                         ) : (
                             <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
                         )}
+                        {isPlaying && (
+                            <div className="absolute inset-0 rounded-xl animate-ping opacity-20" style={{ backgroundColor: accentColor }} />
+                        )}
                     </button>
 
-                    {/* Volume Control */}
-                    <div className="flex-1 flex items-center gap-2">
+                    {/* Station Info */}
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                            <h3 className={`font-bold text-sm ${textMain} truncate`}>
+                                {currentStation.name}
+                            </h3>
+                            {isPlaying && (
+                                <span className="flex-shrink-0 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-red-500 text-white animate-pulse flex items-center gap-1">
+                                    <span className="w-1 h-1 rounded-full bg-white" />
+                                    Live
+                                </span>
+                            )}
+                        </div>
+                        <p className={`text-xs ${textSub} truncate`}>
+                            {currentStation.genre}
+                        </p>
+                    </div>
+
+                    {/* Volume Control Compact */}
+                    <div className="flex items-center gap-1">
                         <button
                             onClick={toggleMute}
-                            className={`p-2 rounded-lg transition-colors ${
+                            className={`p-1.5 rounded-lg transition-colors ${
                                 theme === 'light' 
-                                    ? 'hover:bg-gray-100 text-gray-700' 
+                                    ? 'hover:bg-gray-100 text-gray-600' 
                                     : 'hover:bg-white/5 text-gray-400'
                             }`}
                         >
@@ -281,35 +270,61 @@ export default function RadioCard() {
                                 <Volume2 className="w-4 h-4" />
                             )}
                         </button>
-
-                        <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.01"
-                            value={volume}
-                            onChange={handleVolumeChange}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onTouchStart={(e) => e.stopPropagation()}
-                            className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
-                            style={{
-                                background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} 100%)`
-                            }}
-                        />
-
-                        <span className={`text-xs font-medium w-8 text-right ${theme === 'light' ? 'text-gray-700' : 'text-gray-400'}`}>
+                        <span className={`text-[10px] font-medium w-6 ${textSub}`}>
                             {Math.round(volume * 100)}%
                         </span>
                     </div>
                 </div>
+            </div>
 
-                {/* Footer Info */}
-                <div className={`mt-3 pt-3 border-t ${themeBorder}`}>
-                    <p className={`text-[10px] ${textSub} text-center uppercase tracking-wider flex items-center justify-center gap-1`}>
-                        <Radio className="w-3 h-3" />
-                        Rádio 24/7 • Waves Music
-                    </p>
+            {/* Volume Slider */}
+            <div className="px-4 pb-3">
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                    style={{
+                        background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} ${volume * 100}%, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)'} 100%)`
+                    }}
+                />
+            </div>
+
+            {/* Station Selector - Grid Layout */}
+            <div className={`px-4 pb-4 pt-2 border-t ${themeBorder}`}>
+                <p className={`text-[10px] ${textSub} uppercase tracking-wider mb-2`}>Estações</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                    {RADIO_STATIONS.map((station) => (
+                        <button
+                            key={station.id}
+                            onClick={() => changeStation(station)}
+                            className={`px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all duration-200 truncate ${
+                                currentStation.id === station.id
+                                    ? 'text-white shadow-md scale-105'
+                                    : theme === 'light'
+                                        ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                            }`}
+                            style={currentStation.id === station.id ? { backgroundColor: station.color } : {}}
+                            title={station.name}
+                        >
+                            {station.name.split(' ')[0]}
+                        </button>
+                    ))}
                 </div>
+            </div>
+
+            {/* Footer */}
+            <div className={`px-4 py-2 border-t ${themeBorder} bg-black/10`}>
+                <p className={`text-[9px] ${textSub} text-center uppercase tracking-wider flex items-center justify-center gap-1`}>
+                    <Radio className="w-3 h-3" />
+                    Rádio 24/7 • Waves Music
+                </p>
             </div>
         </div>
     );

@@ -324,8 +324,6 @@ export default function ProductStore() {
                                         <ProductCard
                                             key={product.id}
                                             product={product}
-                                            onPurchase={() => fetchProducts(true)}
-                                            onGoToOrders={() => setActiveTab('orders')}
                                         />
                                     ))}
                                 </div>

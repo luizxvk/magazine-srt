@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Package, Gamepad2, Gift, CreditCard, Sparkles, Coins } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, Package, Gamepad2, Gift, CreditCard, Sparkles, Coins, Percent } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import PurchaseModal from './PurchaseModal';
 
 interface Product {
     id: string;
@@ -14,12 +13,11 @@ interface Product {
     priceBRL?: number;
     availableStock: number;
     isUnlimited: boolean;
+    magazineDiscount?: boolean; // 10% discount for MAGAZINE members
 }
 
 interface ProductCardProps {
     product: Product;
-    onPurchase?: () => void;
-    onGoToOrders?: () => void;
 }
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -38,39 +36,42 @@ const categoryLabels: Record<string, string> = {
     SERVICE: 'Serviço'
 };
 
-export default function ProductCard({ product, onPurchase, onGoToOrders }: ProductCardProps) {
+export default function ProductCard({ product }: ProductCardProps) {
     const { user, theme, accentColor } = useAuth();
-    const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+    const navigate = useNavigate();
 
     const isMGT = user?.membershipType === 'MGT';
+    const isMagazine = user?.membershipType === 'MAGAZINE';
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
 
     const isOutOfStock = !product.isUnlimited && product.availableStock <= 0;
-    const canBuyWithZions = product.priceZions && user && user.zionsCash >= product.priceZions && !isOutOfStock;
+    
+    // Calculate discounted prices for MAGAZINE members
+    const hasDiscount = product.magazineDiscount && isMagazine;
+    const discountedZions = hasDiscount && product.priceZions ? Math.floor(product.priceZions * 0.9) : product.priceZions;
+    const discountedBRL = hasDiscount && product.priceBRL ? +(product.priceBRL * 0.9).toFixed(2) : product.priceBRL;
+    
+    const canBuyWithZions = discountedZions && user && user.zionsCash >= discountedZions && !isOutOfStock;
 
-    const handleBuyClick = () => {
-        setShowPurchaseModal(true);
-    };
-
-    const handlePurchaseComplete = () => {
-        onPurchase?.();
+    const handleCardClick = () => {
+        navigate(`/loja/${product.id}`);
     };
 
     return (
-        <>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-panel relative rounded-xl overflow-hidden group transition-all duration-300"
-                style={{
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderColor: `${color}33`
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = `${color}66`)}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = `${color}33`)}
-            >
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={handleCardClick}
+            className="glass-panel relative rounded-xl overflow-hidden group transition-all duration-300 cursor-pointer"
+            style={{
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: `${color}33`
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = `${color}66`)}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = `${color}33`)}
+        >
                 {/* Product Image or Placeholder - 16:9 aspect ratio */}
                 <div
                     className="aspect-video flex items-center justify-center relative overflow-hidden"
@@ -114,6 +115,14 @@ export default function ProductCard({ product, onPurchase, onGoToOrders }: Produ
                             {isOutOfStock ? 'Esgotado' : `${product.availableStock} disponíveis`}
                         </div>
                     )}
+
+                    {/* Discount Badge */}
+                    {hasDiscount && (
+                        <div className="absolute bottom-3 left-3 px-2 py-1 rounded-lg text-xs font-bold backdrop-blur-sm bg-green-500/90 text-white flex items-center gap-1">
+                            <Percent className="w-3 h-3" />
+                            -10% MAGAZINE
+                        </div>
+                    )}
                 </div>
 
                 {/* Content */}
@@ -134,17 +143,39 @@ export default function ProductCard({ product, onPurchase, onGoToOrders }: Produ
                                 style={{ backgroundColor: `${color}15` }}
                             >
                                 <Coins className="w-4 h-4" style={{ color }} />
-                                <span className="font-bold text-sm" style={{ color }}>
-                                    {product.priceZions.toLocaleString()}
-                                </span>
+                                {hasDiscount ? (
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-xs line-through opacity-50" style={{ color }}>
+                                            {product.priceZions.toLocaleString()}
+                                        </span>
+                                        <span className="font-bold text-sm" style={{ color }}>
+                                            {discountedZions?.toLocaleString()}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span className="font-bold text-sm" style={{ color }}>
+                                        {product.priceZions.toLocaleString()}
+                                    </span>
+                                )}
                             </div>
                         )}
 
                         {product.priceBRL && (
                             <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-green-500/10">
-                                <span className="font-bold text-sm text-green-400">
-                                    R$ {product.priceBRL.toFixed(2)}
-                                </span>
+                                {hasDiscount ? (
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-xs line-through opacity-50 text-green-400">
+                                            R$ {product.priceBRL.toFixed(2)}
+                                        </span>
+                                        <span className="font-bold text-sm text-green-400">
+                                            R$ {discountedBRL?.toFixed(2)}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span className="font-bold text-sm text-green-400">
+                                        R$ {product.priceBRL.toFixed(2)}
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>
@@ -152,7 +183,7 @@ export default function ProductCard({ product, onPurchase, onGoToOrders }: Produ
                     {/* Buy Button */}
                     <div className="flex gap-2 pt-1">
                         <button
-                            onClick={handleBuyClick}
+                            onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
                             disabled={isOutOfStock}
                             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg font-medium text-sm transition-all text-white disabled:opacity-40 disabled:cursor-not-allowed"
                             style={{
@@ -165,22 +196,12 @@ export default function ProductCard({ product, onPurchase, onGoToOrders }: Produ
                     </div>
 
                     {/* User Zions balance hint */}
-                    {product.priceZions && user && !canBuyWithZions && !isOutOfStock && (
+                    {discountedZions && user && !canBuyWithZions && !isOutOfStock && (
                         <p className="text-xs text-center text-gray-500">
-                            Faltam {(product.priceZions - user.zionsCash).toLocaleString()} Zions
+                            Faltam {(discountedZions - user.zionsCash).toLocaleString()} Zions
                         </p>
                     )}
                 </div>
-            </motion.div>
-
-            {/* Purchase Modal */}
-            <PurchaseModal
-                product={product}
-                isOpen={showPurchaseModal}
-                onClose={() => setShowPurchaseModal(false)}
-                onPurchaseComplete={handlePurchaseComplete}
-                onGoToOrders={onGoToOrders}
-            />
-        </>
+        </motion.div>
     );
 }

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     ArrowLeft, ShoppingCart, Package, Gamepad2, Gift, CreditCard, 
     Sparkles, Coins, Calendar, HardDrive, Monitor, User, 
-    ChevronLeft, ChevronRight, X, Shield
+    ChevronLeft, ChevronRight, X, Shield, Percent
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -24,6 +24,7 @@ interface Product {
     priceBRL?: number;
     availableStock: number;
     isUnlimited: boolean;
+    magazineDiscount?: boolean;
     developer?: string;
     releaseDate?: string;
     sizeGB?: number;
@@ -60,8 +61,18 @@ export default function ProductDetails() {
     const [showGallery, setShowGallery] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
+    const isMagazine = user?.membershipType === 'MAGAZINE';
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
+
+    // Discount calculation for MAGAZINE members
+    const hasDiscount = product?.magazineDiscount && isMagazine;
+    const discountedZions = hasDiscount && product?.priceZions 
+        ? Math.floor(product.priceZions * 0.9) 
+        : null;
+    const discountedBRL = hasDiscount && product?.priceBRL 
+        ? (product.priceBRL * 0.9).toFixed(2) 
+        : null;
 
     useEffect(() => {
         if (id) {
@@ -317,22 +328,54 @@ export default function ProductDetails() {
 
                             {/* Price */}
                             <div className="border-t border-white/10 pt-4 mb-4">
-                                <div className="flex items-baseline gap-2">
+                                {/* Discount Badge */}
+                                {hasDiscount && (
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40">
+                                            <Percent className="w-4 h-4 text-amber-400" />
+                                            <span className="text-amber-400 text-sm font-bold">-10% MAGAZINE</span>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                <div className="flex items-baseline gap-2 flex-wrap">
                                     {product.priceZions && (
                                         <div className="flex items-center gap-2">
                                             <Coins className="w-6 h-6" style={{ color }} />
-                                            <span className="text-3xl font-bold" style={{ color }}>
-                                                {product.priceZions} Z$
-                                            </span>
+                                            {hasDiscount ? (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xl text-gray-500 line-through">
+                                                        {product.priceZions} Z$
+                                                    </span>
+                                                    <span className="text-3xl font-bold text-amber-400">
+                                                        {discountedZions} Z$
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-3xl font-bold" style={{ color }}>
+                                                    {product.priceZions} Z$
+                                                </span>
+                                            )}
                                         </div>
                                     )}
                                     {product.priceZions && product.priceBRL && (
                                         <span className="text-gray-400 mx-2">ou</span>
                                     )}
                                     {product.priceBRL && (
-                                        <span className="text-2xl font-bold text-emerald-400">
-                                            R$ {product.priceBRL.toFixed(2)}
-                                        </span>
+                                        hasDiscount ? (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-lg text-gray-500 line-through">
+                                                    R$ {product.priceBRL.toFixed(2)}
+                                                </span>
+                                                <span className="text-2xl font-bold text-amber-400">
+                                                    R$ {discountedBRL}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-2xl font-bold text-emerald-400">
+                                                R$ {product.priceBRL.toFixed(2)}
+                                            </span>
+                                        )
                                     )}
                                 </div>
                                 

@@ -13,7 +13,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { 
             name, description, imageBase64, screenshotBase64, category, 
-            priceZions, priceBRL, stock, isUnlimited,
+            priceZions, priceBRL, stock, isUnlimited, magazineDiscount,
             developer, releaseDate, sizeGB, platform, tags 
         } = req.body;
         const userId = req.user?.userId;
@@ -50,6 +50,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
                 priceBRL: priceBRL || null,
                 stock: stock || 0,
                 isUnlimited: isUnlimited || false,
+                magazineDiscount: magazineDiscount || false,
                 developer: developer || null,
                 releaseDate: releaseDate || null,
                 sizeGB: sizeGB || null,
@@ -79,7 +80,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
         const { id } = req.params;
         const { 
             name, description, imageBase64, screenshotBase64, category, 
-            priceZions, priceBRL, stock, isUnlimited, isActive,
+            priceZions, priceBRL, stock, isUnlimited, isActive, magazineDiscount,
             developer, releaseDate, sizeGB, platform, tags 
         } = req.body;
         const userId = req.user?.userId;
@@ -118,6 +119,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
             stock,
             isUnlimited,
             isActive,
+            magazineDiscount: magazineDiscount || false,
             developer: developer || null,
             releaseDate: releaseDate || null,
             sizeGB: sizeGB || null,

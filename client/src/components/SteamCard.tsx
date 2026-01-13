@@ -13,7 +13,7 @@ interface SteamActivity {
 }
 
 export default function SteamCard() {
-    const { user, theme } = useAuth();
+    const { theme } = useAuth();
     const [activities, setActivities] = useState<SteamActivity[]>([]);
     const [loading, setLoading] = useState(true);
     const [connected, setConnected] = useState(false);

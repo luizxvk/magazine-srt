@@ -187,26 +187,9 @@ export default function ToolsCarousel() {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                className="relative overflow-hidden"
+                className="relative overflow-hidden min-h-[200px]"
             >
-                <div 
-                    className="transition-all duration-300 ease-out"
-                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                >
-                    <div className="flex">
-                        {tools.map((tool, index) => (
-                            <div 
-                                key={tool.id} 
-                                className="w-full flex-shrink-0"
-                                style={{ 
-                                    display: index === currentIndex ? 'block' : 'none'
-                                }}
-                            >
-                                {index === currentIndex && renderCurrentTool()}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {renderCurrentTool()}
             </div>
 
             {/* Dots Indicator */}

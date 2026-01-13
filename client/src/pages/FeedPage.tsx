@@ -11,7 +11,6 @@ import { useAuth } from '../context/AuthContext';
 import { Sparkles, Settings } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
-import DailyLoginCard from '../components/DailyLoginCard';
 import ModernLoader from '../components/ModernLoader';
 
 import AnnouncementCard from '../components/AnnouncementCard';
@@ -19,11 +18,9 @@ import StoriesBar from '../components/StoriesBar';
 import RecommendationsDrawer from '../components/RecommendationsDrawer';
 import NewMembersModal from '../components/NewMembersModal';
 import EventsModal from '../components/EventsModal';
-import OnlineFriendsCard from '../components/OnlineFriendsCard';
 import CustomizationShop from '../components/CustomizationShop';
 import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
-import ProductStoreCard from '../components/ProductStoreCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
@@ -355,49 +352,26 @@ export default function FeedPage() {
                     </main>
 
                     {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
-                    <aside className="hidden xl:block w-80 space-y-6 sticky top-24 h-fit animate-fade-in-left">
+                    <aside className="hidden xl:block w-72 space-y-4 sticky top-24 h-fit animate-fade-in-left">
                         {/* Tools Carousel - Radio, Discord, Steam, Twitch */}
-                        <div id="radio-card" className="mb-6 transition-all duration-300 rounded-2xl">
+                        <div id="radio-card" className="transition-all duration-300 rounded-2xl">
                             <ToolsCarousel />
                         </div>
 
-                        {/* Product Store Card */}
-                        <div className="mb-6">
-                            <ProductStoreCard />
-                        </div>
-
                         {/* Market Card */}
-                        <div className="mb-6">
-                            <MarketCard />
-                        </div>
+                        <MarketCard />
 
                         {/* Inventory Card */}
-                        <div className="mb-6">
-                            <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
-                        </div>
-
-                        {/* Daily Login Card */}
-                        <div className="mb-6">
-                            <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
-                        </div>
-
-                        {/* Online Friends Card */}
-                        <div className="mb-6">
-                            <OnlineFriendsCard maxDisplay={5} />
-                        </div>
+                        <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
 
                         {/* Group Chat Card */}
-                        <div className="mb-6">
-                            <GroupChatCard />
-                        </div>
+                        <GroupChatCard />
 
                         {/* Feedback Form Card */}
-                        <div className="mb-6">
-                            <FeedbackFormCard />
-                        </div>
+                        <FeedbackFormCard />
 
                         {/* SRT LOG Promotion Card */}
-                        <div className="mb-6 transform hover:scale-105 transition-transform duration-500">
+                        <div className="transform hover:scale-105 transition-transform duration-500">
                             <AnnouncementCard />
                         </div>
                     </aside>

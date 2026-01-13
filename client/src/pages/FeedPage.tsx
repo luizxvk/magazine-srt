@@ -45,6 +45,13 @@ interface Post {
     isHighlight: boolean;
     tags: string[];
     isLiked: boolean;
+    linkedProduct?: {
+        id: string;
+        name: string;
+        imageUrl: string | null;
+        priceZions: number | null;
+        priceBRL: number | null;
+    } | null;
 }
 
 export default function FeedPage() {
@@ -92,7 +99,8 @@ export default function FeedPage() {
                 timestamp: p.createdAt,
                 isHighlight: p.isHighlight,
                 tags: p.tags?.map((t: any) => t.tag) || [],
-                isLiked: p.isLiked || false
+                isLiked: p.isLiked || false,
+                linkedProduct: p.linkedProduct || null
             }));
             setPosts(mappedPosts);
         } catch (error) {
@@ -315,7 +323,8 @@ export default function FeedPage() {
                                         title: p.content,
                                         image: p.image,
                                         category: p.tags[0] || 'DESTAQUE',
-                                        author: p.author
+                                        author: p.author,
+                                        linkedProduct: p.linkedProduct
                                     }))} />
                                 )}
 

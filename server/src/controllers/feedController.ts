@@ -41,6 +41,15 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
                     select: { userId: true },
                 },
                 tags: true,
+                linkedProduct: {
+                    select: {
+                        id: true,
+                        name: true,
+                        imageUrl: true,
+                        priceZions: true,
+                        priceBRL: true,
+                    }
+                }
             },
         });
 
@@ -76,6 +85,15 @@ export const getHighlights = async (req: AuthRequest, res: Response) => {
                     select: { userId: true },
                 },
                 tags: true,
+                linkedProduct: {
+                    select: {
+                        id: true,
+                        name: true,
+                        imageUrl: true,
+                        priceZions: true,
+                        priceBRL: true,
+                    }
+                }
             },
         });
 

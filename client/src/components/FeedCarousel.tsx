@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+interface LinkedProduct {
+    id: string;
+    name: string;
+    imageUrl: string | null;
+    priceZions: number | null;
+    priceBRL: number | null;
+}
 
 interface CarouselPost {
     id: string;
@@ -13,6 +21,7 @@ interface CarouselPost {
         name: string;
         avatarUrl: string;
     };
+    linkedProduct?: LinkedProduct | null;
 }
 
 interface FeedCarouselProps {
@@ -99,6 +108,12 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                                     <Sparkles className="w-3 h-3" />
                                     Destaque
                                 </span>
+                                {currentPost.linkedProduct && (
+                                    <span className="px-3 py-1 rounded-full border bg-emerald-500/20 border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                        <ShoppingBag className="w-3 h-3" />
+                                        Produto
+                                    </span>
+                                )}
                                 <span className="text-xs text-gray-300 uppercase tracking-wider font-medium">
                                     {currentPost.category.toUpperCase() !== 'DESTAQUE' && currentPost.category}
                                 </span>
@@ -107,6 +122,27 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif !text-white mb-4 leading-tight max-w-3xl drop-shadow-lg">
                                 {currentPost.title}
                             </h2>
+
+                            {/* Linked Product Info */}
+                            {currentPost.linkedProduct && (
+                                <div className="mb-4 inline-flex items-center gap-3 px-4 py-2 bg-black/60 backdrop-blur-md rounded-xl border border-white/10">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium text-white">{currentPost.linkedProduct.name}</span>
+                                        <span className="text-xs text-gold-400">
+                                            {currentPost.linkedProduct.priceZions ? `${currentPost.linkedProduct.priceZions} Z$` : ''}
+                                            {currentPost.linkedProduct.priceZions && currentPost.linkedProduct.priceBRL ? ' ou ' : ''}
+                                            {currentPost.linkedProduct.priceBRL ? `R$ ${currentPost.linkedProduct.priceBRL.toFixed(2)}` : ''}
+                                        </span>
+                                    </div>
+                                    <Link
+                                        to="/loja"
+                                        className="px-3 py-1.5 bg-gold-500 text-black text-xs font-bold rounded-lg hover:bg-gold-400 transition-colors"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        Ver na Loja
+                                    </Link>
+                                </div>
+                            )}
 
                             <div className="flex items-center gap-3">
                                 <div className={`w-8 h-8 rounded-full p-0.5 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>

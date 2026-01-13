@@ -11,6 +11,7 @@ const createPostSchema = z.object({
     tags: z.array(z.string()).optional(),
     isHighlight: z.boolean().optional(),
     mediaType: z.enum(['IMAGE', 'VIDEO', 'TEXT']).default('IMAGE'),
+    linkedProductId: z.string().nullable().optional(),
 });
 
 export const createPost = async (req: AuthRequest, res: Response) => {
@@ -58,6 +59,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                 videoUrl: data.videoUrl,
                 isHighlight: data.isHighlight || false,
                 mediaType: data.mediaType,
+                linkedProductId: data.linkedProductId || null,
                 tags: {
                     create: data.tags?.map(tag => ({ tag })) || [],
                 },
@@ -72,6 +74,15 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                     }
                 },
                 tags: true,
+                linkedProduct: {
+                    select: {
+                        id: true,
+                        name: true,
+                        imageUrl: true,
+                        priceZions: true,
+                        priceBRL: true,
+                    }
+                }
             }
         });
 

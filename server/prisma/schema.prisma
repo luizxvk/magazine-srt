@@ -125,29 +125,32 @@ model Message {
 }
 
 model Post {
-  id            String    @id @default(uuid())
-  userId        String
-  imageUrl      String?
-  videoUrl      String?
-  caption       String?
-  likesCount    Int       @default(0)
-  commentsCount Int       @default(0)
-  isHighlight   Boolean   @default(false)
-  mediaType     MediaType @default(IMAGE)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  isPublic      Boolean   @default(true)
-  isRemoved     Boolean   @default(false)
-  reportsCount  Int       @default(0)
-  comments      Comment[]
-  likes         Like[]
-  user          User      @relation(fields: [userId], references: [id])
-  tags          PostTag[]
+  id              String    @id @default(uuid())
+  userId          String
+  imageUrl        String?
+  videoUrl        String?
+  caption         String?
+  likesCount      Int       @default(0)
+  commentsCount   Int       @default(0)
+  isHighlight     Boolean   @default(false)
+  mediaType       MediaType @default(IMAGE)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  isPublic        Boolean   @default(true)
+  isRemoved       Boolean   @default(false)
+  reportsCount    Int       @default(0)
+  linkedProductId String?   // ID do produto vinculado (para destaques de loja)
+  linkedProduct   Product?  @relation("PostProduct", fields: [linkedProductId], references: [id])
+  comments        Comment[]
+  likes           Like[]
+  user            User      @relation(fields: [userId], references: [id])
+  tags            PostTag[]
 
   @@index([userId])
   @@index([createdAt])
   @@index([isHighlight])
   @@index([isRemoved])
+  @@index([linkedProductId])
 }
 
 model Comment {
@@ -554,6 +557,7 @@ model Product {
   createdBy     User            @relation("ProductCreator", fields: [createdById], references: [id])
   keys          ProductKey[]
   orders        Order[]
+  linkedPosts   Post[]          @relation("PostProduct")
   
   @@index([category])
   @@index([isActive])

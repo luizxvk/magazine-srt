@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import prisma from '../utils/prisma';
+import { reportMetricsToRovex, testRovexConnection, isRovexConfigured } from '../services/rovexService';
 
 const router = Router();
 
@@ -254,6 +255,58 @@ router.post('/webhook', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('❌ Rovex webhook error:', error);
     res.status(500).json({ success: false, error: 'Webhook processing failed' });
+  }
+});
+
+/**
+ * POST /api/rovex/report-metrics
+ * Endpoint para forçar envio de métricas para a Rovex (manual trigger)
+ */
+router.post('/report-metrics', async (req: Request, res: Response) => {
+  try {
+    if (!isRovexConfigured()) {
+      return res.status(503).json({
+        success: false,
+        error: 'Rovex integration not configured',
+      });
+    }
+
+    const success = await reportMetricsToRovex();
+    
+    res.json({
+      success,
+      message: success ? 'Metrics reported successfully' : 'Failed to report metrics',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('❌ Manual metrics report error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to report metrics',
+    });
+  }
+});
+
+/**
+ * GET /api/rovex/connection-test
+ * Testa conexão com a plataforma Rovex
+ */
+router.get('/connection-test', async (req: Request, res: Response) => {
+  try {
+    const result = await testRovexConnection();
+    res.json({
+      success: result.connected,
+      ...result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('❌ Connection test error:', error);
+    res.status(500).json({
+      success: false,
+      configured: false,
+      connected: false,
+      error: 'Test failed',
+    });
   }
 });
 

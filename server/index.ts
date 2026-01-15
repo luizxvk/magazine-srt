@@ -34,6 +34,7 @@ import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
 import { runVerificationCronJobs } from './src/services/verificationCronService';
+import { reportMetricsToRovex, isRovexConfigured } from './src/services/rovexService';
 
 dotenv.config();
 
@@ -156,6 +157,28 @@ if (!isServerless) {
         runVerificationCronJobs().catch(err =>
             console.error('Initial cron job error:', err)
         );
+
+        // === ROVEX INTEGRATION ===
+        // Report metrics to Rovex Platform every 5 minutes
+        if (isRovexConfigured()) {
+            console.log('[Rovex] ✅ Integration configured - starting metrics cron');
+            
+            // Report every 5 minutes
+            setInterval(() => {
+                reportMetricsToRovex().catch(err =>
+                    console.error('[Rovex] Metrics cron error:', err)
+                );
+            }, 5 * 60 * 1000); // 5 minutes
+
+            // Report on startup (after 10 seconds to let server stabilize)
+            setTimeout(() => {
+                reportMetricsToRovex().catch(err =>
+                    console.error('[Rovex] Initial metrics report error:', err)
+                );
+            }, 10 * 1000);
+        } else {
+            console.log('[Rovex] ⚠️ Integration not configured - skipping metrics cron');
+        }
     });
 
     // Keep the server alive

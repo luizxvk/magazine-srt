@@ -1,7 +1,11 @@
-import { Gift, Users, Camera, Calendar, UserPlus, Star } from 'lucide-react';
+import { Gift, Users, Camera, Calendar, UserPlus, Star, ShoppingBag, Palette, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
+import { Feature } from '../utils/features';
+import { useFeature } from '../hooks/useFeature';
+import { useState } from 'react';
+import UpgradeModal from './UpgradeModal';
 
 interface LeftSidebarProps {
     onDailyLoginClick: () => void;
@@ -14,6 +18,7 @@ interface SidebarItem {
     label: string;
     onClick?: () => void;
     to?: string;
+    feature?: Feature; // Feature gate opcional
 }
 
 export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick }: LeftSidebarProps) {
@@ -39,17 +44,20 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
         {
             icon: <Gift className="w-5 h-5" />,
             label: 'Bônus Diário',
-            onClick: onDailyLoginClick
+            onClick: onDailyLoginClick,
+            feature: Feature.DAILY_LOGIN
         },
         {
             icon: <Users className="w-5 h-5" />,
             label: 'Grupos',
-            to: '/groups'
+            to: '/groups',
+            feature: Feature.GROUPS
         },
         {
             icon: <Camera className="w-5 h-5" />,
             label: 'Catálogo de Fotos',
-            to: '/catalog'
+            to: '/catalog',
+            feature: Feature.PHOTO_CATALOG
         },
         {
             icon: <Calendar className="w-5 h-5" />,
@@ -64,42 +72,93 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
         {
             icon: <Star className="w-5 h-5" />,
             label: 'Destaques da Semana',
-            to: '/highlights'
+            to: '/highlights',
+            feature: Feature.HIGHLIGHTS
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5" />,
+            label: 'Marketplace',
+            to: '/market',
+            feature: Feature.MARKETPLACE_P2P
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            label: 'Customização',
+            to: '/customization',
+            feature: Feature.CUSTOMIZATION_SHOP
         }
     ];
+
+    // Estado para modal de upgrade
+    const [upgradeModal, setUpgradeModal] = useState<{ open: boolean; feature: Feature | null; requiredPlan?: string; currentPlan?: string }>({
+        open: false,
+        feature: null
+    });
+
+    // Componente interno para item do menu com verificação de feature
+    const MenuItem = ({ item, index }: { item: SidebarItem; index: number }) => {
+        const featureCheck = useFeature(item.feature || Feature.FEED);
+        const isLocked = item.feature ? !featureCheck.isAvailable : false;
+        
+        const handleClick = () => {
+            if (isLocked && item.feature) {
+                setUpgradeModal({ 
+                    open: true, 
+                    feature: item.feature,
+                    requiredPlan: featureCheck.requiredPlan,
+                    currentPlan: featureCheck.currentPlan
+                });
+                return;
+            }
+            item.onClick?.();
+        };
+
+        const content = (
+            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${themeHoverBg} transition-all duration-200 cursor-pointer group ${isLocked ? 'opacity-60' : ''}`}>
+                <span className={`${themeIconColor} group-hover:scale-110 transition-transform duration-200`}>
+                    {item.icon}
+                </span>
+                <span className={`flex-1 text-sm font-medium ${textMain} group-hover:${isMGT ? 'text-emerald-400' : 'text-gold-400'} transition-colors`}>
+                    {item.label}
+                </span>
+                {isLocked && (
+                    <Lock size={12} className="text-amber-500" />
+                )}
+            </div>
+        );
+
+        if (isLocked) {
+            return (
+                <li key={index} onClick={handleClick} className="cursor-pointer">
+                    {content}
+                </li>
+            );
+        }
+
+        if (item.to) {
+            return (
+                <li key={index}>
+                    <Link to={item.to}>
+                        {content}
+                    </Link>
+                </li>
+            );
+        }
+
+        return (
+            <li key={index} onClick={handleClick}>
+                {content}
+            </li>
+        );
+    };
 
     return (
         <aside className="hidden lg:block w-56 sticky top-24 h-fit animate-fade-in-right">
             <nav className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-3 transition-all duration-300`}>
                 <ul className="space-y-1">
-                    {items.map((item, index) => {
-                        const content = (
-                            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${themeHoverBg} transition-all duration-200 cursor-pointer group`}>
-                                <span className={`${themeIconColor} group-hover:scale-110 transition-transform duration-200`}>
-                                    {item.icon}
-                                </span>
-                                <span className={`text-sm font-medium ${textMain} group-hover:${isMGT ? 'text-emerald-400' : 'text-gold-400'} transition-colors`}>
-                                    {item.label}
-                                </span>
-                            </div>
-                        );
-
-                        if (item.to) {
-                            return (
-                                <li key={index}>
-                                    <Link to={item.to}>
-                                        {content}
-                                    </Link>
-                                </li>
-                            );
-                        }
-
-                        return (
-                            <li key={index} onClick={item.onClick}>
-                                {content}
-                            </li>
-                        );
-                    })}
+                    {items.map((item, index) => (
+                        <MenuItem key={index} item={item} index={index} />
+                    ))}
                 </ul>
             </nav>
 
@@ -122,6 +181,17 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             <div className="mt-4">
                 <OnlineFriendsCard maxDisplay={4} />
             </div>
+
+            {/* Upgrade Modal */}
+            {upgradeModal.feature && (
+                <UpgradeModal
+                    isOpen={upgradeModal.open}
+                    onClose={() => setUpgradeModal({ open: false, feature: null })}
+                    feature={upgradeModal.feature}
+                    currentPlan={upgradeModal.currentPlan}
+                    requiredPlan={upgradeModal.requiredPlan}
+                />
+            )}
         </aside>
     );
 }

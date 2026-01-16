@@ -14,16 +14,16 @@ interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   feature: Feature;
-  currentPlan: string;
-  requiredPlan: string;
+  currentPlan?: string;
+  requiredPlan?: string;
 }
 
 export default function UpgradeModal({
   isOpen,
   onClose,
   feature,
-  currentPlan,
-  requiredPlan,
+  currentPlan = Plan.FREE,
+  requiredPlan = Plan.STARTER,
 }: UpgradeModalProps) {
   const { theme } = useAuth();
   const isDarkMode = theme === 'dark';

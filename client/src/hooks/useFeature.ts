@@ -223,7 +223,7 @@ const PLAN_FEATURES: Record<Plan, Feature[]> = {
   ],
 };
 
-function getAllFeaturesForPlan(plan: Plan): Feature[] {
+export function getAllFeaturesForPlan(plan: Plan): Feature[] {
   const planIndex = PLAN_HIERARCHY.indexOf(plan);
   const allFeatures = new Set<Feature>();
   
@@ -235,7 +235,10 @@ function getAllFeaturesForPlan(plan: Plan): Feature[] {
   return Array.from(allFeatures);
 }
 
-function getMinimumPlanForFeature(feature: Feature): Plan {
+/**
+ * Retorna o plano mínimo necessário para uma feature
+ */
+export function getMinimumPlanForFeature(feature: Feature): Plan {
   for (const plan of PLAN_HIERARCHY) {
     const features = getAllFeaturesForPlan(plan);
     if (features.includes(feature)) {
@@ -245,10 +248,30 @@ function getMinimumPlanForFeature(feature: Feature): Plan {
   return Plan.ENTERPRISE;
 }
 
-function isPlanEqualOrHigher(currentPlan: Plan, requiredPlan: Plan): boolean {
+/**
+ * Alias para getMinimumPlanForFeature (usado pelo CommunityContext)
+ */
+export function getRequiredPlan(feature: Feature): Plan {
+  return getMinimumPlanForFeature(feature);
+}
+
+/**
+ * Verifica se o plano atual é igual ou superior ao requerido
+ */
+export function isPlanEqualOrHigher(currentPlan: Plan, requiredPlan: Plan): boolean {
   const currentIndex = PLAN_HIERARCHY.indexOf(currentPlan);
   const requiredIndex = PLAN_HIERARCHY.indexOf(requiredPlan);
   return currentIndex >= requiredIndex;
+}
+
+/**
+ * Verifica se uma feature está disponível para um plano
+ * @param feature - Feature a verificar
+ * @param plan - Plano atual
+ */
+export function isFeatureAvailable(feature: Feature, plan: Plan): boolean {
+  const requiredPlan = getMinimumPlanForFeature(feature);
+  return isPlanEqualOrHigher(plan, requiredPlan);
 }
 
 /**

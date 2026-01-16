@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { CommunityProvider } from './context/CommunityContext';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import ModernLogin from './pages/ModernLogin';
@@ -45,9 +46,10 @@ logger.init();
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
+    <CommunityProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
           <Route path="/" element={<ModernLogin />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/register" element={<Register />} />
@@ -95,6 +97,7 @@ function App() {
         <DevBanner />
       </Router>
     </AuthProvider>
+    </CommunityProvider>
   );
 }
 

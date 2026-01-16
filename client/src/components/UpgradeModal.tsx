@@ -58,14 +58,15 @@ export default function UpgradeModal({
             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998]"
           />
           
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[9999] px-4"
-          >
-            <div className={`${bgModal} border ${borderColor} rounded-2xl shadow-2xl overflow-hidden`}>
+          {/* Modal Container - Flex centralizado */}
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-md pointer-events-auto"
+            >
+              <div className={`${bgModal} border ${borderColor} rounded-2xl shadow-2xl overflow-hidden`}>
               {/* Header com gradiente */}
               <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 p-6 relative">
                 <button
@@ -199,6 +200,7 @@ export default function UpgradeModal({
               </div>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>,

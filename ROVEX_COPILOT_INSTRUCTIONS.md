@@ -123,9 +123,9 @@ enum HealthStatus {
 }
 
 enum Plan {
-  STARTER           // Up to 500 users, $29/mo
-  GROWTH            // Up to 2000 users, $79/mo
-  ENTERPRISE        // Unlimited, $199/mo
+  STARTER           // Up to 500 users, R$ 247/mo
+  GROWTH            // Up to 2000 users, R$ 597/mo
+  ENTERPRISE        // Unlimited users, R$ 1.497/mo
 }
 
 enum BillingCycle {
@@ -133,6 +133,71 @@ enum BillingCycle {
   YEARLY
 }
 ```
+
+---
+
+## 💰 Pricing & Cost Breakdown
+
+### Operational Costs per Community (Monthly)
+
+| Service | STARTER (500 users) | GROWTH (2000 users) | ENTERPRISE (unlimited) |
+|---------|---------------------|---------------------|------------------------|
+| **PostgreSQL (Neon/Supabase)** | R$ 25 | R$ 80 | R$ 200+ |
+| **Hosting (Vercel/Railway)** | R$ 35 | R$ 80 | R$ 150 |
+| **Storage (Cloudflare R2)** | R$ 15 | R$ 50 | R$ 120 |
+| **Images (Cloudinary)** | R$ 20 | R$ 60 | R$ 150 |
+| **Email (Resend/Sendgrid)** | R$ 10 | R$ 30 | R$ 80 |
+| **DNS + SSL** | R$ 5 | R$ 5 | R$ 10 |
+| **Backup + Monitoring** | R$ 10 | R$ 25 | R$ 50 |
+| **Support (proportional)** | R$ 20 | R$ 50 | R$ 100 |
+| **TOTAL COST** | **~R$ 140** | **~R$ 380** | **~R$ 860** |
+| **Profit Margin (~40-50%)** | +R$ 107 | +R$ 217 | +R$ 637 |
+| **FINAL PRICE** | **R$ 247/mês** | **R$ 597/mês** | **R$ 1.497/mês** |
+
+### Plan Features Comparison
+
+| Feature | STARTER | GROWTH | ENTERPRISE |
+|---------|---------|--------|------------|
+| **Max Users** | 500 | 2,000 | Unlimited |
+| **Storage (R2)** | 5 GB | 25 GB | 100 GB |
+| **Cloudinary Uploads** | 10 GB/mo | 50 GB/mo | 200 GB/mo |
+| **Email Quota** | 1,000/mo | 10,000/mo | 50,000/mo |
+| **Custom Domain** | ❌ | ✅ | ✅ |
+| **White-label** | ❌ | ❌ | ✅ |
+| **Priority Support** | ❌ | ✅ | ✅ (dedicated) |
+| **SLA Uptime** | 99% | 99.5% | 99.9% |
+| **Social Integrations** | 1 | 3 | Unlimited |
+| **Analytics Dashboard** | Basic | Advanced | Full + API |
+| **Daily Backups** | 7 days | 30 days | 90 days |
+
+### Annual Discount (15% off)
+
+| Plan | Monthly | Annual (15% off) | Savings |
+|------|---------|------------------|---------|
+| STARTER | R$ 247/mo | R$ 2.519/yr (~R$ 210/mo) | R$ 445/yr |
+| GROWTH | R$ 597/mo | R$ 6.089/yr (~R$ 507/mo) | R$ 1.075/yr |
+| ENTERPRISE | R$ 1.497/mo | R$ 15.269/yr (~R$ 1.272/mo) | R$ 2.695/yr |
+
+### Usage-Based Add-ons
+
+| Add-on | Price |
+|--------|-------|
+| +1,000 users | R$ 50/mo |
+| +10 GB storage | R$ 25/mo |
+| +10 GB Cloudinary | R$ 30/mo |
+| +5,000 emails | R$ 15/mo |
+| Extra subdomain | R$ 30/mo |
+| Premium theme pack | R$ 97 (one-time) |
+
+### Rovex Revenue Projections
+
+| Scenario | Communities | Avg Plan | MRR | Annual |
+|----------|-------------|----------|-----|--------|
+| Early Stage | 10 | STARTER | R$ 2,470 | R$ 29,640 |
+| Growth | 50 | Mixed | R$ 21,000 | R$ 252,000 |
+| Mature | 200 | Mixed | R$ 100,000+ | R$ 1.2M+ |
+
+---
 
 ## API Communication with Communities
 

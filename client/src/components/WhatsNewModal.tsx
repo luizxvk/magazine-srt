@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Navigation, LayoutDashboard, Disc, Gamepad2, Image, Tag } from 'lucide-react';
+import { X, Sparkles, Check, Navigation, LayoutDashboard, Disc, Gamepad2, Image, Tag, Lock, FileText, Rocket } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.2';
+const CURRENT_VERSION = '0.4.3';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,43 +33,43 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.2 - STEAM-STYLE PRODUCT DETAILS
+    // v0.4.3 - FEATURE GATES SYSTEM
     const updates: UpdateItem[] = [
+        {
+            icon: <Lock className="w-5 h-5 text-amber-500" />,
+            title: '🔐 Sistema Feature Gates',
+            description: 'Novo sistema de controle de features por plano. Features premium agora mostram cadeado e modal de upgrade!',
+            isNew: true
+        },
+        {
+            icon: <FileText className="w-5 h-5 text-blue-500" />,
+            title: '📋 Catálogo de 150+ Features',
+            description: 'Documentação completa de todas as funcionalidades organizadas por plano: FREE, STARTER, GROWTH e ENTERPRISE.',
+            isNew: true
+        },
+        {
+            icon: <Rocket className="w-5 h-5 text-purple-500" />,
+            title: '🚀 Integração Rovex Platform',
+            description: 'APIs e documentação prontas para integração com a plataforma SaaS Rovex!',
+            isNew: true
+        },
+        // v0.4.2 - STEAM-STYLE PRODUCT DETAILS
         {
             icon: <Gamepad2 className="w-5 h-5 text-blue-500" />,
             title: '🎮 Página de Produto Estilo Steam',
             description: 'Clique em qualquer produto para ver detalhes completos: galeria de imagens, informações do jogo, tags e muito mais!',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Image className="w-5 h-5 text-purple-500" />,
             title: '📸 Galeria de Screenshots',
             description: 'Produtos agora suportam múltiplas screenshots! Navegue pelo carrossel ou expanda em tela cheia.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Tag className="w-5 h-5 text-emerald-500" />,
             title: '🏷️ Tags e Info do Jogo',
             description: 'Desenvolvedor, plataforma, tamanho em GB, data de lançamento e tags personalizadas (#FPS, #Action, etc).',
-            isNew: true
-        },
-        // v0.4.1 - FACEBOOK-STYLE LAYOUT & TOOLS CAROUSEL
-        {
-            icon: <LayoutDashboard className="w-5 h-5 text-blue-500" />,
-            title: '📱 Sidebar Estilo Facebook',
-            description: 'Nova barra lateral esquerda com acesso rápido: Bônus Diário, Grupos, Catálogo, Eventos, Novos Membros e Destaques!',
-            isNew: false
-        },
-        {
-            icon: <Disc className="w-5 h-5 text-purple-500" />,
-            title: '🎛️ Carrossel de Ferramentas',
-            description: 'Rádio, Discord, Steam e Twitch agora em um carrossel compacto! Navegue com tabs ou setas.',
-            isNew: false
-        },
-        {
-            icon: <Navigation className="w-5 h-5 text-emerald-500" />,
-            title: '🖥️ Layout 3 Colunas',
-            description: 'Feed reorganizado: Sidebar Esquerda + Feed Central + Ferramentas à Direita. Mais espaço, melhor navegação!',
             isNew: false
         }
     ];

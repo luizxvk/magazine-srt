@@ -607,9 +607,9 @@ enum CommunityStatus {
 }
 
 enum Plan {
-  STARTER     // Até 500 usuários
-  GROWTH      // Até 2000 usuários
-  ENTERPRISE  // Ilimitado
+  STARTER     // Até 500 usuários, R$ 247/mês
+  GROWTH      // Até 2000 usuários, R$ 597/mês
+  ENTERPRISE  // Ilimitado, R$ 1.497/mês
 }
 
 enum RovexRole {
@@ -618,6 +618,25 @@ enum RovexRole {
   SUPPORT          // Staff de suporte
 }
 ```
+
+### 💰 Detalhamento de Custos por Plano
+
+**STARTER (R$ 247/mês)** - Até 500 usuários
+- Custo operacional: ~R$ 140/mês
+- Margem: ~R$ 107 (43%)
+- Ideal para: Comunidades pequenas, testes, MVPs
+
+**GROWTH (R$ 597/mês)** - Até 2.000 usuários  
+- Custo operacional: ~R$ 380/mês
+- Margem: ~R$ 217 (36%)
+- Ideal para: Comunidades em crescimento, criadores
+
+**ENTERPRISE (R$ 1.497/mês)** - Ilimitado
+- Custo operacional: ~R$ 860/mês
+- Margem: ~R$ 637 (42%)
+- Ideal para: Grandes marcas, múltiplas comunidades
+
+**Desconto Anual**: 15% off (ex: STARTER = R$ 210/mês)
 
 ### Fluxo de Comunicação em Tempo Real
 

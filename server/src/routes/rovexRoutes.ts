@@ -38,33 +38,235 @@ const validateRovexSecret = (req: Request, res: Response, next: NextFunction) =>
 // Aplicar middleware em todas as rotas
 router.use(validateRovexSecret);
 
-// Feature requirements by plan
+/**
+ * Feature Requirements by Plan
+ * Based on MAGAZINE_FEATURES_CATALOG.md
+ * 
+ * 🆓 FREE - Trial 14 dias
+ * 🟢 STARTER - R$ 247/mês
+ * 🟡 GROWTH - R$ 597/mês
+ * 🔴 ENTERPRISE - R$ 1.497/mês
+ */
 const FEATURE_REQUIREMENTS: Record<string, string> = {
-  // Core features (FREE)
-  'feed': 'FREE',
-  'profile': 'FREE',
-  'basic_customization': 'FREE',
+  // ============== AUTH & USERS (FREE) ==============
+  'auth.register': 'FREE',
+  'auth.login': 'FREE',
+  'auth.email_verification': 'FREE',
+  'auth.password_recovery': 'FREE',
+  'auth.google_oauth': 'GROWTH',
   
-  // STARTER features
-  'groups': 'STARTER',
-  'market': 'STARTER',
-  'supply_box': 'STARTER',
-  'badges': 'STARTER',
-  'daily_login': 'STARTER',
+  'user.profile': 'FREE',
+  'user.avatar_upload': 'STARTER',
+  'user.levels': 'FREE',
+  'user.friends': 'FREE',
+  'user.online_status': 'FREE',
+  'user.do_not_disturb': 'STARTER',
+  'user.session_security': 'STARTER',
+  'user.verified_badge': 'GROWTH',
+  'user.lite_mode': 'FREE',
+  'user.dual_membership': 'STARTER',
   
-  // GROWTH features
-  'analytics': 'GROWTH',
-  'custom_themes': 'GROWTH',
-  'api_access': 'GROWTH',
-  'export_data': 'GROWTH',
-  'advanced_gamification': 'GROWTH',
+  // ============== FEED & CONTENT ==============
+  'feed.view': 'FREE',
+  'feed.create_post': 'FREE',
+  'feed.image_upload': 'STARTER',
+  'feed.video_upload': 'GROWTH',
+  'feed.likes': 'FREE',
+  'feed.comments': 'FREE',
+  'feed.highlights': 'STARTER',
+  'feed.product_link': 'GROWTH',
+  'feed.visibility_control': 'STARTER',
+  'feed.reports': 'FREE',
   
-  // ENTERPRISE features
-  'white_label': 'ENTERPRISE',
-  'sso_integration': 'ENTERPRISE',
-  'priority_support': 'ENTERPRISE',
-  'custom_domain': 'ENTERPRISE',
-  'unlimited_storage': 'ENTERPRISE',
+  // ============== STORIES ==============
+  'stories.create': 'FREE',
+  'stories.view': 'FREE',
+  'stories.expiration': 'FREE',
+  'stories.view_count': 'STARTER',
+  'stories.editor': 'GROWTH',
+  'stories.dm_reply': 'STARTER',
+  
+  // ============== GAMIFICATION ==============
+  'gamification.xp': 'FREE',
+  'gamification.zions_points': 'FREE',
+  'gamification.zions_cash': 'GROWTH',
+  'gamification.xp_rewards': 'FREE',
+  'gamification.level_up': 'FREE',
+  'gamification.level_timeline': 'STARTER',
+  'gamification.daily_bonus': 'FREE',
+  'gamification.streaks': 'FREE',
+  'gamification.badges': 'FREE',
+  'gamification.badge_display': 'FREE',
+  'gamification.equipped_badge': 'STARTER',
+  'gamification.trophies': 'FREE',
+  
+  // ============== RANKING ==============
+  'ranking.global': 'FREE',
+  'ranking.page': 'FREE',
+  'ranking.modal': 'FREE',
+  'ranking.top3': 'FREE',
+  'ranking.by_period': 'GROWTH',
+  
+  // ============== ECONOMY ==============
+  'economy.wallet': 'FREE',
+  'economy.history': 'FREE',
+  'economy.buy_zions': 'GROWTH',
+  'economy.withdraw': 'ENTERPRISE',
+  'economy.conversion': 'GROWTH',
+  
+  // ============== SUPPLY BOX ==============
+  'supply_box.system': 'STARTER',
+  'supply_box.free_daily': 'STARTER',
+  'supply_box.progressive_price': 'STARTER',
+  'supply_box.rarities': 'STARTER',
+  'supply_box.duplicate_compensation': 'STARTER',
+  'supply_box.animation': 'STARTER',
+  
+  // ============== MARKETPLACE P2P ==============
+  'market.list_item': 'GROWTH',
+  'market.buy_item': 'GROWTH',
+  'market.cancel_listing': 'GROWTH',
+  'market.history': 'GROWTH',
+  'market.fees': 'GROWTH',
+  'market.filters': 'GROWTH',
+  'market.stats': 'GROWTH',
+  
+  // ============== PRODUCT STORE ==============
+  'store.view': 'STARTER',
+  'store.game_keys': 'GROWTH',
+  'store.gift_cards': 'GROWTH',
+  'store.subscriptions': 'ENTERPRISE',
+  'store.digital_items': 'GROWTH',
+  'store.key_management': 'GROWTH',
+  'store.vip_discount': 'STARTER',
+  'store.pay_zions': 'STARTER',
+  'store.pay_pix': 'GROWTH',
+  'store.pay_card': 'ENTERPRISE',
+  
+  // ============== CUSTOMIZATION ==============
+  'customization.shop': 'STARTER',
+  'customization.backgrounds': 'STARTER',
+  'customization.colors': 'STARTER',
+  'customization.badge_frames': 'STARTER',
+  'customization.theme_packs': 'GROWTH',
+  'customization.equip': 'STARTER',
+  'customization.inventory': 'STARTER',
+  'customization.preview': 'STARTER',
+  
+  // ============== CHAT & MESSAGES ==============
+  'chat.dm': 'FREE',
+  'chat.realtime': 'FREE',
+  'chat.history': 'FREE',
+  'chat.read_receipts': 'STARTER',
+  'chat.window': 'FREE',
+  'chat.notifications': 'FREE',
+  'chat.image_upload': 'STARTER',
+  
+  // ============== GROUPS ==============
+  'groups.create': 'STARTER',
+  'groups.private': 'STARTER',
+  'groups.roles': 'STARTER',
+  'groups.invites': 'STARTER',
+  'groups.messages': 'STARTER',
+  'groups.settings': 'STARTER',
+  'groups.avatar': 'STARTER',
+  'groups.background': 'GROWTH',
+  'groups.nsfw': 'GROWTH',
+  'groups.mute': 'STARTER',
+  
+  // ============== NOTIFICATIONS ==============
+  'notifications.inapp': 'FREE',
+  'notifications.likes': 'FREE',
+  'notifications.comments': 'FREE',
+  'notifications.badges': 'FREE',
+  'notifications.friends': 'FREE',
+  'notifications.messages': 'FREE',
+  'notifications.groups': 'STARTER',
+  'notifications.system': 'FREE',
+  
+  // ============== SOCIAL INTEGRATIONS ==============
+  'social.discord': 'STARTER',
+  'social.discord_status': 'STARTER',
+  'social.discord_guilds': 'GROWTH',
+  'social.steam': 'STARTER',
+  'social.steam_games': 'GROWTH',
+  'social.steam_friends': 'GROWTH',
+  'social.twitch': 'GROWTH',
+  'social.twitch_live': 'GROWTH',
+  'social.twitch_follows': 'GROWTH',
+  'social.activity_log': 'GROWTH',
+  
+  // ============== ADMIN PANEL ==============
+  'admin.dashboard': 'STARTER',
+  'admin.grid_dashboard': 'GROWTH',
+  'admin.user_management': 'STARTER',
+  'admin.toggle_membership': 'STARTER',
+  'admin.ban_user': 'STARTER',
+  'admin.reset_password': 'STARTER',
+  'admin.official_posts': 'STARTER',
+  'admin.announcements': 'STARTER',
+  'admin.events': 'STARTER',
+  'admin.rewards': 'STARTER',
+  'admin.badge_management': 'GROWTH',
+  'admin.approve_invites': 'STARTER',
+  'admin.manage_reports': 'STARTER',
+  'admin.approve_withdrawals': 'ENTERPRISE',
+  'admin.feedbacks': 'STARTER',
+  'admin.dev_tools': 'ENTERPRISE',
+  
+  // ============== PHOTO CATALOG ==============
+  'catalog.view': 'STARTER',
+  'catalog.upload': 'STARTER',
+  'catalog.categories': 'STARTER',
+  'catalog.favorites': 'STARTER',
+  'catalog.visibility': 'STARTER',
+  
+  // ============== ANALYTICS ==============
+  'analytics.basic': 'STARTER',
+  'analytics.active_users': 'STARTER',
+  'analytics.online_now': 'STARTER',
+  'analytics.counters': 'STARTER',
+  'analytics.market_stats': 'GROWTH',
+  'analytics.revenue': 'ENTERPRISE',
+  'analytics.api': 'ENTERPRISE',
+  
+  // ============== UI/UX ==============
+  'ui.dark_mode': 'FREE',
+  'ui.light_mode': 'FREE',
+  'ui.responsive': 'FREE',
+  'ui.mobile_carousel': 'FREE',
+  'ui.glassmorphism': 'FREE',
+  'ui.animations': 'FREE',
+  'ui.loading_screen': 'FREE',
+  'ui.welcome_tour': 'STARTER',
+  'ui.search': 'FREE',
+  'ui.confetti': 'FREE',
+  'ui.toasts': 'FREE',
+  'ui.image_crop': 'STARTER',
+  
+  // ============== TECHNICAL ==============
+  'tech.jwt': 'FREE',
+  'tech.session_token': 'STARTER',
+  'tech.cloudinary': 'STARTER',
+  'tech.cloudflare_r2': 'GROWTH',
+  'tech.email': 'FREE',
+  'tech.cron_jobs': 'STARTER',
+  'tech.rate_limiting': 'STARTER',
+  
+  // ============== ROVEX INTEGRATION ==============
+  'rovex.health': 'STARTER',
+  'rovex.metrics': 'STARTER',
+  'rovex.config': 'STARTER',
+  'rovex.webhooks': 'STARTER',
+  'rovex.auto_report': 'STARTER',
+  
+  // ============== ENTERPRISE EXCLUSIVES ==============
+  'enterprise.white_label': 'ENTERPRISE',
+  'enterprise.sso': 'ENTERPRISE',
+  'enterprise.custom_domain': 'ENTERPRISE',
+  'enterprise.unlimited_storage': 'ENTERPRISE',
+  'enterprise.priority_support': 'ENTERPRISE',
+  'enterprise.sla': 'ENTERPRISE',
 };
 
 const PLAN_HIERARCHY = ['FREE', 'STARTER', 'GROWTH', 'ENTERPRISE'];

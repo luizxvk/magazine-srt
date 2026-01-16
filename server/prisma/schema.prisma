@@ -886,3 +886,13 @@ model SocialActivity {
   @@index([isLive])
   @@index([startedAt])
 }
+
+// ============================================
+// SYSTEM CONFIGURATION
+// ============================================
+
+model SystemConfig {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}

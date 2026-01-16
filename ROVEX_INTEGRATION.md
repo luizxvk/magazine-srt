@@ -1,22 +1,24 @@
 # 🔗 Integração Magazine ↔ Rovex Platform
 
 > **Status**: ✅ Implementado (Janeiro 2026)  
-> **Versão**: 1.0
+> **Versão**: 2.0 (White-Label Provisioning)
 
 ---
 
 ## 📋 Resumo da Implementação
 
-A integração permite comunicação bidirecional entre o Magazine (comunidade) e a plataforma Rovex.
+A integração permite comunicação bidirecional entre o Magazine (comunidade) e a plataforma Rovex, incluindo provisionamento white-label e feature gates.
 
 ### Arquivos Criados/Modificados
 
 | Arquivo | Descrição |
 |---------|-----------|
 | `server/src/services/rovexService.ts` | Serviço principal de integração |
-| `server/src/routes/rovexRoutes.ts` | Endpoints da API Rovex |
-| `server/index.ts` | Cron job automático |
-| `server/.env.example` | Variáveis de ambiente |
+| `server/src/routes/rovexRoutes.ts` | Endpoints da API Rovex (provisioning, features, config) |
+| `server/prisma/schema.prisma` | Model `SystemConfig` para persistência |
+| `client/src/config/community.config.ts` | Configuração white-label do frontend |
+| `client/src/context/CommunityContext.tsx` | Provider de configuração dinâmica |
+| `client/src/hooks/useFeature.ts` | Hook de feature gates |
 
 ---
 
@@ -31,6 +33,25 @@ ROVEX_API_SECRET=<copiar do dashboard da comunidade na Rovex>
 ```
 
 ⚠️ **Importante**: Sem essas variáveis, o cron job NÃO será iniciado (fail-safe).
+
+---
+
+## 🎯 Feature Gates por Plano
+
+| Feature | FREE | STARTER | GROWTH | ENTERPRISE |
+|---------|------|---------|--------|------------|
+| Feed & Perfil | ✅ | ✅ | ✅ | ✅ |
+| Grupos | ❌ | ✅ | ✅ | ✅ |
+| Market | ❌ | ✅ | ✅ | ✅ |
+| Supply Box | ❌ | ✅ | ✅ | ✅ |
+| Badges | ❌ | ✅ | ✅ | ✅ |
+| Daily Login | ❌ | ✅ | ✅ | ✅ |
+| Analytics | ❌ | ❌ | ✅ | ✅ |
+| Custom Themes | ❌ | ❌ | ✅ | ✅ |
+| API Access | ❌ | ❌ | ✅ | ✅ |
+| White Label | ❌ | ❌ | ❌ | ✅ |
+| SSO Integration | ❌ | ❌ | ❌ | ✅ |
+| Custom Domain | ❌ | ❌ | ❌ | ✅ |
 
 ---
 
@@ -62,8 +83,11 @@ interface RovexMetrics {
 |--------|----------|-----------|
 | `GET` | `/api/rovex/health` | Health check da comunidade |
 | `GET` | `/api/rovex/metrics` | Métricas sob demanda |
-| `GET` | `/api/rovex/config` | Configurações da comunidade |
-| `PUT` | `/api/rovex/config` | Atualizar configs via Rovex |
+| `GET` | `/api/rovex/config` | Configurações da comunidade (do DB ou defaults) |
+| `PUT` | `/api/rovex/config` | Atualizar configs via Rovex (persiste no DB) |
+| `GET` | `/api/rovex/features` | Lista features e disponibilidade por plano |
+| `POST` | `/api/rovex/provision` | Provisionar nova comunidade + admin user |
+| `PUT` | `/api/rovex/plan` | Upgrade/downgrade de plano |
 | `POST` | `/api/rovex/webhook` | Receber eventos da Rovex |
 
 ### Endpoints que Magazine USA (Magazine chama Rovex)
@@ -72,6 +96,86 @@ interface RovexMetrics {
 |--------|----------|-----------|
 | `POST` | `/api/rovex/report-metrics` | Trigger manual de report |
 | `GET` | `/api/rovex/connection-test` | Testar conexão com Rovex |
+
+---
+
+## 🚀 Provisioning API
+
+### POST `/api/rovex/provision`
+
+Cria/atualiza configuração completa da comunidade e opcionalmente cria usuário admin.
+
+```json
+// Request
+{
+  "communityName": "Minha Comunidade",
+  "subdomain": "minha-comunidade",
+  "plan": "STARTER",
+  "tierVipName": "VIP",
+  "tierVipColor": "#FFD700",
+  "tierStdName": "MEMBER",
+  "tierStdColor": "#10B981",
+  "currencyName": "Coins",
+  "currencySymbol": "C$",
+  "primaryColor": "#FFD700",
+  "secondaryColor": "#10B981",
+  "logoUrl": "https://...",
+  "adminUser": {
+    "email": "admin@example.com",
+    "password": "securepassword",
+    "name": "Admin"
+  }
+}
+
+// Response
+{
+  "success": true,
+  "message": "Community provisioned successfully",
+  "config": { ... },
+  "adminUser": { "userId": "...", "action": "created" }
+}
+```
+
+### PUT `/api/rovex/plan`
+
+Atualiza o plano da comunidade (upgrade/downgrade).
+
+```json
+// Request
+{
+  "plan": "GROWTH",
+  "features": { ... }
+}
+
+// Response
+{
+  "success": true,
+  "message": "Plan updated to GROWTH",
+  "config": { ... }
+}
+```
+
+### GET `/api/rovex/features`
+
+Lista todas as features e disponibilidade por plano.
+
+```json
+// Response
+{
+  "success": true,
+  "currentPlan": "STARTER",
+  "allFeatures": {
+    "feed": "FREE",
+    "groups": "STARTER",
+    "analytics": "GROWTH",
+    "white_label": "ENTERPRISE"
+  },
+  "availableFeatures": ["feed", "profile", "groups", "market"],
+  "lockedFeatures": [
+    { "feature": "analytics", "requiredPlan": "GROWTH" }
+  ]
+}
+```
 
 ---
 
@@ -176,12 +280,48 @@ O Magazine escuta estes eventos em `POST /api/rovex/webhook`:
 
 ## 🔮 TODO / Melhorias Futuras
 
+- [x] Implementar SystemConfig para persistir configurações no DB
+- [x] Adicionar endpoint de provisioning com criação de admin
+- [x] Adicionar endpoint de upgrade/downgrade de plano
+- [x] Adicionar endpoint de features por plano
 - [ ] Implementar cache de métricas (evitar queries repetidas)
 - [ ] Adicionar retry com backoff em caso de falha
-- [ ] Suportar múltiplas comunidades (multi-tenant)
 - [ ] Dashboard interno mostrando status da integração
 - [ ] Implementar `config.updated` webhook para recarregar configs dinamicamente
 - [ ] Adicionar métricas de engagement (likes, shares)
+- [ ] Fase 4: Substituir textos hardcoded por config dinâmica (Magazine → config.communityName)
+
+---
+
+## 🎨 Frontend: CommunityContext
+
+### Uso no Frontend
+
+```tsx
+import { useCommunity } from '../context/CommunityContext';
+
+function MyComponent() {
+  const { 
+    config,           // Full community config
+    formatCurrency,   // (amount) => "Z$ 100"
+    getTierColor,     // (tier) => "#d4af37"
+    getTierName,      // (tier) => "MAGAZINE"
+    isVipTier,        // (tier) => true/false
+    isFeatureEnabled, // (featureId) => true/false
+    getFeatureRequiredPlan, // (featureId) => "GROWTH"
+  } = useCommunity();
+  
+  return (
+    <div>
+      <h1>Bem-vindo ao {config.communityName}!</h1>
+      <p>Você tem {formatCurrency(100)}</p>
+      {!isFeatureEnabled('analytics') && (
+        <p>Analytics requer plano {getFeatureRequiredPlan('analytics')}</p>
+      )}
+    </div>
+  );
+}
+```
 
 ---
 

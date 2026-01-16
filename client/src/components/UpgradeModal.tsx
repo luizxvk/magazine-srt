@@ -3,9 +3,12 @@
  * 
  * Modal que aparece quando usuário tenta acessar feature bloqueada.
  * Mostra informações sobre o plano necessário e CTA para upgrade.
+ * 
+ * Usa createPortal para renderizar no body e garantir z-index máximo.
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { X, Sparkles, Check, ArrowRight, Lock, Crown } from 'lucide-react';
 import { Feature, FEATURE_INFO, PLAN_DETAILS, Plan, formatPrice } from '../utils/features';
 import { useAuth } from '../context/AuthContext';
@@ -41,7 +44,8 @@ export default function UpgradeModal({
   const textMuted = isDarkMode ? 'text-white/60' : 'text-gray-500';
   const cardBg = isDarkMode ? 'bg-white/5' : 'bg-gray-100';
 
-  return (
+  // Usa createPortal para renderizar no body e escapar de qualquer stacking context
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -197,6 +201,7 @@ export default function UpgradeModal({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

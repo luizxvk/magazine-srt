@@ -35,7 +35,122 @@ const validateRovexSecret = (req: Request, res: Response, next: NextFunction) =>
   next();
 };
 
-// Aplicar middleware em todas as rotas
+/**
+ * Middleware para validar secret do Cron (Vercel)
+ */
+const validateCronSecret = (req: Request, res: Response, next: NextFunction) => {
+  const cronSecret = process.env.CRON_SECRET;
+  
+  // Se CRON_SECRET não está configurado, bloquear acesso
+  if (!cronSecret) {
+    console.warn('⚠️ CRON_SECRET not configured - blocking cron access');
+    return res.status(503).json({
+      success: false,
+      error: 'Cron not configured',
+    });
+  }
+  
+  // Vercel envia o secret no header Authorization: Bearer <secret>
+  const authHeader = req.headers.authorization;
+  const secret = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  
+  if (!secret || secret !== cronSecret) {
+    console.warn('⚠️ Unauthorized cron request attempt');
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized - Invalid cron secret',
+    });
+  }
+  
+  next();
+};
+
+// =====================================
+// ROTAS PÚBLICAS (sem autenticação)
+// =====================================
+
+/**
+ * GET /api/rovex/public/health
+ * Health check público para monitoramento externo
+ * NÃO requer autenticação
+ */
+router.get('/public/health', async (req: Request, res: Response) => {
+  try {
+    // Testar conexão com banco
+    const dbStart = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    const dbLatency = Date.now() - dbStart;
+    
+    res.json({
+      status: 'healthy',
+      database: true,
+      dbLatencyMs: dbLatency,
+      version: process.env.APP_VERSION || '0.4.3',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  } catch (error) {
+    console.error('❌ Public health check failed:', error);
+    res.status(503).json({
+      status: 'unhealthy',
+      database: false,
+      timestamp: new Date().toISOString(),
+      error: 'Database connection failed',
+    });
+  }
+});
+
+/**
+ * GET /api/rovex/cron/metrics
+ * Endpoint de cron para Vercel - reporta métricas periodicamente
+ * Autenticado via CRON_SECRET
+ */
+router.get('/cron/metrics', validateCronSecret, async (req: Request, res: Response) => {
+  console.log('[Cron] Starting Rovex metrics sync...');
+  
+  try {
+    if (!isRovexConfigured()) {
+      console.warn('[Cron] Rovex not configured - skipping');
+      return res.json({
+        success: true,
+        skipped: true,
+        message: 'Rovex integration not configured',
+        timestamp: new Date().toISOString(),
+      });
+    }
+    
+    const success = await reportMetricsToRovex();
+    
+    if (success) {
+      console.log('[Cron] ✅ Metrics synced successfully');
+      return res.json({
+        success: true,
+        message: 'Metrics synced to Rovex',
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      console.error('[Cron] ❌ Failed to sync metrics');
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to report metrics',
+        timestamp: new Date().toISOString(),
+      });
+    }
+  } catch (error) {
+    console.error('[Cron] ❌ Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+// =====================================
+// ROTAS PROTEGIDAS (requerem ROVEX_API_SECRET)
+// =====================================
+
+// Aplicar middleware de autenticação nas rotas abaixo
 router.use(validateRovexSecret);
 
 /**

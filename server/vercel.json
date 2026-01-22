@@ -11,5 +11,11 @@
             "src": "/(.*)",
             "dest": "index.ts"
         }
+    ],
+    "crons": [
+        {
+            "path": "/api/rovex/cron/metrics",
+            "schedule": "*/10 * * * *"
+        }
     ]
 }

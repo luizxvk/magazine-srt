@@ -67,7 +67,7 @@ interface TypingUser {
 export default function GroupChatPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, theme, showToast } = useAuth();
+  const { user, theme, showToast, showError } = useAuth();
   const isMGT = user?.membershipType === 'MGT';
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -355,9 +355,10 @@ export default function GroupChatPage() {
       });
 
       fetchNewMessages();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending image:', error);
-      showToast('Não foi possível enviar a imagem');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Não foi possível enviar a imagem';
+      showError('Erro ao enviar imagem', errorMessage);
     } finally {
       setPendingImageFile(null);
     }

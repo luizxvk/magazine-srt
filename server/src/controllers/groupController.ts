@@ -388,6 +388,24 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'Você não tem permissão para postar' });
     }
 
+    // Verificar limite de 3 imagens por grupo
+    if (imageUrl) {
+      const imageCount = await prisma.groupMessage.count({
+        where: {
+          groupId: id,
+          imageUrl: { not: null },
+          deletedAt: null,
+        },
+      });
+
+      if (imageCount >= 3) {
+        return res.status(400).json({ 
+          error: 'Limite de imagens atingido',
+          message: 'Este grupo já atingiu o limite máximo de 3 imagens. Exclua uma imagem existente para enviar uma nova.'
+        });
+      }
+    }
+
     const message = await prisma.groupMessage.create({
       data: {
         groupId: id,
@@ -1071,6 +1089,23 @@ export const postImageMessage = async (req: AuthRequest, res: Response) => {
     // Check posting permission - same logic as postMessage
     if (!member.canPost && member.group.settings?.allowMemberPosts === false) {
       return res.status(403).json({ error: 'Você não tem permissão para postar' });
+    }
+
+    // Verificar limite de 3 imagens por grupo
+    const imageCount = await prisma.groupMessage.count({
+      where: {
+        groupId,
+        imageUrl: { not: null },
+        deletedAt: null,
+      },
+    });
+
+    if (imageCount >= 3) {
+      return res.status(400).json({ 
+        error: 'Limite de imagens atingido',
+        message: 'Este grupo já atingiu o limite máximo de 3 imagens. Exclua uma imagem existente para enviar uma nova.',
+        code: 'IMAGE_LIMIT_REACHED'
+      });
     }
 
     // Verificar saldo de Zions

@@ -3,6 +3,9 @@ import prisma from './prisma';
 type LogLevel = 'INFO' | 'WARN' | 'ERROR';
 type LogSource = 'BACKEND' | 'FRONTEND';
 
+// Flag to disable DB logging when connection issues occur
+let dbLoggingEnabled = false; // DISABLED - consuming connections and causing issues
+
 class Logger {
     private static instance: Logger;
     private originalConsoleLog: any;
@@ -23,6 +26,9 @@ class Logger {
     }
 
     public init() {
+        // Only intercept if DB logging is enabled
+        if (!dbLoggingEnabled) return;
+        
         console.log = (...args: any[]) => {
             this.log('INFO', 'BACKEND', args);
             this.originalConsoleLog.apply(console, args);
@@ -40,6 +46,9 @@ class Logger {
     }
 
     public async log(level: LogLevel, source: LogSource, messageArgs: any[], metadata?: any) {
+        // Skip if DB logging disabled
+        if (!dbLoggingEnabled) return;
+        
         try {
             const message = messageArgs.map(arg =>
                 typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
@@ -57,8 +66,8 @@ class Logger {
                 }
             });
         } catch (error) {
-            // Fallback to original console if DB fails, to avoid losing the error
-            this.originalConsoleError('Failed to save log to DB:', error);
+            // Disable DB logging on failure to prevent connection pool exhaustion
+            dbLoggingEnabled = false;
         }
     }
 }

@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 // Singleton pattern to prevent multiple PrismaClient instances
 // This is especially important in serverless environments like Vercel
 // where each function invocation could create a new connection
-// Updated: v0.4.0
+// Updated: v0.4.8 - Improved connection handling
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -11,10 +11,11 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  // Improve connection resilience for serverless
+  datasourceUrl: process.env.DATABASE_URL,
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// Always use global in serverless to reuse connection
+globalForPrisma.prisma = prisma;
 
 export default prisma;

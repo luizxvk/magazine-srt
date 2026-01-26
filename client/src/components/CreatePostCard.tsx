@@ -25,7 +25,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const canUseCarousel = (user?.zionsPoints || 0) >= 300;
 
     // Theme - seguindo padrão do projeto (emerald para MGT, gold para Magazine)
-    const cardBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
+    const cardBg = theme === 'light' ? 'bg-white' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
     const cardBorder = theme === 'light' ? 'border-gray-200' : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30');
     const cardGlow = isMGT 
         ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' 

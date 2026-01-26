@@ -197,7 +197,7 @@ export default function FeedPage() {
         }
     };
 
-    const highlightedPosts = posts.filter(post => post.isHighlight && !post.linkedProduct);
+    const highlightedPosts = posts.filter(post => post.isHighlight);
     const regularPosts = posts.filter(post => !post.isHighlight);
 
     const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';

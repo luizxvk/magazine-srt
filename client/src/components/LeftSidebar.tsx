@@ -1,4 +1,4 @@
-import { Gift, Users, Camera, Calendar, UserPlus, Star, ShoppingBag, Palette, Lock } from 'lucide-react';
+import { Gift, Users, Camera, Calendar, UserPlus, Star, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
@@ -74,18 +74,6 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             label: 'Destaques da Semana',
             to: '/highlights',
             feature: Feature.HIGHLIGHTS
-        },
-        {
-            icon: <ShoppingBag className="w-5 h-5" />,
-            label: 'Marketplace',
-            to: '/market',
-            feature: Feature.MARKETPLACE_P2P
-        },
-        {
-            icon: <Palette className="w-5 h-5" />,
-            label: 'Customização',
-            to: '/customization',
-            feature: Feature.CUSTOMIZATION_SHOP
         }
     ];
 

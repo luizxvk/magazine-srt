@@ -157,8 +157,8 @@ export const redeemReward = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Reward out of stock' });
         }
 
-        if (user.zions < reward.costZions) {
-            return res.status(400).json({ error: 'Insufficient Zions' });
+        if ((user.zionsPoints || 0) < reward.costZions) {
+            return res.status(400).json({ error: 'Insufficient Zions Points' });
         }
 
         // Check if reward is unique and user has already redeemed it
@@ -210,7 +210,7 @@ export const redeemReward = async (req: Request, res: Response) => {
             prisma.user.update({
                 where: { id: userId },
                 data: { 
-                    zions: zionChange > 0 ? { decrement: zionChange } : zionChange < 0 ? { increment: Math.abs(zionChange) } : undefined
+                    zionsPoints: zionChange > 0 ? { decrement: zionChange } : zionChange < 0 ? { increment: Math.abs(zionChange) } : undefined
                 }
             }),
             prisma.reward.update({

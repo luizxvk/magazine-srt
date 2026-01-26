@@ -68,7 +68,7 @@ export default function Rewards() {
     };
 
     const handleRedeem = async (reward: Reward) => {
-        if (!user || user.zions < reward.costZions) return;
+        if (!user || (user.zionsPoints || 0) < reward.costZions) return;
 
         setRedeeming(reward.id);
         try {
@@ -167,7 +167,7 @@ export default function Rewards() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {rewards.map((reward) => {
-                        const canAfford = (user?.zions || 0) >= reward.costZions;
+                        const canAfford = (user?.zionsPoints || 0) >= reward.costZions;
                         const isRedeemed = redeemedCode?.id === reward.id;
                         const alreadyRedeemedUnique = !reward.isUnlimited && redemptions.some(r => r.reward.id === reward.id);
 

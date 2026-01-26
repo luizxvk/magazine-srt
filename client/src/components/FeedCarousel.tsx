@@ -90,7 +90,10 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                     }}
                     className="absolute inset-0 w-full h-full"
                 >
-                    <Link to={`/post/${currentPost.id}`} className="block w-full h-full cursor-pointer">
+                    <Link 
+                        to={currentPost.linkedProduct ? `/loja/${currentPost.linkedProduct.id}` : `/post/${currentPost.id}`} 
+                        className="block w-full h-full cursor-pointer"
+                    >
                         {/* Main Image */}
                         <img
                             src={currentPost.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'}
@@ -134,13 +137,11 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                                             {currentPost.linkedProduct.priceBRL ? `R$ ${currentPost.linkedProduct.priceBRL.toFixed(2)}` : ''}
                                         </span>
                                     </div>
-                                    <Link
-                                        to={`/loja/${currentPost.linkedProduct.id}`}
+                                    <span
                                         className="px-3 py-1.5 bg-gold-500 text-black text-xs font-bold rounded-lg hover:bg-gold-400 transition-colors"
-                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         Comprar
-                                    </Link>
+                                    </span>
                                 </div>
                             )}
 

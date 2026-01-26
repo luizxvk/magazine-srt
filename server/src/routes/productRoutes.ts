@@ -8,6 +8,8 @@ import {
     getProducts,
     getProduct,
     purchaseWithZions,
+    purchaseWithBRL,
+    checkProductPaymentStatus,
     getUserOrders,
     getAllOrders,
     getAdminProducts
@@ -23,8 +25,14 @@ router.get('/', authenticateToken, getProducts);
 router.get('/:id', authenticateToken, getProduct);
 
 // ===================== USER ROUTES =====================
-// Purchase a product with Zions
+// Purchase a product with Zions Cash
 router.post('/purchase/zions', authenticateToken, purchaseWithZions);
+
+// Purchase a product with BRL (Mercado Pago PIX)
+router.post('/purchase/brl', authenticateToken, purchaseWithBRL);
+
+// Check product order payment status
+router.get('/orders/:orderId/status', authenticateToken, checkProductPaymentStatus);
 
 // Get user's purchase history
 router.get('/orders/my', authenticateToken, getUserOrders);

@@ -4,6 +4,8 @@ import { uploadProductImage } from '../services/cloudinaryService';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { sendProductKeysEmail } from '../services/emailService';
 import { awardXP } from '../services/gamificationService';
+import MercadoPagoConfig, { Preference, Payment } from 'mercadopago';
+import crypto from 'crypto';
 
 // ===================== PRODUCT MANAGEMENT (Admin) =====================
 
@@ -653,4 +655,308 @@ export const getAdminProducts = async (req: AuthRequest, res: Response) => {
         console.error('Error getting admin products:', error);
         res.status(500).json({ error: 'Erro ao buscar produtos' });
     }
+};
+
+// ===================== PURCHASE WITH BRL (Mercado Pago) =====================
+
+/**
+ * Create PIX payment for product purchase
+ */
+export const purchaseWithBRL = async (req: AuthRequest, res: Response) => {
+    try {
+        const { productId, quantity = 1 } = req.body;
+        const userId = req.user?.userId;
+
+        if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+            console.error('[PRODUCT_PAYMENT] MERCADOPAGO_ACCESS_TOKEN not configured');
+            return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
+        }
+
+        // Get product
+        const product = await prisma.product.findUnique({
+            where: { id: productId },
+            include: {
+                keys: {
+                    where: { isUsed: false },
+                    take: quantity
+                }
+            }
+        });
+
+        if (!product || !product.isActive) {
+            return res.status(404).json({ error: 'Produto não encontrado ou indisponível' });
+        }
+
+        if (!product.priceBRL) {
+            return res.status(400).json({ error: 'Este produto não aceita pagamento em BRL' });
+        }
+
+        // Check stock
+        if (!product.isUnlimited && product.keys.length < quantity) {
+            return res.status(400).json({ error: 'Estoque insuficiente' });
+        }
+
+        // Get user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, email: true, displayName: true, name: true, membershipType: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        // Calculate price with discount for MAGAZINE members
+        let totalPrice = product.priceBRL * quantity;
+        if (product.magazineDiscount && user.membershipType === 'MAGAZINE') {
+            totalPrice = totalPrice * 0.9; // 10% discount
+        }
+
+        // Create order with PENDING status
+        const order = await prisma.order.create({
+            data: {
+                buyerId: userId!,
+                productId,
+                quantity,
+                totalBRL: totalPrice,
+                paymentMethod: 'PIX',
+                paymentStatus: 'PENDING'
+            }
+        });
+
+        // Create Mercado Pago PIX payment
+        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
+        const payment = new Payment(client);
+
+        console.log(`[PRODUCT_PAYMENT] Creating PIX for product ${product.name}, R$${totalPrice} - User: ${userId}`);
+
+        const result = await payment.create({
+            body: {
+                transaction_amount: totalPrice,
+                description: `${product.name} - Magazine/MGT`,
+                payment_method_id: 'pix',
+                payer: {
+                    email: user.email,
+                    first_name: user.displayName || user.name?.split(' ')[0] || 'Usuario',
+                    last_name: user.name?.split(' ').slice(1).join(' ') || 'Magazine'
+                },
+                external_reference: `product_${order.id}`, // Prefix to identify product orders
+                notification_url: `${process.env.BACKEND_URL || 'https://api.magazinesrt.com.br'}/api/payments/webhook`
+            }
+        });
+
+        // Update order with payment ID
+        await prisma.order.update({
+            where: { id: order.id },
+            data: { paymentId: String(result.id) }
+        });
+
+        console.log(`[PRODUCT_PAYMENT] PIX created - PaymentID: ${result.id} - Status: ${result.status}`);
+
+        const pixInfo = result.point_of_interaction?.transaction_data;
+
+        res.json({
+            success: true,
+            orderId: order.id,
+            paymentId: result.id,
+            qrCode: pixInfo?.qr_code,
+            qrCodeBase64: pixInfo?.qr_code_base64,
+            copyPaste: pixInfo?.qr_code,
+            ticketUrl: pixInfo?.ticket_url,
+            status: result.status,
+            expirationDate: result.date_of_expiration,
+            product: product.name,
+            totalBRL: totalPrice
+        });
+
+    } catch (error: any) {
+        console.error('[PRODUCT_PAYMENT] Error creating PIX:', error?.message || error);
+        res.status(500).json({ error: 'Erro ao criar pagamento PIX' });
+    }
+};
+
+/**
+ * Check product order payment status and deliver keys if approved
+ */
+export const checkProductPaymentStatus = async (req: AuthRequest, res: Response) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user?.userId;
+
+        if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+            return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
+        }
+
+        // Get order
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: {
+                product: {
+                    include: {
+                        keys: {
+                            where: { isUsed: false },
+                            take: 10 // Max keys per order
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: 'Pedido não encontrado' });
+        }
+
+        // Security check - user can only check their own orders
+        if (order.buyerId !== userId) {
+            return res.status(403).json({ error: 'Acesso negado' });
+        }
+
+        // Already completed?
+        if (order.paymentStatus === 'COMPLETED') {
+            const deliveredKeys = await prisma.productKey.findMany({
+                where: { orderId: order.id },
+                select: { key: true }
+            });
+            return res.json({
+                status: 'approved',
+                paymentStatus: 'COMPLETED',
+                keys: deliveredKeys.map(k => k.key)
+            });
+        }
+
+        if (!order.paymentId) {
+            return res.status(400).json({ error: 'Pagamento não encontrado para este pedido' });
+        }
+
+        // Check payment status on Mercado Pago
+        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
+        const payment = new Payment(client);
+        const result = await payment.get({ id: order.paymentId });
+
+        if (result.status === 'approved') {
+            // Deliver keys
+            const keys = await deliverProductKeys(order.id, order.product, order.quantity, userId!);
+            
+            return res.json({
+                status: 'approved',
+                paymentStatus: 'COMPLETED',
+                keys
+            });
+        }
+
+        res.json({
+            status: result.status,
+            statusDetail: result.status_detail,
+            paymentStatus: order.paymentStatus
+        });
+
+    } catch (error: any) {
+        console.error('[PRODUCT_PAYMENT] Error checking status:', error?.message || error);
+        res.status(500).json({ error: 'Erro ao verificar status do pagamento' });
+    }
+};
+
+/**
+ * Helper to deliver product keys after payment approval
+ */
+const deliverProductKeys = async (orderId: string, product: any, quantity: number, userId: string): Promise<string[]> => {
+    // Check if already delivered (idempotency)
+    const existingKeys = await prisma.productKey.findMany({
+        where: { orderId },
+        select: { key: true }
+    });
+
+    if (existingKeys.length > 0) {
+        console.log(`[PRODUCT_PAYMENT] Keys already delivered for order ${orderId}`);
+        return existingKeys.map(k => k.key);
+    }
+
+    // Get available keys
+    const availableKeys = await prisma.productKey.findMany({
+        where: { productId: product.id, isUsed: false },
+        take: quantity
+    });
+
+    if (availableKeys.length < quantity && !product.isUnlimited) {
+        console.error(`[PRODUCT_PAYMENT] Not enough keys for order ${orderId}`);
+        throw new Error('Estoque insuficiente');
+    }
+
+    // Get user for email
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, displayName: true, name: true }
+    });
+
+    // Calculate 10% cashback in Points
+    const cashbackPoints = Math.floor((product.priceBRL || 0) * quantity * 10);
+
+    // Execute transaction
+    await prisma.$transaction(async (tx) => {
+        // Update order status
+        await tx.order.update({
+            where: { id: orderId },
+            data: { paymentStatus: 'COMPLETED' }
+        });
+
+        // Mark keys as used
+        if (availableKeys.length > 0) {
+            await tx.productKey.updateMany({
+                where: { id: { in: availableKeys.map(k => k.id) } },
+                data: {
+                    isUsed: true,
+                    usedAt: new Date(),
+                    usedById: userId,
+                    orderId: orderId
+                }
+            });
+        }
+
+        // Update stock if not unlimited
+        if (!product.isUnlimited) {
+            await tx.product.update({
+                where: { id: product.id },
+                data: { stock: { decrement: quantity } }
+            });
+        }
+
+        // Add cashback points
+        if (cashbackPoints > 0) {
+            await tx.user.update({
+                where: { id: userId },
+                data: { zionsPoints: { increment: cashbackPoints } }
+            });
+
+            await tx.zionHistory.create({
+                data: {
+                    userId,
+                    amount: cashbackPoints,
+                    reason: `Cashback: ${product.name} (10%)`
+                }
+            });
+        }
+    });
+
+    // Send keys via email
+    const keys = availableKeys.map(k => k.key);
+    if (user?.email && keys.length > 0) {
+        await sendProductKeysEmail(
+            user.email,
+            user.displayName || user.name || 'Cliente',
+            product.name,
+            keys,
+            orderId
+        );
+    }
+
+    // Award XP
+    try {
+        const xpAmount = Math.floor((product.priceBRL || 0) * quantity);
+        await awardXP(userId, xpAmount, `Compra: ${product.name}`);
+    } catch (xpError) {
+        console.error('Failed to award XP:', xpError);
+    }
+
+    console.log(`[PRODUCT_PAYMENT] ✅ Keys delivered for order ${orderId}: ${keys.length} keys`);
+    return keys;
 };

@@ -109,7 +109,9 @@ export default function ProfilePage() {
             const fetchUserPosts = async () => {
                 try {
                     const response = await api.get(`/users/${profileUser.id}/posts`);
-                    setUserPosts(response.data);
+                    // Filtrar posts de loja/produtos (isHighlight) - eles só aparecem no carrossel
+                    const regularPosts = response.data.filter((post: any) => !post.isHighlight);
+                    setUserPosts(regularPosts);
                 } catch (error) {
                     console.error('Failed to fetch user posts', error);
                 }

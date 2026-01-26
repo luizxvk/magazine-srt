@@ -67,7 +67,7 @@ interface TypingUser {
 export default function GroupChatPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, theme, showAchievement } = useAuth();
+  const { user, theme, showToast } = useAuth();
   const isMGT = user?.membershipType === 'MGT';
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +129,7 @@ export default function GroupChatPage() {
     setInviting(true);
     try {
       await api.post(`/groups/${id}/invite`, { invitedUserId: friendId });
-      showAchievement('Convite Enviado!', 'O usuário receberá uma notificação do convite');
+      showToast('✅ Convite enviado com sucesso!');
       setShowInviteModal(false);
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || 'Erro ao enviar convite';
@@ -137,7 +137,7 @@ export default function GroupChatPage() {
       if (error.response?.status !== 400) {
         console.error('Error inviting member:', error);
       }
-      showAchievement('Erro', errorMessage);
+      showToast(`❌ ${errorMessage}`);
     } finally {
       setInviting(false);
     }

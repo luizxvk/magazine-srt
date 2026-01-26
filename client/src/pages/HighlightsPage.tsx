@@ -39,9 +39,9 @@ export default function HighlightsPage() {
     const fetchHighlights = async () => {
         try {
             const response = await api.get('/feed/highlights');
-            // Filter to only show posts WITH images
-            const postsWithImages = response.data.filter((post: HighlightPost) => 
-                post.imageUrl && post.imageUrl.trim() !== ''
+            // Filter to only show posts WITH images AND without linked products (user posts only)
+            const postsWithImages = response.data.filter((post: any) => 
+                post.imageUrl && post.imageUrl.trim() !== '' && !post.linkedProductId
             );
             setPosts(postsWithImages);
             setFilteredPosts(postsWithImages);

@@ -82,24 +82,55 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
 
     useEffect(() => {
         const loadInventory = () => {
-            if (!user?.ownedCustomizations) {
+            if (!user?.ownedCustomizations || user.ownedCustomizations.length === 0) {
                 setItems([]);
                 setLoading(false);
                 return;
             }
 
             const ownedItems: InventoryItem[] = user.ownedCustomizations
-                .filter(id => ITEM_DATA[id])
-                .map(id => ({
-                    id,
-                    name: ITEM_DATA[id].name,
-                    type: ITEM_DATA[id].type,
-                    preview: ITEM_DATA[id].preview,
-                    isEquipped: 
-                        user.equippedBackground === id || 
-                        user.equippedBadge === id || 
-                        user.equippedColor === id
-                }));
+                .map(id => {
+                    // Check if we have data for this item
+                    if (ITEM_DATA[id]) {
+                        return {
+                            id,
+                            name: ITEM_DATA[id].name,
+                            type: ITEM_DATA[id].type,
+                            preview: ITEM_DATA[id].preview,
+                            isEquipped: 
+                                user.equippedBackground === id || 
+                                user.equippedBadge === id || 
+                                user.equippedColor === id
+                        };
+                    }
+                    
+                    // For unknown items, try to infer type from prefix
+                    let type: 'background' | 'badge' | 'color' = 'background';
+                    let preview = '#333';
+                    let name = id.replace(/_/g, ' ').replace(/^(bg|badge|color)/, '').trim();
+                    
+                    if (id.startsWith('bg_')) {
+                        type = 'background';
+                        preview = 'linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #1a1a2e 100%)';
+                    } else if (id.startsWith('badge_')) {
+                        type = 'badge';
+                        preview = '🏆';
+                    } else if (id.startsWith('color_')) {
+                        type = 'color';
+                        preview = '#9933ff';
+                    }
+                    
+                    return {
+                        id,
+                        name: name.charAt(0).toUpperCase() + name.slice(1),
+                        type,
+                        preview,
+                        isEquipped: 
+                            user.equippedBackground === id || 
+                            user.equippedBadge === id || 
+                            user.equippedColor === id
+                    };
+                });
 
             setItems(ownedItems);
             setLoading(false);

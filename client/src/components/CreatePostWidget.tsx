@@ -7,6 +7,7 @@ import { compressImage, getBase64Size } from '../utils/imageCompression';
 
 interface CreatePostWidgetProps {
     onPostCreated: () => void;
+    inline?: boolean; // When true, renders inline (not fixed) for mobile below carousel
 }
 
 interface MentionUser {
@@ -16,7 +17,7 @@ interface MentionUser {
     imageUrl?: string;
 }
 
-export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProps) {
+export default function CreatePostWidget({ onPostCreated, inline = false }: CreatePostWidgetProps) {
     const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen, accentColor } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
@@ -266,9 +267,12 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
     if (isVisitor) {
         return (
             <motion.div 
-                className="fixed bottom-8 w-[95%] max-w-2xl z-20 px-4 md:px-0"
-                style={{ left: '50%' }}
-                animate={{ 
+                className={inline 
+                    ? "w-full max-w-2xl mx-auto px-0" 
+                    : "fixed bottom-8 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+                }
+                style={inline ? {} : { left: '50%' }}
+                animate={inline ? {} : { 
                     x: '-50%',
                     y: isMobileDrawerOpen ? 100 : 0,
                     opacity: isMobileDrawerOpen ? 0 : 1
@@ -290,9 +294,12 @@ export default function CreatePostWidget({ onPostCreated }: CreatePostWidgetProp
 
     return (
         <motion.div 
-            className="fixed bottom-8 w-[95%] max-w-2xl z-20 px-4 md:px-0"
-            style={{ left: '50%' }}
-            animate={{ 
+            className={inline 
+                ? "w-full max-w-2xl mx-auto px-0" 
+                : "fixed bottom-8 w-[95%] max-w-2xl z-20 px-4 md:px-0"
+            }
+            style={inline ? {} : { left: '50%' }}
+            animate={inline ? {} : { 
                 x: '-50%',
                 y: isMobileDrawerOpen ? 100 : 0,
                 opacity: isMobileDrawerOpen ? 0 : 1

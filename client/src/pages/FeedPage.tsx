@@ -327,6 +327,11 @@ export default function FeedPage() {
                                     }))} />
                                 )}
 
+                                {/* Inline Post Pill - Mobile Only (below carousel) */}
+                                <div className="lg:hidden">
+                                    <CreatePostWidget onPostCreated={handlePostCreated} inline />
+                                </div>
+
                                 {posts.length === 0 ? (
                                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
                                         <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
@@ -387,8 +392,12 @@ export default function FeedPage() {
                 </div>
             </div>
 
-            {/* Create Post Widget (Fixed Bottom) - Hide when viewing stories or editing story */}
-            {!viewingStoryId && !isStoryEditorOpen && <CreatePostWidget onPostCreated={handlePostCreated} />}
+            {/* Create Post Widget (Fixed Bottom - Desktop Only) - Hide when viewing stories or editing story */}
+            {!viewingStoryId && !isStoryEditorOpen && (
+                <div className="hidden lg:block">
+                    <CreatePostWidget onPostCreated={handlePostCreated} />
+                </div>
+            )}
 
             {/* Modals */}
             <NewMembersModal isOpen={isNewMembersOpen} onClose={() => setIsNewMembersOpen(false)} />

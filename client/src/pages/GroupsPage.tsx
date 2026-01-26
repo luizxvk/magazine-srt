@@ -90,9 +90,9 @@ export default function GroupsPage() {
       <LuxuriousBackground />
       <Header />
       
-      <div className="max-w-7xl mx-auto px-4 pt-32 pb-8 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 pt-48 pb-20 relative z-10">
         {/* Page Title with Icon */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <div className={`p-3 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
               <Users className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`} />

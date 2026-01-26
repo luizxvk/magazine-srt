@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getRanking, getBadges, getRewards, redeemReward, createReward, deleteReward, dailyLogin, getMyRedemptions, getDailyLoginStatus } from '../controllers/gamificationController';
+import { getRanking, getBadges, getRewards, redeemReward, createReward, deleteReward, dailyLogin, getMyRedemptions, getDailyLoginStatus, getZionsHistory } from '../controllers/gamificationController';
 import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -13,5 +13,6 @@ router.post('/rewards', authenticateToken, isAdmin, createReward);
 router.delete('/rewards/:id', authenticateToken, isAdmin, deleteReward);
 router.post('/daily-login', authenticateToken, dailyLogin);
 router.get('/daily-login/status', authenticateToken, getDailyLoginStatus);
+router.get('/zions-history', authenticateToken, getZionsHistory);
 
 export default router;

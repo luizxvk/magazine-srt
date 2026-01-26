@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gift, Lock, Check, Clock, Box, Tag, X } from 'lucide-react';
+import { Gift, Lock, Check, Clock, Box, Tag, X, History, TrendingUp, TrendingDown, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -27,20 +27,32 @@ interface Redemption {
     metadata?: any;
 }
 
+interface ZionHistoryItem {
+    id: string;
+    amount: number;
+    reason: string;
+    createdAt: string;
+}
+
 export default function Rewards() {
     const { user, login, theme } = useAuth();
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+    const [zionHistory, setZionHistory] = useState<ZionHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [redeeming, setRedeeming] = useState<string | null>(null);
     const [redeemedCode, setRedeemedCode] = useState<{ id: string, code: string } | null>(null);
     const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
+    const [activeTab, setActiveTab] = useState<'redemptions' | 'history'>('redemptions');
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeCardText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+    const themeTabActive = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeTabBorder = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeShadow = isMGT ? 'shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
 
     useEffect(() => {
         loadData();
@@ -48,12 +60,14 @@ export default function Rewards() {
 
     const loadData = async () => {
         try {
-            const [rewardsRes, redemptionsRes] = await Promise.all([
+            const [rewardsRes, redemptionsRes, historyRes] = await Promise.all([
                 api.get('/gamification/rewards'),
-                api.get('/gamification/rewards/my')
+                api.get('/gamification/rewards/my'),
+                api.get('/gamification/zions-history')
             ]);
             setRewards(rewardsRes.data);
             setRedemptions(redemptionsRes.data);
+            setZionHistory(historyRes.data);
         } catch (error) {
             console.error('Failed to load rewards data', error);
         } finally {
@@ -250,64 +264,158 @@ export default function Rewards() {
                 </div>
             </div>
 
-            {/* Redemption History */}
-            {redemptions.length > 0 && (
+            {/* History Section with Tabs */}
+            {(redemptions.length > 0 || zionHistory.length > 0) && (
                 <div className="space-y-4 pt-8 border-t border-white/10">
-                    <h3 className={`text-xl font-serif ${themeCardText} mb-6 flex items-center gap-2`}>
-                        <Clock className={`w-5 h-5 ${themeColor}`} />
-                        Meus Resgates
-                    </h3>
-
-                    <div className="space-y-3">
-                        {redemptions.map((redemption) => (
-                            <div key={redemption.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center justify-between">
-                                <div>
-                                    <h4 className={`${themeCardText} font-medium`}>{redemption.reward.title}</h4>
-                                    <p className={`text-xs ${themeSecondary} mt-1`}>
-                                        Resgatado em {new Date(redemption.redeemedAt).toLocaleDateString()}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="text-right mr-4">
-                                        <span className={`text-sm font-bold ${themeText}`}>
-                                            -{redemption.cost}
-                                        </span>
-                                        <span className="text-[10px] text-gray-600 block uppercase tracking-widest">Zions</span>
-                                    </div>
-
-                                    {/* Status Display */}
-                                    <div className="flex flex-col items-end gap-1">
-                                        {redemption.status === 'PENDING' && (
-                                            <div className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-yellow-500/20">
-                                                Em Análise
-                                            </div>
-                                        )}
-                                        {redemption.status === 'PROCESSING' && (
-                                            <div className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
-                                                Processando
-                                            </div>
-                                        )}
-                                        {redemption.status === 'COMPLETED' && (
-                                            <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
-                                                Completo
-                                            </div>
-                                        )}
-                                        {redemption.status === 'CANCELLED' && (
-                                            <div className="bg-red-500/10 text-red-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-red-500/20">
-                                                Cancelado
-                                            </div>
-                                        )}
-
-                                        {redemption.metadata?.ticketCode && (
-                                            <span className="text-[10px] font-mono text-gray-500">
-                                                {redemption.metadata.ticketCode}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                    {/* Tabs */}
+                    <div className="flex gap-4 mb-6 border-b border-white/10 pb-1">
+                        <button
+                            onClick={() => setActiveTab('redemptions')}
+                            className={`pb-3 px-4 text-sm font-medium tracking-wide transition-colors relative flex items-center gap-2 ${
+                                activeTab === 'redemptions' ? themeTabActive : 'text-gray-400 hover:text-white'
+                            }`}
+                        >
+                            <Clock className="w-4 h-4" />
+                            Meus Resgates
+                            {activeTab === 'redemptions' && (
+                                <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${themeTabBorder} ${themeShadow}`} />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('history')}
+                            className={`pb-3 px-4 text-sm font-medium tracking-wide transition-colors relative flex items-center gap-2 ${
+                                activeTab === 'history' ? themeTabActive : 'text-gray-400 hover:text-white'
+                            }`}
+                        >
+                            <History className="w-4 h-4" />
+                            Histórico de Zions
+                            {activeTab === 'history' && (
+                                <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${themeTabBorder} ${themeShadow}`} />
+                            )}
+                        </button>
                     </div>
+
+                    {/* Redemptions Tab Content */}
+                    {activeTab === 'redemptions' && (
+                        <div className="space-y-3">
+                            {redemptions.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <Gift className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                    <p>Nenhum resgate realizado ainda</p>
+                                </div>
+                            ) : (
+                                redemptions.map((redemption) => (
+                                    <div key={redemption.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center justify-between">
+                                        <div>
+                                            <h4 className={`${themeCardText} font-medium`}>{redemption.reward.title}</h4>
+                                            <p className={`text-xs ${themeSecondary} mt-1`}>
+                                                Resgatado em {new Date(redemption.redeemedAt).toLocaleDateString('pt-BR')}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right mr-4">
+                                                <span className={`text-sm font-bold ${themeText}`}>
+                                                    -{redemption.cost}
+                                                </span>
+                                                <span className="text-[10px] text-gray-600 block uppercase tracking-widest">Zions</span>
+                                            </div>
+
+                                            {/* Status Display */}
+                                            <div className="flex flex-col items-end gap-1">
+                                                {redemption.status === 'PENDING' && (
+                                                    <div className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-yellow-500/20">
+                                                        Em Análise
+                                                    </div>
+                                                )}
+                                                {redemption.status === 'PROCESSING' && (
+                                                    <div className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
+                                                        Processando
+                                                    </div>
+                                                )}
+                                                {redemption.status === 'COMPLETED' && (
+                                                    <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
+                                                        Completo
+                                                    </div>
+                                                )}
+                                                {redemption.status === 'CANCELLED' && (
+                                                    <div className="bg-red-500/10 text-red-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-red-500/20">
+                                                        Cancelado
+                                                    </div>
+                                                )}
+
+                                                {redemption.metadata?.ticketCode && (
+                                                    <span className="text-[10px] font-mono text-gray-500">
+                                                        {redemption.metadata.ticketCode}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
+
+                    {/* Zion History Tab Content */}
+                    {activeTab === 'history' && (
+                        <div className="space-y-3">
+                            {zionHistory.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <Coins className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                    <p>Nenhuma transação registrada</p>
+                                </div>
+                            ) : (
+                                zionHistory.map((item) => (
+                                    <motion.div
+                                        key={item.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="glass-panel p-4 rounded-xl border border-white/5 flex items-center justify-between"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-lg ${
+                                                item.amount > 0 
+                                                    ? 'bg-green-500/10' 
+                                                    : 'bg-red-500/10'
+                                            }`}>
+                                                {item.amount > 0 ? (
+                                                    <TrendingUp className="w-5 h-5 text-green-400" />
+                                                ) : (
+                                                    <TrendingDown className="w-5 h-5 text-red-400" />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h4 className={`${themeCardText} font-medium text-sm`}>
+                                                    {item.reason}
+                                                </h4>
+                                                <p className={`text-xs ${themeSecondary}`}>
+                                                    {new Date(item.createdAt).toLocaleDateString('pt-BR', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`text-lg font-bold ${
+                                                item.amount > 0 
+                                                    ? 'text-green-400' 
+                                                    : 'text-red-400'
+                                            }`}>
+                                                {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString('pt-BR')}
+                                            </span>
+                                            <span className="text-[10px] text-gray-600 block uppercase tracking-widest">
+                                                Points
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

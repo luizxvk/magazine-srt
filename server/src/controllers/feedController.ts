@@ -68,6 +68,9 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
 export const getHighlights = async (req: AuthRequest, res: Response) => {
     try {
         const posts = await prisma.post.findMany({
+            where: {
+                linkedProductId: null, // Only show posts WITHOUT linked products (user posts only)
+            },
             take: 10,
             orderBy: { likesCount: 'desc' },
             include: {

@@ -144,19 +144,20 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                             animate={{ scale: 1, opacity: 1 }}
                             className="flex flex-col items-center"
                         >
-                            <div className="mb-6">
-                                <Sparkles className="w-16 h-16 text-yellow-400 animate-pulse mx-auto mb-4" />
+                            <div className="mb-6 flex items-center justify-center gap-3">
+                                <Sparkles className="w-12 h-12 text-yellow-400 animate-pulse" />
                                 <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-200 bg-clip-text text-transparent">
                                     {reward.type === 'DUPLICATE' ? 'Item Duplicado!' : 'Novo Item!'}
                                 </h2>
                             </div>
 
                             {reward.item && (
-                                <div className="w-full max-w-sm mb-6 pointer-events-none">
+                                <div className="w-full max-w-sm mb-6">
                                     <ThemePackCard
                                         pack={reward.item}
                                         onPurchase={() => { }}
                                         loading={false}
+                                        isReward={true}
                                     />
                                 </div>
                             )}

@@ -498,4 +498,22 @@ export const getMyRedemptions = async (req: Request, res: Response) => {
     }
 };
 
+export const getZionsHistory = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore
+        const userId = req.user.userId;
+        
+        const history = await prisma.zionHistory.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            take: 100, // Limit to last 100 transactions
+        });
+        
+        res.json(history);
+    } catch (error) {
+        console.error('Failed to fetch zion history:', error);
+        res.status(500).json({ error: 'Failed to fetch zion history' });
+    }
+};
+
 

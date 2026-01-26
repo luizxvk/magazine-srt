@@ -24,9 +24,10 @@ interface ThemePackCardProps {
     onEquip?: (packId: string) => void;
     onUnequip?: () => void;
     loading?: boolean;
+    isReward?: boolean; // Hide purchase button when displaying as reward
 }
 
-export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, loading }: ThemePackCardProps) {
+export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, loading, isReward }: ThemePackCardProps) {
     const { user, theme } = useAuth();
 
     const isOutOfStock = pack.maxStock && pack.soldCount >= pack.maxStock;
@@ -139,8 +140,8 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
 
                 {/* Price & Action - Vertical Layout like Color Cards */}
                 <div className="flex flex-col gap-2 mt-4">
-                    {/* Price Display - Centered */}
-                    {!pack.isOwned && (
+                    {/* Price Display - Centered (hide for rewards) */}
+                    {!isReward && !pack.isOwned && (
                         pack.rarity === 'LEGENDARY' ? (
                             <div className="flex items-center justify-center gap-1.5">
                                 <div className="flex flex-col text-center">
@@ -169,8 +170,8 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                         )
                     )}
 
-                    {/* Action Button - Full Width */}
-                    {(pack.isOwned || pack.rarity !== 'LEGENDARY') && (
+                    {/* Action Button - Full Width (hide for rewards) */}
+                    {!isReward && (pack.isOwned || pack.rarity !== 'LEGENDARY') && (
                         <button
                             onClick={handleAction}
                             disabled={loading || (!pack.isOwned && (isOutOfStock || !canAfford))}

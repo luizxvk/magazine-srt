@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Gamepad2, Image, Tag, Lock, FileText, Rocket, Smartphone } from 'lucide-react';
+import { X, Sparkles, Check, Gamepad2, Image, Tag, Lock, FileText, Rocket, Smartphone, History, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.6';
+const CURRENT_VERSION = '0.4.7';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,24 +33,30 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.6 - BOTTOM NAVIGATION MOBILE
+    // v0.4.7 - MULTIPLE FIXES & HISTORY
     const updates: UpdateItem[] = [
         {
-            icon: <Smartphone className="w-5 h-5 text-purple-500" />,
-            title: '📱 Bottom Navigation Mobile',
-            description: 'Nova barra de navegação estilo Apple Vision Pro! Acesso rápido a Home, Explorar, Loja e Perfil com animações fluidas.',
+            icon: <History className="w-5 h-5 text-blue-500" />,
+            title: '📊 Histórico de Zions Points',
+            description: 'Nova aba nos Prêmios mostrando todo o histórico de transações: compras, resgates, bônus e mais!',
             isNew: true
+        },
+        {
+            icon: <Filter className="w-5 h-5 text-purple-500" />,
+            title: '🎯 Destaques Filtrados',
+            description: 'Página de Destaques e Carrossel agora mostram apenas posts de usuários, sem produtos da loja.',
+            isNew: true
+        },
+        {
+            icon: <Smartphone className="w-5 h-5 text-emerald-500" />,
+            title: '📱 Bottom Navigation Mobile',
+            description: 'Barra de navegação estilo Apple Vision Pro! Acesso rápido a Home, Explorar, Loja e Perfil.',
+            isNew: false
         },
         {
             icon: <Lock className="w-5 h-5 text-amber-500" />,
             title: '🔐 Sistema Feature Gates',
             description: 'Novo sistema de controle de features por plano. Features premium agora mostram cadeado e modal de upgrade!',
-            isNew: false
-        },
-        {
-            icon: <FileText className="w-5 h-5 text-blue-500" />,
-            title: '📋 Catálogo de 150+ Features',
-            description: 'Documentação completa de todas as funcionalidades organizadas por plano: FREE, STARTER, GROWTH e ENTERPRISE.',
             isNew: false
         },
         // v0.4.2 - STEAM-STYLE PRODUCT DETAILS

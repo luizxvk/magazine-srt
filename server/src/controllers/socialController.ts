@@ -752,10 +752,29 @@ export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
         }
 
         const clientId = process.env.TWITCH_CLIENT_ID;
-        const accessToken = process.env.TWITCH_ACCESS_TOKEN; // App access token
+        const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 
-        if (!clientId || !accessToken) {
-            return res.status(500).json({ message: 'Credenciais Twitch não configuradas' });
+        if (!clientId || !clientSecret) {
+            console.warn('[Twitch] Credenciais não configuradas');
+            return res.json({ streams: [], error: 'Twitch não configurada' });
+        }
+
+        // Get fresh access token using client credentials
+        let accessToken = process.env.TWITCH_ACCESS_TOKEN;
+        
+        try {
+            // Always get a fresh token for reliability
+            const tokenResponse = await axios.post('https://id.twitch.tv/oauth2/token', null, {
+                params: {
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    grant_type: 'client_credentials'
+                }
+            });
+            accessToken = tokenResponse.data.access_token;
+        } catch (tokenError) {
+            console.error('[Twitch] Failed to get access token:', tokenError);
+            return res.json({ streams: [], error: 'Falha ao autenticar com Twitch' });
         }
 
         const usernameList = (usernames as string).split(',');
@@ -784,9 +803,10 @@ export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
         }));
 
         res.json({ streams });
-    } catch (error) {
-        console.error('Error fetching Twitch streams:', error);
-        res.status(500).json({ message: 'Erro ao buscar streams da Twitch' });
+    } catch (error: any) {
+        console.error('Error fetching Twitch streams:', error?.response?.data || error?.message || error);
+        // Return empty array instead of 500 to prevent frontend spam
+        res.json({ streams: [], error: 'Falha ao carregar streams' });
     }
 };
 

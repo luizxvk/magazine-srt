@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import FeedItem from '../components/FeedItem';
-import CreatePostWidget from '../components/CreatePostWidget';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
@@ -66,7 +65,6 @@ export default function FeedPage() {
     const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' as 'success' | 'error' | 'info' });
 
     const [viewingStoryId, setViewingStoryId] = useState<string | null>(null);
-    const [isStoryEditorOpen, setIsStoryEditorOpen] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; postId: string | null }>({
         isOpen: false,
         postId: null
@@ -293,7 +291,6 @@ export default function FeedPage() {
                                 viewingStoryId={viewingStoryId}
                                 onViewStory={setViewingStoryId}
                                 onCloseStory={() => setViewingStoryId(null)}
-                                onEditorStateChange={setIsStoryEditorOpen}
                             />
                         </div>
 

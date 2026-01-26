@@ -72,7 +72,7 @@ const NavItemButton = memo(({
 NavItemButton.displayName = 'NavItemButton';
 
 export default function BottomNavigation() {
-    const { user, isMobileDrawerOpen } = useAuth();
+    const { user } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(true);

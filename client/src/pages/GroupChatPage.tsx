@@ -322,7 +322,7 @@ export default function GroupChatPage() {
 
     // Check Zion balance
     if ((user?.zions || 0) < 10) {
-      showAchievement('Zions Insuficientes', 'Você precisa de 10 Zions para enviar uma imagem');
+      showToast('Você precisa de 10 Zions para enviar uma imagem');
       return;
     }
 
@@ -357,7 +357,7 @@ export default function GroupChatPage() {
       fetchNewMessages();
     } catch (error) {
       console.error('Error sending image:', error);
-      showAchievement('Erro', 'Não foi possível enviar a imagem');
+      showToast('Não foi possível enviar a imagem');
     } finally {
       setPendingImageFile(null);
     }
@@ -389,9 +389,9 @@ export default function GroupChatPage() {
     } catch (error: any) {
       console.error('Error leaving group:', error);
       if (error.response?.status === 400) {
-        showAchievement('Não Permitido', 'O criador do grupo não pode sair. Transfira a propriedade ou delete o grupo.');
+        showToast('O criador do grupo não pode sair. Transfira a propriedade ou delete o grupo.');
       } else {
-        showAchievement('Erro', 'Não foi possível sair do grupo');
+        showToast('Não foi possível sair do grupo');
       }
     }
   };
@@ -402,7 +402,7 @@ export default function GroupChatPage() {
       navigate('/groups');
     } catch (error: any) {
       console.error('Error deleting group:', error);
-      showAchievement('Erro', 'Não foi possível deletar o grupo');
+      showToast('Não foi possível deletar o grupo');
     }
   };
 
@@ -415,7 +415,7 @@ export default function GroupChatPage() {
       fetchGroup();
     } catch (error) {
       console.error('Error updating group name:', error);
-      showAchievement('Erro', 'Não foi possível atualizar o nome do grupo');
+      showToast('Não foi possível atualizar o nome do grupo');
     }
   };
 
@@ -438,7 +438,7 @@ export default function GroupChatPage() {
       fetchGroup();
     } catch (error) {
       console.error('Error updating group avatar:', error);
-      showAchievement('Erro', 'Não foi possível atualizar a foto do grupo');
+      showToast('Não foi possível atualizar a foto do grupo');
     } finally {
       setUploading(false);
     }

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Image as ImageIcon, Video, Hash, AtSign, Send, X, Smile, MapPin, Layers, Lock } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
@@ -8,28 +8,15 @@ interface CreatePostCardProps {
     onPostCreated: () => void;
 }
 
-interface MentionUser {
-    id: string;
-    name: string;
-    displayName: string;
-    imageUrl?: string;
-}
-
 export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
-    const { user, showAchievement, updateUser, theme, accentColor } = useAuth();
+    const { user, showAchievement, updateUser, theme } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaUrl, setMediaUrl] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [loading, setLoading] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [showTagInput, setShowTagInput] = useState(false);
     const [isCarouselMode, setIsCarouselMode] = useState(false);
-    
-    // Mentions
-    const [mentionUsers, setMentionUsers] = useState<MentionUser[]>([]);
-    const [showMentions, setShowMentions] = useState(false);
-    const [mentionFilter, setMentionFilter] = useState('');
     
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,19 +33,6 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const accentBg = isMGT ? 'bg-emerald-500' : 'bg-amber-500';
     const accentText = isMGT ? 'text-emerald-500' : 'text-amber-500';
     const accentHover = isMGT ? 'hover:bg-emerald-500/10' : 'hover:bg-amber-500/10';
-
-    // Load users for mentions
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const response = await api.get('/users');
-                setMentionUsers(response.data.filter((u: MentionUser) => u.id !== user?.id));
-            } catch (error) {
-                console.error('Failed to load users', error);
-            }
-        };
-        loadUsers();
-    }, [user?.id]);
 
     const handleSubmit = async () => {
         if (!caption.trim() && !mediaUrl) return;
@@ -79,7 +53,6 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             setMediaType('TEXT');
             setSelectedTags([]);
             setIsCarouselMode(false);
-            setIsExpanded(false);
             
             // Refresh user to update Zions
             const userRes = await api.get('/users/me');
@@ -129,10 +102,6 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
         }
     };
 
-    const filteredMentions = mentionUsers.filter(u => 
-        (u.displayName || u.name).toLowerCase().includes(mentionFilter.toLowerCase())
-    ).slice(0, 5);
-
     return (
         <div className={`${cardBg} rounded-2xl border ${cardBorder} shadow-lg overflow-hidden`}>
             {/* Header with user info */}
@@ -164,7 +133,6 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     ref={textareaRef}
                     value={caption}
                     onChange={handleTextareaChange}
-                    onFocus={() => setIsExpanded(true)}
                     placeholder={`No que você está pensando, ${user?.name?.split(' ')[0]}?`}
                     className={`w-full ${inputBg} ${textColor} rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500/30' : 'focus:ring-amber-500/30'} min-h-[60px] max-h-[200px] text-base placeholder:${textMuted}`}
                     rows={2}

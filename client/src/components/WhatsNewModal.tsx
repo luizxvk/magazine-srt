@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Gamepad2, Image, Tag, Lock, Smartphone, History, Filter, Shield, Edit3, Zap } from 'lucide-react';
+import { X, Sparkles, Check, Smartphone, History, Filter, Shield, Edit3, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 

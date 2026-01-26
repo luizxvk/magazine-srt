@@ -264,20 +264,41 @@ export default function FeedPage() {
                     />
                     {/* Main Feed Column */}
                     <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
-                        {/* Welcome Header */}
+                        {/* Welcome Header with Stories inline */}
                         <div className="mb-8 animate-fade-in-down">
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
-                                        Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
-                                    </h1>
-                                    <p className="text-gray-400 text-lg font-light tracking-wide">
-                                        {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
-                                    </p>
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8">
+                                {/* Welcome Text */}
+                                <div className="flex items-start justify-between flex-shrink-0 mb-4 lg:mb-0">
+                                    <div>
+                                        <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
+                                            Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                                        </h1>
+                                        <p className="text-gray-400 text-lg font-light tracking-wide">
+                                            {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
+                                        </p>
+                                    </div>
+                                    <Link
+                                        to="/settings"
+                                        className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200 lg:hidden`}
+                                        title="Configurações"
+                                    >
+                                        <Settings className="w-5 h-5" />
+                                    </Link>
                                 </div>
+                                
+                                {/* Stories Bar - Inline on desktop */}
+                                <div className="flex-1 min-w-0 overflow-hidden hidden lg:block">
+                                    <StoriesBar
+                                        viewingStoryId={viewingStoryId}
+                                        onViewStory={setViewingStoryId}
+                                        onCloseStory={() => setViewingStoryId(null)}
+                                    />
+                                </div>
+                                
+                                {/* Settings button - Desktop only */}
                                 <Link
                                     to="/settings"
-                                    className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
+                                    className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200 hidden lg:block flex-shrink-0`}
                                     title="Configurações"
                                 >
                                     <Settings className="w-5 h-5" />
@@ -285,8 +306,8 @@ export default function FeedPage() {
                             </div>
                         </div>
 
-                        {/* Stories Bar */}
-                        <div className="mb-6 animate-fade-in">
+                        {/* Stories Bar - Mobile Only (below welcome) */}
+                        <div className="mb-6 animate-fade-in lg:hidden">
                             <StoriesBar
                                 viewingStoryId={viewingStoryId}
                                 onViewStory={setViewingStoryId}
@@ -294,7 +315,10 @@ export default function FeedPage() {
                             />
                         </div>
 
-                        {/* Mobile Carousel - Quick Access Cards (below Stories) */}
+                        {/* Create Post Card - Right after welcome */}
+                        <CreatePostCard onPostCreated={handlePostCreated} />
+
+                        {/* Mobile Carousel - Quick Access Cards */}
                         <div className="mb-8 lg:hidden">
                             <MobileCarousel
                                 dailyLoginStatus={dailyLoginStatus}
@@ -304,7 +328,7 @@ export default function FeedPage() {
                             />
                         </div>
 
-                        {/* SRT Log Card - Mobile Only (Below Stories) */}
+                        {/* SRT Log Card - Mobile Only */}
                         <div className="xl:hidden mb-8 transform active:scale-95 transition-transform duration-300">
                             <AnnouncementCard />
                         </div>
@@ -324,16 +348,6 @@ export default function FeedPage() {
                                         linkedProduct: p.linkedProduct
                                     }))} />
                                 )}
-
-                                {/* Inline Post Pill - Mobile Only (below carousel) */}
-                                <div className="lg:hidden">
-                                    <CreatePostCard onPostCreated={handlePostCreated} />
-                                </div>
-
-                                {/* Create Post Card - Desktop (above feed) */}
-                                <div className="hidden lg:block">
-                                    <CreatePostCard onPostCreated={handlePostCreated} />
-                                </div>
 
                                 {posts.length === 0 ? (
                                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">

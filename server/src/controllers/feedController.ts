@@ -270,9 +270,8 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                 caption,
                 isHighlight: isHighlight || false,
                 tags: tags && tags.length > 0 ? {
-                    connectOrCreate: tags.map((tag: string) => ({
-                        where: { name: tag },
-                        create: { name: tag }
+                    create: tags.map((tag: string) => ({
+                        tag: tag
                     }))
                 } : undefined,
             },

@@ -41,6 +41,8 @@ import BottomNavigation from './components/BottomNavigation';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
 import OnboardingModals from './components/OnboardingModals';
 import SessionExpiredModal from './components/SessionExpiredModal';
+import { RadioProvider } from './context/RadioContext';
+import MiniRadioPlayer from './components/MiniRadioPlayer';
 
 
 
@@ -51,6 +53,7 @@ function App() {
   return (
     <CommunityProvider>
       <AuthProvider>
+        <RadioProvider>
         <Router>
           <Routes>
           <Route path="/" element={<ModernLogin />} />
@@ -99,9 +102,11 @@ function App() {
         <MessagePopupWrapper />
         <VerificationPrompt />
         <BottomNavigation />
+        <MiniRadioPlayer />
         <Footer />
         <DevBanner />
       </Router>
+    </RadioProvider>
     </AuthProvider>
     </CommunityProvider>
   );

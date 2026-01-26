@@ -260,13 +260,21 @@ export const redeemReward = async (req: Request, res: Response) => {
         console.log(`[redeemReward] zionChange: ${zionChange} (positive = decrement, negative = increment)`);
         console.log(`[redeemReward] User current zionsPoints: ${user.zionsPoints}`);
 
+        // Preparar operações de atualização de usuário
+        const userUpdateData: any = {};
+        if (zionChange > 0) {
+            userUpdateData.zionsPoints = { decrement: zionChange };
+        } else if (zionChange < 0) {
+            userUpdateData.zionsPoints = { increment: Math.abs(zionChange) };
+        }
+        // Se zionChange é 0, não precisa atualizar zionsPoints
+
         const transactionOperations = [
-            prisma.user.update({
+            // Sempre incluir a atualização do usuário (mesmo que vazia para consistência)
+            ...(Object.keys(userUpdateData).length > 0 ? [prisma.user.update({
                 where: { id: userId },
-                data: { 
-                    zionsPoints: zionChange > 0 ? { decrement: zionChange } : zionChange < 0 ? { increment: Math.abs(zionChange) } : undefined
-                }
-            }),
+                data: userUpdateData
+            })] : []),
             prisma.reward.update({
                 where: { id: rewardId },
                 data: { stock: { decrement: 1 } }

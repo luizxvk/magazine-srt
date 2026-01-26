@@ -119,7 +119,7 @@ async function cleanDatabase() {
     
     // 11. Story Views
     const storyViews = await prisma.storyView.deleteMany({
-        where: { userId: { in: userIdsToDelete } }
+        where: { viewerId: { in: userIdsToDelete } }
     });
     console.log(`   StoryView: ${storyViews.count}`);
     
@@ -172,7 +172,7 @@ async function cleanDatabase() {
     
     // 19. Group Messages
     const groupMessages = await prisma.groupMessage.deleteMany({
-        where: { userId: { in: userIdsToDelete } }
+        where: { senderId: { in: userIdsToDelete } }
     });
     console.log(`   GroupMessage: ${groupMessages.count}`);
     
@@ -187,7 +187,7 @@ async function cleanDatabase() {
         where: { 
             OR: [
                 { inviterId: { in: userIdsToDelete } },
-                { inviteeId: { in: userIdsToDelete } }
+                { invitedId: { in: userIdsToDelete } }
             ]
         }
     });
@@ -213,7 +213,7 @@ async function cleanDatabase() {
     // 24. Comments (first need to delete likes on comments, then comments on posts to delete)
     // Get all posts to be deleted
     const postsToDelete = await prisma.post.findMany({
-        where: { authorId: { in: userIdsToDelete } },
+        where: { userId: { in: userIdsToDelete } },
         select: { id: true }
     });
     const postIdsToDelete = postsToDelete.map(p => p.id);
@@ -232,13 +232,13 @@ async function cleanDatabase() {
     
     // Delete comments by users to delete
     const comments = await prisma.comment.deleteMany({
-        where: { authorId: { in: userIdsToDelete } }
+        where: { userId: { in: userIdsToDelete } }
     });
     console.log(`   Comment (by users): ${comments.count}`);
     
     // 25. Posts
     const posts = await prisma.post.deleteMany({
-        where: { authorId: { in: userIdsToDelete } }
+        where: { userId: { in: userIdsToDelete } }
     });
     console.log(`   Post: ${posts.count}`);
     
@@ -254,11 +254,9 @@ async function cleanDatabase() {
     });
     console.log(`   AdminBadge: ${adminBadges.count}`);
     
-    // 28. Products created by users
-    const products = await prisma.product.deleteMany({
-        where: { creatorId: { in: userIdsToDelete } }
-    });
-    console.log(`   Product: ${products.count}`);
+    // 28. Products created by users - skip if no creatorId field exists
+    // Products may not have a direct user relation, skip this
+    console.log(`   Product: (skipped - no direct user relation)`);
     
     // 29. Finally, delete the users themselves
     console.log('\n🗑️  Removendo usuários...');

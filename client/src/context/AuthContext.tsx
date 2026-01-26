@@ -512,6 +512,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {
+        // Limpar flags de onboarding para mostrar WelcomeTour ao fazer novo login
+        Object.keys(sessionStorage).forEach(key => {
+            if (key.startsWith('welcome_shown_')) {
+                sessionStorage.removeItem(key);
+            }
+        });
+        
         localStorage.setItem('token', token);
 
         if (membershipContext) {

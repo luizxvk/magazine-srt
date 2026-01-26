@@ -44,10 +44,11 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
         try {
             await api.post('/posts', {
                 caption,
-                imageUrl: mediaType === 'IMAGE' ? mediaUrl : null,
-                videoUrl: mediaType === 'VIDEO' ? mediaUrl : null,
+                imageUrl: mediaType === 'IMAGE' ? mediaUrl : undefined,
+                videoUrl: mediaType === 'VIDEO' ? mediaUrl : undefined,
+                mediaType: mediaUrl ? mediaType : 'TEXT',
                 isHighlight: isCarouselMode,
-                tags: selectedTags
+                tags: selectedTags.length > 0 ? selectedTags : undefined
             });
 
             // Reset

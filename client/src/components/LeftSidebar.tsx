@@ -44,12 +44,6 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
 
     const items: SidebarItem[] = [
         {
-            icon: <Gift className="w-5 h-5" />,
-            label: 'Bônus Diário',
-            onClick: onDailyLoginClick,
-            feature: Feature.DAILY_LOGIN
-        },
-        {
             icon: <Users className="w-5 h-5" />,
             label: 'Grupos',
             to: '/groups',

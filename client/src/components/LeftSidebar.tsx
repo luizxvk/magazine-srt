@@ -1,4 +1,4 @@
-import { Gift, Users, Camera, Calendar, UserPlus, Star, Lock } from 'lucide-react';
+import { Users, Camera, Calendar, UserPlus, Star, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';

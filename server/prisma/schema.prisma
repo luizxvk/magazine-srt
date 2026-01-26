@@ -180,7 +180,7 @@ model Like {
 
 model Badge {
   id          String      @id @default(uuid())
-  name        String
+  name        String      @unique
   description String
   iconUrl     String
   trophies    Int         @default(0)

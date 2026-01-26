@@ -6,10 +6,11 @@ import { z } from 'zod';
 // Validation schemas
 const createRewardSchema = z.object({
     title: z.string().min(1).max(200),
-    type: z.enum(['RAFFLE_TICKET', 'BADGE', 'PHYSICAL', 'DIGITAL', 'CUSTOM']),
+    type: z.enum(['PRODUCT', 'COUPON', 'DIGITAL']),
     costZions: z.number().int().min(0),
     zionsReward: z.number().int().min(0).optional(),
     stock: z.number().int().min(-1).optional(), // -1 = unlimited
+    isUnlimited: z.boolean().optional(),
     metadata: z.record(z.string(), z.any()).optional(),
     backgroundColor: z.string().max(50).optional(),
 });
@@ -123,6 +124,49 @@ export const createReward = async (req: Request, res: Response) => {
     }
 };
 
+// Schema for updating rewards
+const updateRewardSchema = z.object({
+    title: z.string().min(1).max(200).optional(),
+    type: z.enum(['PRODUCT', 'COUPON', 'DIGITAL']).optional(),
+    costZions: z.number().int().min(0).optional(),
+    zionsReward: z.number().int().min(0).optional(),
+    stock: z.number().int().min(-1).optional(),
+    isUnlimited: z.boolean().optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
+    backgroundColor: z.string().max(50).optional(),
+});
+
+export const updateReward = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore
+        if (req.user.role !== 'ADMIN') {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
+        const { id } = req.params;
+        const data = updateRewardSchema.parse(req.body);
+
+        const existing = await prisma.reward.findUnique({ where: { id } });
+        if (!existing) {
+            return res.status(404).json({ error: 'Reward not found' });
+        }
+
+        const updated = await prisma.reward.update({
+            where: { id },
+            data: data as any
+        });
+
+        console.log(`[updateReward] Updated reward ${id}: costZions=${updated.costZions}, zionsReward=${updated.zionsReward}`);
+        res.json(updated);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: 'Invalid input', details: error.issues });
+        }
+        console.error('Failed to update reward:', error);
+        res.status(500).json({ error: 'Failed to update reward' });
+    }
+};
+
 export const deleteReward = async (req: Request, res: Response) => {
     try {
         // @ts-ignore
@@ -210,6 +254,11 @@ export const redeemReward = async (req: Request, res: Response) => {
 
         // Calculate final zion change: cost minus reward
         const zionChange = reward.costZions - (reward.zionsReward || 0);
+        
+        console.log(`[redeemReward] User: ${user.name}, Reward: ${reward.title}`);
+        console.log(`[redeemReward] costZions: ${reward.costZions}, zionsReward: ${reward.zionsReward}`);
+        console.log(`[redeemReward] zionChange: ${zionChange} (positive = decrement, negative = increment)`);
+        console.log(`[redeemReward] User current zionsPoints: ${user.zionsPoints}`);
 
         const transactionOperations = [
             prisma.user.update({
@@ -283,6 +332,14 @@ export const redeemReward = async (req: Request, res: Response) => {
 
         await prisma.$transaction(transactionOperations);
 
+        // Fetch updated user to return in response
+        const updatedUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { zionsPoints: true, zionsCash: true }
+        });
+        
+        console.log(`[redeemReward] ✅ Success! User new zionsPoints: ${updatedUser?.zionsPoints}`);
+
         // Send confirmation email
         try {
             await sendRewardRedemptionEmail({
@@ -298,7 +355,12 @@ export const redeemReward = async (req: Request, res: Response) => {
             // Email failure doesn't affect the redemption itself
         }
 
-        res.json({ success: true, message: 'Reward redeemed successfully', code: { code: ticketCode } });
+        res.json({ 
+            success: true, 
+            message: 'Reward redeemed successfully', 
+            code: { code: ticketCode },
+            updatedZionsPoints: updatedUser?.zionsPoints
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to redeem reward' });

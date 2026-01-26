@@ -66,6 +66,24 @@ async function main() {
 
     for (const badge of badges) {
         console.log(`Processing badge: ${badge.name}`);
+        
+        // Primeiro, deletar duplicatas com o mesmo nome (mantém apenas 1)
+        const existingBadges = await prisma.badge.findMany({ where: { name: badge.name } });
+        
+        if (existingBadges.length > 1) {
+            console.log(`  Found ${existingBadges.length} badges with name "${badge.name}", cleaning duplicates...`);
+            // Manter o primeiro, deletar os outros
+            const [keep, ...duplicates] = existingBadges;
+            for (const dup of duplicates) {
+                // Redirecionar UserBadges
+                await prisma.userBadge.updateMany({
+                    where: { badgeId: dup.id },
+                    data: { badgeId: keep.id }
+                });
+                await prisma.badge.delete({ where: { id: dup.id } });
+            }
+        }
+        
         const existingBadge = await prisma.badge.findFirst({ where: { name: badge.name } });
 
         if (existingBadge) {

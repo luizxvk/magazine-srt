@@ -57,7 +57,6 @@ const EMAILJS_WELCOME_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_WELCOME_TEMPLAT
 export const sendWelcomeEmail = async (params: WelcomeEmailParams): Promise<boolean> => {
     if (!isEmailJSConfigured()) {
         console.warn('[EmailJS] Não configurado para email de boas-vindas.');
-        console.log('[EmailJS] Senha temporária (dev):', params.temp_password);
         return false;
     }
 

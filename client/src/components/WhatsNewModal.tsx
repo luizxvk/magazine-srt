@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Gamepad2, Image, Tag, Lock, Smartphone, History, Filter } from 'lucide-react';
+import { X, Sparkles, Check, Gamepad2, Image, Tag, Lock, Smartphone, History, Filter, Shield, Edit3, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.7';
+const CURRENT_VERSION = '0.4.8';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,49 +33,42 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.7 - MULTIPLE FIXES & HISTORY
+    // v0.4.8 - SECURITY & UX IMPROVEMENTS
     const updates: UpdateItem[] = [
+        {
+            icon: <Shield className="w-5 h-5 text-red-500" />,
+            title: '🔒 Segurança Reforçada',
+            description: 'Removidos logs de dados sensíveis. Suas credenciais agora estão 100% protegidas!',
+            isNew: true
+        },
+        {
+            icon: <Edit3 className="w-5 h-5 text-emerald-500" />,
+            title: '✏️ Editar Recompensas',
+            description: 'Admins agora podem editar recompensas existentes, incluindo Zions de bônus e tipo de resgate.',
+            isNew: true
+        },
+        {
+            icon: <Zap className="w-5 h-5 text-yellow-500" />,
+            title: '⚡ XP em Compras',
+            description: 'Ao comprar produtos na loja, você ganha XP igual ao valor em Zions Cash gasto!',
+            isNew: true
+        },
         {
             icon: <History className="w-5 h-5 text-blue-500" />,
             title: '📊 Histórico de Zions Points',
             description: 'Nova aba nos Prêmios mostrando todo o histórico de transações: compras, resgates, bônus e mais!',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Filter className="w-5 h-5 text-purple-500" />,
             title: '🎯 Destaques Filtrados',
             description: 'Página de Destaques e Carrossel agora mostram apenas posts de usuários, sem produtos da loja.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Smartphone className="w-5 h-5 text-emerald-500" />,
             title: '📱 Bottom Navigation Mobile',
             description: 'Barra de navegação estilo Apple Vision Pro! Acesso rápido a Home, Explorar, Loja e Perfil.',
-            isNew: false
-        },
-        {
-            icon: <Lock className="w-5 h-5 text-amber-500" />,
-            title: '🔐 Sistema Feature Gates',
-            description: 'Novo sistema de controle de features por plano. Features premium agora mostram cadeado e modal de upgrade!',
-            isNew: false
-        },
-        // v0.4.2 - STEAM-STYLE PRODUCT DETAILS
-        {
-            icon: <Gamepad2 className="w-5 h-5 text-blue-500" />,
-            title: '🎮 Página de Produto Estilo Steam',
-            description: 'Clique em qualquer produto para ver detalhes completos: galeria de imagens, informações do jogo, tags e muito mais!',
-            isNew: false
-        },
-        {
-            icon: <Image className="w-5 h-5 text-purple-500" />,
-            title: '📸 Galeria de Screenshots',
-            description: 'Produtos agora suportam múltiplas screenshots! Navegue pelo carrossel ou expanda em tela cheia.',
-            isNew: false
-        },
-        {
-            icon: <Tag className="w-5 h-5 text-emerald-500" />,
-            title: '🏷️ Tags e Info do Jogo',
-            description: 'Desenvolvedor, plataforma, tamanho em GB, data de lançamento e tags personalizadas (#FPS, #Action, etc).',
             isNew: false
         }
     ];

@@ -3,6 +3,7 @@ import prisma from '../utils/prisma';
 import { uploadProductImage } from '../services/cloudinaryService';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { sendProductKeysEmail } from '../services/emailService';
+import { awardXP } from '../services/gamificationService';
 
 // ===================== PRODUCT MANAGEMENT (Admin) =====================
 
@@ -491,6 +492,15 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             select: { key: true }
         });
 
+        // Award XP equal to Zions Cash spent
+        try {
+            await awardXP(userId!, totalCost, `Compra: ${product.name}`);
+            console.log(`[purchaseWithZions] Awarded ${totalCost} XP to user ${userId}`);
+        } catch (xpError) {
+            console.error('Failed to award XP:', xpError);
+            // Don't fail the purchase if XP fails
+        }
+
         // Send keys via email
         const keys = deliveredKeys.map(k => k.key);
         if (user.email && keys.length > 0) {
@@ -513,6 +523,7 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
                 totalZions: totalCost
             },
             cashbackPoints,
+            xpEarned: totalCost,
             emailSent: !!user.email
         });
     } catch (error) {

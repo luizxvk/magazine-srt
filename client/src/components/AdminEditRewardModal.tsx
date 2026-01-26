@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-import { X, Save, Image as ImageIcon, Gift, Tag, Box, Edit2 } from 'lucide-react';
+import { X, Save, Image as ImageIcon, Gift, Tag, Box, Edit2, Coins } from 'lucide-react';
 import api from '../services/api';
 
 interface Reward {
@@ -8,7 +8,9 @@ interface Reward {
     title: string;
     type: 'PRODUCT' | 'COUPON' | 'DIGITAL';
     costZions: number;
+    zionsReward?: number;
     stock: number;
+    isUnlimited?: boolean;
     metadata?: {
         imageUrl?: string;
     };
@@ -26,7 +28,9 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
     const [title, setTitle] = useState('');
     const [type, setType] = useState<'PRODUCT' | 'COUPON' | 'DIGITAL'>('DIGITAL');
     const [costZions, setCostZions] = useState(0);
+    const [zionsReward, setZionsReward] = useState(0);
     const [stock, setStock] = useState(0);
+    const [isUnlimited, setIsUnlimited] = useState(true);
     const [imageUrl, setImageUrl] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -35,7 +39,9 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
             setTitle(reward.title);
             setType(reward.type);
             setCostZions(reward.costZions);
+            setZionsReward(reward.zionsReward || 0);
             setStock(reward.stock);
+            setIsUnlimited(reward.isUnlimited ?? true);
             setImageUrl(reward.metadata?.imageUrl || '');
         }
     }, [reward]);
@@ -64,7 +70,9 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                 title,
                 type,
                 costZions,
+                zionsReward,
                 stock,
+                isUnlimited,
                 metadata: imageUrl ? { imageUrl } : undefined
             });
 
@@ -154,7 +162,7 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                                     <input
                                         type="number"
                                         value={costZions}
-                                        onChange={e => setCostZions(parseInt(e.target.value))}
+                                        onChange={e => setCostZions(parseInt(e.target.value) || 0)}
                                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-500/50 outline-none font-mono text-lg"
                                     />
                                 </div>
@@ -163,9 +171,65 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                                     <input
                                         type="number"
                                         value={stock}
-                                        onChange={e => setStock(parseInt(e.target.value))}
+                                        onChange={e => setStock(parseInt(e.target.value) || 0)}
                                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-500/50 outline-none font-mono text-lg"
                                     />
+                                </div>
+                            </div>
+
+                            {/* Zions Reward Field */}
+                            <div className="p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/20">
+                                <label className="block text-xs text-emerald-400 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
+                                    <Coins className="w-4 h-4" />
+                                    Zions de Recompensa
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={zionsReward}
+                                    onChange={e => setZionsReward(parseInt(e.target.value) || 0)}
+                                    className="w-full bg-black/40 border border-emerald-500/30 rounded-xl px-4 py-3 text-white focus:border-emerald-500/50 outline-none font-mono text-lg"
+                                />
+                                <p className="mt-2 text-xs text-gray-400">
+                                    {zionsReward > 0 
+                                        ? `O usuário receberá ${zionsReward} Zions ao resgatar.`
+                                        : 'Deixe 0 se não quiser dar Zions como bônus.'
+                                    }
+                                </p>
+                            </div>
+
+                            {/* Redemption Type Toggle */}
+                            <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/20">
+                                <label className="block text-xs text-blue-400 mb-3 uppercase tracking-wider font-bold">Tipo de Resgate</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsUnlimited(true)}
+                                        className={`p-3 rounded-xl text-sm font-bold border transition-all ${
+                                            isUnlimited
+                                                ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                                                : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center gap-1">
+                                            <span>🔄 Ilimitado</span>
+                                            <span className="text-[10px] opacity-70">1h cooldown</span>
+                                        </div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsUnlimited(false)}
+                                        className={`p-3 rounded-xl text-sm font-bold border transition-all ${
+                                            !isUnlimited
+                                                ? 'bg-gold-500/20 border-gold-500 text-gold-400'
+                                                : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center gap-1">
+                                            <span>🎁 Único</span>
+                                            <span className="text-[10px] opacity-70">Uma vez só</span>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         </div>

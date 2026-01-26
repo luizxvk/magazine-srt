@@ -54,12 +54,10 @@ export default function ModernLogin() {
     };
 
     const onMagazineSubmit = async (data: LoginFormValues) => {
-        console.log('Magazine Form Submitted:', data);
         await handleLogin(data, magazineForm.setError, 'MAGAZINE');
     };
 
     const onMgtSubmit = async (data: LoginFormValues) => {
-        console.log('MGT Form Submitted:', data);
         await handleLogin(data, mgtForm.setError, 'MGT');
     };
 

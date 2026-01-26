@@ -120,24 +120,16 @@ export const login = async (req: Request, res: Response) => {
         }
 
         const { email: parsedEmail, password } = loginSchema.parse(req.body);
-        console.log('Parsed email:', parsedEmail);
 
         const user = await prisma.user.findUnique({ where: { email: parsedEmail } });
         if (!user) {
-            console.log('User not found:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
-
-        console.log('User found:', user.id, user.email);
-        console.log('User currency fields:', { zions: user.zions, zionsPoints: user.zionsPoints, zionsCash: user.zionsCash });
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);
         if (!validPassword) {
-            console.log('Invalid password for user:', parsedEmail);
             return res.status(400).json({ error: 'Invalid credentials' });
         }
-
-        console.log('Password valid, proceeding with login');
 
         // Award "Primeiros Passos" badge and 10 trophies (fail-safe)
         try {

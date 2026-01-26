@@ -26,6 +26,7 @@ import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
 import LeftSidebar from '../components/LeftSidebar';
 import ToolsCarousel from '../components/ToolsCarousel';
+import CreatePostCard from '../components/CreatePostCard';
 
 interface Post {
     id: string;
@@ -329,7 +330,12 @@ export default function FeedPage() {
 
                                 {/* Inline Post Pill - Mobile Only (below carousel) */}
                                 <div className="lg:hidden">
-                                    <CreatePostWidget onPostCreated={handlePostCreated} inline />
+                                    <CreatePostCard onPostCreated={handlePostCreated} />
+                                </div>
+
+                                {/* Create Post Card - Desktop (above feed) */}
+                                <div className="hidden lg:block">
+                                    <CreatePostCard onPostCreated={handlePostCreated} />
                                 </div>
 
                                 {posts.length === 0 ? (
@@ -391,13 +397,6 @@ export default function FeedPage() {
                     </aside>
                 </div>
             </div>
-
-            {/* Create Post Widget (Fixed Bottom - Desktop Only) - Hide when viewing stories or editing story */}
-            {!viewingStoryId && !isStoryEditorOpen && (
-                <div className="hidden lg:block">
-                    <CreatePostWidget onPostCreated={handlePostCreated} />
-                </div>
-            )}
 
             {/* Modals */}
             <NewMembersModal isOpen={isNewMembersOpen} onClose={() => setIsNewMembersOpen(false)} />

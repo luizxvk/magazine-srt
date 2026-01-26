@@ -35,6 +35,7 @@ import MessagePopup from './components/MessagePopup';
 import DevBanner from './components/DevBanner';
 import VerificationPrompt from './components/VerificationPrompt';
 import Footer from './components/Footer';
+import BottomNavigation from './components/BottomNavigation';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
 import WhatsNewModal from './components/WhatsNewModal';
 import SessionExpiredModal from './components/SessionExpiredModal';
@@ -93,6 +94,7 @@ function App() {
         <WhatsNewModal />
         <MessagePopupWrapper />
         <VerificationPrompt />
+        <BottomNavigation />
         <Footer />
         <DevBanner />
       </Router>

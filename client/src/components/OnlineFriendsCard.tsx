@@ -132,12 +132,12 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                         className="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="relative">
+                                            <div className="relative shrink-0">
                                                 {friend.avatarUrl ? (
                                                     <img
                                                         src={friend.avatarUrl}
                                                         alt={friend.displayName || friend.name}
-                                                        className="w-10 h-10 rounded-full object-cover border border-white/20"
+                                                        className="w-10 h-10 min-w-[40px] rounded-full object-cover border border-white/20 aspect-square"
                                                     />
                                                 ) : (
                                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${themeBg}`}>

@@ -24,15 +24,18 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const isMGT = user?.membershipType === 'MGT';
     const canUseCarousel = (user?.zionsPoints || 0) >= 300;
 
-    // Theme
-    const cardBg = theme === 'light' ? 'bg-white' : 'bg-[#1a1a1a]';
-    const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
+    // Theme - seguindo padrão do projeto (emerald para MGT, gold para Magazine)
+    const cardBg = theme === 'light' ? 'bg-white' : 'bg-white/5';
+    const cardBorder = theme === 'light' ? 'border-gray-200' : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30');
+    const cardGlow = isMGT 
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
     const inputBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
     const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textMuted = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
-    const accentBg = isMGT ? 'bg-emerald-500' : 'bg-amber-500';
-    const accentText = isMGT ? 'text-emerald-500' : 'text-amber-500';
-    const accentHover = isMGT ? 'hover:bg-emerald-500/10' : 'hover:bg-amber-500/10';
+    const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const accentText = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const accentHover = isMGT ? 'hover:bg-emerald-500/10' : 'hover:bg-gold-500/10';
 
     const handleSubmit = async () => {
         if (!caption.trim() && !mediaUrl) return;
@@ -103,7 +106,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     };
 
     return (
-        <div className={`${cardBg} rounded-2xl border ${cardBorder} shadow-lg overflow-hidden`}>
+        <div className={`${cardBg} rounded-2xl border ${cardBorder} ${cardGlow} backdrop-blur-xl overflow-hidden transition-all duration-300`}>
             {/* Header with user info */}
             <div className="p-4 flex items-center gap-3">
                 <div className="relative">
@@ -145,7 +148,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     {selectedTags.map(tag => (
                         <span 
                             key={tag} 
-                            className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}
+                            className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}
                         >
                             #{tag}
                             <button onClick={() => setSelectedTags(selectedTags.filter(t => t !== tag))}>

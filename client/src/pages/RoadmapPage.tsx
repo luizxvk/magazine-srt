@@ -242,52 +242,55 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Zap className="w-5 h-5" />,
         category: 'feature'
     },
+    {
+        id: '29b',
+        title: 'Sistema de Cores Personalizadas',
+        description: 'Cores de destaque personalizadas integradas em todo perfil. Cores Básicas e Tom Pastel na loja de personalização.',
+        status: 'completed',
+        version: 'v0.4.0',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29c',
+        title: 'Integração com Discord',
+        description: 'Sincronize sua conta e veja seus servidores Discord diretamente na plataforma.',
+        status: 'completed',
+        version: 'v0.4.5',
+        icon: <MessageSquare className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29d',
+        title: 'Sistema de Toasts Personalizado',
+        description: 'Notificações elegantes (sucesso, erro, aviso) seguindo o padrão visual do projeto.',
+        status: 'completed',
+        version: 'v0.4.9',
+        icon: <Sparkles className="w-5 h-5" />,
+        category: 'improvement'
+    },
     
     // ===== IN PROGRESS =====
     {
         id: '30',
-        title: 'Sistema de Cores Personalizadas',
-        description: 'Cores de destaque personalizadas integradas em todo perfil. Categorização em Cores Básicas e Tom Pastel na loja de personalização.',
+        title: 'Hub de Comunidades Gamers (Rovex)',
+        description: 'Expansão para maior rede social de comunidades gamers do Brasil com a Rovex. Torneios, clãs e eventos ao vivo.',
         status: 'in-progress',
-        icon: <Palette className="w-5 h-5" />,
+        icon: <Gamepad2 className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '31',
+        title: 'Transmissões ao Vivo',
+        description: 'Faça lives para seus seguidores com chat integrado e sistema de doações em Zions. Aguardando aprovação da Twitch.',
+        status: 'in-progress',
+        icon: <Zap className="w-5 h-5" />,
         category: 'feature'
     },
     
     // ===== PLANNED =====
     {
-        id: '31',
-        title: 'Revista Digital com IA',
-        description: 'Gere revistas digitais automáticas usando IA com base nas fotos do seu catálogo. Layouts profissionais em minutos.',
-        status: 'planned',
-        icon: <BrainCircuit className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
         id: '32',
-        title: 'Integração com Discord',
-        description: 'Sincronize seu perfil e receba notificações no Discord da comunidade.',
-        status: 'planned',
-        icon: <MessageSquare className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '33',
-        title: 'App Mobile Nativo',
-        description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
-        status: 'planned',
-        icon: <Rocket className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '34',
-        title: 'Sistema de Prestígio',
-        description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
-        status: 'planned',
-        icon: <Crown className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
-        id: '35',
         title: 'Cards Animados (GIF)',
         description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
         status: 'planned',
@@ -295,28 +298,36 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '36',
-        title: 'Hub de Comunidades Gamers',
-        description: 'Expanda para maior rede social de comunidades gamers do Brasil. Torneios, clãs e eventos ao vivo.',
+        id: '33',
+        title: 'Revista Digital com IA',
+        description: 'Gere revistas digitais automáticas usando IA com base nas fotos do seu catálogo. Layouts profissionais em minutos.',
         status: 'planned',
-        icon: <Gamepad2 className="w-5 h-5" />,
-        category: 'community'
+        icon: <BrainCircuit className="w-5 h-5" />,
+        category: 'feature'
     },
     {
-        id: '37',
+        id: '34',
+        title: 'App Mobile Nativo',
+        description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
+        status: 'planned',
+        icon: <Rocket className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '35',
+        title: 'Sistema de Prestígio',
+        description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
+        status: 'planned',
+        icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '36',
         title: 'Sistema de Eventos e Torneios',
         description: 'Crie e participe de eventos exclusivos. Rankings, prêmios e transmissões ao vivo.',
         status: 'planned',
         icon: <Trophy className="w-5 h-5" />,
         category: 'community'
-    },
-    {
-        id: '38',
-        title: 'Transmissões ao Vivo',
-        description: 'Faça lives para seus seguidores com chat integrado e sistema de doações em Zions.',
-        status: 'planned',
-        icon: <Zap className="w-5 h-5" />,
-        category: 'feature'
     }
 ];
 

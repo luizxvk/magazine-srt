@@ -67,28 +67,28 @@ const RADIO_STATIONS: RadioStation[] = [
         id: 'lofi',
         name: 'Lo-Fi Hip Hop',
         genre: 'Lo-Fi / Chill Beats',
-        streamUrl: 'https://streams.ilovemusic.de/iloveradio17.mp3',
+        streamUrl: 'https://stream.zeno.fm/0r0xa792kwzuv',
         color: '#98D8AA'
     },
     {
         id: 'jazz',
         name: 'Smooth Jazz',
         genre: 'Jazz / Relaxing',
-        streamUrl: 'https://strm112.1.fm/smoothjazz_mobile_mp3',
+        streamUrl: 'https://stream.zeno.fm/fyn8eh13hn8uv',
         color: '#F97316'
     },
     {
         id: 'electronic',
         name: 'Electronic',
         genre: 'EDM / House',
-        streamUrl: 'https://streams.ilovemusic.de/iloveradio2.mp3',
+        streamUrl: 'https://stream.zeno.fm/0hq1sm8am0zuv',
         color: '#EC4899'
     },
     {
         id: 'rock',
         name: 'Classic Rock',
         genre: 'Rock / Classic',
-        streamUrl: 'https://strm112.1.fm/classicrock_mobile_mp3',
+        streamUrl: 'https://stream.zeno.fm/yn65fsaurfhvv',
         color: '#EF4444'
     }
 ];

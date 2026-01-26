@@ -72,7 +72,7 @@ const NavItemButton = memo(({
 NavItemButton.displayName = 'NavItemButton';
 
 export default function BottomNavigation() {
-    const { user } = useAuth();
+    const { user, isMobileDrawerOpen } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(true);
@@ -131,7 +131,7 @@ export default function BottomNavigation() {
     }, [navigate]);
 
     // Hide when drawer/modal is open or should be hidden
-    if (shouldHide || !user) return null;
+    if (shouldHide || !user || isMobileDrawerOpen) return null;
 
     return (
         <>

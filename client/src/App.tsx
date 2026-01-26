@@ -39,7 +39,7 @@ import VerificationPrompt from './components/VerificationPrompt';
 import Footer from './components/Footer';
 import BottomNavigation from './components/BottomNavigation';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
-import WhatsNewModal from './components/WhatsNewModal';
+import OnboardingModals from './components/OnboardingModals';
 import SessionExpiredModal from './components/SessionExpiredModal';
 
 
@@ -95,7 +95,7 @@ function App() {
         <ToastWrapper />
         <ZionsModalWrapper />
         <SessionExpiredWrapper />
-        <WhatsNewModal />
+        <OnboardingModals />
         <MessagePopupWrapper />
         <VerificationPrompt />
         <BottomNavigation />

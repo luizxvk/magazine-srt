@@ -2,22 +2,38 @@ import { useState, useEffect } from 'react';
 import { X, ChevronRight, Star, Layout, Zap, ShoppingBag, Calendar, Trophy, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function WelcomeTour() {
+interface WelcomeTourProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalOnClose }: WelcomeTourProps = {}) {
     const { theme, user } = useAuth();
     const [step, setStep] = useState(0);
-    const [isVisible, setIsVisible] = useState(false);
+    const [internalIsVisible, setInternalIsVisible] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
 
+    // Use external state if provided, otherwise use internal state
+    const isVisible = externalIsOpen !== undefined ? externalIsOpen : internalIsVisible;
+
     useEffect(() => {
+        // Only auto-show if using internal state (no external control)
+        if (externalIsOpen !== undefined) return;
+        
         const hasSeenTour = localStorage.getItem('has_seen_tour');
         if (!hasSeenTour) {
-            setIsVisible(true);
+            setInternalIsVisible(true);
         }
-    }, []);
+    }, [externalIsOpen]);
 
     const handleClose = () => {
-        setIsVisible(false);
+        setStep(0);
         localStorage.setItem('has_seen_tour', 'true');
+        if (externalOnClose) {
+            externalOnClose();
+        } else {
+            setInternalIsVisible(false);
+        }
     };
 
     const handleNext = () => {

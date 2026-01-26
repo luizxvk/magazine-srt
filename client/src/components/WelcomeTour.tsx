@@ -124,7 +124,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4">
-            <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-900'} border ${theme === 'light' ? (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20') : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative shadow-[0_0_50px_rgba(212,175,55,0.2)]`}>
+            <div className={`${theme === 'light' ? 'bg-white' : (isMGT ? 'bg-emerald-950/90' : 'bg-[#0a0a0a]')} border ${theme === 'light' ? (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20') : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative shadow-[0_0_50px_rgba(212,175,55,0.2)]`}>
                 {/* BETA Badge */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import WelcomeTour from './WelcomeTour';
@@ -17,18 +17,23 @@ export default function OnboardingModals() {
     
     const [showWelcome, setShowWelcome] = useState(false);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
-    const [hasChecked, setHasChecked] = useState(false);
+    const hasCheckedRef = useRef(false);
+    const lastUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
-        // Só verificar uma vez por sessão
-        if (hasChecked) return;
-
         // Não mostrar em páginas de auth
         const isAuthPage = ['/', '/login', '/register', '/request-invite', '/reset-password'].includes(location.pathname);
         if (!user || isAuthPage) return;
 
-        // Marcar como verificado
-        setHasChecked(true);
+        // Se o usuário mudou, resetar o check
+        if (lastUserIdRef.current !== user.id) {
+            hasCheckedRef.current = false;
+            lastUserIdRef.current = user.id;
+        }
+
+        // Só verificar uma vez por sessão por usuário
+        if (hasCheckedRef.current) return;
+        hasCheckedRef.current = true;
 
         // Verificar se precisa mostrar o Welcome Tour (SEMPRE ao logar)
         const sessionKey = `welcome_shown_${user.id}`;
@@ -37,12 +42,14 @@ export default function OnboardingModals() {
         if (!hasShownThisSession) {
             // Mostrar Welcome Tour
             sessionStorage.setItem(sessionKey, 'true');
-            setTimeout(() => setShowWelcome(true), 500);
+            // Limpar localStorage do WelcomeTour antigo para evitar conflito
+            localStorage.removeItem('has_seen_tour');
+            setTimeout(() => setShowWelcome(true), 800);
         } else {
             // Se já mostrou welcome, verificar WhatsNew
             checkWhatsNew();
         }
-    }, [user, location.pathname, hasChecked]);
+    }, [user, location.pathname]);
 
     const checkWhatsNew = () => {
         const lastSeenVersion = localStorage.getItem('whatsNewVersion');

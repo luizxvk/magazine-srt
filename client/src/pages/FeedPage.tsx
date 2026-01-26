@@ -261,6 +261,7 @@ export default function FeedPage() {
                         onDailyLoginClick={openDailyLoginModal}
                         onNewMembersClick={() => setIsNewMembersOpen(true)}
                         onEventsClick={() => setIsEventsOpen(true)}
+                        dailyLoginStatus={dailyLoginStatus}
                     />
                     {/* Main Feed Column */}
                     <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">

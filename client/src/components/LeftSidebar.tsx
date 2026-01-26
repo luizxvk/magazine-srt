@@ -1,7 +1,8 @@
 import { Gift, Users, Camera, Calendar, UserPlus, Star, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
+import DailyLoginCard from './DailyLoginCard';
 import { Feature } from '../utils/features';
 import { useFeature } from '../hooks/useFeature';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ interface LeftSidebarProps {
     onDailyLoginClick: () => void;
     onNewMembersClick: () => void;
     onEventsClick: () => void;
+    dailyLoginStatus?: DailyLoginStatus | null;
 }
 
 interface SidebarItem {
@@ -21,7 +23,7 @@ interface SidebarItem {
     feature?: Feature; // Feature gate opcional
 }
 
-export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick }: LeftSidebarProps) {
+export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick, dailyLoginStatus }: LeftSidebarProps) {
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
@@ -168,6 +170,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             {/* Online Friends Card */}
             <div className="mt-4">
                 <OnlineFriendsCard maxDisplay={4} />
+            </div>
+
+            {/* Daily Login Card */}
+            <div className="mt-4">
+                <DailyLoginCard status={dailyLoginStatus ?? null} onClick={onDailyLoginClick} />
             </div>
 
             {/* Upgrade Modal */}

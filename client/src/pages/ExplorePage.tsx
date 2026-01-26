@@ -3,14 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { 
-    Search, TrendingUp, Users, Hash, Sparkles, 
+    Search, TrendingUp, Users, Sparkles, 
     ChevronRight, Heart, MessageCircle, Star,
-    Zap, Crown, Flame, Music, Gamepad2, Camera
+    Crown, Store, Gift, Users2, MessageSquare, 
+    ShoppingBag, Trophy, Camera, Map
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import ModernLoader from '../components/ModernLoader';
+import SearchModal from '../components/SearchModal';
 
 interface TrendingPost {
     id: string;
@@ -36,12 +38,13 @@ interface TopMember {
     isVerified?: boolean;
 }
 
-interface Category {
+interface FeatureCard {
     id: string;
     name: string;
+    description: string;
     icon: React.ReactNode;
     color: string;
-    count: number;
+    path: string;
 }
 
 export default function ExplorePage() {
@@ -49,29 +52,32 @@ export default function ExplorePage() {
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     
-    const [searchQuery, setSearchQuery] = useState('');
     const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
     const [topMembers, setTopMembers] = useState<TopMember[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'discover' | 'trending' | 'members'>('discover');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
 
     // Theme colors
     const themeTitle = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT ? 'shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_20px_rgba(212,175,55,0.3)]';
     const themeButtonActive = isMGT ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-gold-500/20 text-gold-400 border-gold-500/50';
-    const themeCardBg = theme === 'light' ? 'bg-white/80' : 'bg-white/5';
+    const themeCardBg = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeTextSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
-    // Categories for explore
-    const categories: Category[] = [
-        { id: 'gaming', name: 'Gaming', icon: <Gamepad2 className="w-5 h-5" />, color: 'from-purple-500 to-indigo-600', count: 0 },
-        { id: 'music', name: 'Música', icon: <Music className="w-5 h-5" />, color: 'from-pink-500 to-rose-600', count: 0 },
-        { id: 'photos', name: 'Fotos', icon: <Camera className="w-5 h-5" />, color: 'from-blue-500 to-cyan-600', count: 0 },
-        { id: 'trending', name: 'Em Alta', icon: <Flame className="w-5 h-5" />, color: 'from-orange-500 to-red-600', count: 0 },
-        { id: 'elite', name: 'Elite', icon: <Crown className="w-5 h-5" />, color: 'from-amber-500 to-yellow-600', count: 0 },
-        { id: 'new', name: 'Novidades', icon: <Zap className="w-5 h-5" />, color: 'from-green-500 to-emerald-600', count: 0 },
+    // Features disponíveis na plataforma
+    const features: FeatureCard[] = [
+        { id: 'market', name: 'Mercado', description: 'Compre e venda itens', icon: <Store className="w-6 h-6" />, color: isMGT ? 'from-emerald-500 to-emerald-700' : 'from-gold-500 to-amber-700', path: '/market' },
+        { id: 'rewards', name: 'Recompensas', description: 'Resgate prêmios exclusivos', icon: <Gift className="w-6 h-6" />, color: 'from-purple-500 to-violet-700', path: '/rewards' },
+        { id: 'groups', name: 'Grupos', description: 'Comunidades e chats', icon: <Users2 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/groups' },
+        { id: 'social', name: 'Social', description: 'Amigos e conexões', icon: <MessageSquare className="w-6 h-6" />, color: 'from-pink-500 to-rose-700', path: '/social' },
+        { id: 'store', name: 'Loja', description: 'Produtos físicos', icon: <ShoppingBag className="w-6 h-6" />, color: 'from-orange-500 to-red-700', path: '/store' },
+        { id: 'catalog', name: 'Catálogo', description: 'Galeria de fotos', icon: <Camera className="w-6 h-6" />, color: 'from-cyan-500 to-blue-700', path: '/catalog' },
+        { id: 'ranking', name: 'Ranking', description: 'Classificação global', icon: <Trophy className="w-6 h-6" />, color: 'from-amber-500 to-yellow-700', path: '/ranking' },
+        { id: 'roadmap', name: 'Roadmap', description: 'Próximas novidades', icon: <Map className="w-6 h-6" />, color: 'from-teal-500 to-emerald-700', path: '/roadmap' },
     ];
 
     useEffect(() => {
@@ -101,12 +107,12 @@ export default function ExplorePage() {
         }
     };
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            // Navigate to search results or filter
-            navigate(`/feed?search=${encodeURIComponent(searchQuery)}`);
-        }
+    const handleFeatureClick = (feature: FeatureCard) => {
+        setSelectedFeature(feature.id);
+        // Navegar para a feature após um pequeno delay para mostrar animação
+        setTimeout(() => {
+            navigate(feature.path);
+        }, 200);
     };
 
     if (loading) {
@@ -126,6 +132,9 @@ export default function ExplorePage() {
             <LuxuriousBackground />
             <Header />
 
+            {/* Search Modal */}
+            <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
             <div className="max-w-6xl mx-auto pt-24 pb-32 px-4 relative z-10">
                 {/* Search Header */}
                 <motion.div
@@ -141,25 +150,23 @@ export default function ExplorePage() {
                     </p>
                 </motion.div>
 
-                {/* Search Bar */}
-                <motion.form
+                {/* Search Bar - Abre o SearchModal */}
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    onSubmit={handleSearch}
                     className="mb-8"
                 >
-                    <div className={`relative rounded-2xl ${themeCardBg} backdrop-blur-xl border ${themeBorder} overflow-hidden ${themeGlow}`}>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className={`w-full relative rounded-2xl ${themeCardBg} backdrop-blur-xl border ${themeBorder} overflow-hidden ${themeGlow} text-left transition-all hover:scale-[1.01]`}
+                    >
                         <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${themeTextSecondary}`} />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Buscar posts, membros, tags..."
-                            className={`w-full py-4 pl-12 pr-4 bg-transparent ${themeText} placeholder:${themeTextSecondary} focus:outline-none text-lg`}
-                        />
-                    </div>
-                </motion.form>
+                        <div className={`w-full py-4 pl-12 pr-4 ${themeTextSecondary} text-lg`}>
+                            Buscar posts, membros, tags...
+                        </div>
+                    </button>
+                </motion.div>
 
                 {/* Tabs */}
                 <motion.div
@@ -171,7 +178,7 @@ export default function ExplorePage() {
                     {['discover', 'trending', 'members'].map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => setActiveTab(tab as any)}
+                            onClick={() => setActiveTab(tab as typeof activeTab)}
                             className={`px-5 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition-all duration-300 border ${
                                 activeTab === tab
                                     ? themeButtonActive
@@ -196,26 +203,33 @@ export default function ExplorePage() {
                             exit={{ opacity: 0, y: -20 }}
                             className="space-y-8"
                         >
-                            {/* Categories Grid */}
-                            <div>
-                                <h2 className={`text-xl font-semibold ${themeText} mb-4 flex items-center gap-2`}>
-                                    <Hash className={`w-5 h-5 ${themeTitle}`} />
-                                    Categorias
+                            {/* Features Card */}
+                            <div className={`${themeCardBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-6`}>
+                                <h2 className={`text-xl font-semibold ${themeText} mb-2 flex items-center gap-2`}>
+                                    <Sparkles className={`w-5 h-5 ${themeTitle}`} />
+                                    O que você quer explorar?
                                 </h2>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                                    {categories.map((category, index) => (
+                                <p className={`${themeTextSecondary} text-sm mb-6`}>
+                                    Selecione uma feature para começar
+                                </p>
+                                
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                    {features.map((feature, index) => (
                                         <motion.button
-                                            key={category.id}
+                                            key={feature.id}
                                             initial={{ opacity: 0, scale: 0.9 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ delay: index * 0.05 }}
-                                            onClick={() => navigate(`/feed?tag=${category.id}`)}
-                                            className={`group relative p-4 rounded-2xl bg-gradient-to-br ${category.color} overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg`}
+                                            onClick={() => handleFeatureClick(feature)}
+                                            className={`group relative p-4 rounded-xl bg-gradient-to-br ${feature.color} overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                                                selectedFeature === feature.id ? 'ring-2 ring-white scale-105' : ''
+                                            }`}
                                         >
                                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                                            <div className="relative flex flex-col items-center gap-2 text-white">
-                                                {category.icon}
-                                                <span className="font-medium text-sm">{category.name}</span>
+                                            <div className="relative flex flex-col items-center gap-2 text-white text-center">
+                                                {feature.icon}
+                                                <span className="font-semibold text-sm">{feature.name}</span>
+                                                <span className="text-xs text-white/70 hidden sm:block">{feature.description}</span>
                                             </div>
                                         </motion.button>
                                     ))}

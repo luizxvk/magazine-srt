@@ -149,9 +149,9 @@ export default function Rewards() {
                         initial={{ opacity: 0, y: -20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] max-w-md w-full px-4"
+                        className="fixed inset-0 z-[200] flex items-center justify-center p-4 pointer-events-none"
                     >
-                        <div className={`relative backdrop-blur-xl rounded-2xl border shadow-2xl p-4 pr-12 ${
+                        <div className={`relative backdrop-blur-xl rounded-2xl border shadow-2xl p-4 pr-12 max-w-md w-full pointer-events-auto ${
                             notification.type === 'error' 
                                 ? 'bg-red-500/10 border-red-500/30 text-red-300' 
                                 : notification.type === 'success'

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, Star, Award, Layout, Zap, ShoppingBag, Calendar } from 'lucide-react';
+import { X, ChevronRight, Star, Award, Layout, Zap, ShoppingBag, Calendar, Users, Radio, Trophy, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function WelcomeTour() {
@@ -32,52 +32,91 @@ export default function WelcomeTour() {
     const steps = isMGT ? [
         {
             title: "Bem-vindo à MGT",
-            description: "Explore o universo exclusivo da nossa comunidade.",
-            icon: <Star className="w-12 h-12 text-emerald-400" />
+            description: "Você faz parte de uma comunidade exclusiva! Aqui você terá acesso a funcionalidades únicas, recompensas especiais e muito mais.",
+            icon: <Star className="w-12 h-12 text-emerald-400" />,
+            features: ["Acesso exclusivo MGT", "Tema esmeralda personalizado", "Benefícios VIP"]
         },
         {
-            title: "Feed Exclusivo",
-            description: "Compartilhe momentos com a elite.",
-            icon: <Layout className="w-12 h-12 text-emerald-400" />
+            title: "Feed & Comunidade",
+            description: "Compartilhe momentos, crie posts com imagens, interaja com curtidas e comentários. Conecte-se com outros membros!",
+            icon: <Layout className="w-12 h-12 text-emerald-400" />,
+            features: ["Posts com mídia", "Curtidas e comentários", "Stories temporários"]
         },
         {
             title: "Sistema de Zions",
-            description: "Ganhe moedas por engajamento.",
-            icon: <Zap className="w-12 h-12 text-emerald-400" />
+            description: "Nossa moeda virtual! Ganhe Zions por engajamento: posts, curtidas, comentários e login diário.",
+            icon: <Zap className="w-12 h-12 text-emerald-400" />,
+            features: ["Recompensas diárias", "Bônus por engajamento", "Multiplicadores"]
         },
         {
-            title: "Loja Premium",
-            description: "Troque Zions por recompensas reais.",
-            icon: <ShoppingBag className="w-12 h-12 text-emerald-400" />
+            title: "Loja & Recompensas",
+            description: "Troque seus Zions por recompensas reais! Gift cards, itens exclusivos e muito mais.",
+            icon: <ShoppingBag className="w-12 h-12 text-emerald-400" />,
+            features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
         },
         {
-            title: "Eventos VIP",
-            description: "Acesso a encontros exclusivos.",
-            icon: <Calendar className="w-12 h-12 text-emerald-400" />
+            title: "Ranking & Conquistas",
+            description: "Suba de nível, desbloqueie badges exclusivos e dispute posições no ranking global!",
+            icon: <Trophy className="w-12 h-12 text-emerald-400" />,
+            features: ["Sistema de níveis", "Badges colecionáveis", "Ranking semanal"]
+        },
+        {
+            title: "Eventos & Mais",
+            description: "Acesso a eventos VIP, rádio integrada, grupos e muito mais recursos por vir!",
+            icon: <Calendar className="w-12 h-12 text-emerald-400" />,
+            features: ["Eventos exclusivos", "Rádio Lo-Fi", "Grupos privados"]
         }
     ] : [
         {
             title: "Bem-vindo ao Magazine",
-            description: "Uma experiência exclusiva de rede social, gamificação e recompensas.",
-            icon: <Star className="w-12 h-12 text-gold-400" />
+            description: "Uma plataforma exclusiva que combina rede social, gamificação e recompensas reais. Explore tudo o que preparamos para você!",
+            icon: <Star className="w-12 h-12 text-gold-400" />,
+            features: ["Rede social premium", "Sistema de recompensas", "Comunidade exclusiva"]
         },
         {
-            title: "Feed Premium",
-            description: "Compartilhe seus momentos, interaja com a comunidade e descubra conteúdos incríveis.",
-            icon: <Layout className="w-12 h-12 text-gold-400" />
+            title: "Feed & Posts",
+            description: "Compartilhe seus momentos com posts, imagens e interaja com a comunidade através de curtidas e comentários.",
+            icon: <Layout className="w-12 h-12 text-gold-400" />,
+            features: ["Posts com mídia", "Curtidas e comentários", "Stories 24h"]
         },
         {
-            title: "Gamificação",
-            description: "Ganhe troféus por interagir, suba no ranking e desbloqueie recompensas exclusivas.",
-            icon: <Award className="w-12 h-12 text-gold-400" />
+            title: "Sistema de Zions",
+            description: "Ganhe Zions (nossa moeda virtual) por tudo que você faz: posts, curtidas, comentários, login diário e mais!",
+            icon: <Zap className="w-12 h-12 text-gold-400" />,
+            features: ["Moeda virtual", "Recompensas diárias", "Bônus de engajamento"]
+        },
+        {
+            title: "Loja Premium",
+            description: "Use seus Zions para resgatar recompensas reais! Gift cards, itens exclusivos e muito mais.",
+            icon: <ShoppingBag className="w-12 h-12 text-gold-400" />,
+            features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
+        },
+        {
+            title: "Ranking & Níveis",
+            description: "Suba de nível com sua atividade, colecione badges exclusivos e dispute posições no ranking!",
+            icon: <Trophy className="w-12 h-12 text-gold-400" />,
+            features: ["15 níveis", "Badges únicos", "Ranking global"]
+        },
+        {
+            title: "Recursos Extras",
+            description: "Rádio integrada, eventos, grupos de chat, customização de perfil e muito mais funcionalidades!",
+            icon: <Sparkles className="w-12 h-12 text-gold-400" />,
+            features: ["Rádio Lo-Fi", "Eventos VIP", "Customização"]
         }
     ];
 
     if (!isVisible) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-900'} border ${theme === 'light' ? `border-${accentColor}-500/20` : `border-${accentColor}-500/30`} rounded-2xl p-8 max-w-md w-full text-center relative shadow-[0_0_50px_rgba(212,175,55,0.2)]`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4">
+            <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-900'} border ${theme === 'light' ? (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20') : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative shadow-[0_0_50px_rgba(212,175,55,0.2)]`}>
+                {/* BETA Badge */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
+                        🚀 BETA v0.4
+                    </span>
+                </div>
+
                 <button
                     onClick={handleClose}
                     className={`absolute top-4 right-4 ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-white'} transition-colors`}
@@ -86,32 +125,65 @@ export default function WelcomeTour() {
                     <X className="w-6 h-6" />
                 </button>
 
-                <div className="mb-6 flex justify-center">
-                    <div className={`w-24 h-24 ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                <div className="mb-4 mt-2 flex justify-center">
+                    <div className={`w-20 h-20 sm:w-24 sm:h-24 ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse`}>
                         {steps[step].icon}
                     </div>
                 </div>
 
-                <h2 className={`text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-emerald-300' : 'text-gold-300')} mb-4`}>{steps[step].title}</h2>
-                <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} mb-8 leading-relaxed`}>{steps[step].description}</p>
+                <h2 className={`text-xl sm:text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-emerald-300' : 'text-gold-300')} mb-2`}>
+                    {steps[step].title}
+                </h2>
+                
+                <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} mb-4 leading-relaxed text-sm sm:text-base`}>
+                    {steps[step].description}
+                </p>
 
+                {/* Feature Pills */}
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
+                    {steps[step].features.map((feature, i) => (
+                        <span 
+                            key={i}
+                            className={`px-3 py-1 text-xs rounded-full ${theme === 'light' 
+                                ? (isMGT ? 'bg-emerald-100 text-emerald-700' : 'bg-gold-100 text-gold-700')
+                                : (isMGT ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-gold-500/10 text-gold-400 border border-gold-500/20')
+                            }`}
+                        >
+                            {feature}
+                        </span>
+                    ))}
+                </div>
+
+                {/* Progress & Navigation */}
                 <div className="flex items-center justify-between">
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                         {steps.map((_, i) => (
-                            <div
+                            <button
                                 key={i}
-                                className={`w-2 h-2 rounded-full transition-colors ${i === step ? (isMGT ? 'bg-emerald-500' : 'bg-gold-500') : (theme === 'light' ? 'bg-gray-300' : 'bg-gray-700')}`}
+                                onClick={() => setStep(i)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === step 
+                                    ? (isMGT ? 'bg-emerald-500 w-6' : 'bg-gold-500 w-6') 
+                                    : (theme === 'light' ? 'bg-gray-300 hover:bg-gray-400' : 'bg-gray-700 hover:bg-gray-600')
+                                }`}
                             />
                         ))}
                     </div>
                     <button
                         onClick={handleNext}
-                        className={`flex items-center gap-2 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} text-black px-6 py-2 rounded-full font-medium ${isMGT ? 'hover:bg-emerald-400' : 'hover:bg-gold-400'} transition-colors`}
+                        className={`flex items-center gap-2 ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'} text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg`}
                     >
-                        {step === steps.length - 1 ? 'Começar' : 'Próximo'}
+                        {step === steps.length - 1 ? 'Começar!' : 'Próximo'}
                         <ChevronRight className="w-4 h-4" />
                     </button>
                 </div>
+
+                {/* Skip link */}
+                <button 
+                    onClick={handleClose}
+                    className={`mt-4 text-xs ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-gray-300'} transition-colors`}
+                >
+                    Pular introdução
+                </button>
             </div>
         </div>
     );

@@ -17,3 +17,5 @@ check_*.ts
 check_*.js
 verify-*.ts
 **/scripts/reset-*.ts
+.vercel
+.env*.local

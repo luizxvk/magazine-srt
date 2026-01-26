@@ -140,11 +140,9 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                     <X className="w-6 h-6" />
                 </button>
 
-                <div className="mb-4 mt-6 flex justify-center">
-                    <div className={`w-20 h-20 sm:w-24 sm:h-24 ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse mx-auto`}>
-                        <div className="flex items-center justify-center w-full h-full">
-                            {steps[step].icon}
-                        </div>
+                <div className="mb-4 mt-6 w-full flex items-center justify-center">
+                    <div className={`w-20 h-20 sm:w-24 sm:h-24 ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full grid place-items-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse`}>
+                        {steps[step].icon}
                     </div>
                 </div>
 

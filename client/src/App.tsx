@@ -26,6 +26,7 @@ import GroupChatPage from './pages/GroupChatPage';
 import MarketPage from './pages/MarketPage';
 import PhotoCatalogPage from './pages/PhotoCatalogPage';
 import ProductStore from './pages/ProductStore';
+import ExplorePage from './pages/ExplorePage';
 import ProductDetails from './pages/ProductDetails';
 import FeedbackPage from './pages/FeedbackPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
@@ -64,6 +65,7 @@ function App() {
           <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
           <Route path="/ranking" element={<PrivateRoute><RankingPage /></PrivateRoute>} />
+          <Route path="/explore" element={<PrivateRoute><ExplorePage /></PrivateRoute>} />
           <Route path="/rewards" element={<PrivateRoute><RewardsPage /></PrivateRoute>} />
           <Route path="/highlights" element={<PrivateRoute><HighlightsPage /></PrivateRoute>} />
           <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />

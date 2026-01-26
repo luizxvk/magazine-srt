@@ -60,14 +60,21 @@ export default function Rewards() {
 
     const loadData = async () => {
         try {
-            const [rewardsRes, redemptionsRes, historyRes] = await Promise.all([
+            const [rewardsRes, redemptionsRes] = await Promise.all([
                 api.get('/gamification/rewards'),
-                api.get('/gamification/rewards/my'),
-                api.get('/gamification/zions-history')
+                api.get('/gamification/rewards/my')
             ]);
             setRewards(rewardsRes.data);
             setRedemptions(redemptionsRes.data);
-            setZionHistory(historyRes.data);
+            
+            // Load zions history separately (may fail if table doesn't exist yet)
+            try {
+                const historyRes = await api.get('/gamification/zions-history');
+                setZionHistory(historyRes.data);
+            } catch (historyError) {
+                console.warn('Zions history not available yet:', historyError);
+                setZionHistory([]);
+            }
         } catch (error) {
             console.error('Failed to load rewards data', error);
         } finally {

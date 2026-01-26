@@ -89,7 +89,12 @@ export const getBadges = async (req: Request, res: Response) => {
 export const getRewards = async (req: Request, res: Response) => {
     try {
         const rewards = await prisma.reward.findMany({
-            where: { stock: { gt: 0 } },
+            where: {
+                OR: [
+                    { stock: { gt: 0 } },
+                    { isUnlimited: true }
+                ]
+            },
             orderBy: { costZions: 'asc' }
         });
         res.json(rewards);

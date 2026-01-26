@@ -13,13 +13,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { id: 'home', icon: Home, label: 'Home', path: '/feed' },
-    { id: 'explore', icon: Search, label: 'Explorar', path: '/ranking' },
+    { id: 'explore', icon: Search, label: 'Explorar', path: '/explore' },
     { id: 'store', icon: ShoppingBag, label: 'Loja', path: '/loja' },
     { id: 'profile', icon: User, label: 'Perfil', path: '/profile' },
 ];
 
 export default function BottomNavigation() {
-    const { user } = useAuth();
+    const { user, isMobileDrawerOpen } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(true);
@@ -37,6 +37,30 @@ export default function BottomNavigation() {
     // Don't show on auth pages or desktop
     const hiddenPaths = ['/', '/login', '/register', '/request-invite', '/reset-password'];
     const shouldHide = hiddenPaths.includes(location.pathname);
+
+    // Detect if any modal/popup is open by checking common modal classes in DOM
+    const [hasOpenModal, setHasOpenModal] = useState(false);
+    
+    useEffect(() => {
+        const checkForModals = () => {
+            // Check for common modal indicators
+            const modalOverlays = document.querySelectorAll('[role="dialog"], .fixed.inset-0, [data-modal="true"]');
+            const hasVisibleModal = Array.from(modalOverlays).some(el => {
+                const style = window.getComputedStyle(el);
+                return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+            });
+            setHasOpenModal(hasVisibleModal);
+        };
+        
+        // Use MutationObserver to detect DOM changes
+        const observer = new MutationObserver(checkForModals);
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        
+        // Initial check
+        checkForModals();
+        
+        return () => observer.disconnect();
+    }, []);
 
     // Update active based on current path
     useEffect(() => {
@@ -63,7 +87,8 @@ export default function BottomNavigation() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY]);
 
-    if (shouldHide || !user) return null;
+    // Hide when drawer/modal is open or should be hidden
+    if (shouldHide || !user || isMobileDrawerOpen || hasOpenModal) return null;
 
     return (
         <>

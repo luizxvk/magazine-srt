@@ -32,6 +32,7 @@ import FeedbackPage from './pages/FeedbackPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
+import Toast from './components/Toast';
 import MessagePopup from './components/MessagePopup';
 import DevBanner from './components/DevBanner';
 import VerificationPrompt from './components/VerificationPrompt';
@@ -91,6 +92,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <AchievementWrapper />
+        <ToastWrapper />
         <ZionsModalWrapper />
         <SessionExpiredWrapper />
         <WhatsNewModal />
@@ -115,6 +117,21 @@ function AchievementWrapper() {
       title={achievement.title}
       description={achievement.description}
       onClose={clearAchievement}
+    />
+  );
+}
+
+function ToastWrapper() {
+  const { toastData, clearToast } = useAuth();
+
+  if (!toastData) return null;
+
+  return (
+    <Toast
+      message={toastData.message}
+      description={toastData.description}
+      type={toastData.type}
+      onClose={clearToast}
     />
   );
 }

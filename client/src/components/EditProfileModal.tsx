@@ -12,7 +12,7 @@ interface EditProfileModalProps {
 }
 
 export default function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, showError, showWarning } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
     const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
@@ -54,7 +54,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
             onClose();
         } catch (error: any) {
             console.error('Failed to update profile', error);
-            alert(`Failed to update profile: ${error.response?.data?.error || error.message}`);
+            showError('Erro ao atualizar perfil', error.response?.data?.error || error.message);
         } finally {
             setLoading(false);
         }
@@ -66,7 +66,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
             window.location.href = '/login';
         } catch (error) {
             console.error('Failed to delete account', error);
-            alert('Erro ao excluir conta.');
+            showError('Erro ao excluir conta', 'Tente novamente mais tarde.');
         }
     };
 
@@ -110,7 +110,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                                             // Check file size limit (2MB max)
                                             const maxSize = 2 * 1024 * 1024; // 2MB in bytes
                                             if (file.size > maxSize) {
-                                                alert('O arquivo é muito grande. Tamanho máximo: 2MB');
+                                                showWarning('Arquivo muito grande', 'Tamanho máximo: 2MB');
                                                 e.target.value = '';
                                                 return;
                                             }
@@ -119,13 +119,13 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                                             if (file.type === 'image/gif') {
                                                 const currentLevel = user?.level || 1;
                                                 if (currentLevel < 15) {
-                                                    alert('GIFs de perfil são permitidos apenas para usuários Nível 15 ou superior!');
+                                                    showWarning('Recurso bloqueado', 'GIFs de perfil são permitidos apenas para Nível 15+');
                                                     e.target.value = '';
                                                     return;
                                                 }
                                                 // GIF size limit is stricter
                                                 if (file.size > maxSize) {
-                                                    alert('GIFs devem ter no máximo 2MB');
+                                                    showWarning('GIF muito grande', 'GIFs devem ter no máximo 2MB');
                                                     e.target.value = '';
                                                     return;
                                                 }

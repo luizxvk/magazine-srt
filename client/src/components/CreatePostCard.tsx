@@ -9,7 +9,7 @@ interface CreatePostCardProps {
 }
 
 export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
-    const { user, showAchievement, updateUser, theme } = useAuth();
+    const { user, showSuccess, showError, updateUser, theme } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaUrl, setMediaUrl] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
@@ -58,11 +58,11 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             const userRes = await api.get('/users/me');
             updateUser(userRes.data);
             
-            showAchievement('Post Publicado!', 'Sua publicação está no ar.');
+            showSuccess('Post Publicado!', 'Sua publicação está no ar.');
             onPostCreated();
         } catch (error: any) {
             console.error('Failed to create post', error);
-            showAchievement('Erro', error.response?.data?.error || 'Falha ao publicar');
+            showError('Falha ao publicar', error.response?.data?.error || 'Tente novamente mais tarde.');
         } finally {
             setLoading(false);
         }

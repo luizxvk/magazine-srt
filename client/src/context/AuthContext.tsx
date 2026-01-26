@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 import DailyLoginModal from '../components/DailyLoginModal';
+import type { ToastType } from '../components/Toast';
+
+export interface ToastData {
+    message: string;
+    description?: string;
+    type: ToastType;
+}
 
 interface User {
     id: string;
@@ -50,6 +57,13 @@ interface AuthContextType {
     achievement: { title: string; description: string } | null;
     showToast: (message: string) => void;
     toast: string | null;
+    // Typed toasts
+    toastData: ToastData | null;
+    showSuccess: (message: string, description?: string) => void;
+    showError: (message: string, description?: string) => void;
+    showWarning: (message: string, description?: string) => void;
+    showInfo: (message: string, description?: string) => void;
+    clearToast: () => void;
     dailyLoginStatus: DailyLoginStatus | null;
     openDailyLoginModal: () => void;
     // Zions Modal
@@ -131,6 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [loading, setLoading] = useState(true);
     const [achievement, setAchievement] = useState<{ title: string; description: string } | null>(null);
     const [toast, setToast] = useState<string | null>(null);
+    const [toastData, setToastData] = useState<ToastData | null>(null);
     const [dailyLoginStatus, setDailyLoginStatus] = useState<DailyLoginStatus | null>(null);
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
@@ -475,6 +490,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTimeout(() => setToast(null), 2000);
     };
 
+    // Typed toast functions
+    const showSuccess = (message: string, description?: string) => {
+        setToastData({ message, description, type: 'success' });
+    };
+
+    const showError = (message: string, description?: string) => {
+        setToastData({ message, description, type: 'error' });
+    };
+
+    const showWarning = (message: string, description?: string) => {
+        setToastData({ message, description, type: 'warning' });
+    };
+
+    const showInfo = (message: string, description?: string) => {
+        setToastData({ message, description, type: 'info' });
+    };
+
+    const clearToast = () => {
+        setToastData(null);
+    };
+
     const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {
         localStorage.setItem('token', token);
 
@@ -622,6 +658,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             achievement,
             showToast,
             toast,
+            toastData,
+            showSuccess,
+            showError,
+            showWarning,
+            showInfo,
+            clearToast,
             dailyLoginStatus,
             openDailyLoginModal: () => setIsDailyLoginModalOpen(true),
             isZionsModalOpen,

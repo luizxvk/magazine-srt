@@ -29,7 +29,7 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, onClose }: ChatWindowProps) {
-    const { user, theme, setActiveChatUserId } = useAuth();
+    const { user, theme, setActiveChatUserId, showError } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -102,7 +102,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
             setMessages(messages.filter(msg => msg.id !== messageId));
         } catch (error) {
             console.error('Failed to delete message', error);
-            alert('Erro ao deletar mensagem');
+            showError('Erro ao deletar mensagem');
         }
     };
 

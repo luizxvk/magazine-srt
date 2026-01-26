@@ -8,8 +8,11 @@ import { uploadPostImage, uploadStoryImage } from '../services/cloudinaryService
 const prisma = new PrismaClient();
 
 const createPostSchema = z.object({
-    imageUrl: z.string().url(),
+    imageUrl: z.string().url().optional().nullable(),
+    videoUrl: z.string().url().optional().nullable(),
     caption: z.string().optional(),
+    isHighlight: z.boolean().optional(),
+    tags: z.array(z.string()).optional(),
 });
 
 const commentSchema = z.object({
@@ -228,11 +231,16 @@ export const createPost = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        const { imageUrl, caption } = createPostSchema.parse(req.body);
+        const { imageUrl, videoUrl, caption, isHighlight, tags } = createPostSchema.parse(req.body);
+
+        // Validate: must have either caption or media
+        if (!caption?.trim() && !imageUrl && !videoUrl) {
+            return res.status(400).json({ error: 'Post deve ter texto ou mídia' });
+        }
 
         // Upload to Cloudinary CDN if base64 (reduces DB egress)
-        let finalImageUrl = imageUrl;
-        if (imageUrl.startsWith('data:')) {
+        let finalImageUrl = imageUrl || null;
+        if (imageUrl && imageUrl.startsWith('data:')) {
             const cloudinaryUrl = await uploadPostImage(imageUrl);
             if (cloudinaryUrl) {
                 finalImageUrl = cloudinaryUrl;
@@ -253,11 +261,20 @@ export const createPost = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'Você atingiu o limite de 10 postagens por dia.' });
         }
 
+        // Create post with tags
         const post = await prisma.post.create({
             data: {
                 userId,
                 imageUrl: finalImageUrl,
+                videoUrl: videoUrl || null,
                 caption,
+                isHighlight: isHighlight || false,
+                tags: tags && tags.length > 0 ? {
+                    connectOrCreate: tags.map((tag: string) => ({
+                        where: { name: tag },
+                        create: { name: tag }
+                    }))
+                } : undefined,
             },
             include: {
                 user: {
@@ -268,6 +285,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                         avatarUrl: true,
                     },
                 },
+                tags: true,
             },
         });
 

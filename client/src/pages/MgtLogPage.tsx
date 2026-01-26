@@ -74,7 +74,7 @@ const defaultPlans: Plan[] = [
 ];
 
 export default function MgtLogPage() {
-    const { user } = useAuth();
+    const { user, showError } = useAuth();
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     const isAdmin = user?.role === 'ADMIN';
@@ -128,11 +128,11 @@ export default function MgtLogPage() {
             if (data.init_point) {
                 window.location.href = data.init_point;
             } else {
-                alert('Erro ao iniciar pagamento. Tente novamente.');
+                showError('Erro ao iniciar pagamento', 'Tente novamente.');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Erro ao conectar com o servidor.');
+            showError('Erro ao conectar', 'Não foi possível conectar com o servidor.');
         } finally {
             setLoading(null);
         }

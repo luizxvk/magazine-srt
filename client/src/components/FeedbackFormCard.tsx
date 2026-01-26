@@ -9,7 +9,7 @@ interface FeedbackFormCardProps {
 }
 
 export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
-    const { user, theme, accentColor, isVisitor } = useAuth();
+    const { user, theme, accentColor, isVisitor, showError, showWarning } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
     const [canSubmit, setCanSubmit] = useState(true);
@@ -81,7 +81,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
         
         for (const field of ratingFields) {
             if (formData[field as keyof typeof formData] === 0) {
-                alert('Por favor, preencha todas as avaliações de 1 a 5.');
+                showWarning('Avaliações pendentes', 'Preencha todas as avaliações de 1 a 5.');
                 return;
             }
         }
@@ -91,7 +91,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
             await api.post('/feedback', formData);
             setSubmitted(true);
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao enviar feedback');
+            showError('Erro ao enviar feedback', error.response?.data?.error);
         } finally {
             setSubmitting(false);
         }

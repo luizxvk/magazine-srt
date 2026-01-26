@@ -24,7 +24,7 @@ interface BadgeTemplate {
 }
 
 const BadgeManager: React.FC = () => {
-    const { theme } = useAuth();
+    const { theme, showError, showWarning } = useAuth();
     const [badges, setBadges] = useState<AdminBadge[]>([]);
     const [templates, setTemplates] = useState<BadgeTemplate[]>([]);
     const [loading, setLoading] = useState(true);
@@ -81,7 +81,7 @@ const BadgeManager: React.FC = () => {
 
     const handleCreateBadge = async () => {
         if (!badgeText.trim() || !userId) {
-            alert('Por favor, preencha todos os campos');
+            showWarning('Campos obrigatórios', 'Preencha todos os campos');
             return;
         }
 
@@ -103,7 +103,7 @@ const BadgeManager: React.FC = () => {
             fetchBadges();
         } catch (error: any) {
             console.error('Error creating badge:', error);
-            alert(error.response?.data?.error || 'Erro ao criar selo');
+            showError('Erro ao criar selo', error.response?.data?.error);
         }
     };
 
@@ -115,7 +115,7 @@ const BadgeManager: React.FC = () => {
             fetchBadges();
         } catch (error) {
             console.error('Error deleting badge:', error);
-            alert('Erro ao remover selo');
+            showError('Erro ao remover selo');
         }
     };
 

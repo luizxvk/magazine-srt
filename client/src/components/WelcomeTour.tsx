@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, Star, Award, Layout, Zap, ShoppingBag, Calendar, Users, Radio, Trophy, Sparkles } from 'lucide-react';
+import { X, ChevronRight, Star, Layout, Zap, ShoppingBag, Calendar, Trophy, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function WelcomeTour() {
@@ -7,7 +7,6 @@ export default function WelcomeTour() {
     const [step, setStep] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
-    const accentColor = isMGT ? 'emerald' : 'gold';
 
     useEffect(() => {
         const hasSeenTour = localStorage.getItem('has_seen_tour');

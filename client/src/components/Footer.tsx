@@ -19,10 +19,20 @@ export default function Footer() {
         : 'local';
 
     return (
-        <footer className="fixed bottom-4 right-4 z-10 pointer-events-none">
-            <div className={`text-xs ${theme === 'light' ? 'text-gray-400' : 'text-gray-600'} font-mono`}>
-                {version}{commitHash}{buildDate}
+        <>
+            {/* Rovex Watermark - Bottom Left */}
+            <div className="fixed bottom-4 left-4 z-10 pointer-events-none">
+                <div className={`text-[10px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-600'} font-light tracking-wider opacity-60`}>
+                    Powered by <span className="font-medium">Rovex</span>
+                </div>
             </div>
-        </footer>
+
+            {/* Version Info - Bottom Right */}
+            <footer className="fixed bottom-4 right-4 z-10 pointer-events-none">
+                <div className={`text-xs ${theme === 'light' ? 'text-gray-400' : 'text-gray-600'} font-mono`}>
+                    {version}{commitHash}{buildDate}
+                </div>
+            </footer>
+        </>
     );
 }

@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 
 export default function MarketCard() {
     const navigate = useNavigate();
-    const { user, accentColor } = useAuth();
+    const { user, accentColor, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
     // Use accentColor from context (already resolved from equippedColor key to hex)
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const backgroundAccent = accentColor || defaultColor;
+    const themeBg = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
     
     const handleTabNavigation = (tab: string) => {
         navigate('/market', { state: { activeTab: tab } });
@@ -17,7 +18,7 @@ export default function MarketCard() {
 
     return (
         <div 
-            className="glass-panel rounded-xl p-5 border transition-all duration-300 group cursor-pointer relative overflow-hidden"
+            className={`${themeBg} backdrop-blur-xl rounded-xl p-5 border transition-all duration-300 group cursor-pointer relative overflow-hidden`}
             style={{ 
                 borderColor: `${backgroundAccent}33`,
             }}

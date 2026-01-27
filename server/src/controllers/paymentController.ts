@@ -68,7 +68,14 @@ export const createPixPayment = async (req: Request, res: Response) => {
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
         // Criar pagamento PIX
-        const webhookUrl = process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/payments/webhook` : undefined;
+        // Garantir que BACKEND_URL tem https://
+        let webhookUrl: string | undefined = undefined;
+        if (process.env.BACKEND_URL) {
+            const baseUrl = process.env.BACKEND_URL.startsWith('http') 
+                ? process.env.BACKEND_URL 
+                : `https://${process.env.BACKEND_URL}`;
+            webhookUrl = `${baseUrl}/api/payments/webhook`;
+        }
         
         const result = await payment.create({
             body: {

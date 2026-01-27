@@ -360,19 +360,21 @@
     }
 }
 
-@keyframes wave-motion {
-    0%, 100% {
-        transform: translateX(0) translateY(0);
-        border-radius: 1000% 1000% 0 0;
+@keyframes wave {
+    2% {
+        transform: translateX(1);
     }
     25% {
-        transform: translateX(-25%) translateY(2%);
+        transform: translateX(-25%);
     }
     50% {
-        transform: translateX(-50%) translateY(0);
+        transform: translateX(-50%);
     }
     75% {
-        transform: translateX(-25%) translateY(-2%);
+        transform: translateX(-25%);
+    }
+    100% {
+        transform: translateX(1);
     }
 }
 
@@ -383,33 +385,40 @@
         rgba(48,238,226,1) 68%, 
         rgba(255,25,25,1) 98%);
     background-size: 400% 400%;
+    background-attachment: fixed;
     animation: gradient-waves-flow 15s ease infinite;
-    overflow: hidden;
+    overflow: auto;
     position: relative;
 }
 
+/* Wave elements - use with child divs or pseudo-elements */
+.anim-gradient-waves .wave,
 .anim-gradient-waves::before,
 .anim-gradient-waves::after {
-    content: '';
+    background: rgb(255 255 255 / 25%);
+    border-radius: 1000% 1000% 0 0;
     position: fixed;
     width: 200%;
     height: 12em;
+    animation: wave 10s -3s linear infinite;
+    transform: translate3d(0, 0, 0);
+    opacity: 0.8;
     bottom: 0;
     left: 0;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 1000% 1000% 0 0;
     z-index: 0;
     pointer-events: none;
 }
 
 .anim-gradient-waves::before {
-    animation: wave-motion 10s linear infinite;
-    opacity: 0.6;
+    content: '';
+    bottom: -1.25em;
+    animation: wave 18s linear reverse infinite;
+    opacity: 0.8;
 }
 
 .anim-gradient-waves::after {
-    bottom: -1.5em;
-    animation: wave-motion 18s linear infinite reverse;
-    opacity: 0.4;
-    height: 14em;
+    content: '';
+    bottom: -2.5em;
+    animation: wave 20s -1s reverse infinite;
+    opacity: 0.9;
 }

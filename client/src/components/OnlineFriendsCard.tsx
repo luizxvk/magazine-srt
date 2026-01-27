@@ -34,7 +34,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
     const themeGlow = isMGT
         ? 'shadow-[0_0_20px_rgba(16,185,129,0.15)]'
         : 'shadow-[0_0_20px_rgba(212,175,55,0.15)]';
-    const bgColor = theme === 'light' ? 'bg-white/80' : 'bg-white/5';
+    const bgColor = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
 
     useEffect(() => {
         const fetchOnlineFriends = async () => {

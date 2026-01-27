@@ -125,17 +125,10 @@ export default function GroupSettingsModal({
     }
   };
 
-  const handleBackgroundSelect = async (backgroundId: string) => {
+  const handleBackgroundSelect = (backgroundId: string) => {
     if (!isAdmin) return;
-    setLoading(true);
-    try {
-      await api.put(`/groups/${groupId}/background`, { backgroundId });
-      onBackgroundChange(backgroundId);
-    } catch (error) {
-      console.error('Error updating background:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Just call the parent handler - it handles the API call
+    onBackgroundChange(backgroundId);
   };
 
   const handleRemoveMember = async (memberId: string) => {

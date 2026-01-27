@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Palette, Image, Award, ChevronRight, Sparkles } from 'lucide-react';
+import { Package, Palette, Image, Award, ChevronRight, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface InventoryItem {
@@ -247,8 +247,8 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
                                         />
                                     )}
                                     {item.isEquipped && (
-                                        <div className="absolute top-0 right-0 w-2 h-2 rounded-full m-0.5" style={{ backgroundColor: accentColor }}>
-                                            <Sparkles className="w-2 h-2 text-black" />
+                                        <div className="absolute top-0 right-0 w-4 h-4 rounded-full m-0.5 flex items-center justify-center" style={{ backgroundColor: accentColor }}>
+                                            <Check className="w-3 h-3 text-black" />
                                         </div>
                                     )}
                                 </div>

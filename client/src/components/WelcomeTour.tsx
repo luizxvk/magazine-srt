@@ -134,15 +134,18 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
 
                 <button
                     onClick={handleClose}
-                    className={`absolute top-4 right-4 ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-white'} transition-colors`}
+                    className={`absolute top-4 right-4 ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-white'} transition-colors z-10`}
                     aria-label="Fechar tour"
                 >
                     <X className="w-6 h-6" />
                 </button>
 
-                <div className="my-8 w-full flex items-center justify-center">
-                    <div className={`w-20 h-20 sm:w-24 sm:h-24 ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse`}>
-                        {steps[step].icon}
+                {/* Icon centered in card - pushed down to account for badge */}
+                <div className="pt-6 pb-4">
+                    <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+                        <div className={`w-full h-full ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse`}>
+                            {steps[step].icon}
+                        </div>
                     </div>
                 </div>
 

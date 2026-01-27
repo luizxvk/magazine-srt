@@ -80,9 +80,9 @@ export default function HighlightsPage() {
             <LuxuriousBackground />
             <Header />
 
-            <div className="max-w-7xl mx-auto pt-24 px-4 relative z-10">
+            <div className="max-w-7xl mx-auto pt-28 px-4 relative z-10">
                 {/* Header with title and controls */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 mt-4">
                     {/* Title - Styled like PhotoCatalog */}
                     <div className={`flex items-center gap-4 p-4 rounded-xl ${
                         theme === 'light' 

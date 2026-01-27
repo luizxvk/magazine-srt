@@ -736,36 +736,35 @@ export default function GroupChatPage() {
                         </div>
                       )}
 
-                      <span className="text-xs text-gray-400 mt-1 ${isMe ? 'mr-2' : 'ml-2'}">
+                      <span className={`text-xs text-gray-400 mt-1 ${isMe ? 'mr-2' : 'ml-2'}`}>
                         {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}
+                        {/* Show reactor avatars inline */}
+                        {msg.reactions && msg.reactions.length > 0 && (
+                          <span className="ml-2 inline-flex -space-x-1">
+                            {Array.from(new Set(msg.reactions.map(r => r.userId))).slice(0, 3).map((userId) => {
+                              const reactor = msg.reactions?.find(r => r.userId === userId)?.user;
+                              if (!reactor) return null;
+                              return (
+                                <img
+                                  key={userId}
+                                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(reactor.displayName || reactor.name)}&size=16`}
+                                  alt={reactor.displayName || reactor.name}
+                                  className="w-4 h-4 rounded-full border border-gray-800 inline-block"
+                                  title={reactor.displayName || reactor.name}
+                                />
+                              );
+                            })}
+                            {Array.from(new Set(msg.reactions?.map(r => r.userId) || [])).length > 3 && (
+                              <span className="w-4 h-4 rounded-full bg-gray-700 flex items-center justify-center text-[8px] text-white border border-gray-800 inline-flex">
+                                +{Array.from(new Set(msg.reactions?.map(r => r.userId) || [])).length - 3}
+                              </span>
+                            )}
+                          </span>
+                        )}
                       </span>
-
-                      {/* Read receipts - small avatars for who has seen the message */}
-                      {isMe && (
-                        <div className="flex -space-x-1 mt-1 mr-2">
-                          {group?.members
-                            .filter(m => m.userId !== user?.id)
-                            .slice(0, 3)
-                            .map((member) => (
-                              <img
-                                key={member.id}
-                                src={member.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.user.name)}&size=16`}
-                                alt={member.user.name}
-                                className="w-4 h-4 rounded-full border border-gray-800"
-                                title={member.user.displayName || member.user.name}
-                              />
-                            ))
-                          }
-                          {(group?.members.length || 0) > 4 && (
-                            <div className="w-4 h-4 rounded-full bg-gray-700 flex items-center justify-center text-[8px] text-white border border-gray-800">
-                              +{(group?.members.length || 0) - 4}
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </motion.div>
                 );

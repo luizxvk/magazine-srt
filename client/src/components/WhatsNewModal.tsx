@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Zap, MessageCircle, Users, Palette, ChevronDown } from 'lucide-react';
+import { X, Sparkles, Check, Zap, MessageCircle, Users, Palette, ChevronDown, Sun, Triangle, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.12';
+const CURRENT_VERSION = '0.4.13';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,42 +33,42 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.12 - GROUP CHAT IMPROVEMENTS & UX
+    // v0.4.13 - PREMIUM ANIMATED BACKGROUNDS
     const updates: UpdateItem[] = [
         {
-            icon: <MessageCircle className="w-5 h-5 text-blue-500" />,
-            title: '💬 Reações nos Grupos',
-            description: 'Agora você pode reagir às mensagens com emojis! Basta passar o mouse sobre uma mensagem.',
+            icon: <Sun className="w-5 h-5 text-pink-400" />,
+            title: '🌈 Rainbow Skies',
+            description: 'Novo fundo animado premium com raios de arco-íris! Ativa automaticamente o modo claro.',
             isNew: true
         },
         {
-            icon: <MessageCircle className="w-5 h-5 text-purple-500" />,
-            title: '↩️ Responder Mensagens',
-            description: 'Responda diretamente a qualquer mensagem nos grupos com o botão de reply.',
+            icon: <Triangle className="w-5 h-5 text-amber-400" />,
+            title: '🔺 Infinite Triangles',
+            description: 'Fundo animado com grid hexagonal e triângulos SVG que usam sua cor de destaque.',
             isNew: true
         },
         {
-            icon: <Palette className="w-5 h-5 text-emerald-500" />,
-            title: '🎨 Fundo dos Grupos',
-            description: 'Administradores agora podem mudar o fundo dos grupos nas configurações!',
-            isNew: true
-        },
-        {
-            icon: <ChevronDown className="w-5 h-5 text-amber-500" />,
-            title: '📜 Carregar Mais no Feed',
-            description: 'Novo botão "Carregar Mais" no feed para ver posts antigos sem perder os atuais.',
+            icon: <Star className="w-5 h-5 text-purple-400" />,
+            title: '⭐ Categoria Featured',
+            description: 'Nova seção "Featured" na loja de personalização para fundos animados premium!',
             isNew: true
         },
         {
             icon: <Users className="w-5 h-5 text-cyan-500" />,
-            title: '👥 Ver Mais Recomendados',
-            description: 'Na aba Social, agora você pode ver todos os usuários recomendados com o botão "Ver Mais".',
+            title: '👤 Perfis de Outros Usuários',
+            description: 'Agora você pode clicar em membros no Explorar e ver seus perfis completos.',
             isNew: true
         },
         {
-            icon: <Zap className="w-5 h-5 text-yellow-500" />,
-            title: '⭐ Novo Timeline de Nível',
-            description: 'Timeline de nível redesenhado com botões menores e barra de XP visível no topo.',
+            icon: <Palette className="w-5 h-5 text-emerald-500" />,
+            title: '🎨 Ondas Gradiente Aprimorado',
+            description: 'Animação CSS do fundo "Ondas Gradiente" redesenhada com especificação exata.',
+            isNew: true
+        },
+        {
+            icon: <Sparkles className="w-5 h-5 text-blue-500" />,
+            title: '🔧 Correções de Bugs',
+            description: 'Corrigido scroll bloqueado em Triângulos Cósmicos, reações em grupos e erros de build.',
             isNew: true
         }
     ];

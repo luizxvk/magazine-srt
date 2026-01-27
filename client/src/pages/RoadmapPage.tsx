@@ -269,6 +269,24 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Sparkles className="w-5 h-5" />,
         category: 'improvement'
     },
+    {
+        id: '29e',
+        title: 'Reações e Replies nos Grupos',
+        description: 'Reaja com emojis e responda diretamente às mensagens nos chats de grupo.',
+        status: 'completed',
+        version: 'v0.4.12',
+        icon: <MessageSquare className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29f',
+        title: 'Fundos Animados Premium',
+        description: 'Rainbow Skies (raios arco-íris com modo claro) e Infinite Triangles (grid hexagonal com cor de destaque). Categoria Featured na loja!',
+        status: 'completed',
+        version: 'v0.4.13',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'feature'
+    },
     
     // ===== IN PROGRESS =====
     {

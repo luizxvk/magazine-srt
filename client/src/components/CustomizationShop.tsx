@@ -960,7 +960,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                     );
                                 })}
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </motion.div>
             </motion.div>

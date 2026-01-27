@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CommunityProvider } from './context/CommunityContext';
 import PrivateRoute from './components/PrivateRoute';
@@ -48,6 +48,12 @@ import MiniRadioPlayer from './components/MiniRadioPlayer';
 // Initialize Logger
 logger.init();
 
+// Wrapper component to redirect /profile/:id to /profile?id=:id
+function ProfileRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/profile?id=${id}`} replace />;
+}
+
 function App() {
   return (
     <CommunityProvider>
@@ -65,6 +71,7 @@ function App() {
           <Route path="/feed" element={<PrivateRoute><FeedPage /></PrivateRoute>} />
           <Route path="/post/:id" element={<PrivateRoute><PostPage /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+          <Route path="/profile/:id" element={<PrivateRoute><ProfileRedirect /></PrivateRoute>} />
           <Route path="/social" element={<PrivateRoute><SocialPage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
           <Route path="/ranking" element={<PrivateRoute><RankingPage /></PrivateRoute>} />

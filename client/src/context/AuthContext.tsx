@@ -16,6 +16,7 @@ interface User {
     role: string;
     points: number;
     trophies: number;
+    xp: number; // XP para cálculo de nível
     zions: number; // DEPRECATED - manter para compatibilidade
     zionsPoints: number; // Moeda para customizações (100 points = 1 cash)
     zionsCash: number; // Moeda real (1 cash = R$ 1,00)
@@ -31,6 +32,11 @@ interface User {
     equippedBadge?: string | null;
     equippedColor?: string | null;
     liteMode?: boolean;
+    // Profile card background
+    profileBgUrl?: string | null;
+    profileBgScale?: number | null;
+    profileBgPosX?: number | null;
+    profileBgPosY?: number | null;
 }
 
 export interface DailyLoginStatus {
@@ -586,6 +592,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             zionsPoints: 0,
             zionsCash: 0,
             level: 0,
+            xp: 0,
             membershipType: membershipType,
             displayName: 'Visitante',
             bio: 'Explorando o Clube Magazine'

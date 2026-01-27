@@ -149,16 +149,39 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             {/* Quick Stats */}
             <div className={`mt-4 ${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-4 transition-all duration-300`}>
                 <p className={`text-xs ${textSub} mb-2`}>Seu progresso</p>
-                <div className="flex items-center justify-between">
-                    <span className={`text-sm ${textMain}`}>Nível {user?.level || 1}</span>
-                    <span className={`text-xs ${themeIconColor}`}>{user?.points || 0} pts</span>
-                </div>
-                <div className={`mt-2 h-1.5 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
-                    <div 
-                        className={`h-full rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} transition-all duration-500`}
-                        style={{ width: `${Math.min(((user?.points || 0) % 1000) / 10, 100)}%` }}
-                    />
-                </div>
+                {(() => {
+                    // XP Table matching server: Level X requires XP_TABLE[X-1] total XP
+                    const XP_TABLE = Array.from({ length: 30 }, (_, i) => {
+                        const level = i + 1;
+                        if (level === 1) return 0;
+                        return Math.floor(1000 * Math.pow(level - 1, 1.2));
+                    });
+                    
+                    const currentLevel = user?.level || 1;
+                    const currentXP = user?.xp || 0;
+                    const currentLevelXP = XP_TABLE[currentLevel - 1] || 0;
+                    const nextLevelXP = XP_TABLE[currentLevel] || XP_TABLE[29];
+                    const xpInCurrentLevel = currentXP - currentLevelXP;
+                    const xpNeededForNextLevel = nextLevelXP - currentLevelXP;
+                    const progressPercent = xpNeededForNextLevel > 0 
+                        ? Math.min((xpInCurrentLevel / xpNeededForNextLevel) * 100, 100)
+                        : 100;
+
+                    return (
+                        <>
+                            <div className="flex items-center justify-between">
+                                <span className={`text-sm ${textMain}`}>Nível {currentLevel}</span>
+                                <span className={`text-xs ${themeIconColor}`}>{xpInCurrentLevel} / {xpNeededForNextLevel} XP</span>
+                            </div>
+                            <div className={`mt-2 h-1.5 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
+                                <div 
+                                    className={`h-full rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} transition-all duration-500`}
+                                    style={{ width: `${progressPercent}%` }}
+                                />
+                            </div>
+                        </>
+                    );
+                })()}
             </div>
 
             {/* Online Friends Card */}

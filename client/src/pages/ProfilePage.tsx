@@ -60,13 +60,18 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (profileUser) {
-            const savedBg = localStorage.getItem(`profile_bg_${profileUser.id}`);
-            const savedBgSettings = localStorage.getItem(`profile_bg_settings_${profileUser.id}`);
-            if (savedBg) setBgImage(savedBg);
-            if (savedBgSettings) {
-                const settings = JSON.parse(savedBgSettings);
-                setBgScale(settings.scale || 1);
-                setBgPosition(settings.position || { x: 50, y: 50 });
+            // Load background from database (visible to all users)
+            if (profileUser.profileBgUrl) {
+                setBgImage(profileUser.profileBgUrl);
+                setBgScale(profileUser.profileBgScale || 1);
+                setBgPosition({
+                    x: profileUser.profileBgPosX || 50,
+                    y: profileUser.profileBgPosY || 50
+                });
+            } else {
+                setBgImage(null);
+                setBgScale(1);
+                setBgPosition({ x: 50, y: 50 });
             }
 
             // Open chat if param is present
@@ -251,14 +256,25 @@ export default function ProfilePage() {
                         {/* Footer */}
                         <div className="p-4 border-t border-white/10 flex justify-between gap-3">
                             <button
-                                onClick={() => {
+                                onClick={async () => {
                                     if (currentUser) {
-                                        localStorage.removeItem(`profile_bg_${currentUser.id}`);
-                                        localStorage.removeItem(`profile_bg_settings_${currentUser.id}`);
-                                        setBgImage(null);
-                                        setTempBgImage(null);
-                                        setIsBgAdjustOpen(false);
-                                        showToast('Imagem de fundo removida', 'info');
+                                        try {
+                                            await api.put('/users/me/profile-background', {
+                                                profileBgUrl: null,
+                                                profileBgScale: 1,
+                                                profileBgPosX: 50,
+                                                profileBgPosY: 50
+                                            });
+                                            setBgImage(null);
+                                            setTempBgImage(null);
+                                            setBgScale(1);
+                                            setBgPosition({ x: 50, y: 50 });
+                                            setIsBgAdjustOpen(false);
+                                            showToast('Imagem de fundo removida', 'info');
+                                        } catch (error) {
+                                            console.error('Failed to remove background:', error);
+                                            showToast('Erro ao remover imagem', 'error');
+                                        }
                                     }
                                 }}
                                 className="px-4 py-2 rounded-full text-red-400 border border-red-500/30 hover:bg-red-500/10 text-sm"
@@ -273,16 +289,22 @@ export default function ProfilePage() {
                                     Cancelar
                                 </button>
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (currentUser && tempBgImage) {
-                                            localStorage.setItem(`profile_bg_${currentUser.id}`, tempBgImage);
-                                            localStorage.setItem(`profile_bg_settings_${currentUser.id}`, JSON.stringify({
-                                                scale: bgScale,
-                                                position: bgPosition
-                                            }));
-                                            setBgImage(tempBgImage);
-                                            setIsBgAdjustOpen(false);
-                                            showToast('Imagem de fundo atualizada!', 'success');
+                                            try {
+                                                const response = await api.put('/users/me/profile-background', {
+                                                    profileBgUrl: tempBgImage,
+                                                    profileBgScale: bgScale,
+                                                    profileBgPosX: bgPosition.x,
+                                                    profileBgPosY: bgPosition.y
+                                                });
+                                                setBgImage(response.data.profileBgUrl);
+                                                setIsBgAdjustOpen(false);
+                                                showToast('Imagem de fundo atualizada!', 'success');
+                                            } catch (error) {
+                                                console.error('Failed to save background:', error);
+                                                showToast('Erro ao salvar imagem', 'error');
+                                            }
                                         }
                                     }}
                                     className={`px-6 py-2 rounded-full text-black text-sm font-medium ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'}`}

@@ -196,6 +196,57 @@ const updateProfileSchema = z.object({
     zionsCash: z.number().min(0).optional(),
 });
 
+const updateProfileBgSchema = z.object({
+    profileBgUrl: z.string().nullable().optional(),
+    profileBgScale: z.number().min(0.5).max(3).optional(),
+    profileBgPosX: z.number().min(0).max(100).optional(),
+    profileBgPosY: z.number().min(0).max(100).optional(),
+});
+
+export const updateProfileBackground = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const data = updateProfileBgSchema.parse(req.body);
+
+        // Upload image to Cloudinary if base64
+        if (data.profileBgUrl && data.profileBgUrl.startsWith('data:')) {
+            console.log(`[updateProfileBg] Uploading background image to CDN...`);
+            const cloudinaryUrl = await uploadAvatar(data.profileBgUrl);
+            if (cloudinaryUrl) {
+                data.profileBgUrl = cloudinaryUrl;
+                console.log(`[updateProfileBg] Background uploaded: ${cloudinaryUrl.substring(0, 50)}...`);
+            }
+        }
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                profileBgUrl: data.profileBgUrl,
+                profileBgScale: data.profileBgScale,
+                profileBgPosX: data.profileBgPosX,
+                profileBgPosY: data.profileBgPosY,
+            },
+            select: {
+                id: true,
+                profileBgUrl: true,
+                profileBgScale: true,
+                profileBgPosX: true,
+                profileBgPosY: true,
+            },
+        });
+
+        res.json(user);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: (error as any).errors });
+        }
+        console.error('Error updating profile background:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const getMe = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
@@ -213,6 +264,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 role: true,
                 points: true,
                 trophies: true,
+                xp: true,
                 zions: true,
                 zionsPoints: true,
                 zionsCash: true,
@@ -224,6 +276,10 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 equippedBadge: true,
                 equippedColor: true,
                 isVerified: true,
+                profileBgUrl: true,
+                profileBgScale: true,
+                profileBgPosX: true,
+                profileBgPosY: true,
             },
         });
 
@@ -355,6 +411,10 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
                 equippedBackground: true,
                 equippedBadge: true,
                 equippedColor: true,
+                profileBgUrl: true,
+                profileBgScale: true,
+                profileBgPosX: true,
+                profileBgPosY: true,
             },
         });
 

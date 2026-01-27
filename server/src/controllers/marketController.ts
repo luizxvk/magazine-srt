@@ -315,7 +315,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { listingId } = req.params;
-    const { paymentMethod = 'CASH' } = req.body; // 'CASH' or 'POINTS'
+    const paymentMethod = req.body?.paymentMethod || 'CASH'; // 'CASH' or 'POINTS'
 
     if (!userId) {
       return res.status(401).json({ error: 'Não autenticado' });

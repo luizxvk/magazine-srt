@@ -55,6 +55,14 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     const canDelete = isMyStory || isAdmin;
     const accentColor = isMGT ? 'emerald-500' : 'gold-500';
 
+    // Emit event to hide/show bottom navigation when story viewer opens/closes
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('storyViewerStateChange', { detail: { isOpen: true } }));
+        return () => {
+            window.dispatchEvent(new CustomEvent('storyViewerStateChange', { detail: { isOpen: false } }));
+        };
+    }, []);
+
     useEffect(() => {
         if (currentStory) {
             onStoryViewed(currentStory.id);

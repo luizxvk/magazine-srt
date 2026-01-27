@@ -78,6 +78,7 @@ export default function BottomNavigation() {
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [activeId, setActiveId] = useState('home');
+    const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
 
@@ -86,6 +87,18 @@ export default function BottomNavigation() {
     const activeTextColor = isMGT ? 'text-emerald-400' : 'text-amber-400';
     const activeBgColor = isMGT ? 'bg-emerald-500/20' : 'bg-amber-500/20';
     const borderGlow = isMGT ? 'border-emerald-500/20' : 'border-amber-500/20';
+
+    // Listen for story viewer state changes
+    useEffect(() => {
+        const handleStoryViewerState = (e: CustomEvent<{ isOpen: boolean }>) => {
+            setIsStoryViewerOpen(e.detail.isOpen);
+        };
+
+        window.addEventListener('storyViewerStateChange', handleStoryViewerState as EventListener);
+        return () => {
+            window.removeEventListener('storyViewerStateChange', handleStoryViewerState as EventListener);
+        };
+    }, []);
 
     // Don't show on auth pages or desktop
     const hiddenPaths = ['/', '/login', '/register', '/request-invite', '/reset-password'];
@@ -130,8 +143,8 @@ export default function BottomNavigation() {
         navigate(item.path);
     }, [navigate]);
 
-    // Hide when drawer/modal is open or should be hidden
-    if (shouldHide || !user || isMobileDrawerOpen) return null;
+    // Hide when drawer/modal is open, story viewer is open, or should be hidden
+    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen) return null;
 
     return (
         <>

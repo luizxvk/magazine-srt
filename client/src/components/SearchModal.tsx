@@ -182,8 +182,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         setTimeout(() => {
             switch (result.type) {
                 case 'user':
-                    // Navigate to user profile
-                    window.location.href = `/profile/${result.id}`;
+                    // Navigate to user profile using navigate instead of window.location
+                    navigate(`/profile?id=${result.id}`);
                     break;
                 case 'post':
                     navigate(`/post/${result.id}`);

@@ -3,26 +3,29 @@ import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import WelcomeTour from './WelcomeTour';
 import WhatsNewModal from './WhatsNewModal';
+import EmailVerificationPopup from './EmailVerificationPopup';
 
-const CURRENT_VERSION = '0.4.10';
+const CURRENT_VERSION = '0.4.11';
 
 /**
  * Gerencia a ordem dos modais de onboarding:
  * 1. WelcomeTour (sempre que logar)
- * 2. WhatsNewModal (se houver novidades)
+ * 2. EmailVerificationPopup (se email não verificado)
+ * 3. WhatsNewModal (se houver novidades)
  */
 export default function OnboardingModals() {
     const { user } = useAuth();
     const location = useLocation();
     
     const [showWelcome, setShowWelcome] = useState(false);
+    const [showEmailVerification, setShowEmailVerification] = useState(false);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
     const hasCheckedRef = useRef(false);
     const lastUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
-        // Não mostrar em páginas de auth
-        const isAuthPage = ['/', '/login', '/register', '/request-invite', '/reset-password'].includes(location.pathname);
+        // Não mostrar em páginas de auth ou verificação
+        const isAuthPage = ['/', '/login', '/register', '/request-invite', '/reset-password', '/verify-email'].includes(location.pathname);
         if (!user || isAuthPage) return;
 
         // Se o usuário mudou, resetar o check
@@ -46,10 +49,25 @@ export default function OnboardingModals() {
             localStorage.removeItem('has_seen_tour');
             setTimeout(() => setShowWelcome(true), 800);
         } else {
-            // Se já mostrou welcome, verificar WhatsNew
-            checkWhatsNew();
+            // Se já mostrou welcome, verificar email verification
+            checkEmailVerification();
         }
     }, [user, location.pathname]);
+
+    const checkEmailVerification = () => {
+        // Se email não está verificado, mostrar popup
+        if (user && !user.isVerified) {
+            const dismissedKey = `email_verification_dismissed_${user.id}`;
+            const wasDismissed = sessionStorage.getItem(dismissedKey);
+            
+            if (!wasDismissed) {
+                setTimeout(() => setShowEmailVerification(true), 500);
+                return;
+            }
+        }
+        // Se já verificado ou foi dispensado, verificar WhatsNew
+        checkWhatsNew();
+    };
 
     const checkWhatsNew = () => {
         const lastSeenVersion = localStorage.getItem('whatsNewVersion');
@@ -60,7 +78,17 @@ export default function OnboardingModals() {
 
     const handleWelcomeClose = () => {
         setShowWelcome(false);
-        // Após fechar Welcome, verificar se precisa mostrar WhatsNew
+        // Após fechar Welcome, verificar email verification
+        checkEmailVerification();
+    };
+
+    const handleEmailVerificationClose = () => {
+        setShowEmailVerification(false);
+        // Marcar como dispensado para não mostrar novamente nesta sessão
+        if (user) {
+            sessionStorage.setItem(`email_verification_dismissed_${user.id}`, 'true');
+        }
+        // Após fechar verificação, verificar WhatsNew
         checkWhatsNew();
     };
 
@@ -72,6 +100,7 @@ export default function OnboardingModals() {
     return (
         <>
             <WelcomeTour isOpen={showWelcome} onClose={handleWelcomeClose} />
+            <EmailVerificationPopup isOpen={showEmailVerification} onClose={handleEmailVerificationClose} />
             <WhatsNewModal isOpen={showWhatsNew} onClose={handleWhatsNewClose} />
         </>
     );

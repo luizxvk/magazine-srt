@@ -42,6 +42,11 @@ model User {
   verificationExpiry     DateTime?
   verificationSentAt     DateTime?
   doNotDisturb           Boolean        @default(false)
+  // Profile card background settings
+  profileBgUrl           String?        // URL da imagem de fundo do card de perfil
+  profileBgScale         Float?         @default(1) // Escala do background (1 = 100%)
+  profileBgPosX          Float?         @default(50) // Posição X em porcentagem
+  profileBgPosY          Float?         @default(50) // Posição Y em porcentagem
   adminBadges            AdminBadge[]
   catalogPhotos          CatalogPhoto[]
   comments               Comment[]

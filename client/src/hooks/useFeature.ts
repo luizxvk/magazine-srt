@@ -16,7 +16,7 @@ let communityPlanCache: Plan | null = null;
  * Hook para verificar disponibilidade de features
  */
 export function useFeature(feature: Feature) {
-  const [currentPlan, setCurrentPlan] = useState<Plan>(communityPlanCache || Plan.STARTER);
+  const [currentPlan, setCurrentPlan] = useState<Plan>(communityPlanCache || Plan.ENTERPRISE);
   const [loading, setLoading] = useState(!communityPlanCache);
   
   useEffect(() => {
@@ -36,9 +36,9 @@ export function useFeature(feature: Feature) {
           setCurrentPlan(response.data.data.currentPlan);
         }
       } catch (error) {
-        // Em caso de erro, assume STARTER (plano padrão do Magazine)
-        console.warn('[useFeature] Could not fetch community plan, defaulting to STARTER');
-        communityPlanCache = Plan.STARTER;
+        // Em caso de erro, assume ENTERPRISE (Magazine tem todas features)
+        console.warn('[useFeature] Could not fetch community plan, defaulting to ENTERPRISE');
+        communityPlanCache = Plan.ENTERPRISE;
       } finally {
         setLoading(false);
       }
@@ -67,7 +67,7 @@ export function useFeature(feature: Feature) {
  * Hook para verificar múltiplas features de uma vez
  */
 export function useFeatures(features: Feature[]) {
-  const [currentPlan, setCurrentPlan] = useState<Plan>(communityPlanCache || Plan.STARTER);
+  const [currentPlan, setCurrentPlan] = useState<Plan>(communityPlanCache || Plan.ENTERPRISE);
   const [loading, setLoading] = useState(!communityPlanCache);
   
   useEffect(() => {
@@ -85,7 +85,7 @@ export function useFeatures(features: Feature[]) {
           setCurrentPlan(response.data.data.currentPlan);
         }
       } catch (error) {
-        communityPlanCache = Plan.STARTER;
+        communityPlanCache = Plan.ENTERPRISE;
       } finally {
         setLoading(false);
       }
@@ -114,7 +114,7 @@ export function useFeatures(features: Feature[]) {
  * Hook para obter informações sobre o plano atual
  */
 export function useCommunityPlan() {
-  const [currentPlan, setCurrentPlan] = useState<Plan>(communityPlanCache || Plan.STARTER);
+  const [currentPlan, setCurrentPlan] = useState<Plan>(communityPlanCache || Plan.ENTERPRISE);
   const [loading, setLoading] = useState(!communityPlanCache);
   
   useEffect(() => {
@@ -132,7 +132,7 @@ export function useCommunityPlan() {
           setCurrentPlan(response.data.data.currentPlan);
         }
       } catch (error) {
-        communityPlanCache = Plan.STARTER;
+        communityPlanCache = Plan.ENTERPRISE;
       } finally {
         setLoading(false);
       }

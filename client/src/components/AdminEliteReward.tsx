@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trophy, Coins, Package, Save, Loader2, Gift } from 'lucide-react';
+import { Trophy, Coins, Package, Save, Loader2, Gift, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -8,6 +8,7 @@ interface RankingRewardConfig {
     rewardAmount?: number;
     rewardProductName?: string;
     rewardDescription?: string;
+    showInHighlights?: boolean;
 }
 
 interface AdminEliteRewardProps {
@@ -22,7 +23,8 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
         rewardType: 'none',
         rewardAmount: 0,
         rewardProductName: '',
-        rewardDescription: ''
+        rewardDescription: '',
+        showInHighlights: false
     });
 
     const cardBg = theme === 'light' ? 'bg-white' : 'bg-zinc-900/80';
@@ -46,7 +48,8 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
                 rewardType: 'none',
                 rewardAmount: 0,
                 rewardProductName: '',
-                rewardDescription: ''
+                rewardDescription: '',
+                showInHighlights: false
             });
         } finally {
             setLoading(false);
@@ -160,6 +163,31 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
                         rows={2}
                         className={`w-full px-4 py-3 rounded-xl ${inputBg} border ${inputBorder} ${textMain} focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 outline-none transition-all resize-none`}
                     />
+                </div>
+            )}
+
+            {/* Show in Highlights Toggle */}
+            {config.rewardType !== 'none' && (
+                <div className="mb-6">
+                    <div className={`flex items-center justify-between p-4 rounded-xl ${inputBg} border ${inputBorder}`}>
+                        <div className="flex items-center gap-3">
+                            <Star className="w-5 h-5 text-amber-500" />
+                            <div>
+                                <p className={`font-medium ${textMain}`}>Mostrar em Destaques</p>
+                                <p className={`text-xs ${textSub}`}>Exibir card do prêmio na página de Destaques</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setConfig({ ...config, showInHighlights: !config.showInHighlights })}
+                            className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${
+                                config.showInHighlights ? 'bg-gold-500' : 'bg-gray-600'
+                            }`}
+                        >
+                            <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                                config.showInHighlights ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
+                            }`} />
+                        </button>
+                    </div>
                 </div>
             )}
 

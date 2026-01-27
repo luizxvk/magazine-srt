@@ -52,32 +52,45 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                 const response = await api.get('/notifications');
                 const notifications = response.data;
                 
+                // Find unread MESSAGE notification
                 const messageNotif = notifications.find((n: any) => 
                     n.type === 'MESSAGE' && 
                     !n.read && 
                     !dismissedNotifIds.current.has(n.id)
                 );
 
+                console.log('[MessagePopup] Checking notifications, found message:', messageNotif?.id);
+
                 if (!messageNotif || messageNotif.id === lastNotifId.current) {
                     return;
                 }
                 
-                const content = JSON.parse(messageNotif.content);
+                let content;
+                try {
+                    content = JSON.parse(messageNotif.content);
+                } catch {
+                    console.error('[MessagePopup] Failed to parse notification content');
+                    return;
+                }
                     
-                if (activeChatUserId && activeChatUserId === content.actor.id) {
+                if (activeChatUserId && activeChatUserId === content.actor?.id) {
                     dismissedNotifIds.current.add(messageNotif.id);
                     return;
                 }
                 
+                console.log('[MessagePopup] Showing popup for message from:', content.actor?.name);
+                
                 lastNotifId.current = messageNotif.id;
                 setUnreadMessage({
                     id: messageNotif.id,
-                    senderId: content.actor.id,
-                    content: content.text,
+                    senderId: content.actor?.id,
+                    content: content.text || 'Nova mensagem',
                     createdAt: messageNotif.createdAt,
                     sender: {
-                        ...content.actor,
-                        membershipType: content.actor.membershipType
+                        id: content.actor?.id,
+                        name: content.actor?.name || 'Usuário',
+                        avatarUrl: content.actor?.avatarUrl || null,
+                        membershipType: content.actor?.membershipType
                     }
                 });
                 setIsVisible(true);
@@ -86,19 +99,19 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                 if (autoDismissTimer.current) {
                     clearTimeout(autoDismissTimer.current);
                 }
-                // Don't auto-dismiss on mobile if not expanded
-                if (!isMobile) {
-                    autoDismissTimer.current = setTimeout(() => {
-                        setIsVisible(false);
-                    }, 10000);
-                }
+                // Auto-dismiss after 15 seconds
+                autoDismissTimer.current = setTimeout(() => {
+                    setIsVisible(false);
+                    setIsExpanded(false);
+                }, 15000);
             } catch (error) {
-                console.error('Failed to check messages', error);
+                console.error('[MessagePopup] Failed to check messages', error);
             }
         };
 
+        // Check immediately and then every 10 seconds
         checkUnreadMessages();
-        const interval = setInterval(checkUnreadMessages, 15000);
+        const interval = setInterval(checkUnreadMessages, 10000);
         return () => {
             clearInterval(interval);
             if (autoDismissTimer.current) {

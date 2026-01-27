@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter, Star } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter, Star, Trophy, Coins, Package, Calendar } from 'lucide-react';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 
@@ -22,6 +22,14 @@ interface HighlightPost {
     isLiked: boolean;
 }
 
+interface RankingRewardConfig {
+    rewardType: 'zions_points' | 'zions_cash' | 'product' | 'none';
+    rewardAmount?: number;
+    rewardProductName?: string;
+    rewardDescription?: string;
+    showInHighlights?: boolean;
+}
+
 export default function HighlightsPage() {
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
@@ -31,6 +39,50 @@ export default function HighlightsPage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
     const [availableTags, setAvailableTags] = useState<string[]>([]);
+    const [rewardConfig, setRewardConfig] = useState<RankingRewardConfig | null>(null);
+    const [daysRemaining, setDaysRemaining] = useState(0);
+
+    useEffect(() => {
+        fetchHighlights();
+        fetchRewardConfig();
+        calculateDaysRemaining();
+    }, []);
+
+    const fetchRewardConfig = async () => {
+        try {
+            const response = await api.get('/content/elite-ranking-reward');
+            if (response.data && response.data.showInHighlights && response.data.rewardType !== 'none') {
+                setRewardConfig(response.data);
+            }
+        } catch {
+            // No reward config
+        }
+    };
+
+    const calculateDaysRemaining = () => {
+        const now = new Date();
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const diff = Math.ceil((lastDay.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        setDaysRemaining(diff);
+    };
+
+    const getRewardIcon = () => {
+        switch (rewardConfig?.rewardType) {
+            case 'zions_points': return <Coins className="w-6 h-6 text-yellow-500" />;
+            case 'zions_cash': return <Coins className="w-6 h-6 text-green-500" />;
+            case 'product': return <Package className="w-6 h-6 text-purple-500" />;
+            default: return <Trophy className="w-6 h-6 text-gold-500" />;
+        }
+    };
+
+    const getRewardText = () => {
+        switch (rewardConfig?.rewardType) {
+            case 'zions_points': return `${rewardConfig.rewardAmount?.toLocaleString()} Zions Points`;
+            case 'zions_cash': return `R$ ${rewardConfig.rewardAmount?.toFixed(2)}`;
+            case 'product': return rewardConfig.rewardProductName || 'Prêmio Especial';
+            default: return 'Prêmio do Ranking';
+        }
+    };
 
     useEffect(() => {
         fetchHighlights();
@@ -130,6 +182,58 @@ export default function HighlightsPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Elite Ranking Reward Card */}
+                {rewardConfig && (
+                    <Link to="/ranking" className="block mb-6">
+                        <div className={`relative overflow-hidden rounded-2xl p-6 ${
+                            theme === 'light' 
+                                ? 'bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200' 
+                                : 'bg-gradient-to-r from-gold-950/50 to-amber-950/50 border border-gold-500/30'
+                        } hover:scale-[1.01] transition-transform cursor-pointer group`}>
+                            {/* Background decoration */}
+                            <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+                                <Trophy className="w-full h-full text-gold-500" />
+                            </div>
+                            
+                            <div className="flex items-center gap-4 relative z-10">
+                                <div className={`p-4 rounded-2xl ${theme === 'light' ? 'bg-amber-100' : 'bg-gold-500/20'}`}>
+                                    {getRewardIcon()}
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Trophy className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                        <span className={`text-xs font-semibold uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                            Prêmio Elite Ranking
+                                        </span>
+                                    </div>
+                                    <h3 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                        {getRewardText()}
+                                    </h3>
+                                    {rewardConfig.rewardDescription && (
+                                        <p className={`text-sm mt-1 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                            {rewardConfig.rewardDescription}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="text-right">
+                                    <div className={`flex items-center gap-1.5 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                        <Calendar className="w-4 h-4" />
+                                        <span className="text-sm font-medium">
+                                            {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}
+                                        </span>
+                                    </div>
+                                    <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
+                                        restantes
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {/* Hover indicator */}
+                            <div className={`absolute bottom-0 left-0 right-0 h-1 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left`} />
+                        </div>
+                    </Link>
+                )}
 
                 {/* Tag Filters */}
                 {availableTags.length > 0 && (

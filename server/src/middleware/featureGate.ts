@@ -23,8 +23,8 @@ function getCommunityPlan(): Plan {
   if (planFromEnv && Object.values(Plan).includes(planFromEnv)) {
     return planFromEnv;
   }
-  // Default: STARTER para Magazine SRT
-  return Plan.STARTER;
+  // Default: ENTERPRISE para Magazine SRT (todas features liberadas)
+  return Plan.ENTERPRISE;
 }
 
 export interface FeatureLockedError {

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Smartphone, History, Filter, Shield, Edit3, Zap } from 'lucide-react';
+import { X, Sparkles, Check, Shield, Zap, Share2, Lock, RefreshCw, Link2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.8';
+const CURRENT_VERSION = '0.4.11';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,42 +33,42 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.8 - SECURITY & UX IMPROVEMENTS
+    // v0.4.11 - SHARE PREVIEW & UX IMPROVEMENTS
     const updates: UpdateItem[] = [
+        {
+            icon: <Link2 className="w-5 h-5 text-blue-500" />,
+            title: '🔗 Preview de Links',
+            description: 'Ao compartilhar posts no WhatsApp/Telegram, agora aparece a imagem e descrição do post!',
+            isNew: true
+        },
+        {
+            icon: <Lock className="w-5 h-5 text-amber-500" />,
+            title: '⌨️ Aviso de Caps Lock',
+            description: 'Nos campos de senha agora aparece um aviso quando o Caps Lock está ativado.',
+            isNew: true
+        },
+        {
+            icon: <RefreshCw className="w-5 h-5 text-emerald-500" />,
+            title: '🔄 Reativar Conta',
+            description: 'Contas excluídas agora podem ser reativadas ao fazer novo cadastro com o mesmo email.',
+            isNew: true
+        },
+        {
+            icon: <Share2 className="w-5 h-5 text-purple-500" />,
+            title: '📤 Preço Mínimo no Market',
+            description: 'Ao vender Theme Packs, agora tem um preço mínimo de 80% do valor original.',
+            isNew: true
+        },
         {
             icon: <Shield className="w-5 h-5 text-red-500" />,
             title: '🔒 Segurança Reforçada',
             description: 'Removidos logs de dados sensíveis. Suas credenciais agora estão 100% protegidas!',
-            isNew: true
-        },
-        {
-            icon: <Edit3 className="w-5 h-5 text-emerald-500" />,
-            title: '✏️ Editar Recompensas',
-            description: 'Admins agora podem editar recompensas existentes, incluindo Zions de bônus e tipo de resgate.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Zap className="w-5 h-5 text-yellow-500" />,
             title: '⚡ XP em Compras',
             description: 'Ao comprar produtos na loja, você ganha XP igual ao valor em Zions Cash gasto!',
-            isNew: true
-        },
-        {
-            icon: <History className="w-5 h-5 text-blue-500" />,
-            title: '📊 Histórico de Zions Points',
-            description: 'Nova aba nos Prêmios mostrando todo o histórico de transações: compras, resgates, bônus e mais!',
-            isNew: false
-        },
-        {
-            icon: <Filter className="w-5 h-5 text-purple-500" />,
-            title: '🎯 Destaques Filtrados',
-            description: 'Página de Destaques e Carrossel agora mostram apenas posts de usuários, sem produtos da loja.',
-            isNew: false
-        },
-        {
-            icon: <Smartphone className="w-5 h-5 text-emerald-500" />,
-            title: '📱 Bottom Navigation Mobile',
-            description: 'Barra de navegação estilo Apple Vision Pro! Acesso rápido a Home, Explorar, Loja e Perfil.',
             isNew: false
         }
     ];

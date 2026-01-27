@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
 import logoMgt from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
@@ -30,6 +30,11 @@ export default function Register() {
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [pendingSubmitData, setPendingSubmitData] = useState<RegisterForm | null>(null);
+    const [capsLockOn, setCapsLockOn] = useState(false);
+    
+    const handleCapsLock = (e: React.KeyboardEvent) => {
+        setCapsLockOn(e.getModifierState('CapsLock'));
+    };
     
     const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<RegisterForm>({
         resolver: zodResolver(registerSchema),
@@ -264,8 +269,16 @@ export default function Register() {
                                     type="password"
                                     placeholder="Senha (mínimo 6 caracteres)"
                                     className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
+                                    onKeyDown={handleCapsLock}
+                                    onKeyUp={handleCapsLock}
                                 />
                             </div>
+                            {capsLockOn && (
+                                <p className="text-amber-400 text-[10px] pl-4 flex items-center gap-1">
+                                    <AlertTriangle size={12} />
+                                    Caps Lock está ativado
+                                </p>
+                            )}
                             {errors.password && <p className="text-red-400 text-[10px] pl-4">{errors.password.message}</p>}
                         </div>
 

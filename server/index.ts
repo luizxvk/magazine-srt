@@ -31,6 +31,7 @@ import themePackRoutes from './src/routes/themePackRoutes';
 import supplyBoxRoutes from './src/routes/supplyBoxRoutes';
 import rovexRoutes from './src/routes/rovexRoutes';
 import featureRoutes from './src/routes/featureRoutes';
+import ogRoutes from './src/routes/ogRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -126,6 +127,7 @@ apiRouter.use('/withdrawals', withdrawalRoutes);
 apiRouter.use('/theme-packs', themePackRoutes);
 apiRouter.use('/rovex', rovexRoutes);
 apiRouter.use('/features', featureRoutes);
+apiRouter.use('/og', ogRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

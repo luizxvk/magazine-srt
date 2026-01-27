@@ -141,7 +141,7 @@ export default function ProfilePage() {
     };
 
     const handleShare = (postId: string | number) => {
-        navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
+        navigator.clipboard.writeText(`https://magazine-srt.vercel.app/api/og/post/${postId}`);
         showToast('Link copiado para a área de transferência!', 'success');
     };
 

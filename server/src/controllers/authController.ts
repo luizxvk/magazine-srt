@@ -41,8 +41,65 @@ export const register = async (req: Request, res: Response) => {
         const { email, password, name, membershipType, avatarUrl } = registerSchema.parse(req.body);
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
-        if (existingUser) {
+        
+        // If user exists and is NOT deleted, block registration
+        if (existingUser && !existingUser.deletedAt) {
             return res.status(400).json({ error: 'User already exists' });
+        }
+        
+        // If user exists but WAS deleted, reactivate the account
+        if (existingUser && existingUser.deletedAt) {
+            const passwordHash = await bcrypt.hash(password, 10);
+            const verificationCode = generateVerificationCode();
+            const verificationExpiry = new Date();
+            verificationExpiry.setDate(verificationExpiry.getDate() + 3);
+            
+            const reactivatedUser = await prisma.user.update({
+                where: { id: existingUser.id },
+                data: {
+                    deletedAt: null,
+                    passwordHash,
+                    name,
+                    displayName: name,
+                    membershipType: membershipType || existingUser.membershipType,
+                    avatarUrl: avatarUrl || existingUser.avatarUrl,
+                    isVerified: false,
+                    verificationCode,
+                    verificationExpiry,
+                    verificationSentAt: new Date(),
+                }
+            });
+            
+            // Send verification email
+            try {
+                await sendVerificationEmail({
+                    to: email,
+                    name,
+                    code: verificationCode,
+                });
+            } catch (emailError) {
+                console.error('Failed to send verification email:', emailError);
+            }
+            
+            const token = jwt.sign({ userId: reactivatedUser.id, role: reactivatedUser.role }, process.env.JWT_SECRET!, {
+                expiresIn: '7d',
+            });
+            
+            return res.status(201).json({
+                token,
+                user: {
+                    id: reactivatedUser.id,
+                    name: reactivatedUser.name,
+                    email: reactivatedUser.email,
+                    role: reactivatedUser.role,
+                    trophies: reactivatedUser.trophies || 0,
+                    zions: reactivatedUser.zions || 0,
+                    zionsPoints: reactivatedUser.zionsPoints || 0,
+                    zionsCash: reactivatedUser.zionsCash || 0,
+                    membershipType: reactivatedUser.membershipType,
+                    isVerified: reactivatedUser.isVerified,
+                }
+            });
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
@@ -124,6 +181,11 @@ export const login = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique({ where: { email: parsedEmail } });
         if (!user) {
             return res.status(400).json({ error: 'Invalid credentials' });
+        }
+        
+        // Block login for deleted accounts
+        if (user.deletedAt) {
+            return res.status(400).json({ error: 'Esta conta foi excluída. Você pode criar uma nova conta com este email.' });
         }
 
         const validPassword = await bcrypt.compare(password, user.passwordHash);

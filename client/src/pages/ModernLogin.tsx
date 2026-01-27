@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRightLeft, User, Lock, AlertCircle, X } from 'lucide-react';
+import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import logo from '../assets/logo-mgzn.png';
@@ -468,6 +468,12 @@ export default function ModernLogin() {
 }
 
 function LoginForm({ register, errors, isSubmitting, onSubmit, isMGT, onForgotPassword }: any) {
+    const [capsLockOn, setCapsLockOn] = useState(false);
+    
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        setCapsLockOn(e.getModifierState('CapsLock'));
+    };
+    
     return (
         <form onSubmit={onSubmit} className="space-y-5 w-full max-w-xs mx-auto">
             <div className="space-y-1">
@@ -499,8 +505,16 @@ function LoginForm({ register, errors, isSubmitting, onSubmit, isMGT, onForgotPa
                         type="password"
                         placeholder="Senha"
                         className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
+                        onKeyDown={handleKeyDown}
+                        onKeyUp={handleKeyDown}
                     />
                 </div>
+                {capsLockOn && (
+                    <p className="text-amber-400 text-[10px] pl-2 flex items-center gap-1">
+                        <AlertTriangle size={12} />
+                        Caps Lock está ativado
+                    </p>
+                )}
                 {errors.password && <p className="text-red-400 text-[10px] pl-2">{errors.password.message}</p>}
             </div>
 

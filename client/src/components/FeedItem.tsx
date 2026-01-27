@@ -113,8 +113,8 @@ export default function FeedItem({
             return;
         }
         
-        // Generate public share link
-        const shareUrl = `${window.location.origin}/post/${id}`;
+        // Generate public share link with OG meta tags for preview
+        const shareUrl = `https://magazine-srt.vercel.app/api/og/post/${id}`;
         
         try {
             await navigator.clipboard.writeText(shareUrl);

@@ -61,12 +61,11 @@ export const createPixPayment = async (req: Request, res: Response) => {
                 userId,
                 amount: zions,
                 price: price,
-                status: 'PENDING',
-                externalRef: externalRef
+                status: 'PENDING'
             }
         });
 
-        console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - Ref: ${externalRef}`);
+        console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
         // Criar pagamento PIX
         const result = await payment.create({
@@ -84,13 +83,11 @@ export const createPixPayment = async (req: Request, res: Response) => {
             }
         });
 
-        // Atualizar registro com ID do pagamento
+        // Atualizar registro com ID do pagamento (apenas campos que existem)
         await prisma.zionPurchase.update({
             where: { id: newPurchase.id },
             data: { 
-                paymentId: String(result.id),
-                statusDetail: result.status_detail || null,
-                paymentMethod: 'pix'
+                paymentId: String(result.id)
             }
         });
 
@@ -187,8 +184,7 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
                 where: { id: purchase.id },
                 data: { 
                     status: 'COMPLETED',
-                    paymentId: paymentId,
-                    completedAt: new Date()
+                    paymentId: paymentId
                 }
             }),
             // Registrar no histórico de Zions
@@ -355,8 +351,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
                 await prisma.zionPurchase.update({
                     where: { id: purchase.id },
                     data: { 
-                        status: result.status === 'rejected' ? 'REJECTED' : 'CANCELLED',
-                        statusDetail: result.status_detail || null
+                        status: result.status === 'rejected' ? 'REJECTED' : 'CANCELLED'
                     }
                 });
                 console.log(`[WEBHOOK] Payment ${paymentId} ${result.status}: ${result.status_detail}`);
@@ -389,13 +384,8 @@ export const handleWebhook = async (req: Request, res: Response) => {
                 break;
             
             default:
-                // pending, in_process, etc - apenas atualizar status
-                await prisma.zionPurchase.update({
-                    where: { id: purchase.id },
-                    data: { 
-                        statusDetail: result.status_detail || null
-                    }
-                });
+                // pending, in_process, etc - apenas logar
+                console.log(`[WEBHOOK] Payment ${paymentId} status: ${result.status}`);
         }
 
     } catch (error: any) {

@@ -313,12 +313,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Special handling for Rainbow Skies - create HTML elements and switch to light theme
                 if (userData.equippedBackground === 'anim-rainbow-skies') {
                     createRainbowElements();
-                    // Only MGT can use light theme with Rainbow Skies
+                    
+                    // Save current theme for MGT before switching to light
                     if (userData.membershipType === 'MGT') {
-                        localStorage.setItem('theme', 'light');
-                        document.documentElement.classList.remove('dark');
-                        document.documentElement.classList.add('light');
+                        const currentTheme = localStorage.getItem('theme') || 'dark';
+                        localStorage.setItem('mgt-theme-before-rainbow', currentTheme);
                     }
+                    
+                    // Rainbow Skies activates light mode for everyone
+                    localStorage.setItem('theme', 'light');
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
                 } else {
                     cleanupRainbowElements();
                 }
@@ -491,8 +496,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
             document.body.style.animation = '';
-            // Reset to default theme based on membership
-            setTheme('dark');
+            
+            // Reset theme when background is unequipped
+            // Magazine: always dark (can't use light mode)
+            // MGT: restore previous theme from localStorage
+            if (user?.membershipType === 'MGT') {
+                const savedTheme = localStorage.getItem('mgt-theme-before-rainbow') || localStorage.getItem('theme') || 'dark';
+                // Only restore if it was saved before applying rainbow
+                if (localStorage.getItem('mgt-theme-before-rainbow')) {
+                    setTheme(savedTheme as 'dark' | 'light');
+                    localStorage.removeItem('mgt-theme-before-rainbow');
+                }
+            } else {
+                // Magazine always goes back to dark
+                setTheme('dark');
+            }
         } else if (backgroundStyle.startsWith('class:')) {
             // Class-based animated background (from theme packs)
             const className = backgroundStyle.replace('class:', '');
@@ -501,10 +519,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Special handling for Rainbow Skies
             if (className === 'anim-rainbow-skies') {
                 createRainbowElements();
-                // Only MGT can use light theme with Rainbow Skies
-                if (user?.membershipType === 'MGT') {
-                    setTheme('light');
+                
+                // Save current theme for MGT before switching to light
+                if (user?.membershipType === 'MGT' && !localStorage.getItem('mgt-theme-before-rainbow')) {
+                    localStorage.setItem('mgt-theme-before-rainbow', theme);
                 }
+                
+                // Rainbow Skies activates light mode for everyone
+                setTheme('light');
             } else {
                 cleanupRainbowElements();
             }

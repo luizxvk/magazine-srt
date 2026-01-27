@@ -80,6 +80,7 @@ model User {
   themePacks             UserThemePack[]
   socialConnections      SocialConnection[]
   socialActivities       SocialActivity[]
+  pushSubscriptions      PushSubscription[]
 
   @@index([membershipType])
   @@index([isOnline])
@@ -915,6 +916,24 @@ model SocialActivity {
   @@index([activityType])
   @@index([isLive])
   @@index([startedAt])
+}
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String
+  endpoint  String   @unique
+  keys      Json     // { p256dh: string, auth: string }
+  userAgent String?  // Browser/device info
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
 }
 
 // ============================================

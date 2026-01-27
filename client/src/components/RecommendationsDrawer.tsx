@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Users, Calendar, Star, Sparkles, TrendingUp, Camera, MessageCircle, Radio, Gamepad2, Tv, ChevronRight } from 'lucide-react';
+import { X, Users, Calendar, Star, Sparkles, TrendingUp, Camera, MessageCircle, Gamepad2, Tv, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';

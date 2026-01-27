@@ -1,6 +1,7 @@
 
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
+import { sendPushToUser } from './notificationController';
 
 interface AuthenticatedRequest extends Request {
     user?: {
@@ -78,6 +79,14 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response) => {
                 read: false
             }
         });
+
+        // Send push notification to receiver (async, don't wait)
+        sendPushToUser(
+            receiverId,
+            `💬 ${message.sender.name}`,
+            content.length > 50 ? content.substring(0, 50) + '...' : content,
+            { url: '/messages', senderId, type: 'message' }
+        ).catch(err => console.error('[Push] Error sending message notification:', err));
 
         res.status(201).json(message);
     } catch (error) {

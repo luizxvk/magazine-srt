@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { GroupRole, MessageType } from '@prisma/client';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { sendPushToUser } from './notificationController';
 
 // In-memory storage for typing indicators (expires after 3 seconds)
 interface TypingUser {
@@ -474,6 +475,14 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
                   content: `${message.sender.displayName || message.sender.name} mencionou você em ${member.group.name || 'um grupo'}`
                 }
               });
+              
+              // Send push notification for mention
+              sendPushToUser(
+                mentionedMember.userId,
+                `📢 ${member.group.name || 'Grupo'}`,
+                `${message.sender.displayName || message.sender.name} mencionou você`,
+                { url: `/groups/${id}`, groupId: id, type: 'group_mention' }
+              ).catch(err => console.error('[Push] Error sending mention notification:', err));
             } catch (notifError) {
               console.error('Error creating mention notification:', notifError);
             }
@@ -1434,20 +1443,39 @@ export const addReaction = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Mensagem não encontrada' });
     }
 
-    // Check if reaction already exists (toggle behavior)
+    // Check if user already reacted to this message (with any emoji)
     const existingReaction = await prisma.groupMessageReaction.findFirst({
-      where: { messageId, userId, emoji },
+      where: { messageId, userId },
     });
 
     if (existingReaction) {
-      // Remove reaction if it already exists
-      await prisma.groupMessageReaction.delete({
+      // If same emoji, remove it (toggle off)
+      if (existingReaction.emoji === emoji) {
+        await prisma.groupMessageReaction.delete({
+          where: { id: existingReaction.id },
+        });
+        return res.json({ removed: true, emoji, messageId });
+      }
+      
+      // If different emoji, update to new emoji
+      const updatedReaction = await prisma.groupMessageReaction.update({
         where: { id: existingReaction.id },
+        data: { emoji },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+              avatarUrl: true,
+            },
+          },
+        },
       });
-      return res.json({ removed: true, emoji });
+      return res.json({ updated: true, reaction: updatedReaction, messageId });
     }
 
-    // Add new reaction
+    // Add new reaction (first time reacting to this message)
     const reaction = await prisma.groupMessageReaction.create({
       data: {
         messageId,
@@ -1460,12 +1488,13 @@ export const addReaction = async (req: AuthRequest, res: Response) => {
             id: true,
             name: true,
             displayName: true,
+            avatarUrl: true,
           },
         },
       },
     });
 
-    res.json({ added: true, reaction });
+    res.json({ added: true, reaction, messageId });
   } catch (error) {
     console.error('Error adding reaction:', error);
     res.status(500).json({ error: 'Erro ao adicionar reação' });

@@ -72,7 +72,7 @@ export default function GroupSettingsModal({
   const { user, theme } = useAuth();
   const [activeTab, setActiveTab] = useState<'general' | 'background' | 'members'>(initialTab);
   const [ownedBackgrounds, setOwnedBackgrounds] = useState<string[]>(['bg_default']);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [muteLoading, setMuteLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 

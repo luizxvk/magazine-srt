@@ -350,9 +350,41 @@ export default function GroupChatPage() {
 
   const handleAddReaction = async (messageId: string, emoji: string) => {
     try {
-      await api.post(`/groups/${id}/messages/${messageId}/reactions`, { emoji });
-      // Refresh messages to get updated reactions
-      fetchNewMessages();
+      const response = await api.post(`/groups/${id}/messages/${messageId}/reactions`, { emoji });
+      
+      // Update local state immediately for instant feedback
+      setMessages(prevMessages => prevMessages.map(msg => {
+        if (msg.id !== messageId) return msg;
+        
+        const reactions = msg.reactions || [];
+        
+        if (response.data.removed) {
+          // Remove the reaction
+          return {
+            ...msg,
+            reactions: reactions.filter(r => !(r.userId === user?.id && r.emoji === emoji))
+          };
+        } else if (response.data.updated) {
+          // Update existing reaction to new emoji
+          return {
+            ...msg,
+            reactions: reactions.map(r => 
+              r.userId === user?.id 
+                ? { ...r, emoji: response.data.reaction.emoji }
+                : r
+            )
+          };
+        } else if (response.data.added) {
+          // Add new reaction
+          return {
+            ...msg,
+            reactions: [...reactions, response.data.reaction]
+          };
+        }
+        
+        return msg;
+      }));
+      
       setShowReactionPicker(null);
     } catch (error) {
       console.error('Error adding reaction:', error);

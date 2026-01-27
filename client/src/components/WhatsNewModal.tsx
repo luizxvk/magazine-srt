@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Shield, Zap, Share2, Lock, RefreshCw, Link2 } from 'lucide-react';
+import { X, Sparkles, Check, Shield, Zap, Share2, Lock, RefreshCw, Link2, MessageCircle, Users, Palette, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.11';
+const CURRENT_VERSION = '0.4.12';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,43 +33,43 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.11 - SHARE PREVIEW & UX IMPROVEMENTS
+    // v0.4.12 - GROUP CHAT IMPROVEMENTS & UX
     const updates: UpdateItem[] = [
         {
-            icon: <Link2 className="w-5 h-5 text-blue-500" />,
-            title: '🔗 Preview de Links',
-            description: 'Ao compartilhar posts no WhatsApp/Telegram, agora aparece a imagem e descrição do post!',
+            icon: <MessageCircle className="w-5 h-5 text-blue-500" />,
+            title: '💬 Reações nos Grupos',
+            description: 'Agora você pode reagir às mensagens com emojis! Basta passar o mouse sobre uma mensagem.',
             isNew: true
         },
         {
-            icon: <Lock className="w-5 h-5 text-amber-500" />,
-            title: '⌨️ Aviso de Caps Lock',
-            description: 'Nos campos de senha agora aparece um aviso quando o Caps Lock está ativado.',
+            icon: <MessageCircle className="w-5 h-5 text-purple-500" />,
+            title: '↩️ Responder Mensagens',
+            description: 'Responda diretamente a qualquer mensagem nos grupos com o botão de reply.',
             isNew: true
         },
         {
-            icon: <RefreshCw className="w-5 h-5 text-emerald-500" />,
-            title: '🔄 Reativar Conta',
-            description: 'Contas excluídas agora podem ser reativadas ao fazer novo cadastro com o mesmo email.',
+            icon: <Palette className="w-5 h-5 text-emerald-500" />,
+            title: '🎨 Fundo dos Grupos',
+            description: 'Administradores agora podem mudar o fundo dos grupos nas configurações!',
             isNew: true
         },
         {
-            icon: <Share2 className="w-5 h-5 text-purple-500" />,
-            title: '📤 Preço Mínimo no Market',
-            description: 'Ao vender Theme Packs, agora tem um preço mínimo de 80% do valor original.',
+            icon: <ChevronDown className="w-5 h-5 text-amber-500" />,
+            title: '📜 Carregar Mais no Feed',
+            description: 'Novo botão "Carregar Mais" no feed para ver posts antigos sem perder os atuais.',
             isNew: true
         },
         {
-            icon: <Shield className="w-5 h-5 text-red-500" />,
-            title: '🔒 Segurança Reforçada',
-            description: 'Removidos logs de dados sensíveis. Suas credenciais agora estão 100% protegidas!',
-            isNew: false
+            icon: <Users className="w-5 h-5 text-cyan-500" />,
+            title: '👥 Ver Mais Recomendados',
+            description: 'Na aba Social, agora você pode ver todos os usuários recomendados com o botão "Ver Mais".',
+            isNew: true
         },
         {
             icon: <Zap className="w-5 h-5 text-yellow-500" />,
-            title: '⚡ XP em Compras',
-            description: 'Ao comprar produtos na loja, você ganha XP igual ao valor em Zions Cash gasto!',
-            isNew: false
+            title: '⭐ Novo Timeline de Nível',
+            description: 'Timeline de nível redesenhado com botões menores e barra de XP visível no topo.',
+            isNew: true
         }
     ];
 

@@ -7,7 +7,7 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Settings } from 'lucide-react';
+import { Sparkles, Settings, ChevronDown, Loader2 } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import ModernLoader from '../components/ModernLoader';
@@ -62,6 +62,9 @@ export default function FeedPage() {
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' as 'success' | 'error' | 'info' });
 
     const [viewingStoryId, setViewingStoryId] = useState<string | null>(null);
@@ -77,10 +80,12 @@ export default function FeedPage() {
     const [isEventsOpen, setIsEventsOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
 
-    const fetchPosts = async (silent = false) => {
+    const fetchPosts = async (silent = false, page = 1, append = false) => {
         try {
-            if (!silent) setLoading(true);
-            const response = await api.get('/feed');
+            if (!silent && !append) setLoading(true);
+            if (append) setLoadingMore(true);
+            
+            const response = await api.get(`/feed?page=${page}&limit=10`);
             const mappedPosts = response.data.map((p: any) => ({
                 id: p.id,
                 author: {
@@ -100,18 +105,33 @@ export default function FeedPage() {
                 isLiked: p.isLiked || false,
                 linkedProduct: p.linkedProduct || null
             }));
-            setPosts(mappedPosts);
+            
+            if (append) {
+                setPosts(prev => [...prev, ...mappedPosts]);
+            } else {
+                setPosts(mappedPosts);
+            }
+            
+            // Check if there are more posts
+            setHasMore(mappedPosts.length === 10);
         } catch (error) {
             console.error('Failed to fetch posts', error);
         } finally {
-            if (!silent) setLoading(false);
+            if (!silent && !append) setLoading(false);
+            if (append) setLoadingMore(false);
         }
+    };
+    
+    const loadMorePosts = async () => {
+        const nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
+        await fetchPosts(true, nextPage, true);
     };
 
     useEffect(() => {
-        fetchPosts();
+        fetchPosts(false, 1, false);
         const interval = setInterval(() => {
-            fetchPosts(true);
+            fetchPosts(true, 1, false);
         }, 60000); // Reduced from 15s to 60s to save bandwidth
 
         // Event listener for opening radio from search
@@ -356,6 +376,33 @@ export default function FeedPage() {
                                                 onShare={() => handleShare(post.id)}
                                             />
                                         ))}
+                                        
+                                        {/* Load More Button */}
+                                        {hasMore && regularPosts.length > 0 && (
+                                            <div className="flex justify-center pt-4 pb-8">
+                                                <button
+                                                    onClick={loadMorePosts}
+                                                    disabled={loadingMore}
+                                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                                                        isMGT
+                                                            ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20'
+                                                            : 'bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 border border-gold-500/20'
+                                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                >
+                                                    {loadingMore ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            Carregando...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <ChevronDown className="w-4 h-4" />
+                                                            Carregar Mais
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </>

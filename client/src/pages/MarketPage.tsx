@@ -246,6 +246,19 @@ export default function MarketPage() {
         />
       );
     } else if (item.itemType === 'theme_pack') {
+      // Check if itemPreview is a URL (image) or a gradient
+      const isImageUrl = item.itemPreview && (item.itemPreview.startsWith('http') || item.itemPreview.startsWith('/'));
+      
+      if (isImageUrl) {
+        return (
+          <img
+            src={item.itemPreview}
+            alt={item.itemName || 'Theme Pack'}
+            className={`${sizeClasses[size]} rounded-lg object-cover shadow-sm`}
+          />
+        );
+      }
+      
       return (
         <div
           className={`${sizeClasses[size]} rounded-lg shadow-sm relative overflow-hidden`}

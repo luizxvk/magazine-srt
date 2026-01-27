@@ -57,6 +57,7 @@ model User {
   sentGroupInvites       GroupInvite[]  @relation("SentGroupInvites")
   groupMemberships       GroupMember[]  @relation("UserGroupMemberships")
   groupMessages          GroupMessage[] @relation("UserGroupMessages")
+  groupMessageReactions  GroupMessageReaction[] @relation("UserGroupMessageReactions")
   likes                  Like[]
   receivedMessages       Message[]      @relation("ReceivedMessages")
   sentMessages           Message[]      @relation("SentMessages")
@@ -439,13 +440,32 @@ model GroupMessage {
   editedAt  DateTime?
   deletedAt DateTime?
   isNSFW    Boolean     @default(false)
+  replyToId String?
   group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
   sender    User        @relation("UserGroupMessages", fields: [senderId], references: [id])
   readBy    GroupMessageRead[]
+  reactions GroupMessageReaction[]
+  replyTo   GroupMessage?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   GroupMessage[] @relation("MessageReplies")
 
   @@index([groupId])
   @@index([senderId])
   @@index([createdAt])
+  @@index([replyToId])
+}
+
+model GroupMessageReaction {
+  id        String       @id @default(uuid())
+  messageId String
+  userId    String
+  emoji     String       // e.g., "👍", "❤️", "😂"
+  createdAt DateTime     @default(now())
+  message   GroupMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User         @relation("UserGroupMessageReactions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@index([userId])
 }
 
 // Track which users have read which messages

@@ -6,13 +6,18 @@ import { useAuth } from '../context/AuthContext';
 interface LevelTimelineProps {
     currentLevel: number;
     currentTrophies: number;
+    currentXP?: number;
+    xpForNextLevel?: number;
 }
 
 const LEVELS = Array.from({ length: 30 }, (_, i) => i + 1);
 
-const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
+const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP = 0, xpForNextLevel = 1000 }) => {
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
+
+    // Calculate XP progress percentage
+    const xpProgress = xpForNextLevel > 0 ? Math.min((currentXP / xpForNextLevel) * 100, 100) : 0;
 
     // Theme Colors
     const themeProgressGradient = isMGT
@@ -24,16 +29,16 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
         : 'shadow-[0_0_15px_rgba(234,179,8,0.3)]';
 
     const themeNodeReached = isMGT
-        ? 'bg-gradient-to-br from-emerald-500 to-emerald-700 border-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-        : 'bg-gradient-to-br from-yellow-400 to-yellow-600 border-yellow-300 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]';
+        ? 'bg-gradient-to-br from-emerald-500 to-emerald-700 border-emerald-400 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+        : 'bg-gradient-to-br from-yellow-400 to-yellow-600 border-yellow-300 text-black shadow-[0_0_10px_rgba(234,179,8,0.3)]';
 
     const themeNodeUnreached = theme === 'light'
         ? 'bg-gray-200 border-gray-300 text-gray-400'
         : 'bg-gray-900 border-gray-700 text-gray-500';
 
     const themeRewardIconReached = isMGT
-        ? 'bg-emerald-500/20 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
-        : 'bg-yellow-500/20 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.2)]';
+        ? 'bg-emerald-500/20 text-emerald-500'
+        : 'bg-yellow-500/20 text-yellow-400';
 
     const themeRewardIconUnreached = theme === 'light'
         ? 'bg-gray-200 text-gray-400'
@@ -54,85 +59,79 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel }) => {
 
     return (
         <div className="w-full">
-            <div className="overflow-x-auto overflow-y-hidden pb-8 pt-4 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
-                <div className="min-w-[1600px] px-8 md:px-16">
-                    <div className="relative pt-20 pb-16">
-                        {/* Progress Bar Background */}
-                        <div className={`absolute top-1/2 left-0 w-full h-3 rounded-full -translate-y-1/2 backdrop-blur-sm ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-800/50'}`} />
-
-                        {/* Active Progress Bar */}
-                        <motion.div
-                            className={`absolute top-1/2 left-0 h-3 bg-gradient-to-r ${themeProgressGradient} rounded-full -translate-y-1/2 z-10 ${themeShadow}`}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${((currentLevel - 1) / (LEVELS.length - 1)) * 100}%` }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                        />
-
-                        <div className="relative z-20 flex justify-between items-center">
+            {/* XP Progress Bar */}
+            <div className="mb-4 px-4">
+                <div className="flex justify-between items-center mb-2">
+                    <span className={`text-xs font-medium ${isMGT ? 'text-emerald-400' : 'text-yellow-400'}`}>
+                        Nível {currentLevel}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                        {currentXP.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP
+                    </span>
+                </div>
+                <div className={`w-full h-3 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-800/50'} overflow-hidden`}>
+                    <motion.div
+                        className={`h-full bg-gradient-to-r ${themeProgressGradient} rounded-full ${themeShadow}`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${xpProgress}%` }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    />
+                </div>
+            </div>
+            
+            {/* Level Timeline */}
+            <div className="overflow-x-auto overflow-y-hidden pb-4 pt-2 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                <div className="min-w-[1200px] px-4 md:px-8">
+                    <div className="relative py-8">
+                        {/* Reward Labels at Top */}
+                        <div className="absolute top-0 left-0 w-full flex justify-between items-center px-1">
                             {LEVELS.map((level) => {
-                                const isReached = level <= currentLevel;
-                                const isCurrent = level === currentLevel;
                                 const reward = getLevelReward(level);
-
+                                const isReached = level <= currentLevel;
+                                if (!reward) return <div key={level} className="w-7" />;
+                                const Icon = reward.icon;
                                 return (
-                                    <div key={level} className="relative flex flex-col items-center group">
-                                        {/* Reward Indicator - Positioned higher and with more space */}
-                                        {reward && (() => {
-                                            const Icon = reward.icon;
-                                            return (
-                                                <div className="absolute -top-16 flex flex-col items-center transition-transform duration-300 hover:-translate-y-1">
-                                                    <div className={`p-2 rounded-full mb-2 ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
-                                                        <Icon size={16} />
-                                                    </div>
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${isReached ? themeTextReached : themeTextUnreached}`}>
-                                                        {reward.label}
-                                                    </span>
-
-                                                    {/* Tooltip for Reward - Visible on Group Hover - Positioned to the side */}
-                                                    <div className="absolute top-0 left-full ml-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[60]">
-                                                        <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/90 border-white/20 text-gray-200'} border rounded-lg px-3 py-2 text-xs shadow-xl backdrop-blur-md min-w-[160px] relative`}>
-                                                            <div className="absolute top-1/2 -left-[5px] -translate-y-1/2 w-2.5 h-2.5 rotate-45 border-l border-b border-white/20 bg-black/90 layer-50" />
-                                                            <div className="font-bold flex items-center gap-2 mb-1.5 border-b border-white/10 pb-1.5">
-                                                                <Icon className="w-3 h-3 text-gold-500" />
-                                                                <span className="uppercase tracking-wider text-[10px]">{reward.label}</span>
-                                                            </div>
-                                                            <div className="space-y-0.5 text-[10px] opacity-90">
-                                                                <p>• Nova Insígnia Exclusiva</p>
-                                                                <p>• Bônus de {level * 10} Zions</p>
-                                                                {level >= 15 && <p>• Foto de Perfil GIF</p>}
-                                                                {level >= 20 && <p>• Acesso VIP Eventos</p>}
-                                                                {level >= 25 && <p>• Suporte Prioritário</p>}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
-
-                                        {/* Level Node */}
-                                        <motion.div
-                                            className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center border-3 transition-all duration-300 ${isReached
-                                                ? themeNodeReached
-                                                : themeNodeUnreached
-                                                } ${isCurrent ? `scale-125 ring-4 ${isMGT ? 'ring-emerald-500/30' : 'ring-yellow-500/30'} z-30` : 'z-20'}`}
-                                            initial={false}
-                                            animate={{ scale: isCurrent ? 1.2 : 1 }}
-                                            whileHover={{ scale: 1.1 }}
-                                        >
-                                            <span className="text-sm md:text-base font-bold">{level}</span>
-                                        </motion.div>
-
-                                        {/* Tooltip for non-reward levels */}
-                                        {!reward && (
-                                            <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">
-                                                <div className={`${theme === 'light' ? 'bg-white border-gray-200 text-gray-600' : 'bg-black/80 border-white/10 text-gray-300'} border rounded px-2 py-1 text-[9px] backdrop-blur-md`}>
-                                                    Nível {level}
-                                                </div>
-                                            </div>
-                                        )}
+                                    <div key={level} className="flex flex-col items-center w-7">
+                                        <div className={`p-1 rounded-full ${isReached ? themeRewardIconReached : themeRewardIconUnreached}`}>
+                                            <Icon size={10} />
+                                        </div>
+                                        <span className={`text-[8px] font-bold uppercase tracking-wider mt-0.5 ${isReached ? themeTextReached : themeTextUnreached}`}>
+                                            {reward.label}
+                                        </span>
                                     </div>
                                 );
                             })}
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="relative mt-10 mb-6">
+                            <div className={`absolute top-1/2 left-0 w-full h-2 rounded-full -translate-y-1/2 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-800/50'}`} />
+                            <motion.div
+                                className={`absolute top-1/2 left-0 h-2 bg-gradient-to-r ${themeProgressGradient} rounded-full -translate-y-1/2 z-10 ${themeShadow}`}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${((currentLevel - 1) / (LEVELS.length - 1)) * 100}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                            />
+                            
+                            {/* Level Nodes */}
+                            <div className="relative z-20 flex justify-between items-center">
+                                {LEVELS.map((level) => {
+                                    const isReached = level <= currentLevel;
+                                    const isCurrent = level === currentLevel;
+
+                                    return (
+                                        <motion.div
+                                            key={level}
+                                            className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                                                isReached ? themeNodeReached : themeNodeUnreached
+                                            } ${isCurrent ? `scale-110 ring-2 ${isMGT ? 'ring-emerald-500/40' : 'ring-yellow-500/40'} z-30` : 'z-20'}`}
+                                            whileHover={{ scale: 1.15 }}
+                                        >
+                                            <span className="text-[10px] font-bold">{level}</span>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>

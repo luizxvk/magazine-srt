@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield, UserCheck, X, Check } from 'lucide-react';
+import { Users, Shield, UserCheck, X, Check, ChevronDown, Loader2 } from 'lucide-react';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
@@ -52,6 +52,9 @@ export default function SocialPage() {
     const [groupInvites, setGroupInvites] = useState<GroupInvite[]>([]);
     const [recommended, setRecommended] = useState<Friend[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [recommendedPage, setRecommendedPage] = useState(1);
+    const [hasMoreRecommended, setHasMoreRecommended] = useState(true);
     const [joinedGroupPopup, setJoinedGroupPopup] = useState<{ show: boolean; groupName: string; groupId: string } | null>(null);
     const navigate = useNavigate();
 
@@ -83,14 +86,16 @@ export default function SocialPage() {
                 setRequests(friendReqResponse.data);
                 setGroupInvites(groupInvResponse.data);
             } else {
-                // Fetch recommended users (mocking for now by fetching all users and filtering)
-                // In a real app, this should be a dedicated endpoint
+                // Fetch recommended users with pagination
                 const response = await api.get('/users');
                 // Filter out self and existing friends (basic client-side filter for demo)
                 const allUsers = response.data as Friend[];
                 const friendIds = new Set(friends.map(f => f.id));
-                const recs = allUsers.filter(u => u.id !== user?.id && !friendIds.has(u.id)).slice(0, 10);
-                setRecommended(recs);
+                const recs = allUsers.filter(u => u.id !== user?.id && !friendIds.has(u.id));
+                const paginatedRecs = recs.slice(0, 10);
+                setRecommended(paginatedRecs);
+                setHasMoreRecommended(recs.length > 10);
+                setRecommendedPage(1);
             }
         } catch (error) {
             console.error('Failed to fetch social data', error);
@@ -143,6 +148,25 @@ export default function SocialPage() {
             setGroupInvites(groupInvites.filter(i => i.id !== inviteId));
         } catch (error) {
             console.error('Failed to reject group invite', error);
+        }
+    };
+    
+    const loadMoreRecommended = async () => {
+        setLoadingMore(true);
+        try {
+            const response = await api.get('/users');
+            const allUsers = response.data as Friend[];
+            const friendIds = new Set(friends.map(f => f.id));
+            const recs = allUsers.filter(u => u.id !== user?.id && !friendIds.has(u.id));
+            const nextPage = recommendedPage + 1;
+            const paginatedRecs = recs.slice(0, nextPage * 10);
+            setRecommended(paginatedRecs);
+            setRecommendedPage(nextPage);
+            setHasMoreRecommended(paginatedRecs.length < recs.length);
+        } catch (error) {
+            console.error('Failed to load more recommended', error);
+        } finally {
+            setLoadingMore(false);
         }
     };
 
@@ -342,32 +366,61 @@ export default function SocialPage() {
                             </>
                         ) : (
                             recommended.length > 0 ? (
-                                recommended.map(rec => (
-                                    <div key={rec.id} className={`glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4 ${themeHoverBorder} transition-colors group cursor-pointer`} onClick={() => navigate(`/profile?id=${rec.id}`)}>
-                                        <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
-                                            {rec.avatarUrl ? (
-                                                <img src={rec.avatarUrl} alt={rec.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                                    <Users className="w-5 h-5 text-gray-500" />
-                                                </div>
-                                            )}
+                                <>
+                                    {recommended.map(rec => (
+                                        <div key={rec.id} className={`glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4 ${themeHoverBorder} transition-colors group cursor-pointer`} onClick={() => navigate(`/profile?id=${rec.id}`)}>
+                                            <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
+                                                {rec.avatarUrl ? (
+                                                    <img src={rec.avatarUrl} alt={rec.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                        <Users className="w-5 h-5 text-gray-500" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className={`text-white font-medium truncate group-hover:${themeColor} transition-colors`}>
+                                                    {rec.displayName || rec.name}
+                                                </h3>
+                                                <p className="text-xs text-gray-400 flex items-center gap-2">
+                                                    <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{rec.trophies} Troféus</span>
+                                                    <span className="w-1 h-1 bg-gray-600 rounded-full" />
+                                                    <span>Nível {rec.level || 1}</span>
+                                                </p>
+                                            </div>
+                                            <button className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}>
+                                                Ver Perfil
+                                            </button>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className={`text-white font-medium truncate group-hover:${themeColor} transition-colors`}>
-                                                {rec.displayName || rec.name}
-                                            </h3>
-                                            <p className="text-xs text-gray-400 flex items-center gap-2">
-                                                <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{rec.trophies} Troféus</span>
-                                                <span className="w-1 h-1 bg-gray-600 rounded-full" />
-                                                <span>Nível {rec.level || 1}</span>
-                                            </p>
+                                    ))}
+                                    
+                                    {/* Load More Button */}
+                                    {hasMoreRecommended && (
+                                        <div className="col-span-full flex justify-center pt-4">
+                                            <button
+                                                onClick={loadMoreRecommended}
+                                                disabled={loadingMore}
+                                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                                                    isMGT
+                                                        ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20'
+                                                        : 'bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 border border-gold-500/20'
+                                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                            >
+                                                {loadingMore ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        Carregando...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <ChevronDown className="w-4 h-4" />
+                                                        Ver Mais
+                                                    </>
+                                                )}
+                                            </button>
                                         </div>
-                                        <button className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-red-500 hover:bg-red-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}>
-                                            Ver Perfil
-                                        </button>
-                                    </div>
-                                ))
+                                    )}
+                                </>
                             ) : (
                                 <div className="col-span-full text-center py-20 bg-white/5 rounded-2xl border border-white/10">
                                     <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />

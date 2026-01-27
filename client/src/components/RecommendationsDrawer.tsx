@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Users, Calendar, Star, Sparkles } from 'lucide-react';
+import { X, Users, Calendar, Star, Sparkles, TrendingUp } from 'lucide-react';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import DailyLoginCard from './DailyLoginCard';
 import PhotoCatalogCard from './PhotoCatalogCard';
@@ -42,6 +42,27 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
     const isMGT = user?.membershipType === 'MGT';
     const [catalogPhotos, setCatalogPhotos] = useState<CatalogPhoto[]>([]);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
+
+    // XP Progress calculation
+    const progressData = useMemo(() => {
+        const XP_TABLE = Array.from({ length: 30 }, (_, i) => {
+            const level = i + 1;
+            if (level === 1) return 0;
+            return Math.floor(1000 * Math.pow(level - 1, 1.2));
+        });
+        
+        const currentLevel = user?.level || 1;
+        const currentXP = user?.xp || 0;
+        const currentLevelXP = XP_TABLE[currentLevel - 1] || 0;
+        const nextLevelXP = XP_TABLE[currentLevel] || XP_TABLE[29];
+        const xpInCurrentLevel = currentXP - currentLevelXP;
+        const xpNeededForNextLevel = nextLevelXP - currentLevelXP;
+        const progressPercent = xpNeededForNextLevel > 0 
+            ? Math.min((xpInCurrentLevel / xpNeededForNextLevel) * 100, 100)
+            : 100;
+        
+        return { currentLevel, xpInCurrentLevel, xpNeededForNextLevel, progressPercent };
+    }, [user?.level, user?.xp]);
 
     // Fetch user's catalog photos when drawer opens
     useEffect(() => {
@@ -118,6 +139,30 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
 
                             {/* Daily Login Card */}
                             <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
+
+                            {/* Progress Card */}
+                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className={`p-2 ${themeIconBg} rounded-lg`}>
+                                        <TrendingUp className={`w-5 h-5 ${themeIconColor}`} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400">Seu progresso</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`font-bold ${themeText}`}>Nível {progressData.currentLevel}</span>
+                                            <span className={`text-sm ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                {progressData.xpInCurrentLevel} / {progressData.xpNeededForNextLevel} XP
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={`h-2 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
+                                    <div 
+                                        className={`h-full rounded-full transition-all duration-500 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}
+                                        style={{ width: `${progressData.progressPercent}%` }}
+                                    />
+                                </div>
+                            </div>
 
                             {/* MGT Log Card */}
                             <MgtLogCard />

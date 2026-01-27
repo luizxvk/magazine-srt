@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter, Star } from 'lucide-react';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 
@@ -23,7 +23,7 @@ interface HighlightPost {
 }
 
 export default function HighlightsPage() {
-    const { user } = useAuth();
+    const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [posts, setPosts] = useState<HighlightPost[]>([]);
     const [filteredPosts, setFilteredPosts] = useState<HighlightPost[]>([]);
@@ -71,8 +71,6 @@ export default function HighlightsPage() {
     }, [selectedTag, posts]);
 
     // Explicit theme classes for Tailwind JIT
-    const themeTitle = isMGT ? 'text-emerald-400' : 'text-gold-400';
-    const themeButtonActive = isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400';
     const themeTagActive = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
     const themeBadge = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
     const themeSpinner = isMGT ? 'border-emerald-500' : 'border-gold-500';
@@ -85,29 +83,46 @@ export default function HighlightsPage() {
             <div className="max-w-7xl mx-auto pt-24 px-4 relative z-10">
                 {/* Header with title and controls */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div className="flex items-center gap-4">
-                        <Link to="/feed" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors" title="Voltar ao Feed">
-                            <ArrowLeft className="w-6 h-6 text-white" />
+                    {/* Title - Styled like PhotoCatalog */}
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${
+                        theme === 'light' 
+                            ? (isMGT ? 'bg-emerald-100' : 'bg-amber-100') 
+                            : (isMGT ? 'bg-emerald-950/30' : 'bg-gold-950/30')
+                    } border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                        <Link to="/feed" className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20 hover:bg-emerald-500/30' : 'bg-gold-500/20 hover:bg-gold-500/30'} transition-colors`} title="Voltar ao Feed">
+                            <ArrowLeft className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                         </Link>
-                        <h1 className={`text-3xl font-serif ${themeTitle}`}>
-                            Destaques da Semana
-                        </h1>
+                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
+                            <Star className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                        </div>
+                        <div>
+                            <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                Destaques da Semana
+                            </h2>
+                            <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                Os melhores posts da comunidade.
+                            </p>
+                        </div>
                     </div>
 
                     {/* Controls */}
                     <div className="flex items-center gap-3">
                         {/* View Mode Toggle */}
-                        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+                        <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}>
                             <button
                                 onClick={() => setViewMode('grid')}
-                                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? themeButtonActive : 'text-gray-400 hover:text-white'}`}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'grid' 
+                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                 title="Visualização em grade"
                             >
                                 <Grid className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setViewMode('list')}
-                                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? themeButtonActive : 'text-gray-400 hover:text-white'}`}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'list' 
+                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                 title="Visualização em lista"
                             >
                                 <List className="w-4 h-4" />

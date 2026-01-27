@@ -323,7 +323,7 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
-    const { content, imageUrl, type } = req.body;
+    const { content, imageUrl, type, replyToId } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
@@ -413,6 +413,7 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
         content,
         imageUrl,
         type: type || MessageType.TEXT,
+        replyToId: replyToId || null,
       },
       include: {
         sender: {
@@ -421,6 +422,19 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
             name: true,
             displayName: true,
             avatarUrl: true,
+          },
+        },
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true,
+              },
+            },
           },
         },
       },
@@ -540,6 +554,33 @@ export const getGroupMessages = async (req: AuthRequest, res: Response) => {
             name: true,
             displayName: true,
             avatarUrl: true,
+          },
+        },
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true,
+              },
+            },
+          },
+        },
+        reactions: {
+          select: {
+            id: true,
+            emoji: true,
+            userId: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true,
+              },
+            },
           },
         },
       },
@@ -1355,5 +1396,134 @@ export const getMessageReaders = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error getting message readers:', error);
     res.status(500).json({ error: 'Erro ao buscar leitores' });
+  }
+};
+
+// Add reaction to a message
+export const addReaction = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { id: groupId, messageId } = req.params;
+    const { emoji } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    if (!emoji) {
+      return res.status(400).json({ error: 'Emoji é obrigatório' });
+    }
+
+    // Verify user is a member of the group
+    const member = await prisma.groupMember.findUnique({
+      where: {
+        groupId_userId: { groupId, userId },
+      },
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    // Verify message exists
+    const message = await prisma.groupMessage.findFirst({
+      where: { id: messageId, groupId, deletedAt: null },
+    });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Mensagem não encontrada' });
+    }
+
+    // Check if reaction already exists (toggle behavior)
+    const existingReaction = await prisma.groupMessageReaction.findFirst({
+      where: { messageId, userId, emoji },
+    });
+
+    if (existingReaction) {
+      // Remove reaction if it already exists
+      await prisma.groupMessageReaction.delete({
+        where: { id: existingReaction.id },
+      });
+      return res.json({ removed: true, emoji });
+    }
+
+    // Add new reaction
+    const reaction = await prisma.groupMessageReaction.create({
+      data: {
+        messageId,
+        userId,
+        emoji,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
+      },
+    });
+
+    res.json({ added: true, reaction });
+  } catch (error) {
+    console.error('Error adding reaction:', error);
+    res.status(500).json({ error: 'Erro ao adicionar reação' });
+  }
+};
+
+// Get reactions for a message
+export const getMessageReactions = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { id: groupId, messageId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // Verify user is a member of the group
+    const member = await prisma.groupMember.findUnique({
+      where: {
+        groupId_userId: { groupId, userId },
+      },
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    const reactions = await prisma.groupMessageReaction.findMany({
+      where: { messageId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    // Group reactions by emoji
+    const grouped: { [key: string]: { emoji: string; count: number; users: any[]; userReacted: boolean } } = {};
+    
+    reactions.forEach((r) => {
+      if (!grouped[r.emoji]) {
+        grouped[r.emoji] = { emoji: r.emoji, count: 0, users: [], userReacted: false };
+      }
+      grouped[r.emoji].count++;
+      grouped[r.emoji].users.push(r.user);
+      if (r.userId === userId) {
+        grouped[r.emoji].userReacted = true;
+      }
+    });
+
+    res.json(Object.values(grouped));
+  } catch (error) {
+    console.error('Error getting reactions:', error);
+    res.status(500).json({ error: 'Erro ao buscar reações' });
   }
 };

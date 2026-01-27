@@ -3,13 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Image, ArrowLeft, Users, Settings, LogOut,
-  Edit3, Volume2, VolumeX, Palette, Eye, EyeOff, X, Edit, Trash2
+  Edit3, Volume2, VolumeX, Palette, Eye, EyeOff, X, Edit, Trash2,
+  Reply, Smile
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
+import GroupSettingsModal from '../components/GroupSettingsModal';
 
 interface Group {
   id: string;
@@ -42,6 +44,27 @@ interface GroupMember {
   };
 }
 
+interface MessageReaction {
+  id: string;
+  emoji: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    displayName?: string;
+  };
+}
+
+interface ReplyTo {
+  id: string;
+  content: string;
+  sender: {
+    id: string;
+    name: string;
+    displayName?: string;
+  };
+}
+
 interface Message {
   id: string;
   content: string;
@@ -56,6 +79,8 @@ interface Message {
     avatarUrl?: string;
   };
   senderNickname?: string;
+  replyTo?: ReplyTo | null;
+  reactions?: MessageReaction[];
 }
 
 interface TypingUser {
@@ -97,6 +122,11 @@ export default function GroupChatPage() {
   const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
   const [mentionFilter, setMentionFilter] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null);
+
+  const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -305,14 +335,27 @@ export default function GroupChatPage() {
     try {
       await api.post(`/groups/${id}/messages`, {
         content: messageText,
-        type: 'TEXT'
+        type: 'TEXT',
+        replyToId: replyingTo?.id || null
       });
       setMessageText('');
+      setReplyingTo(null);
       fetchNewMessages();
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleAddReaction = async (messageId: string, emoji: string) => {
+    try {
+      await api.post(`/groups/${id}/messages/${messageId}/reactions`, { emoji });
+      // Refresh messages to get updated reactions
+      fetchNewMessages();
+      setShowReactionPicker(null);
+    } catch (error) {
+      console.error('Error adding reaction:', error);
     }
   };
 
@@ -404,6 +447,17 @@ export default function GroupChatPage() {
     } catch (error: any) {
       console.error('Error deleting group:', error);
       showToast('Não foi possível deletar o grupo');
+    }
+  };
+
+  const handleBackgroundChange = async (backgroundId: string) => {
+    try {
+      await api.put(`/groups/${id}/background`, { backgroundId });
+      fetchGroup();
+      showToast('Fundo do grupo atualizado!');
+    } catch (error: any) {
+      console.error('Error updating background:', error);
+      showToast('Não foi possível mudar o fundo');
     }
   };
 
@@ -560,43 +614,127 @@ export default function GroupChatPage() {
                 const isMe = msg.sender.id === user?.id;
                 const displayName = getDisplayName(msg);
 
+                // Group reactions by emoji
+                const groupedReactions: { [key: string]: { count: number; users: string[]; userReacted: boolean } } = {};
+                msg.reactions?.forEach(r => {
+                  if (!groupedReactions[r.emoji]) {
+                    groupedReactions[r.emoji] = { count: 0, users: [], userReacted: false };
+                  }
+                  groupedReactions[r.emoji].count++;
+                  groupedReactions[r.emoji].users.push(r.user.displayName || r.user.name);
+                  if (r.userId === user?.id) {
+                    groupedReactions[r.emoji].userReacted = true;
+                  }
+                });
+
                 return (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${isMe ? 'justify-end' : 'justify-start'} group/msg`}
                   >
-                    <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
+                    <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col relative`}>
                       {!isMe && (
                         <span className={`text-xs ${themeSecondary} mb-1 ml-2`}>{displayName}</span>
                       )}
 
-                      <div
-                        className={`rounded-2xl px-4 py-2 ${isMe
-                          ? `${accentBg} text-white`
-                          : `${theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'} ${themeText}`
-                          }`}
-                      >
-                        {msg.type === 'IMAGE' && msg.imageUrl ? (
-                          <div>
-                            {msg.isNSFW && !showNSFW ? (
-                              <div className="p-4 text-sm opacity-60">
-                                [Conteúdo +18 oculto]
-                              </div>
-                            ) : (
-                              <img
-                                src={msg.imageUrl}
-                                alt="Shared image"
-                                className="max-w-full rounded-lg"
-                              />
-                            )}
-                            {msg.content && <p className="mt-2">{msg.content}</p>}
-                          </div>
-                        ) : (
-                          <p>{msg.content}</p>
-                        )}
+                      {/* Reply preview */}
+                      {msg.replyTo && (
+                        <div className={`text-xs ${themeSecondary} mb-1 px-3 py-1 rounded-lg bg-white/5 border-l-2 ${isMGT ? 'border-emerald-500' : 'border-gold-500'} ${isMe ? 'mr-2' : 'ml-2'}`}>
+                          <span className="font-medium">{msg.replyTo.sender.displayName || msg.replyTo.sender.name}</span>
+                          <p className="truncate max-w-[200px]">{msg.replyTo.content}</p>
+                        </div>
+                      )}
+
+                      <div className="relative">
+                        <div
+                          className={`rounded-2xl px-4 py-2 ${isMe
+                            ? `${accentBg} text-white`
+                            : `${theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'} ${themeText}`
+                            }`}
+                        >
+                          {msg.type === 'IMAGE' && msg.imageUrl ? (
+                            <div>
+                              {msg.isNSFW && !showNSFW ? (
+                                <div className="p-4 text-sm opacity-60">
+                                  [Conteúdo +18 oculto]
+                                </div>
+                              ) : (
+                                <img
+                                  src={msg.imageUrl}
+                                  alt="Shared image"
+                                  className="max-w-full rounded-lg"
+                                />
+                              )}
+                              {msg.content && <p className="mt-2">{msg.content}</p>}
+                            </div>
+                          ) : (
+                            <p>{msg.content}</p>
+                          )}
+                        </div>
+
+                        {/* Action buttons (reply & react) - shown on hover */}
+                        <div className={`absolute top-1/2 -translate-y-1/2 ${isMe ? '-left-20' : '-right-20'} flex items-center gap-1 opacity-0 group-hover/msg:opacity-100 transition-opacity`}>
+                          <button
+                            onClick={() => setReplyingTo(msg)}
+                            className="p-1.5 rounded-full bg-gray-700/80 hover:bg-gray-600 transition-colors text-white"
+                            title="Responder"
+                          >
+                            <Reply className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setShowReactionPicker(showReactionPicker === msg.id ? null : msg.id)}
+                            className="p-1.5 rounded-full bg-gray-700/80 hover:bg-gray-600 transition-colors text-white"
+                            title="Reagir"
+                          >
+                            <Smile className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Reaction picker */}
+                        <AnimatePresence>
+                          {showReactionPicker === msg.id && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              className={`absolute ${isMe ? 'right-0' : 'left-0'} -top-10 bg-gray-800 rounded-full px-2 py-1 flex gap-1 shadow-lg border border-white/10 z-10`}
+                            >
+                              {QUICK_REACTIONS.map(emoji => (
+                                <button
+                                  key={emoji}
+                                  onClick={() => handleAddReaction(msg.id, emoji)}
+                                  className="hover:scale-125 transition-transform text-lg px-1"
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
+
+                      {/* Reactions display */}
+                      {Object.keys(groupedReactions).length > 0 && (
+                        <div className={`flex flex-wrap gap-1 mt-1 ${isMe ? 'mr-2 justify-end' : 'ml-2'}`}>
+                          {Object.entries(groupedReactions).map(([emoji, data]) => (
+                            <button
+                              key={emoji}
+                              onClick={() => handleAddReaction(msg.id, emoji)}
+                              className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs ${
+                                data.userReacted 
+                                  ? `${isMGT ? 'bg-emerald-500/30 border-emerald-500' : 'bg-gold-500/30 border-gold-500'} border` 
+                                  : 'bg-gray-700/50 hover:bg-gray-600/50'
+                              } transition-colors`}
+                              title={data.users.join(', ')}
+                            >
+                              <span>{emoji}</span>
+                              <span className="text-gray-300">{data.count}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
                       <span className="text-xs text-gray-400 mt-1 ${isMe ? 'mr-2' : 'ml-2'}">
                         {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
@@ -674,7 +812,40 @@ export default function GroupChatPage() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 bg-black/20 relative">
+          <form onSubmit={handleSendMessage} className="border-t border-white/10 bg-black/20 relative">
+            {/* Reply indicator */}
+            <AnimatePresence>
+              {replyingTo && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className={`px-4 pt-3 pb-1 border-l-4 ${isMGT ? 'border-emerald-500' : 'border-gold-500'} bg-white/5`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Reply className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm">
+                        <span className="text-gray-400">Respondendo a </span>
+                        <span className={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                          {replyingTo.sender.displayName || replyingTo.sender.name}
+                        </span>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setReplyingTo(null)}
+                      className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 truncate mt-1 pl-6">{replyingTo.content}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="p-4 relative">
             {/* Sugestões de menção */}
             <AnimatePresence>
               {showMentionSuggestions && filteredMentionMembers.length > 0 && (
@@ -744,6 +915,7 @@ export default function GroupChatPage() {
                 <Send className="w-5 h-5" />
               </button>
             </div>
+            </div>
           </form>
         </div>
       </div>
@@ -798,7 +970,7 @@ export default function GroupChatPage() {
                 <button
                   onClick={() => {
                     setShowSettings(false);
-                    // TODO: Open background selector
+                    setShowBackgroundModal(true);
                   }}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${themeText}`}
                 >
@@ -1149,6 +1321,33 @@ export default function GroupChatPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Background Settings Modal */}
+      {group && (
+        <GroupSettingsModal
+          isOpen={showBackgroundModal}
+          onClose={() => setShowBackgroundModal(false)}
+          groupId={group.id}
+          groupName={group.name}
+          currentBackground={group.backgroundId}
+          isMuted={myMember?.isMuted || false}
+          isAdmin={isAdmin}
+          members={group.members.map(m => ({
+            id: m.id,
+            role: m.role,
+            user: {
+              id: m.user.id,
+              name: m.user.name,
+              displayName: m.user.displayName || m.user.name,
+              avatarUrl: m.user.avatarUrl || ''
+            }
+          }))}
+          onMuteToggle={() => handleToggleMute()}
+          onBackgroundChange={handleBackgroundChange}
+          onDeleteGroup={isCreator ? handleDeleteGroup : undefined}
+          initialTab="background"
+        />
+      )}
     </div>
   );
 }

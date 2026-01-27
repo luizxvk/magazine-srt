@@ -44,6 +44,7 @@ export default function Rewards() {
     const [redeemedCode, setRedeemedCode] = useState<{ id: string, code: string } | null>(null);
     const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
     const [activeTab, setActiveTab] = useState<'redemptions' | 'history'>('redemptions');
+    const [historyLimit, setHistoryLimit] = useState(10);
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
@@ -372,7 +373,8 @@ export default function Rewards() {
                                     <p>Nenhuma transação registrada</p>
                                 </div>
                             ) : (
-                                zionHistory.map((item) => (
+                                <>
+                                {zionHistory.slice(0, historyLimit).map((item) => (
                                     <motion.div
                                         key={item.id}
                                         initial={{ opacity: 0, y: 10 }}
@@ -419,7 +421,16 @@ export default function Rewards() {
                                             </span>
                                         </div>
                                     </motion.div>
-                                ))
+                                ))}
+                                {zionHistory.length > historyLimit && (
+                                    <button
+                                        onClick={() => setHistoryLimit(prev => prev + 10)}
+                                        className={`w-full py-3 rounded-lg text-sm font-medium transition-all ${isMGT ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-gold-500/10 text-gold-400 hover:bg-gold-500/20'}`}
+                                    >
+                                        Mostrar Mais ({zionHistory.length - historyLimit} restantes)
+                                    </button>
+                                )}
+                                </>
                             )}
                         </div>
                     )}

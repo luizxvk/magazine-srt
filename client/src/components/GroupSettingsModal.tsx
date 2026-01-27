@@ -29,6 +29,7 @@ interface GroupSettingsModalProps {
   onMemberRemove?: (memberId: string) => void;
   onRoleChange?: (memberId: string, role: 'MODERATOR' | 'MEMBER') => void;
   onDeleteGroup?: () => void;
+  initialTab?: 'general' | 'background' | 'members';
 }
 
 // Available backgrounds with preview (same as CustomizationShop)
@@ -66,9 +67,10 @@ export default function GroupSettingsModal({
   onMemberRemove,
   onRoleChange,
   onDeleteGroup,
+  initialTab = 'general',
 }: GroupSettingsModalProps) {
   const { user, theme } = useAuth();
-  const [activeTab, setActiveTab] = useState<'general' | 'background' | 'members'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'background' | 'members'>(initialTab);
   const [ownedBackgrounds, setOwnedBackgrounds] = useState<string[]>(['bg_default']);
   const [loading, setLoading] = useState(false);
   const [muteLoading, setMuteLoading] = useState(false);
@@ -78,6 +80,13 @@ export default function GroupSettingsModal({
   const isDarkMode = theme === 'dark';
   const themeColor = isMGT ? 'emerald' : 'gold';
   const bgMain = isDarkMode ? 'bg-gradient-to-br from-neutral-900 via-neutral-950 to-black' : 'bg-white';
+
+  // Reset to initial tab when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
   const borderColor = isDarkMode ? 'border-white/10' : 'border-gray-200';
   const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
   const textSub = isDarkMode ? 'text-gray-400' : 'text-gray-600';

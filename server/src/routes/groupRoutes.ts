@@ -23,6 +23,8 @@ import {
   getTypingUsers,
   markMessagesRead,
   getMessageReaders,
+  addReaction,
+  getMessageReactions,
 } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -63,5 +65,9 @@ router.post('/:groupId/typing', setTyping);
 router.get('/:groupId/typing', getTypingUsers);
 router.post('/:groupId/read', markMessagesRead);
 router.get('/:groupId/messages/:messageId/readers', getMessageReaders);
+
+// Rotas de reações
+router.post('/:id/messages/:messageId/reactions', addReaction);
+router.get('/:id/messages/:messageId/reactions', getMessageReactions);
 
 export default router;

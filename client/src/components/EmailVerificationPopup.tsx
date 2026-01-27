@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, X, ShieldCheck, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
+import { Mail, X, ShieldCheck, AlertTriangle, Loader2, ArrowRight, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -11,21 +11,27 @@ interface EmailVerificationPopupProps {
 }
 
 export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerificationPopupProps) {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, theme } = useAuth();
     const navigate = useNavigate();
+    const isMGT = user?.membershipType === 'MGT';
+    const isDarkMode = theme === 'dark';
+    
+    // Theme colors
+    const themeColor = isMGT ? 'emerald' : 'gold';
+    const gradientFrom = isMGT ? 'from-emerald-500' : 'from-gold-500';
+    const gradientTo = isMGT ? 'to-emerald-600' : 'to-amber-600';
+    const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const accentBorder = isMGT ? 'border-emerald-500' : 'border-gold-500';
+    const accentRing = isMGT ? 'ring-emerald-500/20' : 'ring-gold-500/20';
+    const cardBg = isMGT ? 'from-emerald-950/90 to-gray-950' : 'from-gray-900 to-gray-950';
+    const borderColor = isMGT ? 'border-emerald-500/20' : 'border-white/10';
+
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
     const [resending, setResending] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [codeSent, setCodeSent] = useState(false);
-
-    useEffect(() => {
-        if (isOpen && !codeSent) {
-            // Enviar código automaticamente ao abrir
-            sendCode();
-        }
-    }, [isOpen]);
 
     const refreshUserData = async () => {
         try {
@@ -41,16 +47,16 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
     const sendCode = async () => {
         try {
             setResending(true);
+            setError('');
             await api.post('/auth/resend-verification');
             setCodeSent(true);
-            setError('');
         } catch (err: any) {
             if (err.response?.data?.error === 'Email already verified') {
                 setSuccess(true);
                 await refreshUserData();
                 setTimeout(onClose, 1500);
             } else {
-                setError('Erro ao enviar código. Tente novamente.');
+                setError(err.response?.data?.error || 'Erro ao enviar código. Tente novamente.');
             }
         } finally {
             setResending(false);
@@ -136,7 +142,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    className="relative w-full max-w-md bg-gradient-to-b from-gray-900 to-gray-950 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+                    className={`relative w-full max-w-md bg-gradient-to-b ${cardBg} rounded-2xl border ${borderColor} shadow-2xl overflow-hidden`}
                 >
                     {/* Header */}
                     <div className="relative p-6 pb-4">
@@ -148,7 +154,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                         </button>
 
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center mb-4">
+                            <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${gradientFrom} ${gradientTo} flex items-center justify-center mb-4`}>
                                 {success ? (
                                     <ShieldCheck className="w-8 h-8 text-white" />
                                 ) : (
@@ -160,10 +166,17 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                 {success ? 'Email Verificado!' : 'Verifique seu Email'}
                             </h2>
 
-                            {!success && (
+                            {!success && !codeSent && (
+                                <p className="text-gray-400 text-sm">
+                                    Clique no botão abaixo para receber um código de verificação em<br />
+                                    <span className={`${accentText} font-medium`}>{user?.email}</span>
+                                </p>
+                            )}
+
+                            {!success && codeSent && (
                                 <p className="text-gray-400 text-sm">
                                     Enviamos um código de 6 dígitos para<br />
-                                    <span className="text-gold-400 font-medium">{user?.email}</span>
+                                    <span className={`${accentText} font-medium`}>{user?.email}</span>
                                 </p>
                             )}
                         </div>
@@ -176,13 +189,53 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                 animate={{ scale: 1 }}
                                 className="flex flex-col items-center gap-4"
                             >
-                                <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                                    <ShieldCheck className="w-10 h-10 text-emerald-400" />
+                                <div className={`w-20 h-20 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                                    <ShieldCheck className={`w-10 h-10 ${accentText}`} />
                                 </div>
                                 <p className="text-gray-300 text-center">
                                     Sua conta está verificada e protegida!
                                 </p>
                             </motion.div>
+                        </div>
+                    ) : !codeSent ? (
+                        // Estado inicial - mostrar botão para enviar código
+                        <div className="p-6 pt-2 space-y-4">
+                            <button
+                                onClick={sendCode}
+                                disabled={resending}
+                                className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${gradientFrom} ${gradientTo} text-black font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-${themeColor}-500/25 transition-all`}
+                            >
+                                {resending ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Enviando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="w-5 h-5" />
+                                        Enviar Código
+                                    </>
+                                )}
+                            </button>
+
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex items-center justify-center gap-2 text-red-400 text-sm"
+                                >
+                                    <AlertTriangle className="w-4 h-4" />
+                                    {error}
+                                </motion.div>
+                            )}
+
+                            <button
+                                onClick={handleGoToVerificationPage}
+                                className="w-full flex items-center justify-center gap-1 text-gray-400 hover:text-white transition-colors text-sm"
+                            >
+                                Ver mais detalhes
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
                         </div>
                     ) : (
                         <>
@@ -199,7 +252,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                             value={digit}
                                             onChange={(e) => handleCodeChange(index, e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(index, e)}
-                                            className="w-11 h-14 text-center text-xl font-bold bg-white/5 border border-white/20 rounded-xl text-white focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none transition-all"
+                                            className={`w-11 h-14 text-center text-xl font-bold ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'} border border-white/20 rounded-xl text-white focus:${accentBorder} focus:ring-2 focus:${accentRing} outline-none transition-all`}
                                             disabled={loading}
                                         />
                                     ))}
@@ -222,7 +275,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                 <button
                                     onClick={handleVerify}
                                     disabled={loading || code.some(d => !d)}
-                                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 text-black font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-gold-500/25 transition-all"
+                                    className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${gradientFrom} ${gradientTo} text-black font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-${themeColor}-500/25 transition-all`}
                                 >
                                     {loading ? (
                                         <>
@@ -238,7 +291,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                     <button
                                         onClick={sendCode}
                                         disabled={resending}
-                                        className="text-gold-400 hover:text-gold-300 disabled:opacity-50 transition-colors"
+                                        className={`${accentText} hover:opacity-80 disabled:opacity-50 transition-colors`}
                                     >
                                         {resending ? 'Enviando...' : 'Reenviar código'}
                                     </button>
@@ -257,8 +310,8 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
 
                     {/* Warning Banner */}
                     {!success && (
-                        <div className="bg-amber-500/10 border-t border-amber-500/20 px-6 py-4">
-                            <p className="text-amber-400/80 text-xs text-center">
+                        <div className={`${isMGT ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'} border-t px-6 py-4`}>
+                            <p className={`${isMGT ? 'text-emerald-400/80' : 'text-amber-400/80'} text-xs text-center`}>
                                 ⚠️ Verifique seu email para manter sua conta ativa e ter acesso a todas as funcionalidades.
                             </p>
                         </div>

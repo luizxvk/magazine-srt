@@ -341,20 +341,15 @@ model ZionPurchase {
   price           Float    // Preço em reais
   paymentId       String?  @unique // ID do pagamento no Mercado Pago
   preferenceId    String?  @unique // ID da preferência no Mercado Pago
-  externalRef     String?  @unique // Referência externa única para idempotência
   status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED, REFUNDED
-  statusDetail    String?  // Detalhe do status do MP
-  paymentMethod   String?  // Método de pagamento usado
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  completedAt     DateTime? // Quando foi aprovado
   user            User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
   @@index([paymentId])
   @@index([preferenceId])
-  @@index([externalRef])
 }
 
 model Event {

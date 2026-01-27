@@ -173,7 +173,14 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             return;
         }
 
-        if (!user || (user.zions || 0) < item.price) {
+        // Check if user has made at least one post
+        if (!user?.postCount || user.postCount < 1) {
+            setNotification({ type: 'error', message: 'Faça sua primeira postagem para desbloquear a loja!' });
+            setTimeout(() => setNotification(null), 4000);
+            return;
+        }
+
+        if (!user || (user.zionsPoints || 0) < item.price) {
             setNotification({ type: 'error', message: 'Zions insuficientes!' });
             setTimeout(() => setNotification(null), 3000);
             return;
@@ -596,15 +603,15 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     ) : (
                                                                         <button
                                                                             onClick={() => handlePurchase(item)}
-                                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
                                                                                 ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
                                                                                 : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
                                                                                 <span className="animate-spin">⏳</span>
-                                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
                                                                                     {item.price}
@@ -676,15 +683,15 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     ) : (
                                                                         <button
                                                                             onClick={() => handlePurchase(item)}
-                                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
                                                                                 ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
                                                                                 : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
                                                                                 <span className="animate-spin">⏳</span>
-                                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
                                                                                     {item.price}
@@ -756,15 +763,15 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     ) : (
                                                                         <button
                                                                             onClick={() => handlePurchase(item)}
-                                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
                                                                                 ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
                                                                                 : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
                                                                                 <span className="animate-spin">⏳</span>
-                                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
                                                                                     {item.price}
@@ -832,15 +839,15 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     ) : (
                                                                         <button
                                                                             onClick={() => handlePurchase(item)}
-                                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
                                                                                 ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
                                                                                 : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
                                                                                 <span className="animate-spin">⏳</span>
-                                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
                                                                                     {item.price}
@@ -934,15 +941,15 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                     ) : (
                                                         <button
                                                             onClick={() => handlePurchase(item)}
-                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
-                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${(user?.zions || 0) < item.price
+                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${(user?.zionsPoints || 0) < item.price
                                                                 ? `${isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-300 text-gray-400'} cursor-not-allowed`
                                                                 : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
                                                                 }`}
                                                         >
                                                             {purchasing === item.id ? (
                                                                 <span className="animate-spin">⏳</span>
-                                                            ) : (user?.zions || 0) < item.price ? (
+                                                            ) : (user?.zionsPoints || 0) < item.price ? (
                                                                 <>
                                                                     <Lock className="w-3 h-3" />
                                                                     {item.price}

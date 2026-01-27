@@ -26,6 +26,7 @@ interface User {
     displayName?: string;
     bio?: string;
     isVerified?: boolean;
+    postCount?: number; // Total de posts do usuário
     // Customization fields
     ownedCustomizations?: string[];
     equippedBackground?: string | null;

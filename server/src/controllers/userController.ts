@@ -280,6 +280,11 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 profileBgScale: true,
                 profileBgPosX: true,
                 profileBgPosY: true,
+                _count: {
+                    select: {
+                        posts: true
+                    }
+                }
             },
         });
 
@@ -290,8 +295,12 @@ export const getMe = async (req: AuthRequest, res: Response) => {
             ...user,
             ownedCustomizations: user.ownedCustomizations
                 ? JSON.parse(user.ownedCustomizations)
-                : []
+                : [],
+            postCount: user._count?.posts || 0
         };
+
+        // Remove _count from response
+        delete (userData as any)._count;
 
         res.json(userData);
     } catch (error) {

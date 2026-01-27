@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Settings, Bell, LogOut, Trash2, User, Zap } from 'lucide-react';
+import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
@@ -23,6 +23,7 @@ export default function SettingsPage() {
     );
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [sendingVerification, setSendingVerification] = useState(false);
 
     const themeColor = isMGT ? 'emerald' : 'gold';
     const themeBg = theme === 'light' ? 'bg-gray-50' : 'bg-black';
@@ -72,6 +73,24 @@ export default function SettingsPage() {
         }
     };
 
+    const handleSendVerification = async () => {
+        if (user?.isVerified) {
+            showToast('Seu email já está verificado!');
+            return;
+        }
+        
+        setSendingVerification(true);
+        try {
+            await api.post('/auth/resend-verification');
+            showToast('Email de verificação enviado! Verifique sua caixa de entrada.');
+        } catch (error: any) {
+            const message = error.response?.data?.error || 'Erro ao enviar email de verificação';
+            showToast(message);
+        } finally {
+            setSendingVerification(false);
+        }
+    };
+
     return (
         <div className={`min-h-screen ${themeBg}`}>
             <Header />
@@ -107,6 +126,34 @@ export default function SettingsPage() {
                             className={`w-full py-3 rounded-xl bg-${themeColor}-500/10 text-${themeColor}-400 hover:bg-${themeColor}-500/20 transition-colors font-medium`}
                         >
                             Editar Perfil
+                        </button>
+                        
+                        {/* Email Verification Button */}
+                        <button
+                            onClick={handleSendVerification}
+                            disabled={sendingVerification || user?.isVerified}
+                            className={`w-full mt-3 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors font-medium ${
+                                user?.isVerified
+                                    ? 'bg-green-500/10 text-green-400 cursor-default'
+                                    : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
+                            }`}
+                        >
+                            {user?.isVerified ? (
+                                <>
+                                    <CheckCircle className="w-5 h-5" />
+                                    Email Verificado
+                                </>
+                            ) : sendingVerification ? (
+                                <>
+                                    <span className="animate-spin">⏳</span>
+                                    Enviando...
+                                </>
+                            ) : (
+                                <>
+                                    <Mail className="w-5 h-5" />
+                                    Verificar Email
+                                </>
+                            )}
                         </button>
                     </div>
 

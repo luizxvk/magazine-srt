@@ -196,8 +196,7 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
                 data: {
                     userId: purchase.userId,
                     amount: purchase.amount,
-                    type: 'PURCHASE',
-                    description: `Compra de ${purchase.amount} Zions por R$${purchase.price.toFixed(2)}`
+                    reason: `Compra de ${purchase.amount} Zions Cash por R$${purchase.price.toFixed(2)}`
                 }
             })
         ]);
@@ -331,7 +330,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
         // Check if it's a product order (prefixed with "product_")
         if (externalRef.startsWith('product_')) {
             const orderId = externalRef.replace('product_', '');
-            await processProductPayment(orderId, String(paymentId), result.status, result.status_detail);
+            await processProductPayment(orderId, String(paymentId), result.status || 'pending', result.status_detail || null);
             return;
         }
 
@@ -381,8 +380,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
                             data: {
                                 userId: purchase.userId,
                                 amount: -purchase.amount,
-                                type: 'REFUND',
-                                description: `Reembolso de ${purchase.amount} Zions`
+                                reason: `Reembolso de ${purchase.amount} Zions Cash`
                             }
                         })
                     ]);
@@ -447,7 +445,7 @@ const processProductPayment = async (orderId: string, paymentId: string, status:
             case 'cancelled':
                 await prisma.order.update({
                     where: { id: orderId },
-                    data: { paymentStatus: status === 'rejected' ? 'FAILED' : 'CANCELLED' }
+                    data: { paymentStatus: 'FAILED' }
                 });
                 console.log(`[WEBHOOK] Product order ${orderId} ${status}`);
                 break;

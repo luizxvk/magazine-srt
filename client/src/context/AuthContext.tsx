@@ -579,8 +579,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const trianglesContainer = document.createElement('div');
             trianglesContainer.className = 'triangles-container';
             
-            // Create 60 shape elements (10 cols * 6 rows)
-            for (let i = 0; i < 60; i++) {
+            // Create 120 shape elements (15 cols * 8 rows) to cover larger screens
+            for (let i = 0; i < 120; i++) {
                 const shape = document.createElement('div');
                 shape.className = 'triangle-shape';
                 

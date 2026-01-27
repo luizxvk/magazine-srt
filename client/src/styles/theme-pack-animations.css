@@ -712,24 +712,26 @@
     position: relative;
 }
 
-/* Radial gradient overlay to fade edges */
+/* Dark vignette overlay for better content readability */
 .anim-infinite-triangles .triangles-overlay {
     width: 100vw;
     height: 100vh;
     position: fixed;
     inset: 0;
     z-index: 1;
-    background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.15) 100%);
+    background: 
+        radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.3) 100%);
     pointer-events: none;
 }
 
-/* Container for grid layout */
+/* Container for grid layout - expanded for larger screens */
 .anim-infinite-triangles .triangles-container {
     position: fixed;
     inset: 0;
     display: grid;
-    grid-template-columns: repeat(10, 200px);
-    grid-template-rows: repeat(6, 230px);
+    grid-template-columns: repeat(15, 200px);
+    grid-template-rows: repeat(8, 230px);
     transform: translate(-3%, -4%);
     z-index: 0;
     pointer-events: none;
@@ -743,21 +745,27 @@
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
 }
 
-/* Hexagon row transforms */
-.anim-infinite-triangles .triangle-shape:nth-child(n+11) {
+/* Hexagon row transforms - 15 columns grid */
+.anim-infinite-triangles .triangle-shape:nth-child(n+16) {
     transform: translate(-50%, -25%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+21) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+31) {
     transform: translate(0%, -50%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+31) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+46) {
     transform: translate(-50%, -75%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+41) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+61) {
     transform: translate(0%, -100%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+51) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+76) {
     transform: translate(-50%, -125%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+91) {
+    transform: translate(0%, -150%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+106) {
+    transform: translate(-50%, -175%);
 }
 
 /* SVG triangle animation */

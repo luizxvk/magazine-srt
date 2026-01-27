@@ -104,8 +104,23 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
             if (isMyStory) {
                 fetchViewers(currentStory.id);
             }
+            // Reset like state and fetch current story like status
+            setIsLiked(false);
+            checkStoryLikeStatus(currentStory.id);
         }
     }, [currentStory?.id]);
+    
+    // Check if current user has liked this story
+    const checkStoryLikeStatus = async (storyId: string) => {
+        if (!isValidStoryId(storyId)) return;
+        try {
+            const response = await api.get(`/feed/stories/${storyId}/like-status`);
+            setIsLiked(response.data.isLiked);
+        } catch (error) {
+            // Silently fail - assume not liked
+            setIsLiked(false);
+        }
+    };
 
     useEffect(() => {
         if (isPaused) return;

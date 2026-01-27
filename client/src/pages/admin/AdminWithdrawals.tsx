@@ -42,7 +42,7 @@ interface AdminWithdrawalsProps {
 }
 
 export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
-    const { theme } = useAuth();
+    const { theme, showToast } = useAuth();
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
     const [stats, setStats] = useState<Stats[]>([]);
     const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
             await api.post(`/withdrawals/admin/${id}/approve`);
             fetchWithdrawals();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao aprovar');
+            showToast(error.response?.data?.error || 'Erro ao aprovar');
         } finally {
             setSubmitting(false);
         }
@@ -91,7 +91,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
             await api.post(`/withdrawals/admin/${id}/process`);
             fetchWithdrawals();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao processar');
+            showToast(error.response?.data?.error || 'Erro ao processar');
         } finally {
             setSubmitting(false);
         }
@@ -103,7 +103,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
             await api.post(`/withdrawals/admin/${id}/complete`);
             fetchWithdrawals();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao completar');
+            showToast(error.response?.data?.error || 'Erro ao completar');
         } finally {
             setSubmitting(false);
         }
@@ -119,7 +119,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
             setRejectionNote('');
             fetchWithdrawals();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao rejeitar');
+            showToast(error.response?.data?.error || 'Erro ao rejeitar');
         } finally {
             setSubmitting(false);
         }

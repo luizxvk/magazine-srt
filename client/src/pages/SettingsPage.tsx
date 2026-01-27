@@ -8,7 +8,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import api from '../services/api';
 
 export default function SettingsPage() {
-    const { user, logout, theme, toggleTheme } = useAuth();
+    const { user, logout, theme, toggleTheme, showToast } = useAuth();
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     
@@ -68,7 +68,7 @@ export default function SettingsPage() {
             navigate('/login');
         } catch (error) {
             console.error('Error deleting account:', error);
-            alert('Erro ao remover conta. Tente novamente.');
+            showToast('Erro ao remover conta. Tente novamente.');
         }
     };
 

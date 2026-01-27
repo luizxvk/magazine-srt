@@ -6,7 +6,7 @@ import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 
 export default function VerificationPage() {
-    const { user } = useAuth();
+    const { user, showToast } = useAuth();
     const navigate = useNavigate();
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -134,7 +134,7 @@ export default function VerificationPage() {
 
         try {
             await api.post('/auth/resend-verification');
-            alert('Código reenviado! Verifique seu email.');
+            showToast('Código reenviado! Verifique seu email.');
         } catch (err: any) {
             const errorMsg = err.response?.data?.error;
             // Se já verificado, redireciona

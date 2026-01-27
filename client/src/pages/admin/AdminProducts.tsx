@@ -41,7 +41,7 @@ const categoryOptions = [
 ];
 
 export default function AdminProducts({ onClose }: AdminProductsProps) {
-    const { theme } = useAuth();
+    const { theme, showToast } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -150,7 +150,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             resetForm();
             fetchProducts();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao salvar produto');
+            showToast(error.response?.data?.error || 'Erro ao salvar produto');
         } finally {
             setSubmitting(false);
         }
@@ -163,7 +163,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             await api.delete(`/products/admin/${productId}`);
             fetchProducts();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao excluir produto');
+            showToast(error.response?.data?.error || 'Erro ao excluir produto');
         }
     };
 
@@ -180,7 +180,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             setSelectedProductId(null);
             fetchProducts();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao adicionar keys');
+            showToast(error.response?.data?.error || 'Erro ao adicionar keys');
         } finally {
             setSubmitting(false);
         }
@@ -191,7 +191,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             await api.put(`/products/admin/${product.id}`, { isActive: !product.isActive });
             fetchProducts();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao atualizar produto');
+            showToast(error.response?.data?.error || 'Erro ao atualizar produto');
         }
     };
 

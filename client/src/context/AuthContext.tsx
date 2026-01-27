@@ -665,6 +665,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             clouds.className = 'moonlit-clouds';
             container.appendChild(clouds);
             
+            // Create blur overlay for content readability
+            const blurOverlay = document.createElement('div');
+            blurOverlay.className = 'moonlit-blur-overlay';
+            container.appendChild(blurOverlay);
+            
             document.body.appendChild(container);
         }
     }, [backgroundStyle, user]);

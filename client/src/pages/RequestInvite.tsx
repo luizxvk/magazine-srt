@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import logo from '../assets/logo-mgzn.png';
@@ -7,6 +8,7 @@ import { ArrowRight, Instagram, Mail, User } from 'lucide-react';
 
 export default function RequestInvite() {
     const navigate = useNavigate();
+    const { showToast } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -23,7 +25,7 @@ export default function RequestInvite() {
             setSuccess(true);
         } catch (error: any) {
             console.error('Failed to request invite', error);
-            alert(error.response?.data?.error || 'Erro ao solicitar convite. Tente novamente.');
+            showToast(error.response?.data?.error || 'Erro ao solicitar convite. Tente novamente.');
         } finally {
             setLoading(false);
         }

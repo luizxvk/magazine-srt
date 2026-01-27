@@ -237,25 +237,32 @@ export default function MiniRadioPlayer() {
 
                                 {/* Station Selector */}
                                 <div className="grid grid-cols-4 gap-1.5">
-                                    {RADIO_STATIONS.slice(0, 8).map((station) => (
-                                        <button
-                                            key={station.id}
-                                            onClick={() => {
-                                                changeStation(station);
-                                                handleInteraction();
-                                            }}
-                                            className={`px-2 py-1.5 rounded-lg text-[10px] font-medium truncate transition-all ${
-                                                currentStation.id === station.id
-                                                    ? 'text-white'
-                                                    : `${textSub} ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`
-                                            }`}
-                                            style={{
-                                                backgroundColor: currentStation.id === station.id ? station.color : undefined
-                                            }}
-                                        >
-                                            {station.name.split(' ')[0]}
-                                        </button>
-                                    ))}
+                                    {RADIO_STATIONS.slice(0, 8).map((station) => {
+                                        // Use accent color for selected, otherwise use project theme colors
+                                        const isSelected = currentStation.id === station.id;
+                                        const buttonBg = isSelected 
+                                            ? (isMGT ? '#10b981' : '#d4af37') 
+                                            : undefined;
+                                        
+                                        return (
+                                            <button
+                                                key={station.id}
+                                                onClick={() => {
+                                                    changeStation(station);
+                                                    handleInteraction();
+                                                }}
+                                                className={`px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all ${
+                                                    isSelected
+                                                        ? 'text-white'
+                                                        : `${textSub} ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`
+                                                }`}
+                                                style={{ backgroundColor: buttonBg }}
+                                                title={station.name}
+                                            >
+                                                {station.name.length > 5 ? station.name.substring(0, 5) + '.' : station.name}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </motion.div>

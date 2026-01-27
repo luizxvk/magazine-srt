@@ -519,10 +519,10 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
                                         tag: '',
                                         heroDescription: ''
                                     });
-                                    alert('Anúncio removido com sucesso!'); // Using alert as simple feedback
+                                    if (showToast) showToast('Anúncio removido com sucesso!', 'success'); // Using showToast for feedback
                                 } catch (error) {
                                     console.error('Failed to remove', error);
-                                    alert('Erro ao remover anúncio');
+                                    if (showToast) showToast('Erro ao remover anúncio', 'error');
                                 } finally {
                                     setLoading(false);
                                 }

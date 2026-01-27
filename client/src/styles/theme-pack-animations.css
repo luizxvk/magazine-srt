@@ -722,6 +722,8 @@
     background: 
         radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%),
         linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.3) 100%);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
     pointer-events: none;
 }
 
@@ -890,6 +892,16 @@
     bottom: 0;
     z-index: 2;
     animation: moonlit-move-background 150s linear infinite;
+}
+
+/* Subtle blur overlay for content readability */
+.anim-moonlit-sky .moonlit-blur-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    pointer-events: none;
 }
 
 /* Moon image */

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check, AtSign, ChevronUp, ChevronDown } from 'lucide-react';
+import { Image as ImageIcon, Send, X, Layers, Lock, Hash, Check, AtSign, ChevronUp, ChevronDown, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -18,7 +18,7 @@ interface MentionUser {
 }
 
 export default function CreatePostWidget({ onPostCreated, inline = false }: CreatePostWidgetProps) {
-    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen, accentColor } = useAuth();
+    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen, accentColor, showToast } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -161,7 +161,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
     const handleSubmit = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (isVisitor) {
-            alert('Faça login para publicar.');
+            showToast?.('Faça login para publicar.');
             return;
         }
         if (!caption.trim() && !mediaUrl) return;
@@ -219,7 +219,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
 
         } catch (error: any) {
             console.error('Failed to create post', error);
-            alert(`Failed to create post: ${error.response?.data?.error || error.message}`);
+            showToast?.(`Erro ao criar post: ${error.response?.data?.error || error.message}`);
         } finally {
             setLoading(false);
         }
@@ -262,6 +262,54 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
                 reader.readAsDataURL(file);
             }
         }
+    };
+
+    const videoInputRef = useRef<HTMLInputElement>(null);
+    const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_VIDEO_DURATION = 60; // 60 seconds
+
+    const handleVideoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Check file size
+        if (file.size > MAX_VIDEO_SIZE) {
+            showToast?.('Vídeo muito grande! Máximo permitido: 10MB');
+            return;
+        }
+
+        // Check if it's a video
+        if (!file.type.startsWith('video/')) {
+            showToast?.('Por favor, selecione um arquivo de vídeo válido');
+            return;
+        }
+
+        // Check video duration
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        
+        video.onloadedmetadata = () => {
+            URL.revokeObjectURL(video.src);
+            if (video.duration > MAX_VIDEO_DURATION) {
+                showToast?.(`Vídeo muito longo! Máximo permitido: ${MAX_VIDEO_DURATION} segundos`);
+                return;
+            }
+
+            // Video is valid, convert to base64
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setMediaUrl(reader.result as string);
+                setMediaType('VIDEO');
+                showToast?.('Vídeo carregado com sucesso!');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        video.onerror = () => {
+            showToast?.('Erro ao processar o vídeo');
+        };
+
+        video.src = URL.createObjectURL(file);
     };
 
     if (isVisitor) {
@@ -514,6 +562,14 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
                                         onChange={handleFileSelect}
                                         aria-label="Selecionar imagem"
                                     />
+                                    <input
+                                        type="file"
+                                        ref={videoInputRef}
+                                        className="hidden"
+                                        accept="video/*"
+                                        onChange={handleVideoSelect}
+                                        aria-label="Selecionar vídeo"
+                                    />
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
@@ -521,6 +577,14 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
                                         title="Adicionar Imagem"
                                     >
                                         <ImageIcon className="w-5 h-5 stroke-[1.5]" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => videoInputRef.current?.click()}
+                                        className={`${themeTextMuted} ${themeTextHover} ${themeBgHover} rounded-full p-2 transition-all duration-300`}
+                                        title="Adicionar Vídeo (máx. 10MB, 60s)"
+                                    >
+                                        <Video className="w-5 h-5 stroke-[1.5]" />
                                     </button>
                                 </div>
                             </motion.div>

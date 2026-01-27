@@ -45,7 +45,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.R
 };
 
 export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
-    const { user, theme, updateUserZions } = useAuth();
+    const { user, theme, updateUserZions, showToast } = useAuth();
     const [activeTab, setActiveTab] = useState<'new' | 'history'>('new');
     const [rate, setRate] = useState<ConversionRate | null>(null);
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
@@ -130,7 +130,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
             updateUserZions(response.data.refundedZions || 0);
             fetchData();
         } catch (err: any) {
-            alert(err.response?.data?.error || 'Erro ao cancelar');
+            showToast(err.response?.data?.error || 'Erro ao cancelar');
         }
     };
 

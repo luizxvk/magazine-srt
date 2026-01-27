@@ -49,7 +49,7 @@ const hexToRgba = (hex: string, alpha: number) => {
 };
 
 export default function DiscordCard() {
-    const { user, theme } = useAuth();
+    const { user, theme, showToast } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
     const [connection, setConnection] = useState<DiscordConnection | null>(null);
@@ -124,7 +124,7 @@ export default function DiscordCard() {
         try {
             if (!user?.id) {
                 console.error('User not logged in');
-                alert('Você precisa estar logado para conectar o Discord');
+                showToast('Você precisa estar logado para conectar o Discord');
                 return;
             }
 
@@ -135,7 +135,7 @@ export default function DiscordCard() {
             window.location.href = authUrl;
         } catch (error) {
             console.error('Error initiating Discord auth:', error);
-            alert('Erro ao iniciar autenticação com Discord');
+            showToast('Erro ao iniciar autenticação com Discord');
         }
     };
 

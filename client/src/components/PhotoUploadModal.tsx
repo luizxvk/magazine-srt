@@ -12,7 +12,7 @@ interface PhotoUploadModalProps {
 }
 
 export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUploadModalProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, showToast } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
     const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
             
             // Check file size (max 10MB before compression)
             if (file.size > 10 * 1024 * 1024) {
-                alert('Imagem muito grande. Tamanho máximo: 10MB');
+                showToast('Imagem muito grande. Tamanho máximo: 10MB');
                 return;
             }
             
@@ -123,7 +123,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
             setIsPublic(true);
         } catch (error) {
             console.error('Failed to upload photo', error);
-            alert('Falha ao enviar foto. Verifique se a imagem é válida e tente novamente.');
+            showToast('Falha ao enviar foto. Verifique se a imagem é válida e tente novamente.');
         } finally {
             setLoading(false);
         }

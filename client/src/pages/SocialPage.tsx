@@ -45,7 +45,7 @@ interface GroupInvite {
 }
 
 export default function SocialPage() {
-    const { user } = useAuth();
+    const { user, showToast } = useAuth();
     const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended'>('friends');
     const [friends, setFriends] = useState<Friend[]>([]);
     const [requests, setRequests] = useState<FriendRequest[]>([]);
@@ -138,7 +138,7 @@ export default function SocialPage() {
             }
         } catch (error) {
             console.error('Failed to accept group invite', error);
-            alert('Erro ao aceitar convite');
+            showToast('Erro ao aceitar convite');
         }
     };
 

@@ -516,6 +516,37 @@ export const likeStory = async (req: AuthRequest, res: Response) => {
     }
 };
 
+export const getStoryLikeStatus = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { storyId } = req.params;
+
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        // Check if user has liked this story by looking for a recent notification
+        const recentLike = await prisma.notification.findFirst({
+            where: {
+                type: 'LIKE',
+                content: {
+                    contains: userId
+                },
+                createdAt: {
+                    gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Within 24 hours
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // For now, we'll use a simpler approach - check StoryLike table if exists
+        // Since we don't have StoryLike model, return false for now
+        // This will be improved when StoryLike model is added
+        res.json({ isLiked: false });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const getStories = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;

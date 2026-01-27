@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Star, Shield, Zap } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import LuxuriousBackground from '../../components/LuxuriousBackground';
 import Header from '../../components/Header';
@@ -65,6 +66,7 @@ const defaultPlans: Plan[] = [
 
 export default function AdminEditSrtLogPage() {
     const navigate = useNavigate();
+    const { showToast } = useAuth();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [content, setContent] = useState<PageContent>({
@@ -103,10 +105,10 @@ export default function AdminEditSrtLogPage() {
         setSaving(true);
         try {
             await api.post('/content/mgt-log-page', content); // Using POST/PUT handled by controller
-            alert('Alterações salvas com sucesso!');
+            showToast('Alterações salvas com sucesso!');
         } catch (error) {
             console.error('Failed to save content', error);
-            alert('Erro ao salvar alterações.');
+            showToast('Erro ao salvar alterações.');
         } finally {
             setSaving(false);
         }

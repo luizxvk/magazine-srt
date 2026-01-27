@@ -49,14 +49,14 @@ export const RADIO_STATIONS: RadioStation[] = [
         id: 'jazz',
         name: 'Smooth Jazz',
         genre: 'Jazz / Relaxing',
-        streamUrl: 'https://stream.zeno.fm/fyn8eh13hn8uv',
+        streamUrl: 'https://stream.zeno.fm/4d6my9a2hauuv',
         color: '#F97316'
     },
     {
         id: 'electronic',
         name: 'Electronic',
         genre: 'EDM / House',
-        streamUrl: 'https://stream.zeno.fm/0hq1sm8am0zuv',
+        streamUrl: 'https://stream.zeno.fm/s44rmn2a3wzuv',
         color: '#EC4899'
     },
     {

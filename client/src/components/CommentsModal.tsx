@@ -24,16 +24,16 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
     const { user, showAchievement, updateUserZions, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
-    const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
+    const themeBg = theme === 'light' ? 'bg-white' : (isMGT ? 'bg-emerald-950/95' : 'bg-zinc-900/95');
     const themeBorder = isMGT
-        ? (theme === 'light' ? 'border-red-200' : 'border-red-500/20')
-        : (theme === 'light' ? 'border-gold-200' : 'border-gold-500/20');
-    const themeText = isMGT ? 'text-emerald-500' : 'text-gold-400';
+        ? (theme === 'light' ? 'border-emerald-200' : 'border-emerald-500/30')
+        : (theme === 'light' ? 'border-gold-200' : 'border-gold-500/30');
+    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeTextSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const themeInputBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
+    const themeInputBg = theme === 'light' ? 'bg-gray-100' : (isMGT ? 'bg-emerald-900/50' : 'bg-white/5');
     const themeInputText = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
-    const themeCommentBg = theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5';
+    const themeButton = isMGT ? 'bg-emerald-500 hover:bg-emerald-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
+    const themeCommentBg = theme === 'light' ? 'bg-gray-50 border-gray-100' : (isMGT ? 'bg-emerald-900/30 border-emerald-500/10' : 'bg-white/5 border-white/5');
 
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');

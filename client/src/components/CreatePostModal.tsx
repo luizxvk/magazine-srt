@@ -10,7 +10,7 @@ interface CreatePostModalProps {
 }
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostModalProps) {
-    const { user } = useAuth();
+    const { user, showToast } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -63,7 +63,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
             // alert('Post created successfully!'); // Debug
         } catch (error: any) {
             console.error('Failed to create post', error);
-            alert(`Failed to create post: ${error.response?.data?.error || error.message}`);
+            showToast(`Erro ao criar post: ${error.response?.data?.error || error.message}`);
         } finally {
             setLoading(false);
         }

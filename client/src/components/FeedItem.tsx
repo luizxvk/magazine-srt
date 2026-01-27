@@ -91,7 +91,7 @@ export default function FeedItem({
     onShare,
     isExpanded = false
 }: FeedItemProps) {
-    const { user, theme, isVisitor } = useAuth();
+    const { user, theme, isVisitor, showToast } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
@@ -136,11 +136,11 @@ export default function FeedItem({
         setIsReporting(true);
         try {
             await api.post(`/reports/post/${id}`, { reason: reportReason });
-            alert('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
+            showToast('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
             setShowReportModal(false);
             setReportReason('');
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Erro ao enviar denúncia');
+            showToast(error.response?.data?.error || 'Erro ao enviar denúncia');
         } finally {
             setIsReporting(false);
         }

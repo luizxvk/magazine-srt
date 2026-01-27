@@ -14,6 +14,7 @@ import AdminEditRewardModal from '../components/AdminEditRewardModal';
 import AdminCreateEvent from '../components/AdminCreateEvent';
 import BadgeManager from '../components/BadgeManager';
 import AdminFeedbackCard from '../components/AdminFeedbackCard';
+import AdminEliteReward from '../components/AdminEliteReward';
 import AdminProducts from './admin/AdminProducts';
 import AdminWithdrawals from './admin/AdminWithdrawals';
 
@@ -255,6 +256,7 @@ export default function AdminDashboard() {
                         <AdminCreateAnnouncement showToast={showToast} />
                         <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
                         <AdminCreateEvent showToast={showToast} />
+                        <AdminEliteReward showToast={showToast} />
                         <BadgeManager />
                         <AdminFeedbackCard />
                     </div>

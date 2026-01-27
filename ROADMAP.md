@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.4.1 (Beta)  
-> **Última Atualização:** 12 de Janeiro de 2026
+> **Versão Atual:** v0.4.15 (Beta)  
+> **Última Atualização:** 27 de Janeiro de 2026
 
 ---
 
@@ -11,16 +11,45 @@
 🟢 Fase Beta Ativa
 ├─ Sistema Base: 100% ✅
 ├─ Features Sociais: 95% ✅
-├─ Gamificação: 90% ✅
+├─ Gamificação: 95% ✅
 ├─ E-commerce: 85% 🔄
-└─ Personalização: 80% 🔄
+└─ Personalização: 85% 🔄
 ```
 
 ---
 
-## ✅ Recentemente Implementado (v0.3.25 - v0.4.1)
+## ✅ Recentemente Implementado (v0.4.1 - v0.4.15)
 
-### v0.4.1 (Atual - Janeiro 2026) 🎉
+### v0.4.15 (Atual - Janeiro 2026) 🎉
+**ELITE RANKING PRIZES & UX IMPROVEMENTS**
+
+- 🏆 **Sistema de Prêmios Elite Ranking**
+  - Card de prêmio mensal no modal de ranking
+  - Contador de dias restantes até fim do mês
+  - Suporte a 3 tipos: Zions Points, Zions Cash, Produto
+  - Configuração admin para definir prêmio do mês
+  - Notificações de lembrete para quando prêmio estiver disponível
+
+- 📻 **Correções de Rádio**
+  - URLs de stream Jazz e Eletrônica atualizadas
+  - Problema de 404 nas estações corrigido
+
+- 🎬 **Upload de Vídeo**
+  - Suporte a vídeo nos posts (MP4, MOV, WebM, AVI)
+  - Botão de vídeo no widget de criação de post
+  - Preview de vídeo antes de publicar
+
+- ✨ **Melhorias Visuais**
+  - Blur sutil nos backgrounds Moonlit Sky e Infinite Triangles
+  - Layout do Elite Ranking corrigido (Nível/Troféus sem quebra)
+  - Cores do modal de comentários ajustadas
+
+- 🔧 **UX Melhorada**
+  - ~30 alerts substituídos por toast notifications
+  - Bug de stories corrigido
+  - Fotos do catálogo não sobrepõem mais
+
+### v0.4.1 (Janeiro 2026)
 **LAYOUT FACEBOOK-STYLE & TOOLS CAROUSEL**
 
 - 📱 **Sidebar Esquerda Estilo Facebook**

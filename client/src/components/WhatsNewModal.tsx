@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Users, Sun, Triangle, Star, Moon } from 'lucide-react';
+import { X, Sparkles, Check, Users, Sun, Triangle, Star, Moon, Trophy, Radio, Video, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.14';
+const CURRENT_VERSION = '0.4.15';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,42 +33,42 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.14 - MOONLIT SKY & IMPROVEMENTS
+    // v0.4.15 - ELITE RANKING PRIZES & IMPROVEMENTS
     const updates: UpdateItem[] = [
         {
+            icon: <Trophy className="w-5 h-5 text-yellow-400" />,
+            title: '🏆 Prêmios Elite Ranking',
+            description: 'Novo sistema de prêmios mensais! Card com dias restantes e recompensa do mês.',
+            isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5 text-blue-400" />,
+            title: '🔔 Lembretes de Prêmio',
+            description: 'Ative notificações para lembrar quando o prêmio mensal estiver disponível.',
+            isNew: true
+        },
+        {
+            icon: <Radio className="w-5 h-5 text-green-400" />,
+            title: '📻 Rádios Corrigidas',
+            description: 'Jazz e Eletrônica agora funcionam novamente com novos streams.',
+            isNew: true
+        },
+        {
+            icon: <Video className="w-5 h-5 text-purple-400" />,
+            title: '🎬 Upload de Vídeo',
+            description: 'Agora você pode publicar vídeos nos seus posts! Suporte a MP4, MOV e mais.',
+            isNew: true
+        },
+        {
             icon: <Moon className="w-5 h-5 text-indigo-400" />,
-            title: '🌙 Moonlit Sky',
-            description: 'Novo fundo premium! Céu noturno com lua, estrelas cintilantes e nuvens em movimento.',
+            title: '✨ Backgrounds com Blur',
+            description: 'Moonlit Sky e Infinite Triangles agora têm blur sutil para melhor leitura.',
             isNew: true
         },
         {
-            icon: <Triangle className="w-5 h-5 text-amber-400" />,
-            title: '🔺 Infinite Triangles Melhorado',
-            description: 'Cobertura total da tela, vinheta escura para melhor legibilidade do conteúdo.',
-            isNew: true
-        },
-        {
-            icon: <Sun className="w-5 h-5 text-pink-400" />,
-            title: '🌈 Rainbow Skies',
-            description: 'Raios de arco-íris deslizando em fundo gradiente. Ativa modo claro automaticamente!',
-            isNew: true
-        },
-        {
-            icon: <Star className="w-5 h-5 text-purple-400" />,
-            title: '⭐ Categoria Featured',
-            description: 'Nova seção "Featured" na loja com fundos animados premium exclusivos.',
-            isNew: true
-        },
-        {
-            icon: <Users className="w-5 h-5 text-cyan-500" />,
-            title: '👤 Perfis de Outros Usuários',
-            description: 'Clique em membros no Explorar e veja seus perfis completos.',
-            isNew: true
-        },
-        {
-            icon: <Sparkles className="w-5 h-5 text-blue-500" />,
-            title: '🔧 Correções Gerais',
-            description: 'Melhorias de performance, scroll, reações em grupos e erros de build.',
+            icon: <Sparkles className="w-5 h-5 text-cyan-500" />,
+            title: '🔧 UX Melhorada',
+            description: 'Alerts substituídos por toasts, layout do ranking corrigido, stories e mais.',
             isNew: true
         }
     ];

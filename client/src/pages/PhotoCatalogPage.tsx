@@ -63,7 +63,7 @@ function PhotoCard({
             case 'landscape':
                 return 'col-span-2 row-span-1';
             case 'portrait':
-                return 'col-span-1 row-span-2';
+                return 'col-span-1 row-span-1'; // Changed from row-span-2 to prevent overlapping
             default:
                 return 'col-span-1 row-span-1';
         }
@@ -606,7 +606,7 @@ export default function PhotoCatalogPage() {
                 {/* (Lines 151-207 omitted for brevity, keeping original logic) */}
                 {/* Gallery Grid - Responsive with Dynamic Aspect Ratios */}
                 <div className={`
-                    ${viewMode === 'masonry' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 auto-rows-[200px]' : ''}
+                    ${viewMode === 'masonry' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 auto-rows-[180px]' : ''}
                     ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4' : ''}
                     ${viewMode === 'list' ? 'flex flex-col gap-4 max-w-3xl mx-auto' : ''}
                 `}>

@@ -45,7 +45,7 @@ export default function MarketCard() {
             <div className="grid grid-cols-3 gap-2 relative z-10">
                 <button
                     onClick={() => handleTabNavigation('browse')}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
+                    className={`flex flex-col items-center justify-center gap-1.5 p-3 min-h-[72px] rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
                     <div className="group-hover/btn:scale-110 transition-transform">
                         <TrendingUp className="w-4 h-4" style={{ color: backgroundAccent }} />
@@ -54,7 +54,7 @@ export default function MarketCard() {
                 </button>
                 <button
                     onClick={() => handleTabNavigation('sell')}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
+                    className={`flex flex-col items-center justify-center gap-1.5 p-3 min-h-[72px] rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
                     <div className="group-hover/btn:scale-110 transition-transform">
                         <Package className="w-4 h-4" style={{ color: backgroundAccent }} />
@@ -63,7 +63,7 @@ export default function MarketCard() {
                 </button>
                 <button
                     onClick={() => handleTabNavigation('history')}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
+                    className={`flex flex-col items-center justify-center gap-1.5 p-3 min-h-[72px] rounded-lg bg-black/40 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group/btn`}
                 >
                     <div className="group-hover/btn:scale-110 transition-transform">
                         <History className="w-4 h-4" style={{ color: backgroundAccent }} />

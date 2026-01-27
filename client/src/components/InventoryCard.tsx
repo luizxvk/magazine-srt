@@ -199,18 +199,18 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
                     <>
                         {/* Stats */}
                         <div className="grid grid-cols-3 gap-2 mb-4">
-                            <div className="text-center p-2 rounded-lg bg-white/5">
-                                <Image className="w-4 h-4 mx-auto mb-1 text-purple-400" />
+                            <div className="flex flex-col items-center justify-center p-2 min-h-[72px] rounded-lg bg-white/5">
+                                <Image className="w-4 h-4 mb-1 text-purple-400" />
                                 <p className="text-lg font-bold text-white">{backgroundCount}</p>
                                 <p className="text-[10px] text-gray-400">Fundos</p>
                             </div>
-                            <div className="text-center p-2 rounded-lg bg-white/5">
-                                <Award className="w-4 h-4 mx-auto mb-1 text-yellow-400" />
+                            <div className="flex flex-col items-center justify-center p-2 min-h-[72px] rounded-lg bg-white/5">
+                                <Award className="w-4 h-4 mb-1 text-yellow-400" />
                                 <p className="text-lg font-bold text-white">{badgeCount}</p>
                                 <p className="text-[10px] text-gray-400">Badges</p>
                             </div>
-                            <div className="text-center p-2 rounded-lg bg-white/5">
-                                <Palette className="w-4 h-4 mx-auto mb-1 text-cyan-400" />
+                            <div className="flex flex-col items-center justify-center p-2 min-h-[72px] rounded-lg bg-white/5">
+                                <Palette className="w-4 h-4 mb-1 text-cyan-400" />
                                 <p className="text-lg font-bold text-white">{colorCount}</p>
                                 <p className="text-[10px] text-gray-400">Cores</p>
                             </div>

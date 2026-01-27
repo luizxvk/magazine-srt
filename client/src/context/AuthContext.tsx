@@ -528,6 +528,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Special handling for Rainbow Skies
             if (className === 'anim-rainbow-skies') {
                 createRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
                 
                 // Save current theme for MGT before switching to light
                 if (user?.membershipType === 'MGT' && !localStorage.getItem('mgt-theme-before-rainbow')) {
@@ -538,10 +540,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setTheme('light');
             } else if (className === 'anim-infinite-triangles') {
                 cleanupRainbowElements();
+                cleanupMoonlitElements();
                 createInfiniteTrianglesElements();
+            } else if (className === 'anim-moonlit-sky') {
+                cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                createMoonlitElements();
             } else {
                 cleanupRainbowElements();
                 cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
             }
             
             // Clear inline styles
@@ -553,6 +561,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Traditional gradient (inline style)
             cleanupRainbowElements();
             cleanupInfiniteTrianglesElements();
+            cleanupMoonlitElements();
             document.body.style.background = backgroundStyle;
             document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';
@@ -579,8 +588,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const trianglesContainer = document.createElement('div');
             trianglesContainer.className = 'triangles-container';
             
-            // Create 120 shape elements (15 cols * 8 rows) to cover larger screens
-            for (let i = 0; i < 120; i++) {
+            // Create 240 shape elements (20 cols * 12 rows) to cover all screen sizes
+            for (let i = 0; i < 240; i++) {
                 const shape = document.createElement('div');
                 shape.className = 'triangle-shape';
                 
@@ -614,6 +623,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             
             container.appendChild(trianglesContainer);
+            document.body.appendChild(container);
+        }
+        
+        // Cleanup function for Moonlit Sky elements
+        function cleanupMoonlitElements() {
+            const existingContainer = document.getElementById('moonlit-sky-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        }
+        
+        // Helper function to create Moonlit Sky elements
+        function createMoonlitElements() {
+            // Clean up any existing elements first
+            cleanupMoonlitElements();
+            
+            const container = document.createElement('div');
+            container.id = 'moonlit-sky-container';
+            container.className = 'moonlit-container';
+            
+            // Create moon image
+            const moon = document.createElement('img');
+            moon.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png';
+            moon.alt = 'Moon';
+            moon.className = 'moonlit-moon';
+            container.appendChild(moon);
+            
+            // Create stars layer
+            const stars = document.createElement('div');
+            stars.className = 'moonlit-stars';
+            container.appendChild(stars);
+            
+            // Create twinkling layer
+            const twinkling = document.createElement('div');
+            twinkling.className = 'moonlit-twinkling';
+            container.appendChild(twinkling);
+            
+            // Create clouds layer
+            const clouds = document.createElement('div');
+            clouds.className = 'moonlit-clouds';
+            container.appendChild(clouds);
+            
             document.body.appendChild(container);
         }
     }, [backgroundStyle, user]);

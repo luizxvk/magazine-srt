@@ -281,9 +281,9 @@ const roadmapItems: RoadmapItem[] = [
     {
         id: '29f',
         title: 'Fundos Animados Premium',
-        description: 'Rainbow Skies (raios arco-íris com modo claro) e Infinite Triangles (grid hexagonal com cor de destaque). Categoria Featured na loja!',
+        description: 'Rainbow Skies (raios arco-íris com modo claro), Infinite Triangles (grid hexagonal com cor de destaque) e Moonlit Sky (céu noturno com lua e estrelas). Categoria Featured na loja!',
         status: 'completed',
-        version: 'v0.4.13',
+        version: 'v0.4.14',
         icon: <Palette className="w-5 h-5" />,
         category: 'feature'
     },

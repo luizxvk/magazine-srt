@@ -592,6 +592,7 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'anim-gradient-waves', name: 'Ondas Gradiente', price: 2000, type: 'animated', preview: '🌊' },
         { id: 'anim-rainbow-skies', name: 'Rainbow Skies', price: 3000, type: 'animated', preview: '🌈' },
         { id: 'anim-infinite-triangles', name: 'Infinite Triangles', price: 3500, type: 'animated', preview: '🔷' },
+        { id: 'anim-moonlit-sky', name: 'Moonlit Sky', price: 4000, type: 'animated', preview: '🌙' },
     ],
     badges: [
         { id: 'badge_skull', name: 'Caveira', price: 300, preview: '💀' },

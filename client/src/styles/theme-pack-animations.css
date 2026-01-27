@@ -725,17 +725,18 @@
     pointer-events: none;
 }
 
-/* Container for grid layout - expanded for larger screens */
+/* Container for grid layout - uses calc to ensure full coverage on any screen */
 .anim-infinite-triangles .triangles-container {
     position: fixed;
-    inset: 0;
+    top: -10%;
+    left: -10%;
+    width: 120vw;
+    height: 120vh;
     display: grid;
-    grid-template-columns: repeat(15, 200px);
-    grid-template-rows: repeat(8, 230px);
-    transform: translate(-3%, -4%);
+    grid-template-columns: repeat(20, 200px);
+    grid-template-rows: repeat(12, 230px);
     z-index: 0;
     pointer-events: none;
-    overflow: hidden;
 }
 
 /* Individual shape with hexagon clip */
@@ -745,27 +746,39 @@
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
 }
 
-/* Hexagon row transforms - 15 columns grid */
-.anim-infinite-triangles .triangle-shape:nth-child(n+16) {
+/* Hexagon row transforms - 20 columns grid (alternating offset pattern) */
+.anim-infinite-triangles .triangle-shape:nth-child(n+21) {
     transform: translate(-50%, -25%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+31) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+41) {
     transform: translate(0%, -50%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+46) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+61) {
     transform: translate(-50%, -75%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+61) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+81) {
     transform: translate(0%, -100%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+76) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+101) {
     transform: translate(-50%, -125%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+91) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+121) {
     transform: translate(0%, -150%);
 }
-.anim-infinite-triangles .triangle-shape:nth-child(n+106) {
+.anim-infinite-triangles .triangle-shape:nth-child(n+141) {
     transform: translate(-50%, -175%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+161) {
+    transform: translate(0%, -200%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+181) {
+    transform: translate(-50%, -225%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+201) {
+    transform: translate(0%, -250%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+221) {
+    transform: translate(-50%, -275%);
 }
 
 /* SVG triangle animation */
@@ -813,4 +826,82 @@
     stroke: color-mix(in srgb, var(--accent-color, #d4af37) 80%, #ffffff80);
     animation: triangleGrow 4s linear infinite;
     animation-delay: 3s;
+}
+
+/* ========================================
+   MOONLIT SKY - Night sky with moon, stars, and clouds
+   Dreamy nighttime atmosphere with animated elements
+   ======================================== */
+
+@keyframes moonlit-move-background {
+    from {
+        transform: translate3d(0px, 0px, 0px);
+    }
+    to { 
+        transform: translate3d(1000px, 0px, 0px);
+    }
+}
+
+.anim-moonlit-sky {
+    background: #000011;
+    position: relative;
+}
+
+/* Main container */
+.anim-moonlit-sky .moonlit-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+/* Stars layer */
+.anim-moonlit-sky .moonlit-stars {
+    background: black url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+/* Twinkling stars layer */
+.anim-moonlit-sky .moonlit-twinkling {
+    width: 10000px;
+    height: 100%;
+    background: transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png") repeat;
+    background-size: 1000px 1000px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    animation: moonlit-move-background 70s linear infinite;
+}
+
+/* Clouds layer */
+.anim-moonlit-sky .moonlit-clouds {
+    width: 10000px;
+    height: 100%;
+    background: transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat;
+    background-size: 1000px 1000px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    animation: moonlit-move-background 150s linear infinite;
+}
+
+/* Moon image */
+.anim-moonlit-sky .moonlit-moon {
+    height: 50vh;
+    width: 50vh;
+    max-height: 400px;
+    max-width: 400px;
+    position: absolute;
+    z-index: 3;
+    right: 5%;
+    top: 5%;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
 }

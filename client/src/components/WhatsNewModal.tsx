@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Users, Palette, Sun, Triangle, Star } from 'lucide-react';
+import { X, Sparkles, Check, Users, Palette, Sun, Triangle, Star, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.13';
+const CURRENT_VERSION = '0.4.14';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,42 +33,42 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.13 - PREMIUM ANIMATED BACKGROUNDS
+    // v0.4.14 - MOONLIT SKY & IMPROVEMENTS
     const updates: UpdateItem[] = [
         {
-            icon: <Sun className="w-5 h-5 text-pink-400" />,
-            title: '🌈 Rainbow Skies',
-            description: 'Novo fundo animado premium com raios de arco-íris! Ativa automaticamente o modo claro.',
+            icon: <Moon className="w-5 h-5 text-indigo-400" />,
+            title: '🌙 Moonlit Sky',
+            description: 'Novo fundo premium! Céu noturno com lua, estrelas cintilantes e nuvens em movimento.',
             isNew: true
         },
         {
             icon: <Triangle className="w-5 h-5 text-amber-400" />,
-            title: '🔺 Infinite Triangles',
-            description: 'Fundo animado com grid hexagonal e triângulos SVG que usam sua cor de destaque.',
+            title: '🔺 Infinite Triangles Melhorado',
+            description: 'Cobertura total da tela, vinheta escura para melhor legibilidade do conteúdo.',
+            isNew: true
+        },
+        {
+            icon: <Sun className="w-5 h-5 text-pink-400" />,
+            title: '🌈 Rainbow Skies',
+            description: 'Raios de arco-íris deslizando em fundo gradiente. Ativa modo claro automaticamente!',
             isNew: true
         },
         {
             icon: <Star className="w-5 h-5 text-purple-400" />,
             title: '⭐ Categoria Featured',
-            description: 'Nova seção "Featured" na loja de personalização para fundos animados premium!',
+            description: 'Nova seção "Featured" na loja com fundos animados premium exclusivos.',
             isNew: true
         },
         {
             icon: <Users className="w-5 h-5 text-cyan-500" />,
             title: '👤 Perfis de Outros Usuários',
-            description: 'Agora você pode clicar em membros no Explorar e ver seus perfis completos.',
-            isNew: true
-        },
-        {
-            icon: <Palette className="w-5 h-5 text-emerald-500" />,
-            title: '🎨 Ondas Gradiente Aprimorado',
-            description: 'Animação CSS do fundo "Ondas Gradiente" redesenhada com especificação exata.',
+            description: 'Clique em membros no Explorar e veja seus perfis completos.',
             isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5 text-blue-500" />,
-            title: '🔧 Correções de Bugs',
-            description: 'Corrigido scroll bloqueado em Triângulos Cósmicos, reações em grupos e erros de build.',
+            title: '🔧 Correções Gerais',
+            description: 'Melhorias de performance, scroll, reações em grupos e erros de build.',
             isNew: true
         }
     ];

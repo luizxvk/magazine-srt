@@ -58,6 +58,7 @@ const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%)' },
     { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, #000 100%)' },
+    { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'Céu noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
 ];
 
 // Predefined badges (profile decorations)

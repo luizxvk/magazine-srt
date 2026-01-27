@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, User, ChevronRight } from 'lucide-react';
+import { MessageCircle, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -26,7 +26,6 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const { user, isVisitor, theme } = useAuth();
     const [unreadMessage, setUnreadMessage] = useState<UnreadMessage | null>(null);
     const [isVisible, setIsVisible] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false); // For mobile pill expansion
     const [showChat, setShowChat] = useState(false);
     const lastNotifId = useRef<string | null>(null);
     const autoDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,7 +93,6 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                     }
                 });
                 setIsVisible(true);
-                setIsExpanded(false); // Start collapsed on mobile
 
                 if (autoDismissTimer.current) {
                     clearTimeout(autoDismissTimer.current);
@@ -102,7 +100,6 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                 // Auto-dismiss after 15 seconds
                 autoDismissTimer.current = setTimeout(() => {
                     setIsVisible(false);
-                    setIsExpanded(false);
                 }, 15000);
             } catch (error) {
                 console.error('[MessagePopup] Failed to check messages', error);
@@ -134,7 +131,6 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const handleOpenChat = async () => {
         setShowChat(true);
         setIsVisible(false);
-        setIsExpanded(false);
         if (unreadMessage?.id) {
             dismissedNotifIds.current.add(unreadMessage.id);
             try {
@@ -154,27 +150,8 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const handleDismiss = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsVisible(false);
-        setIsExpanded(false);
         if (unreadMessage?.id) {
             dismissedNotifIds.current.add(unreadMessage.id);
-        }
-    };
-
-    const handlePillClick = () => {
-        if (isMobile && !isExpanded) {
-            setIsExpanded(true);
-            // Auto dismiss after expansion
-            if (autoDismissTimer.current) {
-                clearTimeout(autoDismissTimer.current);
-            }
-            autoDismissTimer.current = setTimeout(() => {
-                if (!showChat) {
-                    setIsExpanded(false);
-                    setIsVisible(false);
-                }
-            }, 15000);
-        } else {
-            handleOpenChat();
         }
     };
 
@@ -211,121 +188,80 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
             <AnimatePresence>
                 {isVisible && unreadMessage && !showChat && (
                     <>
-                        {/* Mobile: Edge Pill (Samsung Style) */}
-                        {isMobile && !isExpanded && (
-                            <motion.div
-                                initial={{ x: 100, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                exit={{ x: 100, opacity: 0 }}
-                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                                className="fixed right-0 top-1/3 z-[100]"
-                                onClick={handlePillClick}
+                        {/* Both Mobile and Desktop: Full Card */}
+                        <motion.div
+                            initial={{ opacity: 0, y: isMobile ? -100 : 100, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: isMobile ? -50 : 50, scale: 0.95 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className={`fixed z-[100] ${
+                                isMobile 
+                                    ? 'top-4 left-4 right-4 max-w-md mx-auto' 
+                                    : 'bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)]'
+                            }`}
+                        >
+                            <div 
+                                onClick={handleOpenChat}
+                                className={`${themeBg} rounded-2xl border ${isSenderMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} shadow-2xl backdrop-blur-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl group`}
                             >
-                                <div 
-                                    className={`flex items-center gap-2 pl-3 pr-1 py-2 rounded-l-full shadow-2xl backdrop-blur-xl cursor-pointer
-                                        ${isSenderMGT ? 'bg-emerald-600/95' : 'bg-gradient-to-r from-yellow-600/95 to-amber-500/95'}`}
-                                >
-                                    {/* Avatar */}
-                                    <div className="relative flex-shrink-0">
-                                        {unreadMessage.sender.avatarUrl ? (
-                                            <img
-                                                src={unreadMessage.sender.avatarUrl}
-                                                alt=""
-                                                className="w-8 h-8 rounded-full object-cover border-2 border-white/30"
-                                            />
-                                        ) : (
-                                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 border-2 border-white/30">
-                                                <User className="w-4 h-4 text-white" />
+                                {/* Top Accent Line */}
+                                <div className={`h-1 bg-gradient-to-r ${isSenderMGT ? 'from-emerald-600 via-emerald-400 to-emerald-600' : 'from-gold-600 via-gold-400 to-gold-600'}`} />
+                                
+                                <div className="p-4">
+                                    <div className="flex items-start gap-3">
+                                        {/* Avatar */}
+                                        <div className="relative flex-shrink-0">
+                                            {unreadMessage.sender.avatarUrl ? (
+                                                <img
+                                                    src={unreadMessage.sender.avatarUrl}
+                                                    alt={unreadMessage.sender.name}
+                                                    className={`w-12 h-12 rounded-full object-cover border-2 ${avatarBorder}`}
+                                                />
+                                            ) : (
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-gray-100' : 'bg-neutral-800'} border-2 ${avatarBorder}`}>
+                                                    <User className="w-6 h-6 text-gray-400" />
+                                                </div>
+                                            )}
+                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-black" />
+                                            <div className={`absolute -bottom-1 -right-1 ${isSenderMGT ? 'bg-emerald-600' : 'bg-amber-600'} rounded-full p-1 border-2 ${theme === 'light' ? 'border-white' : 'border-black'}`}>
+                                                <MessageCircle className="w-2.5 h-2.5 text-white fill-current" />
                                             </div>
-                                        )}
-                                        {/* Message icon badge */}
-                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                                            <MessageCircle className={`w-2.5 h-2.5 ${isSenderMGT ? 'text-emerald-600' : 'text-amber-600'} fill-current`} />
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className={`font-bold ${themeText} truncate text-sm`}>{unreadMessage.sender.name}</h4>
+                                                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSenderMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                                        {isSenderMGT ? 'MGT' : 'MAG'}
+                                                    </span>
+                                                </div>
+                                                <button
+                                                    onClick={handleDismiss}
+                                                    className={`p-1.5 rounded-full opacity-50 hover:opacity-100 transition-all ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <p className={`text-sm ${themeSubtext} line-clamp-2 mt-1`}>
+                                                {unreadMessage.content}
+                                            </p>
                                         </div>
                                     </div>
-                                    
-                                    {/* Chevron */}
-                                    <ChevronRight className="w-4 h-4 text-white/80" />
-                                </div>
-                            </motion.div>
-                        )}
 
-                        {/* Mobile: Expanded Card / Desktop: Full Card */}
-                        {(!isMobile || isExpanded) && (
-                            <motion.div
-                                initial={{ opacity: 0, y: isMobile ? 0 : 100, x: isMobile ? 50 : 0, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, x: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: isMobile ? 0 : 50, x: isMobile ? 50 : 0, scale: 0.95 }}
-                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                                className={`fixed z-[100] ${
-                                    isMobile 
-                                        ? 'right-2 top-1/3 w-72' 
-                                        : 'bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)]'
-                                }`}
-                            >
-                                <div 
-                                    onClick={handleOpenChat}
-                                    className={`${themeBg} rounded-2xl border ${isSenderMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} shadow-2xl backdrop-blur-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl group`}
-                                >
-                                    {/* Top Accent Line */}
-                                    <div className={`h-1 bg-gradient-to-r ${isSenderMGT ? 'from-emerald-600 via-emerald-400 to-emerald-600' : 'from-gold-600 via-gold-400 to-gold-600'}`} />
-                                    
-                                    <div className="p-4">
-                                        <div className="flex items-start gap-3">
-                                            {/* Avatar */}
-                                            <div className="relative flex-shrink-0">
-                                                {unreadMessage.sender.avatarUrl ? (
-                                                    <img
-                                                        src={unreadMessage.sender.avatarUrl}
-                                                        alt={unreadMessage.sender.name}
-                                                        className={`w-12 h-12 rounded-full object-cover border-2 ${avatarBorder}`}
-                                                    />
-                                                ) : (
-                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-gray-100' : 'bg-neutral-800'} border-2 ${avatarBorder}`}>
-                                                        <User className="w-6 h-6 text-gray-400" />
-                                                    </div>
-                                                )}
-                                                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-black" />
-                                                <div className={`absolute -bottom-1 -right-1 ${isSenderMGT ? 'bg-emerald-600' : 'bg-amber-600'} rounded-full p-1 border-2 ${theme === 'light' ? 'border-white' : 'border-black'}`}>
-                                                    <MessageCircle className="w-2.5 h-2.5 text-white fill-current" />
-                                                </div>
-                                            </div>
-
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <h4 className={`font-bold ${themeText} truncate text-sm`}>{unreadMessage.sender.name}</h4>
-                                                        <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSenderMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
-                                                            {isSenderMGT ? 'MGT' : 'MAG'}
-                                                        </span>
-                                                    </div>
-                                                    <button
-                                                        onClick={handleDismiss}
-                                                        className={`p-1.5 rounded-full opacity-50 hover:opacity-100 transition-all ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <p className={`text-sm ${themeSubtext} line-clamp-2 mt-1`}>
-                                                    {unreadMessage.content}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Footer */}
-                                        <div className={`mt-3 pt-3 border-t ${theme === 'light' ? 'border-gray-100' : 'border-white/5'} flex items-center justify-between`}>
-                                            <span className={`text-xs ${themeSubtext} opacity-60`}>
-                                                {formatTimeAgo(unreadMessage.createdAt)}
-                                            </span>
-                                            <span className={`text-xs font-medium ${isSenderMGT ? 'text-emerald-400' : 'text-gold-400'} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                                                Clique para responder →
-                                            </span>
-                                        </div>
+                                    {/* Footer */}
+                                    <div className={`mt-3 pt-3 border-t ${theme === 'light' ? 'border-gray-100' : 'border-white/5'} flex items-center justify-between`}>
+                                        <span className={`text-xs ${themeSubtext} opacity-60`}>
+                                            {formatTimeAgo(unreadMessage.createdAt)}
+                                        </span>
+                                        <span className={`text-xs font-medium ${isSenderMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                            Toque para responder →
+                                        </span>
                                     </div>
                                 </div>
-                            </motion.div>
-                        )}
+                            </div>
+                        </motion.div>
                     </>
                 )}
             </AnimatePresence>

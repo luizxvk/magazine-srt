@@ -72,7 +72,7 @@ const NavItemButton = memo(({
 NavItemButton.displayName = 'NavItemButton';
 
 export default function BottomNavigation() {
-    const { user, isMobileDrawerOpen } = useAuth();
+    const { user, isMobileDrawerOpen, activeChatUserId } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(true);
@@ -144,7 +144,8 @@ export default function BottomNavigation() {
     }, [navigate]);
 
     // Hide when drawer/modal is open, story viewer is open, or should be hidden
-    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen) return null;
+    // Hide navbar when chat popup is open or other conditions
+    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen || activeChatUserId) return null;
 
     return (
         <>

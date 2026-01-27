@@ -51,10 +51,15 @@ export default function HighlightsPage() {
     const fetchRewardConfig = async () => {
         try {
             const response = await api.get('/content/elite-ranking-reward');
+            console.log('[HighlightsPage] Reward config response:', response.data);
             if (response.data && response.data.showInHighlights && response.data.rewardType !== 'none') {
+                console.log('[HighlightsPage] Setting rewardConfig:', response.data);
                 setRewardConfig(response.data);
+            } else {
+                console.log('[HighlightsPage] Reward config not set. showInHighlights:', response.data?.showInHighlights, 'rewardType:', response.data?.rewardType);
             }
-        } catch {
+        } catch (err) {
+            console.error('[HighlightsPage] Error fetching reward config:', err);
             // No reward config
         }
     };

@@ -423,3 +423,281 @@
     animation: wave 20s -1s reverse infinite;
     opacity: 0.9;
 }
+
+/* ========================================
+   RAINBOW SKIES - Gradient sliding animation
+   ======================================== */
+
+@keyframes rainbow-gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+@keyframes rainbow-slide {
+    from {
+        right: -25vw;
+    }
+    to {
+        right: 125vw;
+    }
+}
+
+.anim-rainbow-skies {
+    background: linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%);
+    animation: rainbow-gradient 15s ease infinite;
+    background-size: 400% 400%;
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* Rainbow rays container */
+.anim-rainbow-skies .rainbow-rays {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Individual rainbow ray */
+.anim-rainbow-skies .rainbow-ray {
+    height: 100vh;
+    width: 0;
+    top: 0;
+    position: absolute;
+    transform: rotate(10deg);
+    transform-origin: top right;
+    pointer-events: none;
+}
+
+/* Rainbow ray color variations using box-shadow */
+.anim-rainbow-skies .rainbow-ray:nth-child(1) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 43.2s linear infinite;
+    animation-delay: -1.8s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(2) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 42.3s linear infinite;
+    animation-delay: -3.6s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(3) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 41.4s linear infinite;
+    animation-delay: -5.4s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(4) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 40.5s linear infinite;
+    animation-delay: -7.2s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(5) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 39.6s linear infinite;
+    animation-delay: -9s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(6) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 38.7s linear infinite;
+    animation-delay: -10.8s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(7) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 37.8s linear infinite;
+    animation-delay: -12.6s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(8) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 36.9s linear infinite;
+    animation-delay: -14.4s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(9) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 36s linear infinite;
+    animation-delay: -16.2s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(10) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 35.1s linear infinite;
+    animation-delay: -18s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(11) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 34.2s linear infinite;
+    animation-delay: -19.8s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(12) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 33.3s linear infinite;
+    animation-delay: -21.6s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(13) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 32.4s linear infinite;
+    animation-delay: -23.4s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(14) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 31.5s linear infinite;
+    animation-delay: -25.2s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(15) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 30.6s linear infinite;
+    animation-delay: -27s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(16) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 29.7s linear infinite;
+    animation-delay: -28.8s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(17) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 28.8s linear infinite;
+    animation-delay: -30.6s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(18) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 27.9s linear infinite;
+    animation-delay: -32.4s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(19) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 27s linear infinite;
+    animation-delay: -34.2s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(20) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 26.1s linear infinite;
+    animation-delay: -36s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(21) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(96 165 250),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 25.2s linear infinite;
+    animation-delay: -37.8s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(22) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(94 234 212),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 24.3s linear infinite;
+    animation-delay: -39.6s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(23) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(94 234 212), 50px 0 50px 25px rgb(232 121 249),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 23.4s linear infinite;
+    animation-delay: -41.4s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(24) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(96 165 250),
+        0 0 50px 25px rgb(232 121 249), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 22.5s linear infinite;
+    animation-delay: -43.2s;
+}
+
+.anim-rainbow-skies .rainbow-ray:nth-child(25) {
+    box-shadow: -130px 0 80px 40px white, -50px 0 50px 25px rgb(232 121 249),
+        0 0 50px 25px rgb(96 165 250), 50px 0 50px 25px rgb(94 234 212),
+        130px 0 80px 40px white;
+    animation: rainbow-slide 21.6s linear infinite;
+    animation-delay: -45s;
+}
+
+/* Bottom glow - horizontal */
+.anim-rainbow-skies .rainbow-h {
+    box-shadow: 0 0 50vh 40vh white;
+    width: 100vw;
+    height: 0;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Left glow - vertical */
+.anim-rainbow-skies .rainbow-v {
+    box-shadow: 0 0 35vw 25vw white;
+    width: 0;
+    height: 100vh;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+}

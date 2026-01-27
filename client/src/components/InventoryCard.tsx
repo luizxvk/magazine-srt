@@ -32,6 +32,7 @@ const ITEM_DATA: Record<string, { name: string; type: 'background' | 'badge' | '
     // Animated backgrounds
     'anim-cosmic-triangles': { name: 'Triângulos Cósmicos', type: 'background', preview: 'radial-gradient(circle at center, #111 0%, #000 60%)' },
     'anim-gradient-waves': { name: 'Ondas Gradiente', type: 'background', preview: 'linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%)' },
+    'anim-rainbow-skies': { name: 'Rainbow Skies', type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     // Badges
     badge_crown: { name: 'Coroa', type: 'badge', preview: '👑' },
     badge_skull: { name: 'Caveira', type: 'badge', preview: '💀' },

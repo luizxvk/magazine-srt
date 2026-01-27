@@ -590,6 +590,7 @@ const CUSTOMIZATION_ITEMS = {
         // FUNDOS ANIMADOS PREMIUM
         { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', price: 2500, type: 'animated', preview: '🔺' },
         { id: 'anim-gradient-waves', name: 'Ondas Gradiente', price: 2000, type: 'animated', preview: '🌊' },
+        { id: 'anim-rainbow-skies', name: 'Rainbow Skies', price: 3000, type: 'animated', preview: '🌈' },
     ],
     badges: [
         { id: 'badge_skull', name: 'Caveira', price: 300, preview: '💀' },

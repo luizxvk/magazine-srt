@@ -258,6 +258,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
 
+        // Helper function to clean up rainbow elements
+        const cleanupRainbowElements = () => {
+            const existingRainbow = document.getElementById('rainbow-skies-container');
+            if (existingRainbow) {
+                existingRainbow.remove();
+            }
+        };
+
+        // Helper function to create rainbow elements
+        const createRainbowElements = () => {
+            cleanupRainbowElements();
+            
+            const container = document.createElement('div');
+            container.id = 'rainbow-skies-container';
+            
+            // Create rainbow rays container
+            const raysContainer = document.createElement('div');
+            raysContainer.className = 'rainbow-rays';
+            
+            // Create 25 rainbow rays
+            for (let i = 0; i < 25; i++) {
+                const ray = document.createElement('div');
+                ray.className = 'rainbow-ray';
+                raysContainer.appendChild(ray);
+            }
+            
+            // Create horizontal glow
+            const hGlow = document.createElement('div');
+            hGlow.className = 'rainbow-h';
+            
+            // Create vertical glow
+            const vGlow = document.createElement('div');
+            vGlow.className = 'rainbow-v';
+            
+            container.appendChild(raysContainer);
+            container.appendChild(hGlow);
+            container.appendChild(vGlow);
+            
+            document.body.appendChild(container);
+        };
+
         // Apply background immediately OR clear if none equipped
         if (userData.equippedBackground) {
             // Check if it's an animated background (class-based)
@@ -268,6 +309,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 // Add the new animation class
                 document.body.classList.add(userData.equippedBackground);
+
+                // Special handling for Rainbow Skies - create HTML elements and switch to light theme
+                if (userData.equippedBackground === 'anim-rainbow-skies') {
+                    createRainbowElements();
+                    // Force light theme for Rainbow Skies
+                    localStorage.setItem('theme', 'light');
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                } else {
+                    cleanupRainbowElements();
+                }
 
                 // Clear inline styles that might conflict
                 document.body.style.background = '';
@@ -289,6 +341,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Clear any previously applied background (both classes and styles)
             const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
             existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
+
+            // Clean up rainbow elements if any
+            const existingRainbow = document.getElementById('rainbow-skies-container');
+            if (existingRainbow) {
+                existingRainbow.remove();
+            }
 
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
@@ -383,8 +441,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
         existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
 
+        // Helper function to clean up rainbow elements
+        const cleanupRainbowElements = () => {
+            const existingRainbow = document.getElementById('rainbow-skies-container');
+            if (existingRainbow) {
+                existingRainbow.remove();
+            }
+        };
+
+        // Helper function to create rainbow elements
+        const createRainbowElements = () => {
+            cleanupRainbowElements();
+            
+            const container = document.createElement('div');
+            container.id = 'rainbow-skies-container';
+            
+            // Create rainbow rays container
+            const raysContainer = document.createElement('div');
+            raysContainer.className = 'rainbow-rays';
+            
+            // Create 25 rainbow rays
+            for (let i = 0; i < 25; i++) {
+                const ray = document.createElement('div');
+                ray.className = 'rainbow-ray';
+                raysContainer.appendChild(ray);
+            }
+            
+            // Create horizontal glow
+            const hGlow = document.createElement('div');
+            hGlow.className = 'rainbow-h';
+            
+            // Create vertical glow
+            const vGlow = document.createElement('div');
+            vGlow.className = 'rainbow-v';
+            
+            container.appendChild(raysContainer);
+            container.appendChild(hGlow);
+            container.appendChild(vGlow);
+            
+            document.body.appendChild(container);
+        };
+
         if (!isAuthenticated || !backgroundStyle) {
             // Reset to default when not authenticated or no custom background
+            cleanupRainbowElements();
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
@@ -393,6 +493,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Class-based animated background (from theme packs)
             const className = backgroundStyle.replace('class:', '');
             document.body.classList.add(className);
+            
+            // Special handling for Rainbow Skies
+            if (className === 'anim-rainbow-skies') {
+                createRainbowElements();
+                // Force light theme for Rainbow Skies
+                setTheme('light');
+            } else {
+                cleanupRainbowElements();
+            }
+            
             // Clear inline styles
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
@@ -400,6 +510,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             document.body.style.animation = '';
         } else {
             // Traditional gradient (inline style)
+            cleanupRainbowElements();
             document.body.style.background = backgroundStyle;
             document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';

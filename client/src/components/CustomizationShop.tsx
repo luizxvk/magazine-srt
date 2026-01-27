@@ -53,6 +53,7 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     // FUNDOS ANIMADOS PREMIUM
     { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', description: 'Triângulos 3D coloridos em movimento hipnótico', price: 2500, type: 'background', preview: 'radial-gradient(circle at center, #111 0%, #000 60%)' },
     { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%)' },
+    { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
 ];
 
 // Predefined badges (profile decorations)

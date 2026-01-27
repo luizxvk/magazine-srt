@@ -175,9 +175,15 @@ export default function MarketPage() {
       return;
     }
 
+    // Verificar se é theme pack para calcular preço mínimo
+    const selectedPack = userPacks.find(up => up.pack.id === selectedItem);
+    const isThemePack = !!selectedPack;
+    const originalPrice = selectedPack?.pack?.price || 0;
+    const minPrice = isThemePack && originalPrice > 0 ? Math.floor(originalPrice * 0.8) : 10;
+
     const price = parseInt(sellPrice);
-    if (isNaN(price) || price < 10 || price > 10000) {
-      showNotification('error', 'Preço deve ser entre 10 e 10.000 Zions');
+    if (isNaN(price) || price < minPrice || price > 10000) {
+      showNotification('error', `Preço deve ser entre ${minPrice.toLocaleString()} e 10.000 Zions`);
       return;
     }
 
@@ -342,7 +348,9 @@ export default function MarketPage() {
     id: up.pack.id,
     name: up.pack.name,
     type: 'theme_pack',
-    preview: up.pack.backgroundUrl
+    preview: up.pack.backgroundUrl,
+    originalPrice: up.pack.price || 0, // Preço original para calcular mínimo
+    rarity: up.pack.rarity || 'COMMON'
   }));
 
   const sellableItems = [...standardSellableItems, ...themePackItems];
@@ -691,40 +699,63 @@ export default function MarketPage() {
                 const itemToSell = sellableItems.find(i => i.id === selectedItem);
                 if (!itemToSell) return null;
 
+                // Verificar se é theme pack para mostrar valor original
+                const isThemePack = itemToSell.type === 'theme_pack';
+                const originalPrice = (itemToSell as any).originalPrice || 0;
+
                 return (
                   <div className="flex items-center gap-4 mb-6">
                     {renderItemPreview({ itemType: itemToSell.type, itemPreview: itemToSell.preview }, 'md')}
                     <div>
                       <h3 className={`font-semibold ${themeText}`}>{itemToSell.name}</h3>
                       <p className={`text-sm ${themeSecondary} capitalize`}>{itemToSell.type === 'theme_pack' ? 'Theme Pack' : itemToSell.type}</p>
+                      {isThemePack && originalPrice > 0 && (
+                        <p className={`text-xs ${themeSecondary} mt-1`}>
+                          Valor original: <span className={`text-${themeColor}-400`}>{originalPrice.toLocaleString()} Zions</span>
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
               })()}
 
               {/* Price Input */}
-              <div className="mb-6">
-                <label className={`block text-sm font-medium ${themeText} mb-2`}>
-                  Preço (10 - 10.000 Zions)
-                </label>
-                <div className="relative">
-                  <Zap className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-${themeColor}-400`} />
-                  <input
-                    type="number"
-                    value={sellPrice}
-                    onChange={(e) => setSellPrice(e.target.value)}
-                    placeholder="Digite o preço..."
-                    min={10}
-                    max={10000}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'} border ${themeBorder} ${themeText}`}
-                  />
-                </div>
-                {sellPrice && (
-                  <p className={`text-sm ${themeSecondary} mt-2`}>
-                    Você receberá: <span className={`text-${themeColor}-400 font-medium`}>{Math.floor(parseInt(sellPrice) * 0.95)} Zions</span> (após taxa de 5%)
-                  </p>
-                )}
-              </div>
+              {(() => {
+                const itemToSell = sellableItems.find(i => i.id === selectedItem);
+                const isThemePack = itemToSell?.type === 'theme_pack';
+                const originalPrice = (itemToSell as any)?.originalPrice || 0;
+                const minPrice = isThemePack && originalPrice > 0 ? Math.floor(originalPrice * 0.8) : 10;
+
+                return (
+                  <div className="mb-6">
+                    <label className={`block text-sm font-medium ${themeText} mb-2`}>
+                      Preço ({minPrice.toLocaleString()} - 10.000 Zions)
+                    </label>
+                    <div className="relative">
+                      <Zap className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-${themeColor}-400`} />
+                      <input
+                        type="number"
+                        value={sellPrice}
+                        onChange={(e) => setSellPrice(e.target.value)}
+                        placeholder={`Mínimo ${minPrice.toLocaleString()} Zions...`}
+                        min={minPrice}
+                        max={10000}
+                        className={`w-full pl-10 pr-4 py-3 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'} border ${themeBorder} ${themeText}`}
+                      />
+                    </div>
+                    {sellPrice && (
+                      <p className={`text-sm ${themeSecondary} mt-2`}>
+                        Você receberá: <span className={`text-${themeColor}-400 font-medium`}>{Math.floor(parseInt(sellPrice) * 0.95)} Zions</span> (após taxa de 5%)
+                      </p>
+                    )}
+                    {sellPrice && parseInt(sellPrice) < minPrice && (
+                      <p className="text-sm text-red-400 mt-1">
+                        ⚠️ Preço mínimo para este item é {minPrice.toLocaleString()} Zions
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Actions */}
               <div className="flex gap-3">

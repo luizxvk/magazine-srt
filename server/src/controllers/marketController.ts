@@ -207,10 +207,6 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Item e preço são obrigatórios' });
     }
 
-    if (price < 10) {
-      return res.status(400).json({ error: 'Preço mínimo é 10 Zions' });
-    }
-
     if (price > 10000) {
       return res.status(400).json({ error: 'Preço máximo é 10.000 Zions' });
     }
@@ -230,6 +226,7 @@ export const createListing = async (req: AuthRequest, res: Response) => {
     let itemType = '';
     let itemName = '';
     let itemPreview = '';
+    let minPrice = 10; // Preço mínimo padrão
 
     // Check ITEM_DATA first (standard items)
     if (ITEM_DATA[itemId]) {
@@ -262,9 +259,17 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         return res.status(400).json({ error: 'Desequipe os itens do pack antes de vendê-lo' });
       }
 
+      // Calcular preço mínimo para theme packs (80% do preço original)
+      minPrice = Math.floor(userPack.pack.price * 0.8);
+
       itemType = 'theme_pack';
       itemName = userPack.pack.name;
       itemPreview = userPack.pack.backgroundUrl;
+    }
+
+    // Validar preço mínimo
+    if (price < minPrice) {
+      return res.status(400).json({ error: `Preço mínimo para este item é ${minPrice} Zions` });
     }
 
     // Check if item is already listed

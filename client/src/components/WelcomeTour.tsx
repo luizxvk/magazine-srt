@@ -128,7 +128,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                 {/* BETA Badge */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
-                        BETA v0.4.11
+                        BETA v0.4.12
                     </span>
                 </div>
 
@@ -140,7 +140,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                     <X className="w-6 h-6" />
                 </button>
 
-                <div className="mb-4 mt-6 w-full flex items-center justify-center">
+                <div className="my-8 w-full flex items-center justify-center">
                     <div className={`w-20 h-20 sm:w-24 sm:h-24 ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse`}>
                         {steps[step].icon}
                     </div>

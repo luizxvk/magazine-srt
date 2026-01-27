@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, MoreVertical, Eye, Heart, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -48,7 +48,41 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     const [isLiked, setIsLiked] = useState(false);
     const [showCommentInput, setShowCommentInput] = useState(false);
     const [commentText, setCommentText] = useState('');
+    const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
 
+    // Group stories by user
+    const storiesByUser = useMemo(() => {
+        const grouped: { userId: string; user: Story['user']; stories: Story[] }[] = [];
+        stories.forEach(story => {
+            const existing = grouped.find(g => g.userId === story.user.id);
+            if (existing) {
+                existing.stories.push(story);
+            } else {
+                grouped.push({ userId: story.user.id, user: story.user, stories: [story] });
+            }
+        });
+        return grouped;
+    }, [stories]);
+
+    // Find current user group and story index within that group
+    const currentNavigation = useMemo(() => {
+        let totalIndex = 0;
+        for (let userIdx = 0; userIdx < storiesByUser.length; userIdx++) {
+            const userStories = storiesByUser[userIdx].stories;
+            for (let storyIdx = 0; storyIdx < userStories.length; storyIdx++) {
+                if (totalIndex === currentIndex) {
+                    return {
+                        userIndex: userIdx,
+                        storyIndexInUser: storyIdx,
+                        totalStoriesForUser: userStories.length,
+                        currentUserStories: userStories
+                    };
+                }
+                totalIndex++;
+            }
+        }
+        return { userIndex: 0, storyIndexInUser: 0, totalStoriesForUser: 1, currentUserStories: stories.slice(0, 1) };
+    }, [currentIndex, storiesByUser, stories]);
     const currentStory = stories[currentIndex];
     const isMyStory = currentStory?.user.id === user?.id;
     const isAdmin = user?.role === 'ADMIN';
@@ -122,21 +156,23 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         }
     };
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
+        setTransitionDirection('right');
         if (currentIndex < stories.length - 1) {
             setCurrentIndex(currentIndex + 1);
             setProgress(0);
         } else {
             onClose();
         }
-    };
+    }, [currentIndex, stories.length, onClose]);
 
-    const handlePrevious = () => {
+    const handlePrevious = useCallback(() => {
+        setTransitionDirection('left');
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
             setProgress(0);
         }
-    };
+    }, [currentIndex]);
 
     const handleDelete = async () => {
         if (!canDelete) return;
@@ -212,17 +248,21 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[10000] bg-black flex items-center justify-center"
         >
-            {/* Progress Bars */}
+            {/* Progress Bars - Per User's Stories */}
             <div className="absolute top-0 left-0 right-0 z-50 flex gap-1 p-2">
-                {stories.map((_, index) => (
+                {currentNavigation.currentUserStories.map((_, index) => (
                     <div key={index} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
                         <motion.div
-                            className={`h-full bg-${accentColor}`}
+                            className={`h-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}
                             initial={{ width: '0%' }}
                             animate={{
-                                width: index < currentIndex ? '100%' : index === currentIndex ? `${progress}%` : '0%'
+                                width: index < currentNavigation.storyIndexInUser 
+                                    ? '100%' 
+                                    : index === currentNavigation.storyIndexInUser 
+                                        ? `${progress}%` 
+                                        : '0%'
                             }}
-                            transition={{ duration: 0.1 }}
+                            transition={{ duration: 0.1, ease: 'linear' }}
                         />
                     </div>
                 ))}
@@ -264,29 +304,36 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                 </div>
             </div>
 
-            {/* Story Image */}
-            <div
-                className="relative w-full h-full max-w-lg cursor-pointer"
-                onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    if (x < rect.width / 2) {
-                        handlePrevious();
-                    } else {
-                        handleNext();
-                    }
-                }}
-                onMouseDown={() => setIsPaused(true)}
-                onMouseUp={() => setIsPaused(false)}
-                onTouchStart={() => setIsPaused(true)}
-                onTouchEnd={() => setIsPaused(false)}
-            >
-                <img
-                    src={currentStory?.imageUrl}
-                    alt="Story"
-                    className="w-full h-full object-contain"
-                />
-            </div>
+            {/* Story Image with Animation */}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={currentStory?.id}
+                    initial={{ opacity: 0, x: transitionDirection === 'right' ? 50 : -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: transitionDirection === 'right' ? -50 : 50 }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    className="relative w-full h-full max-w-lg cursor-pointer"
+                    onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        if (x < rect.width / 2) {
+                            handlePrevious();
+                        } else {
+                            handleNext();
+                        }
+                    }}
+                    onMouseDown={() => setIsPaused(true)}
+                    onMouseUp={() => setIsPaused(false)}
+                    onTouchStart={() => setIsPaused(true)}
+                    onTouchEnd={() => setIsPaused(false)}
+                >
+                    <img
+                        src={currentStory?.imageUrl}
+                        alt="Story"
+                        className="w-full h-full object-contain"
+                    />
+                </motion.div>
+            </AnimatePresence>
 
             {/* Bottom Actions - Show for all stories */}
             <div className="absolute bottom-6 left-0 right-0 z-50 px-6">

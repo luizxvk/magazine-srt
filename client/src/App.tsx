@@ -35,7 +35,6 @@ import AchievementPopup from './components/AchievementPopup';
 import Toast from './components/Toast';
 import MessagePopup from './components/MessagePopup';
 import DevBanner from './components/DevBanner';
-import VerificationPrompt from './components/VerificationPrompt';
 import Footer from './components/Footer';
 import BottomNavigation from './components/BottomNavigation';
 import ZionsPurchaseModal from './components/ZionsPurchaseModal';
@@ -100,7 +99,6 @@ function App() {
         <SessionExpiredWrapper />
         <OnboardingModals />
         <MessagePopupWrapper />
-        <VerificationPrompt />
         <BottomNavigation />
         <MiniRadioPlayer />
         <Footer />

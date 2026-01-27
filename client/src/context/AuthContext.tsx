@@ -488,10 +488,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             
             document.body.appendChild(container);
         };
+        
+        // Helper function to clean up infinite triangles elements
+        const cleanupInfiniteTrianglesElements = () => {
+            const existingContainer = document.getElementById('infinite-triangles-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        };
 
         if (!isAuthenticated || !backgroundStyle) {
             // Reset to default when not authenticated or no custom background
             cleanupRainbowElements();
+            cleanupInfiniteTrianglesElements();
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
@@ -527,8 +536,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 
                 // Rainbow Skies activates light mode for everyone
                 setTheme('light');
+            } else if (className === 'anim-infinite-triangles') {
+                cleanupRainbowElements();
+                createInfiniteTrianglesElements();
             } else {
                 cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
             }
             
             // Clear inline styles
@@ -539,10 +552,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
             // Traditional gradient (inline style)
             cleanupRainbowElements();
+            cleanupInfiniteTrianglesElements();
             document.body.style.background = backgroundStyle;
             document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';
             document.body.style.animation = 'wave-bg 8s ease-in-out infinite';
+        }
+        
+        // Helper function to create infinite triangles elements
+        function createInfiniteTrianglesElements() {
+            // Clean up any existing elements first
+            const existingContainer = document.getElementById('infinite-triangles-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+            
+            const container = document.createElement('div');
+            container.id = 'infinite-triangles-container';
+            
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'triangles-overlay';
+            container.appendChild(overlay);
+            
+            // Create triangles container
+            const trianglesContainer = document.createElement('div');
+            trianglesContainer.className = 'triangles-container';
+            
+            // Create 60 shape elements (10 cols * 6 rows)
+            for (let i = 0; i < 60; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'triangle-shape';
+                
+                // Create SVG with animated polygons
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 115');
+                svg.setAttribute('preserveAspectRatio', 'xMidYMin slice');
+                
+                // Create 4 animated polygons with different delays
+                const classes = ['tri-accent', 'tri-secondary', 'tri-tertiary', 'tri-quaternary'];
+                classes.forEach((cls, index) => {
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.classList.add(cls);
+                    polygon.setAttribute('points', '50 57.5, 50 57.5, 50 57.5');
+                    
+                    // Create animation
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                    animate.setAttribute('attributeName', 'points');
+                    animate.setAttribute('repeatCount', 'indefinite');
+                    animate.setAttribute('dur', '4s');
+                    animate.setAttribute('begin', `${index}s`);
+                    animate.setAttribute('from', '50 57.5, 50 57.5, 50 57.5');
+                    animate.setAttribute('to', '50 -75, 175 126, -75 126');
+                    
+                    polygon.appendChild(animate);
+                    svg.appendChild(polygon);
+                });
+                
+                shape.appendChild(svg);
+                trianglesContainer.appendChild(shape);
+            }
+            
+            container.appendChild(trianglesContainer);
+            document.body.appendChild(container);
         }
     }, [backgroundStyle, user]);
 

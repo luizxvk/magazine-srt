@@ -701,3 +701,108 @@
     pointer-events: none;
     z-index: 0;
 }
+
+/* ========================================
+   INFINITE TRIANGLES - Animated hexagon grid with triangles
+   Uses project accent colors (gold/emerald)
+   ======================================== */
+
+.anim-infinite-triangles {
+    background-color: var(--accent-color, #d4af37);
+    position: relative;
+}
+
+/* Radial gradient overlay to fade edges */
+.anim-infinite-triangles .triangles-overlay {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.15) 100%);
+    pointer-events: none;
+}
+
+/* Container for grid layout */
+.anim-infinite-triangles .triangles-container {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(10, 200px);
+    grid-template-rows: repeat(6, 230px);
+    transform: translate(-3%, -4%);
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Individual shape with hexagon clip */
+.anim-infinite-triangles .triangle-shape {
+    width: 200px;
+    height: 230px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+/* Hexagon row transforms */
+.anim-infinite-triangles .triangle-shape:nth-child(n+11) {
+    transform: translate(-50%, -25%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+21) {
+    transform: translate(0%, -50%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+31) {
+    transform: translate(-50%, -75%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+41) {
+    transform: translate(0%, -100%);
+}
+.anim-infinite-triangles .triangle-shape:nth-child(n+51) {
+    transform: translate(-50%, -125%);
+}
+
+/* SVG triangle animation */
+.anim-infinite-triangles .triangle-shape svg {
+    width: 100%;
+    height: 100%;
+}
+
+.anim-infinite-triangles .triangle-shape polygon {
+    fill: none;
+    stroke-width: 5;
+}
+
+/* Triangle animation keyframes - each color starts at different time */
+@keyframes triangleGrow {
+    0% {
+        points: 50 57.5, 50 57.5, 50 57.5;
+    }
+    100% {
+        points: 50 -75, 175 126, -75 126;
+    }
+}
+
+/* Accent color triangle (primary) - gold for Magazine, emerald for MGT */
+.anim-infinite-triangles .triangle-shape .tri-accent {
+    stroke: var(--accent-color, #d4af37);
+    animation: triangleGrow 4s linear infinite;
+    animation-delay: 0s;
+}
+
+/* Secondary colors for variety */
+.anim-infinite-triangles .triangle-shape .tri-secondary {
+    stroke: color-mix(in srgb, var(--accent-color, #d4af37) 70%, white);
+    animation: triangleGrow 4s linear infinite;
+    animation-delay: 1s;
+}
+
+.anim-infinite-triangles .triangle-shape .tri-tertiary {
+    stroke: color-mix(in srgb, var(--accent-color, #d4af37) 50%, black);
+    animation: triangleGrow 4s linear infinite;
+    animation-delay: 2s;
+}
+
+.anim-infinite-triangles .triangle-shape .tri-quaternary {
+    stroke: color-mix(in srgb, var(--accent-color, #d4af37) 80%, #ffffff80);
+    animation: triangleGrow 4s linear infinite;
+    animation-delay: 3s;
+}

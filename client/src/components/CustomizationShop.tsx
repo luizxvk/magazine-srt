@@ -50,10 +50,14 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'bg_emerald', name: 'Esmeralda', description: 'Verde profundo luxuoso', price: 700, type: 'background', preview: 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)' },
     { id: 'bg_royal', name: 'Real Púrpura', description: 'Púrpura majestoso', price: 900, type: 'background', preview: 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)' },
     { id: 'bg_carbon', name: 'Fibra de Carbono', description: 'Textura escura premium', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)' },
-    // FUNDOS ANIMADOS PREMIUM
+];
+
+// FEATURED - Premium animated backgrounds
+const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', description: 'Triângulos 3D coloridos em movimento hipnótico', price: 2500, type: 'background', preview: 'radial-gradient(circle at center, #111 0%, #000 60%)' },
     { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%)' },
     { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
+    { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, #000 100%)' },
 ];
 
 // Predefined badges (profile decorations)
@@ -322,18 +326,23 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     const getItems = () => {
         // Filter out Magazine-exclusive items for MGT users
-        const filterMagazineExclusive = (items: typeof backgrounds | typeof badges | typeof colors) => {
+        const filterMagazineExclusive = (items: typeof backgrounds | typeof badges | typeof colors | typeof featuredBackgrounds) => {
             if (!isMGT) return items;
             // MGT users don't see Magazine-exclusive items (bg_default, badge_crown, color_gold)
             return items.filter(item => !['bg_default', 'badge_crown', 'color_gold'].includes(item.id));
         };
 
         switch (activeTab) {
-            case 'background': return filterMagazineExclusive(backgrounds);
+            case 'background': {
+                // Categorize backgrounds - regular and featured (animated)
+                const regularBgs = filterMagazineExclusive(backgrounds) as typeof backgrounds;
+                const featuredBgs = filterMagazineExclusive(featuredBackgrounds) as typeof featuredBackgrounds;
+                return { regularBgs, featuredBgs };
+            }
             case 'badge': return filterMagazineExclusive(badges);
             case 'color': {
                 // Categorize colors
-                const allColors = filterMagazineExclusive(colors);
+                const allColors = filterMagazineExclusive(colors) as typeof colors;
                 const basicColors = allColors.filter(c => !c.id.includes('pastel'));
                 const pastelColors = allColors.filter(c => c.id.includes('pastel'));
                 return { basicColors, pastelColors };
@@ -697,9 +706,165 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                     </>
                                 );
                             })()
-                        ) : (
+                        ) : activeTab === 'background' ? (
+                            // Render background categories
+                            (() => {
+                                const { regularBgs, featuredBgs } = getItems() as { regularBgs: typeof backgrounds; featuredBgs: typeof featuredBackgrounds };
+                                return (
+                                    <>
+                                        {/* Featured Backgrounds */}
+                                        <div className="mb-6">
+                                            <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
+                                                <Sparkles className={`w-4 h-4 text-${themeColor}-400`} />
+                                                Featured
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full bg-${themeColor}-500/20 text-${themeColor}-400`}>PREMIUM</span>
+                                            </h3>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {featuredBgs.map(item => {
+                                                    const owned = isOwned(item.id);
+                                                    const equipped = isEquipped(item);
+                                                    return (
+                                                        <motion.div
+                                                            key={item.id}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                        >
+                                                            <div className="aspect-square relative flex items-center justify-center overflow-hidden">
+                                                                <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
+                                                                {equipped && (
+                                                                    <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
+                                                                        <Check className="w-3 h-3 text-black" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                                <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                                                <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
+                                                                <div className="mt-2">
+                                                                    {owned ? (
+                                                                        <button
+                                                                            onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {equipped ? 'Desequipar' : 'Equipar'}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handlePurchase(item)}
+                                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {purchasing === item.id ? (
+                                                                                <span className="animate-spin">⏳</span>
+                                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                                <>
+                                                                                    <Lock className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Zap className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            )}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        {/* Regular Backgrounds */}
+                                        <div>
+                                            <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
+                                                <Image className={`w-4 h-4 text-${themeColor}-400`} />
+                                                Fundos Básicos
+                                            </h3>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {regularBgs.map(item => {
+                                                    const owned = isOwned(item.id);
+                                                    const equipped = isEquipped(item);
+                                                    const isFree = item.price === 0;
+                                                    return (
+                                                        <motion.div
+                                                            key={item.id}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                        >
+                                                            <div className="aspect-square relative flex items-center justify-center overflow-hidden">
+                                                                <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
+                                                                {equipped && (
+                                                                    <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
+                                                                        <Check className="w-3 h-3 text-black" />
+                                                                    </div>
+                                                                )}
+                                                                {isFree && !(isMGT && item.id === 'bg_default') && (
+                                                                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
+                                                                        <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                                <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                                                <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
+                                                                <div className="mt-2">
+                                                                    {owned ? (
+                                                                        <button
+                                                                            onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {equipped ? 'Desequipar' : 'Equipar'}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handlePurchase(item)}
+                                                                            disabled={purchasing === item.id || (user?.zions || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zions || 0) < item.price
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {purchasing === item.id ? (
+                                                                                <span className="animate-spin">⏳</span>
+                                                                            ) : (user?.zions || 0) < item.price ? (
+                                                                                <>
+                                                                                    <Lock className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Zap className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            )}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </>
+                                );
+                            })()
+                        ) : activeTab === 'badge' ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {(getItems() as typeof backgrounds | typeof badges).map(item => {
+                                {(badges).map(item => {
                                     const owned = isOwned(item.id);
                                     const equipped = isEquipped(item);
                                     const isFree = item.price === 0;

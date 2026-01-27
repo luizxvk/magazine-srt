@@ -313,10 +313,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Special handling for Rainbow Skies - create HTML elements and switch to light theme
                 if (userData.equippedBackground === 'anim-rainbow-skies') {
                     createRainbowElements();
-                    // Force light theme for Rainbow Skies
-                    localStorage.setItem('theme', 'light');
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.classList.add('light');
+                    // Only MGT can use light theme with Rainbow Skies
+                    if (userData.membershipType === 'MGT') {
+                        localStorage.setItem('theme', 'light');
+                        document.documentElement.classList.remove('dark');
+                        document.documentElement.classList.add('light');
+                    }
                 } else {
                     cleanupRainbowElements();
                 }
@@ -489,6 +491,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
             document.body.style.animation = '';
+            // Reset to default theme based on membership
+            setTheme('dark');
         } else if (backgroundStyle.startsWith('class:')) {
             // Class-based animated background (from theme packs)
             const className = backgroundStyle.replace('class:', '');
@@ -497,8 +501,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Special handling for Rainbow Skies
             if (className === 'anim-rainbow-skies') {
                 createRainbowElements();
-                // Force light theme for Rainbow Skies
-                setTheme('light');
+                // Only MGT can use light theme with Rainbow Skies
+                if (user?.membershipType === 'MGT') {
+                    setTheme('light');
+                }
             } else {
                 cleanupRainbowElements();
             }

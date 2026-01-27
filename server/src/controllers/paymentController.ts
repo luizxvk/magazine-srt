@@ -68,6 +68,8 @@ export const createPixPayment = async (req: Request, res: Response) => {
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
         // Criar pagamento PIX
+        const webhookUrl = process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/payments/webhook` : undefined;
+        
         const result = await payment.create({
             body: {
                 transaction_amount: price,
@@ -78,8 +80,8 @@ export const createPixPayment = async (req: Request, res: Response) => {
                     first_name: user.name?.split(' ')[0] || 'Usuario',
                     last_name: user.name?.split(' ').slice(1).join(' ') || 'Magazine'
                 },
-                external_reference: newPurchase.id, // Usar ID do registro para rastreabilidade
-                notification_url: `${process.env.BACKEND_URL || 'https://api.magazinesrt.com.br'}/api/payments/webhook`
+                external_reference: newPurchase.id,
+                ...(webhookUrl && { notification_url: webhookUrl })
             }
         });
 

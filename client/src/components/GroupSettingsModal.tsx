@@ -125,10 +125,15 @@ export default function GroupSettingsModal({
     }
   };
 
-  const handleBackgroundSelect = (backgroundId: string) => {
-    if (!isAdmin) return;
-    // Just call the parent handler - it handles the API call
-    onBackgroundChange(backgroundId);
+  const handleBackgroundSelect = async (backgroundId: string) => {
+    if (!isAdmin || loading) return;
+    setLoading(true);
+    try {
+      // Call the parent handler - it handles the API call
+      onBackgroundChange(backgroundId);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRemoveMember = async (memberId: string) => {

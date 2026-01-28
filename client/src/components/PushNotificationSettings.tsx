@@ -130,10 +130,10 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
 
     if (compact) {
         return (
-            <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-xl">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     {isSubscribed ? (
-                        <BellRing className="w-5 h-5 text-amber-400" />
+                        <BellRing className="w-5 h-5 text-emerald-400" />
                     ) : (
                         <Bell className="w-5 h-5 text-zinc-400" />
                     )}
@@ -145,16 +145,16 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
                 <button
                     onClick={isSubscribed ? handleDisable : handleEnable}
                     disabled={actionLoading || permission === 'denied'}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                    className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
                         isSubscribed 
-                            ? 'bg-amber-500' 
-                            : 'bg-zinc-600'
-                    } ${actionLoading || permission === 'denied' ? 'opacity-50' : ''}`}
+                            ? 'bg-emerald-500' 
+                            : 'bg-gray-600'
+                    } ${actionLoading || permission === 'denied' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                    <motion.div
-                        className="absolute w-5 h-5 bg-white rounded-full top-0.5"
-                        animate={{ left: isSubscribed ? '26px' : '2px' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    <div
+                        className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                            isSubscribed ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
+                        }`}
                     />
                 </button>
             </div>

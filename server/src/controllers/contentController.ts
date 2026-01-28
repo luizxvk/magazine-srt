@@ -84,11 +84,17 @@ export const checkEliteRankingWinner = async (req: AuthRequest, res: Response) =
         const alreadyClaimed = claimRecord?.content ? (claimRecord.content as any).claimed : false;
         const claimedByUserId = claimRecord?.content ? (claimRecord.content as any).userId : null;
 
+        // Check if it's the end of the month (last 3 days)
+        const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const currentDay = now.getDate();
+        const isEndOfMonth = currentDay >= lastDayOfMonth - 2; // Last 3 days of month
+
         res.json({
             isWinner,
             hasReward: true,
-            canClaim: isWinner && !alreadyClaimed,
+            canClaim: isWinner && !alreadyClaimed && isEndOfMonth,
             alreadyClaimed: alreadyClaimed && claimedByUserId === userId,
+            daysUntilClaim: isEndOfMonth ? 0 : (lastDayOfMonth - 2) - currentDay,
             reward: {
                 type: rewardConfig.rewardType,
                 amount: rewardConfig.rewardAmount,

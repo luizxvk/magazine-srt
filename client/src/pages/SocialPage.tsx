@@ -91,11 +91,18 @@ export default function SocialPage() {
                 setRequests(friendReqResponse.data);
                 setGroupInvites(groupInvResponse.data);
             } else {
-                // Fetch recommended users with pagination
-                const response = await api.get('/users');
-                // Filter out self and existing friends (basic client-side filter for demo)
-                const allUsers = response.data as Friend[];
-                const friendIds = new Set(friends.map(f => f.id));
+                // Fetch recommended users - need to also fetch friends to filter
+                const [usersResponse, friendsResponse] = await Promise.all([
+                    api.get('/users'),
+                    api.get('/social/friends')
+                ]);
+                
+                const allUsers = usersResponse.data as Friend[];
+                const currentFriends = friendsResponse.data as Friend[];
+                setFriends(currentFriends); // Update friends list
+                
+                // Filter out self and existing friends
+                const friendIds = new Set(currentFriends.map(f => f.id));
                 const recs = allUsers.filter(u => u.id !== user?.id && !friendIds.has(u.id));
                 const paginatedRecs = recs.slice(0, 10);
                 setRecommended(paginatedRecs);

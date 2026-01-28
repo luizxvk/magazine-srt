@@ -67,6 +67,14 @@ export default function MobileCarousel({
             }
         },
         {
+            id: 'recommended',
+            title: 'Adicionar Amigos',
+            subtitle: 'Pessoas que você pode conhecer',
+            icon: <UserPlus className="w-6 h-6" />,
+            gradient: 'from-rose-500 to-pink-600',
+            onClick: () => navigate('/social?tab=recommended')
+        },
+        {
             id: 'photos',
             title: 'Catálogo de Fotos',
             subtitle: 'Explore as fotos da comunidade',
@@ -105,14 +113,6 @@ export default function MobileCarousel({
             icon: <MessageSquare className="w-6 h-6" />,
             gradient: 'from-emerald-500 to-teal-600',
             onClick: () => navigate('/feedback')
-        },
-        {
-            id: 'recommended',
-            title: 'Adicionar Amigos',
-            subtitle: 'Pessoas que você pode conhecer',
-            icon: <UserPlus className="w-6 h-6" />,
-            gradient: 'from-rose-500 to-pink-600',
-            onClick: () => navigate('/social?tab=recommended')
         }
     ];
 

@@ -49,12 +49,6 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
     const [winnerStatus, setWinnerStatus] = useState<WinnerStatus | null>(null);
     const [claiming, setClaiming] = useState(false);
     const [showClaimSuccess, setShowClaimSuccess] = useState(false);
-    const [users, setUsers] = useState<RankedUser[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [sortBy, setSortBy] = useState<'trophies' | 'level'>('trophies');
-    const [rewardConfig, setRewardConfig] = useState<RankingRewardConfig | null>(null);
-    const [daysRemaining, setDaysRemaining] = useState(0);
-    const [reminderEnabled, setReminderEnabled] = useState(false);
 
     useEffect(() => {
         // Check if reminder is already enabled

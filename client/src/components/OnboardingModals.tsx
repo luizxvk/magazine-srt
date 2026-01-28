@@ -5,7 +5,7 @@ import WelcomeTour from './WelcomeTour';
 import WhatsNewModal from './WhatsNewModal';
 import EmailVerificationPopup from './EmailVerificationPopup';
 
-const CURRENT_VERSION = '0.4.17';
+const CURRENT_VERSION = '0.4.18';
 
 /**
  * Gerencia a ordem dos modais de onboarding:

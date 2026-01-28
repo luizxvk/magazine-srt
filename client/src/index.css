@@ -792,6 +792,19 @@ html.rgb-dynamic [class*="border-accent"] {
   animation: scaleIn 0.25s ease-out forwards;
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .animate-scale-out {
   animation: scaleOut 0.2s ease-in forwards;
 }

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, ScrollText, Check, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface TermsOfServiceModalProps {
     isOpen: boolean;
@@ -38,26 +37,19 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
         }
     };
 
+    // Early return if not open - simpler than AnimatePresence for better compatibility
+    if (!isOpen) return null;
+
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-                >
-                    <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose} />
-                    
-                    <motion.div
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.95, opacity: 0 }}
-                        className={`relative w-full max-w-2xl max-h-[90vh] bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'}`}
-                    >
-                        {/* Header */}
-                        <div className={`flex items-center justify-between p-4 border-b ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-                            <div className="flex items-center gap-3">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
+            <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose} />
+            
+            <div
+                className={`relative w-full max-w-2xl max-h-[90vh] bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border animate-scale-in ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'}`}
+            >
+                {/* Header */}
+                <div className={`flex items-center justify-between p-4 border-b ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                    <div className="flex items-center gap-3">
                                 <div className={`p-2 rounded-lg ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
                                     <ScrollText className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                                 </div>
@@ -315,9 +307,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                                 </button>
                             </div>
                         </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                    </div>
+                </div>
     );
 }

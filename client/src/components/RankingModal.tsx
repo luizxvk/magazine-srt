@@ -147,6 +147,14 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
             fetchRewardConfig();
             calculateDaysRemaining();
             if (user) fetchWinnerStatus();
+            
+            // Poll for real-time updates while modal is open
+            const interval = setInterval(() => {
+                fetchRanking();
+                if (user) fetchWinnerStatus();
+            }, 30000);
+            
+            return () => clearInterval(interval);
         }
     }, [isOpen, user]);
 
@@ -253,10 +261,10 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                             )}
                         </AnimatePresence>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 {/* Days Counter */}
-                                <div className="text-center">
+                                <div className="text-center flex-shrink-0">
                                     <div className={`w-14 h-14 rounded-xl ${accentBg} flex items-center justify-center mb-1`}>
                                         <span className="text-2xl font-bold text-black">{daysRemaining}</span>
                                     </div>
@@ -264,23 +272,23 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                                 </div>
                                 
                                 {/* Info */}
-                                <div>
+                                <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <Calendar className={`w-4 h-4 ${accentText}`} />
+                                        <Calendar className={`w-4 h-4 ${accentText} flex-shrink-0`} />
                                         <span className="text-xs text-gray-400 uppercase tracking-wider">Prêmio do Mês</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className={`${accentText}`}>{getRewardIcon()}</span>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className={`${accentText} flex-shrink-0`}>{getRewardIcon()}</span>
                                         <span className="text-white font-semibold">{getRewardText()}</span>
                                     </div>
                                     {rewardConfig.rewardDescription && (
-                                        <p className="text-xs text-gray-500 mt-1">{rewardConfig.rewardDescription}</p>
+                                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{rewardConfig.rewardDescription}</p>
                                     )}
                                 </div>
                             </div>
                             
                             {/* Claim Button or Reminder Button */}
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
                                 {winnerStatus?.canClaim && (
                                     <motion.button
                                         onClick={handleClaimReward}

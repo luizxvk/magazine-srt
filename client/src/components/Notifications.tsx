@@ -61,8 +61,8 @@ export default function Notifications({ onClose }: NotificationsProps) {
         };
 
         fetchNotifications();
-        // Poll every 60 seconds for new notifications (reduced from 30s to save bandwidth)
-        const interval = setInterval(fetchNotifications, 60000);
+        // Poll every 30 seconds for new notifications (real-time updates)
+        const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, []);
 

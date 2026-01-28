@@ -132,7 +132,7 @@ export default function FeedPage() {
         fetchPosts(false, 1, false);
         const interval = setInterval(() => {
             fetchPosts(true, 1, false);
-        }, 60000); // Reduced from 15s to 60s to save bandwidth
+        }, 30000); // Poll every 30s for real-time updates
 
         // Event listener for opening radio from search
         const handleOpenRadio = () => {

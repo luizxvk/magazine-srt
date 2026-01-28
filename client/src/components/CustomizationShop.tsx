@@ -902,7 +902,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                             })()
                         ) : activeTab === 'badge' ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {(badges).map(item => {
+                                {(getItems() as typeof badges).map(item => {
                                     const owned = isOwned(item.id);
                                     const equipped = isEquipped(item);
                                     const isFree = item.price === 0;

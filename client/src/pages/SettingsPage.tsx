@@ -5,6 +5,7 @@ import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle } from 'lu
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
+import PushNotificationSettings from '../components/PushNotificationSettings';
 import api from '../services/api';
 
 export default function SettingsPage() {
@@ -198,6 +199,11 @@ export default function SettingsPage() {
                                     doNotDisturb ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
+                        </div>
+
+                        {/* Push Notifications - External */}
+                        <div className="pt-2 border-t border-zinc-700/50">
+                            <PushNotificationSettings compact />
                         </div>
                     </div>
 

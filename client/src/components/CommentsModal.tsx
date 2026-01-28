@@ -153,14 +153,16 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                         className={`fixed z-[70] ${
                             isMobile 
                                 ? 'inset-x-0 bottom-0 max-h-[85vh] rounded-t-3xl pb-20' 
-                                : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[80vh] rounded-3xl'
-                        } ${glassStyle} border shadow-2xl overflow-hidden flex flex-col`}
-                        style={{
-                            boxShadow: isMGT 
-                                ? '0 25px 50px -12px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(16, 185, 129, 0.1)'
-                                : '0 25px 50px -12px rgba(245, 158, 11, 0.25), 0 0 0 1px rgba(245, 158, 11, 0.1)'
-                        }}
+                                : 'inset-0 flex items-center justify-center pointer-events-none'
+                        }`}
                     >
+                        <div className={`${!isMobile ? 'w-full max-w-lg max-h-[80vh] rounded-3xl pointer-events-auto' : 'w-full h-full'} ${glassStyle} border shadow-2xl overflow-hidden flex flex-col`}
+                            style={{
+                                boxShadow: isMGT 
+                                    ? '0 25px 50px -12px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(16, 185, 129, 0.1)'
+                                    : '0 25px 50px -12px rgba(245, 158, 11, 0.25), 0 0 0 1px rgba(245, 158, 11, 0.1)'
+                            }}
+                        >
                         {/* Mobile Handle Bar */}
                         {isMobile && (
                             <div className="flex justify-center pt-3 pb-2">
@@ -280,6 +282,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                 </motion.button>
                             </div>
                         </form>
+                        </div>
                     </motion.div>
                 </>
             )}

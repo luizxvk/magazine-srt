@@ -27,7 +27,9 @@ interface CustomizationShopProps {
 const defaultItems = {
     background: { id: 'bg_default', name: 'Magazine Clássico', description: 'O visual padrão do Magazine', price: 0, type: 'background' as const, preview: 'linear-gradient(125deg, #0a0a0a 0%, #1a1a1a 100%)' },
     badge: { id: 'badge_crown', name: 'Coroa Magazine', description: 'Símbolo de elite', price: 0, type: 'badge' as const, preview: '👑' },
+    badgeMGT: { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 0, type: 'badge' as const, preview: '⭐' },
     color: { id: 'color_gold', name: 'Dourado Magazine', description: 'A cor clássica Magazine', price: 0, type: 'color' as const, preview: '#d4af37' },
+    colorMGT: { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 0, type: 'color' as const, preview: '#00ffff' },
 };
 
 // Predefined backgrounds
@@ -119,6 +121,14 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     // Default items are always owned
     const defaultItemIds = [defaultItems.background.id, defaultItems.badge.id, defaultItems.color.id];
 
+    // ENTERPRISE plan has access to ALL items
+    const allItemIds = [
+        ...backgrounds.map(b => b.id),
+        ...featuredBackgrounds.map(b => b.id),
+        ...badges.map(b => b.id),
+        ...colors.map(c => c.id)
+    ];
+
     useEffect(() => {
         if (isOpen) {
             fetchUserCustomizations();
@@ -144,24 +154,44 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     };
 
     const fetchUserCustomizations = async () => {
+        // Determine default items based on membership type
+        const defaultBadge = isMGT ? defaultItems.badgeMGT.id : defaultItems.badge.id;
+        const defaultColor = isMGT ? defaultItems.colorMGT.id : defaultItems.color.id;
+        const defaultBg = isMGT ? 'bg_galaxy' : defaultItems.background.id; // MGT uses Galaxy as default
+
         try {
             const response = await api.get('/users/customizations');
-            setOwnedItems([...defaultItemIds, ...(response.data.owned || [])]);
-            // If no items equipped, set defaults as equipped
+            // ENTERPRISE plan (Magazine e MGT) tem acesso a TODOS os itens
+            const enterpriseOwned = [...defaultItemIds, ...allItemIds];
+            setOwnedItems([...new Set([...enterpriseOwned, ...(response.data.owned || [])])]);
+            // If no items equipped, set defaults based on membership
             const equipped = response.data.equipped || {};
+            
+            // Check if equipped badge is Magazine-exclusive for MGT user
+            let badgeToEquip = equipped.badge || defaultBadge;
+            if (isMGT && badgeToEquip === 'badge_crown') {
+                badgeToEquip = defaultItems.badgeMGT.id;
+            }
+            
+            // Check if equipped color is Magazine-exclusive for MGT user
+            let colorToEquip = equipped.color || defaultColor;
+            if (isMGT && colorToEquip === 'color_gold') {
+                colorToEquip = defaultItems.colorMGT.id;
+            }
+            
             setEquippedItems({
-                background: equipped.background || defaultItems.background.id,
-                badge: equipped.badge || defaultItems.badge.id,
-                color: equipped.color || defaultItems.color.id
+                background: equipped.background || defaultBg,
+                badge: badgeToEquip,
+                color: colorToEquip
             });
         } catch (error) {
             console.error('Failed to fetch customizations', error);
-            // At minimum, user has default items and they are equipped
-            setOwnedItems(defaultItemIds);
+            // ENTERPRISE tem todos os itens
+            setOwnedItems([...new Set([...defaultItemIds, ...allItemIds])]);
             setEquippedItems({
-                background: defaultItems.background.id,
-                badge: defaultItems.badge.id,
-                color: defaultItems.color.id
+                background: defaultBg,
+                badge: defaultBadge,
+                color: defaultColor
             });
         }
     };
@@ -390,7 +420,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     onClick={e => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className={`p-4 border-b ${borderColor} flex items-center justify-between bg-gradient-to-r from-${themeColor}-500/10 to-transparent`}>
+                    <div className={`p-4 border-b ${borderColor} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-${themeColor}-500/10 to-transparent`}>
                         <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-lg bg-${themeColor}-500/20`}>
                                 <Sparkles className={`w-5 h-5 text-${themeColor}-400`} />
@@ -400,17 +430,17 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                 <p className={`text-xs ${textSub}`}>Customize seu perfil</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                             <button
                                 onClick={() => setShowSupplyBox(true)}
-                                className={`px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transition-all flex items-center gap-1`}
+                                className={`px-2 sm:px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transition-all flex items-center gap-1 whitespace-nowrap`}
                             >
                                 <PackageOpen className="w-3 h-3" />
-                                Supply Box
+                                <span className="hidden sm:inline">Supply</span> Box
                             </button>
-                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-${themeColor}-500/20 border border-${themeColor}-500/30`}>
-                                <Zap className={`w-4 h-4 text-${themeColor}-400`} />
-                                <span className={`text-sm font-bold text-${themeColor}-400`}>{user?.zionsPoints?.toLocaleString() || 0} Points</span>
+                            <div className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full bg-${themeColor}-500/20 border border-${themeColor}-500/30`}>
+                                <Zap className={`w-3 sm:w-4 h-3 sm:h-4 text-${themeColor}-400`} />
+                                <span className={`text-xs sm:text-sm font-bold text-${themeColor}-400 whitespace-nowrap`}>{user?.zionsPoints?.toLocaleString() || 0} Points</span>
                             </div>
                             <button onClick={onClose} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}>
                                 <X className={`w-5 h-5 ${textSub}`} />

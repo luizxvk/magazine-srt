@@ -243,7 +243,8 @@ export default function Notifications({ onClose }: NotificationsProps) {
                                 <div>
                                     <p className={`text-sm leading-tight mb-1 ${contentColor}`}>
                                         {hasActor && <span className={`font-bold ${isMGT ? 'text-white' : 'text-gold-400'}`}>{parsedContent.actor.name} </span>}
-                                        {parsedContent.text}
+                                        {parsedContent.title && <span className="font-semibold">{parsedContent.title} </span>}
+                                        {parsedContent.message || parsedContent.text}
                                     </p>
                                     <p className={`text-[10px] ${timeColor}`}>{getTimeAgo(notification.createdAt)}</p>
                                 </div>

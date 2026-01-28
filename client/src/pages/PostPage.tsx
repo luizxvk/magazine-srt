@@ -4,16 +4,19 @@ import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import FeedItem from '../components/FeedItem';
 import ModernLoader from '../components/ModernLoader';
+import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 
 export default function PostPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    // const { user } = useAuth(); // user is not used
+    const { showAchievement, updateUserZions } = useAuth();
     const [post, setPost] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [showComments, setShowComments] = useState(false);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -64,6 +67,37 @@ export default function PostPage() {
     if (loading) return <ModernLoader fullScreen />;
     if (!post) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Post não encontrado</div>;
 
+    const handleLike = async () => {
+        try {
+            const response = await api.post(`/posts/${id}/like`);
+            setPost((prev: any) => ({
+                ...prev,
+                likes: response.data.likesCount,
+                likedBy: response.data.isLiked ? ['me'] : []
+            }));
+
+            if (response.data.newBadges?.length > 0) {
+                response.data.newBadges.forEach((badge: string) => {
+                    showAchievement('Nova Conquista!', `Você desbloqueou a medalha: ${badge}`);
+                });
+            }
+
+            if (response.data.zionsEarned) {
+                showAchievement('Recompensa!', `Você ganhou ${response.data.zionsEarned} Zions!`);
+                updateUserZions(response.data.zionsEarned);
+            }
+        } catch (error) {
+            console.error('Failed to like post', error);
+        }
+    };
+
+    const handleCommentAdded = () => {
+        setPost((prev: any) => ({
+            ...prev,
+            comments: prev.comments + 1
+        }));
+    };
+
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">
             <LuxuriousBackground />
@@ -89,13 +123,21 @@ export default function PostPage() {
                         likes={post.likes}
                         comments={post.comments}
                         isLiked={post.likedBy?.includes('me')}
-                        onLike={() => { }} // Simplified for view only or implement full logic
-                        onComment={() => { }}
+                        onLike={handleLike}
+                        onComment={() => setShowComments(true)}
                         onDelete={() => { }}
                         onShare={() => { }}
-                        isExpanded={true} // New prop to indicate expanded view
+                        isExpanded={true}
                     />
                 </div>
+
+                {/* Comments Modal */}
+                <CommentsModal
+                    isOpen={showComments}
+                    onClose={() => setShowComments(false)}
+                    postId={post.id}
+                    onCommentAdded={handleCommentAdded}
+                />
             </div>
         </div>
     );

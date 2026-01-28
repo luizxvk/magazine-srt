@@ -95,6 +95,26 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
     
     const handleImageLoad = () => {
         setImageLoaded(true);
+        
+        // Auto-ajustar zoom para fotos paisagem/retrato cobrirem o círculo
+        if (imageRef.current) {
+            const img = imageRef.current;
+            const circleSize = viewSize - 40; // tamanho do círculo de crop
+            const minDimension = Math.min(img.naturalWidth, img.naturalHeight);
+            
+            // Calcular escala necessária para cobrir o círculo
+            const neededScale = circleSize / minDimension;
+            
+            // Se a imagem é muito grande, começar com escala menor
+            // Se é muito pequena para cobrir o círculo, aumentar
+            if (neededScale > 1) {
+                setScale(neededScale);
+            } else if (neededScale < 0.5) {
+                setScale(0.5);
+            } else {
+                setScale(1);
+            }
+        }
     };
     
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -130,11 +150,11 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
     };
     
     const handleZoomIn = () => {
-        setScale(prev => Math.min(prev + 0.1, 3));
+        setScale(prev => Math.min(prev + 0.1, 5));
     };
     
     const handleZoomOut = () => {
-        setScale(prev => Math.max(prev - 0.1, 0.5));
+        setScale(prev => Math.max(prev - 0.1, 0.1));
     };
     
     const handleReset = () => {

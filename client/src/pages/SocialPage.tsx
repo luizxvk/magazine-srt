@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield, UserCheck, X, Check, ChevronDown, Loader2 } from 'lucide-react';
+import { Users, Shield, UserCheck, X, Check, ChevronDown, Loader2, UserPlus } from 'lucide-react';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from '../components/ModernLoader';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -46,7 +46,11 @@ interface GroupInvite {
 
 export default function SocialPage() {
     const { user, showToast } = useAuth();
-    const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended'>('friends');
+    const [searchParams] = useSearchParams();
+    const tabParam = searchParams.get('tab');
+    const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended'>(
+        tabParam === 'recommended' ? 'recommended' : tabParam === 'requests' ? 'requests' : 'friends'
+    );
     const [friends, setFriends] = useState<Friend[]>([]);
     const [requests, setRequests] = useState<FriendRequest[]>([]);
     const [groupInvites, setGroupInvites] = useState<GroupInvite[]>([]);
@@ -56,6 +60,7 @@ export default function SocialPage() {
     const [recommendedPage, setRecommendedPage] = useState(1);
     const [hasMoreRecommended, setHasMoreRecommended] = useState(true);
     const [joinedGroupPopup, setJoinedGroupPopup] = useState<{ show: boolean; groupName: string; groupId: string } | null>(null);
+    const [sendingRequest, setSendingRequest] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const isMGT = user?.membershipType === 'MGT';
@@ -167,6 +172,22 @@ export default function SocialPage() {
             console.error('Failed to load more recommended', error);
         } finally {
             setLoadingMore(false);
+        }
+    };
+
+    const handleSendFriendRequest = async (userId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSendingRequest(userId);
+        try {
+            await api.post(`/social/request/${userId}`);
+            showToast('Solicitação de amizade enviada!');
+            // Remover da lista de recomendados
+            setRecommended(prev => prev.filter(r => r.id !== userId));
+        } catch (error: any) {
+            const message = error.response?.data?.error || 'Erro ao enviar solicitação';
+            showToast(message);
+        } finally {
+            setSendingRequest(null);
         }
     };
 
@@ -388,9 +409,26 @@ export default function SocialPage() {
                                                     <span>Nível {rec.level || 1}</span>
                                                 </p>
                                             </div>
-                                            <button className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}>
-                                                Ver Perfil
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <button 
+                                                    onClick={(e) => navigate(`/profile?id=${rec.id}`)}
+                                                    className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
+                                                >
+                                                    Ver Perfil
+                                                </button>
+                                                <button
+                                                    onClick={(e) => handleSendFriendRequest(rec.id, e)}
+                                                    disabled={sendingRequest === rec.id}
+                                                    className={`p-1.5 rounded-lg transition-all ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50`}
+                                                    title="Enviar solicitação de amizade"
+                                                >
+                                                    {sendingRequest === rec.id ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <UserPlus className="w-4 h-4" />
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                     

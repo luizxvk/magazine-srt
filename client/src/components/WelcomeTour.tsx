@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, Star, Layout, Zap, ShoppingBag, Calendar, Trophy, Sparkles } from 'lucide-react';
+import { X, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface WelcomeTourProps {
@@ -48,74 +48,74 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
         {
             title: "Bem-vindo à MGT",
             description: "Você faz parte de uma comunidade exclusiva! Aqui você terá acesso a funcionalidades únicas, recompensas especiais e muito mais.",
-            icon: <Star className="w-12 h-12 text-emerald-400" />,
+            emoji: "🌟",
             features: ["Acesso exclusivo MGT", "Tema esmeralda personalizado", "Benefícios VIP"]
         },
         {
             title: "Feed & Comunidade",
             description: "Compartilhe momentos, crie posts com imagens, interaja com curtidas e comentários. Conecte-se com outros membros!",
-            icon: <Layout className="w-12 h-12 text-emerald-400" />,
+            emoji: "📱",
             features: ["Posts com mídia", "Curtidas e comentários", "Stories temporários"]
         },
         {
             title: "Sistema de Zions",
             description: "Nossa moeda virtual! Ganhe Zions por engajamento: posts, curtidas, comentários e login diário.",
-            icon: <Zap className="w-12 h-12 text-emerald-400" />,
+            emoji: "⚡",
             features: ["Recompensas diárias", "Bônus por engajamento", "Multiplicadores"]
         },
         {
             title: "Loja & Recompensas",
             description: "Troque seus Zions por recompensas reais! Gift cards, itens exclusivos e muito mais.",
-            icon: <ShoppingBag className="w-12 h-12 text-emerald-400" />,
+            emoji: "🛒",
             features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
         },
         {
             title: "Ranking & Conquistas",
             description: "Suba de nível, desbloqueie badges exclusivos e dispute posições no ranking global!",
-            icon: <Trophy className="w-12 h-12 text-emerald-400" />,
+            emoji: "🏆",
             features: ["Sistema de níveis", "Badges colecionáveis", "Ranking semanal"]
         },
         {
             title: "Eventos & Mais",
             description: "Acesso a eventos VIP, rádio integrada, grupos e muito mais recursos por vir!",
-            icon: <Calendar className="w-12 h-12 text-emerald-400" />,
+            emoji: "📅",
             features: ["Eventos exclusivos", "Rádio Lo-Fi", "Grupos privados"]
         }
     ] : [
         {
             title: "Bem-vindo ao Magazine",
             description: "Uma plataforma exclusiva que combina rede social, gamificação e recompensas reais. Explore tudo o que preparamos para você!",
-            icon: <Star className="w-12 h-12 text-gold-400" />,
+            emoji: "🌟",
             features: ["Rede social premium", "Sistema de recompensas", "Comunidade exclusiva"]
         },
         {
             title: "Feed & Posts",
             description: "Compartilhe seus momentos com posts, imagens e interaja com a comunidade através de curtidas e comentários.",
-            icon: <Layout className="w-12 h-12 text-gold-400" />,
+            emoji: "📱",
             features: ["Posts com mídia", "Curtidas e comentários", "Stories 24h"]
         },
         {
             title: "Sistema de Zions",
             description: "Ganhe Zions (nossa moeda virtual) por tudo que você faz: posts, curtidas, comentários, login diário e mais!",
-            icon: <Zap className="w-12 h-12 text-gold-400" />,
+            emoji: "⚡",
             features: ["Moeda virtual", "Recompensas diárias", "Bônus de engajamento"]
         },
         {
             title: "Loja Premium",
             description: "Use seus Zions para resgatar recompensas reais! Gift cards, itens exclusivos e muito mais.",
-            icon: <ShoppingBag className="w-12 h-12 text-gold-400" />,
+            emoji: "🛒",
             features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
         },
         {
             title: "Ranking & Níveis",
             description: "Suba de nível com sua atividade, colecione badges exclusivos e dispute posições no ranking!",
-            icon: <Trophy className="w-12 h-12 text-gold-400" />,
+            emoji: "🏆",
             features: ["15 níveis", "Badges únicos", "Ranking global"]
         },
         {
             title: "Recursos Extras",
             description: "Rádio integrada, eventos, grupos de chat, customização de perfil e muito mais funcionalidades!",
-            icon: <Sparkles className="w-12 h-12 text-gold-400" />,
+            emoji: "✨",
             features: ["Rádio Lo-Fi", "Eventos VIP", "Customização"]
         }
     ];
@@ -128,7 +128,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                 {/* BETA Badge */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
-                        BETA v0.4.12
+                        BETA v0.4.18
                     </span>
                 </div>
 
@@ -140,11 +140,11 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                     <X className="w-6 h-6" />
                 </button>
 
-                {/* Icon centered in card - pushed down to account for badge */}
+                {/* Emoji centered in card - pushed down to account for badge */}
                 <div className="pt-6 pb-4">
                     <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
-                        <div className={`w-full h-full ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} animate-pulse`}>
-                            {steps[step].icon}
+                        <div className={`w-full h-full ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                            <span className="text-4xl sm:text-5xl">{steps[step].emoji}</span>
                         </div>
                     </div>
                 </div>

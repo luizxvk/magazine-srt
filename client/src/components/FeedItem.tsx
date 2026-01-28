@@ -43,7 +43,25 @@ function MediaContent({ video, image, title, category, theme, isMGT, isExpanded,
     return (
         <>
             {video ? (
-                <video src={video} controls className="w-full h-full object-cover" />
+                <video 
+                    src={video} 
+                    controls 
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-full object-contain bg-black" 
+                    onError={(e) => {
+                        console.error('Video load error:', e);
+                        // Tenta recarregar com tipo diferente
+                        const videoEl = e.currentTarget;
+                        if (!videoEl.querySelector('source')) {
+                            const source = document.createElement('source');
+                            source.src = video;
+                            source.type = 'video/mp4';
+                            videoEl.appendChild(source);
+                            videoEl.load();
+                        }
+                    }}
+                />
             ) : (
                 <img
                     src={image}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -105,6 +105,14 @@ export default function MobileCarousel({
             icon: <MessageSquare className="w-6 h-6" />,
             gradient: 'from-emerald-500 to-teal-600',
             onClick: () => navigate('/feedback')
+        },
+        {
+            id: 'recommended',
+            title: 'Adicionar Amigos',
+            subtitle: 'Pessoas que você pode conhecer',
+            icon: <UserPlus className="w-6 h-6" />,
+            gradient: 'from-rose-500 to-pink-600',
+            onClick: () => navigate('/social?tab=recommended')
         }
     ];
 

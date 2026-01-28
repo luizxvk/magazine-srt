@@ -336,7 +336,13 @@ export default function Rewards() {
 
                                             {/* Status Display */}
                                             <div className="flex flex-col items-end gap-1">
-                                                {redemption.status === 'PENDING' && (
+                                                {/* Para recompensas digitais com zionsReward, considera como completo automaticamente */}
+                                                {(redemption.status === 'COMPLETED' || (redemption.status === 'PENDING' && redemption.reward.type === 'DIGITAL')) && (
+                                                    <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
+                                                        Completo
+                                                    </div>
+                                                )}
+                                                {redemption.status === 'PENDING' && redemption.reward.type !== 'DIGITAL' && (
                                                     <div className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-yellow-500/20">
                                                         Em Análise
                                                     </div>
@@ -344,11 +350,6 @@ export default function Rewards() {
                                                 {redemption.status === 'PROCESSING' && (
                                                     <div className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
                                                         Processando
-                                                    </div>
-                                                )}
-                                                {redemption.status === 'COMPLETED' && (
-                                                    <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
-                                                        Completo
                                                     </div>
                                                 )}
                                                 {redemption.status === 'CANCELLED' && (
@@ -372,7 +373,7 @@ export default function Rewards() {
 
                     {/* Zion History Tab Content */}
                     {activeTab === 'history' && (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             {zionHistory.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500">
                                     <Coins className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -380,54 +381,83 @@ export default function Rewards() {
                                 </div>
                             ) : (
                                 <>
-                                {zionHistory.slice(0, historyLimit).map((item) => (
-                                    <motion.div
-                                        key={item.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="glass-panel p-4 rounded-xl border border-white/5 flex items-center justify-between"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${
-                                                item.amount > 0 
-                                                    ? 'bg-green-500/10' 
-                                                    : 'bg-red-500/10'
-                                            }`}>
-                                                {item.amount > 0 ? (
-                                                    <TrendingUp className="w-5 h-5 text-green-400" />
-                                                ) : (
-                                                    <TrendingDown className="w-5 h-5 text-red-400" />
-                                                )}
+                                {/* Header do Extrato */}
+                                <div className="flex items-center justify-between px-4 py-2 text-xs text-gray-500 uppercase tracking-wider border-b border-white/5">
+                                    <span>Descrição</span>
+                                    <span>Valor</span>
+                                </div>
+                                
+                                {zionHistory.slice(0, historyLimit).map((item) => {
+                                    // Formatar a descrição para ser mais amigável
+                                    const formatReason = (reason: string) => {
+                                        const translations: { [key: string]: string } = {
+                                            'Redeemed reward:': 'Resgate:',
+                                            'Recompensa:': 'Bônus:',
+                                            'Created a post': 'Criou uma publicação',
+                                            'Commented on a post': 'Comentou em uma publicação',
+                                            'Liked post': 'Curtiu publicação',
+                                            'Daily Login Bonus': 'Bônus de Login Diário',
+                                            'Supply Box Open': 'Abertura de Supply Box',
+                                            'Highlight Post Cost': 'Destacar publicação',
+                                            'Elite Ranking': 'Ranking Elite',
+                                        };
+                                        
+                                        let formatted = reason;
+                                        for (const [en, pt] of Object.entries(translations)) {
+                                            if (formatted.includes(en)) {
+                                                formatted = formatted.replace(en, pt);
+                                            }
+                                        }
+                                        
+                                        // Limitar UUIDs/IDs longos
+                                        formatted = formatted.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '...');
+                                        
+                                        return formatted;
+                                    };
+                                    
+                                    return (
+                                        <motion.div
+                                            key={item.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className={`px-4 py-3 border-b border-white/5 flex items-center justify-between hover:bg-white/5 transition-colors ${theme === 'light' ? 'hover:bg-gray-50' : ''}`}
+                                        >
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                <div className={`w-1.5 h-8 rounded-full ${
+                                                    item.amount > 0 
+                                                        ? 'bg-green-500' 
+                                                        : 'bg-red-500/60'
+                                                }`} />
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className={`${themeCardText} font-medium text-sm truncate`}>
+                                                        {formatReason(item.reason)}
+                                                    </h4>
+                                                    <p className={`text-xs ${themeSecondary}`}>
+                                                        {new Date(item.createdAt).toLocaleDateString('pt-BR', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h4 className={`${themeCardText} font-medium text-sm`}>
-                                                    {item.reason}
-                                                </h4>
-                                                <p className={`text-xs ${themeSecondary}`}>
-                                                    {new Date(item.createdAt).toLocaleDateString('pt-BR', {
-                                                        day: '2-digit',
-                                                        month: '2-digit',
-                                                        year: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </p>
+                                            <div className="text-right pl-4">
+                                                <span className={`text-sm font-mono font-bold ${
+                                                    item.amount > 0 
+                                                        ? 'text-green-400' 
+                                                        : 'text-red-400'
+                                                }`}>
+                                                    {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString('pt-BR')}
+                                                </span>
+                                                <span className="text-[10px] text-gray-600 block uppercase tracking-widest">
+                                                    Zions
+                                                </span>
                                             </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`text-lg font-bold ${
-                                                item.amount > 0 
-                                                    ? 'text-green-400' 
-                                                    : 'text-red-400'
-                                            }`}>
-                                                {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString('pt-BR')}
-                                            </span>
-                                            <span className="text-[10px] text-gray-600 block uppercase tracking-widest">
-                                                Points
-                                            </span>
-                                        </div>
-                                    </motion.div>
-                                ))}
+                                        </motion.div>
+                                    );
+                                })}
                                 {zionHistory.length > historyLimit && (
                                     <button
                                         onClick={() => setHistoryLimit(prev => prev + 10)}

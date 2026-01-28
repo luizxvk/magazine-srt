@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Bell, Gift, RefreshCw, Palette, Check, ImageIcon } from 'lucide-react';
+import { X, Sparkles, Bell, Video, UserPlus, ZoomIn, Receipt, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.17';
+const CURRENT_VERSION = '0.4.18';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,42 +33,36 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.17 - PUSH NOTIFICATIONS & REAL-TIME
+    // v0.4.18 - MELHORIAS DE UX
     const updates: UpdateItem[] = [
         {
-            icon: <Bell className="w-5 h-5 text-blue-400" />,
-            title: '🔔 Push Notifications',
-            description: 'Receba notificações push quando alguém comentar, enviar mensagem ou solicitar amizade!',
+            icon: <Video className="w-5 h-5 text-blue-400" />,
+            title: 'Vídeos Corrigidos',
+            description: 'Correção na reprodução de vídeos curtos nos posts do feed.',
             isNew: true
         },
         {
-            icon: <RefreshCw className="w-5 h-5 text-green-400" />,
-            title: '⚡ Atualizações em Tempo Real',
-            description: 'Feed, notificações e ranking agora atualizam automaticamente a cada 30 segundos.',
+            icon: <UserPlus className="w-5 h-5 text-pink-400" />,
+            title: 'Adicionar Amigos Fácil',
+            description: 'Novo card no carrossel mobile e botão rápido para adicionar amigos na aba Recomendados.',
             isNew: true
         },
         {
-            icon: <Gift className="w-5 h-5 text-purple-400" />,
-            title: '🎁 Alertas de Recompensas',
-            description: 'Receba push notification quando uma nova recompensa exclusiva estiver disponível!',
+            icon: <ZoomIn className="w-5 h-5 text-green-400" />,
+            title: 'Crop de Foto Melhorado',
+            description: 'Zoom livre na edição de foto de perfil - funciona melhor com fotos em paisagem!',
             isNew: true
         },
         {
-            icon: <Palette className="w-5 h-5 text-yellow-400" />,
-            title: '👁️ Preview de Temas',
-            description: 'Visualize os packs de tema antes de comprar com o novo modo de prévia.',
+            icon: <Receipt className="w-5 h-5 text-purple-400" />,
+            title: 'Extrato de Zions',
+            description: 'Histórico de Zions reformulado no estilo de extrato bancário, mais limpo e informativo.',
             isNew: true
         },
         {
-            icon: <ImageIcon className="w-5 h-5 text-pink-400" />,
-            title: '📸 Catálogo Espaçado',
-            description: 'Fotos do catálogo agora têm espaçamento adequado entre elas.',
-            isNew: true
-        },
-        {
-            icon: <Gift className="w-5 h-5 text-amber-400" />,
-            title: '🎁 Aba Prêmios',
-            description: 'Mensagem amigável quando não há recompensas disponíveis. Fique ligado!',
+            icon: <Bell className="w-5 h-5 text-amber-400" />,
+            title: 'Status de Resgates',
+            description: 'Correção na exibição do status de recompensas digitais - agora mostra "Completo" corretamente.',
             isNew: true
         }
     ];

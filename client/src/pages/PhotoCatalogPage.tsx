@@ -33,13 +33,15 @@ function PhotoCard({
     onToggleFavorite, 
     onDelete, 
     showActions = false,
-    userId 
+    userId,
+    onClick
 }: { 
     photo: CatalogPhoto; 
     onToggleFavorite: (id: string, e: React.MouseEvent) => void;
     onDelete: (id: string, e: React.MouseEvent) => void;
     showActions?: boolean;
     userId?: string;
+    onClick?: () => void;
 }) {
     const [orientation, setOrientation] = useState<'landscape' | 'portrait' | 'square'>(photo.orientation || 'square');
     const [loaded, setLoaded] = useState(false);
@@ -84,6 +86,7 @@ function PhotoCard({
     return (
         <div className={`${getGridClasses()} p-1`}>
         <div
+            onClick={onClick}
             className={`relative group rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 h-full ${!loaded ? 'animate-pulse bg-white/5' : ''} ring-2 ring-transparent hover:ring-white/20`}
             style={getAspectStyle()}
         >
@@ -179,17 +182,19 @@ function GridPhotoCard({
     onToggleFavorite, 
     onDelete, 
     showActions = false,
-    userId 
+    userId,
+    onClick
 }: { 
     photo: CatalogPhoto; 
     onToggleFavorite: (id: string, e: React.MouseEvent) => void;
     onDelete: (id: string, e: React.MouseEvent) => void;
     showActions?: boolean;
     userId?: string;
+    onClick?: () => void;
 }) {
     return (
         <div className="p-1">
-        <div className="relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 aspect-square ring-2 ring-transparent hover:ring-white/20">
+        <div onClick={onClick} className="relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 aspect-square ring-2 ring-transparent hover:ring-white/20">
             <img
                 src={photo.imageUrl}
                 alt={photo.title || 'Foto do catálogo'}
@@ -230,7 +235,8 @@ function ListPhotoCard({
     onDelete, 
     showActions = false,
     userId,
-    isMGT
+    isMGT,
+    onClick
 }: { 
     photo: CatalogPhoto; 
     onToggleFavorite: (id: string, e: React.MouseEvent) => void;
@@ -238,11 +244,12 @@ function ListPhotoCard({
     showActions?: boolean;
     userId?: string;
     isMGT?: boolean;
+    onClick?: () => void;
 }) {
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     
     return (
-        <div className={`flex gap-4 p-4 rounded-2xl bg-white/5 border ${themeBorder} backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group`}>
+        <div onClick={onClick} className={`flex gap-4 p-4 rounded-2xl bg-white/5 border ${themeBorder} backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group`}>
             <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 rounded-xl overflow-hidden">
                 <img
                     src={photo.imageUrl}
@@ -336,6 +343,9 @@ export default function PhotoCatalogPage() {
     // Delete confirmation modal state
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
+    
+    // Expanded photo state (Google Photos style)
+    const [expandedPhoto, setExpandedPhoto] = useState<CatalogPhoto | null>(null);
 
     // Filters
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -610,9 +620,9 @@ export default function PhotoCatalogPage() {
                 {/* (Lines 151-207 omitted for brevity, keeping original logic) */}
                 {/* Gallery Grid - Responsive with Dynamic Aspect Ratios */}
                 <div className={`
-                    ${viewMode === 'masonry' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 auto-rows-[180px]' : ''}
-                    ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6' : ''}
-                    ${viewMode === 'list' ? 'flex flex-col gap-6 max-w-3xl mx-auto' : ''}
+                    ${viewMode === 'masonry' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 auto-rows-[180px]' : ''}
+                    ${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3' : ''}
+                    ${viewMode === 'list' ? 'flex flex-col gap-4 max-w-3xl mx-auto' : ''}
                 `}>
                     {photos.map((photo) => (
                         viewMode === 'list' ? (
@@ -624,6 +634,7 @@ export default function PhotoCatalogPage() {
                                 showActions={activeTab === 'my'}
                                 userId={user?.id}
                                 isMGT={isMGT}
+                                onClick={() => setExpandedPhoto(photo)}
                             />
                         ) : viewMode === 'grid' ? (
                             <GridPhotoCard
@@ -633,6 +644,7 @@ export default function PhotoCatalogPage() {
                                 onDelete={handleDelete}
                                 showActions={activeTab === 'my'}
                                 userId={user?.id}
+                                onClick={() => setExpandedPhoto(photo)}
                             />
                         ) : (
                             <PhotoCard
@@ -642,6 +654,7 @@ export default function PhotoCatalogPage() {
                                 onDelete={handleDelete}
                                 showActions={activeTab === 'my'}
                                 userId={user?.id}
+                                onClick={() => setExpandedPhoto(photo)}
                             />
                         )
                     ))}
@@ -686,6 +699,94 @@ export default function PhotoCatalogPage() {
                     cancelText="Cancelar"
                     isDestructive={true}
                 />
+
+                {/* Expanded Photo Modal - Google Photos Style */}
+                {expandedPhoto && (
+                    <div 
+                        className="fixed inset-0 z-50 flex items-center justify-center"
+                        onClick={() => setExpandedPhoto(null)}
+                    >
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/95 backdrop-blur-sm animate-fade-in" />
+                        
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setExpandedPhoto(null)}
+                            className="absolute top-4 right-4 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        {/* Photo Info - Top Left */}
+                        <div className="absolute top-4 left-4 z-10">
+                            {expandedPhoto.title && (
+                                <h2 className="text-white font-bold text-xl mb-2">{expandedPhoto.title}</h2>
+                            )}
+                            {expandedPhoto.user && (
+                                <div className="flex items-center gap-2">
+                                    {expandedPhoto.user.avatarUrl ? (
+                                        <img 
+                                            src={expandedPhoto.user.avatarUrl} 
+                                            alt={expandedPhoto.user.displayName || expandedPhoto.user.name}
+                                            className="w-8 h-8 rounded-full object-cover border-2 border-white/30"
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                            <User className="w-4 h-4 text-white/70" />
+                                        </div>
+                                    )}
+                                    <span className="text-white/80 font-medium">
+                                        {expandedPhoto.user.displayName || expandedPhoto.user.name}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Tags - Bottom Left */}
+                        <div className="absolute bottom-4 left-4 z-10 flex flex-wrap gap-2">
+                            {expandedPhoto.category && (
+                                <span className={`text-xs uppercase tracking-wider px-3 py-1 rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                    {expandedPhoto.category}
+                                </span>
+                            )}
+                            {expandedPhoto.carBrand && (
+                                <span className={`text-xs uppercase tracking-wider px-3 py-1 rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                    {expandedPhoto.carBrand}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Actions - Bottom Right */}
+                        <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleFavorite(expandedPhoto.id, e);
+                                    setExpandedPhoto(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null);
+                                }}
+                                className={`p-3 rounded-full transition-colors ${
+                                    expandedPhoto.isFavorite 
+                                        ? 'bg-yellow-500/20 text-yellow-400' 
+                                        : 'bg-white/10 hover:bg-white/20 text-white'
+                                }`}
+                            >
+                                <Star className={`w-5 h-5 ${expandedPhoto.isFavorite ? 'fill-current' : ''}`} />
+                            </button>
+                        </div>
+
+                        {/* Main Image Container */}
+                        <div 
+                            className="relative max-w-[90vw] max-h-[85vh] animate-scale-in"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img
+                                src={expandedPhoto.imageUrl}
+                                alt={expandedPhoto.title || 'Foto expandida'}
+                                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

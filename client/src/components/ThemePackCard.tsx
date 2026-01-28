@@ -9,6 +9,7 @@ interface ThemePack {
     backgroundUrl: string;
     accentColor: string;
     previewUrl?: string;
+    badgeUrl?: string;
     price: number;
     maxStock?: number;
     soldCount: number;
@@ -137,6 +138,16 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, on
                         />
                         <span>Cor Destaque: {pack.accentColor || '#d4af37'}</span>
                     </div>
+                    {pack.badgeUrl && (
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <img 
+                                src={pack.badgeUrl} 
+                                alt="Badge" 
+                                className="w-4 h-4 object-contain"
+                            />
+                            <span>Badge Exclusiva Inclusa</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Price & Action - Vertical Layout like Color Cards */}

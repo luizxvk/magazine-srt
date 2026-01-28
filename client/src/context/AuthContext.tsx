@@ -83,6 +83,9 @@ interface AuthContextType {
     accentColor: string;
     backgroundStyle: string | null;
     equippedBadge: string | null;
+    // Theme Preview Mode
+    previewTheme: { background: string; color: string; packName: string; packId: string; price: number } | null;
+    setPreviewTheme: (preview: { background: string; color: string; packName: string; packId: string; price: number } | null) => void;
     // Active Chat
     activeChatUserId: string | null;
     setActiveChatUserId: (userId: string | null) => void;
@@ -158,6 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
     const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+    const [previewTheme, setPreviewTheme] = useState<{ background: string; color: string; packName: string; packId: string; price: number } | null>(null);
     const [theme, setTheme] = useState<'dark' | 'light'>(() => {
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
@@ -169,8 +173,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return 'dark';
     });
 
-    // Compute accent color from user's equipped customization
+    // Compute accent color from user's equipped customization (or preview)
     const accentColor = React.useMemo(() => {
+        // If preview is active, use preview color
+        if (previewTheme?.color) {
+            return previewTheme.color;
+        }
         if (user?.equippedColor) {
             // Check if it's a direct HEX value (from theme packs)
             if (user.equippedColor.startsWith('#')) {
@@ -188,10 +196,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         // Default colors based on membership
         return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
-    }, [user?.equippedColor, user?.membershipType]);
+    }, [user?.equippedColor, user?.membershipType, previewTheme?.color]);
 
-    // Compute background style from user's equipped customization
+    // Compute background style from user's equipped customization (or preview)
     const backgroundStyle = React.useMemo(() => {
+        // If preview is active, use preview background
+        if (previewTheme?.background) {
+            return `class:${previewTheme.background}`; // Theme packs use class-based backgrounds
+        }
         // Check if it's an animated background (class-based)
         if (user?.equippedBackground?.startsWith('anim-')) {
             return `class:${user.equippedBackground}`; // Special marker for class-based
@@ -201,7 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return BACKGROUND_STYLES[user.equippedBackground];
         }
         return null; // Use default background
-    }, [user?.equippedBackground]);
+    }, [user?.equippedBackground, previewTheme?.background]);
 
     // Helper function to immediately apply accent color styles (used on login AND page load)
     const applyAccentStyles = (userData: User) => {
@@ -957,6 +969,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             accentColor,
             backgroundStyle,
             equippedBadge: user?.equippedBadge || null,
+            // Theme Preview Mode
+            previewTheme,
+            setPreviewTheme,
             // Active Chat
             activeChatUserId,
             setActiveChatUserId,
@@ -971,6 +986,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 status={dailyLoginStatus}
                 onClaim={handleClaimDailyLogin}
             />
+            {/* Theme Preview Bar */}
+            {previewTheme && (
+                <div className="fixed bottom-0 left-0 right-0 z-[9999] p-4 bg-gradient-to-t from-black via-black/95 to-transparent">
+                    <div className="max-w-lg mx-auto">
+                        <div className="text-center mb-3">
+                            <span 
+                                className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-2"
+                                style={{ backgroundColor: previewTheme.color }}
+                            >
+                                PRÉVIA
+                            </span>
+                            <h3 className="text-white font-bold text-lg">{previewTheme.packName}</h3>
+                            <div className="flex items-center justify-center gap-2 mt-1">
+                                <img src="/assets/zions/zion-50.png" alt="Zions" className="w-4 h-4" />
+                                <span className="text-white font-semibold">{previewTheme.price.toLocaleString('pt-BR')}</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setPreviewTheme(null)}
+                                className="flex-1 py-3 rounded-xl font-semibold text-white bg-white/10 hover:bg-white/20 transition-all"
+                            >
+                                ← Cancelar
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Dispatch custom event to trigger purchase
+                                    window.dispatchEvent(new CustomEvent('purchasePreviewPack', { detail: previewTheme.packId }));
+                                }}
+                                className="flex-1 py-3 rounded-xl font-semibold text-black transition-all"
+                                style={{ backgroundColor: previewTheme.color }}
+                            >
+                                🛒 Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {toast && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[9999] animate-fade-in">
                     <div className="bg-black/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl border border-white/10 font-medium">

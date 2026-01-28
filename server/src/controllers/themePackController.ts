@@ -136,7 +136,7 @@ export const purchaseThemePack = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// Equip a theme pack (apply background + color)
+// Equip a theme pack (apply background + color + badge)
 export const equipThemePack = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
@@ -163,12 +163,13 @@ export const equipThemePack = async (req: AuthRequest, res: Response) => {
 
         const pack = userPack.pack;
 
-        // Update user's equipped items
+        // Update user's equipped items (including badge from pack)
         await prisma.user.update({
             where: { id: userId },
             data: {
                 equippedBackground: pack.backgroundUrl,
-                equippedColor: pack.accentColor
+                equippedColor: pack.accentColor,
+                equippedBadge: pack.badgeUrl || undefined // Equip pack badge if exists
             }
         });
 
@@ -177,7 +178,8 @@ export const equipThemePack = async (req: AuthRequest, res: Response) => {
             message: 'Theme pack equipped successfully!',
             pack: {
                 backgroundUrl: pack.backgroundUrl,
-                accentColor: pack.accentColor
+                accentColor: pack.accentColor,
+                badgeUrl: pack.badgeUrl
             }
         });
     } catch (error) {

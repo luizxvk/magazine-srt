@@ -830,6 +830,7 @@ model ThemePack {
   backgroundUrl   String          // URL do fundo animado (video/gif/webm)
   accentColor     String          // Hex da cor destaque "#FF6B35"
   previewUrl      String?         // Thumbnail estática para preview
+  badgeUrl        String?         // URL da badge inclusa no pack
   price           Int             // Preço em Zions
   fontFamily      String?         // Fonte customizada para título
   maxStock        Int?            // Estoque máximo (null = ilimitado)

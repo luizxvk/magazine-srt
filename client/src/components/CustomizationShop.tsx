@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, ArrowLeft, ShoppingCart } from 'lucide-react';
+import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
@@ -103,7 +103,7 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {
-    const { user, updateUserZions, updateUser, theme } = useAuth();
+    const { user, updateUserZions, updateUser, theme, setPreviewTheme } = useAuth();
     const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color' | 'packs'>('background');
     const [purchasing, setPurchasing] = useState<string | null>(null);
     const [ownedItems, setOwnedItems] = useState<string[]>([]);
@@ -113,7 +113,6 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const [userPacks, setUserPacks] = useState<any[]>([]);
     const [showSupplyBox, setShowSupplyBox] = useState(false);
     const [loadingPacks, setLoadingPacks] = useState(false);
-    const [previewPack, setPreviewPack] = useState<any | null>(null);
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'emerald' : 'gold';
@@ -315,13 +314,14 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         try {
             const response = await api.post(`/theme-packs/${packId}/equip`);
             setNotification({ type: 'success', message: response.data.message });
-            // Update user state with equipped items from pack
+            // Update user state with equipped items from pack (including badge)
             const pack = response.data.pack;
             if (pack) {
                 updateUser({
                     ...user!,
                     equippedBackground: pack.backgroundUrl,
-                    equippedColor: pack.accentColor
+                    equippedColor: pack.accentColor,
+                    equippedBadge: pack.badgeUrl || user!.equippedBadge
                 });
             }
             fetchThemePacks(); // Refresh to update equipped status
@@ -361,14 +361,29 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     };
 
     const handlePreviewPack = (pack: any) => {
-        setPreviewPack(pack);
+        // Set global preview theme and close shop
+        setPreviewTheme({
+            background: pack.backgroundUrl,
+            color: pack.accentColor,
+            packName: pack.name,
+            packId: pack.id,
+            price: pack.price
+        });
+        onClose(); // Close the shop to show the preview
     };
 
-    const handlePurchaseFromPreview = async () => {
-        if (!previewPack) return;
-        await handlePurchaseThemePack(previewPack.id);
-        setPreviewPack(null);
-    };
+    // Listen for purchase event from preview bar
+    React.useEffect(() => {
+        const handlePurchaseEvent = async (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const packId = customEvent.detail;
+            await handlePurchaseThemePack(packId);
+            setPreviewTheme(null);
+        };
+
+        window.addEventListener('purchasePreviewPack', handlePurchaseEvent);
+        return () => window.removeEventListener('purchasePreviewPack', handlePurchaseEvent);
+    }, []);
 
     const isOwned = (itemId: string) => ownedItems.includes(itemId);
     const isEquipped = (item: Omit<ShopItem, 'owned' | 'equipped'>) => equippedItems[item.type] === item.id;
@@ -1015,92 +1030,6 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     </div>
                 </motion.div>
             </motion.div>
-
-            {/* Theme Pack Preview Overlay */}
-            <AnimatePresence>
-                {previewPack && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100]"
-                    >
-                        {/* Animated Background Preview */}
-                        <div 
-                            className={`absolute inset-0 ${previewPack.backgroundUrl}`}
-                            style={{ 
-                                backgroundSize: '200% 200%',
-                                animation: 'gradient-shift 8s ease infinite'
-                            }}
-                        />
-                        
-                        {/* Overlay with accent color glow */}
-                        <div className="absolute inset-0 bg-black/40" />
-                        
-                        {/* Preview Info at Top */}
-                        <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/80 to-transparent">
-                            <div className="flex items-center gap-3">
-                                <span 
-                                    className="px-3 py-1 rounded-full text-sm font-bold text-white"
-                                    style={{ backgroundColor: previewPack.accentColor }}
-                                >
-                                    PRÉVIA
-                                </span>
-                                <div>
-                                    <h2 className="text-white font-bold text-lg">{previewPack.name}</h2>
-                                    <p className="text-white/70 text-sm">{previewPack.gameTitle}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons at Bottom - Above navbar */}
-                        <div className="absolute bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                            <div className="flex flex-col gap-3 max-w-md mx-auto">
-                                {/* Pack details */}
-                                <div className="text-center mb-2">
-                                    <p className="text-white/80 text-sm">{previewPack.description}</p>
-                                    <div className="flex items-center justify-center gap-2 mt-2">
-                                        <img 
-                                            src="/assets/zions/zion-50.png" 
-                                            alt="Zions" 
-                                            className="w-5 h-5"
-                                        />
-                                        <span className="text-white font-bold">
-                                            {previewPack.price?.toLocaleString('pt-BR')}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Buttons */}
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={() => setPreviewPack(null)}
-                                        className="flex-1 py-3 rounded-xl font-semibold text-white bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-                                    >
-                                        <ArrowLeft className="w-5 h-5" />
-                                        Voltar
-                                    </button>
-                                    <button
-                                        onClick={handlePurchaseFromPreview}
-                                        disabled={purchasing === previewPack.id || (user?.zionsPoints || 0) < previewPack.price}
-                                        className="flex-1 py-3 rounded-xl font-semibold text-black transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                                        style={{ backgroundColor: previewPack.accentColor }}
-                                    >
-                                        {purchasing === previewPack.id ? (
-                                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                                        ) : (
-                                            <>
-                                                <ShoppingCart className="w-5 h-5" />
-                                                Comprar
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
             <SupplyBoxModal
                 isOpen={showSupplyBox}

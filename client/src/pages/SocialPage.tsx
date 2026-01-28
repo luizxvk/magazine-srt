@@ -411,7 +411,7 @@ export default function SocialPage() {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <button 
-                                                    onClick={(e) => navigate(`/profile?id=${rec.id}`)}
+                                                    onClick={() => navigate(`/profile?id=${rec.id}`)}
                                                     className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
                                                 >
                                                     Ver Perfil

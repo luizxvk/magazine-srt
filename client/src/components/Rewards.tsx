@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gift, Lock, Check, Clock, Box, Tag, X, History, TrendingUp, TrendingDown, Coins } from 'lucide-react';
+import { Gift, Lock, Check, Clock, Box, Tag, X, History, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';

@@ -4,52 +4,29 @@ const prisma = new PrismaClient();
 
 // Mapeamento de badges por gameTitle (case insensitive match)
 const PACK_BADGES: Record<string, string> = {
-    // Red Dead Redemption - Revólver
-    'red dead': 'https://cdn-icons-png.flaticon.com/512/3601/3601698.png',
-    // Hollow Knight - Espada/Agulha
-    'hollow knight': 'https://cdn-icons-png.flaticon.com/512/7555/7555748.png',
-    // The Witcher - Medalão de lobo
-    'witcher': 'https://cdn-icons-png.flaticon.com/512/3771/3771508.png',
-    // Valorant - Mira/Crosshair
-    'valorant': 'https://cdn-icons-png.flaticon.com/512/6369/6369894.png',
-    // Resident Evil - Vírus/Bio
-    'resident evil': 'https://cdn-icons-png.flaticon.com/512/3081/3081559.png',
-    // Stray - Gato
-    'stray': 'https://cdn-icons-png.flaticon.com/512/1076/1076877.png',
-    // Cyberpunk - Chip/Cyber
-    'cyberpunk': 'https://cdn-icons-png.flaticon.com/512/2809/2809871.png',
-    // Night City - Cidade neon
-    'night city': 'https://cdn-icons-png.flaticon.com/512/7641/7641847.png',
-    // GTA - Carro
-    'gta': 'https://cdn-icons-png.flaticon.com/512/3097/3097139.png',
-    // Forza - Velocímetro
-    'forza': 'https://cdn-icons-png.flaticon.com/512/2361/2361952.png',
-    // Need for Speed - Chama
-    'need for speed': 'https://cdn-icons-png.flaticon.com/512/785/785116.png',
-    // The Crew - Volante
-    'crew': 'https://cdn-icons-png.flaticon.com/512/3774/3774278.png',
-    // Elden Ring - Anel
-    'elden ring': 'https://cdn-icons-png.flaticon.com/512/6941/6941697.png',
-    // Dark Souls - Fogueira
-    'dark souls': 'https://cdn-icons-png.flaticon.com/512/3174/3174963.png',
-    // God of War - Machado
-    'god of war': 'https://cdn-icons-png.flaticon.com/512/3166/3166896.png',
-    // Horizon - Arco
-    'horizon': 'https://cdn-icons-png.flaticon.com/512/6632/6632869.png',
-    // Spider-Man - Teia
-    'spider': 'https://cdn-icons-png.flaticon.com/512/3014/3014013.png',
-    // Minecraft - Picareta
-    'minecraft': 'https://cdn-icons-png.flaticon.com/512/743/743123.png',
-    // Call of Duty - Mira militar
-    'call of duty': 'https://cdn-icons-png.flaticon.com/512/2061/2061956.png',
-    // Assassin's Creed - Capuz/Lâmina
-    'assassin': 'https://cdn-icons-png.flaticon.com/512/2694/2694779.png',
-    // FIFA - Bola de futebol
-    'fifa': 'https://cdn-icons-png.flaticon.com/512/53/53283.png',
-    // Rocket League - Foguete
-    'rocket league': 'https://cdn-icons-png.flaticon.com/512/2906/2906274.png',
+    // Valorant
+    'valorant': 'https://img.icons8.com/?size=100&id=ld4oxG9uNT5V&format=png&color=000000',
+    // Red Dead Redemption
+    'red dead': 'https://img.icons8.com/?size=100&id=LzBRW74k9E9c&format=png&color=000000',
+    // Hollow Knight
+    'hollow knight': 'https://img.icons8.com/?size=100&id=m4ruZvTt68SY&format=png&color=000000',
+    // The Witcher
+    'witcher': 'https://img.icons8.com/?size=100&id=hZJ8QaNgdE8S&format=png&color=000000',
+    // Resident Evil
+    'resident evil': 'https://img.icons8.com/?size=100&id=3gLLhBYwHTFg&format=png&color=000000',
+    // Stray
+    'stray': 'https://img.icons8.com/?size=100&id=He74K2AoYI0r&format=png&color=000000',
+    // GTA / Rockstar
+    'gta': 'https://img.icons8.com/?size=100&id=LmbJipJS2cfG&format=png&color=000000',
+    'rockstar': 'https://img.icons8.com/?size=100&id=LmbJipJS2cfG&format=png&color=000000',
+    // God of War
+    'god of war': 'https://img.icons8.com/?size=100&id=C9Z3dngNBjYJ&format=png&color=000000',
+    'nordic': 'https://img.icons8.com/?size=100&id=C9Z3dngNBjYJ&format=png&color=000000',
+    // Cyberpunk
+    'cyberpunk': 'https://img.icons8.com/?size=100&id=OKYaYQfXrLta&format=png&color=000000',
+    'night city': 'https://img.icons8.com/?size=100&id=OKYaYQfXrLta&format=png&color=000000',
     // Default fallback - Gamepad
-    'default': 'https://cdn-icons-png.flaticon.com/512/3612/3612569.png',
+    'default': 'https://img.icons8.com/?size=100&id=12455&format=png&color=000000',
 };
 
 async function updatePackBadges() {

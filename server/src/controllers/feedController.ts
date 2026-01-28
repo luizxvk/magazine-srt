@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { awardTrophies, checkAndAwardBadges, awardZions, awardXP } from '../services/gamificationService';
 import { uploadPostImage, uploadStoryImage } from '../services/cloudinaryService';
+import { sendPushToUser } from './notificationController';
 
 const prisma = new PrismaClient();
 
@@ -345,6 +346,45 @@ export const createPost = async (req: AuthRequest, res: Response) => {
         // Award 250 XP for posting
         await awardXP(userId, 250, 'Created a post');
 
+        // Detect mentions in caption and send push notifications
+        if (caption) {
+            const mentionRegex = /@(\w+)/g;
+            const mentions = caption.match(mentionRegex);
+            if (mentions && mentions.length > 0) {
+                // Get unique usernames (remove @ prefix)
+                const usernames = [...new Set(mentions.map((m: string) => m.substring(1).toLowerCase()))];
+                
+                // Find users by name or displayName
+                const mentionedUsers = await prisma.user.findMany({
+                    where: {
+                        OR: [
+                            { name: { in: usernames, mode: 'insensitive' } },
+                            { displayName: { in: usernames, mode: 'insensitive' } }
+                        ],
+                        id: { not: userId } // Don't notify yourself
+                    },
+                    select: { id: true, name: true }
+                });
+
+                // Get poster name for notification
+                const poster = await prisma.user.findUnique({
+                    where: { id: userId },
+                    select: { name: true, displayName: true }
+                });
+                const posterName = poster?.displayName || poster?.name || 'Alguém';
+
+                // Send push to each mentioned user
+                for (const mentionedUser of mentionedUsers) {
+                    await sendPushToUser(
+                        mentionedUser.id,
+                        '📢 Você foi mencionado!',
+                        `${posterName} mencionou você em uma postagem`,
+                        { url: `/post/${post.id}` }
+                    );
+                }
+            }
+        }
+
         // Get updated user stats
         const updatedUser = await prisma.user.findUnique({
             where: { id: userId },
@@ -423,6 +463,14 @@ export const commentPost = async (req: AuthRequest, res: Response) => {
                     content: notificationContent,
                 }
             });
+
+            // Send push notification for comment
+            sendPushToUser(
+                post.userId,
+                `💬 ${actor?.name || 'Alguém'} comentou`,
+                text.length > 50 ? text.substring(0, 50) + '...' : text,
+                { url: `/post/${id}`, postId: id, type: 'comment' }
+            ).catch(err => console.error('[Push] Error sending comment notification:', err));
         }
 
         // --- GAMIFICATION ---

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import { sendRewardRedemptionEmail } from '../services/emailVerificationService';
+import { sendPushToUser } from './notificationController';
 import { z } from 'zod';
 
 // Validation schemas
@@ -115,6 +116,25 @@ export const createReward = async (req: Request, res: Response) => {
         const reward = await prisma.reward.create({
             data: data as any
         });
+
+        // Send push notification to all users about new reward
+        const allUsers = await prisma.user.findMany({
+            where: { deletedAt: null },
+            select: { id: true }
+        });
+
+        // Send push to all users (async, don't wait)
+        Promise.all(
+            allUsers.map(user =>
+                sendPushToUser(
+                    user.id,
+                    '🎁 Nova Recompensa Exclusiva!',
+                    `${reward.title} está disponível para resgate!`,
+                    { url: '/rewards', rewardId: reward.id, type: 'new_reward' }
+                ).catch(() => {}) // Ignore individual failures
+            )
+        ).catch(err => console.error('[Push] Error sending new reward notifications:', err));
+
         res.status(201).json(reward);
     } catch (error) {
         if (error instanceof z.ZodError) {

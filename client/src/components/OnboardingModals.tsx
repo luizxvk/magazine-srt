@@ -5,13 +5,13 @@ import WelcomeTour from './WelcomeTour';
 import WhatsNewModal from './WhatsNewModal';
 import EmailVerificationPopup from './EmailVerificationPopup';
 
-const CURRENT_VERSION = '0.4.12';
+const CURRENT_VERSION = '0.4.17';
 
 /**
  * Gerencia a ordem dos modais de onboarding:
- * 1. WelcomeTour (sempre que logar)
+ * 1. WelcomeTour (apenas quando há atualização nova)
  * 2. EmailVerificationPopup (se email não verificado)
- * 3. WhatsNewModal (se houver novidades)
+ * 3. WhatsNewModal (se houver novidades - após Welcome Tour)
  */
 export default function OnboardingModals() {
     const { user } = useAuth();
@@ -38,18 +38,15 @@ export default function OnboardingModals() {
         if (hasCheckedRef.current) return;
         hasCheckedRef.current = true;
 
-        // Verificar se precisa mostrar o Welcome Tour (SEMPRE ao logar)
-        const sessionKey = `welcome_shown_${user.id}`;
-        const hasShownThisSession = sessionStorage.getItem(sessionKey);
+        // Verificar se há nova versão - mostrar Welcome Tour apenas em atualizações
+        const lastSeenVersion = localStorage.getItem('lastSeenAppVersion');
+        const isNewVersion = lastSeenVersion !== CURRENT_VERSION;
         
-        if (!hasShownThisSession) {
-            // Mostrar Welcome Tour
-            sessionStorage.setItem(sessionKey, 'true');
-            // Limpar localStorage do WelcomeTour antigo para evitar conflito
-            localStorage.removeItem('has_seen_tour');
+        if (isNewVersion) {
+            // Nova versão detectada - mostrar Welcome Tour
             setTimeout(() => setShowWelcome(true), 800);
         } else {
-            // Se já mostrou welcome, verificar email verification
+            // Mesma versão - pular para email verification
             checkEmailVerification();
         }
     }, [user, location.pathname]);
@@ -78,6 +75,8 @@ export default function OnboardingModals() {
 
     const handleWelcomeClose = () => {
         setShowWelcome(false);
+        // Marcar versão como vista
+        localStorage.setItem('lastSeenAppVersion', CURRENT_VERSION);
         // Após fechar Welcome, verificar email verification
         checkEmailVerification();
     };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +19,7 @@ interface FeedItemProps {
     likes: number;
     comments: number;
     isLiked?: boolean;
+    isHighlight?: boolean;
     onLike?: (id: string | number) => void;
     onComment?: (id: string | number) => void;
     onDelete?: (id: string | number) => void;
@@ -34,10 +35,11 @@ interface MediaContentProps {
     theme: 'dark' | 'light';
     isMGT: boolean;
     isExpanded: boolean;
+    isHighlight?: boolean;
 }
 
 // Extracted outside to avoid re-creation on each render
-function MediaContent({ video, image, title, category, theme, isMGT, isExpanded }: MediaContentProps) {
+function MediaContent({ video, image, title, category, theme, isMGT, isExpanded, isHighlight }: MediaContentProps) {
     return (
         <>
             {video ? (
@@ -52,7 +54,13 @@ function MediaContent({ video, image, title, category, theme, isMGT, isExpanded 
             <div className="absolute inset-0 bg-gradient-to-t from-red-900/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none" />
 
             {/* Category Badge */}
-            <div className="absolute top-4 left-4 pointer-events-none">
+            <div className="absolute top-4 left-4 pointer-events-none flex gap-2">
+                {isHighlight && (
+                    <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium flex items-center gap-1 ${isMGT ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
+                        <Sparkles className="w-3 h-3" />
+                        Destaque
+                    </span>
+                )}
                 <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isMGT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isMGT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
                     {category}
                 </span>
@@ -85,6 +93,7 @@ export default function FeedItem({
     likes,
     comments,
     isLiked,
+    isHighlight,
     onLike,
     onComment,
     onDelete,
@@ -163,11 +172,11 @@ export default function FeedItem({
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-square md:aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>
                     {!isExpanded ? (
                         <Link to={`/post/${id}`} className="block w-full h-full">
-                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} />
+                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} isHighlight={isHighlight} />
                         </Link>
                     ) : (
                         <div className="w-full h-full">
-                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} />
+                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} isHighlight={isHighlight} />
                         </div>
                     )}
                 </div>

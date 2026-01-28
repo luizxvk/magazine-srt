@@ -370,6 +370,7 @@ export default function FeedPage() {
                                                 likes={post.likes}
                                                 comments={post.comments}
                                                 isLiked={post.isLiked}
+                                                isHighlight={post.isHighlight}
                                                 onLike={() => handleLike(post.id)}
                                                 onComment={() => setActiveCommentPostId(post.id)}
                                                 onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}

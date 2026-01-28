@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, MessageCircle, Trophy, Layers, Gift, Image, Maximize2, Check } from 'lucide-react';
+import { X, Sparkles, Bell, Gift, RefreshCw, Palette, Check, ImageIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.16';
+const CURRENT_VERSION = '0.4.17';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,34 +33,34 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.16 - PREMIUM UPDATES
+    // v0.4.17 - PUSH NOTIFICATIONS & REAL-TIME
     const updates: UpdateItem[] = [
         {
-            icon: <Trophy className="w-5 h-5 text-yellow-400" />,
-            title: '🏆 Resgate de Prêmio Elite',
-            description: 'Líder do ranking agora pode resgatar o prêmio mensal diretamente no modal!',
+            icon: <Bell className="w-5 h-5 text-blue-400" />,
+            title: '🔔 Push Notifications',
+            description: 'Receba notificações push quando alguém comentar, enviar mensagem ou solicitar amizade!',
             isNew: true
         },
         {
-            icon: <MessageCircle className="w-5 h-5 text-blue-400" />,
-            title: '💬 Comentários Premium',
-            description: 'Novo design Apple Vision Pro com glassmorphism e bottom sheet no mobile.',
+            icon: <RefreshCw className="w-5 h-5 text-green-400" />,
+            title: '⚡ Atualizações em Tempo Real',
+            description: 'Feed, notificações e ranking agora atualizam automaticamente a cada 30 segundos.',
             isNew: true
         },
         {
-            icon: <Layers className="w-5 h-5 text-purple-400" />,
-            title: '✨ Destaques 5 Dias',
-            description: 'Posts em destaque agora duram 5 dias ao invés de 1, e aparecem no seu perfil.',
+            icon: <Gift className="w-5 h-5 text-purple-400" />,
+            title: '🎁 Alertas de Recompensas',
+            description: 'Receba push notification quando uma nova recompensa exclusiva estiver disponível!',
             isNew: true
         },
         {
-            icon: <Maximize2 className="w-5 h-5 text-green-400" />,
-            title: '📐 Stories: Pinch to Zoom',
-            description: 'Redimensione o texto dos stories com gestos de pinça ou botões de zoom.',
+            icon: <Palette className="w-5 h-5 text-yellow-400" />,
+            title: '👁️ Preview de Temas',
+            description: 'Visualize os packs de tema antes de comprar com o novo modo de prévia.',
             isNew: true
         },
         {
-            icon: <Image className="w-5 h-5 text-pink-400" />,
+            icon: <ImageIcon className="w-5 h-5 text-pink-400" />,
             title: '📸 Catálogo Espaçado',
             description: 'Fotos do catálogo agora têm espaçamento adequado entre elas.',
             isNew: true

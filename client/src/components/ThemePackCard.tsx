@@ -1,4 +1,4 @@
-import { Sparkles, Check, Lock } from 'lucide-react';
+import { Sparkles, Check, Lock, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface ThemePack {
@@ -23,11 +23,12 @@ interface ThemePackCardProps {
     onPurchase: (packId: string) => void;
     onEquip?: (packId: string) => void;
     onUnequip?: () => void;
+    onPreview?: (pack: ThemePack) => void;
     loading?: boolean;
     isReward?: boolean; // Hide purchase button when displaying as reward
 }
 
-export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, loading, isReward }: ThemePackCardProps) {
+export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, onPreview, loading, isReward }: ThemePackCardProps) {
     const { user, theme } = useAuth();
 
     const isOutOfStock = pack.maxStock && pack.soldCount >= pack.maxStock;
@@ -168,6 +169,21 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, lo
                                 </span>
                             </div>
                         )
+                    )}
+
+                    {/* Preview Button - Show for non-owned packs */}
+                    {!isReward && !pack.isOwned && onPreview && (
+                        <button
+                            onClick={() => onPreview(pack)}
+                            className={`w-full py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+                                theme === 'light'
+                                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    : 'bg-white/10 text-white hover:bg-white/20'
+                            }`}
+                        >
+                            <Eye className="w-4 h-4" />
+                            Prévia
+                        </button>
                     )}
 
                     {/* Action Button - Full Width (hide for rewards) */}

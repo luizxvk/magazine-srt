@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { sendPushToUser } from './notificationController';
 
 export const sendFriendRequest = async (req: AuthRequest, res: Response) => {
     try {
@@ -57,6 +58,14 @@ export const sendFriendRequest = async (req: AuthRequest, res: Response) => {
                 }
             })
         ]);
+
+        // Send push notification
+        sendPushToUser(
+            addresseeId,
+            '🤝 Nova solicitação de amizade',
+            `${requester?.name || 'Alguém'} quer ser seu amigo!`,
+            { url: '/friends?tab=requests', type: 'friend_request' }
+        ).catch(err => console.error('[Push] Error sending friend request notification:', err));
 
         res.json({ message: 'Friend request sent' });
     } catch (error) {

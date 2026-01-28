@@ -188,7 +188,13 @@ export default function Rewards() {
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {rewards.map((reward) => {
+                    {rewards.length === 0 ? (
+                        <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                            <Gift className="w-12 h-12 text-gray-500/50 mb-4" />
+                            <p className={`text-lg font-medium ${themeSecondary}`}>Nenhuma recompensa disponível</p>
+                            <p className="text-sm text-gray-500 mt-1">Fique ligado! Novas recompensas serão adicionadas em breve.</p>
+                        </div>
+                    ) : rewards.map((reward) => {
                         const canAfford = (user?.zionsPoints || 0) >= reward.costZions;
                         const isRedeemed = redeemedCode?.id === reward.id;
                         const alreadyRedeemedUnique = !reward.isUnlimited && redemptions.some(r => r.reward.id === reward.id);

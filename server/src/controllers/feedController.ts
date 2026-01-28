@@ -70,12 +70,20 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
 
 export const getHighlights = async (req: AuthRequest, res: Response) => {
     try {
+        // Calculate 5 days ago for highlight expiration
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+        
         const posts = await prisma.post.findMany({
             where: {
+                isHighlight: true,
+                createdAt: {
+                    gte: fiveDaysAgo // Only highlights from last 5 days
+                },
                 linkedProductId: null, // Only show posts WITHOUT linked products (user posts only)
             },
-            take: 10,
-            orderBy: { likesCount: 'desc' },
+            take: 20,
+            orderBy: { createdAt: 'desc' },
             include: {
                 user: {
                     select: {

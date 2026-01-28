@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile, Move, ZoomIn, ZoomOut } from 'lucide-react';
+import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile, Move, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface StoryEditorProps {
@@ -21,7 +21,38 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
     const [imageScale, setImageScale] = useState(1);
     const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
     const [isDraggingText, setIsDraggingText] = useState(false);
+    const [textScale, setTextScale] = useState(1);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const textRef = useRef<HTMLDivElement>(null);
+    
+    // Pinch-to-zoom state
+    const initialDistance = useRef<number | null>(null);
+    const initialScale = useRef<number>(1);
+
+    // Handle touch events for pinch-to-zoom on text
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        if (e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            initialDistance.current = Math.sqrt(dx * dx + dy * dy);
+            initialScale.current = textScale;
+        }
+    }, [textScale]);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        if (e.touches.length === 2 && initialDistance.current !== null) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const scale = (distance / initialDistance.current) * initialScale.current;
+            setTextScale(Math.min(Math.max(0.5, scale), 3));
+        }
+    }, []);
+
+    const handleTouchEnd = useCallback(() => {
+        initialDistance.current = null;
+    }, []);
 
     const emojis = ['😀', '😂', '🥰', '😍', '🤩', '😎', '🔥', '💯', '❤️', '💙', '💚', '💛', '🎉', '✨', '⚡', '🌟', '👍', '👏', '🙌', '💪', '🎂', '🎈', '🎁', '🌈', '☀️', '🌙', '⭐', '💫'];
 
@@ -64,12 +95,14 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
 
             // Draw text if present
             if (text.trim()) {
-                ctx.font = 'bold 72px Arial, sans-serif';
+                const baseFontSize = 72;
+                const scaledFontSize = Math.round(baseFontSize * textScale);
+                ctx.font = `bold ${scaledFontSize}px Arial, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
                 const lines = text.split('\n');
-                const lineHeight = 90;
+                const lineHeight = Math.round(90 * textScale);
                 // Apply text position offset (convert from percentage to pixels)
                 const startY = canvas.height / 2 + (textPosition.y * canvas.height / 100) - ((lines.length - 1) * lineHeight) / 2;
                 const centerX = canvas.width / 2 + (textPosition.x * canvas.width / 100);
@@ -81,12 +114,13 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                     if (bgOpacity > 0) {
                         ctx.fillStyle = `rgba(0, 0, 0, ${bgOpacity})`;
                         const metrics = ctx.measureText(line);
-                        const padding = 40;
+                        const padding = Math.round(40 * textScale);
+                        const bgHeight = Math.round(90 * textScale);
                         ctx.fillRect(
                             centerX - metrics.width / 2 - padding,
-                            y - 45,
+                            y - bgHeight / 2,
                             metrics.width + padding * 2,
-                            90
+                            bgHeight
                         );
                     }
 
@@ -142,23 +176,48 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 {/* Story Preview - CENTRALIZADO */}
                 <div className="flex-1 flex items-center justify-center">
                     <div className="relative w-full max-w-md mx-auto">
-                        {/* Controles de Zoom da Imagem */}
-                        <div className="flex items-center justify-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1 mb-4 w-fit mx-auto">
-                            <button
-                                onClick={() => setImageScale(Math.max(0.5, imageScale - 0.1))}
-                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                            >
-                                <ZoomOut className="w-4 h-4 text-white" />
-                            </button>
-                            <span className="text-white text-xs px-2 min-w-[50px] text-center">
-                                {Math.round(imageScale * 100)}%
-                            </span>
-                            <button
-                                onClick={() => setImageScale(Math.min(2, imageScale + 0.1))}
-                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                            >
-                                <ZoomIn className="w-4 h-4 text-white" />
-                            </button>
+                        {/* Controles de Zoom */}
+                        <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+                            {/* Zoom da Imagem */}
+                            <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1">
+                                <button
+                                    onClick={() => setImageScale(Math.max(0.5, imageScale - 0.1))}
+                                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                >
+                                    <ZoomOut className="w-4 h-4 text-white" />
+                                </button>
+                                <span className="text-white text-xs px-2 min-w-[50px] text-center">
+                                    🖼 {Math.round(imageScale * 100)}%
+                                </span>
+                                <button
+                                    onClick={() => setImageScale(Math.min(2, imageScale + 0.1))}
+                                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                >
+                                    <ZoomIn className="w-4 h-4 text-white" />
+                                </button>
+                            </div>
+                            
+                            {/* Zoom do Texto */}
+                            {text && (
+                                <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full p-1">
+                                    <button
+                                        onClick={() => setTextScale(Math.max(0.5, textScale - 0.1))}
+                                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                    >
+                                        <ZoomOut className="w-4 h-4 text-white" />
+                                    </button>
+                                    <span className="text-white text-xs px-2 min-w-[50px] text-center">
+                                        <Maximize2 className="w-3 h-3 inline mr-1" />
+                                        {Math.round(textScale * 100)}%
+                                    </span>
+                                    <button
+                                        onClick={() => setTextScale(Math.min(3, textScale + 0.1))}
+                                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                    >
+                                        <ZoomIn className="w-4 h-4 text-white" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         <motion.div
@@ -172,9 +231,10 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                             />
                         </motion.div>
                     
-                        {/* Text Overlay - DRAGGABLE */}
+                        {/* Text Overlay - DRAGGABLE + PINCH TO ZOOM */}
                         {text && (
                             <motion.div
+                                ref={textRef}
                                 drag
                                 dragMomentum={false}
                                 dragElastic={0.1}
@@ -188,19 +248,23 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                         y: textPosition.y + (info.offset.y / containerRect.height) * 100
                                     });
                                 }}
+                                onTouchStart={handleTouchStart}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={handleTouchEnd}
                                 style={{
                                     x: 0,
                                     y: 0,
+                                    scale: textScale,
                                 }}
-                                className={`absolute inset-0 flex items-center justify-center ${isDraggingText ? 'cursor-grabbing' : 'cursor-grab'}`}
+                                className={`absolute inset-0 flex items-center justify-center ${isDraggingText ? 'cursor-grabbing' : 'cursor-grab'} touch-none`}
                             >
                                 <div className="text-center px-8 select-none">
                                     <div className="flex items-center justify-center gap-2 mb-2 opacity-70">
                                         <Move className="w-4 h-4 text-white" />
-                                        <span className="text-white text-xs">Arraste para mover</span>
+                                        <span className="text-white text-xs">Arraste • Pinça para redimensionar</span>
                                     </div>
                                     {text.split('\n').map((line, index) => (
-                                        <div key={index} className="relative inline-block my-1">
+                                        <div key={index} className="relative block my-1">
                                             {bgOpacity > 0 && (
                                                 <div
                                                     className="absolute inset-0 -mx-6 -my-1 rounded-lg"
@@ -208,10 +272,10 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                                 />
                                             )}
                                             <p
-                                                className="relative text-4xl md:text-5xl font-bold px-6"
+                                                className="relative text-3xl md:text-4xl font-bold px-6 whitespace-pre-wrap break-words"
                                                 style={{ color: textColor }}
                                             >
-                                                {line}
+                                                {line || '\u00A0'}
                                             </p>
                                         </div>
                                     ))}

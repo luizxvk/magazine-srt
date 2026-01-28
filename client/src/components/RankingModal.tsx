@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Trophy, Star, Crown, Gift, Calendar, Coins, Package, Bell, BellOff } from 'lucide-react';
+import { X, Trophy, Star, Crown, Gift, Calendar, Coins, Package, Bell, BellOff, Sparkles, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 interface RankingModalProps {
     isOpen: boolean;
@@ -24,7 +26,29 @@ interface RankingRewardConfig {
     rewardDescription?: string;
 }
 
+interface WinnerStatus {
+    isWinner: boolean;
+    hasReward: boolean;
+    canClaim: boolean;
+    alreadyClaimed: boolean;
+    reward?: {
+        type: string;
+        amount?: number;
+        productName?: string;
+    };
+}
+
 export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalProps) {
+    const { user, showAchievement, updateUserZions } = useAuth();
+    const [users, setUsers] = useState<RankedUser[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState<'trophies' | 'level'>('trophies');
+    const [rewardConfig, setRewardConfig] = useState<RankingRewardConfig | null>(null);
+    const [daysRemaining, setDaysRemaining] = useState(0);
+    const [reminderEnabled, setReminderEnabled] = useState(false);
+    const [winnerStatus, setWinnerStatus] = useState<WinnerStatus | null>(null);
+    const [claiming, setClaiming] = useState(false);
+    const [showClaimSuccess, setShowClaimSuccess] = useState(false);
     const [users, setUsers] = useState<RankedUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState<'trophies' | 'level'>('trophies');
@@ -115,12 +139,45 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
             setDaysRemaining(diffDays);
         };
 
+        const fetchWinnerStatus = async () => {
+            try {
+                const response = await api.get('/content/elite-ranking/winner-status');
+                setWinnerStatus(response.data);
+            } catch (error) {
+                console.error('Failed to fetch winner status', error);
+            }
+        };
+
         if (isOpen) {
             fetchRanking();
             fetchRewardConfig();
             calculateDaysRemaining();
+            if (user) fetchWinnerStatus();
         }
-    }, [isOpen]);
+    }, [isOpen, user]);
+
+    const handleClaimReward = async () => {
+        setClaiming(true);
+        try {
+            const response = await api.post('/content/elite-ranking/claim-reward');
+            setShowClaimSuccess(true);
+            setWinnerStatus(prev => prev ? { ...prev, canClaim: false, alreadyClaimed: true } : null);
+            
+            // Update user zions if zions_points
+            if (winnerStatus?.reward?.type === 'zions_points' && winnerStatus.reward.amount) {
+                updateUserZions(winnerStatus.reward.amount);
+            }
+            
+            showAchievement('🏆 Parabéns!', response.data.message);
+            
+            // Hide success animation after 3 seconds
+            setTimeout(() => setShowClaimSuccess(false), 3000);
+        } catch (error: any) {
+            showAchievement('Erro', error.response?.data?.error || 'Falha ao resgatar prêmio');
+        } finally {
+            setClaiming(false);
+        }
+    };
 
     const sortedUsers = [...users].sort((a, b) => {
         if (sortBy === 'trophies') {
@@ -179,7 +236,29 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
 
                 {/* Reward Card */}
                 {rewardConfig && rewardConfig.rewardType !== 'none' && (
-                    <div className={`mx-4 mt-4 p-4 rounded-2xl ${accentBgLight} border ${accentBorder} backdrop-blur-sm`}>
+                    <div className={`mx-4 mt-4 p-4 rounded-2xl ${accentBgLight} border ${accentBorder} backdrop-blur-sm relative overflow-hidden`}>
+                        {/* Success Animation Overlay */}
+                        <AnimatePresence>
+                            {showClaimSuccess && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-gradient-to-r from-emerald-500/90 to-teal-500/90 flex items-center justify-center z-10"
+                                >
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', damping: 15 }}
+                                        className="flex items-center gap-3 text-white"
+                                    >
+                                        <Check className="w-8 h-8" />
+                                        <span className="text-xl font-bold">Prêmio Resgatado!</span>
+                                    </motion.div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 {/* Days Counter */}
@@ -206,19 +285,65 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                                 </div>
                             </div>
                             
-                            {/* Reminder Button */}
-                            <button
-                                onClick={reminderEnabled ? handleDisableReminder : handleEnableReminder}
-                                className={`p-3 rounded-full transition-all ${
-                                    reminderEnabled 
-                                        ? `${accentBg} text-black` 
-                                        : `${accentBgLight} ${accentText} hover:${accentBg} hover:text-black`
-                                }`}
-                                title={reminderEnabled ? 'Desativar lembrete' : 'Ativar lembrete de notificação'}
-                            >
-                                {reminderEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
-                            </button>
+                            {/* Claim Button or Reminder Button */}
+                            <div className="flex items-center gap-2">
+                                {winnerStatus?.canClaim && (
+                                    <motion.button
+                                        onClick={handleClaimReward}
+                                        disabled={claiming}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                                            isMGT 
+                                                ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-white shadow-lg shadow-emerald-500/30' 
+                                                : 'bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-lg shadow-amber-500/30'
+                                        } ${claiming ? 'opacity-50' : ''}`}
+                                    >
+                                        {claiming ? (
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        ) : (
+                                            <Sparkles className="w-4 h-4" />
+                                        )}
+                                        Resgatar!
+                                    </motion.button>
+                                )}
+                                
+                                {winnerStatus?.alreadyClaimed && (
+                                    <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${accentBgLight} ${accentText}`}>
+                                        <Check className="w-4 h-4" />
+                                        <span>Resgatado</span>
+                                    </div>
+                                )}
+                                
+                                {(!winnerStatus?.canClaim && !winnerStatus?.alreadyClaimed) && (
+                                    <button
+                                        onClick={reminderEnabled ? handleDisableReminder : handleEnableReminder}
+                                        className={`p-3 rounded-full transition-all ${
+                                            reminderEnabled 
+                                                ? `${accentBg} text-black` 
+                                                : `${accentBgLight} ${accentText} hover:${accentBg} hover:text-black`
+                                        }`}
+                                        title={reminderEnabled ? 'Desativar lembrete' : 'Ativar lembrete de notificação'}
+                                    >
+                                        {reminderEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
+                                    </button>
+                                )}
+                            </div>
                         </div>
+
+                        {/* Winner Badge */}
+                        {winnerStatus?.isWinner && !winnerStatus.alreadyClaimed && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className={`mt-3 pt-3 border-t ${accentBorder} flex items-center gap-2`}
+                            >
+                                <Crown className={`w-4 h-4 ${accentText}`} />
+                                <span className={`text-sm ${accentText} font-medium`}>
+                                    Você é o líder! {winnerStatus.canClaim ? 'Resgate seu prêmio!' : ''}
+                                </span>
+                            </motion.div>
+                        )}
                     </div>
                 )}
 

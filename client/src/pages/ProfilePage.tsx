@@ -375,21 +375,21 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            {/* Badge Icon - Shows equipped badge or default crown for Magazine */}
+                            {/* Badge Icon - Shows equipped badge (image URL or emoji) */}
                             {(isOwnProfile ? equippedBadge : profileUser.equippedBadge) ? (
                                 <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12">
-                                    <span className="text-3xl">{BADGE_EMOJIS[(isOwnProfile ? equippedBadge : profileUser.equippedBadge) || ''] || '👑'}</span>
+                                    {/* Check if it's a URL (pack badge) or an ID (market badge) */}
+                                    {((isOwnProfile ? equippedBadge : profileUser.equippedBadge) || '').startsWith('http') ? (
+                                        <img 
+                                            src={isOwnProfile ? equippedBadge! : profileUser.equippedBadge!}
+                                            alt="Badge"
+                                            className="w-8 h-8 object-contain"
+                                        />
+                                    ) : (
+                                        <span className="text-3xl">{BADGE_EMOJIS[(isOwnProfile ? equippedBadge : profileUser.equippedBadge) || ''] || '👑'}</span>
+                                    )}
                                 </div>
-                            ) : !isMGT && (
-                                <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12 animate-pulse-slow">
-                                    <Crown
-                                        size={32}
-                                        className="text-yellow-400"
-                                        fill="currentColor"
-                                        strokeWidth={1.5}
-                                    />
-                                </div>
-                            )}
+                            ) : null}
 
                             <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
                                 Lvl {profileUser.level || 1}

@@ -53,16 +53,23 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const isMGT = user?.membershipType === 'MGT';
     const headerBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
 
-    // Get badge icon - default crown for Magazine
+    // Get badge icon - supports URLs (pack badges) and IDs (market badges)
     const getBadgeIcon = () => {
         // Visitors don't get badges
         if (isVisitor) return null;
         
+        // If equipped badge is a URL (from theme pack)
+        if (equippedBadge && equippedBadge.startsWith('http')) {
+            return <img src={equippedBadge} alt="Badge" className="w-4 h-4 object-contain" />;
+        }
+        
+        // If equipped badge is a market badge ID
         if (equippedBadge && BADGE_ICONS[equippedBadge]) {
             return BADGE_ICONS[equippedBadge];
         }
-        // Default: crown for Magazine, nothing for MGT
-        return user?.membershipType === 'MAGAZINE' ? <span className="text-xs">👑</span> : null;
+        
+        // No badge equipped - no default for anyone
+        return null;
     };
 
     useEffect(() => {

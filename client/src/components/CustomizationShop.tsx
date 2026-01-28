@@ -337,9 +337,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const handleUnequipThemePack = async () => {
         setPurchasing('unequip');
         try {
-            // Unequip background and color
+            // Unequip background, color and badge
             await api.post('/users/customizations/unequip', { category: 'backgrounds' });
             await api.post('/users/customizations/unequip', { category: 'colors' });
+            await api.post('/users/customizations/unequip', { category: 'badges' });
             
             setNotification({ type: 'success', message: 'Pack desequipado com sucesso!' });
             
@@ -347,7 +348,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             updateUser({
                 ...user!,
                 equippedBackground: null,
-                equippedColor: null
+                equippedColor: null,
+                equippedBadge: null
             });
             
             fetchThemePacks(); // Refresh to update equipped status

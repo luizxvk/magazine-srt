@@ -124,6 +124,49 @@ export const getHighlights = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// Get top posts ordered by likes (Destaques da Semana)
+export const getTopPosts = async (req: AuthRequest, res: Response) => {
+    try {
+        const posts = await prisma.post.findMany({
+            where: {
+                linkedProductId: null, // Only user posts
+                imageUrl: {
+                    not: null
+                }
+            },
+            take: 50,
+            orderBy: { likesCount: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true,
+                        trophies: true,
+                    },
+                },
+                likes: {
+                    where: { userId: req.user?.userId },
+                    select: { userId: true },
+                },
+                tags: true,
+            },
+        });
+
+        const formattedPosts = posts.map((post) => ({
+            ...post,
+            isLiked: post.likes.length > 0,
+            likes: undefined,
+        }));
+
+        res.json(formattedPosts);
+    } catch (error) {
+        console.error('Error fetching top posts:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const likePost = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;

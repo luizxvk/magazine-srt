@@ -82,8 +82,9 @@ function PhotoCard({
     };
 
     return (
+        <div className={`${getGridClasses()} p-1`}>
         <div
-            className={`${getGridClasses()} relative group rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${!loaded ? 'animate-pulse bg-white/5' : ''} ring-2 ring-transparent hover:ring-white/20`}
+            className={`relative group rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 h-full ${!loaded ? 'animate-pulse bg-white/5' : ''} ring-2 ring-transparent hover:ring-white/20`}
             style={getAspectStyle()}
         >
             {/* Image */}
@@ -168,6 +169,7 @@ function PhotoCard({
                 </div>
             </div>
         </div>
+        </div>
     );
 }
 
@@ -186,6 +188,7 @@ function GridPhotoCard({
     userId?: string;
 }) {
     return (
+        <div className="p-1">
         <div className="relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 aspect-square ring-2 ring-transparent hover:ring-white/20">
             <img
                 src={photo.imageUrl}
@@ -215,6 +218,7 @@ function GridPhotoCard({
                     </div>
                 )}
             </div>
+        </div>
         </div>
     );
 }

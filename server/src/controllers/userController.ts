@@ -769,9 +769,12 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
 
         // Default items (free) that don't require ownership - available for all users
         const defaultItemIds = ['bg_default', 'badge_crown', 'color_gold'];
+        // MGT default items
+        const mgtDefaultItems = ['badge_star', 'color_cyan', 'bg_galaxy'];
+        const allDefaultItems = [...defaultItemIds, ...mgtDefaultItems];
 
         // Check if user owns this item (skip check for default items)
-        if (!defaultItemIds.includes(itemId)) {
+        if (!allDefaultItems.includes(itemId)) {
             const owned = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
             console.log('[equipCustomization] Owned items:', owned, 'Checking for:', itemId);
             if (!owned.includes(itemId)) {

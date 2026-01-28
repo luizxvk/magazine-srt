@@ -120,14 +120,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     // Default items are always owned
     const defaultItemIds = [defaultItems.background.id, defaultItems.badge.id, defaultItems.color.id];
-
-    // ENTERPRISE plan has access to ALL items
-    const allItemIds = [
-        ...backgrounds.map(b => b.id),
-        ...featuredBackgrounds.map(b => b.id),
-        ...badges.map(b => b.id),
-        ...colors.map(c => c.id)
-    ];
+    // MGT users also get their default items
+    const mgtDefaultItemIds = [defaultItems.badgeMGT.id, defaultItems.colorMGT.id, 'bg_galaxy'];
 
     useEffect(() => {
         if (isOpen) {
@@ -159,11 +153,17 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         const defaultColor = isMGT ? defaultItems.colorMGT.id : defaultItems.color.id;
         const defaultBg = isMGT ? 'bg_galaxy' : defaultItems.background.id; // MGT uses Galaxy as default
 
+        // Items that are always free/owned for the user
+        const alwaysOwnedItems = isMGT 
+            ? [...defaultItemIds, ...mgtDefaultItemIds]
+            : [...defaultItemIds];
+
         try {
             const response = await api.get('/users/customizations');
-            // ENTERPRISE plan (Magazine e MGT) tem acesso a TODOS os itens
-            const enterpriseOwned = [...defaultItemIds, ...allItemIds];
-            setOwnedItems([...new Set([...enterpriseOwned, ...(response.data.owned || [])])]);
+            // User owns: default items + purchased items
+            const purchasedItems = response.data.owned || [];
+            setOwnedItems([...new Set([...alwaysOwnedItems, ...purchasedItems])]);
+            
             // If no items equipped, set defaults based on membership
             const equipped = response.data.equipped || {};
             
@@ -186,8 +186,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             });
         } catch (error) {
             console.error('Failed to fetch customizations', error);
-            // ENTERPRISE tem todos os itens
-            setOwnedItems([...new Set([...defaultItemIds, ...allItemIds])]);
+            // On error, only show default items as owned
+            setOwnedItems([...new Set(alwaysOwnedItems)]);
             setEquippedItems({
                 background: defaultBg,
                 badge: defaultBadge,

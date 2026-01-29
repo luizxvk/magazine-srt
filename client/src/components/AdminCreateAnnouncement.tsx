@@ -1,6 +1,7 @@
 import { useState, useRef, type ChangeEvent, useEffect } from 'react';
 import { Image as ImageIcon, Send, Megaphone, Upload, X, Zap, Shield, Trash2, Save } from 'lucide-react';
 import api from '../services/api';
+import ConfirmModal from './ConfirmModal';
 
 interface AdminCreateAnnouncementProps {
     showToast?: (message: string, type: 'success' | 'error' | 'info') => void;
@@ -57,6 +58,7 @@ const defaultPlans: Plan[] = [
 export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnouncementProps) {
     const [activeTab, setActiveTab] = useState<'create' | 'edit_page'>('create');
     const [loading, setLoading] = useState(false);
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
 
     // Create Announcement State
     const [title, setTitle] = useState('');
@@ -500,33 +502,7 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
 
                     <div className="sticky bottom-0 z-20 flex gap-3 bg-[#111] p-4 -mx-2 -mb-2 border-t border-white/10">
                         <button
-                            onClick={async () => {
-                                if (!window.confirm('Tem certeza que deseja remover este anúncio? Ele será ocultado do feed.')) return;
-                                try {
-                                    setLoading(true);
-                                    await api.put('/content/mgt-log-page', {
-                                        logoUrl: '',
-                                        heroTitle: '',
-                                        heroSubtitle: '',
-                                        cards: [],
-                                        // Preserve footer to avoid complete breakage or clear if desired. 
-                                        // Clearing main fields usually hides it.
-                                    });
-                                    setPageContent({
-                                        ...pageContent,
-                                        logoUrl: '',
-                                        heroTitle: '',
-                                        tag: '',
-                                        heroDescription: ''
-                                    });
-                                    if (showToast) showToast('Anúncio removido com sucesso!', 'success'); // Using showToast for feedback
-                                } catch (error) {
-                                    console.error('Failed to remove', error);
-                                    if (showToast) showToast('Erro ao remover anúncio', 'error');
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
+                            onClick={() => setShowRemoveModal(true)}
                             disabled={loading}
                             className="flex-1 bg-red-900/50 text-red-200 font-medium py-3 rounded-lg hover:bg-red-900/70 transition-colors flex items-center justify-center gap-2 border border-red-800"
                         >
@@ -545,6 +521,40 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
                     </div>
                 </div>
             )}
+
+            {/* Remove Announcement Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showRemoveModal}
+                title="Remover Anúncio"
+                message="Tem certeza que deseja remover este anúncio? Ele será ocultado do feed."
+                onConfirm={async () => {
+                    try {
+                        setLoading(true);
+                        await api.put('/content/mgt-log-page', {
+                            logoUrl: '',
+                            heroTitle: '',
+                            heroSubtitle: '',
+                            cards: [],
+                        });
+                        setPageContent({
+                            ...pageContent,
+                            logoUrl: '',
+                            heroTitle: '',
+                            tag: '',
+                            heroDescription: ''
+                        });
+                        if (showToast) showToast('Anúncio removido com sucesso!', 'success');
+                    } catch (error) {
+                        console.error('Failed to remove', error);
+                        if (showToast) showToast('Erro ao remover anúncio', 'error');
+                    } finally {
+                        setLoading(false);
+                        setShowRemoveModal(false);
+                    }
+                }}
+                onClose={() => setShowRemoveModal(false)}
+                confirmText="Remover"
+            />
         </div>
     );
 }

@@ -66,6 +66,7 @@ export default function AdminDashboard() {
         reward: null
     });
     const [resetPasswordModal, setResetPasswordModal] = useState<{ isOpen: boolean; userId: string; userName: string } | null>(null);
+    const [rejectRequestModal, setRejectRequestModal] = useState<{ isOpen: boolean; requestId: string } | null>(null);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
         message: '',
         isVisible: false,
@@ -155,14 +156,20 @@ export default function AdminDashboard() {
     };
 
     const handleRejectRequest = async (id: string) => {
-        if (!window.confirm('Tem certeza que deseja rejeitar esta solicitação?')) return;
+        setRejectRequestModal({ isOpen: true, requestId: id });
+    };
+
+    const confirmRejectRequest = async () => {
+        if (!rejectRequestModal) return;
         try {
-            await api.post(`/invites/${id}/reject`);
-            setRequests(requests.filter(r => r.id !== id));
+            await api.post(`/invites/${rejectRequestModal.requestId}/reject`);
+            setRequests(requests.filter(r => r.id !== rejectRequestModal.requestId));
             showToast('Solicitação rejeitada', 'info');
         } catch (error) {
             console.error('Failed to reject request', error);
             showToast('Erro ao rejeitar solicitação', 'error');
+        } finally {
+            setRejectRequestModal(null);
         }
     };
 
@@ -561,6 +568,16 @@ export default function AdminDashboard() {
                 onConfirm={confirmResetPassword}
                 onClose={() => setResetPasswordModal(null)}
                 confirmText="Enviar"
+            />
+
+            {/* Reject Request Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!rejectRequestModal}
+                title="Rejeitar Solicitação"
+                message="Tem certeza que deseja rejeitar esta solicitação?"
+                onConfirm={confirmRejectRequest}
+                onClose={() => setRejectRequestModal(null)}
+                confirmText="Rejeitar"
             />
         </div>
     );

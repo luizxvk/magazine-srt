@@ -226,7 +226,7 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className={`w-full max-w-2xl glass-panel rounded-3xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} overflow-hidden flex flex-col max-h-[85vh]`}>
                 {/* Header */}
-                <div className={`p-6 border-b ${isMGT ? 'border-emerald-500/10' : 'border-gold-500/10'} flex justify-between items-center bg-black/40`}>
+                <div className={`p-6 border-b ${isMGT ? 'border-emerald-500/10' : 'border-gold-500/10'} flex justify-between items-center bg-black/40 flex-shrink-0`}>
                     <div className="flex items-center gap-3">
                         <Crown className={`w-6 h-6 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
                         <h2 className={`text-xl font-serif ${isMGT ? 'text-white' : 'text-gold-400'}`}>Elite Ranking</h2>
@@ -236,9 +236,9 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                     </button>
                 </div>
 
-                {/* Reward Card */}
+                {/* Reward Card - flex-shrink-0 to prevent cutting */}
                 {rewardConfig && rewardConfig.rewardType !== 'none' && (
-                    <div className={`mx-4 mt-4 p-4 rounded-2xl ${accentBgLight} border ${accentBorder} backdrop-blur-sm relative overflow-hidden`}>
+                    <div className={`mx-4 mt-4 p-4 rounded-2xl ${accentBgLight} border ${accentBorder} backdrop-blur-sm relative overflow-hidden flex-shrink-0`}>
                         {/* Success Animation Overlay */}
                         <AnimatePresence>
                             {showClaimSuccess && (
@@ -353,7 +353,7 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                 )}
 
                 {/* Filters */}
-                <div className="p-4 flex gap-4 border-b border-white/5 bg-white/5">
+                <div className="p-4 flex gap-4 border-b border-white/5 bg-white/5 flex-shrink-0">
                     <button
                         onClick={() => setSortBy('trophies')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'trophies' ? (isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}

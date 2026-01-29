@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Bell, Video, UserPlus, ZoomIn, Receipt, Check, ShieldCheck, Palette, UserX } from 'lucide-react';
+import { X, Sparkles, Bell, Volume2, Heart, Eye, Trophy, Hand, Crown, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.18';
+const CURRENT_VERSION = '0.4.19';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,50 +33,52 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.18 - MELHORIAS DE UX
+    // v0.4.19 - SONS, CONQUISTAS E MELHORIAS UX
     const updates: UpdateItem[] = [
         {
-            icon: <ShieldCheck className="w-5 h-5 text-green-400" />,
-            title: 'Verificação de Email Corrigida',
-            description: 'Agora o primeiro código enviado funciona corretamente! Não precisa mais reenviar.',
+            icon: <Volume2 className="w-5 h-5 text-blue-400" />,
+            title: 'Sons de Notificação',
+            description: 'Novos sons para ações: posts, conquistas, mensagens e alertas!',
             isNew: true
         },
         {
-            icon: <Palette className="w-5 h-5 text-purple-400" />,
-            title: 'Prévia de Packs Melhorada',
-            description: 'Ao visualizar um pack, a badge também é exibida em prévia no perfil e header.',
+            icon: <Trophy className="w-5 h-5 text-amber-400" />,
+            title: 'Conquistas Funcionais',
+            description: 'Todas as 10 conquistas agora funcionam: Primeira Conexão, Popular, Milionário, Veterano...',
             isNew: true
         },
         {
-            icon: <UserX className="w-5 h-5 text-red-400" />,
-            title: 'Contas Excluídas',
-            description: 'Contas removidas não aparecem mais nos recomendados e mostram mensagem apropriada.',
+            icon: <Eye className="w-5 h-5 text-purple-400" />,
+            title: 'Mostrar/Ocultar Senha',
+            description: 'Ícone de olhinho no login para visualizar sua senha enquanto digita.',
             isNew: true
         },
         {
-            icon: <Video className="w-5 h-5 text-blue-400" />,
-            title: 'Vídeos Corrigidos',
-            description: 'Correção na reprodução de vídeos curtos nos posts do feed.',
+            icon: <Heart className="w-5 h-5 text-red-400" />,
+            title: 'Curtir Post Completo',
+            description: 'Corrigido o botão de like quando visualiza um post em tela cheia.',
+            isNew: true
         },
         {
-            icon: <UserPlus className="w-5 h-5 text-pink-400" />,
-            title: 'Adicionar Amigos Fácil',
-            description: 'Novo card no carrossel mobile e botão rápido para adicionar amigos na aba Recomendados.',
+            icon: <Crown className="w-5 h-5 text-yellow-400" />,
+            title: 'Elite Ranking Corrigido',
+            description: 'O card de premiação não é mais cortado quando a lista carrega.',
+            isNew: true
         },
         {
-            icon: <ZoomIn className="w-5 h-5 text-cyan-400" />,
-            title: 'Crop de Foto Melhorado',
-            description: 'Zoom livre na edição de foto de perfil - funciona melhor com fotos em paisagem!',
+            icon: <Hand className="w-5 h-5 text-pink-400" />,
+            title: 'Dica de Swipe',
+            description: 'Ícone animado no carrossel mobile indicando que você pode deslizar.',
         },
         {
-            icon: <Receipt className="w-5 h-5 text-amber-400" />,
-            title: 'Extrato de Zions',
-            description: 'Histórico de Zions reformulado no estilo de extrato bancário, mais limpo e informativo.',
+            icon: <Bell className="w-5 h-5 text-cyan-400" />,
+            title: 'Badge Email Verificado',
+            description: 'Visitantes agora podem ver quem tem email verificado.',
         },
         {
-            icon: <Bell className="w-5 h-5 text-yellow-400" />,
-            title: 'Status de Resgates',
-            description: 'Correção na exibição do status de recompensas digitais - agora mostra "Completo" corretamente.',
+            icon: <Sparkles className="w-5 h-5 text-emerald-400" />,
+            title: 'Fundos Animados na Prévia',
+            description: 'Prévia de packs agora mostra os fundos animados corretamente.',
         }
     ];
 

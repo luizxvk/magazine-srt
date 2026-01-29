@@ -152,8 +152,7 @@ export const resetUserPassword = async (req: AuthRequest, res: Response) => {
 
         // Generate random password
         const generatedPassword = Math.random().toString(36).slice(-8);
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(generatedPassword, salt);
+        const passwordHash = await bcrypt.hash(generatedPassword, 10);
 
         await prisma.user.update({
             where: { id },
@@ -426,6 +425,7 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
                 profileBgPosX: true,
                 profileBgPosY: true,
                 deletedAt: true,
+                isVerified: true,
             },
         });
 

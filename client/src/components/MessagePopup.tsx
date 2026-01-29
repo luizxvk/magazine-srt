@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ChatWindow from './ChatWindow';
+import { playSound } from '../utils/sounds';
 
 interface UnreadMessage {
     id: string;
@@ -93,6 +94,9 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                     }
                 });
                 setIsVisible(true);
+                
+                // Play notification sound
+                playSound('notification');
 
                 if (autoDismissTimer.current) {
                     clearTimeout(autoDismissTimer.current);

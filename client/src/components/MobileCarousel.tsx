@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -185,7 +185,14 @@ export default function MobileCarousel({
         <div className="xl:hidden mb-6 relative group w-full">
             {/* Header - Arrows only visible on larger tablets (sm+) */}
             <div className="flex items-center justify-between mb-3 px-1">
-                <h3 className="text-sm font-medium text-gray-400">Acesso Rápido</h3>
+                <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-medium text-gray-400">Acesso Rápido</h3>
+                    {/* Swipe hint for mobile */}
+                    <div className="flex sm:hidden items-center gap-1 text-gray-500">
+                        <Hand className="w-3 h-3 animate-pulse" />
+                        <ChevronRight className="w-3 h-3 animate-bounce-x" />
+                    </div>
+                </div>
                 <div className="hidden sm:flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={handlePrev}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { playSound } from '../utils/sounds';
 
 interface AchievementPopupProps {
     title: string;
@@ -21,6 +22,9 @@ export default function AchievementPopup({ title, description, onClose }: Achiev
     const themeTitle = theme === 'light' ? 'text-gray-900' : 'text-white';
 
     useEffect(() => {
+        // Play level up sound for achievements
+        playSound('levelUp');
+        
         // Animate in
         setTimeout(() => setVisible(true), 100);
 

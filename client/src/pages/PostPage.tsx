@@ -69,7 +69,7 @@ export default function PostPage() {
 
     const handleLike = async () => {
         try {
-            const response = await api.post(`/posts/${id}/like`);
+            const response = await api.post(`/feed/${id}/like`);
             setPost((prev: any) => ({
                 ...prev,
                 likes: response.data.likesCount,
@@ -114,7 +114,8 @@ export default function PostPage() {
                 <div className="animate-fade-in-up">
                     <FeedItem
                         id={post.id}
-                        image={post.image || post.video}
+                        image={post.image}
+                        video={post.video}
                         title={post.content}
                         category={post.tags[0] || 'GERAL'}
                         author={post.author.name}
@@ -123,6 +124,7 @@ export default function PostPage() {
                         likes={post.likes}
                         comments={post.comments}
                         isLiked={post.likedBy?.includes('me')}
+                        isHighlight={post.isHighlight}
                         onLike={handleLike}
                         onComment={() => setShowComments(true)}
                         onDelete={() => { }}

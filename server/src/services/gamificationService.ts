@@ -97,7 +97,7 @@ export const awardTrophies = async (userId: string, amount: number, reason: stri
 export const awardZions = async (userId: string, amount: number, reason: string) => {
     try {
         // Update user zions
-        await prisma.$transaction([
+        const [updatedUser] = await prisma.$transaction([
             prisma.user.update({
                 where: { id: userId },
                 data: {
@@ -114,6 +114,44 @@ export const awardZions = async (userId: string, amount: number, reason: string)
         ]);
 
         console.log(`Awarded ${amount} Zions to user ${userId} for ${reason}`);
+
+        // Check for Zion-related badges
+        const newZionsTotal = updatedUser.zions;
+
+        // Colecionador de Zions (100 Zions)
+        if (newZionsTotal >= 100) {
+            const badge = await prisma.badge.findFirst({ where: { name: 'Colecionador de Zions' } });
+            if (badge) {
+                const existing = await prisma.userBadge.findUnique({
+                    where: { userId_badgeId: { userId, badgeId: badge.id } }
+                });
+                if (!existing) {
+                    await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+                    await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+                    await prisma.notification.create({
+                        data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+                    });
+                }
+            }
+        }
+
+        // Milionário (1.000.000 Zions)
+        if (newZionsTotal >= 1000000) {
+            const badge = await prisma.badge.findFirst({ where: { name: 'Milionário' } });
+            if (badge) {
+                const existing = await prisma.userBadge.findUnique({
+                    where: { userId_badgeId: { userId, badgeId: badge.id } }
+                });
+                if (!existing) {
+                    await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+                    await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+                    await prisma.notification.create({
+                        data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+                    });
+                }
+            }
+        }
+
         return amount;
     } catch (error) {
         console.error('Error awarding zions:', error);

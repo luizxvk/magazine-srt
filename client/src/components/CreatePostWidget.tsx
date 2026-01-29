@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
+import { playSound } from '../utils/sounds';
 
 interface CreatePostWidgetProps {
     onPostCreated: () => void;
@@ -202,9 +203,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
 
             // Success Animation & Sound
             setIsSuccess(true);
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3'); // Pop sound
-            audio.volume = 0.5;
-            audio.play().catch(e => console.log('Audio play failed', e));
+            playSound('interface');
 
             setTimeout(() => {
                 setCaption('');
@@ -219,6 +218,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
 
         } catch (error: any) {
             console.error('Failed to create post', error);
+            playSound('error');
             showToast?.(`Erro ao criar post: ${error.response?.data?.error || error.message}`);
         } finally {
             setLoading(false);

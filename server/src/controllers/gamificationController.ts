@@ -571,6 +571,27 @@ export const dailyLogin = async (req: Request, res: Response) => {
             })
         ]);
 
+        // Check for Veterano badge (30 days since account creation)
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { createdAt: true } });
+        if (user) {
+            const daysSinceCreation = Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+            if (daysSinceCreation >= 30) {
+                const badge = await prisma.badge.findFirst({ where: { name: 'Veterano' } });
+                if (badge) {
+                    const existing = await prisma.userBadge.findUnique({
+                        where: { userId_badgeId: { userId, badgeId: badge.id } }
+                    });
+                    if (!existing) {
+                        await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+                        await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+                        await prisma.notification.create({
+                            data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+                        });
+                    }
+                }
+            }
+        }
+
         res.json({ message: 'Daily login claimed', claimed: false, awarded: amount, streak: streak + 1 });
     } catch (error) {
         console.error('Failed to process daily login:', error);

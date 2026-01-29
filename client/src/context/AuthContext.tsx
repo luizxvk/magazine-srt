@@ -202,7 +202,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const backgroundStyle = React.useMemo(() => {
         // If preview is active, use preview background
         if (previewTheme?.background) {
-            return `class:${previewTheme.background}`; // Theme packs use class-based backgrounds
+            // Check if it's an animated class-based background (starts with anim-)
+            if (previewTheme.background.startsWith('anim-')) {
+                return `class:${previewTheme.background}`;
+            }
+            // Otherwise it's a gradient CSS value, return as-is
+            return previewTheme.background;
         }
         // Check if it's an animated background (class-based)
         if (user?.equippedBackground?.startsWith('anim-')) {

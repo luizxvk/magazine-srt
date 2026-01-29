@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, MoreVertical, Eye, Heart, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import ConfirmModal from './ConfirmModal';
 
 interface Story {
     id: string;
@@ -49,6 +50,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     const [showCommentInput, setShowCommentInput] = useState(false);
     const [commentText, setCommentText] = useState('');
     const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // Group stories by user
     const storiesByUser = useMemo(() => {
@@ -191,13 +193,17 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
 
     const handleDelete = async () => {
         if (!canDelete) return;
-        if (!confirm('Deseja deletar este story?')) return;
+        setShowDeleteModal(true);
+    };
 
+    const confirmDelete = async () => {
         try {
             await api.delete(`/feed/stories/${currentStory.id}`);
             onClose();
         } catch (error) {
             console.error('Error deleting story:', error);
+        } finally {
+            setShowDeleteModal(false);
         }
     };
 
@@ -581,6 +587,16 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                     </>
                 )}
             </AnimatePresence>
+
+            {/* Delete Story Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                title="Deletar Story"
+                message="Tem certeza que deseja deletar este story? Esta ação não pode ser desfeita."
+                onConfirm={confirmDelete}
+                onClose={() => setShowDeleteModal(false)}
+                confirmText="Deletar"
+            />
         </motion.div>
     );
 }

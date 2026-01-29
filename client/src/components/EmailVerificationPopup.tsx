@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, X, ShieldCheck, AlertTriangle, Loader2, ArrowRight, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { playSound } from '../utils/sounds';
 
 interface EmailVerificationPopupProps {
     isOpen: boolean;
@@ -32,6 +33,13 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [codeSent, setCodeSent] = useState(false);
+
+    // Play sound when popup opens
+    useEffect(() => {
+        if (isOpen) {
+            playSound('wrong');
+        }
+    }, [isOpen]);
 
     const refreshUserData = async () => {
         try {

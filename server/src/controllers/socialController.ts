@@ -109,6 +109,80 @@ export const acceptFriendRequest = async (req: AuthRequest, res: Response) => {
             })
         ]);
 
+        // Award "Primeira Conexão" badge to both users if this is their first friendship
+        const checkAndAwardFirstConnection = async (targetUserId: string) => {
+            const badge = await prisma.badge.findFirst({ where: { name: 'Primeira Conexão' } });
+            if (!badge) return;
+
+            const existingUserBadge = await prisma.userBadge.findUnique({
+                where: { userId_badgeId: { userId: targetUserId, badgeId: badge.id } }
+            });
+
+            if (!existingUserBadge) {
+                await prisma.userBadge.create({
+                    data: { userId: targetUserId, badgeId: badge.id }
+                });
+                await prisma.user.update({
+                    where: { id: targetUserId },
+                    data: { trophies: { increment: badge.trophies } }
+                });
+                await prisma.notification.create({
+                    data: {
+                        userId: targetUserId,
+                        type: 'ACHIEVEMENT',
+                        content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)`
+                    }
+                });
+            }
+        };
+
+        // Check for "Popular" badge (50 friends)
+        const checkAndAwardPopular = async (targetUserId: string) => {
+            const badge = await prisma.badge.findFirst({ where: { name: 'Popular' } });
+            if (!badge) return;
+
+            const existingUserBadge = await prisma.userBadge.findUnique({
+                where: { userId_badgeId: { userId: targetUserId, badgeId: badge.id } }
+            });
+
+            if (existingUserBadge) return; // Already has badge
+
+            // Count accepted friendships
+            const friendCount = await prisma.friendship.count({
+                where: {
+                    OR: [
+                        { requesterId: targetUserId, status: 'ACCEPTED' },
+                        { addresseeId: targetUserId, status: 'ACCEPTED' }
+                    ]
+                }
+            });
+
+            if (friendCount >= 50) {
+                await prisma.userBadge.create({
+                    data: { userId: targetUserId, badgeId: badge.id }
+                });
+                await prisma.user.update({
+                    where: { id: targetUserId },
+                    data: { trophies: { increment: badge.trophies } }
+                });
+                await prisma.notification.create({
+                    data: {
+                        userId: targetUserId,
+                        type: 'ACHIEVEMENT',
+                        content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)`
+                    }
+                });
+            }
+        };
+
+        // Check for both users involved in the friendship
+        await checkAndAwardFirstConnection(userId);
+        await checkAndAwardFirstConnection(request.requesterId);
+        
+        // Check for Popular badge
+        await checkAndAwardPopular(userId);
+        await checkAndAwardPopular(request.requesterId);
+
         res.json({ message: 'Friend request accepted' });
     } catch (error) {
         console.error('Error accepting friend request:', error);

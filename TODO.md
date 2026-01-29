@@ -124,6 +124,25 @@ model UserThemePack {
 
 ## 🐛 Bugs Corrigidos
 
+### ✅ [v0.4.19] Sons de Notificação + Correções UX
+**Data:** Atual  
+**Implementações:**
+- ✅ **Sons de notificação** - 5 sons diferentes para ações (interface, error, wrong, notification, levelUp)
+- ✅ **Badge email verificado** - Visível para visitantes (isVerified adicionado em getUserProfile)
+- ✅ **ConfirmModal** - Substituído todos window.confirm por modal estilizado
+- ✅ **Fundos animados** - Preview funcionando (fix no class: prefix)
+- ✅ **Stories z-index** - Modal acima de todos elementos (z-[10001])
+- ✅ **Swipe hint** - Ícone animado no carrossel mobile
+- ✅ **Conquistas auditadas** - Todas 10 conquistas funcionais
+
+### ✅ [v0.4.19] Conquistas Implementadas
+**Badges corrigidos:**
+- **Primeira Conexão** - Dispara ao aceitar primeira amizade
+- **Popular** - Dispara com 50 amigos aceitos
+- **Colecionador de Zions** - Dispara ao acumular 100 Zions
+- **Milionário** - Dispara ao acumular 1.000.000 Zions
+- **Veterano** - Dispara no daily login após 30 dias de conta
+
 ### ✅ [v0.3.25] Erro 500 ao deletar produto
 **Data:** 12/01/2026  
 **Problema:** DELETE /api/products/admin/:id retornava 500  

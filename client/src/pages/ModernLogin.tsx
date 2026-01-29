@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle } from 'lucide-react';
+import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import logo from '../assets/logo-mgzn.png';
@@ -469,6 +469,7 @@ export default function ModernLogin() {
 
 function LoginForm({ register, errors, isSubmitting, onSubmit, isMGT, onForgotPassword }: any) {
     const [capsLockOn, setCapsLockOn] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     
     const handleKeyDown = (e: React.KeyboardEvent) => {
         setCapsLockOn(e.getModifierState('CapsLock'));
@@ -502,12 +503,20 @@ function LoginForm({ register, errors, isSubmitting, onSubmit, isMGT, onForgotPa
                     <Lock size={18} className={isMGT ? 'text-emerald-500/70' : 'text-gold-500/70'} />
                     <input
                         {...register('password')}
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Senha"
                         className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500"
                         onKeyDown={handleKeyDown}
                         onKeyUp={handleKeyDown}
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={`transition-colors ${isMGT ? 'text-emerald-500/50 hover:text-emerald-400' : 'text-gold-500/50 hover:text-gold-400'}`}
+                        tabIndex={-1}
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                 </div>
                 {capsLockOn && (
                     <p className="text-amber-400 text-[10px] pl-2 flex items-center gap-1">

@@ -32,6 +32,7 @@ interface User {
     equippedBackground?: string | null;
     equippedBadge?: string | null;
     equippedColor?: string | null;
+    equippedProfileBorder?: string | null;
     liteMode?: boolean;
     // Profile card background
     profileBgUrl?: string | null;

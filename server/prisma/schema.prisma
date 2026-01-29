@@ -35,6 +35,7 @@ model User {
   equippedBackground     String?
   equippedBadge          String?
   equippedColor          String?
+  equippedProfileBorder  String?
   liteMode               Boolean        @default(false)
   ownedCustomizations    String?
   isVerified             Boolean        @default(false)

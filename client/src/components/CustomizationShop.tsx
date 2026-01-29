@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen } from 'lucide-react';
+import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, CircleDot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
@@ -12,7 +12,7 @@ interface ShopItem {
     name: string;
     description: string;
     price: number;
-    type: 'background' | 'badge' | 'color';
+    type: 'background' | 'badge' | 'color' | 'profileBorder';
     preview: string;
     owned: boolean;
     equipped: boolean;
@@ -30,6 +30,8 @@ const defaultItems = {
     badgeMGT: { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 0, type: 'badge' as const, preview: '⭐' },
     color: { id: 'color_gold', name: 'Dourado Magazine', description: 'A cor clássica Magazine', price: 0, type: 'color' as const, preview: '#d4af37' },
     colorMGT: { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 0, type: 'color' as const, preview: '#00ffff' },
+    profileBorder: { id: 'border_gold', name: 'Dourado Clássico', description: 'A borda padrão Magazine', price: 0, type: 'profileBorder' as const, preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
+    profileBorderMGT: { id: 'border_emerald', name: 'Esmeralda MGT', description: 'Verde MGT exclusivo', price: 0, type: 'profileBorder' as const, preview: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%)' },
 };
 
 // Predefined backgrounds
@@ -102,12 +104,33 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', description: 'Azul-violeta delicado', price: 350, type: 'color', preview: '#ccccff' },
 ];
 
+// Profile border styles (circular border around avatar)
+const profileBorders: Omit<ShopItem, 'owned' | 'equipped'>[] = [
+    { id: 'border_gold', name: 'Dourado Clássico', description: 'A borda padrão Magazine', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
+    { id: 'border_emerald', name: 'Esmeralda MGT', description: 'Verde MGT exclusivo', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%)' },
+    { id: 'border_rose', name: 'Rosa Neon', description: 'Rosa vibrante e feminino', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%)' },
+    { id: 'border_blue', name: 'Azul Elétrico', description: 'Azul intenso e moderno', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00bfff 0%, #1e90ff 50%, #00bfff 100%)' },
+    { id: 'border_purple', name: 'Roxo Real', description: 'Púrpura majestoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #9933ff 0%, #cc66ff 50%, #9933ff 100%)' },
+    { id: 'border_green', name: 'Verde Esmeralda', description: 'Verde luxuoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ff7f 0%, #32cd32 50%, #00ff7f 100%)' },
+    { id: 'border_red', name: 'Vermelho Fogo', description: 'Vermelho intenso e poderoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4444 0%, #ff0000 50%, #ff4444 100%)' },
+    { id: 'border_cyan', name: 'Ciano Neon', description: 'Azul-esverdeado elétrico', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ffff 0%, #00ced1 50%, #00ffff 100%)' },
+    { id: 'border_orange', name: 'Laranja Fogo', description: 'Laranja quente e energético', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff8c00 0%, #ff6600 50%, #ff8c00 100%)' },
+    { id: 'border_rainbow', name: 'Arco-Íris', description: 'Todas as cores em harmonia', price: 1500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 17%, #ffff00 33%, #00ff00 50%, #0080ff 67%, #8000ff 83%, #ff0080 100%)' },
+    { id: 'border_galaxy', name: 'Galáxia', description: 'Estrelas e cosmos', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #4b0082 50%, #1a0a2e 75%, #0c0c0c 100%)' },
+    { id: 'border_fire', name: 'Chamas', description: 'Fogo ardente', price: 1000, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4500 0%, #ff6600 25%, #ffcc00 50%, #ff6600 75%, #ff4500 100%)' },
+    { id: 'border_ice', name: 'Gelo Ártico', description: 'Cristais de gelo', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #e0ffff 0%, #87ceeb 25%, #00bfff 50%, #87ceeb 75%, #e0ffff 100%)' },
+    { id: 'border_pastel_pink', name: 'Rosa Pastel', description: 'Suave e delicado', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 50%, #ffb6c1 100%)' },
+    { id: 'border_pastel_lavender', name: 'Lavanda Pastel', description: 'Relaxante e elegante', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #e6e6fa 0%, #dda0dd 50%, #e6e6fa 100%)' },
+    { id: 'border_midnight', name: 'Meia-Noite', description: 'Escuro e misterioso', price: 600, type: 'profileBorder', preview: 'linear-gradient(135deg, #191970 0%, #000080 50%, #191970 100%)' },
+    { id: 'border_sunset', name: 'Pôr do Sol', description: 'Cores do entardecer', price: 900, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 25%, #ff6b6b 50%, #feb47b 75%, #ff7e5f 100%)' },
+];
+
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {
     const { user, updateUserZions, updateUser, theme, setPreviewTheme } = useAuth();
-    const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color' | 'packs'>('background');
+    const [activeTab, setActiveTab] = useState<'background' | 'badge' | 'color' | 'profileBorder' | 'packs'>('background');
     const [purchasing, setPurchasing] = useState<string | null>(null);
     const [ownedItems, setOwnedItems] = useState<string[]>([]);
-    const [equippedItems, setEquippedItems] = useState<{ background?: string; badge?: string; color?: string }>({});
+    const [equippedItems, setEquippedItems] = useState<{ background?: string; badge?: string; color?: string; profileBorder?: string }>({});
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [themePacks, setThemePacks] = useState<any[]>([]);
     const [userPacks, setUserPacks] = useState<any[]>([]);
@@ -119,9 +142,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const isDarkMode = theme === 'dark';
 
     // Default items are always owned
-    const defaultItemIds = [defaultItems.background.id, defaultItems.badge.id, defaultItems.color.id];
+    const defaultItemIds = [defaultItems.background.id, defaultItems.badge.id, defaultItems.color.id, defaultItems.profileBorder.id];
     // MGT users also get their default items
-    const mgtDefaultItemIds = [defaultItems.badgeMGT.id, defaultItems.colorMGT.id, 'bg_galaxy'];
+    const mgtDefaultItemIds = [defaultItems.badgeMGT.id, defaultItems.colorMGT.id, 'bg_galaxy', defaultItems.profileBorderMGT.id];
 
     useEffect(() => {
         if (isOpen) {
@@ -152,6 +175,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         const defaultBadge = isMGT ? defaultItems.badgeMGT.id : defaultItems.badge.id;
         const defaultColor = isMGT ? defaultItems.colorMGT.id : defaultItems.color.id;
         const defaultBg = isMGT ? 'bg_galaxy' : defaultItems.background.id; // MGT uses Galaxy as default
+        const defaultBorder = isMGT ? defaultItems.profileBorderMGT.id : defaultItems.profileBorder.id;
 
         // Items that are always free/owned for the user
         const alwaysOwnedItems = isMGT 
@@ -178,11 +202,18 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             if (isMGT && colorToEquip === 'color_gold') {
                 colorToEquip = defaultItems.colorMGT.id;
             }
+
+            // Check if equipped border is Magazine-exclusive for MGT user
+            let borderToEquip = equipped.profileBorder || defaultBorder;
+            if (isMGT && borderToEquip === 'border_gold') {
+                borderToEquip = defaultItems.profileBorderMGT.id;
+            }
             
             setEquippedItems({
                 background: equipped.background || defaultBg,
                 badge: badgeToEquip,
-                color: colorToEquip
+                color: colorToEquip,
+                profileBorder: borderToEquip
             });
         } catch (error) {
             console.error('Failed to fetch customizations', error);
@@ -191,7 +222,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             setEquippedItems({
                 background: defaultBg,
                 badge: defaultBadge,
-                color: defaultColor
+                color: defaultColor,
+                profileBorder: defaultBorder
             });
         }
     };
@@ -218,7 +250,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
         setPurchasing(item.id);
         try {
-            const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
+            const categoryMap: Record<string, string> = { background: 'backgrounds', badge: 'badges', color: 'colors', profileBorder: 'profileBorders' };
             await api.post('/users/customizations/purchase', {
                 itemId: item.id,
                 category: categoryMap[item.type]
@@ -237,7 +269,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     const handleEquip = async (item: Omit<ShopItem, 'owned' | 'equipped'>) => {
         try {
-            const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
+            const categoryMap: Record<string, string> = { background: 'backgrounds', badge: 'badges', color: 'colors', profileBorder: 'profileBorders' };
             const payload = {
                 itemId: item.id,
                 category: categoryMap[item.type]
@@ -256,6 +288,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                 updateUser({ ...user!, equippedBadge: item.id });
             } else if (item.type === 'color') {
                 updateUser({ ...user!, equippedColor: item.id });
+            } else if (item.type === 'profileBorder') {
+                updateUser({ ...user!, equippedProfileBorder: item.id });
             }
 
             setNotification({ type: 'success', message: `${item.name} equipado!` });
@@ -267,9 +301,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         setTimeout(() => setNotification(null), 3000);
     };
 
-    const handleUnequip = async (type: 'background' | 'badge' | 'color') => {
+    const handleUnequip = async (type: 'background' | 'badge' | 'color' | 'profileBorder') => {
         try {
-            const categoryMap = { background: 'backgrounds', badge: 'badges', color: 'colors' };
+            const categoryMap: Record<string, string> = { background: 'backgrounds', badge: 'badges', color: 'colors', profileBorder: 'profileBorders' };
             await api.post('/users/customizations/unequip', { category: categoryMap[type] });
             setEquippedItems(prev => ({ ...prev, [type]: undefined }));
 
@@ -280,6 +314,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                 updateUser({ ...user!, equippedBadge: null });
             } else if (type === 'color') {
                 updateUser({ ...user!, equippedColor: null });
+            } else if (type === 'profileBorder') {
+                updateUser({ ...user!, equippedProfileBorder: null });
             }
 
             setNotification({ type: 'success', message: 'Item desequipado!' });
@@ -393,10 +429,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
     const getItems = () => {
         // Filter out Magazine-exclusive items for MGT users
-        const filterMagazineExclusive = (items: typeof backgrounds | typeof badges | typeof colors | typeof featuredBackgrounds) => {
+        const filterMagazineExclusive = (items: typeof backgrounds | typeof badges | typeof colors | typeof featuredBackgrounds | typeof profileBorders) => {
             if (!isMGT) return items;
-            // MGT users don't see Magazine-exclusive items (bg_default, badge_crown, color_gold)
-            return items.filter(item => !['bg_default', 'badge_crown', 'color_gold'].includes(item.id));
+            // MGT users don't see Magazine-exclusive items (bg_default, badge_crown, color_gold, border_gold)
+            return items.filter(item => !['bg_default', 'badge_crown', 'color_gold', 'border_gold'].includes(item.id));
         };
 
         switch (activeTab) {
@@ -414,6 +450,13 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                 const pastelColors = allColors.filter(c => c.id.includes('pastel'));
                 return { basicColors, pastelColors };
             }
+            case 'profileBorder': {
+                // Categorize borders - basic and special
+                const allBorders = filterMagazineExclusive(profileBorders) as typeof profileBorders;
+                const basicBorders = allBorders.filter(b => b.price <= 500);
+                const premiumBorders = allBorders.filter(b => b.price > 500);
+                return { basicBorders, premiumBorders };
+            }
         }
     };
 
@@ -421,6 +464,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
         { id: 'background' as const, label: 'Fundos', icon: Image },
         { id: 'badge' as const, label: 'Badges', icon: Award },
         { id: 'color' as const, label: 'Cores', icon: Palette },
+        { id: 'profileBorder' as const, label: 'Bordas', icon: CircleDot },
         { id: 'packs' as const, label: 'Packs', icon: PackageOpen },
     ];
 
@@ -734,6 +778,180 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     {owned ? (
                                                                         <button
                                                                             onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {equipped ? 'Desequipar' : 'Equipar'}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handlePurchase(item)}
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {purchasing === item.id ? (
+                                                                                <span className="animate-spin">⏳</span>
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
+                                                                                <>
+                                                                                    <Lock className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Zap className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            )}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </>
+                                );
+                            })()
+                        ) : activeTab === 'profileBorder' ? (
+                            // Render profile border categories
+                            (() => {
+                                const { basicBorders, premiumBorders } = getItems() as { basicBorders: typeof profileBorders; premiumBorders: typeof profileBorders };
+                                return (
+                                    <>
+                                        {/* Basic Borders */}
+                                        <div className="mb-6">
+                                            <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
+                                                <CircleDot className={`w-4 h-4 text-${themeColor}-400`} />
+                                                Bordas Básicas
+                                            </h3>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {basicBorders.map(item => {
+                                                    const owned = isOwned(item.id);
+                                                    const equipped = isEquipped(item);
+                                                    return (
+                                                        <motion.div
+                                                            key={item.id}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                        >
+                                                            <div className="aspect-square relative flex items-center justify-center overflow-hidden bg-black/30">
+                                                                {/* Preview avatar with border */}
+                                                                <div 
+                                                                    className="w-20 h-20 rounded-full p-1"
+                                                                    style={{ background: item.preview }}
+                                                                >
+                                                                    <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                                                        <img
+                                                                            src={user?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=random`}
+                                                                            alt="Preview"
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                {equipped && (
+                                                                    <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
+                                                                        <Check className="w-3 h-3 text-black" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                                <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                                                <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
+                                                                <div className="mt-2">
+                                                                    {owned ? (
+                                                                        <button
+                                                                            onClick={() => equipped ? handleUnequip('profileBorder') : handleEquip(item)}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {equipped ? 'Desequipar' : 'Equipar'}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handlePurchase(item)}
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {purchasing === item.id ? (
+                                                                                <span className="animate-spin">⏳</span>
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
+                                                                                <>
+                                                                                    <Lock className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Zap className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            )}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        {/* Premium Borders */}
+                                        <div>
+                                            <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
+                                                <Sparkles className={`w-4 h-4 text-${themeColor}-400`} />
+                                                Bordas Premium
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full bg-${themeColor}-500/20 text-${themeColor}-400`}>ESPECIAL</span>
+                                            </h3>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {premiumBorders.map(item => {
+                                                    const owned = isOwned(item.id);
+                                                    const equipped = isEquipped(item);
+                                                    return (
+                                                        <motion.div
+                                                            key={item.id}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                        >
+                                                            <div className="aspect-square relative flex items-center justify-center overflow-hidden bg-black/30">
+                                                                {/* Preview avatar with border */}
+                                                                <div 
+                                                                    className="w-20 h-20 rounded-full p-1"
+                                                                    style={{ background: item.preview }}
+                                                                >
+                                                                    <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                                                        <img
+                                                                            src={user?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=random`}
+                                                                            alt="Preview"
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                {equipped && (
+                                                                    <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
+                                                                        <Check className="w-3 h-3 text-black" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                                <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                                                <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
+                                                                <div className="mt-2">
+                                                                    {owned ? (
+                                                                        <button
+                                                                            onClick={() => equipped ? handleUnequip('profileBorder') : handleEquip(item)}
                                                                             className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
                                                                                 ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
                                                                                 : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`

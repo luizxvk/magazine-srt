@@ -307,7 +307,7 @@ export default function FeedPage() {
                         </div>
 
                         {/* Stories Bar */}
-                        <div className="mb-6 animate-fade-in">
+                        <div className="mb-6 animate-fade-in relative z-10">
                             <StoriesBar
                                 viewingStoryId={viewingStoryId}
                                 onViewStory={setViewingStoryId}
@@ -361,7 +361,8 @@ export default function FeedPage() {
                                             <FeedItem
                                                 key={post.id}
                                                 id={post.id}
-                                                image={post.image || post.video}
+                                                image={post.image}
+                                                video={post.video}
                                                 title={post.content}
                                                 category={post.tags[0] || 'GERAL'}
                                                 author={post.author.name}

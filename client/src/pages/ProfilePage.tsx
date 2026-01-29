@@ -15,6 +15,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import ChatWindow from '../components/ChatWindow';
 import LevelTimeline from '../components/LevelTimeline';
 import BadgeDisplay from '../components/BadgeDisplay';
+import { getProfileBorderGradient, getProfileBorderShadow } from '../utils/profileBorderUtils';
 
 // Badge emoji map
 const BADGE_EMOJIS: Record<string, string> = {
@@ -359,7 +360,10 @@ export default function ProfilePage() {
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start relative z-10">
                         {/* Avatar */}
                         <div className="relative group mx-auto md:mx-0 shrink-0">
-                            <div className={`w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-br ${isMGT ? 'from-emerald-600 via-black to-emerald-800 shadow-[0_0_30px_rgba(16,185,129,0.3)]' : 'from-gold-300 via-gold-500 to-gold-800 shadow-[0_0_30px_rgba(212,175,55,0.3)]'}`}>
+                            <div 
+                                className={`w-28 h-28 md:w-32 md:h-32 rounded-full p-1 ${getProfileBorderShadow(profileUser.equippedProfileBorder, isMGT)}`}
+                                style={{ background: getProfileBorderGradient(profileUser.equippedProfileBorder, isMGT) }}
+                            >
                                 <div className="w-full h-full rounded-full bg-black overflow-hidden relative">
                                     <img
                                         src={profileUser.avatarUrl || `https://ui-avatars.com/api/?name=${profileUser.name}&background=000&color=${isMGT ? 'ff0000' : 'd4af37'}`}

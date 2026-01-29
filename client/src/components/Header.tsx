@@ -36,7 +36,7 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
-    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor } = useAuth();
+    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor, previewTheme } = useAuth();
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [hasGroupInvites, setHasGroupInvites] = useState(false);
@@ -54,9 +54,15 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const headerBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
 
     // Get badge icon - supports URLs (pack badges) and IDs (market badges)
+    // Also supports preview mode
     const getBadgeIcon = () => {
         // Visitors don't get badges
         if (isVisitor) return null;
+        
+        // If preview is active and has badge, use preview badge
+        if (previewTheme?.badgeUrl) {
+            return <img src={previewTheme.badgeUrl} alt="Preview Badge" className="w-4 h-4 object-contain" />;
+        }
         
         // If equipped badge is a URL (from theme pack)
         if (equippedBadge && equippedBadge.startsWith('http')) {

@@ -84,8 +84,8 @@ interface AuthContextType {
     backgroundStyle: string | null;
     equippedBadge: string | null;
     // Theme Preview Mode
-    previewTheme: { background: string; color: string; packName: string; packId: string; price: number } | null;
-    setPreviewTheme: (preview: { background: string; color: string; packName: string; packId: string; price: number } | null) => void;
+    previewTheme: { background: string; color: string; packName: string; packId: string; price: number; badgeUrl?: string } | null;
+    setPreviewTheme: (preview: { background: string; color: string; packName: string; packId: string; price: number; badgeUrl?: string } | null) => void;
     // Active Chat
     activeChatUserId: string | null;
     setActiveChatUserId: (userId: string | null) => void;
@@ -161,7 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
     const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-    const [previewTheme, setPreviewTheme] = useState<{ background: string; color: string; packName: string; packId: string; price: number } | null>(null);
+    const [previewTheme, setPreviewTheme] = useState<{ background: string; color: string; packName: string; packId: string; price: number; badgeUrl?: string } | null>(null);
     const [theme, setTheme] = useState<'dark' | 'light'>(() => {
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
@@ -998,28 +998,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                 PRÉVIA
                             </span>
                             <h3 className="text-white font-bold text-lg">{previewTheme.packName}</h3>
-                            <div className="flex items-center justify-center gap-2 mt-1">
-                                <img src="/assets/zions/zion-50.png" alt="Zions" className="w-4 h-4" />
-                                <span className="text-white font-semibold">{previewTheme.price.toLocaleString('pt-BR')}</span>
-                            </div>
+                            {previewTheme.price > 0 ? (
+                                <div className="flex items-center justify-center gap-2 mt-1">
+                                    <img 
+                                        src="/assets/zions/zion-50.png" 
+                                        alt="Zions" 
+                                        className="w-4 h-4"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                        }}
+                                    />
+                                    <span className="text-white font-semibold">{previewTheme.price.toLocaleString('pt-BR')}</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-2 mt-1">
+                                    <span className="text-amber-400 font-semibold text-sm">Exclusivo Supply Box</span>
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setPreviewTheme(null)}
-                                className="flex-1 py-3 rounded-xl font-semibold text-white bg-white/10 hover:bg-white/20 transition-all"
+                                className={`${previewTheme.price > 0 ? 'flex-1' : 'w-full'} py-3 rounded-xl font-semibold text-white bg-white/10 hover:bg-white/20 transition-all`}
                             >
                                 ← Cancelar
                             </button>
-                            <button
-                                onClick={() => {
-                                    // Dispatch custom event to trigger purchase
-                                    window.dispatchEvent(new CustomEvent('purchasePreviewPack', { detail: previewTheme.packId }));
-                                }}
-                                className="flex-1 py-3 rounded-xl font-semibold text-black transition-all"
-                                style={{ backgroundColor: previewTheme.color }}
-                            >
-                                🛒 Comprar
-                            </button>
+                            {previewTheme.price > 0 && (
+                                <button
+                                    onClick={() => {
+                                        // Dispatch custom event to trigger purchase
+                                        window.dispatchEvent(new CustomEvent('purchasePreviewPack', { detail: previewTheme.packId }));
+                                    }}
+                                    className="flex-1 py-3 rounded-xl font-semibold text-black transition-all"
+                                    style={{ backgroundColor: previewTheme.color }}
+                                >
+                                    🛒 Comprar
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

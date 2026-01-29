@@ -17,6 +17,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
         const isAdmin = requestUser?.role === 'ADMIN';
 
         const users = await prisma.user.findMany({
+            where: { deletedAt: null }, // Filter out deleted users
             orderBy: { trophies: 'desc' }, // Changed to trophies for ranking default
             select: {
                 id: true,
@@ -424,12 +425,20 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
                 profileBgScale: true,
                 profileBgPosX: true,
                 profileBgPosY: true,
+                deletedAt: true,
             },
         });
 
         if (!user) return res.status(404).json({ error: 'User not found' });
+        
+        // Check if account was deleted
+        if (user.deletedAt) {
+            return res.status(410).json({ error: 'Esta conta foi excluída ou removida' });
+        }
 
-        res.json(user);
+        // Remove deletedAt from response
+        const { deletedAt, ...userResponse } = user;
+        res.json(userResponse);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

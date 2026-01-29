@@ -369,7 +369,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             color: pack.accentColor,
             packName: pack.name,
             packId: pack.id,
-            price: pack.price
+            price: pack.price,
+            badgeUrl: pack.badgeUrl
         });
         onClose(); // Close the shop to show the preview
     };

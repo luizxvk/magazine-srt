@@ -65,6 +65,7 @@ export default function AdminDashboard() {
         isOpen: false,
         reward: null
     });
+    const [resetPasswordModal, setResetPasswordModal] = useState<{ isOpen: boolean; userId: string; userName: string } | null>(null);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
         message: '',
         isVisible: false,
@@ -166,9 +167,13 @@ export default function AdminDashboard() {
     };
 
     const handleResetPassword = async (userId: string, userName: string) => {
-        if (!window.confirm(`Tem certeza que deseja enviar uma nova senha por email para ${userName}?`)) return;
+        setResetPasswordModal({ isOpen: true, userId, userName });
+    };
+
+    const confirmResetPassword = async () => {
+        if (!resetPasswordModal) return;
         try {
-            const response = await api.post(`/users/${userId}/reset-password`);
+            const response = await api.post(`/users/${resetPasswordModal.userId}/reset-password`);
 
             if (response.data.success) {
                 showToast(response.data.message, 'success');
@@ -178,6 +183,8 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error('Failed to reset password', error);
             showToast('Erro ao enviar nova senha', 'error');
+        } finally {
+            setResetPasswordModal(null);
         }
     };
 
@@ -545,6 +552,16 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             )}
+
+            {/* Reset Password Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!resetPasswordModal}
+                title="Enviar Nova Senha"
+                message={`Tem certeza que deseja enviar uma nova senha por email para ${resetPasswordModal?.userName}?`}
+                onConfirm={confirmResetPassword}
+                onClose={() => setResetPasswordModal(null)}
+                confirmText="Enviar"
+            />
         </div>
     );
 }

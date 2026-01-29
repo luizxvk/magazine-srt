@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Bell, Video, UserPlus, ZoomIn, Receipt, Check } from 'lucide-react';
+import { X, Sparkles, Bell, Video, UserPlus, ZoomIn, Receipt, Check, ShieldCheck, Palette, UserX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -36,34 +36,47 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // v0.4.18 - MELHORIAS DE UX
     const updates: UpdateItem[] = [
         {
+            icon: <ShieldCheck className="w-5 h-5 text-green-400" />,
+            title: 'Verificação de Email Corrigida',
+            description: 'Agora o primeiro código enviado funciona corretamente! Não precisa mais reenviar.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5 text-purple-400" />,
+            title: 'Prévia de Packs Melhorada',
+            description: 'Ao visualizar um pack, a badge também é exibida em prévia no perfil e header.',
+            isNew: true
+        },
+        {
+            icon: <UserX className="w-5 h-5 text-red-400" />,
+            title: 'Contas Excluídas',
+            description: 'Contas removidas não aparecem mais nos recomendados e mostram mensagem apropriada.',
+            isNew: true
+        },
+        {
             icon: <Video className="w-5 h-5 text-blue-400" />,
             title: 'Vídeos Corrigidos',
             description: 'Correção na reprodução de vídeos curtos nos posts do feed.',
-            isNew: true
         },
         {
             icon: <UserPlus className="w-5 h-5 text-pink-400" />,
             title: 'Adicionar Amigos Fácil',
             description: 'Novo card no carrossel mobile e botão rápido para adicionar amigos na aba Recomendados.',
-            isNew: true
         },
         {
-            icon: <ZoomIn className="w-5 h-5 text-green-400" />,
+            icon: <ZoomIn className="w-5 h-5 text-cyan-400" />,
             title: 'Crop de Foto Melhorado',
             description: 'Zoom livre na edição de foto de perfil - funciona melhor com fotos em paisagem!',
-            isNew: true
         },
         {
-            icon: <Receipt className="w-5 h-5 text-purple-400" />,
+            icon: <Receipt className="w-5 h-5 text-amber-400" />,
             title: 'Extrato de Zions',
             description: 'Histórico de Zions reformulado no estilo de extrato bancário, mais limpo e informativo.',
-            isNew: true
         },
         {
-            icon: <Bell className="w-5 h-5 text-amber-400" />,
+            icon: <Bell className="w-5 h-5 text-yellow-400" />,
             title: 'Status de Resgates',
             description: 'Correção na exibição do status de recompensas digitais - agora mostra "Completo" corretamente.',
-            isNew: true
         }
     ];
 

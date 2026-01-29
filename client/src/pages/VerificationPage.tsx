@@ -22,19 +22,9 @@ export default function VerificationPage() {
             return;
         }
 
-        // Envia código automaticamente ao carregar página
-        const sendInitialCode = async () => {
-            try {
-                await api.post('/auth/resend-verification');
-                console.log('Código enviado automaticamente');
-            } catch (err: any) {
-                // Se já verificado, redireciona
-                if (err.response?.data?.error === 'Email already verified') {
-                    navigate('/feed');
-                }
-            }
-        };
-        sendInitialCode();
+        // NÃO envia código automaticamente - o usuário pode já ter recebido um código
+        // e enviar um novo automaticamente invalidaria o anterior
+        // O usuário pode clicar em "Reenviar" se precisar de um novo código
 
         // Calculate time remaining (mock - in real app get from user data)
         const calculateTimeRemaining = () => {

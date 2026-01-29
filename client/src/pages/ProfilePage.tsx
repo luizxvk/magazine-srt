@@ -31,7 +31,7 @@ const BADGE_EMOJIS: Record<string, string> = {
 };
 
 export default function ProfilePage() {
-    const { user: currentUser, theme, equippedBadge } = useAuth();
+    const { user: currentUser, theme, equippedBadge, previewTheme } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const paramId = searchParams.get('id');
@@ -100,9 +100,14 @@ export default function ProfilePage() {
                     const statusRes = await api.get(`/social/status/${targetId}`);
                     setFriendshipStatus(statusRes.data.status);
                     setIsRequester(statusRes.data.isRequester);
-                } catch (error) {
+                } catch (error: any) {
                     console.error('Failed to load profile', error);
-                    showToast('Usuário não encontrado', 'error');
+                    // Check if account was deleted (410 Gone)
+                    if (error.response?.status === 410) {
+                        showToast('Esta conta foi excluída ou removida', 'error');
+                    } else {
+                        showToast('Usuário não encontrado', 'error');
+                    }
                 }
             }
         };
@@ -376,20 +381,29 @@ export default function ProfilePage() {
                             </div>
 
                             {/* Badge Icon - Shows equipped badge (image URL or emoji) */}
-                            {(isOwnProfile ? equippedBadge : profileUser.equippedBadge) ? (
-                                <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12">
-                                    {/* Check if it's a URL (pack badge) or an ID (market badge) */}
-                                    {((isOwnProfile ? equippedBadge : profileUser.equippedBadge) || '').startsWith('http') ? (
-                                        <img 
-                                            src={isOwnProfile ? equippedBadge! : profileUser.equippedBadge!}
-                                            alt="Badge"
-                                            className="w-8 h-8 object-contain"
-                                        />
-                                    ) : (
-                                        <span className="text-3xl">{BADGE_EMOJIS[(isOwnProfile ? equippedBadge : profileUser.equippedBadge) || ''] || '👑'}</span>
-                                    )}
-                                </div>
-                            ) : null}
+                            {/* Use preview badge when in preview mode for own profile */}
+                            {(() => {
+                                const badgeToShow = isOwnProfile && previewTheme?.badgeUrl 
+                                    ? previewTheme.badgeUrl 
+                                    : (isOwnProfile ? equippedBadge : profileUser.equippedBadge);
+                                
+                                if (!badgeToShow) return null;
+                                
+                                return (
+                                    <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12">
+                                        {/* Check if it's a URL (pack badge) or an ID (market badge) */}
+                                        {badgeToShow.startsWith('http') ? (
+                                            <img 
+                                                src={badgeToShow}
+                                                alt="Badge"
+                                                className="w-8 h-8 object-contain"
+                                            />
+                                        ) : (
+                                            <span className="text-3xl">{BADGE_EMOJIS[badgeToShow] || '👑'}</span>
+                                        )}
+                                    </div>
+                                );
+                            })()}
 
                             <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
                                 Lvl {profileUser.level || 1}

@@ -5,13 +5,13 @@ const prisma = new PrismaClient();
 // Mapeamento de badges por gameTitle (case insensitive match)
 const PACK_BADGES: Record<string, string> = {
     // Valorant
-    'valorant': 'https://img.icons8.com/?size=100&id=ld4oxG9uNT5V&format=png&color=000000',
+    'valorant': 'https://img.icons8.com/?size=100&id=bp2NCefx58vp&format=png&color=000000',
     // Red Dead Redemption
     'red dead': 'https://img.icons8.com/?size=100&id=LzBRW74k9E9c&format=png&color=000000',
     // Hollow Knight
     'hollow knight': 'https://img.icons8.com/?size=100&id=m4ruZvTt68SY&format=png&color=000000',
     // The Witcher
-    'witcher': 'https://img.icons8.com/?size=100&id=hZJ8QaNgdE8S&format=png&color=000000',
+    'witcher': 'https://img.icons8.com/?size=100&id=MGNtlXsq2xHJ&format=png&color=000000',
     // Resident Evil
     'resident evil': 'https://img.icons8.com/?size=100&id=3gLLhBYwHTFg&format=png&color=000000',
     // Stray

@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { uploadAvatar } from '../services/cloudinaryService';
 import { sendAdminPasswordResetEmail } from '../services/emailService';
+import { checkProfileCompletionBadge, checkPurchaseBadges, checkVIPBadge } from '../services/gamificationService';
 
 // ... existing code ...
 
@@ -388,6 +389,9 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
                     console.log(`[updateMe] Awarded badge: ${badgeName}`);
                 }
             }
+            
+            // Check for "Perfil Completo" badge
+            await checkProfileCompletionBadge(userId);
         } catch (badgeError) {
             console.error('[updateMe] Error checking badge:', badgeError);
             // Non-blocking error
@@ -649,10 +653,16 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', price: 350, hex: '#ccccff' },
     ],
     profileBorders: [
+        // Free defaults
         { id: 'border_gold', name: 'Dourado (Magazine)', price: 0, preview: '🟡' },
         { id: 'border_emerald', name: 'Esmeralda (MGT)', price: 0, preview: '💚' },
+        // Pastel (400 Zions)
         { id: 'border_pastel_pink', name: 'Rosa Pastel', price: 400, preview: '🌸' },
         { id: 'border_pastel_lavender', name: 'Lavanda Pastel', price: 400, preview: '💜' },
+        { id: 'border_pastel_mint', name: 'Menta Pastel', price: 400, preview: '🌿' },
+        { id: 'border_pastel_peach', name: 'Pêssego Pastel', price: 400, preview: '🍑' },
+        { id: 'border_pastel_sky', name: 'Céu Pastel', price: 400, preview: '☁️' },
+        // Classic (500 Zions)
         { id: 'border_rose', name: 'Rosa', price: 500, preview: '🌹' },
         { id: 'border_blue', name: 'Azul', price: 500, preview: '💙' },
         { id: 'border_purple', name: 'Roxo', price: 500, preview: '💟' },
@@ -660,12 +670,30 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'border_red', name: 'Vermelho', price: 500, preview: '❤️' },
         { id: 'border_cyan', name: 'Ciano', price: 500, preview: '🩵' },
         { id: 'border_orange', name: 'Laranja', price: 500, preview: '🧡' },
+        // Mid-tier (600-800 Zions)
         { id: 'border_midnight', name: 'Meia-Noite', price: 600, preview: '🌙' },
+        { id: 'border_ocean', name: 'Oceano', price: 700, preview: '🌊' },
+        { id: 'border_forest', name: 'Floresta', price: 700, preview: '🌲' },
+        { id: 'border_cherry_blossom', name: 'Flor de Cerejeira', price: 750, preview: '🌸' },
+        { id: 'border_autumn', name: 'Outono', price: 750, preview: '🍂' },
+        { id: 'border_cotton_candy', name: 'Algodão Doce', price: 800, preview: '🍬' },
         { id: 'border_ice', name: 'Gelo', price: 800, preview: '❄️' },
+        // Premium (900-1200 Zions)
         { id: 'border_sunset', name: 'Pôr do Sol', price: 900, preview: '🌅' },
         { id: 'border_fire', name: 'Chamas', price: 1000, preview: '🔥' },
+        { id: 'border_aurora', name: 'Aurora Boreal', price: 1100, preview: '✨' },
+        { id: 'border_neon', name: 'Neon Vibes', price: 1100, preview: '💜' },
+        { id: 'border_lava', name: 'Lava Vulcânica', price: 1100, preview: '🌋' },
+        { id: 'border_electric', name: 'Elétrico', price: 1100, preview: '⚡' },
+        { id: 'border_mystic', name: 'Místico', price: 1200, preview: '🔮' },
         { id: 'border_galaxy', name: 'Galáxia', price: 1200, preview: '🌌' },
+        // Ultra Premium (1500-2500 Zions)
         { id: 'border_rainbow', name: 'Arco-Íris', price: 1500, preview: '🌈' },
+        { id: 'border_diamond', name: 'Diamante', price: 2000, preview: '💎' },
+        { id: 'border_platinum', name: 'Platina', price: 2000, preview: '🪙' },
+        { id: 'border_holographic', name: 'Holográfico', price: 2500, preview: '🪩' },
+        { id: 'border_cosmic', name: 'Cósmico', price: 2500, preview: '🪐' },
+        { id: 'border_phoenix', name: 'Fênix', price: 2500, preview: '🦅' },
     ]
 };
 
@@ -759,6 +787,11 @@ export const purchaseCustomization = async (req: AuthRequest, res: Response) => 
                 ownedCustomizations: JSON.stringify(owned)
             }
         });
+
+        // Check for "Consumista" badge (5 items bought)
+        if (userId) {
+            await checkPurchaseBadges(userId);
+        }
 
         res.json({
             success: true,

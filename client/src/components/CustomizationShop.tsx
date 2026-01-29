@@ -106,8 +106,18 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 
 // Profile border styles (circular border around avatar)
 const profileBorders: Omit<ShopItem, 'owned' | 'equipped'>[] = [
+    // Free defaults
     { id: 'border_gold', name: 'Dourado Clássico', description: 'A borda padrão Magazine', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
     { id: 'border_emerald', name: 'Esmeralda MGT', description: 'Verde MGT exclusivo', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%)' },
+    
+    // Pastel (400 Zions)
+    { id: 'border_pastel_pink', name: 'Rosa Pastel', description: 'Suave e delicado', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 50%, #ffb6c1 100%)' },
+    { id: 'border_pastel_lavender', name: 'Lavanda Pastel', description: 'Relaxante e elegante', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #e6e6fa 0%, #dda0dd 50%, #e6e6fa 100%)' },
+    { id: 'border_pastel_mint', name: 'Menta Pastel', description: 'Refrescante e suave', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #98fb98 0%, #90ee90 50%, #98fb98 100%)' },
+    { id: 'border_pastel_peach', name: 'Pêssego Pastel', description: 'Aconchegante e doce', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffdab9 0%, #ffefd5 50%, #ffdab9 100%)' },
+    { id: 'border_pastel_sky', name: 'Céu Pastel', description: 'Leve como nuvens', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #87ceeb 0%, #add8e6 50%, #87ceeb 100%)' },
+    
+    // Classic colors (500 Zions)
     { id: 'border_rose', name: 'Rosa Neon', description: 'Rosa vibrante e feminino', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%)' },
     { id: 'border_blue', name: 'Azul Elétrico', description: 'Azul intenso e moderno', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00bfff 0%, #1e90ff 50%, #00bfff 100%)' },
     { id: 'border_purple', name: 'Roxo Real', description: 'Púrpura majestoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #9933ff 0%, #cc66ff 50%, #9933ff 100%)' },
@@ -115,14 +125,33 @@ const profileBorders: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'border_red', name: 'Vermelho Fogo', description: 'Vermelho intenso e poderoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4444 0%, #ff0000 50%, #ff4444 100%)' },
     { id: 'border_cyan', name: 'Ciano Neon', description: 'Azul-esverdeado elétrico', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ffff 0%, #00ced1 50%, #00ffff 100%)' },
     { id: 'border_orange', name: 'Laranja Fogo', description: 'Laranja quente e energético', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff8c00 0%, #ff6600 50%, #ff8c00 100%)' },
-    { id: 'border_rainbow', name: 'Arco-Íris', description: 'Todas as cores em harmonia', price: 1500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 17%, #ffff00 33%, #00ff00 50%, #0080ff 67%, #8000ff 83%, #ff0080 100%)' },
-    { id: 'border_galaxy', name: 'Galáxia', description: 'Estrelas e cosmos', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #4b0082 50%, #1a0a2e 75%, #0c0c0c 100%)' },
-    { id: 'border_fire', name: 'Chamas', description: 'Fogo ardente', price: 1000, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4500 0%, #ff6600 25%, #ffcc00 50%, #ff6600 75%, #ff4500 100%)' },
-    { id: 'border_ice', name: 'Gelo Ártico', description: 'Cristais de gelo', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #e0ffff 0%, #87ceeb 25%, #00bfff 50%, #87ceeb 75%, #e0ffff 100%)' },
-    { id: 'border_pastel_pink', name: 'Rosa Pastel', description: 'Suave e delicado', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 50%, #ffb6c1 100%)' },
-    { id: 'border_pastel_lavender', name: 'Lavanda Pastel', description: 'Relaxante e elegante', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #e6e6fa 0%, #dda0dd 50%, #e6e6fa 100%)' },
+    
+    // Mid-tier (600-800 Zions)
     { id: 'border_midnight', name: 'Meia-Noite', description: 'Escuro e misterioso', price: 600, type: 'profileBorder', preview: 'linear-gradient(135deg, #191970 0%, #000080 50%, #191970 100%)' },
+    { id: 'border_ocean', name: 'Oceano Profundo', description: 'Azul das profundezas', price: 700, type: 'profileBorder', preview: 'linear-gradient(135deg, #006994 0%, #0077be 25%, #00a9e0 50%, #0077be 75%, #006994 100%)' },
+    { id: 'border_forest', name: 'Floresta', description: 'Verde natureza', price: 700, type: 'profileBorder', preview: 'linear-gradient(135deg, #228b22 0%, #32cd32 25%, #90ee90 50%, #32cd32 75%, #228b22 100%)' },
+    { id: 'border_cherry_blossom', name: 'Flor de Cerejeira', description: 'Rosa primavera japonesa', price: 750, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb7c5 0%, #ff69b4 25%, #ffc0cb 50%, #ff69b4 75%, #ffb7c5 100%)' },
+    { id: 'border_autumn', name: 'Outono', description: 'Tons terrosos de folhas', price: 750, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b4513 0%, #d2691e 25%, #ff8c00 50%, #d2691e 75%, #8b4513 100%)' },
+    { id: 'border_cotton_candy', name: 'Algodão Doce', description: 'Rosa e azul bebê', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb3de 0%, #89cff0 50%, #ffb3de 100%)' },
+    { id: 'border_ice', name: 'Gelo Ártico', description: 'Cristais de gelo', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #e0ffff 0%, #87ceeb 25%, #00bfff 50%, #87ceeb 75%, #e0ffff 100%)' },
+    
+    // Premium (900-1200 Zions)
     { id: 'border_sunset', name: 'Pôr do Sol', description: 'Cores do entardecer', price: 900, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 25%, #ff6b6b 50%, #feb47b 75%, #ff7e5f 100%)' },
+    { id: 'border_fire', name: 'Chamas', description: 'Fogo ardente', price: 1000, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4500 0%, #ff6600 25%, #ffcc00 50%, #ff6600 75%, #ff4500 100%)' },
+    { id: 'border_aurora', name: 'Aurora Boreal', description: 'Luzes do norte', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ff87 0%, #60efff 25%, #00ff87 50%, #60efff 75%, #00ff87 100%)' },
+    { id: 'border_neon', name: 'Neon Vibes', description: 'Ciberpunk colorido', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff00ff 0%, #00ffff 25%, #ff00ff 50%, #00ffff 75%, #ff00ff 100%)' },
+    { id: 'border_lava', name: 'Lava Vulcânica', description: 'Magma incandescente', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b0000 0%, #ff4500 25%, #ffd700 50%, #ff4500 75%, #8b0000 100%)' },
+    { id: 'border_electric', name: 'Elétrico', description: 'Energia pura', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #fff700 0%, #00ff00 25%, #00ffff 50%, #00ff00 75%, #fff700 100%)' },
+    { id: 'border_mystic', name: 'Místico', description: 'Magia e mistério', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #4b0082 0%, #9400d3 25%, #ff1493 50%, #9400d3 75%, #4b0082 100%)' },
+    { id: 'border_galaxy', name: 'Galáxia', description: 'Estrelas e cosmos', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #4b0082 50%, #1a0a2e 75%, #0c0c0c 100%)' },
+    
+    // Ultra Premium (1500-2500 Zions)
+    { id: 'border_rainbow', name: 'Arco-Íris', description: 'Todas as cores em harmonia', price: 1500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 17%, #ffff00 33%, #00ff00 50%, #0080ff 67%, #8000ff 83%, #ff0080 100%)' },
+    { id: 'border_diamond', name: 'Diamante', description: 'Brilho de diamante raro', price: 2000, type: 'profileBorder', preview: 'linear-gradient(135deg, #b9f2ff 0%, #e0ffff 20%, #ffffff 40%, #e0ffff 60%, #b9f2ff 80%, #ffffff 100%)' },
+    { id: 'border_platinum', name: 'Platina', description: 'Metal precioso', price: 2000, type: 'profileBorder', preview: 'linear-gradient(135deg, #e5e4e2 0%, #c0c0c0 25%, #ffffff 50%, #c0c0c0 75%, #e5e4e2 100%)' },
+    { id: 'border_holographic', name: 'Holográfico', description: 'Efeito iridescente', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 12.5%, #ffff00 25%, #80ff00 37.5%, #00ff00 50%, #00ff80 62.5%, #00ffff 75%, #0080ff 87.5%, #ff00ff 100%)' },
+    { id: 'border_cosmic', name: 'Cósmico', description: 'Nebulosas espaciais', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #000033 0%, #4b0082 20%, #8b008b 40%, #ff1493 60%, #ff69b4 80%, #ffffff 100%)' },
+    { id: 'border_phoenix', name: 'Fênix', description: 'Renascimento em chamas', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b0000 0%, #ff0000 20%, #ff4500 40%, #ffa500 60%, #ffd700 80%, #ffffff 100%)' },
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {

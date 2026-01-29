@@ -3,6 +3,7 @@ import { X, Trophy, Star, Crown, Gift, Calendar, Coins, Package, Bell, BellOff, 
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface RankingModalProps {
     isOpen: boolean;
@@ -17,6 +18,7 @@ interface RankedUser {
     trophies: number;
     level: number;
     membershipType: 'MAGAZINE' | 'MGT';
+    equippedProfileBorder?: string | null;
 }
 
 interface RankingRewardConfig {
@@ -390,11 +392,11 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                                         </td>
                                         <td className="py-3 px-4">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-full p-[1px] flex-shrink-0 ${user.membershipType === 'MGT' ? 'bg-gradient-to-br from-red-600 to-black' : 'bg-gradient-to-br from-gold-400 to-gold-700'}`}>
+                                                <div className="w-8 h-8 rounded-full p-[2px] flex-shrink-0" style={{ background: getProfileBorderGradient(user.equippedProfileBorder, user.membershipType === 'MGT') }}>
                                                     <img
                                                         src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}&background=000&color=fff`}
                                                         alt={user.name}
-                                                        className="w-full h-full rounded-full object-cover border border-black"
+                                                        className="w-full h-full rounded-full object-cover bg-black"
                                                     />
                                                 </div>
                                                 <span className={`text-sm font-medium truncate ${user.membershipType === 'MGT' ? 'text-red-100' : 'text-gold-100'}`}>

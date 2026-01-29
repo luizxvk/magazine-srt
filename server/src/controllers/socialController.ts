@@ -2,6 +2,7 @@ import { Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { sendPushToUser } from './notificationController';
+import { checkFriendshipBadges } from '../services/gamificationService';
 
 export const sendFriendRequest = async (req: AuthRequest, res: Response) => {
     try {
@@ -182,6 +183,10 @@ export const acceptFriendRequest = async (req: AuthRequest, res: Response) => {
         // Check for Popular badge
         await checkAndAwardPopular(userId);
         await checkAndAwardPopular(request.requesterId);
+        
+        // Check for additional friendship badges (Roda de Amigos, Celebridade)
+        await checkFriendshipBadges(userId);
+        await checkFriendshipBadges(request.requesterId);
 
         res.json({ message: 'Friend request accepted' });
     } catch (error) {

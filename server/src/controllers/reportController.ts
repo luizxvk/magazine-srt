@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
+import { checkReportBadge } from '../services/gamificationService';
 
 interface AuthRequest extends Request {
     user?: {
@@ -53,6 +54,9 @@ export const reportPost = async (req: AuthRequest, res: Response) => {
                 reason: reason
             }
         });
+
+        // Award "Xerife" badge for reporting content
+        await checkReportBadge(userId);
 
         // Increment report count on post
         const updatedPost = await prisma.post.update({

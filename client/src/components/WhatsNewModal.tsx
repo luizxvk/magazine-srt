@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Bell, Volume2, Heart, Eye, Trophy, Hand, Crown, Check } from 'lucide-react';
+import { X, Sparkles, Palette, Trophy, ShoppingBag, Award, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.19';
+const CURRENT_VERSION = '0.4.20';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,52 +33,36 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.19 - SONS, CONQUISTAS E MELHORIAS UX
+    // v0.4.20 - MEGA ATUALIZAÇÃO: BORDAS E CONQUISTAS
     const updates: UpdateItem[] = [
         {
-            icon: <Volume2 className="w-5 h-5 text-blue-400" />,
-            title: 'Sons de Notificação',
-            description: 'Novos sons para ações: posts, conquistas, mensagens e alertas!',
+            icon: <Palette className="w-5 h-5 text-pink-400" />,
+            title: '35 Bordas de Perfil',
+            description: 'Nova coleção completa: Aurora, Neon, Holographic, Cosmic, Phoenix e muito mais!',
             isNew: true
         },
         {
             icon: <Trophy className="w-5 h-5 text-amber-400" />,
-            title: 'Conquistas Funcionais',
-            description: 'Todas as 10 conquistas agora funcionam: Primeira Conexão, Popular, Milionário, Veterano...',
+            title: '43 Conquistas',
+            description: 'Sistema completo de badges! De "Primeira Voz" até "Lenda" com 120+ badges coletados.',
             isNew: true
         },
         {
-            icon: <Eye className="w-5 h-5 text-purple-400" />,
-            title: 'Mostrar/Ocultar Senha',
-            description: 'Ícone de olhinho no login para visualizar sua senha enquanto digita.',
+            icon: <Award className="w-5 h-5 text-purple-400" />,
+            title: 'Badges Automáticos',
+            description: 'Conquistas são desbloqueadas automaticamente ao atingir marcos de atividade.',
             isNew: true
         },
         {
-            icon: <Heart className="w-5 h-5 text-red-400" />,
-            title: 'Curtir Post Completo',
-            description: 'Corrigido o botão de like quando visualiza um post em tela cheia.',
+            icon: <ShoppingBag className="w-5 h-5 text-emerald-400" />,
+            title: 'Loja Expandida',
+            description: 'Bordas organizadas por faixa de preço: de gratuitas até 2500 Zions!',
             isNew: true
         },
         {
-            icon: <Crown className="w-5 h-5 text-yellow-400" />,
-            title: 'Elite Ranking Corrigido',
-            description: 'O card de premiação não é mais cortado quando a lista carrega.',
-            isNew: true
-        },
-        {
-            icon: <Hand className="w-5 h-5 text-pink-400" />,
-            title: 'Dica de Swipe',
-            description: 'Ícone animado no carrossel mobile indicando que você pode deslizar.',
-        },
-        {
-            icon: <Bell className="w-5 h-5 text-cyan-400" />,
-            title: 'Badge Email Verificado',
-            description: 'Visitantes agora podem ver quem tem email verificado.',
-        },
-        {
-            icon: <Sparkles className="w-5 h-5 text-emerald-400" />,
-            title: 'Fundos Animados na Prévia',
-            description: 'Prévia de packs agora mostra os fundos animados corretamente.',
+            icon: <Sparkles className="w-5 h-5 text-cyan-400" />,
+            title: 'Bordas no Feed',
+            description: 'Seu avatar agora mostra a borda equipada em posts e ranking.',
         }
     ];
 

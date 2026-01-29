@@ -3,6 +3,7 @@ import prisma from '../utils/prisma';
 import { sendRewardRedemptionEmail } from '../services/emailVerificationService';
 import { sendPushToUser } from './notificationController';
 import { z } from 'zod';
+import { checkLoginStreakBadges, checkRewardBadges } from '../services/gamificationService';
 
 // Validation schemas
 const createRewardSchema = z.object({
@@ -27,6 +28,9 @@ export const getRanking = async (req: Request, res: Response) => {
                 points: true, // Keeping points for compatibility, but ordering by trophies
                 trophies: true,
                 avatarUrl: true,
+                level: true,
+                membershipType: true,
+                equippedProfileBorder: true,
             },
         });
         // Map points to trophies if frontend expects points but means trophies
@@ -360,6 +364,9 @@ export const redeemReward = async (req: Request, res: Response) => {
 
         await prisma.$transaction(transactionOperations);
 
+        // Check for "Rei do Cashback" badge (10 rewards redeemed)
+        await checkRewardBadges(userId);
+
         // Fetch updated user to return in response
         const updatedUser = await prisma.user.findUnique({
             where: { id: userId },
@@ -591,6 +598,10 @@ export const dailyLogin = async (req: Request, res: Response) => {
                 }
             }
         }
+
+        // Check for login streak badges (Conectado, Dedicado, Viciado)
+        const newStreak = streak + 1;
+        await checkLoginStreakBadges(userId, newStreak);
 
         res.json({ message: 'Daily login claimed', claimed: false, awarded: amount, streak: streak + 1 });
     } catch (error) {

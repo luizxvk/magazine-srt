@@ -3,6 +3,7 @@ import { GroupRole, MessageType } from '@prisma/client';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { sendPushToUser } from './notificationController';
+import { checkGroupCreatorBadge } from '../services/gamificationService';
 
 // In-memory storage for typing indicators (expires after 3 seconds)
 interface TypingUser {
@@ -86,6 +87,9 @@ export const createGroup = async (req: AuthRequest, res: Response) => {
         },
       },
     });
+
+    // Award "Anfitrião" badge for creating a group
+    await checkGroupCreatorBadge(userId);
 
     res.json(group);
   } catch (error) {

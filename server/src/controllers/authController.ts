@@ -5,6 +5,7 @@ import prisma from '../utils/prisma';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { generateVerificationCode, sendVerificationEmail, sendPasswordResetEmail } from '../services/emailVerificationService';
+import { checkVIPBadge } from '../services/gamificationService';
 
 // Generate unique session token for single device login
 const generateSessionToken = (): string => {
@@ -139,6 +140,11 @@ export const register = async (req: Request, res: Response) => {
         const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!, {
             expiresIn: '7d',
         });
+
+        // Check for VIP badge if user is MGT
+        if (user.membershipType === 'MGT') {
+            await checkVIPBadge(user.id);
+        }
 
         res.status(201).json({
             token,
@@ -287,6 +293,12 @@ export const login = async (req: Request, res: Response) => {
                 ownedCustomizations: user.ownedCustomizations ? JSON.parse(user.ownedCustomizations) : []
             }
         });
+
+        // Check for VIP badge if user is MGT
+        if (user.membershipType === 'MGT') {
+            await checkVIPBadge(user.id);
+        }
+
         console.log('Login successful for:', user.email);
     } catch (error) {
         console.error('Login error:', error);

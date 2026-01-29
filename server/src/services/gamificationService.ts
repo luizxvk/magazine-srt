@@ -118,39 +118,36 @@ export const awardZions = async (userId: string, amount: number, reason: string)
         // Check for Zion-related badges
         const newZionsTotal = updatedUser.zions;
 
-        // Colecionador de Zions (100 Zions)
-        if (newZionsTotal >= 100) {
-            const badge = await prisma.badge.findFirst({ where: { name: 'Colecionador de Zions' } });
-            if (badge) {
-                const existing = await prisma.userBadge.findUnique({
-                    where: { userId_badgeId: { userId, badgeId: badge.id } }
-                });
-                if (!existing) {
-                    await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
-                    await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
-                    await prisma.notification.create({
-                        data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+        // Helper function to award badge
+        const awardZionBadge = async (badgeName: string, threshold: number) => {
+            if (newZionsTotal >= threshold) {
+                const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+                if (badge) {
+                    const existing = await prisma.userBadge.findUnique({
+                        where: { userId_badgeId: { userId, badgeId: badge.id } }
                     });
+                    if (!existing) {
+                        await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+                        await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+                        await prisma.notification.create({
+                            data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+                        });
+                    }
                 }
             }
-        }
+        };
+
+        // Colecionador de Zions (100 Zions)
+        await awardZionBadge('Colecionador de Zions', 100);
+        
+        // Poupador (1.000 Zions)
+        await awardZionBadge('Poupador', 1000);
+        
+        // Burguês (10.000 Zions)
+        await awardZionBadge('Burguês', 10000);
 
         // Milionário (1.000.000 Zions)
-        if (newZionsTotal >= 1000000) {
-            const badge = await prisma.badge.findFirst({ where: { name: 'Milionário' } });
-            if (badge) {
-                const existing = await prisma.userBadge.findUnique({
-                    where: { userId_badgeId: { userId, badgeId: badge.id } }
-                });
-                if (!existing) {
-                    await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
-                    await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
-                    await prisma.notification.create({
-                        data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
-                    });
-                }
-            }
-        }
+        await awardZionBadge('Milionário', 1000000);
 
         return amount;
     } catch (error) {
@@ -159,7 +156,7 @@ export const awardZions = async (userId: string, amount: number, reason: string)
     }
 };
 
-export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | 'LIKE' | 'COMMENT' | 'LOGIN') => {
+export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | 'LIKE' | 'COMMENT' | 'LOGIN' | 'STORY' | 'VIDEO') => {
     try {
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -202,58 +199,92 @@ export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | '
                 await awardTrophies(userId, badge.trophies, `Badge: ${badgeName}`);
             }
 
+            // Create notification for achievement
+            await prisma.notification.create({
+                data: {
+                    userId,
+                    type: 'ACHIEVEMENT',
+                    content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)`
+                }
+            });
+
             newBadges.push(badgeName);
             awardedBadges.push(badge);
         };
 
-        // --- BADGE LOGIC ---
-
-        // 1. Primeira Voz (First Post)
-        if (actionType === 'POST' && user.posts.length === 1) {
-            await awardBadge('Primeira Voz');
+        // --- CONTENT CREATION BADGES ---
+        if (actionType === 'POST') {
+            // Primeira Voz (First Post)
+            if (user.posts.length === 1) {
+                await awardBadge('Primeira Voz');
+            }
+            // Criador de Conteúdo (5 Posts)
+            if (user.posts.length >= 5) {
+                await awardBadge('Criador de Conteúdo');
+            }
+            // Blogueiro (20 Posts)
+            if (user.posts.length >= 20) {
+                await awardBadge('Blogueiro');
+            }
+            // Editor Chefe (50 Posts)
+            if (user.posts.length >= 50) {
+                await awardBadge('Editor Chefe');
+            }
         }
 
-        // 2. Criador de Conteúdo (5 Posts)
-        if (actionType === 'POST' && user.posts.length === 5) {
-            await awardBadge('Criador de Conteúdo');
+        // Cineasta (10 Videos)
+        if (actionType === 'VIDEO' || actionType === 'POST') {
+            const videoCount = user.posts.filter((p: any) => p.mediaType === 'VIDEO').length;
+            if (videoCount >= 10) {
+                await awardBadge('Cineasta');
+            }
         }
 
-        // Blogueiro (20 Posts)
-        if (actionType === 'POST' && user.posts.length === 20) {
-            await awardBadge('Blogueiro');
+        // Storyteller (20 Stories) - check stories count from stories relation
+        if (actionType === 'STORY' || actionType === 'POST') {
+            const storyCount = await prisma.story.count({ where: { userId } });
+            if (storyCount >= 20) {
+                await awardBadge('Storyteller');
+            }
         }
 
-        // Editor Chefe (50 Posts)
-        if (actionType === 'POST' && user.posts.length === 50) {
-            await awardBadge('Editor Chefe');
+        // --- COMMENT BADGES ---
+        if (actionType === 'COMMENT') {
+            // Comentador (First Comment)
+            if (user.comments.length === 1) {
+                await awardBadge('Comentador');
+            }
+            // Socialite (10 Comments)
+            if (user.comments.length >= 10) {
+                await awardBadge('Socialite');
+            }
+            // Debatedor (50 Comments)
+            if (user.comments.length >= 50) {
+                await awardBadge('Debatedor');
+            }
+            // Tagarela (100 Comments)
+            if (user.comments.length >= 100) {
+                await awardBadge('Tagarela');
+            }
         }
 
-        // 3. Socialite (10 Comments)
-        if (actionType === 'COMMENT' && user.comments.length === 10) {
-            await awardBadge('Socialite');
+        // --- LIKE BADGES ---
+        if (actionType === 'LIKE') {
+            // Engajado (50 Likes given)
+            if (user.likes.length >= 50) {
+                await awardBadge('Engajado');
+            }
+            // Super Fã (100 Likes given)
+            if (user.likes.length >= 100) {
+                await awardBadge('Super Fã');
+            }
+            // Super Like (500 Likes given)
+            if (user.likes.length >= 500) {
+                await awardBadge('Super Like');
+            }
         }
 
-        // Debatedor (50 Comments)
-        if (actionType === 'COMMENT' && user.comments.length === 50) {
-            await awardBadge('Debatedor');
-        }
-
-        // Comentador (First Comment)
-        if (actionType === 'COMMENT' && user.comments.length === 1) {
-            await awardBadge('Comentador');
-        }
-
-        // 4. Engajado (50 Likes given)
-        if (actionType === 'LIKE' && user.likes.length === 50) {
-            await awardBadge('Engajado');
-        }
-
-        // Super Fã (100 Likes given)
-        if (actionType === 'LIKE' && user.likes.length === 100) {
-            await awardBadge('Super Fã');
-        }
-
-        // 5. Influenciador (50 Likes received) & popularity badges
+        // --- POPULARITY BADGES (check on multiple actions) ---
         if (actionType === 'LOGIN' || actionType === 'POST' || actionType === 'LIKE') {
             const totalLikesReceived = await prisma.post.aggregate({
                 where: { userId },
@@ -262,12 +293,17 @@ export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | '
 
             const likesReceived = totalLikesReceived._sum.likesCount || 0;
 
+            // Influenciador (50 Likes received)
             if (likesReceived >= 50) {
                 await awardBadge('Influenciador');
             }
-
+            // Ícone (100 Likes received)
             if (likesReceived >= 100) {
                 await awardBadge('Ícone');
+            }
+            // Top Voice (500 Likes received)
+            if (likesReceived >= 500) {
+                await awardBadge('Top Voice');
             }
 
             // Viral (50 comments received on posts)
@@ -281,10 +317,306 @@ export const checkAndAwardBadges = async (userId: string, actionType: 'POST' | '
             }
         }
 
+        // --- BADGE COLLECTION BADGES ---
+        const totalBadges = user.badges.length + newBadges.length;
+        if (totalBadges >= 5) {
+            await awardBadge('Colecionador');
+        }
+        if (totalBadges >= 15) {
+            await awardBadge('Museu Vivo');
+        }
+        if (totalBadges >= 30) {
+            await awardBadge('Lenda');
+        }
+
         return { newBadges, awardedBadges };
 
     } catch (error) {
         console.error('Error checking badges:', error);
         return { newBadges: [], awardedBadges: [] };
+    }
+};
+
+// ====== FRIENDSHIP BADGES ======
+export const checkFriendshipBadges = async (userId: string) => {
+    try {
+        // Count accepted friendships
+        const friendCount = await prisma.friendship.count({
+            where: {
+                OR: [
+                    { requesterId: userId, status: 'ACCEPTED' },
+                    { addresseeId: userId, status: 'ACCEPTED' }
+                ]
+            }
+        });
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                badges: { include: { badge: true } }
+            }
+        });
+
+        if (!user) return;
+
+        const awardBadgeIfNew = async (badgeName: string) => {
+            const hasBadge = user.badges.some((ub: any) => ub.badge.name === badgeName);
+            if (hasBadge) return;
+
+            const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+            if (!badge) return;
+
+            await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+            await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+            await prisma.notification.create({
+                data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+            });
+        };
+
+        // Roda de Amigos (10 friends)
+        if (friendCount >= 10) {
+            await awardBadgeIfNew('Roda de Amigos');
+        }
+        // Popular (50 friends) - already checked in socialController
+        if (friendCount >= 50) {
+            await awardBadgeIfNew('Popular');
+        }
+        // Celebridade (100 friends)
+        if (friendCount >= 100) {
+            await awardBadgeIfNew('Celebridade');
+        }
+    } catch (error) {
+        console.error('Error checking friendship badges:', error);
+    }
+};
+
+// ====== LOGIN STREAK BADGES ======
+export const checkLoginStreakBadges = async (userId: string, streak: number) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { badges: { include: { badge: true } } }
+        });
+
+        if (!user) return;
+
+        const awardBadgeIfNew = async (badgeName: string) => {
+            const hasBadge = user.badges.some((ub: any) => ub.badge.name === badgeName);
+            if (hasBadge) return;
+
+            const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+            if (!badge) return;
+
+            await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+            await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+            await prisma.notification.create({
+                data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+            });
+        };
+
+        // Conectado (7 days streak)
+        if (streak >= 7) {
+            await awardBadgeIfNew('Conectado');
+        }
+        // Dedicado (14 days streak)
+        if (streak >= 14) {
+            await awardBadgeIfNew('Dedicado');
+        }
+        // Viciado (30 days streak)
+        if (streak >= 30) {
+            await awardBadgeIfNew('Viciado');
+        }
+    } catch (error) {
+        console.error('Error checking login streak badges:', error);
+    }
+};
+
+// ====== SHOP & PURCHASE BADGES ======
+export const checkPurchaseBadges = async (userId: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { badges: { include: { badge: true } } }
+        });
+
+        if (!user) return;
+        
+        // Count purchased items
+        const ownedItems = user.ownedCustomizations ? JSON.parse(user.ownedCustomizations as string) : [];
+        
+        const awardBadgeIfNew = async (badgeName: string) => {
+            const hasBadge = user.badges.some((ub: any) => ub.badge.name === badgeName);
+            if (hasBadge) return;
+
+            const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+            if (!badge) return;
+
+            await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+            await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+            await prisma.notification.create({
+                data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+            });
+        };
+
+        // Consumista (5 items bought)
+        if (ownedItems.length >= 5) {
+            await awardBadgeIfNew('Consumista');
+        }
+    } catch (error) {
+        console.error('Error checking purchase badges:', error);
+    }
+};
+
+// ====== REWARD REDEMPTION BADGES ======
+export const checkRewardBadges = async (userId: string) => {
+    try {
+        // Count redemptions
+        const redemptionCount = await prisma.redemption.count({
+            where: { userId }
+        });
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { 
+                badges: { include: { badge: true } }
+            }
+        });
+
+        if (!user) return;
+        
+        const awardBadgeIfNew = async (badgeName: string) => {
+            const hasBadge = user.badges.some((ub: any) => ub.badge.name === badgeName);
+            if (hasBadge) return;
+
+            const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+            if (!badge) return;
+
+            await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+            await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+            await prisma.notification.create({
+                data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+            });
+        };
+
+        // Rei do Cashback (10 rewards redeemed)
+        if (redemptionCount >= 10) {
+            await awardBadgeIfNew('Rei do Cashback');
+        }
+    } catch (error) {
+        console.error('Error checking reward badges:', error);
+    }
+};
+
+// ====== PROFILE COMPLETION BADGE ======
+export const checkProfileCompletionBadge = async (userId: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { badges: { include: { badge: true } } }
+        });
+
+        if (!user) return;
+
+        // Check if profile is complete (essential fields)
+        const isComplete = !!(
+            user.displayName &&
+            user.bio &&
+            user.avatarUrl &&
+            user.profileBgUrl // Profile background image
+        );
+
+        if (!isComplete) return;
+
+        const hasBadge = user.badges.some((ub: any) => ub.badge.name === 'Perfil Completo');
+        if (hasBadge) return;
+
+        const badge = await prisma.badge.findFirst({ where: { name: 'Perfil Completo' } });
+        if (!badge) return;
+
+        await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+        await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+        await prisma.notification.create({
+            data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+        });
+    } catch (error) {
+        console.error('Error checking profile completion badge:', error);
+    }
+};
+
+// ====== VIP/MGT BADGE ======
+export const checkVIPBadge = async (userId: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { badges: { include: { badge: true } } }
+        });
+
+        if (!user || user.membershipType !== 'MGT') return;
+
+        const hasBadge = user.badges.some((ub: any) => ub.badge.name === 'VIP');
+        if (hasBadge) return;
+
+        const badge = await prisma.badge.findFirst({ where: { name: 'VIP' } });
+        if (!badge) return;
+
+        await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+        await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+        await prisma.notification.create({
+            data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+        });
+    } catch (error) {
+        console.error('Error checking VIP badge:', error);
+    }
+};
+
+// ====== REPORT BADGE (XERIFE) ======
+export const checkReportBadge = async (userId: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { badges: { include: { badge: true } } }
+        });
+
+        if (!user) return;
+
+        const hasBadge = user.badges.some((ub: any) => ub.badge.name === 'Xerife');
+        if (hasBadge) return;
+
+        const badge = await prisma.badge.findFirst({ where: { name: 'Xerife' } });
+        if (!badge) return;
+
+        await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+        await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+        await prisma.notification.create({
+            data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+        });
+    } catch (error) {
+        console.error('Error checking report badge:', error);
+    }
+};
+
+// ====== GROUP CREATOR BADGE (ANFITRIÃO) ======
+export const checkGroupCreatorBadge = async (userId: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { badges: { include: { badge: true } } }
+        });
+
+        if (!user) return;
+
+        const hasBadge = user.badges.some((ub: any) => ub.badge.name === 'Anfitrião');
+        if (hasBadge) return;
+
+        const badge = await prisma.badge.findFirst({ where: { name: 'Anfitrião' } });
+        if (!badge) return;
+
+        await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+        await prisma.user.update({ where: { id: userId }, data: { trophies: { increment: badge.trophies } } });
+        await prisma.notification.create({
+            data: { userId, type: 'ACHIEVEMENT', content: `Você desbloqueou a conquista: ${badge.name}! (+${badge.trophies} Troféus)` }
+        });
+    } catch (error) {
+        console.error('Error checking group creator badge:', error);
     }
 };

@@ -275,7 +275,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 equippedBackground: true,
                 equippedBadge: true,
                 equippedColor: true,
-                // equippedProfileBorder: true, // TODO: uncomment after migration
+                equippedProfileBorder: true,
                 isVerified: true,
                 profileBgUrl: true,
                 profileBgScale: true,
@@ -421,7 +421,7 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
                 equippedBackground: true,
                 equippedBadge: true,
                 equippedColor: true,
-                // equippedProfileBorder: true, // TODO: uncomment after migration
+                equippedProfileBorder: true,
                 profileBgUrl: true,
                 profileBgScale: true,
                 profileBgPosX: true,
@@ -662,7 +662,7 @@ export const getCustomizations = async (req: AuthRequest, res: Response) => {
                 equippedBackground: true,
                 equippedBadge: true,
                 equippedColor: true,
-                // equippedProfileBorder: true, // TODO: uncomment after migration
+                equippedProfileBorder: true,
             }
         });
 
@@ -680,7 +680,7 @@ export const getCustomizations = async (req: AuthRequest, res: Response) => {
                 background: user.equippedBackground,
                 badge: user.equippedBadge,
                 color: user.equippedColor,
-                // profileBorder: user.equippedProfileBorder, // TODO: uncomment after migration
+                profileBorder: user.equippedProfileBorder,
             },
             shop: CUSTOMIZATION_ITEMS
         });
@@ -807,8 +807,7 @@ export const equipCustomization = async (req: AuthRequest, res: Response) => {
         } else if (category === 'colors') {
             updateData.equippedColor = itemId;
         } else if (category === 'profileBorders') {
-            // updateData.equippedProfileBorder = itemId; // TODO: uncomment after migration
-            return res.status(400).json({ error: 'Profile borders coming soon!' });
+            updateData.equippedProfileBorder = itemId;
         } else {
             console.log('[equipCustomization] Invalid category:', category);
             return res.status(400).json({ error: 'Invalid category' });
@@ -845,8 +844,7 @@ export const unequipCustomization = async (req: AuthRequest, res: Response) => {
         } else if (category === 'colors') {
             updateData.equippedColor = null;
         } else if (category === 'profileBorders') {
-            // updateData.equippedProfileBorder = null; // TODO: uncomment after migration
-            return res.status(400).json({ error: 'Profile borders coming soon!' });
+            updateData.equippedProfileBorder = null;
         } else {
             return res.status(400).json({ error: 'Invalid category' });
         }

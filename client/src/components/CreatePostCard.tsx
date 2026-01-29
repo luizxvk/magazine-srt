@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock } from 'lucide-react';
+import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock, BarChart3 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
@@ -18,6 +18,9 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [showTagInput, setShowTagInput] = useState(false);
     const [isCarouselMode, setIsCarouselMode] = useState(false);
+    const [showPollInput, setShowPollInput] = useState(false);
+    const [pollQuestion, setPollQuestion] = useState('');
+    const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
     
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +42,14 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const accentHover = isMGT ? 'hover:bg-emerald-500/10' : 'hover:bg-gold-500/10';
 
     const handleSubmit = async () => {
-        if (!caption.trim() && !mediaUrl) return;
+        if (!caption.trim() && !mediaUrl && !showPollInput) return;
+        
+        // Validar enquete se ativa
+        const validPollOptions = pollOptions.filter(opt => opt.trim());
+        if (showPollInput && validPollOptions.length < 2) {
+            showError('Enquete inválida', 'Adicione pelo menos 2 opções.');
+            return;
+        }
         
         setLoading(true);
         try {
@@ -49,7 +59,10 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                 videoUrl: mediaType === 'VIDEO' ? mediaUrl : undefined,
                 mediaType: mediaUrl ? mediaType : 'TEXT',
                 isHighlight: isCarouselMode,
-                tags: selectedTags.length > 0 ? selectedTags : undefined
+                tags: selectedTags.length > 0 ? selectedTags : undefined,
+                // Enquete
+                pollQuestion: showPollInput ? (pollQuestion || caption) : undefined,
+                pollOptions: showPollInput ? validPollOptions : undefined
             });
 
             // Reset
@@ -58,6 +71,9 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             setMediaType('TEXT');
             setSelectedTags([]);
             setIsCarouselMode(false);
+            setShowPollInput(false);
+            setPollQuestion('');
+            setPollOptions(['', '']);
             
             // Refresh user to update Zions
             const userRes = await api.get('/users/me');
@@ -203,12 +219,76 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                 </div>
             )}
 
+            {/* Poll Input - Apple Vision Pro style */}
+            {showPollInput && (
+                <div className={`mx-4 mb-3 p-4 rounded-2xl ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} border ${cardBorder} backdrop-blur-xl`}>
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <BarChart3 className={`w-4 h-4 ${accentText}`} />
+                            <span className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Enquete</span>
+                        </div>
+                        <button 
+                            onClick={() => setShowPollInput(false)}
+                            className={`p-1 rounded-full ${theme === 'light' ? 'hover:bg-gray-200' : 'hover:bg-white/10'} transition-colors`}
+                        >
+                            <X className="w-4 h-4 text-gray-400" />
+                        </button>
+                    </div>
+                    
+                    <input
+                        type="text"
+                        value={pollQuestion}
+                        onChange={(e) => setPollQuestion(e.target.value)}
+                        placeholder="Pergunta da enquete (opcional)"
+                        className={`w-full ${inputBg} ${theme === 'light' ? 'text-gray-900' : 'text-white'} rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500/30' : 'focus:ring-amber-500/30'}`}
+                    />
+                    
+                    <div className="space-y-2">
+                        {pollOptions.map((option, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                    {index + 1}
+                                </div>
+                                <input
+                                    type="text"
+                                    value={option}
+                                    onChange={(e) => {
+                                        const newOptions = [...pollOptions];
+                                        newOptions[index] = e.target.value;
+                                        setPollOptions(newOptions);
+                                    }}
+                                    placeholder={`Opção ${index + 1}`}
+                                    className={`flex-1 ${inputBg} ${theme === 'light' ? 'text-gray-900' : 'text-white'} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500/30' : 'focus:ring-amber-500/30'}`}
+                                />
+                                {pollOptions.length > 2 && (
+                                    <button 
+                                        onClick={() => setPollOptions(pollOptions.filter((_, i) => i !== index))}
+                                        className="p-1 text-red-400 hover:text-red-300"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {pollOptions.length < 4 && (
+                        <button
+                            onClick={() => setPollOptions([...pollOptions, ''])}
+                            className={`mt-3 text-xs font-medium ${accentText} hover:underline`}
+                        >
+                            + Adicionar opção
+                        </button>
+                    )}
+                </div>
+            )}
+
             {/* Divider */}
             <div className={`border-t ${cardBorder}`} />
 
-            {/* Action Buttons */}
-            <div className="p-3 flex items-center justify-between">
-                <div className="flex items-center gap-1">
+            {/* Action Buttons - Compacto para caber todos */}
+            <div className="p-2 sm:p-3 flex items-center justify-between">
+                <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide">
                     {/* Photo */}
                     <input
                         type="file"
@@ -219,35 +299,52 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${accentHover} transition-colors`}
+                        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg ${accentHover} transition-colors shrink-0`}
+                        title="Adicionar foto"
                     >
-                        <ImageIcon className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-green-500'}`} />
-                        <span className={`text-sm ${textMuted} hidden sm:inline`}>Foto</span>
+                        <ImageIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${isMGT ? 'text-emerald-500' : 'text-green-500'}`} />
+                        <span className={`text-xs sm:text-sm ${textMuted} hidden md:inline`}>Foto</span>
                     </button>
 
                     {/* Video */}
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${accentHover} transition-colors`}
+                        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg ${accentHover} transition-colors shrink-0`}
+                        title="Adicionar vídeo"
                     >
-                        <Video className="w-5 h-5 text-red-500" />
-                        <span className={`text-sm ${textMuted} hidden sm:inline`}>Vídeo</span>
+                        <Video className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                        <span className={`text-xs sm:text-sm ${textMuted} hidden md:inline`}>Vídeo</span>
                     </button>
 
                     {/* Tag */}
                     <button
                         onClick={() => setShowTagInput(!showTagInput)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${accentHover} transition-colors`}
+                        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg ${accentHover} transition-colors shrink-0`}
+                        title="Adicionar tag"
                     >
-                        <Hash className="w-5 h-5 text-blue-500" />
-                        <span className={`text-sm ${textMuted} hidden sm:inline`}>Tag</span>
+                        <Hash className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                        <span className={`text-xs sm:text-sm ${textMuted} hidden md:inline`}>Tag</span>
+                    </button>
+
+                    {/* Poll/Enquete */}
+                    <button
+                        onClick={() => setShowPollInput(!showPollInput)}
+                        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg transition-colors shrink-0 ${
+                            showPollInput 
+                                ? `${isMGT ? 'bg-emerald-500/20' : 'bg-amber-500/20'}` 
+                                : accentHover
+                        }`}
+                        title="Criar enquete"
+                    >
+                        <BarChart3 className={`w-4 h-4 sm:w-5 sm:h-5 ${showPollInput ? accentText : 'text-cyan-500'}`} />
+                        <span className={`text-xs sm:text-sm ${textMuted} hidden md:inline`}>Enquete</span>
                     </button>
 
                     {/* Destaque/Carousel */}
                     <button
                         onClick={() => canUseCarousel && setIsCarouselMode(!isCarouselMode)}
                         disabled={!canUseCarousel}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg transition-colors shrink-0 ${
                             isCarouselMode 
                                 ? `${isMGT ? 'bg-emerald-500/20' : 'bg-amber-500/20'}` 
                                 : accentHover
@@ -255,19 +352,19 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         title={canUseCarousel ? 'Destacar post (300 Zions)' : 'Requer 300 Zions'}
                     >
                         {!canUseCarousel ? (
-                            <Lock className="w-5 h-5 text-gray-500" />
+                            <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                         ) : (
-                            <Layers className={`w-5 h-5 ${isCarouselMode ? accentText : 'text-purple-500'}`} />
+                            <Layers className={`w-4 h-4 sm:w-5 sm:h-5 ${isCarouselMode ? accentText : 'text-purple-500'}`} />
                         )}
-                        <span className={`text-sm ${textMuted} hidden sm:inline`}>Destaque</span>
+                        <span className={`text-xs sm:text-sm ${textMuted} hidden lg:inline`}>Destaque</span>
                     </button>
                 </div>
 
                 {/* Submit Button */}
                 <button
                     onClick={handleSubmit}
-                    disabled={loading || (!caption.trim() && !mediaUrl)}
-                    className={`flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-sm transition-all ${
+                    disabled={loading || (!caption.trim() && !mediaUrl && !showPollInput)}
+                    className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 rounded-full font-semibold text-xs sm:text-sm transition-all shrink-0 ${
                         loading || (!caption.trim() && !mediaUrl)
                             ? 'bg-gray-500/20 text-gray-500 cursor-not-allowed'
                             : `${accentBg} text-black hover:opacity-90 active:scale-95`

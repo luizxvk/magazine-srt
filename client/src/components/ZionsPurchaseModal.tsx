@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Check, ShoppingBag, Loader2, QrCode, Copy, CheckCircle } from 'lucide-react';
+import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -29,26 +29,29 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number } | null>(null);
     const [copied, setCopied] = useState(false);
     const [checkingPayment, setCheckingPayment] = useState(false);
+    const isDark = theme === 'dark';
 
-    /* Centering Fix: Use 'items-center' (already present) but verify height constraints. Using 'max-h-screen' and 'overflow-y-auto' on the container might help smaller screens. */
-    /* MGT Color Fix: Ensure 'text' is emerald, remove other colors if conflicting. The user mentioned "red green and blue". Check 'themeColors' object. */
-
+    // Apple Vision Pro style - glass morphism
     const themeColors = isMGT ? {
-        bg: theme === 'light' ? 'bg-white' : 'bg-gray-900',
-        text: 'text-emerald-500',
+        accent: 'emerald',
+        gradient: 'from-emerald-500/20 to-emerald-900/40',
         border: 'border-emerald-500/30',
-        button: 'bg-emerald-600 hover:bg-emerald-500',
-        popularBg: 'bg-emerald-500',
-        cardBg: theme === 'light' ? 'bg-gray-50' : 'bg-black/40', // Darker background for MGT dark mode
-        cardBorder: theme === 'light' ? 'border-gray-200' : 'border-emerald-500/20' // Emerald border
+        text: 'text-emerald-400',
+        button: 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400',
+        glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
+        cardBg: isDark ? 'bg-gradient-to-br from-emerald-950/50 to-black/50' : 'bg-gradient-to-br from-emerald-50 to-white',
+        bg: isDark ? 'bg-black/80 backdrop-blur-2xl' : 'bg-white/90 backdrop-blur-2xl',
+        cardBorder: 'border-emerald-500/20',
     } : {
-        bg: theme === 'light' ? 'bg-white' : 'bg-gray-900',
-        text: 'text-gold-500',
+        accent: 'gold',
+        gradient: 'from-amber-500/20 to-amber-900/40',
         border: 'border-gold-500/30',
-        button: 'bg-gold-500 hover:bg-gold-400',
-        popularBg: 'bg-gold-500',
-        cardBg: theme === 'light' ? 'bg-gray-50' : 'bg-white/5',
-        cardBorder: theme === 'light' ? 'border-gray-200' : 'border-white/10'
+        text: 'text-gold-400',
+        button: 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400',
+        glow: 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
+        cardBg: isDark ? 'bg-gradient-to-br from-amber-950/30 to-black/50' : 'bg-gradient-to-br from-amber-50 to-white',
+        bg: isDark ? 'bg-black/80 backdrop-blur-2xl' : 'bg-white/90 backdrop-blur-2xl',
+        cardBorder: 'border-amber-500/20',
     };
 
     const handlePurchase = async (amount: number) => {
@@ -182,83 +185,107 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
         );
     }
 
+    // Main purchase screen - Apple Vision Pro glass morphism style
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto pt-10 pb-10">
-            <div className={`w-full max-w-4xl ${themeColors.bg} rounded-3xl border ${themeColors.border} shadow-2xl flex flex-col my-auto relative`}>
-                <div className="p-6 border-b border-white/10 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-xl ${themeColors.cardBg} ${themeColors.text}`}>
-                            <ShoppingBag className="w-6 h-6" />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl overflow-y-auto">
+            <div className={`w-full max-w-4xl rounded-3xl border ${themeColors.border} ${themeColors.glow} backdrop-blur-2xl ${themeColors.cardBg} flex flex-col my-auto relative overflow-hidden`}>
+                {/* Gradient background overlay */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${themeColors.gradient} pointer-events-none`} />
+                
+                {/* Header */}
+                <div className="relative z-10 p-6 border-b border-white/10 flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-2xl bg-gradient-to-br ${themeColors.gradient} border ${themeColors.border}`}>
+                            <Coins className={`w-6 h-6 ${themeColors.text}`} />
                         </div>
                         <div>
-                            <h2 className={`text-xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 Adquirir Zions
                             </h2>
-                            <p className="text-sm text-gray-500">Invista na sua jornada automotiva</p>
+                            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Invista na sua jornada
+                            </p>
                         </div>
                     </div>
-                    <button onClick={handleClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                        <X className={`w-6 h-6 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <button 
+                        onClick={handleClose} 
+                        className={`p-2 rounded-full ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'} transition-colors`}
+                    >
+                        <X className={`w-6 h-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
                     </button>
                 </div>
 
-                <div className="overflow-y-auto p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Packages Grid */}
+                <div className="relative z-10 overflow-y-auto p-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {PACKAGES.map((pkg) => (
                             <div
                                 key={pkg.zions}
-                                className={`relative rounded-2xl border ${themeColors.cardBorder} ${themeColors.cardBg} p-6 flex flex-col items-center text-center transition-transform hover:scale-105 group overflow-hidden`}
+                                className={`relative rounded-2xl border ${themeColors.border} backdrop-blur-xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:border-opacity-60 group overflow-hidden ${
+                                    isDark ? 'bg-black/30' : 'bg-white/50'
+                                }`}
                             >
+                                {/* Popular Badge */}
                                 {pkg.popular && (
-                                    <div className={`absolute top-0 right-0 ${themeColors.popularBg} text-white text-[10px] font-bold uppercase py-1 px-3 rounded-bl-xl z-20`}>
-                                        Mais Popular
+                                    <div className={`absolute -top-0 -right-0 ${themeColors.button} text-white text-[9px] font-bold uppercase py-1 px-2 rounded-bl-xl rounded-tr-xl z-20`}>
+                                        Popular
                                     </div>
                                 )}
 
-                                <div className="mb-4 relative group-hover:scale-110 transition-transform duration-300">
-                                    <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} blur-[40px] opacity-20 rounded-full`} />
+                                {/* Coin Image with Glow */}
+                                <div className="relative mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} blur-[30px] opacity-30 rounded-full`} />
                                     <img
                                         src={pkg.image}
                                         alt={`${pkg.zions} Zions`}
-                                        className="w-32 h-32 object-contain relative z-10 drop-shadow-2xl rounded-full"
-                                        style={{ backgroundColor: 'transparent' }}
+                                        className="w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-2xl"
                                     />
+                                    {/* Badge com quantidade */}
+                                    <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold ${themeColors.button} text-white border border-white/20 whitespace-nowrap`}>
+                                        {pkg.zions} ZIONS
+                                    </div>
                                 </div>
 
-                                <div className="mb-2">
-                                    <span className={`text-3xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                {/* Amount */}
+                                <div className="mt-3 mb-1">
+                                    <span className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                         {pkg.zions}
                                     </span>
-                                    <span className={`text-sm font-medium ${themeColors.text} ml-1`}>ZIONS</span>
+                                    <span className={`text-xs font-semibold ${themeColors.text} ml-1`}>Z</span>
                                 </div>
 
-                                <div className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-6">
+                                {/* Label */}
+                                <div className={`text-[10px] uppercase tracking-widest mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                     {pkg.label}
                                 </div>
 
-                                <div className="flex-1 w-full flex items-end">
-                                    <button
-                                        onClick={() => handlePurchase(pkg.zions)}
-                                        disabled={loading === pkg.zions}
-                                        className={`w-full py-3 rounded-xl font-bold text-white shadow-lg flex items-center justify-center gap-2 ${themeColors.button} transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
-                                    >
-                                        {loading === pkg.zions ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <>
-                                                <QrCode className="w-4 h-4" />
-                                                <span>R$ {pkg.price.toFixed(2).replace('.', ',')}</span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
+                                {/* Buy Button */}
+                                <button
+                                    onClick={() => handlePurchase(pkg.zions)}
+                                    disabled={loading === pkg.zions}
+                                    className={`w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-lg flex items-center justify-center gap-2 ${themeColors.button} transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                    {loading === pkg.zions ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <QrCode className="w-3.5 h-3.5" />
+                                            <span>R$ {pkg.price.toFixed(2).replace('.', ',')}</span>
+                                        </>
+                                    )}
+                                </button>
                             </div>
                         ))}
                     </div>
 
-                    <div className="mt-8 flex items-center justify-center gap-2 text-gray-500 text-sm">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span>Pagamento seguro via Mercado Pago</span>
+                    {/* Security Badge */}
+                    <div className="mt-6 flex items-center justify-center gap-2">
+                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-white/5' : 'bg-black/5'} border ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+                            <Check className="w-4 h-4 text-green-500" />
+                            <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Pagamento seguro via Mercado Pago
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

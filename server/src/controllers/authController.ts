@@ -151,14 +151,24 @@ export const register = async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 name: user.name,
+                displayName: user.displayName,
                 email: user.email,
                 role: user.role,
+                bio: user.bio,
+                avatarUrl: user.avatarUrl,
+                level: user.level || 1,
+                xp: user.xp || 0,
+                points: user.points || 0,
                 trophies: user.trophies || 0,
                 zions: user.zions || 0,
                 zionsPoints: user.zionsPoints || 0,
                 zionsCash: user.zionsCash || 0,
                 membershipType: user.membershipType,
                 isVerified: user.isVerified,
+                equippedBackground: user.equippedBackground,
+                equippedBadge: user.equippedBadge,
+                equippedColor: user.equippedColor,
+                equippedProfileBorder: user.equippedProfileBorder,
             }
         });
     } catch (error) {
@@ -277,19 +287,30 @@ export const login = async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 name: user.name,
+                displayName: user.displayName,
                 email: user.email,
                 role: user.role,
+                bio: user.bio,
+                avatarUrl: user.avatarUrl,
+                level: user.level || 1,
+                xp: user.xp || 0,
+                points: user.points || 0,
                 trophies: user.trophies || 0,
                 zions: user.zions || 0,
                 zionsPoints: user.zionsPoints || 0,
                 zionsCash: user.zionsCash || 0,
-                avatarUrl: user.avatarUrl,
                 membershipType: user.membershipType || 'MAGAZINE',
                 isVerified: user.isVerified,
                 // Customization fields for immediate style application
                 equippedBackground: user.equippedBackground,
                 equippedBadge: user.equippedBadge,
                 equippedColor: user.equippedColor,
+                equippedProfileBorder: user.equippedProfileBorder,
+                // Profile card background settings
+                profileBgUrl: user.profileBgUrl,
+                profileBgScale: user.profileBgScale,
+                profileBgPosX: user.profileBgPosX,
+                profileBgPosY: user.profileBgPosY,
                 ownedCustomizations: user.ownedCustomizations ? JSON.parse(user.ownedCustomizations) : []
             }
         });

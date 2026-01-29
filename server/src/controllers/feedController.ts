@@ -25,6 +25,7 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
         const skip = (page - 1) * limit;
+        const userId = req.user?.userId;
 
         const posts = await prisma.post.findMany({
             skip,
@@ -53,15 +54,50 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
                         priceZions: true,
                         priceBRL: true,
                     }
+                },
+                // Enquete
+                pollOptions: {
+                    include: {
+                        votes: {
+                            select: { id: true, userId: true }
+                        }
+                    }
                 }
             },
         });
 
-        const formattedPosts = posts.map((post) => ({
-            ...post,
-            isLiked: post.likes.length > 0,
-            likes: undefined, // Remove raw likes array
-        }));
+        const formattedPosts = posts.map((post) => {
+            // Processar enquete se existir
+            const hasPoll = post.pollOptions && post.pollOptions.length > 0;
+            let pollData = null;
+            if (hasPoll) {
+                const totalVotes = post.pollOptions.reduce((acc, opt) => acc + opt.votes.length, 0);
+                const userVotedOptionId = post.pollOptions.find(opt => 
+                    opt.votes.some(v => v.userId === userId)
+                )?.id || null;
+                
+                pollData = {
+                    question: post.pollQuestion || post.caption,
+                    options: post.pollOptions.map(opt => ({
+                        id: opt.id,
+                        text: opt.text,
+                        votesCount: opt.votes.length,
+                        percentage: totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0,
+                        isVoted: opt.votes.some(v => v.userId === userId)
+                    })),
+                    totalVotes,
+                    userVotedOptionId
+                };
+            }
+
+            return {
+                ...post,
+                isLiked: post.likes.length > 0,
+                likes: undefined,
+                pollOptions: undefined, // Remove raw poll data
+                poll: pollData
+            };
+        });
 
         res.json(formattedPosts);
     } catch (error) {

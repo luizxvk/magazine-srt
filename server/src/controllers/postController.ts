@@ -12,6 +12,9 @@ const createPostSchema = z.object({
     isHighlight: z.boolean().optional(),
     mediaType: z.enum(['IMAGE', 'VIDEO', 'TEXT']).default('IMAGE'),
     linkedProductId: z.string().nullable().optional(),
+    // Enquete
+    pollQuestion: z.string().optional(),
+    pollOptions: z.array(z.string()).optional(),
 });
 
 export const createPost = async (req: AuthRequest, res: Response) => {
@@ -71,9 +74,13 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                 isHighlight: data.isHighlight || false,
                 mediaType: data.mediaType,
                 linkedProductId: validLinkedProductId,
+                pollQuestion: data.pollOptions?.length ? (data.pollQuestion || data.caption || 'Enquete') : null,
                 tags: {
                     create: data.tags?.map(tag => ({ tag })) || [],
                 },
+                pollOptions: data.pollOptions?.length ? {
+                    create: data.pollOptions.filter(opt => opt.trim()).map(text => ({ text }))
+                } : undefined,
             },
             include: {
                 user: {
@@ -85,6 +92,11 @@ export const createPost = async (req: AuthRequest, res: Response) => {
                     }
                 },
                 tags: true,
+                pollOptions: {
+                    include: {
+                        votes: true
+                    }
+                },
                 linkedProduct: {
                     select: {
                         id: true,
@@ -229,5 +241,58 @@ export const getComments = async (req: AuthRequest, res: Response) => {
         res.json(comments);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Votar em uma enquete
+export const votePoll = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Não autorizado' });
+
+        const { optionId } = req.body;
+        if (!optionId) return res.status(400).json({ error: 'ID da opção é obrigatório' });
+
+        // Verificar se a opção existe e obter o postId
+        const option = await prisma.pollOption.findUnique({
+            where: { id: optionId },
+            include: { post: true }
+        });
+
+        if (!option) return res.status(404).json({ error: 'Opção não encontrada' });
+
+        // Verificar se o usuário já votou em alguma opção deste post
+        const existingVote = await prisma.pollVote.findFirst({
+            where: {
+                userId,
+                option: {
+                    postId: option.postId
+                }
+            }
+        });
+
+        if (existingVote) {
+            // Se votou na mesma opção, remove o voto
+            if (existingVote.optionId === optionId) {
+                await prisma.pollVote.delete({ where: { id: existingVote.id } });
+                return res.json({ message: 'Voto removido', voted: false });
+            }
+            // Se votou em outra opção, muda o voto
+            await prisma.pollVote.update({
+                where: { id: existingVote.id },
+                data: { optionId }
+            });
+            return res.json({ message: 'Voto alterado', voted: true, optionId });
+        }
+
+        // Criar novo voto
+        await prisma.pollVote.create({
+            data: { optionId, userId }
+        });
+
+        res.json({ message: 'Voto registrado', voted: true, optionId });
+    } catch (error) {
+        console.error('Error voting on poll:', error);
+        res.status(500).json({ error: 'Erro ao votar' });
     }
 };

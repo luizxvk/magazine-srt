@@ -82,6 +82,7 @@ model User {
   socialConnections      SocialConnection[]
   socialActivities       SocialActivity[]
   pushSubscriptions      PushSubscription[]
+  pollVotes              PollVote[]
 
   @@index([membershipType])
   @@index([isOnline])
@@ -133,25 +134,28 @@ model Message {
 }
 
 model Post {
-  id              String    @id @default(uuid())
+  id              String       @id @default(uuid())
   userId          String
   imageUrl        String?
   videoUrl        String?
   caption         String?
-  likesCount      Int       @default(0)
-  commentsCount   Int       @default(0)
-  isHighlight     Boolean   @default(false)
-  mediaType       MediaType @default(IMAGE)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  isPublic        Boolean   @default(true)
-  isRemoved       Boolean   @default(false)
-  reportsCount    Int       @default(0)
-  linkedProductId String?   // ID do produto vinculado (para destaques de loja)
-  linkedProduct   Product?  @relation("PostProduct", fields: [linkedProductId], references: [id])
+  likesCount      Int          @default(0)
+  commentsCount   Int          @default(0)
+  isHighlight     Boolean      @default(false)
+  mediaType       MediaType    @default(IMAGE)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  isPublic        Boolean      @default(true)
+  isRemoved       Boolean      @default(false)
+  reportsCount    Int          @default(0)
+  linkedProductId String?      // ID do produto vinculado (para destaques de loja)
+  // Poll fields
+  pollQuestion    String?      // Pergunta da enquete (opcional, usa caption se vazio)
+  pollOptions     PollOption[] // Opções da enquete
+  linkedProduct   Product?     @relation("PostProduct", fields: [linkedProductId], references: [id])
   comments        Comment[]
   likes           Like[]
-  user            User      @relation(fields: [userId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
   tags            PostTag[]
 
   @@index([userId])
@@ -159,6 +163,31 @@ model Post {
   @@index([isHighlight])
   @@index([isRemoved])
   @@index([linkedProductId])
+}
+
+// Enquete - Opção de votação
+model PollOption {
+  id        String     @id @default(uuid())
+  postId    String
+  text      String
+  votes     PollVote[]
+  post      Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+// Enquete - Voto do usuário
+model PollVote {
+  id        String     @id @default(uuid())
+  optionId  String
+  userId    String
+  createdAt DateTime   @default(now())
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, userId]) // Um voto por usuário por opção
+  @@index([optionId])
+  @@index([userId])
 }
 
 model Comment {

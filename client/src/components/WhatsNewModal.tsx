@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Palette, Trophy, ShoppingBag, Award, Check } from 'lucide-react';
+import { X, Sparkles, BarChart3, Clock, CreditCard, RefreshCw, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.20';
+const CURRENT_VERSION = '0.4.21';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,36 +33,36 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.20 - MEGA ATUALIZAÇÃO: BORDAS E CONQUISTAS
+    // v0.4.21 - Enquetes, Limpeza de Grupos, Zions Card Redesign
     const updates: UpdateItem[] = [
         {
-            icon: <Palette className="w-5 h-5 text-pink-400" />,
-            title: '35 Bordas de Perfil',
-            description: 'Nova coleção completa: Aurora, Neon, Holographic, Cosmic, Phoenix e muito mais!',
+            icon: <BarChart3 className="w-5 h-5 text-purple-400" />,
+            title: 'Enquetes nos Posts',
+            description: 'Crie votações estilo WhatsApp! Adicione até 4 opções e veja resultados em tempo real.',
             isNew: true
         },
         {
-            icon: <Trophy className="w-5 h-5 text-amber-400" />,
-            title: '43 Conquistas',
-            description: 'Sistema completo de badges! De "Primeira Voz" até "Lenda" com 120+ badges coletados.',
+            icon: <Clock className="w-5 h-5 text-amber-400" />,
+            title: 'Mensagens Temporárias',
+            description: 'Grupos públicos agora limpam mensagens após 7 dias automaticamente.',
             isNew: true
         },
         {
-            icon: <Award className="w-5 h-5 text-purple-400" />,
-            title: 'Badges Automáticos',
-            description: 'Conquistas são desbloqueadas automaticamente ao atingir marcos de atividade.',
+            icon: <CreditCard className="w-5 h-5 text-emerald-400" />,
+            title: 'Loja de Zions Redesenhada',
+            description: 'Visual premium estilo Apple Vision Pro com glass morphism.',
             isNew: true
         },
         {
-            icon: <ShoppingBag className="w-5 h-5 text-emerald-400" />,
-            title: 'Loja Expandida',
-            description: 'Bordas organizadas por faixa de preço: de gratuitas até 2500 Zions!',
+            icon: <RefreshCw className="w-5 h-5 text-cyan-400" />,
+            title: 'Carregamento Instantâneo',
+            description: 'Dados do perfil (nível, bordas, background) carregam imediatamente ao logar.',
             isNew: true
         },
         {
-            icon: <Sparkles className="w-5 h-5 text-cyan-400" />,
-            title: 'Bordas no Feed',
-            description: 'Seu avatar agora mostra a borda equipada em posts e ranking.',
+            icon: <Sparkles className="w-5 h-5 text-pink-400" />,
+            title: 'Tabs Responsivas',
+            description: 'Loja de personalização com scroll horizontal no mobile.',
         }
     ];
 

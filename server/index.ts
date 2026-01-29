@@ -37,6 +37,7 @@ import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddlew
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
 import { runVerificationCronJobs } from './src/services/verificationCronService';
 import { reportMetricsToRovex, isRovexConfigured } from './src/services/rovexService';
+import { cleanupExpiredGroupMessages } from './src/services/groupMessageCleanupService';
 
 dotenv.config();
 
@@ -161,6 +162,21 @@ if (!isServerless) {
         runVerificationCronJobs().catch(err =>
             console.error('Initial cron job error:', err)
         );
+
+        // === GROUP MESSAGE CLEANUP ===
+        // Clean expired group messages every 6 hours
+        setInterval(() => {
+            cleanupExpiredGroupMessages().catch(err =>
+                console.error('[GroupCleanup] Cron job error:', err)
+            );
+        }, 6 * 60 * 60 * 1000); // 6 hours
+
+        // Run cleanup on startup (after 30 seconds)
+        setTimeout(() => {
+            cleanupExpiredGroupMessages().catch(err =>
+                console.error('[GroupCleanup] Initial cleanup error:', err)
+            );
+        }, 30 * 1000);
 
         // === ROVEX INTEGRATION ===
         // Report metrics to Rovex Platform every 5 minutes

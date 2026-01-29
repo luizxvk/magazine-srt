@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Send, ChevronDown, ChevronUp, Users, X } from 'lucide-react';
+import { MessageCircle, Send, ChevronDown, ChevronUp, Users, X, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -292,6 +292,12 @@ export default function GroupChatCard() {
 
             {/* Messages */}
             <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-2 space-y-2 bg-black/10">
+              {/* Auto-delete warning */}
+              <div className="flex items-center justify-center gap-1 py-1 px-2 mx-auto w-fit rounded-full bg-amber-500/10 border border-amber-500/20">
+                <Clock className="w-3 h-3 text-amber-400" />
+                <span className="text-[10px] text-amber-400">Mensagens são apagadas após 7 dias</span>
+              </div>
+
               {messages.map((msg) => {
                 const isMe = msg.sender.id === user?.id;
                 return (

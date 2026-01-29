@@ -565,19 +565,19 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                         )}
                     </AnimatePresence>
 
-                    {/* Tabs */}
-                    <div className={`flex border-b ${borderColor}`}>
+                    {/* Tabs - scroll horizontal para caber todos */}
+                    <div className={`flex border-b ${borderColor} overflow-x-auto scrollbar-hide`}>
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
+                                className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${activeTab === tab.id
                                     ? `text-${themeColor}-400 border-b-2 border-${themeColor}-400 bg-${themeColor}-500/5`
                                     : `${textSub} ${isDarkMode ? 'hover:text-white hover:bg-white/5' : 'hover:text-gray-900 hover:bg-gray-100'}`
                                     }`}
                             >
-                                <tab.icon className="w-4 h-4" />
-                                {tab.label}
+                                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                <span className="hidden xs:inline sm:inline">{tab.label}</span>
                             </button>
                         ))}
                     </div>

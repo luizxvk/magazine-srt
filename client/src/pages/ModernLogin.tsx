@@ -84,7 +84,18 @@ export default function ModernLogin() {
                 return;
             }
             
-            login(response.data.token, response.data.user, membershipContext);
+            // Store token first
+            localStorage.setItem('token', response.data.token);
+            
+            // Fetch complete user data from /users/me to ensure all fields are loaded
+            try {
+                const fullUserRes = await api.get('/users/me');
+                login(response.data.token, fullUserRes.data, membershipContext);
+            } catch {
+                // Fallback to login response data if /users/me fails
+                login(response.data.token, response.data.user, membershipContext);
+            }
+            
             navigate('/feed');
         } catch (error: any) {
             console.error('Login failed', error);

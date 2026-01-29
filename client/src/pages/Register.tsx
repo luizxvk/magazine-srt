@@ -86,7 +86,19 @@ export default function Register() {
                 membershipType,
                 avatarUrl: avatarBase64 || undefined
             });
-            login(response.data.token, response.data.user, membershipType);
+            
+            // Store token first
+            localStorage.setItem('token', response.data.token);
+            
+            // Fetch complete user data from /users/me to ensure all fields are loaded
+            try {
+                const fullUserRes = await api.get('/users/me');
+                login(response.data.token, fullUserRes.data, membershipType);
+            } catch {
+                // Fallback to register response data if /users/me fails
+                login(response.data.token, response.data.user, membershipType);
+            }
+            
             navigate('/feed');
         } catch (error: any) {
             console.error('Registration failed', error);

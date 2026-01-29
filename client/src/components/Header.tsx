@@ -16,6 +16,7 @@ import RadioCard from './RadioCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 import { getContrastColor } from '../utils/colorUtils';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface HeaderProps {
     onOpenShop?: () => void;
@@ -414,7 +415,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         </div>
 
                         <div className="relative flex-shrink-0">
-                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full p-[1px]`} style={{ background: user?.equippedColor ? `linear-gradient(135deg, ${user.equippedColor}, ${user.equippedColor}dd)` : (isMGT ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #d4af37, #b8941e)') }}>
+                            <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full p-[2px]`} style={{ background: getProfileBorderGradient(user?.equippedProfileBorder, isMGT) }}>
                                 <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
                                     {user?.avatarUrl ? (
                                         <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
@@ -516,7 +517,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         onClick={() => setIsMobileDrawerOpen(false)}
                                         className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors`}
                                     >
-                                        <div className={`w-12 h-12 rounded-full p-[1px]`} style={{ background: user.equippedColor ? `linear-gradient(135deg, ${user.equippedColor}, ${user.equippedColor}dd)` : (isMGT ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #d4af37, #b8941e)') }}>
+                                        <div className={`w-12 h-12 rounded-full p-[2px]`} style={{ background: getProfileBorderGradient(user.equippedProfileBorder, isMGT) }}>
                                             <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
                                                 {user.avatarUrl ? (
                                                     <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />

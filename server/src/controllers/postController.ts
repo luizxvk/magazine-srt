@@ -131,6 +131,8 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
                         name: true,
                         avatarUrl: true,
                         trophies: true,
+                        membershipType: true,
+                        equippedProfileBorder: true,
                     }
                 },
                 tags: true,

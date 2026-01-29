@@ -3,6 +3,7 @@ import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock } from 'lucide-r
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface CreatePostCardProps {
     onPostCreated: () => void;
@@ -111,11 +112,13 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             {/* Header with user info */}
             <div className="p-4 flex items-center gap-3">
                 <div className="relative">
-                    <img
-                        src={user?.avatarUrl || `https://ui-avatars.com/api/?name=${user?.name}&background=random`}
-                        alt={user?.name}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
-                    />
+                    <div className="w-12 h-12 rounded-full p-[2px]" style={{ background: getProfileBorderGradient(user?.equippedProfileBorder, isMGT) }}>
+                        <img
+                            src={user?.avatarUrl || `https://ui-avatars.com/api/?name=${user?.name}&background=random`}
+                            alt={user?.name}
+                            className="w-full h-full rounded-full object-cover bg-black"
+                        />
+                    </div>
                     <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${accentBg} rounded-full border-2 ${theme === 'light' ? 'border-white' : 'border-[#1a1a1a]'}`} />
                 </div>
                 <div className="flex-1">

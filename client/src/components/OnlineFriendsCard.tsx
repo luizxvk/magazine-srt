@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ChatWindow from './ChatWindow';
 import BadgeDisplay from './BadgeDisplay';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface OnlineFriend {
     id: string;
@@ -15,6 +16,7 @@ interface OnlineFriend {
     lastSeenAt?: string;
     membershipType?: string;
     doNotDisturb?: boolean;
+    equippedProfileBorder?: string | null;
 }
 
 interface OnlineFriendsCardProps {
@@ -133,17 +135,19 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="relative shrink-0">
-                                                {friend.avatarUrl ? (
-                                                    <img
-                                                        src={friend.avatarUrl}
-                                                        alt={friend.displayName || friend.name}
-                                                        className="w-10 h-10 min-w-[40px] rounded-full object-cover border border-white/20 aspect-square"
-                                                    />
-                                                ) : (
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${themeBg}`}>
-                                                        <User className={`w-5 h-5 ${themeAccent}`} />
-                                                    </div>
-                                                )}
+                                                <div className="w-10 h-10 min-w-[40px] rounded-full p-[2px]" style={{ background: getProfileBorderGradient(friend.equippedProfileBorder, friendMGT) }}>
+                                                    {friend.avatarUrl ? (
+                                                        <img
+                                                            src={friend.avatarUrl}
+                                                            alt={friend.displayName || friend.name}
+                                                            className="w-full h-full rounded-full object-cover aspect-square bg-black"
+                                                        />
+                                                    ) : (
+                                                        <div className={`w-full h-full rounded-full flex items-center justify-center bg-black`}>
+                                                            <User className={`w-5 h-5 ${themeAccent}`} />
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 {/* Online indicator - red if DND, green if online */}
                                                 <span className={`absolute bottom-0 right-0 w-3 h-3 ${friend.doNotDisturb ? 'bg-red-500' : 'bg-green-500'} rounded-full border-2 border-black`} />
                                             </div>
@@ -189,6 +193,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                     otherUserName={chatOpen.displayName || chatOpen.name}
                     otherUserAvatar={chatOpen.avatarUrl}
                     otherUserMembershipType={chatOpen.membershipType}
+                    otherUserProfileBorder={chatOpen.equippedProfileBorder}
                     onClose={() => setChatOpen(null)}
                 />,
                 document.body

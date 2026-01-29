@@ -34,6 +34,8 @@ interface Post {
         name: string;
         avatarUrl: string;
         trophies: number;
+        membershipType?: string;
+        equippedProfileBorder?: string | null;
     };
     content: string;
     image?: string;
@@ -368,6 +370,8 @@ export default function FeedPage() {
                                                 author={post.author.name}
                                                 authorAvatar={post.author.avatarUrl}
                                                 authorId={post.author.id}
+                                                authorProfileBorder={post.author.equippedProfileBorder}
+                                                authorMembershipType={post.author.membershipType}
                                                 likes={post.likes}
                                                 comments={post.comments}
                                                 isLiked={post.isLiked}

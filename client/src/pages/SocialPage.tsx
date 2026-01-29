@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from '../components/ModernLoader';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface Friend {
     id: string;
@@ -15,6 +16,8 @@ interface Friend {
     avatarUrl?: string;
     trophies: number;
     level: number;
+    membershipType?: string;
+    equippedProfileBorder?: string | null;
 }
 
 interface FriendRequest {
@@ -25,6 +28,7 @@ interface FriendRequest {
         displayName?: string;
         avatarUrl?: string;
         trophies: number;
+        equippedProfileBorder?: string | null;
     };
 }
 
@@ -262,14 +266,16 @@ export default function SocialPage() {
                             friends.length > 0 ? (
                                 friends.map(friend => (
                                     <div key={friend.id} className={`glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4 ${themeHoverBorder} transition-colors group cursor-pointer`} onClick={() => navigate(`/profile?id=${friend.id}`)}>
-                                        <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
-                                            {friend.avatarUrl ? (
-                                                <img src={friend.avatarUrl} alt={friend.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                                    <Users className="w-5 h-5 text-gray-500" />
-                                                </div>
-                                            )}
+                                        <div className="w-12 h-12 rounded-full p-[2px] shrink-0" style={{ background: getProfileBorderGradient(friend.equippedProfileBorder, friend.membershipType === 'MGT') }}>
+                                            <div className="w-full h-full rounded-full bg-black overflow-hidden">
+                                                {friend.avatarUrl ? (
+                                                    <img src={friend.avatarUrl} alt={friend.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                        <Users className="w-5 h-5 text-gray-500" />
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h3 className={`text-white font-medium truncate group-hover:${themeColor} transition-colors`}>
@@ -303,14 +309,16 @@ export default function SocialPage() {
                                 {requests.length > 0 ? (
                                 requests.map(req => (
                                     <div key={req.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4">
-                                        <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
-                                            {req.requester.avatarUrl ? (
-                                                <img src={req.requester.avatarUrl} alt={req.requester.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                                    <Users className="w-5 h-5 text-gray-500" />
-                                                </div>
-                                            )}
+                                        <div className="w-12 h-12 rounded-full p-[2px] shrink-0" style={{ background: getProfileBorderGradient(req.requester.equippedProfileBorder, false) }}>
+                                            <div className="w-full h-full rounded-full bg-black overflow-hidden">
+                                                {req.requester.avatarUrl ? (
+                                                    <img src={req.requester.avatarUrl} alt={req.requester.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                        <Users className="w-5 h-5 text-gray-500" />
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h3 className="text-white font-medium truncate">
@@ -397,14 +405,16 @@ export default function SocialPage() {
                                 <>
                                     {recommended.map(rec => (
                                         <div key={rec.id} className={`glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4 ${themeHoverBorder} transition-colors group cursor-pointer`} onClick={() => navigate(`/profile?id=${rec.id}`)}>
-                                            <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
-                                                {rec.avatarUrl ? (
-                                                    <img src={rec.avatarUrl} alt={rec.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                                        <Users className="w-5 h-5 text-gray-500" />
-                                                    </div>
-                                                )}
+                                            <div className="w-12 h-12 rounded-full p-[2px] shrink-0" style={{ background: getProfileBorderGradient(rec.equippedProfileBorder, rec.membershipType === 'MGT') }}>
+                                                <div className="w-full h-full rounded-full bg-black overflow-hidden">
+                                                    {rec.avatarUrl ? (
+                                                        <img src={rec.avatarUrl} alt={rec.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                            <Users className="w-5 h-5 text-gray-500" />
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h3 className={`text-white font-medium truncate group-hover:${themeColor} transition-colors`}>

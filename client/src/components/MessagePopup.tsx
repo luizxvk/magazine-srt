@@ -16,6 +16,7 @@ interface UnreadMessage {
         name: string;
         avatarUrl: string | null;
         membershipType?: 'MAGAZINE' | 'MGT';
+        equippedProfileBorder?: string | null;
     };
 }
 
@@ -184,6 +185,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                     otherUserName={unreadMessage.sender.name}
                     otherUserAvatar={unreadMessage.sender.avatarUrl}
                     otherUserMembershipType={unreadMessage.sender.membershipType}
+                    otherUserProfileBorder={unreadMessage.sender.equippedProfileBorder}
                     onClose={handleCloseChat}
                 />
             )}

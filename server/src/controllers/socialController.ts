@@ -229,10 +229,10 @@ export const getFriends = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true, equippedProfileBorder: true }
                 },
                 addressee: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true, equippedProfileBorder: true }
                 }
             }
         });
@@ -267,10 +267,10 @@ export const getOnlineFriends = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true, equippedProfileBorder: true }
                 },
                 addressee: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true, equippedProfileBorder: true }
                 }
             }
         });
@@ -340,7 +340,7 @@ export const getPendingRequests = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true }
+                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, equippedProfileBorder: true }
                 }
             }
         });

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Sparkles, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface LinkedProduct {
     id: string;
@@ -20,6 +21,8 @@ interface CarouselPost {
     author: {
         name: string;
         avatarUrl: string;
+        membershipType?: string;
+        equippedProfileBorder?: string | null;
     };
     linkedProduct?: LinkedProduct | null;
 }
@@ -146,11 +149,11 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                             )}
 
                             <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-full p-0.5 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
+                                <div className="w-8 h-8 rounded-full p-[2px]" style={{ background: getProfileBorderGradient(currentPost.author.equippedProfileBorder, currentPost.author.membershipType === 'MGT') }}>
                                     <img
                                         src={currentPost.author.avatarUrl}
                                         alt={currentPost.author.name}
-                                        className="w-full h-full rounded-full object-cover"
+                                        className="w-full h-full rounded-full object-cover bg-black"
                                     />
                                 </div>
                                 <span className="text-sm text-gray-300 font-medium">

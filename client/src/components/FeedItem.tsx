@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import BadgeDisplay from './BadgeDisplay';
 import VisitorBlockPopup from './VisitorBlockPopup';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface FeedItemProps {
     id: string | number;
@@ -16,6 +17,8 @@ interface FeedItemProps {
     author: string;
     authorAvatar?: string;
     authorId?: string; // To check ownership
+    authorProfileBorder?: string | null;
+    authorMembershipType?: string;
     likes: number;
     comments: number;
     isLiked?: boolean;
@@ -108,6 +111,8 @@ export default function FeedItem({
     author,
     authorAvatar,
     authorId,
+    authorProfileBorder,
+    authorMembershipType,
     likes,
     comments,
     isLiked,
@@ -204,12 +209,14 @@ export default function FeedItem({
             <div className={`p-6 flex flex-col flex-1 relative ${theme === 'light' ? 'bg-white/80' : 'bg-black/40'} backdrop-blur-sm ${!(image || video) ? 'min-h-[200px]' : ''}`}>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center overflow-hidden ${isMGT ? 'bg-emerald-500/20 border-red-500/50' : 'bg-gold-500/20 border-gold-500/50'}`}>
-                            {authorAvatar ? (
-                                <img src={authorAvatar} alt={author} className="w-full h-full object-cover" />
-                            ) : (
-                                <div className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />
-                            )}
+                        <div className="w-8 h-8 rounded-full p-[2px]" style={{ background: getProfileBorderGradient(authorProfileBorder, authorMembershipType === 'MGT') }}>
+                            <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center">
+                                {authorAvatar ? (
+                                    <img src={authorAvatar} alt={author} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />
+                                )}
+                            </div>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">{author}</span>

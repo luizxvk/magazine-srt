@@ -328,6 +328,7 @@ export default function ProfilePage() {
                     otherUserName={profileUser.displayName || profileUser.name}
                     otherUserAvatar={profileUser.avatarUrl}
                     otherUserMembershipType={profileUser.membershipType}
+                    otherUserProfileBorder={profileUser.equippedProfileBorder}
                     onClose={() => setIsChatOpen(false)}
                 />
             )}

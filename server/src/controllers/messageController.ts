@@ -45,7 +45,9 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response) => {
                         id: true,
                         name: true,
                         avatarUrl: true,
-                        deletedAt: true
+                        deletedAt: true,
+                        membershipType: true,
+                        equippedProfileBorder: true
                     }
                 },
                 receiver: {
@@ -53,7 +55,9 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response) => {
                         id: true,
                         name: true,
                         avatarUrl: true,
-                        deletedAt: true
+                        deletedAt: true,
+                        membershipType: true,
+                        equippedProfileBorder: true
                     }
                 }
             }
@@ -121,7 +125,9 @@ export const getConversation = async (req: AuthenticatedRequest, res: Response) 
                         id: true,
                         name: true,
                         avatarUrl: true,
-                        deletedAt: true
+                        deletedAt: true,
+                        membershipType: true,
+                        equippedProfileBorder: true
                     }
                 }
             }
@@ -160,7 +166,9 @@ export const getRecentConversations = async (req: AuthenticatedRequest, res: Res
                         id: true,
                         name: true,
                         avatarUrl: true,
-                        deletedAt: true
+                        deletedAt: true,
+                        membershipType: true,
+                        equippedProfileBorder: true
                     }
                 },
                 receiver: {
@@ -168,7 +176,9 @@ export const getRecentConversations = async (req: AuthenticatedRequest, res: Res
                         id: true,
                         name: true,
                         avatarUrl: true,
-                        deletedAt: true
+                        deletedAt: true,
+                        membershipType: true,
+                        equippedProfileBorder: true
                     }
                 }
             }

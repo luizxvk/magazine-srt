@@ -3,6 +3,7 @@ import { Send, X, User, Minimize2, Eye, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from './ModernLoader';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 // ChatWindow Component - Vision Pro Style (SRT Edition)
 interface Message {
@@ -25,10 +26,11 @@ interface ChatWindowProps {
     otherUserName: string;
     otherUserAvatar?: string | null;
     otherUserMembershipType?: string;
+    otherUserProfileBorder?: string | null;
     onClose: () => void;
 }
 
-export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, onClose }: ChatWindowProps) {
+export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, otherUserProfileBorder, onClose }: ChatWindowProps) {
     const { user, theme, setActiveChatUserId, showError } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -155,14 +157,16 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                 {/* Glassy Header */}
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-xl z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-black overflow-visible border border-gold-500/30 shadow-inner relative group">
-                            {otherUserAvatar ? (
-                                <img src={otherUserAvatar} alt={otherUserName} className="w-full h-full rounded-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full rounded-full flex items-center justify-center text-gray-400 bg-neutral-900">
-                                    <User className="w-5 h-5" />
-                                </div>
-                            )}
+                        <div className="w-10 h-10 rounded-full p-[2px] relative" style={{ background: getProfileBorderGradient(otherUserProfileBorder, isOtherMGT) }}>
+                            <div className="w-full h-full rounded-full bg-black overflow-hidden">
+                                {otherUserAvatar ? (
+                                    <img src={otherUserAvatar} alt={otherUserName} className="w-full h-full rounded-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full rounded-full flex items-center justify-center text-gray-400 bg-neutral-900">
+                                        <User className="w-5 h-5" />
+                                    </div>
+                                )}
+                            </div>
                             {/* Online Indicator */}
                             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
                         </div>

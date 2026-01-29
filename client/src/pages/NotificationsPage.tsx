@@ -22,6 +22,7 @@ interface ChatUser {
     name: string;
     avatarUrl: string | null;
     membershipType?: 'MAGAZINE' | 'MGT';
+    equippedProfileBorder?: string | null;
 }
 
 export default function NotificationsPage() {
@@ -162,6 +163,7 @@ export default function NotificationsPage() {
                     otherUserName={chatUser.name}
                     otherUserAvatar={chatUser.avatarUrl}
                     otherUserMembershipType={chatUser.membershipType}
+                    otherUserProfileBorder={chatUser.equippedProfileBorder}
                     onClose={() => setChatUser(null)}
                 />
             )}

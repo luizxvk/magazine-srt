@@ -647,6 +647,25 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'color_pastel_sage', name: 'Sálvia Pastel', price: 350, hex: '#9dc183' },
         { id: 'color_pastel_butter', name: 'Manteiga Pastel', price: 350, hex: '#fffacd' },
         { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', price: 350, hex: '#ccccff' },
+    ],
+    profileBorders: [
+        { id: 'border_gold', name: 'Dourado (Magazine)', price: 0, preview: '🟡' },
+        { id: 'border_emerald', name: 'Esmeralda (MGT)', price: 0, preview: '💚' },
+        { id: 'border_pastel_pink', name: 'Rosa Pastel', price: 400, preview: '🌸' },
+        { id: 'border_pastel_lavender', name: 'Lavanda Pastel', price: 400, preview: '💜' },
+        { id: 'border_rose', name: 'Rosa', price: 500, preview: '🌹' },
+        { id: 'border_blue', name: 'Azul', price: 500, preview: '💙' },
+        { id: 'border_purple', name: 'Roxo', price: 500, preview: '💟' },
+        { id: 'border_green', name: 'Verde', price: 500, preview: '💚' },
+        { id: 'border_red', name: 'Vermelho', price: 500, preview: '❤️' },
+        { id: 'border_cyan', name: 'Ciano', price: 500, preview: '🩵' },
+        { id: 'border_orange', name: 'Laranja', price: 500, preview: '🧡' },
+        { id: 'border_midnight', name: 'Meia-Noite', price: 600, preview: '🌙' },
+        { id: 'border_ice', name: 'Gelo', price: 800, preview: '❄️' },
+        { id: 'border_sunset', name: 'Pôr do Sol', price: 900, preview: '🌅' },
+        { id: 'border_fire', name: 'Chamas', price: 1000, preview: '🔥' },
+        { id: 'border_galaxy', name: 'Galáxia', price: 1200, preview: '🌌' },
+        { id: 'border_rainbow', name: 'Arco-Íris', price: 1500, preview: '🌈' },
     ]
 };
 

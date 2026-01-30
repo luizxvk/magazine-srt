@@ -66,7 +66,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         // If preview is active and has badge, use preview badge
         if (previewTheme?.badgeUrl) {
             const isLocal = previewTheme.badgeUrl.startsWith('/');
-            return <img src={previewTheme.badgeUrl} alt="Preview Badge" className={`object-contain ${isLocal ? 'w-8 h-8' : 'w-4 h-4'}`} />;
+            return <img src={previewTheme.badgeUrl} alt="Preview Badge" className={`object-contain ${isLocal ? 'w-12 h-12' : 'w-4 h-4'}`} />;
         }
         
         // If equipped badge is a URL (from theme pack)
@@ -78,7 +78,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         if (equippedBadge && BADGE_URLS[equippedBadge]) {
             const badgeUrl = BADGE_URLS[equippedBadge];
             const isLocal = badgeUrl.startsWith('/');
-            return <img src={badgeUrl} alt="Badge" className={`object-contain ${isLocal ? 'w-8 h-8' : 'w-4 h-4'}`} />;
+            return <img src={badgeUrl} alt="Badge" className={`object-contain ${isLocal ? 'w-12 h-12' : 'w-4 h-4'}`} />;
         }
         
         // No badge equipped - no default for anyone

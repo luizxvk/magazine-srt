@@ -1,4 +1,4 @@
-import { Search, User, X, Menu } from 'lucide-react';
+import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -13,7 +13,6 @@ import GroupChatCard from './GroupChatCard';
 import CustomizationShop from './CustomizationShop';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import RadioCard from './RadioCard';
-import AccentIcon from './AccentIcon';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 import { getContrastColor } from '../utils/colorUtils';
@@ -161,18 +160,18 @@ export default function Header({ onOpenShop }: HeaderProps) {
     }, [isMobileDrawerOpen, setIsMobileDrawerOpen]);
 
     const menuItems = [
-        { icon: <AccentIcon icon="feed" size={20} />, label: 'Feed', path: '/feed' },
-        { icon: <AccentIcon icon="star" size={20} />, label: 'Destaques', path: '/highlights' },
-        { icon: <AccentIcon icon="shoppingbag" size={20} />, label: 'Loja de Produtos', path: '/store' },
-        { icon: <AccentIcon icon="trophy" size={20} />, label: 'Ranking', path: '/ranking' },
-        { icon: <AccentIcon icon="social" size={20} />, label: 'Social', path: '/social' },
-        { icon: <AccentIcon icon="groups" size={20} />, label: 'Grupos', path: '/groups' },
-        { icon: <AccentIcon icon="feed" size={20} />, label: 'Mercado', path: '/market' },
-        { icon: <AccentIcon icon="ticket" size={20} />, label: 'Recompensas', path: '/rewards' },
-        { icon: <AccentIcon icon="roadmap" size={20} />, label: 'Roadmap', path: '/roadmap' },
-        { icon: <AccentIcon icon="notifications" size={20} />, label: 'Notificações', path: '/notifications', badge: hasUnread },
-        { icon: <AccentIcon icon="settings" size={20} />, label: 'Configurações', path: '/settings' },
-        ...(user?.role === 'ADMIN' ? [{ icon: <AccentIcon icon="settings" size={20} />, label: 'Admin', path: '/admin' }] : []),
+        { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
+        { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
+        { icon: <ShoppingBag className="w-5 h-5" />, label: 'Loja de Produtos', path: '/store' },
+        { icon: <Trophy className="w-5 h-5" />, label: 'Ranking', path: '/ranking' },
+        { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
+        { icon: <MessageCircle className="w-5 h-5" />, label: 'Grupos', path: '/groups' },
+        { icon: <Store className="w-5 h-5" />, label: 'Mercado', path: '/market' },
+        { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
+        { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
+        { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
+        { icon: <Settings className="w-5 h-5" />, label: 'Configurações', path: '/settings' },
+        ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: 'Admin', path: '/admin' }] : []),
     ];
 
     return (
@@ -273,10 +272,11 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         <button
                             onClick={() => onOpenShop ? onOpenShop() : setIsShopOpen(true)}
                             className="p-2 transition-all hover:scale-110"
+                            style={{ color: accentColor }}
                             aria-label="Loja"
                             title="Loja de Personalização"
                         >
-                            <AccentIcon icon="feed" size={20} />
+                            <Store className="w-5 h-5" />
                         </button>
 
                         <Link 
@@ -289,20 +289,21 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 }
                             }}
                             className="relative p-2 transition-all hover:scale-110"
+                            style={{ color: accentColor }}
                             aria-label="Social"
                         >
-                            <AccentIcon icon="social" size={20} />
+                            <Users className="w-5 h-5" />
                         </Link>
 
-                        <Link to="/groups" className="relative p-2 transition-all hover:scale-110" aria-label="Grupos" title="Grupos">
-                            <AccentIcon icon="groups" size={20} />
+                        <Link to="/groups" className="relative p-2 transition-all hover:scale-110" style={{ color: accentColor }} aria-label="Grupos" title="Grupos">
+                            <MessageCircle className="w-5 h-5" />
                             {(hasGroupInvites || hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}
                         </Link>
 
-                        <Link to="/roadmap" className="p-2 transition-all hover:scale-110" aria-label="Roadmap" title="Roadmap">
-                            <AccentIcon icon="roadmap" size={20} />
+                        <Link to="/roadmap" className="p-2 transition-all hover:scale-110" style={{ color: accentColor }} aria-label="Roadmap" title="Roadmap">
+                            <Rocket className="w-5 h-5" />
                         </Link>
 
                         <div className="relative">
@@ -316,9 +317,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     }
                                 }}
                                 className="p-2 transition-all hover:scale-110 relative"
+                                style={{ color: accentColor }}
                                 aria-label="Notifications"
                             >
-                                <AccentIcon icon="notifications" size={20} />
+                                <Bell className="w-5 h-5" />
                                 {!isVisitor && hasUnread && (
                                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                                 )}
@@ -336,17 +338,19 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 }
                             }}
                             className="p-2 transition-all hover:scale-110"
+                            style={{ color: accentColor }}
                             title="Adquirir Zions"
                         >
-                            <AccentIcon icon="coins" size={20} />
+                            <Coins className="w-5 h-5" />
                         </button>
 
                         <button
                             onClick={() => setIsWhatsNewModalOpen(true)}
                             className="p-2 transition-all hover:scale-110"
+                            style={{ color: accentColor }}
                             title="O que há de novo"
                         >
-                            <AccentIcon icon="whatsnew" size={20} />
+                            <Sparkles className="w-5 h-5" />
                         </button>
                     </div>
 
@@ -443,9 +447,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         <button
                             onClick={logout}
                             className={`hidden md:block p-2 transition-all hover:scale-110 border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
+                            style={{ color: accentColor }}
                             title="Sair"
                         >
-                            <AccentIcon icon="logout" size={20} />
+                            <LogOut className="w-5 h-5" />
                         </button>
                     )}
 
@@ -500,7 +505,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     color: user?.equippedColor || (isMGT ? '#10b981' : '#d4af37')
                                                 }}
                                             >
-                                                <AccentIcon icon="logout" size={16} />
+                                                <LogOut className="w-4 h-4" />
                                                 <span>Sair</span>
                                             </button>
                                         )}
@@ -558,7 +563,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
                                 >
-                                    <AccentIcon icon="feed" size={16} />
+                                    <Store className="w-4 h-4" />
                                     <span className="text-sm">Loja</span>
                                 </button>
                                 <button
@@ -568,7 +573,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
                                 >
-                                    <AccentIcon icon="coins" size={16} />
+                                    <Coins className="w-4 h-4" />
                                     <span className="text-sm">Zions Cash</span>
                                 </button>
                             </div>

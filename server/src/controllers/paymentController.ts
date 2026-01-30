@@ -75,34 +75,9 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
-        // Modo de simulação para testes (não chama API do MercadoPago)
-        const isSimulationMode = process.env.MERCADOPAGO_SIMULATION_MODE === 'true';
+        // Verificar se está em modo teste para usar dados especiais
+        const isTestMode = process.env.MERCADOPAGO_TEST_MODE === 'true';
         
-        if (isSimulationMode) {
-            console.log(`[PAYMENT] SIMULATION MODE - Generating fake PIX`);
-            
-            // Simular um QR Code PIX fake para testes
-            const fakePixCode = `00020126580014br.gov.bcb.pix0136${newPurchase.id}5204000053039865406${price.toFixed(2)}5802BR5913MAGAZINE_TEST6009SAO_PAULO62070503***6304`;
-            
-            await prisma.zionPurchase.update({
-                where: { id: newPurchase.id },
-                data: { paymentId: `SIM_${Date.now()}` }
-            });
-            
-            return res.json({
-                paymentId: `SIM_${Date.now()}`,
-                purchaseId: newPurchase.id,
-                qrCode: fakePixCode,
-                qrCodeBase64: null,
-                copyPaste: fakePixCode,
-                ticketUrl: null,
-                status: 'pending',
-                expirationDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-                simulation: true,
-                message: 'MODO SIMULAÇÃO: Use /api/payments/simulate-confirm para simular confirmação'
-            });
-        }
-
         // Criar pagamento PIX real
         // Garantir que BACKEND_URL tem https://
         let webhookUrl: string | undefined = undefined;
@@ -113,15 +88,18 @@ export const createPixPayment = async (req: Request, res: Response) => {
             webhookUrl = `${baseUrl}/api/payments/webhook`;
         }
 
-        // Para credenciais de teste, usar email de teste do Mercado Pago
-        // Credenciais de teste exigem usuários de teste
-        const isTestMode = process.env.MERCADOPAGO_TEST_MODE === 'true' || 
-                          process.env.NODE_ENV !== 'production';
+        // Para testes com credenciais de teste, usar:
+        // - Email de teste
+        // - first_name: "APRO" para simular aprovação automática
         const payerEmail = isTestMode 
-            ? (process.env.MERCADOPAGO_TEST_USER_EMAIL || 'test_user_123456@testuser.com')
+            ? (process.env.MERCADOPAGO_TEST_USER_EMAIL || 'test@testuser.com')
             : user.email;
         
-        console.log(`[PAYMENT] Mode: ${isTestMode ? 'TEST' : 'PRODUCTION'} - Payer email: ${payerEmail}`);
+        // APRO = aprovado automaticamente em modo teste
+        const payerFirstName = isTestMode ? 'APRO' : (user.name?.split(' ')[0] || 'Usuario');
+        const payerLastName = isTestMode ? 'Test' : (user.name?.split(' ').slice(1).join(' ') || 'Magazine');
+        
+        console.log(`[PAYMENT] Mode: ${isTestMode ? 'TEST' : 'PRODUCTION'} - Payer: ${payerFirstName} - Email: ${payerEmail}`);
         
         const result = await payment.create({
             body: {
@@ -130,8 +108,8 @@ export const createPixPayment = async (req: Request, res: Response) => {
                 payment_method_id: 'pix',
                 payer: {
                     email: payerEmail,
-                    first_name: user.name?.split(' ')[0] || 'Usuario',
-                    last_name: user.name?.split(' ').slice(1).join(' ') || 'Magazine'
+                    first_name: payerFirstName,
+                    last_name: payerLastName
                 },
                 external_reference: newPurchase.id,
                 ...(webhookUrl && { notification_url: webhookUrl })

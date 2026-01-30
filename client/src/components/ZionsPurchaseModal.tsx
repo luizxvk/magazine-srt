@@ -31,7 +31,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     const [copied, setCopied] = useState(false);
     const [checkingPayment, setCheckingPayment] = useState(false);
     const [showSuccess, setShowSuccess] = useState<{ amount: number } | null>(null);
-    const pollingRef = useRef<NodeJS.Timeout | null>(null);
+    const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const isDark = theme === 'dark';
 
     // Apple Vision Pro style - glass morphism

@@ -123,7 +123,6 @@ function EdgeNotificationItem({ notification, onClose }: EdgeNotificationProps) 
 
     // Handle drag end
     const handleDragEnd = () => {
-        setIsDragging(false);
         const currentX = x.get();
         if (Math.abs(currentX) > 100) {
             onClose(notification.id);
@@ -145,7 +144,6 @@ function EdgeNotificationItem({ notification, onClose }: EdgeNotificationProps) 
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.5}
-            onDragStart={() => setIsDragging(true)}
             onDragEnd={handleDragEnd}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}

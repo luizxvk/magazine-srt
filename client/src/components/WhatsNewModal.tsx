@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Package, Bell, BarChart3, Palette, Check } from 'lucide-react';
+import { X, Sparkles, Package, Bell, Layout, Eye, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.23';
+const CURRENT_VERSION = '0.4.24';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,36 +33,36 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.23 - UI Premium Apple Vision Pro, Supply Box Melhorado, Enquetes Funcionais
+    // v0.4.24 - Visual padronizado Apple Vision Pro, Supply Box com previews reais
     const updates: UpdateItem[] = [
         {
-            icon: <Palette className="w-5 h-5 text-blue-400" />,
-            title: 'Design Apple Vision Pro',
-            description: 'Cards de postagem, membros e notificações com glass morphism premium e animações fluidas.',
+            icon: <Layout className="w-5 h-5 text-blue-400" />,
+            title: 'Visual Apple Vision Pro',
+            description: 'Todos os cards padronizados com estilo escuro premium, bordas sutis e efeito glass blur.',
             isNew: true
         },
         {
-            icon: <Package className="w-5 h-5 text-purple-400" />,
-            title: 'Supply Box Aprimorado',
-            description: 'Novo visual com sistema de raridades visível, prêmios de Zions Points e acesso rápido no carrossel.',
+            icon: <Eye className="w-5 h-5 text-purple-400" />,
+            title: 'Preview Real no Supply Box',
+            description: 'Veja exatamente o item que você ganhou! Cores, fundos e bordas são exibidos com preview real.',
+            isNew: true
+        },
+        {
+            icon: <Package className="w-5 h-5 text-amber-400" />,
+            title: 'Duplicatas = Zions',
+            description: 'Itens duplicados são convertidos automaticamente em Zions Points de acordo com a raridade.',
             isNew: true
         },
         {
             icon: <Bell className="w-5 h-5 text-emerald-400" />,
-            title: 'Notificações Redesenhadas',
-            description: 'Dropdown de notificações estilo premium com animações de entrada e indicadores coloridos.',
-            isNew: true
-        },
-        {
-            icon: <BarChart3 className="w-5 h-5 text-amber-400" />,
-            title: 'Enquetes Funcionais',
-            description: 'Vote em enquetes diretamente no feed! Barras de progresso animadas e resultados em tempo real.',
+            title: 'Notificações Minimalistas',
+            description: 'Design limpo e elegante sem efeitos excessivos, seguindo o padrão Apple Vision Pro.',
             isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5 text-pink-400" />,
-            title: 'Cores de Destaque',
-            description: 'Todos os componentes agora respeitam a cor de destaque configurada no seu perfil.',
+            title: 'Cards de Acesso Rápido',
+            description: 'Carrossel mobile redesenhado com visual escuro padronizado e ícones coloridos.',
         }
     ];
 

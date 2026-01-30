@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import MercadoPagoConfig, { Preference, Payment } from 'mercadopago';
 import crypto from 'crypto';
+import https from 'https';
 
 // Packages configuration - valores fixos para evitar manipulação
 // Novos valores mais acessíveis e com melhor custo-benefício
@@ -75,69 +76,92 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
-        // Verificar se está em modo teste para usar dados especiais
-        const isTestMode = process.env.MERCADOPAGO_TEST_MODE === 'true';
+        // Usar Orders API que funciona com contas de teste
+        // A Payment API não funciona com credenciais de teste para PIX
+        const payerEmail = user.email || 'test@testuser.com';
+        const payerFirstName = user.name?.split(' ')[0] || 'Usuario';
         
-        // Criar pagamento PIX real
-        // Garantir que BACKEND_URL tem https://
-        let webhookUrl: string | undefined = undefined;
-        if (process.env.BACKEND_URL) {
-            const baseUrl = process.env.BACKEND_URL.startsWith('http') 
-                ? process.env.BACKEND_URL 
-                : `https://${process.env.BACKEND_URL}`;
-            webhookUrl = `${baseUrl}/api/payments/webhook`;
-        }
-
-        // Para testes com credenciais de teste, usar:
-        // - Email de teste
-        // - first_name: "APRO" para simular aprovação automática
-        const payerEmail = isTestMode 
-            ? (process.env.MERCADOPAGO_TEST_USER_EMAIL || 'test@testuser.com')
-            : user.email;
+        console.log(`[PAYMENT] Payer: ${payerFirstName} - Email: ${payerEmail}`);
         
-        // APRO = aprovado automaticamente em modo teste
-        const payerFirstName = isTestMode ? 'APRO' : (user.name?.split(' ')[0] || 'Usuario');
-        const payerLastName = isTestMode ? 'Test' : (user.name?.split(' ').slice(1).join(' ') || 'Magazine');
-        
-        console.log(`[PAYMENT] Mode: ${isTestMode ? 'TEST' : 'PRODUCTION'} - Payer: ${payerFirstName} - Email: ${payerEmail}`);
-        
-        const result = await payment.create({
-            body: {
-                transaction_amount: price,
-                description: `${zions} Zions - Magazine/MGT`,
-                payment_method_id: 'pix',
-                payer: {
-                    email: payerEmail,
-                    first_name: payerFirstName,
-                    last_name: payerLastName
-                },
-                external_reference: newPurchase.id,
-                ...(webhookUrl && { notification_url: webhookUrl })
+        // Criar order via API REST diretamente (Orders API)
+        const orderData = JSON.stringify({
+            type: 'online',
+            external_reference: newPurchase.id,
+            total_amount: price.toFixed(2),
+            payer: {
+                email: payerEmail,
+                first_name: 'APRO' // APRO = aprovação automática em sandbox
+            },
+            transactions: {
+                payments: [{
+                    amount: price.toFixed(2),
+                    payment_method: {
+                        id: 'pix',
+                        type: 'bank_transfer'
+                    }
+                }]
             }
         });
 
-        // Atualizar registro com ID do pagamento (apenas campos que existem)
+        const idempotencyKey = `pix-${newPurchase.id}-${Date.now()}`;
+        
+        const orderResult = await new Promise<any>((resolve, reject) => {
+            const options = {
+                hostname: 'api.mercadopago.com',
+                path: '/v1/orders',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                    'X-Idempotency-Key': idempotencyKey
+                }
+            };
+
+            const req = https.request(options, (res) => {
+                let body = '';
+                res.on('data', (chunk) => body += chunk);
+                res.on('end', () => {
+                    try {
+                        const json = JSON.parse(body);
+                        if (res.statusCode === 201 || res.statusCode === 200) {
+                            resolve(json);
+                        } else {
+                            reject(new Error(json.message || json.errors?.[0]?.description || `HTTP ${res.statusCode}`));
+                        }
+                    } catch (e) {
+                        reject(new Error(`Failed to parse response: ${body}`));
+                    }
+                });
+            });
+
+            req.on('error', reject);
+            req.write(orderData);
+            req.end();
+        });
+
+        // Atualizar registro com ID do pagamento
+        const paymentData = orderResult.transactions?.payments?.[0];
         await prisma.zionPurchase.update({
             where: { id: newPurchase.id },
             data: { 
-                paymentId: String(result.id)
+                paymentId: orderResult.id || paymentData?.id
             }
         });
 
-        console.log(`[PAYMENT] PIX created successfully - PaymentID: ${result.id} - Status: ${result.status}`);
+        console.log(`[PAYMENT] PIX created successfully - OrderID: ${orderResult.id} - Status: ${orderResult.status}`);
 
         // Retornar dados do PIX
-        const pixInfo = result.point_of_interaction?.transaction_data;
+        const pixInfo = paymentData?.payment_method;
         
         res.json({
-            paymentId: result.id,
+            paymentId: orderResult.id,
             purchaseId: newPurchase.id,
             qrCode: pixInfo?.qr_code,
             qrCodeBase64: pixInfo?.qr_code_base64,
             copyPaste: pixInfo?.qr_code,
             ticketUrl: pixInfo?.ticket_url,
-            status: result.status,
-            expirationDate: result.date_of_expiration
+            status: orderResult.status,
+            expirationDate: orderResult.expiration_time
         });
 
     } catch (error: any) {

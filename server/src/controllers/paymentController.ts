@@ -4,12 +4,13 @@ import MercadoPagoConfig, { Preference, Payment } from 'mercadopago';
 import crypto from 'crypto';
 
 // Packages configuration - valores fixos para evitar manipulação
+// Novos valores mais acessíveis e com melhor custo-benefício
 const ZION_PACKAGES: Record<number, number> = {
-    50: 5.00,
-    150: 12.00,
-    300: 20.00,
-    500: 30.00,
-    1000: 50.00
+    100: 4.90,      // Pacote inicial - acessível para todos
+    250: 9.90,      // Popular - bom custo-benefício
+    500: 17.90,     // Entusiasta - 10% de economia
+    1000: 29.90,    // Colecionador - 25% de economia
+    2500: 59.90,    // Magnata - 40% de economia
 };
 
 // Helper para verificar se o pacote é válido
@@ -39,10 +40,17 @@ export const createPixPayment = async (req: Request, res: Response) => {
         // Preço fixo do servidor - NUNCA confie no cliente
         const price = ZION_PACKAGES[zions];
 
-        if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+        if (!accessToken) {
             console.error('[PAYMENT] MERCADOPAGO_ACCESS_TOKEN not configured');
             return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
         }
+
+        // Debug: verificar tipo de credencial
+        const isTestToken = accessToken.startsWith('TEST-') || accessToken.includes('test');
+        const isAppUser = accessToken.startsWith('APP_USR-');
+        console.log(`[PAYMENT] Token type: ${isTestToken ? 'TEST' : isAppUser ? 'PRODUCTION (APP_USR)' : 'UNKNOWN'}`);
+        console.log(`[PAYMENT] Token prefix: ${accessToken.substring(0, 15)}...`);
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
@@ -52,7 +60,7 @@ export const createPixPayment = async (req: Request, res: Response) => {
         // Gerar referência externa única para idempotência
         const externalRef = generateExternalRef(userId, zions);
 
-        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
+        const client = new MercadoPagoConfig({ accessToken });
         const payment = new Payment(client);
 
         // Criar registro da compra ANTES de criar o pagamento

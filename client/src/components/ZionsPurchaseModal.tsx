@@ -14,12 +14,13 @@ interface ZionsPurchaseModalProps {
     onClose: () => void;
 }
 
+// Valores mais acessíveis com melhor custo-benefício
 const PACKAGES = [
-    { zions: 50, price: 5.00, label: 'Iniciante', image: zion50 },
-    { zions: 150, price: 12.00, label: 'Explorador', popular: true, image: zion150 },
-    { zions: 300, price: 20.00, label: 'Entusiasta', image: zion300 },
-    { zions: 500, price: 30.00, label: 'Colecionador', image: zion500 },
-    { zions: 1000, price: 50.00, label: 'Magnata', image: zion1000 },
+    { zions: 100, price: 4.90, label: 'Iniciante', image: zion50 },
+    { zions: 250, price: 9.90, label: 'Popular', popular: true, image: zion150 },
+    { zions: 500, price: 17.90, label: 'Entusiasta', bonus: '10% economia', image: zion300 },
+    { zions: 1000, price: 29.90, label: 'Colecionador', bonus: '25% economia', image: zion500 },
+    { zions: 2500, price: 59.90, label: 'Magnata', bonus: '40% economia', image: zion1000 },
 ];
 
 export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseModalProps) {

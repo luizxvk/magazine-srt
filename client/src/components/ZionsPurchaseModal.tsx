@@ -3,11 +3,6 @@ import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Sparkles, Wallet, 
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
-import zion50 from '../assets/zions/zion-50.png';
-import zion150 from '../assets/zions/zion-150.png';
-import zion300 from '../assets/zions/zion-300.png';
-import zion500 from '../assets/zions/zion-500.png';
-import zion1000 from '../assets/zions/zion-1000.png';
 import zionPointsImg from '../assets/zions/zion-points.png';
 import zionCashImg from '../assets/zions/zion-cash.png';
 

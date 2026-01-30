@@ -345,14 +345,13 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
             return true; // Já processado, não é erro
         }
 
-        // Atualizar status e creditar Zions Cash em uma transação
-        // zionsCash = moeda real (comprada com dinheiro)
-        // zionsPoints = moeda virtual (ganha por engajamento)
+        // Atualizar status e creditar Zions Points em uma transação
+        // Zions comprados vão direto para zionsPoints para uso imediato
         await prisma.$transaction([
             prisma.user.update({
                 where: { id: purchase.userId },
                 data: { 
-                    zionsCash: { increment: purchase.amount } // Creditar apenas em zionsCash (moeda real)
+                    zionsPoints: { increment: purchase.amount } // Creditar em zionsPoints para uso imediato
                 }
             }),
             prisma.zionPurchase.update({
@@ -367,7 +366,7 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
                 data: {
                     userId: purchase.userId,
                     amount: purchase.amount,
-                    reason: `Compra de ${purchase.amount} Zions Cash por R$${purchase.price.toFixed(2)}`
+                    reason: `Compra de ${purchase.amount} Zions Points por R$${purchase.price.toFixed(2)}`
                 }
             })
         ]);

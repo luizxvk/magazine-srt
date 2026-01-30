@@ -84,6 +84,16 @@ export const createPixPayment = async (req: Request, res: Response) => {
                 : `https://${process.env.BACKEND_URL}`;
             webhookUrl = `${baseUrl}/api/payments/webhook`;
         }
+
+        // Para credenciais de teste, usar email de teste do Mercado Pago
+        // Credenciais de teste exigem usuários de teste
+        const isTestMode = process.env.MERCADOPAGO_TEST_MODE === 'true' || 
+                          process.env.NODE_ENV !== 'production';
+        const payerEmail = isTestMode 
+            ? (process.env.MERCADOPAGO_TEST_USER_EMAIL || 'test_user_123456@testuser.com')
+            : user.email;
+        
+        console.log(`[PAYMENT] Mode: ${isTestMode ? 'TEST' : 'PRODUCTION'} - Payer email: ${payerEmail}`);
         
         const result = await payment.create({
             body: {
@@ -91,7 +101,7 @@ export const createPixPayment = async (req: Request, res: Response) => {
                 description: `${zions} Zions - Magazine/MGT`,
                 payment_method_id: 'pix',
                 payer: {
-                    email: user.email,
+                    email: payerEmail,
                     first_name: user.name?.split(' ')[0] || 'Usuario',
                     last_name: user.name?.split(' ').slice(1).join(' ') || 'Magazine'
                 },

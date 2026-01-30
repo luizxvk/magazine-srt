@@ -14,6 +14,24 @@ const ZION_PACKAGES: Record<number, number> = {
     2500: 59.90,    // Magnata - 40% de economia
 };
 
+// Pacotes de recarga de Zions Cash (1:1 com Real)
+const CASH_PACKAGES: Record<number, number> = {
+    10: 10.00,      // Básico
+    25: 25.00,      // Padrão
+    50: 50.00,      // Plus
+    100: 100.00,    // Premium (5% bônus = 105 cash)
+    200: 200.00,    // Elite (10% bônus = 220 cash)
+};
+
+// Bônus para pacotes de Cash
+const CASH_BONUS: Record<number, number> = {
+    10: 0,
+    25: 0,
+    50: 0,
+    100: 5,   // 5% bônus
+    200: 20,  // 10% bônus
+};
+
 // Helper para verificar se o pacote é válido
 const isValidPackage = (zions: number): boolean => {
     return zions in ZION_PACKAGES;
@@ -172,6 +190,139 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error('[PAYMENT] Error creating PIX payment:', error?.message || error);
+        res.status(500).json({ error: 'Falha ao criar pagamento PIX' });
+    }
+};
+
+// Create PIX payment for Zions Cash (1:1 with Real)
+export const createCashPixPayment = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user?.userId || (req as any).user?.id;
+        const { zions } = req.body;
+
+        // Validação rigorosa
+        if (!zions || typeof zions !== 'number' || !(zions in CASH_PACKAGES)) {
+            console.warn(`[PAYMENT] Invalid cash package attempt: ${zions} by user ${userId}`);
+            return res.status(400).json({ error: 'Pacote de Zions Cash inválido' });
+        }
+
+        const price = CASH_PACKAGES[zions];
+        const bonus = CASH_BONUS[zions] || 0;
+        const totalCash = zions + bonus;
+
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+        if (!accessToken) {
+            console.error('[PAYMENT] MERCADOPAGO_ACCESS_TOKEN not configured');
+            return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
+        }
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        // Criar registro da compra
+        const newPurchase = await prisma.zionPurchase.create({
+            data: {
+                userId,
+                amount: totalCash, // Total com bônus
+                price: price,
+                status: 'PENDING'
+            }
+        });
+
+        console.log(`[PAYMENT] Creating Cash PIX: Z$${totalCash} for R$${price} - User: ${userId}`);
+
+        // Em sandbox, o email PRECISA ser @testuser.com
+        const isSandbox = accessToken.includes('3116392914') || process.env.MERCADOPAGO_TEST_MODE === 'true';
+        const payerEmail = isSandbox ? 'test@testuser.com' : (user.email || 'customer@email.com');
+        
+        // Criar order via Orders API
+        const orderData = JSON.stringify({
+            type: 'online',
+            external_reference: newPurchase.id,
+            total_amount: price.toFixed(2),
+            payer: {
+                email: payerEmail,
+                first_name: 'APRO'
+            },
+            transactions: {
+                payments: [{
+                    amount: price.toFixed(2),
+                    payment_method: {
+                        id: 'pix',
+                        type: 'bank_transfer'
+                    }
+                }]
+            }
+        });
+
+        const idempotencyKey = `cash-${newPurchase.id}-${Date.now()}`;
+        
+        const orderResult = await new Promise<any>((resolve, reject) => {
+            const options = {
+                hostname: 'api.mercadopago.com',
+                path: '/v1/orders',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                    'X-Idempotency-Key': idempotencyKey
+                }
+            };
+
+            const req = https.request(options, (res) => {
+                let body = '';
+                res.on('data', (chunk) => body += chunk);
+                res.on('end', () => {
+                    try {
+                        const json = JSON.parse(body);
+                        if (res.statusCode === 201 || res.statusCode === 200) {
+                            resolve(json);
+                        } else {
+                            console.error(`[PAYMENT] Orders API error: ${res.statusCode}`, JSON.stringify(json, null, 2));
+                            reject(new Error(json.message || json.errors?.[0]?.description || json.errors?.[0]?.message || `HTTP ${res.statusCode}`));
+                        }
+                    } catch (e) {
+                        console.error(`[PAYMENT] Failed to parse response:`, body);
+                        reject(new Error(`Failed to parse response: ${body}`));
+                    }
+                });
+            });
+
+            req.on('error', reject);
+            req.write(orderData);
+            req.end();
+        });
+
+        // Atualizar registro com ID do pagamento
+        const paymentData = orderResult.transactions?.payments?.[0];
+        await prisma.zionPurchase.update({
+            where: { id: newPurchase.id },
+            data: { 
+                paymentId: orderResult.id || paymentData?.id
+            }
+        });
+
+        console.log(`[PAYMENT] Cash PIX created - OrderID: ${orderResult.id} - Status: ${orderResult.status}`);
+
+        const pixInfo = paymentData?.payment_method;
+        
+        res.json({
+            paymentId: orderResult.id,
+            purchaseId: newPurchase.id,
+            qrCode: pixInfo?.qr_code,
+            qrCodeBase64: pixInfo?.qr_code_base64,
+            copyPaste: pixInfo?.qr_code,
+            ticketUrl: pixInfo?.ticket_url,
+            status: orderResult.status,
+            expirationDate: orderResult.expiration_time,
+            cashAmount: totalCash,
+            bonus: bonus
+        });
+
+    } catch (error: any) {
+        console.error('[PAYMENT] Error creating Cash PIX:', error?.message || error);
         res.status(500).json({ error: 'Falha ao criar pagamento PIX' });
     }
 };
@@ -345,13 +496,21 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
             return true; // Já processado, não é erro
         }
 
-        // Atualizar status e creditar Zions Points em uma transação
-        // Zions comprados vão direto para zionsPoints para uso imediato
+        // Detectar se é Cash ou Points baseado no preço/valor
+        // Cash packages: 10, 25, 50, 105 (100+5), 220 (200+20)
+        // Points packages: 100, 250, 500, 1000, 2500
+        const isCashPurchase = purchase.price === purchase.amount || 
+            [10, 25, 50, 100, 200].includes(purchase.price) ||
+            purchase.price >= 10 && purchase.amount === purchase.price; // Cash é 1:1
+
+        // Atualizar status e creditar Zions em uma transação
         await prisma.$transaction([
             prisma.user.update({
                 where: { id: purchase.userId },
-                data: { 
-                    zionsPoints: { increment: purchase.amount } // Creditar em zionsPoints para uso imediato
+                data: isCashPurchase ? { 
+                    zionsCash: { increment: purchase.amount } // Creditar em zionsCash
+                } : { 
+                    zionsPoints: { increment: purchase.amount } // Creditar em zionsPoints
                 }
             }),
             prisma.zionPurchase.update({
@@ -366,12 +525,14 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
                 data: {
                     userId: purchase.userId,
                     amount: purchase.amount,
-                    reason: `Compra de ${purchase.amount} Zions Points por R$${purchase.price.toFixed(2)}`
+                    reason: isCashPurchase 
+                        ? `Recarga de Z$${purchase.amount} Zions Cash por R$${purchase.price.toFixed(2)}`
+                        : `Compra de ${purchase.amount} Zions Points por R$${purchase.price.toFixed(2)}`
                 }
             })
         ]);
 
-        console.log(`[PAYMENT] ✅ Zions credited: ${purchase.amount} to user ${purchase.userId} - PaymentID: ${paymentId}`);
+        console.log(`[PAYMENT] ✅ ${isCashPurchase ? 'Cash' : 'Points'} credited: ${purchase.amount} to user ${purchase.userId} - PaymentID: ${paymentId}`);
         return true;
 
     } catch (error: any) {

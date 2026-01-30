@@ -9,6 +9,7 @@ router.post('/create-zions-preference', authenticateToken, paymentController.cre
 
 // PIX routes
 router.post('/zions/pix', authenticateToken, paymentController.createPixPayment);
+router.post('/zions/cash/pix', authenticateToken, paymentController.createCashPixPayment);
 router.get('/status/:paymentId', authenticateToken, paymentController.checkPaymentStatus);
 
 // Simulação de pagamento (apenas em modo teste)

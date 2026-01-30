@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Sparkles } from 'lucide-react';
+import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Sparkles, Wallet, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -8,29 +8,43 @@ import zion150 from '../assets/zions/zion-150.png';
 import zion300 from '../assets/zions/zion-300.png';
 import zion500 from '../assets/zions/zion-500.png';
 import zion1000 from '../assets/zions/zion-1000.png';
+import zionPointsImg from '../assets/zions/zion-points.png';
+import zionCashImg from '../assets/zions/zion-cash.png';
 
 interface ZionsPurchaseModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-// Valores mais acessíveis com melhor custo-benefício
+// Valores mais acessíveis com melhor custo-benefício - ZIONS POINTS
 const PACKAGES = [
-    { zions: 100, price: 4.90, label: 'Iniciante', image: zion50 },
-    { zions: 250, price: 9.90, label: 'Popular', popular: true, image: zion150 },
-    { zions: 500, price: 17.90, label: 'Entusiasta', bonus: '10% economia', image: zion300 },
-    { zions: 1000, price: 29.90, label: 'Colecionador', bonus: '25% economia', image: zion500 },
-    { zions: 2500, price: 59.90, label: 'Magnata', bonus: '40% economia', image: zion1000 },
+    { zions: 100, price: 4.90, label: 'Iniciante', image: zionPointsImg },
+    { zions: 250, price: 9.90, label: 'Popular', popular: true, image: zionPointsImg },
+    { zions: 500, price: 17.90, label: 'Entusiasta', bonus: '10% economia', image: zionPointsImg },
+    { zions: 1000, price: 29.90, label: 'Colecionador', bonus: '25% economia', image: zionPointsImg },
+    { zions: 2500, price: 59.90, label: 'Magnata', bonus: '40% economia', image: zionPointsImg },
 ];
+
+// Valores de recarga para ZIONS CASH (moeda real)
+const CASH_PACKAGES = [
+    { amount: 10, price: 10.00, label: 'Básico', image: zionCashImg },
+    { amount: 25, price: 25.00, label: 'Padrão', popular: true, image: zionCashImg },
+    { amount: 50, price: 50.00, label: 'Plus', bonus: 'Mais usado', image: zionCashImg },
+    { amount: 100, price: 100.00, label: 'Premium', bonus: '5% bônus', image: zionCashImg },
+    { amount: 200, price: 200.00, label: 'Elite', bonus: '10% bônus', image: zionCashImg },
+];
+
+type TabType = 'points' | 'cash';
 
 export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseModalProps) {
     const { user, theme, updateUser } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [loading, setLoading] = useState<number | null>(null);
-    const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number; paymentId: string } | null>(null);
+    const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number; paymentId: string; type: TabType } | null>(null);
     const [copied, setCopied] = useState(false);
     const [checkingPayment, setCheckingPayment] = useState(false);
-    const [showSuccess, setShowSuccess] = useState<{ amount: number } | null>(null);
+    const [showSuccess, setShowSuccess] = useState<{ amount: number; type: TabType } | null>(null);
+    const [activeTab, setActiveTab] = useState<TabType>('points');
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const isDark = theme === 'dark';
 
@@ -57,10 +71,13 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
         cardBorder: 'border-amber-500/20',
     };
 
-    const handlePurchase = async (amount: number) => {
+    const handlePurchase = async (amount: number, type: TabType = 'points') => {
         try {
             setLoading(amount);
-            const response = await api.post('/payments/zions/pix', { zions: amount });
+            
+            // Endpoint diferente para Cash vs Points
+            const endpoint = type === 'cash' ? '/payments/zions/cash/pix' : '/payments/zions/pix';
+            const response = await api.post(endpoint, { zions: amount });
 
             if (response.data.qrCodeBase64) {
                 setPixData({
@@ -68,11 +85,12 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                     qrCodeBase64: response.data.qrCodeBase64,
                     copyPaste: response.data.copyPaste,
                     amount: amount,
-                    paymentId: response.data.paymentId
+                    paymentId: response.data.paymentId,
+                    type: type
                 });
                 
                 // Iniciar polling para verificar status do pagamento
-                startPolling(response.data.paymentId, amount);
+                startPolling(response.data.paymentId, amount, type);
             }
         } catch (error) {
             console.error('Purchase failed', error);
@@ -82,7 +100,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     };
 
     // Polling para verificar status do pagamento
-    const startPolling = (paymentId: string, amount: number) => {
+    const startPolling = (paymentId: string, amount: number, type: TabType = 'points') => {
         // Limpar polling anterior se existir
         if (pollingRef.current) {
             clearInterval(pollingRef.current);
@@ -107,7 +125,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                     
                     // Mostrar popup de sucesso
                     setPixData(null);
-                    setShowSuccess({ amount });
+                    setShowSuccess({ amount, type });
                 }
             } catch (error) {
                 console.error('Error checking payment status:', error);
@@ -152,7 +170,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                     pollingRef.current = null;
                 }
                 setPixData(null);
-                setShowSuccess({ amount: pixData.amount });
+                setShowSuccess({ amount: pixData.amount, type: pixData.type });
             } else {
                 // Pagamento ainda não confirmado - mostrar mensagem
                 alert('Pagamento ainda não confirmado. Aguarde alguns instantes e tente novamente.');
@@ -222,23 +240,32 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                         
                         {/* Title */}
                         <h2 className={`relative z-10 text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                            Compra Realizada!
+                            {showSuccess.type === 'cash' ? 'Recarga Realizada!' : 'Compra Realizada!'}
                         </h2>
                         
                         {/* Amount */}
                         <div className="relative z-10 mb-6">
                             <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl ${isDark ? 'bg-white/5' : 'bg-black/5'} border ${isMGT ? 'border-emerald-500/20' : 'border-amber-500/20'}`}>
-                                <Coins className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                {showSuccess.type === 'cash' ? (
+                                    <Wallet className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                ) : (
+                                    <Coins className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                )}
                                 <span className={`text-3xl font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                    +{showSuccess.amount}
+                                    {showSuccess.type === 'cash' ? `Z$ ${showSuccess.amount}` : `+${showSuccess.amount}`}
                                 </span>
-                                <span className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Zions</span>
+                                {showSuccess.type !== 'cash' && (
+                                    <span className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Points</span>
+                                )}
                             </div>
                         </div>
                         
                         {/* Description */}
                         <p className={`relative z-10 text-sm mb-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                            Seus Zions foram creditados com sucesso na sua conta!
+                            {showSuccess.type === 'cash' 
+                                ? 'Seu saldo foi creditado com sucesso!' 
+                                : 'Seus Zions Points foram creditados com sucesso!'
+                            }
                         </p>
                         
                         {/* Close Button */}
@@ -298,7 +325,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                         {/* Amount */}
                         <div className="mb-4">
                             <span className={`text-2xl font-bold ${themeColors.text}`}>
-                                {pixData.amount} Zions
+                                {pixData.type === 'cash' ? `Z$ ${pixData.amount.toFixed(2)}` : `${pixData.amount} Points`}
                             </span>
                         </div>
 
@@ -356,14 +383,18 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                 <div className="relative z-10 p-6 border-b border-white/10 flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <div className={`p-3 rounded-2xl bg-gradient-to-br ${themeColors.gradient} border ${themeColors.border}`}>
-                            <Coins className={`w-6 h-6 ${themeColors.text}`} />
+                            {activeTab === 'cash' ? (
+                                <Wallet className={`w-6 h-6 ${themeColors.text}`} />
+                            ) : (
+                                <Coins className={`w-6 h-6 ${themeColors.text}`} />
+                            )}
                         </div>
                         <div>
                             <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                Adquirir Zions
+                                {activeTab === 'cash' ? 'Recarregar Zions Cash' : 'Adquirir Zions Points'}
                             </h2>
                             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                                Invista na sua jornada
+                                {activeTab === 'cash' ? 'Saldo para compras no mercado' : 'Invista na sua jornada'}
                             </p>
                         </div>
                     </div>
@@ -375,22 +406,51 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                     </button>
                 </div>
 
+                {/* Tabs */}
+                <div className="relative z-10 px-6 pt-4">
+                    <div className={`inline-flex p-1 rounded-xl ${isDark ? 'bg-white/5' : 'bg-black/5'} border ${themeColors.border}`}>
+                        <button
+                            onClick={() => setActiveTab('points')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                                activeTab === 'points'
+                                    ? `${themeColors.button} text-white shadow-lg`
+                                    : `${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`
+                            }`}
+                        >
+                            <Zap className="w-4 h-4" />
+                            Zions Points
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('cash')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                                activeTab === 'cash'
+                                    ? `${themeColors.button} text-white shadow-lg`
+                                    : `${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`
+                            }`}
+                        >
+                            <Wallet className="w-4 h-4" />
+                            Zions Cash
+                        </button>
+                    </div>
+                </div>
+
                 {/* Packages Grid */}
                 <div className="relative z-10 overflow-y-auto p-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                        {PACKAGES.map((pkg) => (
-                            <div
-                                key={pkg.zions}
-                                className={`relative rounded-2xl border ${themeColors.border} backdrop-blur-xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:border-opacity-60 group overflow-hidden ${
-                                    isDark ? 'bg-black/30' : 'bg-white/50'
-                                }`}
-                            >
-                                {/* Popular Badge */}
-                                {pkg.popular && (
-                                    <div className={`absolute -top-0 -right-0 ${themeColors.button} text-white text-[9px] font-bold uppercase py-1 px-2 rounded-bl-xl rounded-tr-xl z-20`}>
-                                        Popular
-                                    </div>
-                                )}
+                    {activeTab === 'points' ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            {PACKAGES.map((pkg) => (
+                                <div
+                                    key={pkg.zions}
+                                    className={`relative rounded-2xl border ${themeColors.border} backdrop-blur-xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:border-opacity-60 group overflow-hidden ${
+                                        isDark ? 'bg-black/30' : 'bg-white/50'
+                                    }`}
+                                >
+                                    {/* Popular Badge */}
+                                    {pkg.popular && (
+                                        <div className={`absolute -top-0 -right-0 ${themeColors.button} text-white text-[9px] font-bold uppercase py-1 px-2 rounded-bl-xl rounded-tr-xl z-20`}>
+                                            Popular
+                                        </div>
+                                    )}
 
                                 {/* Coin Image with Glow */}
                                 <div className="relative mb-3 group-hover:scale-110 transition-transform duration-300">
@@ -421,7 +481,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
 
                                 {/* Buy Button */}
                                 <button
-                                    onClick={() => handlePurchase(pkg.zions)}
+                                    onClick={() => handlePurchase(pkg.zions, 'points')}
                                     disabled={loading === pkg.zions}
                                     className={`w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-lg flex items-center justify-center gap-2 ${themeColors.button} transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
@@ -437,6 +497,69 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                             </div>
                         ))}
                     </div>
+                    ) : (
+                        /* Cash Packages Grid */
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            {CASH_PACKAGES.map((pkg) => (
+                                <div
+                                    key={pkg.amount}
+                                    className={`relative rounded-2xl border ${themeColors.border} backdrop-blur-xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:border-opacity-60 group overflow-hidden ${
+                                        isDark ? 'bg-black/30' : 'bg-white/50'
+                                    }`}
+                                >
+                                    {/* Popular Badge */}
+                                    {pkg.popular && (
+                                        <div className={`absolute -top-0 -right-0 ${themeColors.button} text-white text-[9px] font-bold uppercase py-1 px-2 rounded-bl-xl rounded-tr-xl z-20`}>
+                                            Popular
+                                        </div>
+                                    )}
+
+                                    {/* Coin Image with Glow */}
+                                    <div className="relative mb-3 group-hover:scale-110 transition-transform duration-300">
+                                        <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} blur-[30px] opacity-30 rounded-full`} />
+                                        <img
+                                            src={pkg.image}
+                                            alt={`Z$ ${pkg.amount}`}
+                                            className="w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-2xl"
+                                        />
+                                        {/* Badge com quantidade */}
+                                        <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold ${themeColors.button} text-white border border-white/20 whitespace-nowrap`}>
+                                            Z$ {pkg.amount}
+                                        </div>
+                                    </div>
+
+                                    {/* Amount */}
+                                    <div className="mt-3 mb-1">
+                                        <span className={`text-xl sm:text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                            Z$
+                                        </span>
+                                        <span className={`text-2xl sm:text-3xl font-bold ${themeColors.text} ml-1`}>{pkg.amount}</span>
+                                    </div>
+
+                                    {/* Label */}
+                                    <div className={`text-[10px] uppercase tracking-widest mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        {pkg.label}
+                                    </div>
+
+                                    {/* Buy Button */}
+                                    <button
+                                        onClick={() => handlePurchase(pkg.amount, 'cash')}
+                                        disabled={loading === pkg.amount}
+                                        className={`w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-lg flex items-center justify-center gap-2 ${themeColors.button} transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        {loading === pkg.amount ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <QrCode className="w-3.5 h-3.5" />
+                                                <span>R$ {pkg.price.toFixed(2).replace('.', ',')}</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Security Badge */}
                     <div className="mt-6 flex items-center justify-center gap-2">

@@ -36,7 +36,7 @@ const BADGE_URLS: Record<string, string> = {
     'badge_seal': 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000',
     'badge_shark': 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000',
     'badge_egghead': 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000',
-    'badge_xitada': '/assets/badges/ta-xitada.png',
+    'badge_xitada': 'https://img.icons8.com/?size=100&id=8S7SkmQtNOry&format=png&color=000000',
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
@@ -65,8 +65,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         
         // If preview is active and has badge, use preview badge
         if (previewTheme?.badgeUrl) {
-            const isLocal = previewTheme.badgeUrl.startsWith('/');
-            return <img src={previewTheme.badgeUrl} alt="Preview Badge" className={`object-contain ${isLocal ? 'w-12 h-12' : 'w-4 h-4'}`} />;
+            return <img src={previewTheme.badgeUrl} alt="Preview Badge" className="w-4 h-4 object-contain" />;
         }
         
         // If equipped badge is a URL (from theme pack)
@@ -76,9 +75,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         
         // If equipped badge is a market badge ID
         if (equippedBadge && BADGE_URLS[equippedBadge]) {
-            const badgeUrl = BADGE_URLS[equippedBadge];
-            const isLocal = badgeUrl.startsWith('/');
-            return <img src={badgeUrl} alt="Badge" className={`object-contain ${isLocal ? 'w-12 h-12' : 'w-4 h-4'}`} />;
+            return <img src={BADGE_URLS[equippedBadge]} alt="Badge" className="w-4 h-4 object-contain" />;
         }
         
         // No badge equipped - no default for anyone

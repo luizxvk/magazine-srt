@@ -80,7 +80,7 @@ const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'badge_seal', name: 'Foca', description: 'Fofinho e focado', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
     { id: 'badge_shark', name: 'Grande Norke', description: 'Predador dos mares', price: 450, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
     { id: 'badge_egghead', name: 'Cabeça de Ovo', description: 'Pensador único', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
-    { id: 'badge_xitada', name: 'Ta Xitada', description: 'Xitou geral!', price: 400, type: 'badge', preview: '/assets/badges/ta-xitada.png' },
+    { id: 'badge_xitada', name: 'Ta Xitada', description: 'Xitou geral!', price: 400, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=8S7SkmQtNOry&format=png&color=000000' },
 ];
 
 // Neon accent colors (excluding gold for Magazine exclusivity)
@@ -1202,12 +1202,8 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                     <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
                                                 )}
                                                 {item.type === 'badge' && (
-                                                    item.preview.startsWith('http') || item.preview.startsWith('/') ? (
-                                                        <img 
-                                                            src={item.preview} 
-                                                            alt={item.name} 
-                                                            className={`object-contain ${item.preview.startsWith('/') ? 'w-20 h-20 scale-150' : 'w-16 h-16'}`}
-                                                        />
+                                                    item.preview.startsWith('http') ? (
+                                                        <img src={item.preview} alt={item.name} className="w-16 h-16 object-contain" />
                                                     ) : (
                                                         <span className="text-5xl">{item.preview}</span>
                                                     )

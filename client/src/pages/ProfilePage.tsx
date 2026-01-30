@@ -32,7 +32,7 @@ const BADGE_URLS: Record<string, string> = {
     'badge_seal': 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000',
     'badge_shark': 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000',
     'badge_egghead': 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000',
-    'badge_xitada': '/assets/badges/ta-xitada.png',
+    'badge_xitada': 'https://img.icons8.com/?size=100&id=8S7SkmQtNOry&format=png&color=000000',
 };
 
 export default function ProfilePage() {
@@ -411,7 +411,7 @@ export default function ProfilePage() {
                                             <img 
                                                 src={BADGE_URLS[badgeToShow]}
                                                 alt="Badge"
-                                                className={`object-contain ${BADGE_URLS[badgeToShow].startsWith('/') ? 'w-20 h-20' : 'w-8 h-8'}`}
+                                                className="w-8 h-8 object-contain"
                                             />
                                         ) : (
                                             <span className="text-3xl">👑</span>

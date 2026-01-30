@@ -42,6 +42,7 @@ import OnboardingModals from './components/OnboardingModals';
 import SessionExpiredModal from './components/SessionExpiredModal';
 import { RadioProvider } from './context/RadioContext';
 import MiniRadioPlayer from './components/MiniRadioPlayer';
+import { EdgeNotificationContainer } from './components/EdgeNotification';
 
 
 
@@ -102,6 +103,7 @@ function App() {
         </Routes>
         <AchievementWrapper />
         <ToastWrapper />
+        <EdgeNotificationWrapper />
         <ZionsModalWrapper />
         <SessionExpiredWrapper />
         <OnboardingModals />
@@ -142,6 +144,17 @@ function ToastWrapper() {
       description={toastData.description}
       type={toastData.type}
       onClose={clearToast}
+    />
+  );
+}
+
+function EdgeNotificationWrapper() {
+  const { edgeNotifications, closeEdgeNotification } = useAuth();
+
+  return (
+    <EdgeNotificationContainer
+      notifications={edgeNotifications}
+      onClose={closeEdgeNotification}
     />
   );
 }

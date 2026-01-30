@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import DailyLoginModal from '../components/DailyLoginModal';
 import type { ToastType } from '../components/Toast';
+import type { EdgeNotificationData, EdgeNotificationType } from '../components/EdgeNotification';
 
 export interface ToastData {
     message: string;
@@ -93,6 +94,10 @@ interface AuthContextType {
     // Mobile Drawer State
     isMobileDrawerOpen: boolean;
     setIsMobileDrawerOpen: (isOpen: boolean) => void;
+    // Edge Notifications (Mobile-style)
+    edgeNotifications: EdgeNotificationData[];
+    showEdgeNotification: (type: EdgeNotificationType, title: string, message: string, options?: { avatar?: string; action?: { label: string; onClick: () => void }; duration?: number }) => void;
+    closeEdgeNotification: (id: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -162,6 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isZionsModalOpen, setIsZionsModalOpen] = useState(false);
     const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+    const [edgeNotifications, setEdgeNotifications] = useState<EdgeNotificationData[]>([]);
     const [previewTheme, setPreviewTheme] = useState<{ background: string; color: string; packName: string; packId: string; price: number; badgeUrl?: string } | null>(null);
     const [theme, setTheme] = useState<'dark' | 'light'>(() => {
         if (typeof window !== 'undefined') {
@@ -803,6 +809,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToastData(null);
     };
 
+    // Edge Notification functions (Samsung Edge style)
+    const showEdgeNotification = useCallback((
+        type: EdgeNotificationType,
+        title: string,
+        message: string,
+        options?: { avatar?: string; action?: { label: string; onClick: () => void }; duration?: number }
+    ) => {
+        const id = `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const notification: EdgeNotificationData = {
+            id,
+            type,
+            title,
+            message,
+            avatar: options?.avatar,
+            action: options?.action,
+            duration: options?.duration || 5000
+        };
+        setEdgeNotifications(prev => [...prev, notification]);
+    }, []);
+
+    const closeEdgeNotification = useCallback((id: string) => {
+        setEdgeNotifications(prev => prev.filter(n => n.id !== id));
+    }, []);
+
     const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {
         // Limpar flags de onboarding para mostrar WelcomeTour ao fazer novo login
         Object.keys(sessionStorage).forEach(key => {
@@ -984,6 +1014,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Mobile Drawer State
             isMobileDrawerOpen,
             setIsMobileDrawerOpen,
+            // Edge Notifications (Mobile-style)
+            edgeNotifications,
+            showEdgeNotification,
+            closeEdgeNotification,
         }}>
             {children}
             <DailyLoginModal

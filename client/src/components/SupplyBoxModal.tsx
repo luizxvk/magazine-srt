@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, X, Sparkles, Gift, Coins, TrendingUp, Zap } from 'lucide-react';
 import api from '../services/api';
@@ -217,22 +217,10 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🎨 Fundos
+                                        📦 Packs de Temas
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🏅 Badges
-                                    </span>
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🖼️ Bordas
-                                    </span>
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🎯 Cores
-                                    </span>
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        � Packs
-                                    </span>
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        �💰 10-200 Zions
+                                        💰 10-500 Zions
                                     </span>
                                 </div>
                             </div>
@@ -400,3 +388,5 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
         </AnimatePresence>
     );
 }
+
+

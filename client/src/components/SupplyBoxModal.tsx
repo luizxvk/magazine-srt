@@ -329,12 +329,41 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                     transition={{ delay: 0.3 }}
                                     className="w-full max-w-sm mb-6"
                                 >
-                                    <ThemePackCard
-                                        pack={reward.item}
-                                        onPurchase={() => { }}
-                                        loading={false}
-                                        isReward={true}
-                                    />
+                                    {reward.rewardType === 'ZIONS' ? (
+                                        // Zions Bonus Display
+                                        <div className={`rounded-2xl p-6 text-center ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'}`}>
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                transition={{ type: "spring", delay: 0.4 }}
+                                                className="flex justify-center mb-4"
+                                            >
+                                                <div 
+                                                    className="w-24 h-24 rounded-full flex items-center justify-center"
+                                                    style={{ 
+                                                        background: `linear-gradient(135deg, ${userAccent}, ${userAccent}88)`,
+                                                        boxShadow: `0 0 40px ${userAccent}40`
+                                                    }}
+                                                >
+                                                    <Coins className="w-12 h-12 text-white" />
+                                                </div>
+                                            </motion.div>
+                                            <h3 className={`text-2xl font-bold mb-2 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                +{reward.item.value} Zions
+                                            </h3>
+                                            <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                Adicionados ao seu saldo
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        // Regular item (Pack, Background, Badge, etc.)
+                                        <ThemePackCard
+                                            pack={reward.item}
+                                            onPurchase={() => { }}
+                                            loading={false}
+                                            isReward={true}
+                                        />
+                                    )}
                                 </motion.div>
                             )}
 

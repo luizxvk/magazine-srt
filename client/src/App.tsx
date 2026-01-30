@@ -43,6 +43,8 @@ import SessionExpiredModal from './components/SessionExpiredModal';
 import { RadioProvider } from './context/RadioContext';
 import MiniRadioPlayer from './components/MiniRadioPlayer';
 import { EdgeNotificationContainer } from './components/EdgeNotification';
+import VersionUpdateNotification from './components/VersionUpdateNotification';
+import BetaRewardPopup from './components/BetaRewardPopup';
 
 
 
@@ -112,6 +114,8 @@ function App() {
         <MiniRadioPlayer />
         <Footer />
         <DevBanner />
+        <VersionUpdateNotification />
+        <BetaRewardWrapper />
       </Router>
     </RadioProvider>
     </AuthProvider>
@@ -190,6 +194,15 @@ function SessionExpiredWrapper() {
 function MessagePopupWrapper() {
   const { activeChatUserId } = useAuth();
   return <MessagePopup activeChatUserId={activeChatUserId} />;
+}
+
+function BetaRewardWrapper() {
+  const { user } = useAuth();
+  
+  // Only show for logged in users
+  if (!user) return null;
+  
+  return <BetaRewardPopup />;
 }
 
 export default App;

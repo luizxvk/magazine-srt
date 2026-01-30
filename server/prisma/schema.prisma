@@ -83,6 +83,7 @@ model User {
   socialActivities       SocialActivity[]
   pushSubscriptions      PushSubscription[]
   pollVotes              PollVote[]
+  betaRewardClaimed      Boolean        @default(false) // Track if user claimed v5.0 beta reward
 
   @@index([membershipType])
   @@index([isOnline])

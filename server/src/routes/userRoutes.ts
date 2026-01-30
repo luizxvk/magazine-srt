@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, updateMe, getUserProfile, getUserPosts, getAllUsers, getRecentMembers, resetUserPassword, deleteUser, getMyRedemptions, getAllRedemptions, updateUserMembership, updateUserLevel, getCustomizations, purchaseCustomization, equipCustomization, unequipCustomization, searchAll, updatePreferences, updateProfileBackground } from '../controllers/userController';
+import { getMe, updateMe, getUserProfile, getUserPosts, getAllUsers, getRecentMembers, resetUserPassword, deleteUser, getMyRedemptions, getAllRedemptions, updateUserMembership, updateUserLevel, getCustomizations, purchaseCustomization, equipCustomization, unequipCustomization, searchAll, updatePreferences, updateProfileBackground, claimBetaReward } from '../controllers/userController';
 import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -22,6 +22,9 @@ router.get('/customizations', authenticateToken, getCustomizations);
 router.post('/customizations/purchase', authenticateToken, purchaseCustomization);
 router.post('/customizations/equip', authenticateToken, equipCustomization);
 router.post('/customizations/unequip', authenticateToken, unequipCustomization);
+
+// Beta reward route
+router.post('/claim-beta-reward', authenticateToken, claimBetaReward);
 
 // Parameterized routes last
 router.get('/:id', authenticateToken, getUserProfile);

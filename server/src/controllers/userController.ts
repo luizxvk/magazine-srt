@@ -248,6 +248,56 @@ export const updateProfileBackground = async (req: AuthRequest, res: Response) =
     }
 };
 
+// Claim Beta Reward - 500 Zions Points for beta users when v5.0 launches
+const BETA_REWARD_POINTS = 500;
+
+export const claimBetaReward = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        // Check if user exists and hasn't claimed yet
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, betaRewardClaimed: true, zionsPoints: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if already claimed
+        if (user.betaRewardClaimed) {
+            return res.status(400).json({ error: 'Beta reward already claimed' });
+        }
+
+        // Credit the reward
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                zionsPoints: { increment: BETA_REWARD_POINTS },
+                betaRewardClaimed: true
+            },
+            select: {
+                id: true,
+                zionsPoints: true,
+                betaRewardClaimed: true
+            }
+        });
+
+        console.log(`[BetaReward] User ${userId} claimed ${BETA_REWARD_POINTS} Zions Points`);
+
+        res.json({ 
+            success: true, 
+            pointsAwarded: BETA_REWARD_POINTS,
+            newBalance: updatedUser.zionsPoints
+        });
+    } catch (error) {
+        console.error('Error claiming beta reward:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const getMe = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;

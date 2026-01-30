@@ -352,7 +352,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleOpen}
                                 disabled={opening || loadingCost}
-                                className="w-full px-8 py-4 font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-black"
+                                className="w-full px-8 py-4 font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-black"
                                 style={{
                                     background: `linear-gradient(135deg, ${userAccent}, ${userAccent}dd)`,
                                     boxShadow: `0 8px 30px ${userAccent}40`
@@ -360,8 +360,31 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                             >
                                 {opening ? (
                                     <>
-                                        <Sparkles className="w-5 h-5 animate-spin" />
-                                        Abrindo...
+                                        {/* Apple-style spinning loader */}
+                                        <div className="relative w-5 h-5">
+                                            {[...Array(8)].map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="absolute w-1.5 h-1.5 rounded-full bg-black"
+                                                    style={{
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        transform: `rotate(${i * 45}deg) translateY(-150%)`,
+                                                        transformOrigin: '0 0',
+                                                        opacity: 1 - (i * 0.1),
+                                                        animation: `spinnerFade 0.8s linear infinite`,
+                                                        animationDelay: `${i * 0.1}s`
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span>Abrindo...</span>
+                                        <style>{`
+                                            @keyframes spinnerFade {
+                                                0%, 100% { opacity: 0.2; }
+                                                50% { opacity: 1; }
+                                            }
+                                        `}</style>
                                     </>
                                 ) : (
                                     <>

@@ -630,7 +630,7 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'badge_moon', name: 'Lua', price: 300, preview: 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000' },
         { id: 'badge_sun', name: 'Sol', price: 350, preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
         { id: 'badge_seal', name: 'Foca', price: 250, preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
-        { id: 'badge_shark', name: 'Grande Tubarão', price: 450, preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
+        { id: 'badge_shark', name: 'Grande Norke', price: 450, preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
         { id: 'badge_egghead', name: 'Cabeça de Ovo', price: 350, preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
     ],
     colors: [

@@ -70,7 +70,7 @@ const ITEM_POOLS = {
         { id: 'badge_egghead', name: 'Cabeça de Ovo', rarity: 'RARE' },
         // EPIC (401+)
         { id: 'badge_diamond', name: 'Diamante', rarity: 'EPIC' },
-        { id: 'badge_shark', name: 'Grande Tubarão', rarity: 'EPIC' },
+        { id: 'badge_shark', name: 'Grande Norke', rarity: 'EPIC' },
     ],
     COLOR: [
         // COMMON (0-350)

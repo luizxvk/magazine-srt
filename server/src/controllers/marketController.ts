@@ -38,7 +38,7 @@ const ITEM_DATA: Record<string, { name: string; type: string; preview: string }>
   badge_moon: { name: 'Lua', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000' },
   badge_sun: { name: 'Sol', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
   badge_seal: { name: 'Foca', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
-  badge_shark: { name: 'Grande Tubarão', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
+  badge_shark: { name: 'Grande Norke', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
   badge_egghead: { name: 'Cabeça de Ovo', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
   // Colors
   color_rgb: { name: 'RGB Dinâmico', type: 'color', preview: 'rgb-dynamic' },

@@ -44,7 +44,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         {
             icon: <Image className="w-5 h-5 text-pink-400" />,
             title: 'Badges com Ícones Visuais',
-            description: 'Todas as badges agora têm ícones PNG do icons8! Foca, Grande Tubarão, Cabeça de Ovo e muito mais.',
+            description: 'Todas as badges agora têm ícones PNG do icons8! Foca, Grande Norke, Cabeça de Ovo e muito mais.',
             isNew: true
         },
         {

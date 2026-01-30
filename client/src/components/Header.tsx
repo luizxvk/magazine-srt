@@ -505,13 +505,49 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className={`relative z-10 p-5 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                                className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
                             >
-                                {/* Top Bar */}
-                                <div className="flex items-center justify-between mb-5">
-                                    <span className={`font-semibold text-sm uppercase tracking-wider ${theme === 'light' ? 'text-gray-500' : 'text-white/50'}`}>
-                                        Menu
-                                    </span>
+                                {/* Top Bar with User + Actions */}
+                                <div className="flex items-center justify-between">
+                                    {/* User Profile - Compact */}
+                                    {user && (
+                                        <Link 
+                                            to="/profile" 
+                                            onClick={() => setIsMobileDrawerOpen(false)}
+                                            className={`flex items-center gap-3 p-2 pr-4 rounded-full transition-all ${
+                                                theme === 'light' 
+                                                    ? 'bg-gray-50 hover:bg-gray-100' 
+                                                    : 'bg-white/5 hover:bg-white/10'
+                                            }`}
+                                        >
+                                            <div className="w-10 h-10 rounded-full p-[2px] shrink-0" style={{ background: getProfileBorderGradient(user.equippedProfileBorder, isMGT) }}>
+                                                <div className={`w-full h-full rounded-full flex items-center justify-center overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
+                                                    {user.avatarUrl ? (
+                                                        <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User className={`w-5 h-5 ${isMGT ? 'text-emerald-300' : 'text-gold-300'}`} />
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                    {user.displayName || user.name}
+                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className={`text-xs font-medium ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                        {user.zionsPoints || 0}
+                                                    </span>
+                                                    <span className={`text-[10px] ${theme === 'light' ? 'text-gray-400' : 'text-white/40'}`}>Points</span>
+                                                    <span className={`text-[10px] ${theme === 'light' ? 'text-gray-300' : 'text-white/20'}`}>•</span>
+                                                    <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-white/60'}`}>
+                                                        Z$ {(user.zionsCash || 0).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    )}
+                                    
+                                    {/* Actions */}
                                     <div className="flex items-center gap-2">
                                         {!isVisitor && (
                                             <motion.button
@@ -521,13 +557,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     setIsMobileDrawerOpen(false);
                                                     logout();
                                                 }}
-                                                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                                                className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-all ${
                                                     theme === 'light' 
                                                         ? 'bg-red-50 text-red-600 hover:bg-red-100' 
                                                         : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
                                                 }`}
                                             >
-                                                <LogOut className="w-4 h-4" />
+                                                <LogOut className="w-3.5 h-3.5" />
                                                 <span>Sair</span>
                                             </motion.button>
                                         )}
@@ -535,56 +571,12 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             onClick={() => setIsMobileDrawerOpen(false)}
-                                            className={`p-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-500' : 'bg-white/5 hover:bg-white/10 text-white/60'} transition-colors`}
+                                            className={`p-2 rounded-full ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-500' : 'bg-white/5 hover:bg-white/10 text-white/60'} transition-colors`}
                                         >
                                             <X className="w-5 h-5" />
                                         </motion.button>
                                     </div>
                                 </div>
-                                
-                                {/* User Profile Card */}
-                                {user && (
-                                    <motion.div
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                    >
-                                        <Link 
-                                            to="/profile" 
-                                            onClick={() => setIsMobileDrawerOpen(false)}
-                                            className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${
-                                                theme === 'light' 
-                                                    ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200/50' 
-                                                    : (isMGT 
-                                                        ? 'bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20' 
-                                                        : 'bg-white/5 hover:bg-white/10 border border-white/10')
-                                            }`}
-                                        >
-                                            <div className="w-14 h-14 rounded-2xl p-[2px] shrink-0" style={{ background: getProfileBorderGradient(user.equippedProfileBorder, isMGT) }}>
-                                                <div className={`w-full h-full rounded-2xl flex items-center justify-center overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
-                                                    {user.avatarUrl ? (
-                                                        <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <User className={`w-7 h-7 ${isMGT ? 'text-emerald-300' : 'text-gold-300'}`} />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className={`text-base font-semibold truncate ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                                    {user.displayName || user.name}
-                                                </p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className={`text-sm font-medium ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                                                        {user.zionsPoints || 0} Points
-                                                    </span>
-                                                    <span className={`text-sm ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>•</span>
-                                                    <span className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-white/60'}`}>
-                                                        Z$ {(user.zionsCash || 0).toFixed(2)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </motion.div>
-                                )}
                             </motion.div>
 
                             {/* Quick Actions Grid */}

@@ -78,7 +78,7 @@ const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'badge_sun', name: 'Sol', description: 'Radiante', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
     // Novos badges
     { id: 'badge_seal', name: 'Foca', description: 'Fofinho e focado', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
-    { id: 'badge_shark', name: 'Grande Tubarão', description: 'Predador dos mares', price: 450, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
+    { id: 'badge_shark', name: 'Grande Norke', description: 'Predador dos mares', price: 450, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
     { id: 'badge_egghead', name: 'Cabeça de Ovo', description: 'Pensador único', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
 ];
 

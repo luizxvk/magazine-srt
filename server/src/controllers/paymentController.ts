@@ -78,10 +78,14 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         // Usar Orders API que funciona com contas de teste
         // A Payment API não funciona com credenciais de teste para PIX
-        const payerEmail = user.email || 'test@testuser.com';
+        
+        // Em sandbox, o email PRECISA ser @testuser.com
+        // Detectar sandbox pelo token (contas de teste tem APP_USR- mas são sandbox)
+        const isSandbox = accessToken.includes('3116392914') || process.env.MERCADOPAGO_TEST_MODE === 'true';
+        const payerEmail = isSandbox ? 'test@testuser.com' : (user.email || 'customer@email.com');
         const payerFirstName = user.name?.split(' ')[0] || 'Usuario';
         
-        console.log(`[PAYMENT] Payer: ${payerFirstName} - Email: ${payerEmail}`);
+        console.log(`[PAYMENT] Mode: ${isSandbox ? 'SANDBOX' : 'PRODUCTION'} - Payer: ${payerFirstName} - Email: ${payerEmail}`);
         
         // Criar order via API REST diretamente (Orders API)
         const orderData = JSON.stringify({

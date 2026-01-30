@@ -468,13 +468,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
             <AnimatePresence mode="wait">
                 {isMobileDrawerOpen && (
                     <>
-                        {/* Backdrop with blur */}
+                        {/* Backdrop - dark overlay without blur for performance */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-                            className={`fixed inset-0 ${user?.liteMode ? 'bg-black/70' : 'bg-black/50 backdrop-blur-md'} z-40 md:hidden`}
+                            className="fixed inset-0 bg-black/80 z-40 md:hidden"
                             onClick={() => setIsMobileDrawerOpen(false)}
                         />
                         

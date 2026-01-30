@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Package, Bell, Layout, Eye, Check } from 'lucide-react';
+import { X, Sparkles, Package, Eye, Check, Palette, Coins, Loader, Image } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.24';
+const CURRENT_VERSION = '0.4.25';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,36 +33,41 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.24 - Visual padronizado Apple Vision Pro, Supply Box com previews reais
+    // v0.4.25 - Zions Cash, Badges icons8, SupplyBox loader, Header icons personalizados
     const updates: UpdateItem[] = [
         {
-            icon: <Layout className="w-5 h-5 text-blue-400" />,
-            title: 'Visual Apple Vision Pro',
-            description: 'Todos os cards padronizados com estilo escuro premium, bordas sutis e efeito glass blur.',
+            icon: <Coins className="w-5 h-5 text-emerald-400" />,
+            title: 'Zions Cash - Sistema Monetário',
+            description: 'Nova moeda premium! Compre com PIX via MercadoPago. Sistema completo com abas Points/Cash na loja.',
             isNew: true
         },
         {
-            icon: <Eye className="w-5 h-5 text-purple-400" />,
+            icon: <Image className="w-5 h-5 text-pink-400" />,
+            title: 'Badges com Ícones Visuais',
+            description: 'Todas as badges agora têm ícones PNG do icons8! Foca, Grande Tubarão, Cabeça de Ovo e muito mais.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5 text-purple-400" />,
+            title: 'Ícones Personalizados no Header',
+            description: 'Todos os ícones do menu agora mudam de cor com sua accent color! Visual único pra cada usuário.',
+            isNew: true
+        },
+        {
+            icon: <Loader className="w-5 h-5 text-blue-400" />,
+            title: 'Loader Apple no Supply Box',
+            description: 'Animação estilo Apple enquanto abre a caixa. Experiência premium de abertura.',
+            isNew: true
+        },
+        {
+            icon: <Eye className="w-5 h-5 text-amber-400" />,
             title: 'Preview Real no Supply Box',
             description: 'Veja exatamente o item que você ganhou! Cores, fundos e bordas são exibidos com preview real.',
-            isNew: true
         },
         {
-            icon: <Package className="w-5 h-5 text-amber-400" />,
-            title: 'Duplicatas = Zions',
+            icon: <Package className="w-5 h-5 text-cyan-400" />,
+            title: 'Duplicatas = Zions Points',
             description: 'Itens duplicados são convertidos automaticamente em Zions Points de acordo com a raridade.',
-            isNew: true
-        },
-        {
-            icon: <Bell className="w-5 h-5 text-emerald-400" />,
-            title: 'Notificações Minimalistas',
-            description: 'Design limpo e elegante sem efeitos excessivos, seguindo o padrão Apple Vision Pro.',
-            isNew: true
-        },
-        {
-            icon: <Sparkles className="w-5 h-5 text-pink-400" />,
-            title: 'Cards de Acesso Rápido',
-            description: 'Carrossel mobile redesenhado com visual escuro padronizado e ícones coloridos.',
         }
     ];
 

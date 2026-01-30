@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const TOUR_VERSION = '0.4.25';
+
 interface WelcomeTourProps {
     isOpen?: boolean;
     onClose?: () => void;
@@ -20,15 +22,15 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
         // Only auto-show if using internal state (no external control)
         if (externalIsOpen !== undefined) return;
         
-        const hasSeenTour = localStorage.getItem('has_seen_tour');
-        if (!hasSeenTour) {
+        const seenTourVersion = localStorage.getItem('tour_version');
+        if (seenTourVersion !== TOUR_VERSION) {
             setInternalIsVisible(true);
         }
     }, [externalIsOpen]);
 
     const handleClose = () => {
         setStep(0);
-        localStorage.setItem('has_seen_tour', 'true');
+        localStorage.setItem('tour_version', TOUR_VERSION);
         if (externalOnClose) {
             externalOnClose();
         } else {

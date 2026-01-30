@@ -160,7 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [achievement, setAchievement] = useState<{ title: string; description: string } | null>(null);
-    const [toast, setToast] = useState<string | null>(null);
+    const [toast] = useState<string | null>(null); // Legacy - kept for compatibility
     const [toastData, setToastData] = useState<ToastData | null>(null);
     const [dailyLoginStatus, setDailyLoginStatus] = useState<DailyLoginStatus | null>(null);
     const [isDailyLoginModalOpen, setIsDailyLoginModalOpen] = useState(false);
@@ -775,41 +775,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const showAchievement = (title: string, description: string) => {
-        setAchievement({ title, description });
-    };
-
-    const clearAchievement = () => {
-        setAchievement(null);
-    };
-
-    const showToast = (message: string) => {
-        setToast(message);
-        setTimeout(() => setToast(null), 2000);
-    };
-
-    // Typed toast functions
-    const showSuccess = (message: string, description?: string) => {
-        setToastData({ message, description, type: 'success' });
-    };
-
-    const showError = (message: string, description?: string) => {
-        setToastData({ message, description, type: 'error' });
-    };
-
-    const showWarning = (message: string, description?: string) => {
-        setToastData({ message, description, type: 'warning' });
-    };
-
-    const showInfo = (message: string, description?: string) => {
-        setToastData({ message, description, type: 'info' });
-    };
-
-    const clearToast = () => {
-        setToastData(null);
-    };
-
-    // Edge Notification functions (Samsung Edge style)
+    // Edge Notification functions (Samsung Edge / Apple Vision Pro style)
     const showEdgeNotification = useCallback((
         type: EdgeNotificationType,
         title: string,
@@ -832,6 +798,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const closeEdgeNotification = useCallback((id: string) => {
         setEdgeNotifications(prev => prev.filter(n => n.id !== id));
     }, []);
+
+    // Achievement popup - NOW USES EDGE NOTIFICATION
+    const showAchievement = useCallback((title: string, description: string) => {
+        showEdgeNotification('achievement', title, description, { duration: 6000 });
+    }, [showEdgeNotification]);
+
+    const clearAchievement = () => {
+        setAchievement(null);
+    };
+
+    // Legacy toast - NOW USES EDGE NOTIFICATION  
+    const showToast = useCallback((message: string, type?: 'success' | 'error' | 'warning' | 'info') => {
+        const notifType = type || 'info';
+        showEdgeNotification(notifType, message, '');
+    }, [showEdgeNotification]);
+
+    // Typed toast functions - NOW USE EDGE NOTIFICATIONS
+    const showSuccess = useCallback((message: string, description?: string) => {
+        showEdgeNotification('success', message, description || '');
+    }, [showEdgeNotification]);
+
+    const showError = useCallback((message: string, description?: string) => {
+        showEdgeNotification('error', message, description || '');
+    }, [showEdgeNotification]);
+
+    const showWarning = useCallback((message: string, description?: string) => {
+        showEdgeNotification('warning', message, description || '');
+    }, [showEdgeNotification]);
+
+    const showInfo = useCallback((message: string, description?: string) => {
+        showEdgeNotification('info', message, description || '');
+    }, [showEdgeNotification]);
+
+    const clearToast = () => {
+        setToastData(null);
+    };
 
     const login = (token: string, userData: User, membershipContext?: 'MAGAZINE' | 'MGT') => {
         // Limpar flags de onboarding para mostrar WelcomeTour ao fazer novo login

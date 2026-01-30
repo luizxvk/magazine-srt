@@ -1202,7 +1202,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                     <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
                                                 )}
                                                 {item.type === 'badge' && (
-                                                    item.preview.startsWith('http') ? (
+                                                    item.preview.startsWith('http') || item.preview.startsWith('/') ? (
                                                         <img src={item.preview} alt={item.name} className="w-16 h-16 object-contain" />
                                                     ) : (
                                                         <span className="text-5xl">{item.preview}</span>

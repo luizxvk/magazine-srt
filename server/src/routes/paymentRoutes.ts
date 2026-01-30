@@ -11,6 +11,9 @@ router.post('/create-zions-preference', authenticateToken, paymentController.cre
 router.post('/zions/pix', authenticateToken, paymentController.createPixPayment);
 router.get('/status/:paymentId', authenticateToken, paymentController.checkPaymentStatus);
 
+// Simulação de pagamento (apenas em modo teste)
+router.post('/simulate-confirm', authenticateToken, paymentController.simulatePaymentConfirmation);
+
 // Webhook
 router.post('/webhook', paymentController.handleWebhook);
 

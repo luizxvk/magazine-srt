@@ -75,7 +75,35 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
-        // Criar pagamento PIX
+        // Modo de simulação para testes (não chama API do MercadoPago)
+        const isSimulationMode = process.env.MERCADOPAGO_SIMULATION_MODE === 'true';
+        
+        if (isSimulationMode) {
+            console.log(`[PAYMENT] SIMULATION MODE - Generating fake PIX`);
+            
+            // Simular um QR Code PIX fake para testes
+            const fakePixCode = `00020126580014br.gov.bcb.pix0136${newPurchase.id}5204000053039865406${price.toFixed(2)}5802BR5913MAGAZINE_TEST6009SAO_PAULO62070503***6304`;
+            
+            await prisma.zionPurchase.update({
+                where: { id: newPurchase.id },
+                data: { paymentId: `SIM_${Date.now()}` }
+            });
+            
+            return res.json({
+                paymentId: `SIM_${Date.now()}`,
+                purchaseId: newPurchase.id,
+                qrCode: fakePixCode,
+                qrCodeBase64: null,
+                copyPaste: fakePixCode,
+                ticketUrl: null,
+                status: 'pending',
+                expirationDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+                simulation: true,
+                message: 'MODO SIMULAÇÃO: Use /api/payments/simulate-confirm para simular confirmação'
+            });
+        }
+
+        // Criar pagamento PIX real
         // Garantir que BACKEND_URL tem https://
         let webhookUrl: string | undefined = undefined;
         if (process.env.BACKEND_URL) {
@@ -137,6 +165,59 @@ export const createPixPayment = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error('[PAYMENT] Error creating PIX payment:', error?.message || error);
         res.status(500).json({ error: 'Falha ao criar pagamento PIX' });
+    }
+};
+
+// Simular confirmação de pagamento (apenas em modo simulação)
+export const simulatePaymentConfirmation = async (req: Request, res: Response) => {
+    try {
+        const { purchaseId } = req.body;
+        const userId = (req as any).user?.userId || (req as any).user?.id;
+
+        if (process.env.MERCADOPAGO_SIMULATION_MODE !== 'true') {
+            return res.status(403).json({ error: 'Simulação não está habilitada' });
+        }
+
+        const purchase = await prisma.zionPurchase.findUnique({
+            where: { id: purchaseId },
+            include: { user: true }
+        });
+
+        if (!purchase) {
+            return res.status(404).json({ error: 'Compra não encontrada' });
+        }
+
+        if (purchase.userId !== userId) {
+            return res.status(403).json({ error: 'Acesso negado' });
+        }
+
+        if (purchase.status === 'COMPLETED') {
+            return res.status(400).json({ error: 'Pagamento já foi confirmado' });
+        }
+
+        // Creditar Zions
+        await prisma.$transaction([
+            prisma.zionPurchase.update({
+                where: { id: purchaseId },
+                data: { status: 'COMPLETED' }
+            }),
+            prisma.user.update({
+                where: { id: purchase.userId },
+                data: { zionsPoints: { increment: purchase.amount } }
+            })
+        ]);
+
+        console.log(`[PAYMENT] SIMULATION: Credited ${purchase.amount} Zions to user ${purchase.userId}`);
+
+        res.json({ 
+            success: true, 
+            message: `${purchase.amount} Zions creditados com sucesso!`,
+            newBalance: (purchase.user.zionsPoints || 0) + purchase.amount
+        });
+
+    } catch (error: any) {
+        console.error('[PAYMENT] Error simulating payment:', error?.message || error);
+        res.status(500).json({ error: 'Falha ao simular confirmação' });
     }
 };
 

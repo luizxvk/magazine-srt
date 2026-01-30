@@ -15,7 +15,6 @@ import VisitorBlockPopup from './VisitorBlockPopup';
 import RadioCard from './RadioCard';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
-import { getContrastColor } from '../utils/colorUtils';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface HeaderProps {
@@ -465,148 +464,230 @@ export default function Header({ onOpenShop }: HeaderProps) {
                 </div>
             </div>
 
-            {/* Mobile Menu Drawer */}
-            <AnimatePresence>
+            {/* Mobile Menu Drawer - Apple Vision Pro Style */}
+            <AnimatePresence mode="wait">
                 {isMobileDrawerOpen && (
                     <>
-                        {/* Backdrop */}
+                        {/* Backdrop with blur */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                            className={`fixed inset-0 ${user?.liteMode ? 'bg-black/70' : 'bg-black/50 backdrop-blur-md'} z-40 md:hidden`}
                             onClick={() => setIsMobileDrawerOpen(false)}
                         />
                         
-                        {/* Drawer */}
+                        {/* Drawer Panel */}
                         <motion.div
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={`mobile-menu-container fixed top-0 right-0 bottom-0 h-screen w-72 ${theme === 'light' ? 'bg-white/95' : 'bg-zinc-900/95'} backdrop-blur-xl z-[60] md:hidden shadow-2xl border-l ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} flex flex-col overflow-y-auto`}
+                            initial={{ x: '100%', opacity: 0.8 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: '100%', opacity: 0.8 }}
+                            transition={{ 
+                                type: 'spring', 
+                                damping: 30, 
+                                stiffness: 350,
+                                mass: 0.8
+                            }}
+                            className={`mobile-menu-container fixed top-0 right-0 bottom-0 h-screen w-80 z-[60] md:hidden flex flex-col overflow-hidden ${
+                                user?.liteMode 
+                                    ? (theme === 'light' ? 'bg-gray-100' : 'bg-zinc-950') 
+                                    : (theme === 'light' ? 'bg-white/90 backdrop-blur-2xl' : 'bg-black/80 backdrop-blur-2xl')
+                            } border-l ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')} shadow-[-20px_0_60px_rgba(0,0,0,0.5)]`}
                         >
-                            {/* Drawer Header */}
-                            <div className={`p-4 border-b ${headerBorder} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/50'}`}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className={`font-bold text-lg ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`}>
+                            {/* Gradient Overlay */}
+                            {!user?.liteMode && (
+                                <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-emerald-500/5 via-transparent to-emerald-500/5' : 'from-gold-500/5 via-transparent to-gold-500/5'} pointer-events-none`} />
+                            )}
+
+                            {/* Header with User Info */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className={`relative z-10 p-5 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                            >
+                                {/* Top Bar */}
+                                <div className="flex items-center justify-between mb-5">
+                                    <span className={`font-semibold text-sm uppercase tracking-wider ${theme === 'light' ? 'text-gray-500' : 'text-white/50'}`}>
                                         Menu
                                     </span>
                                     <div className="flex items-center gap-2">
                                         {!isVisitor && (
-                                            <button
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
                                                 onClick={() => {
                                                     setIsMobileDrawerOpen(false);
                                                     logout();
                                                 }}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105 text-sm"
-                                                style={{ 
-                                                    backgroundColor: user?.equippedColor ? `${user.equippedColor}20` : (isMGT ? '#10b98120' : '#d4af3720'),
-                                                    color: user?.equippedColor || (isMGT ? '#10b981' : '#d4af37')
-                                                }}
+                                                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                                                    theme === 'light' 
+                                                        ? 'bg-red-50 text-red-600 hover:bg-red-100' 
+                                                        : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                                                }`}
                                             >
                                                 <LogOut className="w-4 h-4" />
                                                 <span>Sair</span>
-                                            </button>
+                                            </motion.button>
                                         )}
-                                        <button
+                                        <motion.button
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
                                             onClick={() => setIsMobileDrawerOpen(false)}
-                                            className={`p-2 rounded-lg ${theme === 'light' ? 'text-gray-500 hover:bg-gray-200' : 'text-white/50 hover:bg-white/10'} transition-colors`}
+                                            className={`p-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-500' : 'bg-white/5 hover:bg-white/10 text-white/60'} transition-colors`}
                                         >
                                             <X className="w-5 h-5" />
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 </div>
                                 
-                                {/* User Info */}
+                                {/* User Profile Card */}
                                 {user && (
-                                    <Link 
-                                        to="/profile" 
-                                        onClick={() => setIsMobileDrawerOpen(false)}
-                                        className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors`}
+                                    <motion.div
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
                                     >
-                                        <div className={`w-12 h-12 rounded-full p-[2px]`} style={{ background: getProfileBorderGradient(user.equippedProfileBorder, isMGT) }}>
-                                            <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                                {user.avatarUrl ? (
-                                                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <User className={`w-6 h-6 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
-                                                )}
+                                        <Link 
+                                            to="/profile" 
+                                            onClick={() => setIsMobileDrawerOpen(false)}
+                                            className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${
+                                                theme === 'light' 
+                                                    ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200/50' 
+                                                    : (isMGT 
+                                                        ? 'bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20' 
+                                                        : 'bg-white/5 hover:bg-white/10 border border-white/10')
+                                            }`}
+                                        >
+                                            <div className="w-14 h-14 rounded-2xl p-[2px] shrink-0" style={{ background: getProfileBorderGradient(user.equippedProfileBorder, isMGT) }}>
+                                                <div className={`w-full h-full rounded-2xl flex items-center justify-center overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
+                                                    {user.avatarUrl ? (
+                                                        <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User className={`w-7 h-7 ${isMGT ? 'text-emerald-300' : 'text-gold-300'}`} />
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold truncate" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#10b981' : '#d4af37') }}>{user.displayName || user.name}</p>
-                                            <p className="text-xs" style={{ color: user.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#34d399' : '#e5c86d') }}>
-                                                {user.zionsPoints || 0} Points • Z$ {(user.zionsCash || 0).toFixed(2)}
-                                            </p>
-                                        </div>
-                                    </Link>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`text-base font-semibold truncate ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                    {user.displayName || user.name}
+                                                </p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className={`text-sm font-medium ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                        {user.zionsPoints || 0} Points
+                                                    </span>
+                                                    <span className={`text-sm ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>•</span>
+                                                    <span className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-white/60'}`}>
+                                                        Z$ {(user.zionsCash || 0).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </motion.div>
                                 )}
-                            </div>
+                            </motion.div>
 
-                            {/* Quick Actions */}
-                            <div className={`p-4 border-b ${headerBorder} flex gap-2`}>
-                                <button
-                                    onClick={() => {
-                                        setIsMobileDrawerOpen(false);
-                                        setIsSearchModalOpen(true);
-                                    }}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
-                                >
-                                    <Search className="w-4 h-4" />
-                                    <span className="text-sm">Buscar</span>
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setIsMobileDrawerOpen(false);
-                                        onOpenShop ? onOpenShop() : setIsShopOpen(true);
-                                    }}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
-                                >
-                                    <Store className="w-4 h-4" />
-                                    <span className="text-sm">Loja</span>
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setIsMobileDrawerOpen(false);
-                                        openZionsModal();
-                                    }}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
-                                >
-                                    <Coins className="w-4 h-4" />
-                                    <span className="text-sm">Zions Cash</span>
-                                </button>
-                            </div>
+                            {/* Quick Actions Grid */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.15 }}
+                                className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                            >
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { icon: Search, label: 'Buscar', action: () => { setIsMobileDrawerOpen(false); setIsSearchModalOpen(true); } },
+                                        { icon: Store, label: 'Loja', action: () => { setIsMobileDrawerOpen(false); onOpenShop ? onOpenShop() : setIsShopOpen(true); } },
+                                        { icon: Coins, label: 'Zions', action: () => { setIsMobileDrawerOpen(false); openZionsModal(); } },
+                                    ].map((item, idx) => (
+                                        <motion.button
+                                            key={item.label}
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.2 + idx * 0.05 }}
+                                            onClick={item.action}
+                                            className={`flex flex-col items-center gap-2 py-3 px-2 rounded-xl transition-all ${
+                                                theme === 'light'
+                                                    ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200/50'
+                                                    : (isMGT 
+                                                        ? 'bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20' 
+                                                        : 'bg-white/5 hover:bg-white/10 border border-white/10')
+                                            }`}
+                                        >
+                                            <item.icon className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                            <span className={`text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-white/70'}`}>{item.label}</span>
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            </motion.div>
 
-                            {/* Cards Section + Menu Items */}
-                            <div className="flex-1 overflow-y-auto px-4 py-2">
-                                <div className="flex flex-col gap-4 mb-4">
+                            {/* Scrollable Content */}
+                            <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
+                                {/* Feature Cards */}
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.25 }}
+                                    className="flex flex-col gap-3 mb-5"
+                                >
                                     <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileDrawerOpen(false); openDailyLoginModal(); }} />
                                     <RadioCard />
                                     <OnlineFriendsCard />
                                     <div className="md:hidden">
                                         <GroupChatCard />
                                     </div>
-                                </div>
+                                </motion.div>
 
-                                {/* Menu Items */}
-                                <div className="space-y-1">
-                                {menuItems.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={() => setIsMobileDrawerOpen(false)}
-                                        className={`flex items-center gap-3 px-4 py-3 rounded-lg ${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/5 text-white/80'} transition-colors`}
-                                    >
-                                        <span className={isMGT ? 'text-emerald-500' : 'text-gold-400'}>{item.icon}</span>
-                                        <span className="text-sm">{item.label}</span>
-                                        {item.badge && (
-                                            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-auto" />
-                                        )}
-                                    </Link>
-                                ))}
-                                </div>
+                                {/* Navigation Menu */}
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="space-y-1"
+                                >
+                                    <p className={`text-[10px] font-semibold uppercase tracking-widest mb-3 px-2 ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>
+                                        Navegação
+                                    </p>
+                                    {menuItems.map((item, idx) => (
+                                        <motion.div
+                                            key={item.path}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.35 + idx * 0.03 }}
+                                        >
+                                            <Link
+                                                to={item.path}
+                                                onClick={() => setIsMobileDrawerOpen(false)}
+                                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                                                    theme === 'light' 
+                                                        ? 'hover:bg-gray-100 text-gray-700' 
+                                                        : 'hover:bg-white/5 text-white/80'
+                                                }`}
+                                            >
+                                                <span style={{ color: accentColor }}>{item.icon}</span>
+                                                <span className="text-sm font-medium">{item.label}</span>
+                                                {item.badge && (
+                                                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-auto" />
+                                                )}
+                                            </Link>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
                             </div>
+
+                            {/* Footer */}
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                                className={`relative z-10 p-4 border-t ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                            >
+                                <p className={`text-[10px] text-center ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>
+                                    Powered by <span className="font-medium">Rovex</span>
+                                </p>
+                            </motion.div>
                         </motion.div>
                     </>
                 )}

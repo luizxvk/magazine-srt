@@ -43,27 +43,31 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const isDark = theme === 'dark';
 
-    // Apple Vision Pro style - glass morphism
+    // Apple Vision Pro style - glass morphism with dark backgrounds
     const themeColors = isMGT ? {
         accent: 'emerald',
-        gradient: 'from-emerald-500/20 to-emerald-900/40',
+        gradient: 'from-emerald-500/10 to-transparent',
         border: 'border-emerald-500/30',
         text: 'text-emerald-400',
         button: 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400',
-        glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
-        cardBg: isDark ? 'bg-gradient-to-br from-emerald-950/50 to-black/50' : 'bg-gradient-to-br from-emerald-50 to-white',
-        bg: isDark ? 'bg-black/80 backdrop-blur-2xl' : 'bg-white/90 backdrop-blur-2xl',
+        glow: 'shadow-[0_0_60px_rgba(16,185,129,0.15)]',
+        cardBg: isDark ? 'bg-black/60' : 'bg-white/90',
+        bg: isDark ? 'bg-zinc-950/95 backdrop-blur-2xl' : 'bg-white/95 backdrop-blur-2xl',
         cardBorder: 'border-emerald-500/20',
+        itemBg: isDark ? 'bg-black/40' : 'bg-gray-50',
+        itemBorder: isDark ? 'border-emerald-500/20' : 'border-emerald-200',
     } : {
         accent: 'gold',
-        gradient: 'from-amber-500/20 to-amber-900/40',
+        gradient: 'from-gold-500/10 to-transparent',
         border: 'border-gold-500/30',
         text: 'text-gold-400',
         button: 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400',
-        glow: 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
-        cardBg: isDark ? 'bg-gradient-to-br from-amber-950/30 to-black/50' : 'bg-gradient-to-br from-amber-50 to-white',
-        bg: isDark ? 'bg-black/80 backdrop-blur-2xl' : 'bg-white/90 backdrop-blur-2xl',
-        cardBorder: 'border-amber-500/20',
+        glow: 'shadow-[0_0_60px_rgba(212,175,55,0.15)]',
+        cardBg: isDark ? 'bg-black/60' : 'bg-white/90',
+        bg: isDark ? 'bg-zinc-950/95 backdrop-blur-2xl' : 'bg-white/95 backdrop-blur-2xl',
+        cardBorder: 'border-gold-500/20',
+        itemBg: isDark ? 'bg-black/40' : 'bg-gray-50',
+        itemBorder: isDark ? 'border-gold-500/20' : 'border-amber-200',
     };
 
     const handlePurchase = async (amount: number, type: TabType = 'points') => {
@@ -371,7 +375,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl overflow-y-auto">
             <div className={`w-full max-w-4xl rounded-3xl border ${themeColors.border} ${themeColors.glow} backdrop-blur-2xl ${themeColors.cardBg} flex flex-col my-auto relative overflow-hidden`}>
-                {/* Gradient background overlay */}
+                {/* Subtle gradient background overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${themeColors.gradient} pointer-events-none`} />
                 
                 {/* Header */}
@@ -436,9 +440,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                             {PACKAGES.map((pkg) => (
                                 <div
                                     key={pkg.zions}
-                                    className={`relative rounded-2xl border ${themeColors.border} backdrop-blur-xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:border-opacity-60 group overflow-hidden ${
-                                        isDark ? 'bg-black/30' : 'bg-white/50'
-                                    }`}
+                                    className={`relative rounded-2xl border ${themeColors.itemBorder} p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] group overflow-hidden ${themeColors.itemBg}`}
                                 >
                                     {/* Popular Badge */}
                                     {pkg.popular && (
@@ -494,9 +496,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                             {CASH_PACKAGES.map((pkg) => (
                                 <div
                                     key={pkg.amount}
-                                    className={`relative rounded-2xl border ${themeColors.border} backdrop-blur-xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:border-opacity-60 group overflow-hidden ${
-                                        isDark ? 'bg-black/30' : 'bg-white/50'
-                                    }`}
+                                    className={`relative rounded-2xl border ${themeColors.itemBorder} p-4 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] group overflow-hidden ${themeColors.itemBg}`}
                                 >
                                     {/* Popular Badge */}
                                     {pkg.popular && (

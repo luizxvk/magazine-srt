@@ -126,9 +126,11 @@ export const createPixPayment = async (req: Request, res: Response) => {
                         if (res.statusCode === 201 || res.statusCode === 200) {
                             resolve(json);
                         } else {
-                            reject(new Error(json.message || json.errors?.[0]?.description || `HTTP ${res.statusCode}`));
+                            console.error(`[PAYMENT] Orders API error: ${res.statusCode}`, JSON.stringify(json, null, 2));
+                            reject(new Error(json.message || json.errors?.[0]?.description || json.errors?.[0]?.message || `HTTP ${res.statusCode}`));
                         }
                     } catch (e) {
+                        console.error(`[PAYMENT] Failed to parse response:`, body);
                         reject(new Error(`Failed to parse response: ${body}`));
                     }
                 });

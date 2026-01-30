@@ -25,7 +25,7 @@ const BADGE_URLS: Record<string, string> = {
     'badge_star': 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000',
     'badge_diamond': 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000',
     'badge_lightning': 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000',
-    'badge_pony': 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000',
+    'badge_pony': 'https://img.icons8.com/?size=100&id=16114&format=png&color=000000',
     'badge_heart': 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000',
     'badge_moon': 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000',
     'badge_sun': 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000',

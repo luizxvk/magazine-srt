@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, X, Users, Coins, Rocket, Store, Menu, Star, Home, Trophy, Settings, Ticket, MessageCircle, Sparkles, ShoppingBag } from 'lucide-react';
+import { Search, User, X, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,7 @@ import GroupChatCard from './GroupChatCard';
 import CustomizationShop from './CustomizationShop';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import RadioCard from './RadioCard';
+import AccentIcon from './AccentIcon';
 import api from '../services/api';
 import logoSrt from '../assets/logo-mgt.png';
 import { getContrastColor } from '../utils/colorUtils';
@@ -160,18 +161,18 @@ export default function Header({ onOpenShop }: HeaderProps) {
     }, [isMobileDrawerOpen, setIsMobileDrawerOpen]);
 
     const menuItems = [
-        { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
-        { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
-        { icon: <ShoppingBag className="w-5 h-5" />, label: 'Loja de Produtos', path: '/store' },
-        { icon: <Trophy className="w-5 h-5" />, label: 'Ranking', path: '/ranking' },
-        { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
-        { icon: <MessageCircle className="w-5 h-5" />, label: 'Grupos', path: '/groups' },
-        { icon: <Store className="w-5 h-5" />, label: 'Mercado', path: '/market' },
-        { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
-        { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
-        { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
-        { icon: <Settings className="w-5 h-5" />, label: 'Configurações', path: '/settings' },
-        ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: 'Admin', path: '/admin' }] : []),
+        { icon: <AccentIcon icon="feed" size={20} />, label: 'Feed', path: '/feed' },
+        { icon: <AccentIcon icon="star" size={20} />, label: 'Destaques', path: '/highlights' },
+        { icon: <AccentIcon icon="shoppingbag" size={20} />, label: 'Loja de Produtos', path: '/store' },
+        { icon: <AccentIcon icon="trophy" size={20} />, label: 'Ranking', path: '/ranking' },
+        { icon: <AccentIcon icon="social" size={20} />, label: 'Social', path: '/social' },
+        { icon: <AccentIcon icon="groups" size={20} />, label: 'Grupos', path: '/groups' },
+        { icon: <AccentIcon icon="feed" size={20} />, label: 'Mercado', path: '/market' },
+        { icon: <AccentIcon icon="ticket" size={20} />, label: 'Recompensas', path: '/rewards' },
+        { icon: <AccentIcon icon="roadmap" size={20} />, label: 'Roadmap', path: '/roadmap' },
+        { icon: <AccentIcon icon="notifications" size={20} />, label: 'Notificações', path: '/notifications', badge: hasUnread },
+        { icon: <AccentIcon icon="settings" size={20} />, label: 'Configurações', path: '/settings' },
+        ...(user?.role === 'ADMIN' ? [{ icon: <AccentIcon icon="settings" size={20} />, label: 'Admin', path: '/admin' }] : []),
     ];
 
     return (
@@ -271,11 +272,11 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         {/* Shop Button - Always visible */}
                         <button
                             onClick={() => onOpenShop ? onOpenShop() : setIsShopOpen(true)}
-                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                            className="p-2 transition-all hover:scale-110"
                             aria-label="Loja"
                             title="Loja de Personalização"
                         >
-                            <Store className="w-5 h-5" />
+                            <AccentIcon icon="feed" size={20} />
                         </button>
 
                         <Link 
@@ -287,21 +288,21 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     setShowVisitorBlock(true);
                                 }
                             }}
-                            className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} 
+                            className="relative p-2 transition-all hover:scale-110"
                             aria-label="Social"
                         >
-                            <Users className="w-5 h-5" />
+                            <AccentIcon icon="social" size={20} />
                         </Link>
 
-                        <Link to="/groups" className={`relative p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Grupos" title="Grupos">
-                            <MessageCircle className="w-5 h-5" />
+                        <Link to="/groups" className="relative p-2 transition-all hover:scale-110" aria-label="Grupos" title="Grupos">
+                            <AccentIcon icon="groups" size={20} />
                             {(hasGroupInvites || hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}
                         </Link>
 
-                        <Link to="/roadmap" className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`} aria-label="Roadmap" title="Roadmap">
-                            <Rocket className="w-5 h-5" />
+                        <Link to="/roadmap" className="p-2 transition-all hover:scale-110" aria-label="Roadmap" title="Roadmap">
+                            <AccentIcon icon="roadmap" size={20} />
                         </Link>
 
                         <div className="relative">
@@ -314,10 +315,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         setShowNotifications(!showNotifications);
                                     }
                                 }}
-                                className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-red-400' : 'text-gold-400 hover:text-gold-300')} transition-colors relative`}
+                                className="p-2 transition-all hover:scale-110 relative"
                                 aria-label="Notifications"
                             >
-                                <Bell className="w-5 h-5" />
+                                <AccentIcon icon="notifications" size={20} />
                                 {!isVisitor && hasUnread && (
                                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                                 )}
@@ -334,18 +335,18 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     openZionsModal();
                                 }
                             }}
-                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                            className="p-2 transition-all hover:scale-110"
                             title="Adquirir Zions"
                         >
-                            <Coins className="w-5 h-5" />
+                            <AccentIcon icon="coins" size={20} />
                         </button>
 
                         <button
                             onClick={() => setIsWhatsNewModalOpen(true)}
-                            className={`p-2 ${theme === 'light' ? 'text-black hover:text-gray-700' : (isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300')} transition-colors`}
+                            className="p-2 transition-all hover:scale-110"
                             title="O que há de novo"
                         >
-                            <Sparkles className="w-5 h-5" />
+                            <AccentIcon icon="whatsnew" size={20} />
                         </button>
                     </div>
 
@@ -441,11 +442,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     {!isVisitor && (
                         <button
                             onClick={logout}
-                            className={`hidden md:block p-2 transition-colors border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
-                            style={{ color: user?.equippedColor ? getContrastColor(user.equippedColor) : (isMGT ? '#10b981' : '#d4af37') }}
+                            className={`hidden md:block p-2 transition-all hover:scale-110 border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
                             title="Sair"
                         >
-                            <LogOut className="w-5 h-5" />
+                            <AccentIcon icon="logout" size={20} />
                         </button>
                     )}
 
@@ -494,13 +494,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     setIsMobileDrawerOpen(false);
                                                     logout();
                                                 }}
-                                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-sm"
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105 text-sm"
                                                 style={{ 
                                                     backgroundColor: user?.equippedColor ? `${user.equippedColor}20` : (isMGT ? '#10b98120' : '#d4af3720'),
                                                     color: user?.equippedColor || (isMGT ? '#10b981' : '#d4af37')
                                                 }}
                                             >
-                                                <LogOut className="w-4 h-4" />
+                                                <AccentIcon icon="logout" size={16} />
                                                 <span>Sair</span>
                                             </button>
                                         )}
@@ -558,7 +558,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
                                 >
-                                    <Store className="w-4 h-4" />
+                                    <AccentIcon icon="feed" size={16} />
                                     <span className="text-sm">Loja</span>
                                 </button>
                                 <button
@@ -568,7 +568,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'} transition-colors`}
                                 >
-                                    <Coins className="w-4 h-4" />
+                                    <AccentIcon icon="coins" size={16} />
                                     <span className="text-sm">Zions Cash</span>
                                 </button>
                             </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Sparkles, Wallet, Zap } from 'lucide-react';
+import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Wallet, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -199,94 +199,181 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
 
     if (!isOpen) return null;
 
-    // Success Popup - Apple Vision Pro Premium Style
+    // Success Popup - Apple Pay Premium Style
     if (showSuccess) {
         return (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
-                <div className="relative">
-                    {/* Glow effect */}
-                    <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} blur-[100px] opacity-30 animate-pulse`} />
-                    
-                    <div className={`relative w-full max-w-sm ${isDark ? 'bg-black/60' : 'bg-white/90'} backdrop-blur-3xl rounded-[2.5rem] border ${isMGT ? 'border-emerald-500/30' : 'border-amber-500/30'} shadow-2xl p-8 text-center overflow-hidden`}>
-                        {/* Animated gradient background */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${isMGT ? 'from-emerald-500/10 via-transparent to-emerald-500/5' : 'from-amber-500/10 via-transparent to-amber-500/5'} animate-pulse`} />
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                {/* Dark overlay with subtle gradient */}
+                <div className="absolute inset-0 bg-black/95" />
+                
+                {/* Centered radial glow behind card */}
+                <div 
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} opacity-20 blur-[120px]`}
+                    style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
+                />
+                
+                {/* Confetti particles */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {[...Array(20)].map((_, i) => (
+                        <div
+                            key={i}
+                            className={`absolute w-2 h-2 rounded-full ${
+                                i % 3 === 0 ? (isMGT ? 'bg-emerald-400' : 'bg-amber-400') :
+                                i % 3 === 1 ? (isMGT ? 'bg-emerald-300' : 'bg-amber-300') :
+                                'bg-white'
+                            }`}
+                            style={{
+                                left: `${10 + (i * 4.5)}%`,
+                                top: '-10px',
+                                animation: `confetti-fall ${2 + (i % 3) * 0.5}s ease-out forwards`,
+                                animationDelay: `${i * 0.1}s`,
+                                opacity: 0.8
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Main Card - Apple Vision Pro glassmorphism */}
+                <div 
+                    className="relative z-10 w-full max-w-[340px]"
+                    style={{ animation: 'card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                >
+                    <div className={`relative overflow-hidden rounded-[32px] ${isDark ? 'bg-zinc-900/80' : 'bg-white/90'} backdrop-blur-3xl border ${isMGT ? 'border-emerald-500/20' : 'border-amber-500/20'} shadow-2xl`}>
                         
-                        {/* Floating particles */}
-                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                            {[...Array(6)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className={`absolute w-2 h-2 rounded-full ${isMGT ? 'bg-emerald-400' : 'bg-amber-400'} opacity-60`}
-                                    style={{
-                                        left: `${20 + i * 15}%`,
-                                        animation: `float ${2 + i * 0.5}s ease-in-out infinite`,
-                                        animationDelay: `${i * 0.3}s`,
-                                        top: '50%'
-                                    }}
-                                />
-                            ))}
-                        </div>
+                        {/* Inner glow at top */}
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} opacity-10 blur-3xl rounded-full`} />
                         
-                        {/* Success Icon */}
-                        <div className="relative z-10 mb-6">
-                            <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full ${isMGT ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' : 'bg-gradient-to-br from-amber-500 to-amber-600'} shadow-2xl`}>
+                        <div className="relative p-8 pt-10">
+                            {/* Animated Checkmark - Apple Pay style */}
+                            <div className="flex justify-center mb-8">
                                 <div className="relative">
-                                    <CheckCircle className="w-12 h-12 text-white animate-[scale_0.5s_ease-out]" />
-                                    <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-white animate-ping" />
+                                    {/* Outer ring */}
+                                    <div 
+                                        className={`w-24 h-24 rounded-full ${isMGT ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' : 'bg-gradient-to-br from-amber-500 to-amber-600'}`}
+                                        style={{ animation: 'scale-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
+                                    >
+                                        {/* Inner checkmark with SVG animation */}
+                                        <svg 
+                                            className="absolute inset-0 w-full h-full p-6" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none"
+                                        >
+                                            <path 
+                                                d="M4 12.5L9.5 18L20 6" 
+                                                stroke="white" 
+                                                strokeWidth="3" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round"
+                                                className="check-path"
+                                                style={{
+                                                    strokeDasharray: 30,
+                                                    strokeDashoffset: 30,
+                                                    animation: 'draw-check 0.4s ease-out 0.3s forwards'
+                                                }}
+                                            />
+                                        </svg>
+                                    </div>
+                                    
+                                    {/* Sparkle effects */}
+                                    <div 
+                                        className={`absolute -top-1 -right-1 w-4 h-4 ${isMGT ? 'bg-emerald-300' : 'bg-amber-300'} rounded-full`}
+                                        style={{ animation: 'sparkle 1s ease-out 0.5s forwards', opacity: 0 }}
+                                    />
+                                    <div 
+                                        className={`absolute -bottom-1 -left-1 w-3 h-3 ${isMGT ? 'bg-emerald-400' : 'bg-amber-400'} rounded-full`}
+                                        style={{ animation: 'sparkle 1s ease-out 0.7s forwards', opacity: 0 }}
+                                    />
+                                    <div 
+                                        className={`absolute top-1/2 -right-3 w-2 h-2 ${isMGT ? 'bg-emerald-200' : 'bg-amber-200'} rounded-full`}
+                                        style={{ animation: 'sparkle 1s ease-out 0.6s forwards', opacity: 0 }}
+                                    />
                                 </div>
                             </div>
-                        </div>
-                        
-                        {/* Title */}
-                        <h2 className={`relative z-10 text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                            {showSuccess.type === 'cash' ? 'Recarga Realizada!' : 'Compra Realizada!'}
-                        </h2>
-                        
-                        {/* Amount */}
-                        <div className="relative z-10 mb-6">
-                            <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl ${isDark ? 'bg-white/5' : 'bg-black/5'} border ${isMGT ? 'border-emerald-500/20' : 'border-amber-500/20'}`}>
-                                {showSuccess.type === 'cash' ? (
-                                    <Wallet className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
-                                ) : (
-                                    <Coins className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
-                                )}
-                                <span className={`text-3xl font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                    {showSuccess.type === 'cash' ? `Z$ ${showSuccess.amount}` : `+${showSuccess.amount}`}
-                                </span>
-                                {showSuccess.type !== 'cash' && (
-                                    <span className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Points</span>
-                                )}
+                            
+                            {/* Title */}
+                            <h2 
+                                className={`text-center text-2xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}
+                                style={{ animation: 'fade-up 0.5s ease-out 0.2s forwards', opacity: 0 }}
+                            >
+                                {showSuccess.type === 'cash' ? 'Recarga Realizada!' : 'Compra Realizada!'}
+                            </h2>
+                            
+                            {/* Amount display - Apple Pay style ticket */}
+                            <div 
+                                className="my-6"
+                                style={{ animation: 'fade-up 0.5s ease-out 0.3s forwards', opacity: 0 }}
+                            >
+                                <div className={`relative mx-auto max-w-[200px] py-4 px-6 rounded-2xl ${isDark ? 'bg-black/40' : 'bg-gray-100'} border ${isMGT ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
+                                    {/* Decorative dots */}
+                                    <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${isDark ? 'bg-zinc-900' : 'bg-white'}`} />
+                                    <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${isDark ? 'bg-zinc-900' : 'bg-white'}`} />
+                                    
+                                    <div className="flex items-center justify-center gap-2">
+                                        {showSuccess.type === 'cash' ? (
+                                            <Wallet className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                        ) : (
+                                            <Coins className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                        )}
+                                        <span className={`text-3xl font-bold tracking-tight ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                            {showSuccess.type === 'cash' ? `Z$ ${showSuccess.amount}` : `+${showSuccess.amount}`}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
+                            
+                            {/* Description */}
+                            <p 
+                                className={`text-center text-sm mb-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                                style={{ animation: 'fade-up 0.5s ease-out 0.4s forwards', opacity: 0 }}
+                            >
+                                {showSuccess.type === 'cash' 
+                                    ? 'Seu saldo foi creditado com sucesso!' 
+                                    : 'Seus Zions Points foram creditados!'
+                                }
+                            </p>
+                            
+                            {/* Continue Button */}
+                            <button
+                                onClick={handleSuccessClose}
+                                className={`w-full py-4 rounded-2xl font-semibold text-white text-lg ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-400 active:bg-amber-600'} transition-all duration-200 active:scale-[0.98]`}
+                                style={{ animation: 'fade-up 0.5s ease-out 0.5s forwards', opacity: 0 }}
+                            >
+                                Continuar
+                            </button>
                         </div>
-                        
-                        {/* Description */}
-                        <p className={`relative z-10 text-sm mb-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {showSuccess.type === 'cash' 
-                                ? 'Seu saldo foi creditado com sucesso!' 
-                                : 'Seus Zions Points foram creditados com sucesso!'
-                            }
-                        </p>
-                        
-                        {/* Close Button */}
-                        <button
-                            onClick={handleSuccessClose}
-                            className={`relative z-10 w-full py-4 rounded-2xl font-bold text-white text-lg ${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400' : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400'} transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]`}
-                        >
-                            Continuar
-                        </button>
                     </div>
                 </div>
                 
-                {/* CSS for floating animation */}
+                {/* Apple Pay style animations */}
                 <style>{`
-                    @keyframes float {
-                        0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
-                        50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+                    @keyframes pulse-glow {
+                        0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1); }
+                        50% { opacity: 0.25; transform: translate(-50%, -50%) scale(1.1); }
                     }
-                    @keyframes scale {
+                    @keyframes card-appear {
+                        0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+                        100% { opacity: 1; transform: scale(1) translateY(0); }
+                    }
+                    @keyframes scale-bounce {
                         0% { transform: scale(0); }
-                        50% { transform: scale(1.2); }
+                        60% { transform: scale(1.1); }
                         100% { transform: scale(1); }
+                    }
+                    @keyframes draw-check {
+                        to { stroke-dashoffset: 0; }
+                    }
+                    @keyframes sparkle {
+                        0% { opacity: 0; transform: scale(0); }
+                        50% { opacity: 1; transform: scale(1.5); }
+                        100% { opacity: 0; transform: scale(0); }
+                    }
+                    @keyframes fade-up {
+                        0% { opacity: 0; transform: translateY(10px); }
+                        100% { opacity: 1; transform: translateY(0); }
+                    }
+                    @keyframes confetti-fall {
+                        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
                     }
                 `}</style>
             </div>

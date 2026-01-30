@@ -229,7 +229,10 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                         🎯 Cores
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        💰 10-200 Zions
+                                        � Packs
+                                    </span>
+                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
+                                        �💰 10-200 Zions
                                     </span>
                                 </div>
                             </div>

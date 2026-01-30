@@ -111,7 +111,9 @@ export default function FeedPage() {
                     id: p.user.id,
                     name: p.user.displayName || p.user.name,
                     avatarUrl: p.user.avatarUrl,
-                    trophies: p.user.trophies || 0
+                    trophies: p.user.trophies || 0,
+                    membershipType: p.user.membershipType,
+                    equippedProfileBorder: p.user.equippedProfileBorder
                 },
                 content: p.caption || '',
                 image: p.imageUrl,
@@ -122,7 +124,14 @@ export default function FeedPage() {
                 isHighlight: p.isHighlight,
                 tags: p.tags?.map((t: any) => t.tag) || [],
                 isLiked: p.isLiked || false,
-                poll: p.poll || null,
+                poll: p.poll ? {
+                    ...p.poll,
+                    options: p.poll.options.map((opt: any) => ({
+                        ...opt,
+                        voteCount: opt.votesCount ?? opt.voteCount ?? 0,
+                        percentage: opt.percentage ?? 0
+                    }))
+                } : null,
                 linkedProduct: p.linkedProduct || null
             }));
             
@@ -404,7 +413,7 @@ export default function FeedPage() {
                                                     // Update local state after vote
                                                     setPosts(prev => prev.map(p => {
                                                         if (p.id !== postId || !p.poll) return p;
-                                                        const totalVotes = p.poll.totalVotes + 1;
+                                                        const totalVotes = (p.poll.totalVotes || 0) + 1;
                                                         return {
                                                             ...p,
                                                             poll: {
@@ -412,11 +421,13 @@ export default function FeedPage() {
                                                                 totalVotes,
                                                                 userVotedOptionId: optionId,
                                                                 options: p.poll.options.map(opt => {
-                                                                    const newVoteCount = opt.id === optionId ? opt.voteCount + 1 : opt.voteCount;
+                                                                    const currentVotes = opt.voteCount || 0;
+                                                                    const newVoteCount = opt.id === optionId ? currentVotes + 1 : currentVotes;
+                                                                    const percentage = totalVotes > 0 ? Math.round((newVoteCount / totalVotes) * 100) : 0;
                                                                     return {
                                                                         ...opt,
                                                                         voteCount: newVoteCount,
-                                                                        percentage: Math.round((newVoteCount / totalVotes) * 100)
+                                                                        percentage: isNaN(percentage) ? 0 : percentage
                                                                     };
                                                                 })
                                                             }

@@ -31,22 +31,24 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const defaultAccent = isMGT ? '#10b981' : '#d4af37';
     const userAccent = accentColor || defaultAccent;
 
-    // Apple Vision Pro Glass Morphism Style
+    // Themed Glass Morphism Style - MGT (emerald) vs Magazine (dark/gold)
     const cardBg = theme === 'light' 
-        ? 'bg-white/70' 
-        : 'bg-white/[0.03]';
+        ? 'bg-white/80' 
+        : (isMGT ? 'bg-emerald-950/40' : 'bg-black/60');
     const cardBorder = theme === 'light' 
-        ? 'border-white/50' 
-        : 'border-white/[0.08]';
+        ? 'border-gray-200/50' 
+        : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20');
     const cardShadow = theme === 'light'
-        ? 'shadow-[0_8px_32px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(255,255,255,0.5)]'
-        : 'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_0_0_1px_rgba(255,255,255,0.05)]';
+        ? 'shadow-[0_8px_32px_rgba(0,0,0,0.08)]'
+        : (isMGT 
+            ? 'shadow-[0_8px_32px_rgba(16,185,129,0.15),inset_0_0_0_1px_rgba(16,185,129,0.1)]' 
+            : 'shadow-[0_8px_32px_rgba(212,175,55,0.15),inset_0_0_0_1px_rgba(212,175,55,0.1)]');
     const inputBg = theme === 'light' 
         ? 'bg-gray-100/80' 
-        : 'bg-white/[0.04]';
+        : (isMGT ? 'bg-emerald-900/30' : 'bg-black/40');
     const inputBorder = theme === 'light'
         ? 'border-gray-200/50'
-        : 'border-white/[0.06]';
+        : (isMGT ? 'border-emerald-500/20' : 'border-white/10');
     const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textMuted = theme === 'light' ? 'text-gray-500' : 'text-white/50';
 
@@ -137,11 +139,13 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className={`${cardBg} rounded-3xl border ${cardBorder} ${cardShadow} backdrop-blur-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_16px_48px_rgba(0,0,0,0.2)]`}
+            className={`${cardBg} rounded-3xl border ${cardBorder} ${cardShadow} backdrop-blur-xl overflow-hidden transition-all duration-500`}
             style={{
                 background: theme === 'light' 
-                    ? 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)'
-                    : `linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)`,
+                    ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)'
+                    : (isMGT 
+                        ? 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(6,78,59,0.15) 100%)'
+                        : 'linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.9) 100%)'),
             }}
         >
             {/* Subtle accent glow */}

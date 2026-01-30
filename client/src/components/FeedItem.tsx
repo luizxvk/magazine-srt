@@ -220,18 +220,39 @@ export default function FeedItem({
         }
     };
 
+    // Themed styles
+    const cardBg = theme === 'light' 
+        ? 'bg-white/90' 
+        : (isMGT ? 'bg-emerald-950/40' : 'bg-black/60');
+    const cardBorder = theme === 'light' 
+        ? 'border-gray-200' 
+        : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20');
+    const cardHoverBorder = isMGT ? 'hover:border-emerald-500/40' : 'hover:border-gold-500/40';
+    const cardShadow = theme === 'light'
+        ? 'shadow-lg'
+        : (isMGT 
+            ? 'shadow-[0_8px_32px_rgba(16,185,129,0.1)]' 
+            : 'shadow-[0_8px_32px_rgba(212,175,55,0.1)]');
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            whileHover={!isExpanded ? { scale: 1.02, y: -5 } : {}}
+            whileHover={!isExpanded ? { scale: 1.01, y: -3 } : {}}
             onMouseDown={() => setIsPressed(true)}
             onMouseUp={() => setIsPressed(false)}
             onMouseLeave={() => setIsPressed(false)}
             onTouchStart={() => setIsPressed(true)}
             onTouchEnd={() => setIsPressed(false)}
-            className={`glass-panel rounded-xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-200 ${isMGT ? 'hover:border-white/40' : 'hover:border-gold-500/40'} ${isPressed && theme === 'light' ? 'shadow-[0_0_30px_rgba(0,0,0,0.15)] ring-2 ring-gray-300' : ''}`}
+            className={`${cardBg} rounded-2xl border ${cardBorder} ${cardShadow} backdrop-blur-xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-300 ${cardHoverBorder} ${isPressed && theme === 'light' ? 'ring-2 ring-gray-300' : ''}`}
+            style={{
+                background: theme === 'light' 
+                    ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,250,250,0.9) 100%)'
+                    : (isMGT 
+                        ? 'linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(6,78,59,0.12) 100%)'
+                        : 'linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.9) 100%)')
+            }}
         >
             {(image || video) && (
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-square md:aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>
@@ -248,20 +269,20 @@ export default function FeedItem({
             )}
 
             {/* Content */}
-            <div className={`p-6 flex flex-col flex-1 relative ${theme === 'light' ? 'bg-white/80' : 'bg-black/40'} backdrop-blur-sm ${!(image || video) ? 'min-h-[200px]' : ''}`}>
+            <div className={`p-5 flex flex-col flex-1 relative ${!(image || video) ? 'min-h-[180px]' : ''}`}>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full p-[2px]" style={{ background: getProfileBorderGradient(authorProfileBorder, authorMembershipType === 'MGT') }}>
-                            <div className="w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full p-[2px] shadow-md" style={{ background: getProfileBorderGradient(authorProfileBorder, authorMembershipType === 'MGT') }}>
+                            <div className={`w-full h-full rounded-full overflow-hidden flex items-center justify-center ${theme === 'light' ? 'bg-gray-100' : 'bg-black'}`}>
                                 {authorAvatar ? (
                                     <img src={authorAvatar} alt={author} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} />
+                                    <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: userAccent }} />
                                 )}
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">{author}</span>
+                            <span className={`text-xs font-medium uppercase tracking-wider`} style={{ color: userAccent }}>{author}</span>
                             {authorId && <BadgeDisplay userId={authorId} />}
                         </div>
                     </div>

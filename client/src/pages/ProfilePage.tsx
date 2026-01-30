@@ -7,7 +7,7 @@ import Ranking from '../components/Ranking';
 import Badges from '../components/Badges';
 import Rewards from '../components/Rewards';
 import ModernLoader from '../components/ModernLoader';
-import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, ZoomIn, ZoomOut, Move, BadgeCheck } from 'lucide-react';
+import { Camera, Edit2, Palette, Trash2, Share2, UserPlus, UserCheck, MessageCircle, ZoomIn, ZoomOut, Move, BadgeCheck, BarChart3 } from 'lucide-react';
 import EditProfileModal from '../components/EditProfileModal';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import ToastNotification from '../components/ToastNotification';
@@ -651,6 +651,54 @@ export default function ProfilePage() {
                                             )}
                                             
                                             <p className="text-gray-300 text-sm mb-3">{post.caption}</p>
+
+                                            {/* Poll Section */}
+                                            {post.pollOptions && post.pollOptions.length > 0 && (
+                                                <div className="mb-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <BarChart3 className={`w-4 h-4 ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`} />
+                                                        <span className="text-sm font-medium text-gray-300">
+                                                            {post.pollOptions.reduce((acc: number, opt: any) => acc + (opt.votes?.length || opt._count?.votes || 0), 0)} votos
+                                                        </span>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        {post.pollOptions.map((option: any) => {
+                                                            const totalVotes = post.pollOptions.reduce((acc: number, opt: any) => acc + (opt.votes?.length || opt._count?.votes || 0), 0);
+                                                            const optionVotes = option.votes?.length || option._count?.votes || 0;
+                                                            const percentage = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
+                                                            
+                                                            return (
+                                                                <div
+                                                                    key={option.id}
+                                                                    className="relative p-3 rounded-xl overflow-hidden"
+                                                                    style={{
+                                                                        background: 'rgba(255,255,255,0.05)',
+                                                                        border: '1px solid rgba(255,255,255,0.1)'
+                                                                    }}
+                                                                >
+                                                                    {/* Progress bar */}
+                                                                    <div
+                                                                        className="absolute inset-y-0 left-0 rounded-xl"
+                                                                        style={{ 
+                                                                            width: `${percentage}%`,
+                                                                            background: isMGT 
+                                                                                ? 'linear-gradient(90deg, rgba(16,185,129,0.3), rgba(16,185,129,0.15))'
+                                                                                : 'linear-gradient(90deg, rgba(212,175,55,0.3), rgba(212,175,55,0.15))'
+                                                                        }}
+                                                                    />
+                                                                    <div className="relative flex items-center justify-between">
+                                                                        <span className="text-sm text-white">{option.text}</span>
+                                                                        <span className={`text-sm font-semibold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                                            {percentage}%
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             <div className="flex items-center gap-4 text-xs text-gray-500 justify-between">
                                                 <div className="flex gap-4">
                                                     <span>{new Date(post.createdAt).toLocaleDateString()}</span>

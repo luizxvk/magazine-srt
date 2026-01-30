@@ -411,7 +411,7 @@ export default function ProfilePage() {
                                             <img 
                                                 src={BADGE_URLS[badgeToShow]}
                                                 alt="Badge"
-                                                className={`object-contain ${BADGE_URLS[badgeToShow].startsWith('/') ? 'w-12 h-12' : 'w-8 h-8'}`}
+                                                className={`object-contain ${BADGE_URLS[badgeToShow].startsWith('/') ? 'w-16 h-16' : 'w-8 h-8'}`}
                                             />
                                         ) : (
                                             <span className="text-3xl">👑</span>

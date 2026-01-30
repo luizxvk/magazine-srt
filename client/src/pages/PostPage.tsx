@@ -21,41 +21,64 @@ export default function PostPage() {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                // const response = await api.get(`/feed`); // Ideally we should have a get single post endpoint, but for now we filter
-                // Or better, if backend supports it: api.get(`/posts/${id}`)
-                // Let's try to find it in the feed first or implement a get single post if needed.
-                // Assuming /posts/:id might exist or we filter from feed.
-                // Actually, let's try to fetch the specific post if possible.
-                // If not, we fetch feed and find it.
-
-                // Trying to fetch specific post
-                // Since I don't know if GET /posts/:id exists and returns the same format as feed, 
-                // I'll fetch feed and filter for safety as I know feed structure.
-                const feedRes = await api.get('/feed');
-                const foundPost = feedRes.data.find((p: any) => p.id === id);
-
-                if (foundPost) {
-                    setPost({
-                        id: foundPost.id,
-                        author: {
-                            id: foundPost.user.id,
-                            name: foundPost.user.displayName || foundPost.user.name,
-                            avatarUrl: foundPost.user.avatarUrl,
-                            trophies: foundPost.user.trophies || 0
-                        },
-                        content: foundPost.caption || '',
-                        image: foundPost.imageUrl,
-                        video: foundPost.videoUrl,
-                        likes: foundPost.likesCount || 0,
-                        comments: foundPost.commentsCount || 0,
-                        timestamp: foundPost.createdAt,
-                        isHighlight: foundPost.isHighlight,
-                        tags: foundPost.tags?.map((t: any) => t.tag) || [],
-                        likedBy: foundPost.isLiked ? ['me'] : []
-                    });
-                }
+                // Try to fetch specific post first
+                const response = await api.get(`/posts/${id}`);
+                const p = response.data;
+                
+                setPost({
+                    id: p.id,
+                    author: {
+                        id: p.user.id,
+                        name: p.user.displayName || p.user.name,
+                        avatarUrl: p.user.avatarUrl,
+                        trophies: p.user.trophies || 0,
+                        membershipType: p.user.membershipType,
+                        equippedProfileBorder: p.user.equippedProfileBorder
+                    },
+                    content: p.caption || '',
+                    image: p.imageUrl,
+                    video: p.videoUrl,
+                    likes: p.likesCount || p.likes?.length || 0,
+                    comments: p.commentsCount || 0,
+                    timestamp: p.createdAt,
+                    isHighlight: p.isHighlight,
+                    tags: p.tags?.map((t: any) => t.tag) || [],
+                    likedBy: p.isLiked ? ['me'] : [],
+                    pollQuestion: p.pollQuestion,
+                    pollOptions: p.pollOptions,
+                    userVote: p.userVote
+                });
             } catch (error) {
                 console.error('Failed to fetch post', error);
+                // Fallback: try feed
+                try {
+                    const feedRes = await api.get('/feed?limit=50');
+                    const foundPost = feedRes.data.find((p: any) => p.id === id);
+                    if (foundPost) {
+                        setPost({
+                            id: foundPost.id,
+                            author: {
+                                id: foundPost.user.id,
+                                name: foundPost.user.displayName || foundPost.user.name,
+                                avatarUrl: foundPost.user.avatarUrl,
+                                trophies: foundPost.user.trophies || 0,
+                                membershipType: foundPost.user.membershipType,
+                                equippedProfileBorder: foundPost.user.equippedProfileBorder
+                            },
+                            content: foundPost.caption || '',
+                            image: foundPost.imageUrl,
+                            video: foundPost.videoUrl,
+                            likes: foundPost.likesCount || 0,
+                            comments: foundPost.commentsCount || 0,
+                            timestamp: foundPost.createdAt,
+                            isHighlight: foundPost.isHighlight,
+                            tags: foundPost.tags?.map((t: any) => t.tag) || [],
+                            likedBy: foundPost.isLiked ? ['me'] : []
+                        });
+                    }
+                } catch (feedError) {
+                    console.error('Failed to fetch from feed too', feedError);
+                }
             } finally {
                 setLoading(false);
             }

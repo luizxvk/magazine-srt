@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +12,7 @@ interface MobileCarouselProps {
     onDailyLoginClick: () => void;
     onNewMembersClick: () => void;
     onEventsClick: () => void;
+    onSupplyBoxClick?: () => void;
 }
 
 interface CarouselCard {
@@ -28,7 +29,8 @@ export default function MobileCarousel({
     dailyLoginStatus,
     onDailyLoginClick,
     onNewMembersClick,
-    onEventsClick
+    onEventsClick,
+    onSupplyBoxClick
 }: MobileCarouselProps) {
     const { user, accentColor } = useAuth();
     const navigate = useNavigate();
@@ -54,6 +56,15 @@ export default function MobileCarousel({
             gradient: 'from-amber-500 to-orange-600',
             onClick: onDailyLoginClick,
             badge: dailyLoginStatus?.claimed ? '✓' : dailyLoginStatus?.nextReward
+        },
+        {
+            id: 'supplybox',
+            title: 'Supply Box',
+            subtitle: 'Abra e ganhe prêmios!',
+            icon: <Package className="w-6 h-6" />,
+            gradient: 'from-indigo-500 to-purple-600',
+            onClick: onSupplyBoxClick,
+            badge: '🎁'
         },
         {
             id: 'whatsnew',

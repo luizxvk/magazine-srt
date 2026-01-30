@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { createPost, deletePost, getComments, votePoll } from '../controllers/postController';
+import { createPost, deletePost, getComments, votePoll, getPostById } from '../controllers/postController';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { commentPost } from '../controllers/feedController';
 
 const router = Router();
 
 router.post('/', authenticateToken, createPost);
+router.get('/:id', authenticateToken, getPostById); // Get single post
 router.delete('/:id', authenticateToken, deletePost);
 
 // Comments routes

@@ -26,6 +26,21 @@ import MobileCarousel from '../components/MobileCarousel';
 import LeftSidebar from '../components/LeftSidebar';
 import ToolsCarousel from '../components/ToolsCarousel';
 import CreatePostCard from '../components/CreatePostCard';
+import SupplyBoxModal from '../components/SupplyBoxModal';
+
+interface PollOption {
+    id: string;
+    text: string;
+    voteCount: number;
+    percentage: number;
+}
+
+interface Poll {
+    question: string;
+    options: PollOption[];
+    totalVotes: number;
+    userVotedOptionId: string | null;
+}
 
 interface Post {
     id: string;
@@ -46,6 +61,7 @@ interface Post {
     isHighlight: boolean;
     tags: string[];
     isLiked: boolean;
+    poll?: Poll | null;
     linkedProduct?: {
         id: string;
         name: string;
@@ -81,6 +97,7 @@ export default function FeedPage() {
     const [isNewMembersOpen, setIsNewMembersOpen] = useState(false);
     const [isEventsOpen, setIsEventsOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
+    const [isSupplyBoxOpen, setIsSupplyBoxOpen] = useState(false);
 
     const fetchPosts = async (silent = false, page = 1, append = false) => {
         try {
@@ -105,6 +122,7 @@ export default function FeedPage() {
                 isHighlight: p.isHighlight,
                 tags: p.tags?.map((t: any) => t.tag) || [],
                 isLiked: p.isLiked || false,
+                poll: p.poll || null,
                 linkedProduct: p.linkedProduct || null
             }));
             
@@ -327,6 +345,7 @@ export default function FeedPage() {
                                 onDailyLoginClick={openDailyLoginModal}
                                 onNewMembersClick={() => setIsNewMembersOpen(true)}
                                 onEventsClick={() => setIsEventsOpen(true)}
+                                onSupplyBoxClick={() => setIsSupplyBoxOpen(true)}
                             />
                         </div>
 
@@ -376,10 +395,34 @@ export default function FeedPage() {
                                                 comments={post.comments}
                                                 isLiked={post.isLiked}
                                                 isHighlight={post.isHighlight}
+                                                poll={post.poll}
                                                 onLike={() => handleLike(post.id)}
                                                 onComment={() => setActiveCommentPostId(post.id)}
                                                 onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}
                                                 onShare={() => handleShare(post.id)}
+                                                onPollVote={(postId, optionId) => {
+                                                    // Update local state after vote
+                                                    setPosts(prev => prev.map(p => {
+                                                        if (p.id !== postId || !p.poll) return p;
+                                                        const totalVotes = p.poll.totalVotes + 1;
+                                                        return {
+                                                            ...p,
+                                                            poll: {
+                                                                ...p.poll,
+                                                                totalVotes,
+                                                                userVotedOptionId: optionId,
+                                                                options: p.poll.options.map(opt => {
+                                                                    const newVoteCount = opt.id === optionId ? opt.voteCount + 1 : opt.voteCount;
+                                                                    return {
+                                                                        ...opt,
+                                                                        voteCount: newVoteCount,
+                                                                        percentage: Math.round((newVoteCount / totalVotes) * 100)
+                                                                    };
+                                                                })
+                                                            }
+                                                        };
+                                                    }));
+                                                }}
                                             />
                                         ))}
                                         
@@ -445,6 +488,10 @@ export default function FeedPage() {
             {/* Modals */}
             <NewMembersModal isOpen={isNewMembersOpen} onClose={() => setIsNewMembersOpen(false)} />
             <EventsModal isOpen={isEventsOpen} onClose={() => setIsEventsOpen(false)} />
+            <SupplyBoxModal 
+                isOpen={isSupplyBoxOpen} 
+                onClose={() => setIsSupplyBoxOpen(false)} 
+            />
         </div>
     );
 }

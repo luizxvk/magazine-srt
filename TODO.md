@@ -153,10 +153,10 @@ model UserThemePack {
 
 ## 📝 Notas Gerais
 
-- Versão Atual: **0.3.27**
+- Versão Atual: **0.4.22**
 - Branch: **beta**
 - Deploy: Vercel (client) + Vercel (server)
 
 ---
 
-*Última atualização: 12/01/2026*
+*Última atualização: 30/01/2026*

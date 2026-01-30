@@ -630,11 +630,26 @@ export default function ProfilePage() {
                                                 <Share2 className="w-4 h-4" />
                                             </button>
 
+                                            {/* Image */}
                                             {post.imageUrl && (
                                                 <div className="aspect-video rounded-2xl overflow-hidden mb-4">
                                                     <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
                                                 </div>
                                             )}
+                                            
+                                            {/* Video */}
+                                            {post.videoUrl && (
+                                                <div className="aspect-video rounded-2xl overflow-hidden mb-4 bg-black">
+                                                    <video 
+                                                        src={post.videoUrl} 
+                                                        controls 
+                                                        playsInline
+                                                        preload="metadata"
+                                                        className="w-full h-full object-contain"
+                                                    />
+                                                </div>
+                                            )}
+                                            
                                             <p className="text-gray-300 text-sm mb-3">{post.caption}</p>
                                             <div className="flex items-center gap-4 text-xs text-gray-500 justify-between">
                                                 <div className="flex gap-4">

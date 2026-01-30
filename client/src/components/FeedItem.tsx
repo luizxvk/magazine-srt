@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles, BarChart3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,6 +7,20 @@ import api from '../services/api';
 import BadgeDisplay from './BadgeDisplay';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
+
+interface PollOption {
+    id: string;
+    text: string;
+    voteCount: number;
+    percentage: number;
+}
+
+interface Poll {
+    question: string;
+    options: PollOption[];
+    totalVotes: number;
+    userVotedOptionId: string | null;
+}
 
 interface FeedItemProps {
     id: string | number;
@@ -23,10 +37,12 @@ interface FeedItemProps {
     comments: number;
     isLiked?: boolean;
     isHighlight?: boolean;
+    poll?: Poll | null;
     onLike?: (id: string | number) => void;
     onComment?: (id: string | number) => void;
     onDelete?: (id: string | number) => void;
     onShare?: (id: string | number) => void;
+    onPollVote?: (postId: string | number, optionId: string) => void;
     isExpanded?: boolean;
 }
 
@@ -117,13 +133,15 @@ export default function FeedItem({
     comments,
     isLiked,
     isHighlight,
+    poll,
     onLike,
     onComment,
     onDelete,
     onShare,
+    onPollVote,
     isExpanded = false
 }: FeedItemProps) {
-    const { user, theme, isVisitor, showToast } = useAuth();
+    const { user, theme, isVisitor, showToast, accentColor } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
@@ -132,10 +150,14 @@ export default function FeedItem({
     const [isPressed, setIsPressed] = useState(false);
     const [showVisitorBlock, setShowVisitorBlock] = useState(false);
     const [visitorBlockFeature, setVisitorBlockFeature] = useState('');
+    const [votingOptionId, setVotingOptionId] = useState<string | null>(null);
     const isOwner = user?.id === authorId;
     const isAdmin = user?.role === 'ADMIN';
     const canDelete = isOwner || isAdmin;
     const isMGT = user?.membershipType === 'MGT';
+
+    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const userAccent = accentColor || defaultAccent;
 
 
     const handleShare = async () => {
@@ -159,6 +181,26 @@ export default function FeedItem({
         
         if (onShare) {
             onShare(id);
+        }
+    };
+
+    const handlePollVote = async (optionId: string) => {
+        if (isVisitor) {
+            setVisitorBlockFeature('votar em enquetes');
+            setShowVisitorBlock(true);
+            return;
+        }
+
+        setVotingOptionId(optionId);
+        try {
+            await api.post('/posts/poll/vote', { optionId });
+            if (onPollVote) {
+                onPollVote(id, optionId);
+            }
+        } catch (error: any) {
+            showToast(error.response?.data?.error || 'Erro ao votar');
+        } finally {
+            setVotingOptionId(null);
         }
     };
 
@@ -354,6 +396,97 @@ export default function FeedItem({
                 <h3 className={`text-xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-4 leading-snug transition-colors ${image || video ? (isExpanded ? '' : 'line-clamp-2') : ''} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'}`}>
                     {title}
                 </h3>
+
+                {/* Poll Section */}
+                {poll && poll.options.length > 0 && (
+                    <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-3">
+                            <BarChart3 className="w-4 h-4" style={{ color: userAccent }} />
+                            <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                                {poll.totalVotes} {poll.totalVotes === 1 ? 'voto' : 'votos'}
+                            </span>
+                        </div>
+                        <div className="space-y-2">
+                            {poll.options.map((option) => {
+                                const isVoted = poll.userVotedOptionId === option.id;
+                                const hasVoted = poll.userVotedOptionId !== null;
+                                const isVoting = votingOptionId === option.id;
+
+                                return (
+                                    <motion.button
+                                        key={option.id}
+                                        whileHover={{ scale: hasVoted ? 1 : 1.01 }}
+                                        whileTap={{ scale: hasVoted ? 1 : 0.99 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            if (!hasVoted && !isVoting) {
+                                                handlePollVote(option.id);
+                                            }
+                                        }}
+                                        disabled={hasVoted || isVoting}
+                                        className={`relative w-full p-3 rounded-xl text-left overflow-hidden transition-all ${
+                                            hasVoted 
+                                                ? 'cursor-default' 
+                                                : 'cursor-pointer hover:bg-opacity-90'
+                                        }`}
+                                        style={{
+                                            background: theme === 'light' 
+                                                ? (isVoted ? `${userAccent}15` : 'rgba(0,0,0,0.03)')
+                                                : (isVoted ? `${userAccent}20` : 'rgba(255,255,255,0.05)'),
+                                            border: `1px solid ${isVoted ? userAccent : (theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)')}`
+                                        }}
+                                    >
+                                        {/* Progress bar background */}
+                                        {hasVoted && (
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${option.percentage}%` }}
+                                                transition={{ duration: 0.5, ease: 'easeOut' }}
+                                                className="absolute inset-y-0 left-0"
+                                                style={{ 
+                                                    background: `linear-gradient(90deg, ${userAccent}30, ${userAccent}15)`,
+                                                    borderRadius: 'inherit'
+                                                }}
+                                            />
+                                        )}
+                                        
+                                        <div className="relative flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                {isVoted && (
+                                                    <Check className="w-4 h-4" style={{ color: userAccent }} />
+                                                )}
+                                                <span className={`text-sm ${
+                                                    isVoted 
+                                                        ? 'font-medium' 
+                                                        : ''
+                                                } ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+                                                    {option.text}
+                                                </span>
+                                            </div>
+                                            {hasVoted && (
+                                                <span 
+                                                    className="text-sm font-semibold"
+                                                    style={{ color: userAccent }}
+                                                >
+                                                    {option.percentage}%
+                                                </span>
+                                            )}
+                                            {isVoting && (
+                                                <motion.div
+                                                    animate={{ rotate: 360 }}
+                                                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                                    className="w-4 h-4 rounded-full border-2 border-t-transparent"
+                                                    style={{ borderColor: `${userAccent}40`, borderTopColor: 'transparent' }}
+                                                />
+                                            )}
+                                        </div>
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 {/* Spacer to push actions to bottom */}
                 <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">

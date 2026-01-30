@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, BarChart3, Clock, CreditCard, RefreshCw, Check } from 'lucide-react';
+import { X, Sparkles, Package, Bell, BarChart3, Palette, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.21';
+const CURRENT_VERSION = '0.4.23';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,36 +33,36 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.21 - Enquetes, Limpeza de Grupos, Zions Card Redesign
+    // v0.4.23 - UI Premium Apple Vision Pro, Supply Box Melhorado, Enquetes Funcionais
     const updates: UpdateItem[] = [
         {
-            icon: <BarChart3 className="w-5 h-5 text-purple-400" />,
-            title: 'Enquetes nos Posts',
-            description: 'Crie votações estilo WhatsApp! Adicione até 4 opções e veja resultados em tempo real.',
+            icon: <Palette className="w-5 h-5 text-blue-400" />,
+            title: 'Design Apple Vision Pro',
+            description: 'Cards de postagem, membros e notificações com glass morphism premium e animações fluidas.',
             isNew: true
         },
         {
-            icon: <Clock className="w-5 h-5 text-amber-400" />,
-            title: 'Mensagens Temporárias',
-            description: 'Grupos públicos agora limpam mensagens após 7 dias automaticamente.',
+            icon: <Package className="w-5 h-5 text-purple-400" />,
+            title: 'Supply Box Aprimorado',
+            description: 'Novo visual com sistema de raridades visível, prêmios de Zions Points e acesso rápido no carrossel.',
             isNew: true
         },
         {
-            icon: <CreditCard className="w-5 h-5 text-emerald-400" />,
-            title: 'Loja de Zions Redesenhada',
-            description: 'Visual premium estilo Apple Vision Pro com glass morphism.',
+            icon: <Bell className="w-5 h-5 text-emerald-400" />,
+            title: 'Notificações Redesenhadas',
+            description: 'Dropdown de notificações estilo premium com animações de entrada e indicadores coloridos.',
             isNew: true
         },
         {
-            icon: <RefreshCw className="w-5 h-5 text-cyan-400" />,
-            title: 'Carregamento Instantâneo',
-            description: 'Dados do perfil (nível, bordas, background) carregam imediatamente ao logar.',
+            icon: <BarChart3 className="w-5 h-5 text-amber-400" />,
+            title: 'Enquetes Funcionais',
+            description: 'Vote em enquetes diretamente no feed! Barras de progresso animadas e resultados em tempo real.',
             isNew: true
         },
         {
             icon: <Sparkles className="w-5 h-5 text-pink-400" />,
-            title: 'Tabs Responsivas',
-            description: 'Loja de personalização com scroll horizontal no mobile.',
+            title: 'Cores de Destaque',
+            description: 'Todos os componentes agora respeitam a cor de destaque configurada no seu perfil.',
         }
     ];
 

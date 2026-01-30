@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.4.15 (Beta)  
-> **Última Atualização:** 27 de Janeiro de 2026
+> **Versão Atual:** v0.4.22 (Beta)  
+> **Última Atualização:** 30 de Janeiro de 2026
 
 ---
 
@@ -10,7 +10,7 @@
 ```
 🟢 Fase Beta Ativa
 ├─ Sistema Base: 100% ✅
-├─ Features Sociais: 95% ✅
+├─ Features Sociais: 98% ✅
 ├─ Gamificação: 95% ✅
 ├─ E-commerce: 85% 🔄
 └─ Personalização: 85% 🔄
@@ -18,10 +18,36 @@
 
 ---
 
-## ✅ Recentemente Implementado (v0.4.1 - v0.4.15)
+## ✅ Recentemente Implementado (v0.4.1 - v0.4.22)
 
-### v0.4.15 (Atual - Janeiro 2026) 🎉
-**ELITE RANKING PRIZES & UX IMPROVEMENTS**
+### v0.4.22 (Atual - Janeiro 2026) 🎉
+**SOCIAL DISCOVERY & FRIEND REQUESTS**
+
+- 👥 **Aba Recomendados no Social**
+  - Nova aba para descobrir membros da comunidade
+  - Lista paginada com "Ver Mais" para carregar mais sugestões
+  - Filtra automaticamente amigos já adicionados
+  - Cards com avatar, nível e troféus de cada usuário
+
+- ➕ **Envio de Solicitação de Amizade**
+  - Botão de adicionar diretamente da aba Recomendados
+  - Feedback visual com loading spinner durante envio
+  - Toast de confirmação ao enviar solicitação
+  - Remove usuário da lista após enviar pedido
+
+- 🎯 **UX Melhorada na SocialPage**
+  - Navegação por tabs: Amigos / Solicitações / Recomendados
+  - Suporte a query params (?tab=recommended)
+  - Botões "Ver Perfil" e "Adicionar" lado a lado
+  - Bordas de perfil personalizadas visíveis
+
+- 🔧 **Melhorias Técnicas**
+  - Carregamento paralelo de dados (Promise.all)
+  - State management otimizado para evitar re-renders
+  - Paginação client-side eficiente
+
+### v0.4.21 (Janeiro 2026)
+**ENQUETES, LIMPEZA DE GRUPOS, ZIONS CARD REDESIGN**
 
 - 🏆 **Sistema de Prêmios Elite Ranking**
   - Card de prêmio mensal no modal de ranking

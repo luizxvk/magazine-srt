@@ -158,6 +158,70 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// Get single post by ID
+export const getPostById = async (req: AuthRequest, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user?.userId;
+
+        const post = await prisma.post.findUnique({
+            where: { id },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true,
+                        trophies: true,
+                        membershipType: true,
+                        equippedProfileBorder: true,
+                    }
+                },
+                tags: true,
+                likes: true,
+                pollOptions: {
+                    include: {
+                        votes: true
+                    }
+                }
+            }
+        });
+
+        if (!post) {
+            return res.status(404).json({ error: 'Post não encontrado' });
+        }
+
+        // Check if current user liked
+        const isLiked = userId ? post.likes.some(like => like.userId === userId) : false;
+
+        // Get user's vote on poll if exists
+        let userVote = null;
+        if (userId && post.pollOptions?.length > 0) {
+            const vote = await prisma.pollVote.findFirst({
+                where: {
+                    userId,
+                    option: { postId: post.id }
+                }
+            });
+            userVote = vote?.optionId || null;
+        }
+
+        res.json({
+            ...post,
+            isLiked,
+            userVote,
+            pollOptions: post.pollOptions?.map(opt => ({
+                ...opt,
+                votesCount: opt.votes.length
+            }))
+        });
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const deletePost = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;

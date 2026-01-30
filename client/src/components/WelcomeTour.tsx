@@ -128,7 +128,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                 {/* BETA Badge */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
-                        BETA v0.4.21
+                        BETA v0.4.22
                     </span>
                 </div>
 

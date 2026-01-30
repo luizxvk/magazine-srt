@@ -19,6 +19,106 @@ const RARITIES = [
     { name: 'LEGENDARY', label: 'Lendário', color: '#f59e0b', chance: 3, gradient: 'from-amber-400 to-orange-500' }
 ];
 
+// Preview configurations for items
+const BACKGROUND_PREVIEWS: Record<string, string> = {
+    'bg_default': 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+    'bg_aurora': 'linear-gradient(125deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #16213e 75%, #1a1a2e 100%)',
+    'bg_sunset': 'linear-gradient(125deg, #1a0a0a 0%, #2d1f1f 25%, #4a2020 50%, #2d1f1f 75%, #1a0a0a 100%)',
+    'bg_ocean': 'linear-gradient(125deg, #0a1628 0%, #0c2340 33%, #0a1628 66%, #0c2340 100%)',
+    'bg_forest': 'linear-gradient(125deg, #0a1a0a 0%, #0f2a0f 33%, #0a1a0a 66%, #0f2a0f 100%)',
+    'bg_galaxy': 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #2d1b4e 50%, #1a0a2e 75%, #0c0c0c 100%)',
+    'bg_matrix': 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 33%, #0a0f0a 66%, #0a1a0a 100%)',
+    'bg_fire': 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 25%, #4a2a0a 50%, #2d1a0a 75%, #1a0a0a 100%)',
+    'bg_city': 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 33%, #1a1a2e 66%, #0f0f1a 100%)',
+    'bg_space': 'linear-gradient(135deg, #000005 0%, #0a0a1a 33%, #000005 66%, #0a0a1a 100%)',
+    'bg_cyberpunk': 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)',
+    'bg_lava': 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)',
+    'bg_ice': 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)',
+    'bg_neon_grid': 'linear-gradient(135deg, #0d0d0d 0%, #1a0d1a 25%, #2a0d2a 50%, #1a0d1a 75%, #0d0d0d 100%)',
+    'bg_emerald': 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)',
+    'bg_royal': 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)',
+    'bg_carbon': 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)',
+    'anim-cosmic-triangles': 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%)',
+    'anim-gradient-waves': 'linear-gradient(135deg, #0a1628 0%, #1a3050 50%, #0a1628 100%)',
+    'anim-rainbow-skies': 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%)',
+    'anim-infinite-triangles': 'linear-gradient(135deg, #2d1b4e 0%, #4a2c7d 50%, #2d1b4e 100%)',
+    'anim-moonlit-sky': 'linear-gradient(135deg, #0a0a2e 0%, #1a1a4e 50%, #0a0a2e 100%)',
+};
+
+const COLOR_PREVIEWS: Record<string, string> = {
+    'color_gold': '#d4af37',
+    'color_rgb': 'linear-gradient(90deg, #ff0000, #00ff00, #0000ff, #ff0000)',
+    'color_cyan': '#00ffff',
+    'color_magenta': '#ff00ff',
+    'color_lime': '#00ff00',
+    'color_orange': '#ff6600',
+    'color_purple': '#9933ff',
+    'color_pink': '#ff69b4',
+    'color_blue': '#0066ff',
+    'color_red': '#ff0033',
+    'color_pastel_pink': '#ffb6c1',
+    'color_pastel_lavender': '#e6e6fa',
+    'color_pastel_mint': '#98fb98',
+    'color_pastel_peach': '#ffdab9',
+    'color_pastel_sky': '#87ceeb',
+    'color_pastel_coral': '#ffb5a7',
+    'color_pastel_lilac': '#dda0dd',
+    'color_pastel_sage': '#9dc183',
+    'color_pastel_butter': '#fffacd',
+    'color_pastel_periwinkle': '#ccccff',
+};
+
+const BORDER_PREVIEWS: Record<string, string> = {
+    'border_gold': 'linear-gradient(135deg, #d4af37, #f4d03f)',
+    'border_emerald': 'linear-gradient(135deg, #10b981, #34d399)',
+    'border_rose': 'linear-gradient(135deg, #f43f5e, #fb7185)',
+    'border_blue': 'linear-gradient(135deg, #3b82f6, #60a5fa)',
+    'border_purple': 'linear-gradient(135deg, #8b5cf6, #a78bfa)',
+    'border_green': 'linear-gradient(135deg, #22c55e, #4ade80)',
+    'border_red': 'linear-gradient(135deg, #ef4444, #f87171)',
+    'border_cyan': 'linear-gradient(135deg, #06b6d4, #22d3ee)',
+    'border_orange': 'linear-gradient(135deg, #f97316, #fb923c)',
+    'border_midnight': 'linear-gradient(135deg, #1e1b4b, #312e81)',
+    'border_ocean': 'linear-gradient(135deg, #0369a1, #0ea5e9)',
+    'border_forest': 'linear-gradient(135deg, #166534, #22c55e)',
+    'border_cherry_blossom': 'linear-gradient(135deg, #fda4af, #fecdd3)',
+    'border_autumn': 'linear-gradient(135deg, #ea580c, #f97316)',
+    'border_cotton_candy': 'linear-gradient(135deg, #f0abfc, #e879f9)',
+    'border_ice': 'linear-gradient(135deg, #67e8f9, #a5f3fc)',
+    'border_sunset': 'linear-gradient(135deg, #f97316, #eab308, #ef4444)',
+    'border_fire': 'linear-gradient(135deg, #ef4444, #f97316, #eab308)',
+    'border_aurora': 'linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899)',
+    'border_neon': 'linear-gradient(135deg, #22d3ee, #a855f7, #ec4899)',
+    'border_lava': 'linear-gradient(135deg, #dc2626, #ea580c, #fbbf24)',
+    'border_electric': 'linear-gradient(135deg, #3b82f6, #06b6d4, #22d3ee)',
+    'border_mystic': 'linear-gradient(135deg, #7c3aed, #a855f7, #d946ef)',
+    'border_galaxy': 'linear-gradient(135deg, #1e1b4b, #7c3aed, #ec4899)',
+    'border_rainbow': 'linear-gradient(135deg, #ef4444, #eab308, #22c55e, #3b82f6, #a855f7)',
+    'border_diamond': 'linear-gradient(135deg, #e5e7eb, #f3f4f6, #d1d5db)',
+    'border_platinum': 'linear-gradient(135deg, #94a3b8, #cbd5e1, #94a3b8)',
+    'border_holographic': 'linear-gradient(135deg, #06b6d4, #a855f7, #ec4899, #eab308, #22c55e)',
+    'border_cosmic': 'linear-gradient(135deg, #1e1b4b, #4c1d95, #7c3aed, #ec4899)',
+    'border_phoenix': 'linear-gradient(135deg, #dc2626, #f97316, #eab308, #f97316, #dc2626)',
+    'border_pastel_pink': 'linear-gradient(135deg, #ffc1cc, #ffb6c1)',
+    'border_pastel_lavender': 'linear-gradient(135deg, #e6e6fa, #d8bfd8)',
+    'border_pastel_mint': 'linear-gradient(135deg, #98fb98, #90ee90)',
+    'border_pastel_peach': 'linear-gradient(135deg, #ffdab9, #ffe4c4)',
+    'border_pastel_sky': 'linear-gradient(135deg, #87ceeb, #add8e6)',
+};
+
+const BADGE_ICONS: Record<string, string> = {
+    'badge_crown': '👑',
+    'badge_fire': '🔥',
+    'badge_heart': '❤️',
+    'badge_pony': '🦄',
+    'badge_skull': '💀',
+    'badge_star': '⭐',
+    'badge_moon': '🌙',
+    'badge_sun': '☀️',
+    'badge_lightning': '⚡',
+    'badge_diamond': '💎',
+};
+
 export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBoxModalProps) {
     const { user, theme, accentColor } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
@@ -364,7 +464,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                             isReward={true}
                                         />
                                     ) : (
-                                        // Individual Item Display (Background, Badge, Color, Border)
+                                        // Individual Item Display with REAL Preview (Background, Badge, Color, Border)
                                         <div className={`rounded-2xl p-6 text-center ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'}`}>
                                             <motion.div
                                                 initial={{ scale: 0 }}
@@ -372,19 +472,54 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                 transition={{ type: "spring", delay: 0.4 }}
                                                 className="flex justify-center mb-4"
                                             >
-                                                <div 
-                                                    className="w-24 h-24 rounded-2xl flex items-center justify-center text-4xl"
-                                                    style={{ 
-                                                        background: `linear-gradient(135deg, ${userAccent}40, ${userAccent}20)`,
-                                                        border: `2px solid ${userAccent}60`,
-                                                        boxShadow: `0 0 30px ${userAccent}30`
-                                                    }}
-                                                >
-                                                    {reward.rewardType === 'BACKGROUND' && '🎨'}
-                                                    {reward.rewardType === 'BADGE' && '🏅'}
-                                                    {reward.rewardType === 'COLOR' && '🎯'}
-                                                    {reward.rewardType === 'BORDER' && '🖼️'}
-                                                </div>
+                                                {reward.rewardType === 'BACKGROUND' && (
+                                                    <div 
+                                                        className="w-28 h-28 rounded-2xl shadow-lg"
+                                                        style={{ 
+                                                            background: BACKGROUND_PREVIEWS[reward.item.id] || `linear-gradient(135deg, ${userAccent}40, ${userAccent}20)`,
+                                                            boxShadow: `0 8px 30px ${getRarityColor(reward.rarity)}40`
+                                                        }}
+                                                    />
+                                                )}
+                                                {reward.rewardType === 'COLOR' && (
+                                                    <div 
+                                                        className="w-28 h-28 rounded-full shadow-lg flex items-center justify-center"
+                                                        style={{ 
+                                                            background: reward.item.id === 'color_rgb' 
+                                                                ? COLOR_PREVIEWS[reward.item.id]
+                                                                : COLOR_PREVIEWS[reward.item.id] || userAccent,
+                                                            boxShadow: `0 8px 30px ${COLOR_PREVIEWS[reward.item.id] || userAccent}60`
+                                                        }}
+                                                    >
+                                                        {reward.item.id === 'color_rgb' && (
+                                                            <span className="text-white text-xl font-bold drop-shadow-lg">RGB</span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                {reward.rewardType === 'BORDER' && (
+                                                    <div 
+                                                        className="w-28 h-28 rounded-full p-1 shadow-lg"
+                                                        style={{ 
+                                                            background: BORDER_PREVIEWS[reward.item.id] || `linear-gradient(135deg, ${userAccent}, ${userAccent}aa)`,
+                                                            boxShadow: `0 8px 30px ${getRarityColor(reward.rarity)}40`
+                                                        }}
+                                                    >
+                                                        <div className={`w-full h-full rounded-full ${theme === 'light' ? 'bg-gray-100' : 'bg-[#1a1a1a]'} flex items-center justify-center`}>
+                                                            <span className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>👤</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {reward.rewardType === 'BADGE' && (
+                                                    <div 
+                                                        className="w-28 h-28 rounded-2xl flex items-center justify-center shadow-lg"
+                                                        style={{ 
+                                                            background: `linear-gradient(135deg, ${theme === 'light' ? '#f3f4f6' : 'rgba(255,255,255,0.1)'}, ${theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.05)'})`,
+                                                            boxShadow: `0 8px 30px ${getRarityColor(reward.rarity)}40`
+                                                        }}
+                                                    >
+                                                        <span className="text-5xl">{BADGE_ICONS[reward.item.id] || '🏅'}</span>
+                                                    </div>
+                                                )}
                                             </motion.div>
                                             <h3 className={`text-xl font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                                                 {reward.item.name}
@@ -395,6 +530,14 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                 {reward.rewardType === 'COLOR' && 'Cor de Destaque'}
                                                 {reward.rewardType === 'BORDER' && 'Borda de Perfil'}
                                             </p>
+                                            {reward.type === 'DUPLICATE' && (
+                                                <div className="mt-3 px-3 py-1.5 rounded-lg bg-amber-500/20 inline-flex items-center gap-2">
+                                                    <Coins className="w-4 h-4 text-amber-400" />
+                                                    <span className="text-sm text-amber-400 font-medium">
+                                                        +{reward.compensation} Zions (duplicata)
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </motion.div>

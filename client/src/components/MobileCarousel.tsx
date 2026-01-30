@@ -45,6 +45,11 @@ export default function MobileCarousel({
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
 
+    // Estilo padrão Apple Vision Pro - escuro com accent color do usuário
+    const cardStyle = isMGT 
+        ? 'from-emerald-500/20 to-emerald-900/40' 
+        : 'from-[#2c2c2e] to-[#1c1c1e]';
+
     const cards: CarouselCard[] = [
         {
             id: 'daily',
@@ -53,7 +58,7 @@ export default function MobileCarousel({
                 ? `Sequência: ${dailyLoginStatus.streak} dias`
                 : `Resgate ${dailyLoginStatus?.nextReward || 0} Zions`,
             icon: <Gift className="w-6 h-6" />,
-            gradient: 'from-amber-500 to-orange-600',
+            gradient: cardStyle,
             onClick: onDailyLoginClick,
             badge: dailyLoginStatus?.claimed ? '✓' : dailyLoginStatus?.nextReward
         },
@@ -62,7 +67,7 @@ export default function MobileCarousel({
             title: 'Supply Box',
             subtitle: 'Abra e ganhe prêmios!',
             icon: <Package className="w-6 h-6" />,
-            gradient: 'from-indigo-500 to-purple-600',
+            gradient: cardStyle,
             onClick: onSupplyBoxClick,
             badge: '🎁'
         },
@@ -71,7 +76,7 @@ export default function MobileCarousel({
             title: 'O Que Há de Novo',
             subtitle: 'Novidades e atualizações',
             icon: <Star className="w-6 h-6" />,
-            gradient: 'from-blue-500 to-indigo-600',
+            gradient: cardStyle,
             onClick: () => {
                 const event = new CustomEvent('openWhatsNew');
                 window.dispatchEvent(event);
@@ -82,7 +87,7 @@ export default function MobileCarousel({
             title: 'Adicionar Amigos',
             subtitle: 'Pessoas que você pode conhecer',
             icon: <UserPlus className="w-6 h-6" />,
-            gradient: 'from-rose-500 to-pink-600',
+            gradient: cardStyle,
             onClick: () => navigate('/social?tab=recommended')
         },
         {
@@ -90,7 +95,7 @@ export default function MobileCarousel({
             title: 'Catálogo de Fotos',
             subtitle: 'Explore as fotos da comunidade',
             icon: <Camera className="w-6 h-6" />,
-            gradient: 'from-pink-500 to-rose-600',
+            gradient: cardStyle,
             onClick: () => navigate('/catalog')
         },
         {
@@ -98,7 +103,7 @@ export default function MobileCarousel({
             title: 'Eventos Exclusivos',
             subtitle: 'Confira os próximos eventos',
             icon: <Calendar className="w-6 h-6" />,
-            gradient: 'from-violet-500 to-purple-600',
+            gradient: cardStyle,
             onClick: onEventsClick
         },
         {
@@ -106,7 +111,7 @@ export default function MobileCarousel({
             title: 'Membros Novos',
             subtitle: 'Conheça quem chegou',
             icon: <Users className="w-6 h-6" />,
-            gradient: 'from-cyan-500 to-blue-600',
+            gradient: cardStyle,
             onClick: onNewMembersClick
         },
         {
@@ -114,7 +119,7 @@ export default function MobileCarousel({
             title: 'Destaques da Semana',
             subtitle: 'Os melhores momentos',
             icon: <Star className="w-6 h-6" />,
-            gradient: 'from-yellow-500 to-amber-600',
+            gradient: cardStyle,
             onClick: () => navigate('/highlights')
         },
         {
@@ -122,7 +127,7 @@ export default function MobileCarousel({
             title: 'Feedback',
             subtitle: 'Sua opinião importa!',
             icon: <MessageSquare className="w-6 h-6" />,
-            gradient: 'from-emerald-500 to-teal-600',
+            gradient: cardStyle,
             onClick: () => navigate('/feedback')
         }
     ];
@@ -251,17 +256,17 @@ export default function MobileCarousel({
                             className="flex-shrink-0 w-32 sm:w-36 snap-start transition-opacity duration-300"
                         >
                             <div
-                                className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/20 active:scale-95 transition-transform`}
+                                className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/30 active:scale-95 transition-transform border border-white/10 backdrop-blur-xl`}
                             >
                                 {/* Badge */}
                                 {card.badge && (
-                                    <div className="absolute top-1.5 right-1.5 bg-black/30 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm">
+                                    <div className="absolute top-1.5 right-1.5 bg-black/40 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm">
                                         {card.badge}
                                     </div>
                                 )}
 
                                 {/* Icon */}
-                                <div className="text-white/90 drop-shadow-md">
+                                <div className="drop-shadow-md" style={{ color }}>
                                     {card.icon}
                                 </div>
 
@@ -270,7 +275,7 @@ export default function MobileCarousel({
                                     <p className="text-white drop-shadow-md font-bold text-[11px] sm:text-xs leading-tight truncate">
                                         {card.title}
                                     </p>
-                                    <p className="text-white/90 drop-shadow-md text-[9px] leading-tight truncate mt-0.5">
+                                    <p className="text-white/70 drop-shadow-md text-[9px] leading-tight truncate mt-0.5">
                                         {card.subtitle}
                                     </p>
                                 </div>

@@ -220,19 +220,17 @@ export default function FeedItem({
         }
     };
 
-    // Themed styles
+    // Themed styles - Apple Vision Pro padronizado
     const cardBg = theme === 'light' 
         ? 'bg-white/90' 
-        : (isMGT ? 'bg-emerald-950/40' : 'bg-black/60');
+        : 'bg-[#1c1c1e]/90';
     const cardBorder = theme === 'light' 
         ? 'border-gray-200' 
-        : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20');
-    const cardHoverBorder = isMGT ? 'hover:border-emerald-500/40' : 'hover:border-gold-500/40';
+        : 'border-white/10';
+    const cardHoverBorder = isMGT ? 'hover:border-emerald-500/30' : 'hover:border-gold-500/30';
     const cardShadow = theme === 'light'
         ? 'shadow-lg'
-        : (isMGT 
-            ? 'shadow-[0_8px_32px_rgba(16,185,129,0.1)]' 
-            : 'shadow-[0_8px_32px_rgba(212,175,55,0.1)]');
+        : 'shadow-[0_8px_32px_rgba(0,0,0,0.3)]';
 
     return (
         <motion.div
@@ -245,14 +243,7 @@ export default function FeedItem({
             onMouseLeave={() => setIsPressed(false)}
             onTouchStart={() => setIsPressed(true)}
             onTouchEnd={() => setIsPressed(false)}
-            className={`${cardBg} rounded-2xl border ${cardBorder} ${cardShadow} backdrop-blur-xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-300 ${cardHoverBorder} ${isPressed && theme === 'light' ? 'ring-2 ring-gray-300' : ''}`}
-            style={{
-                background: theme === 'light' 
-                    ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,250,250,0.9) 100%)'
-                    : (isMGT 
-                        ? 'linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(6,78,59,0.12) 100%)'
-                        : 'linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.9) 100%)')
-            }}
+            className={`${cardBg} rounded-2xl border ${cardBorder} ${cardShadow} backdrop-blur-2xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-300 ${cardHoverBorder} ${isPressed && theme === 'light' ? 'ring-2 ring-gray-300' : ''}`}
         >
             {(image || video) && (
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-square md:aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>

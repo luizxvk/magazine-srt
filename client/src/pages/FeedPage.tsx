@@ -375,7 +375,7 @@ export default function FeedPage() {
                                         image: p.image,
                                         category: p.tags[0] || 'DESTAQUE',
                                         author: p.author,
-                                        linkedProduct: p.linkedProduct
+                                        linkedProduct: p.linkedProduct || null
                                     }))} />
                                 )}
 

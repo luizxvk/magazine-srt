@@ -60,14 +60,17 @@ const ITEM_POOLS = {
         { id: 'badge_fire', name: 'Fogo', rarity: 'COMMON' },
         { id: 'badge_heart', name: 'Coração', rarity: 'COMMON' },
         { id: 'badge_pony', name: 'Unicórnio', rarity: 'COMMON' },
+        { id: 'badge_seal', name: 'Foca', rarity: 'COMMON' },
         // RARE (251-400)
         { id: 'badge_skull', name: 'Caveira', rarity: 'RARE' },
         { id: 'badge_star', name: 'Estrela', rarity: 'RARE' },
         { id: 'badge_moon', name: 'Lua', rarity: 'RARE' },
         { id: 'badge_sun', name: 'Sol', rarity: 'RARE' },
         { id: 'badge_lightning', name: 'Raio', rarity: 'RARE' },
+        { id: 'badge_egghead', name: 'Cabeça de Ovo', rarity: 'RARE' },
         // EPIC (401+)
         { id: 'badge_diamond', name: 'Diamante', rarity: 'EPIC' },
+        { id: 'badge_shark', name: 'Grande Tubarão', rarity: 'EPIC' },
     ],
     COLOR: [
         // COMMON (0-350)

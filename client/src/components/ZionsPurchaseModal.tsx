@@ -389,7 +389,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                 {activeTab === 'cash' ? 'Recarregar Zions Cash' : 'Adquirir Zions Points'}
                             </h2>
                             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {activeTab === 'cash' ? 'Saldo para compras no mercado' : 'Invista na sua jornada'}
+                                {activeTab === 'cash' ? 'Saldo para comprar na Loja de Produtos' : 'Invista na sua jornada'}
                             </p>
                         </div>
                     </div>
@@ -455,10 +455,6 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                         alt={`${pkg.zions} Zions`}
                                         className="w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-2xl"
                                     />
-                                    {/* Badge com quantidade */}
-                                    <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold ${themeColors.button} text-white border border-white/20 whitespace-nowrap`}>
-                                        {pkg.zions} ZIONS
-                                    </div>
                                 </div>
 
                                 {/* Amount */}
@@ -517,10 +513,6 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                             alt={`Z$ ${pkg.amount}`}
                                             className="w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-2xl"
                                         />
-                                        {/* Badge com quantidade */}
-                                        <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold ${themeColors.button} text-white border border-white/20 whitespace-nowrap`}>
-                                            Z$ {pkg.amount}
-                                        </div>
                                     </div>
 
                                     {/* Amount */}

@@ -35,17 +35,20 @@ const ITEM_DATA: Record<string, { name: string; type: 'background' | 'badge' | '
     'anim-rainbow-skies': { name: 'Rainbow Skies', type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     'anim-infinite-triangles': { name: 'Infinite Triangles', type: 'background', preview: 'linear-gradient(135deg, #d4af37 0%, #000 100%)' },
     'anim-moonlit-sky': { name: 'Moonlit Sky', type: 'background', preview: 'linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
-    // Badges
-    badge_crown: { name: 'Coroa', type: 'badge', preview: '👑' },
-    badge_skull: { name: 'Caveira', type: 'badge', preview: '💀' },
-    badge_fire: { name: 'Fogo', type: 'badge', preview: '🔥' },
-    badge_diamond: { name: 'Diamante', type: 'badge', preview: '💎' },
-    badge_star: { name: 'Estrela', type: 'badge', preview: '⭐' },
-    badge_lightning: { name: 'Raio', type: 'badge', preview: '⚡' },
-    badge_pony: { name: 'Unicórnio', type: 'badge', preview: '🦄' },
-    badge_heart: { name: 'Coração', type: 'badge', preview: '❤️' },
-    badge_moon: { name: 'Lua', type: 'badge', preview: '🌙' },
-    badge_sun: { name: 'Sol', type: 'badge', preview: '☀️' },
+    // Badges - using icons8 URLs
+    badge_crown: { name: 'Coroa', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000' },
+    badge_skull: { name: 'Caveira', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000' },
+    badge_fire: { name: 'Fogo', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=NjzqV0aREXb6&format=png&color=000000' },
+    badge_diamond: { name: 'Diamante', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000' },
+    badge_star: { name: 'Estrela', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
+    badge_lightning: { name: 'Raio', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
+    badge_pony: { name: 'Unicórnio', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' },
+    badge_heart: { name: 'Coração', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000' },
+    badge_moon: { name: 'Lua', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000' },
+    badge_sun: { name: 'Sol', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
+    badge_seal: { name: 'Foca', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
+    badge_shark: { name: 'Grande Tubarão', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
+    badge_egghead: { name: 'Cabeça de Ovo', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
     // Colors
     color_gold: { name: 'Dourado', type: 'color', preview: '#d4af37' },
     color_rgb: { name: 'RGB Dinâmico', type: 'color', preview: 'linear-gradient(90deg, #ff0000, #00ff00, #0000ff)' },
@@ -235,7 +238,11 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
                                 >
                                     {item.type === 'badge' ? (
                                         <div className="w-full h-full flex items-center justify-center bg-black/50 text-lg">
-                                            {item.preview}
+                                            {item.preview.startsWith('http') ? (
+                                                <img src={item.preview} alt={item.name} className="w-8 h-8 object-contain" />
+                                            ) : (
+                                                item.preview
+                                            )}
                                         </div>
                                     ) : item.type === 'color' ? (
                                         <div 

@@ -22,18 +22,21 @@ interface HeaderProps {
     onOpenShop?: () => void;
 }
 
-// Badge icons based on equipped badge
-const BADGE_ICONS: Record<string, React.ReactNode> = {
-    'badge_crown': <span className="text-xs">👑</span>,
-    'badge_skull': <span className="text-xs">💀</span>,
-    'badge_fire': <span className="text-xs">🔥</span>,
-    'badge_diamond': <span className="text-xs">💎</span>,
-    'badge_star': <span className="text-xs">⭐</span>,
-    'badge_lightning': <span className="text-xs">⚡</span>,
-    'badge_pony': <span className="text-xs">🦄</span>,
-    'badge_heart': <span className="text-xs">❤️</span>,
-    'badge_moon': <span className="text-xs">🌙</span>,
-    'badge_sun': <span className="text-xs">☀️</span>,
+// Badge icons based on equipped badge - now using URLs from icons8
+const BADGE_URLS: Record<string, string> = {
+    'badge_crown': 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000',
+    'badge_skull': 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000',
+    'badge_fire': 'https://img.icons8.com/?size=100&id=NjzqV0aREXb6&format=png&color=000000',
+    'badge_diamond': 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000',
+    'badge_star': 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000', // Using raio for star
+    'badge_lightning': 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000',
+    'badge_pony': 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000',
+    'badge_heart': 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000',
+    'badge_moon': 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000',
+    'badge_sun': 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000',
+    'badge_seal': 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000',
+    'badge_shark': 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000',
+    'badge_egghead': 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000',
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
@@ -71,8 +74,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
         }
         
         // If equipped badge is a market badge ID
-        if (equippedBadge && BADGE_ICONS[equippedBadge]) {
-            return BADGE_ICONS[equippedBadge];
+        if (equippedBadge && BADGE_URLS[equippedBadge]) {
+            return <img src={BADGE_URLS[equippedBadge]} alt="Badge" className="w-4 h-4 object-contain" />;
         }
         
         // No badge equipped - no default for anyone

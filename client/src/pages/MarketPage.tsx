@@ -275,7 +275,11 @@ export default function MarketPage() {
     } else if (item.itemType === 'badge') {
       return (
         <div className={`${sizeClasses[size]} rounded-lg ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'} flex items-center justify-center text-2xl`}>
-          {item.itemPreview}
+          {item.itemPreview.startsWith('http') ? (
+            <img src={item.itemPreview} alt="Badge" className={`${size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-10 h-10' : 'w-14 h-14'} object-contain`} />
+          ) : (
+            item.itemPreview
+          )}
         </div>
       );
     } else if (item.itemType === 'color') {
@@ -324,15 +328,19 @@ export default function MarketPage() {
     'anim-rainbow-skies': { name: 'Rainbow Skies', type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     'anim-infinite-triangles': { name: 'Infinite Triangles', type: 'background', preview: 'linear-gradient(135deg, #d4af37 0%, #000 100%)' },
     'anim-moonlit-sky': { name: 'Moonlit Sky', type: 'background', preview: 'linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
-    badge_skull: { name: 'Caveira', type: 'badge', preview: '💀' },
-    badge_fire: { name: 'Fogo', type: 'badge', preview: '🔥' },
-    badge_star: { name: 'Estrela', type: 'badge', preview: '⭐' },
-    badge_diamond: { name: 'Diamante', type: 'badge', preview: '💎' },
-    badge_lightning: { name: 'Raio', type: 'badge', preview: '⚡' },
-    badge_pony: { name: 'Unicórnio', type: 'badge', preview: '🦄' },
-    badge_heart: { name: 'Coração', type: 'badge', preview: '❤️' },
-    badge_moon: { name: 'Lua', type: 'badge', preview: '🌙' },
-    badge_sun: { name: 'Sol', type: 'badge', preview: '☀️' },
+    // Badges - using icons8 URLs
+    badge_skull: { name: 'Caveira', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000' },
+    badge_fire: { name: 'Fogo', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=NjzqV0aREXb6&format=png&color=000000' },
+    badge_star: { name: 'Estrela', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
+    badge_diamond: { name: 'Diamante', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000' },
+    badge_lightning: { name: 'Raio', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
+    badge_pony: { name: 'Unicórnio', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' },
+    badge_heart: { name: 'Coração', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000' },
+    badge_moon: { name: 'Lua', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000' },
+    badge_sun: { name: 'Sol', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
+    badge_seal: { name: 'Foca', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
+    badge_shark: { name: 'Grande Tubarão', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
+    badge_egghead: { name: 'Cabeça de Ovo', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
     color_rgb: { name: 'RGB Dinâmico', type: 'color', preview: 'rgb-dynamic' },
     color_cyan: { name: 'Ciano Neon', type: 'color', preview: '#00ffff' },
     color_magenta: { name: 'Magenta Neon', type: 'color', preview: '#ff00ff' },

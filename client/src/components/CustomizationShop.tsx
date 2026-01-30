@@ -26,7 +26,7 @@ interface CustomizationShopProps {
 // Default items (free, always owned)
 const defaultItems = {
     background: { id: 'bg_default', name: 'Magazine Clássico', description: 'O visual padrão do Magazine', price: 0, type: 'background' as const, preview: 'linear-gradient(125deg, #0a0a0a 0%, #1a1a1a 100%)' },
-    badge: { id: 'badge_crown', name: 'Coroa Magazine', description: 'Símbolo de elite', price: 0, type: 'badge' as const, preview: '👑' },
+    badge: { id: 'badge_crown', name: 'Coroa Magazine', description: 'Símbolo de elite', price: 0, type: 'badge' as const, preview: 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000' },
     badgeMGT: { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 0, type: 'badge' as const, preview: '⭐' },
     color: { id: 'color_gold', name: 'Dourado Magazine', description: 'A cor clássica Magazine', price: 0, type: 'color' as const, preview: '#d4af37' },
     colorMGT: { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 0, type: 'color' as const, preview: '#00ffff' },
@@ -68,15 +68,18 @@ const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 // Predefined badges (profile decorations)
 const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     defaultItems.badge,
-    { id: 'badge_skull', name: 'Caveira', description: 'Estilo rebelde', price: 300, type: 'badge', preview: '💀' },
-    { id: 'badge_fire', name: 'Fogo', description: 'Queima tudo!', price: 200, type: 'badge', preview: '🔥' },
-    { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 350, type: 'badge', preview: '⭐' },
-    { id: 'badge_diamond', name: 'Diamante', description: 'Precioso e raro', price: 500, type: 'badge', preview: '💎' },
-    { id: 'badge_lightning', name: 'Raio', description: 'Velocidade máxima', price: 400, type: 'badge', preview: '⚡' },
-    { id: 'badge_pony', name: 'Unicórnio', description: 'Mágico e único', price: 250, type: 'badge', preview: '🦄' },
-    { id: 'badge_heart', name: 'Coração', description: 'Com amor', price: 200, type: 'badge', preview: '❤️' },
-    { id: 'badge_moon', name: 'Lua', description: 'Noturno', price: 300, type: 'badge', preview: '🌙' },
-    { id: 'badge_sun', name: 'Sol', description: 'Radiante', price: 350, type: 'badge', preview: '☀️' },
+    { id: 'badge_skull', name: 'Caveira', description: 'Estilo rebelde', price: 300, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000' },
+    { id: 'badge_fire', name: 'Fogo', description: 'Queima tudo!', price: 200, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=NjzqV0aREXb6&format=png&color=000000' },
+    { id: 'badge_diamond', name: 'Diamante', description: 'Precioso e raro', price: 500, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000' },
+    { id: 'badge_lightning', name: 'Raio', description: 'Velocidade máxima', price: 400, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
+    { id: 'badge_pony', name: 'Unicórnio', description: 'Mágico e único', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' },
+    { id: 'badge_heart', name: 'Coração', description: 'Com amor', price: 200, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000' },
+    { id: 'badge_moon', name: 'Lua', description: 'Noturno', price: 300, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000' },
+    { id: 'badge_sun', name: 'Sol', description: 'Radiante', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
+    // Novos badges
+    { id: 'badge_seal', name: 'Foca', description: 'Fofinho e focado', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
+    { id: 'badge_shark', name: 'Grande Tubarão', description: 'Predador dos mares', price: 450, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
+    { id: 'badge_egghead', name: 'Cabeça de Ovo', description: 'Pensador único', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
 ];
 
 // Neon accent colors (excluding gold for Magazine exclusivity)
@@ -1198,7 +1201,11 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                     <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
                                                 )}
                                                 {item.type === 'badge' && (
-                                                    <span className="text-5xl">{item.preview}</span>
+                                                    item.preview.startsWith('http') ? (
+                                                        <img src={item.preview} alt={item.name} className="w-16 h-16 object-contain" />
+                                                    ) : (
+                                                        <span className="text-5xl">{item.preview}</span>
+                                                    )
                                                 )}
                                                 {item.type === 'color' && (
                                                     item.preview === 'rgb-dynamic' ? (

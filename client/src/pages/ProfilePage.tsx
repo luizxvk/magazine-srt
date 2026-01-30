@@ -17,18 +17,21 @@ import LevelTimeline from '../components/LevelTimeline';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient, getProfileBorderShadow } from '../utils/profileBorderUtils';
 
-// Badge emoji map
-const BADGE_EMOJIS: Record<string, string> = {
-    'badge_crown': '👑',
-    'badge_skull': '💀',
-    'badge_fire': '🔥',
-    'badge_star': '⭐',
-    'badge_diamond': '💎',
-    'badge_lightning': '⚡',
-    'badge_pony': '🦄',
-    'badge_heart': '❤️',
-    'badge_moon': '🌙',
-    'badge_sun': '☀️',
+// Badge URL map - using icons8 URLs
+const BADGE_URLS: Record<string, string> = {
+    'badge_crown': 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000',
+    'badge_skull': 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000',
+    'badge_fire': 'https://img.icons8.com/?size=100&id=NjzqV0aREXb6&format=png&color=000000',
+    'badge_star': 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000',
+    'badge_diamond': 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000',
+    'badge_lightning': 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000',
+    'badge_pony': 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000',
+    'badge_heart': 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000',
+    'badge_moon': 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000',
+    'badge_sun': 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000',
+    'badge_seal': 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000',
+    'badge_shark': 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000',
+    'badge_egghead': 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000',
 };
 
 export default function ProfilePage() {
@@ -403,8 +406,14 @@ export default function ProfilePage() {
                                                 alt="Badge"
                                                 className="w-8 h-8 object-contain"
                                             />
+                                        ) : BADGE_URLS[badgeToShow] ? (
+                                            <img 
+                                                src={BADGE_URLS[badgeToShow]}
+                                                alt="Badge"
+                                                className="w-8 h-8 object-contain"
+                                            />
                                         ) : (
-                                            <span className="text-3xl">{BADGE_EMOJIS[badgeToShow] || '👑'}</span>
+                                            <span className="text-3xl">👑</span>
                                         )}
                                     </div>
                                 );

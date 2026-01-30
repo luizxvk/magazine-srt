@@ -1203,7 +1203,11 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                 )}
                                                 {item.type === 'badge' && (
                                                     item.preview.startsWith('http') || item.preview.startsWith('/') ? (
-                                                        <img src={item.preview} alt={item.name} className="w-16 h-16 object-contain" />
+                                                        <img 
+                                                            src={item.preview} 
+                                                            alt={item.name} 
+                                                            className={`object-contain ${item.preview.startsWith('/') ? 'w-20 h-20 scale-150' : 'w-16 h-16'}`}
+                                                        />
                                                     ) : (
                                                         <span className="text-5xl">{item.preview}</span>
                                                     )

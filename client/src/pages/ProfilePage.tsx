@@ -399,7 +399,7 @@ export default function ProfilePage() {
                                 if (!badgeToShow) return null;
                                 
                                 return (
-                                    <div className={`absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12 ${BADGE_URLS[badgeToShow]?.startsWith('/') ? '-top-1 -left-1' : ''}`}>
+                                    <div className="absolute -top-3 -left-3 z-30 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] transform -rotate-12">
                                         {/* Check if it's a URL (pack badge) or an ID (market badge) */}
                                         {badgeToShow.startsWith('http') ? (
                                             <img 
@@ -411,7 +411,7 @@ export default function ProfilePage() {
                                             <img 
                                                 src={BADGE_URLS[badgeToShow]}
                                                 alt="Badge"
-                                                className={`object-contain ${BADGE_URLS[badgeToShow].startsWith('/') ? 'w-10 h-10' : 'w-8 h-8'}`}
+                                                className={`object-contain ${BADGE_URLS[badgeToShow].startsWith('/') ? 'w-12 h-12' : 'w-8 h-8'}`}
                                             />
                                         ) : (
                                             <span className="text-3xl">👑</span>

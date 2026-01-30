@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -27,9 +27,11 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     const { user, theme, updateUser } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [loading, setLoading] = useState<number | null>(null);
-    const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number } | null>(null);
+    const [pixData, setPixData] = useState<{ qrCode: string; qrCodeBase64: string; copyPaste: string; amount: number; paymentId: string } | null>(null);
     const [copied, setCopied] = useState(false);
     const [checkingPayment, setCheckingPayment] = useState(false);
+    const [showSuccess, setShowSuccess] = useState<{ amount: number } | null>(null);
+    const pollingRef = useRef<NodeJS.Timeout | null>(null);
     const isDark = theme === 'dark';
 
     // Apple Vision Pro style - glass morphism
@@ -65,8 +67,12 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                     qrCode: response.data.qrCode,
                     qrCodeBase64: response.data.qrCodeBase64,
                     copyPaste: response.data.copyPaste,
-                    amount: amount
+                    amount: amount,
+                    paymentId: response.data.paymentId
                 });
+                
+                // Iniciar polling para verificar status do pagamento
+                startPolling(response.data.paymentId, amount);
             }
         } catch (error) {
             console.error('Purchase failed', error);
@@ -74,6 +80,49 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
             setLoading(null);
         }
     };
+
+    // Polling para verificar status do pagamento
+    const startPolling = (paymentId: string, amount: number) => {
+        // Limpar polling anterior se existir
+        if (pollingRef.current) {
+            clearInterval(pollingRef.current);
+        }
+
+        pollingRef.current = setInterval(async () => {
+            try {
+                const response = await api.get(`/payments/status/${paymentId}`);
+                
+                if (response.data.completed || response.data.status === 'approved') {
+                    // Pagamento aprovado!
+                    if (pollingRef.current) {
+                        clearInterval(pollingRef.current);
+                        pollingRef.current = null;
+                    }
+                    
+                    // Atualizar dados do usuário
+                    const userResponse = await api.get('/users/me');
+                    if (userResponse.data) {
+                        updateUser(userResponse.data);
+                    }
+                    
+                    // Mostrar popup de sucesso
+                    setPixData(null);
+                    setShowSuccess({ amount });
+                }
+            } catch (error) {
+                console.error('Error checking payment status:', error);
+            }
+        }, 3000); // Verificar a cada 3 segundos
+    };
+
+    // Limpar polling quando componente desmontar ou fechar
+    useEffect(() => {
+        return () => {
+            if (pollingRef.current) {
+                clearInterval(pollingRef.current);
+            }
+        };
+    }, []);
 
     const handleCopyPix = async () => {
         if (pixData?.copyPaste) {
@@ -84,15 +133,30 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     };
 
     const handleConfirmPayment = async () => {
+        if (!pixData?.paymentId) return;
+        
         setCheckingPayment(true);
         try {
-            // Get updated user data
-            const response = await api.get('/users/me');
-            if (response.data) {
-                updateUser(response.data);
+            const response = await api.get(`/payments/status/${pixData.paymentId}`);
+            
+            if (response.data.completed || response.data.status === 'approved') {
+                // Atualizar dados do usuário
+                const userResponse = await api.get('/users/me');
+                if (userResponse.data) {
+                    updateUser(userResponse.data);
+                }
+                
+                // Mostrar popup de sucesso
+                if (pollingRef.current) {
+                    clearInterval(pollingRef.current);
+                    pollingRef.current = null;
+                }
+                setPixData(null);
+                setShowSuccess({ amount: pixData.amount });
+            } else {
+                // Pagamento ainda não confirmado - mostrar mensagem
+                alert('Pagamento ainda não confirmado. Aguarde alguns instantes e tente novamente.');
             }
-            setPixData(null);
-            onClose();
         } catch (error) {
             console.error('Error refreshing user', error);
         } finally {
@@ -101,12 +165,107 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     };
 
     const handleClose = () => {
+        if (pollingRef.current) {
+            clearInterval(pollingRef.current);
+            pollingRef.current = null;
+        }
         setPixData(null);
         setCopied(false);
+        setShowSuccess(null);
+        onClose();
+    };
+
+    const handleSuccessClose = () => {
+        setShowSuccess(null);
         onClose();
     };
 
     if (!isOpen) return null;
+
+    // Success Popup - Apple Vision Pro Premium Style
+    if (showSuccess) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
+                <div className="relative">
+                    {/* Glow effect */}
+                    <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} blur-[100px] opacity-30 animate-pulse`} />
+                    
+                    <div className={`relative w-full max-w-sm ${isDark ? 'bg-black/60' : 'bg-white/90'} backdrop-blur-3xl rounded-[2.5rem] border ${isMGT ? 'border-emerald-500/30' : 'border-amber-500/30'} shadow-2xl p-8 text-center overflow-hidden`}>
+                        {/* Animated gradient background */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${isMGT ? 'from-emerald-500/10 via-transparent to-emerald-500/5' : 'from-amber-500/10 via-transparent to-amber-500/5'} animate-pulse`} />
+                        
+                        {/* Floating particles */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            {[...Array(6)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`absolute w-2 h-2 rounded-full ${isMGT ? 'bg-emerald-400' : 'bg-amber-400'} opacity-60`}
+                                    style={{
+                                        left: `${20 + i * 15}%`,
+                                        animation: `float ${2 + i * 0.5}s ease-in-out infinite`,
+                                        animationDelay: `${i * 0.3}s`,
+                                        top: '50%'
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        
+                        {/* Success Icon */}
+                        <div className="relative z-10 mb-6">
+                            <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full ${isMGT ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' : 'bg-gradient-to-br from-amber-500 to-amber-600'} shadow-2xl`}>
+                                <div className="relative">
+                                    <CheckCircle className="w-12 h-12 text-white animate-[scale_0.5s_ease-out]" />
+                                    <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-white animate-ping" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Title */}
+                        <h2 className={`relative z-10 text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            Compra Realizada!
+                        </h2>
+                        
+                        {/* Amount */}
+                        <div className="relative z-10 mb-6">
+                            <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl ${isDark ? 'bg-white/5' : 'bg-black/5'} border ${isMGT ? 'border-emerald-500/20' : 'border-amber-500/20'}`}>
+                                <Coins className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                <span className={`text-3xl font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                    +{showSuccess.amount}
+                                </span>
+                                <span className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Zions</span>
+                            </div>
+                        </div>
+                        
+                        {/* Description */}
+                        <p className={`relative z-10 text-sm mb-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Seus Zions foram creditados com sucesso na sua conta!
+                        </p>
+                        
+                        {/* Close Button */}
+                        <button
+                            onClick={handleSuccessClose}
+                            className={`relative z-10 w-full py-4 rounded-2xl font-bold text-white text-lg ${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400' : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400'} transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]`}
+                        >
+                            Continuar
+                        </button>
+                    </div>
+                </div>
+                
+                {/* CSS for floating animation */}
+                <style>{`
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
+                        50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+                    }
+                    @keyframes scale {
+                        0% { transform: scale(0); }
+                        50% { transform: scale(1.2); }
+                        100% { transform: scale(1); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
 
     // PIX Payment Screen
     if (pixData) {

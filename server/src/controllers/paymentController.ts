@@ -234,24 +234,83 @@ export const checkPaymentStatus = async (req: Request, res: Response) => {
     try {
         const { paymentId } = req.params;
         const userId = (req as any).user?.userId || (req as any).user?.id;
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
-        if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+        if (!accessToken) {
             return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
         }
 
-        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
-        const payment = new Payment(client);
+        // Buscar a compra pelo paymentId (que na verdade é o orderId)
+        const purchase = await prisma.zionPurchase.findFirst({
+            where: { paymentId: paymentId },
+            include: { user: true }
+        });
 
-        const result = await payment.get({ id: paymentId });
+        if (!purchase) {
+            return res.status(404).json({ error: 'Compra não encontrada' });
+        }
+
+        if (purchase.userId !== userId) {
+            return res.status(403).json({ error: 'Acesso negado' });
+        }
+
+        // Se já foi processada, retornar sucesso
+        if (purchase.status === 'COMPLETED') {
+            return res.json({ 
+                status: 'approved',
+                statusDetail: 'accredited',
+                completed: true,
+                zionsAmount: purchase.amount
+            });
+        }
+
+        // Verificar status no MercadoPago via Orders API
+        const orderStatus = await new Promise<any>((resolve, reject) => {
+            const options = {
+                hostname: 'api.mercadopago.com',
+                path: `/v1/orders/${paymentId}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            };
+
+            const req = https.request(options, (res) => {
+                let body = '';
+                res.on('data', (chunk) => body += chunk);
+                res.on('end', () => {
+                    try {
+                        resolve(JSON.parse(body));
+                    } catch (e) {
+                        reject(new Error('Failed to parse response'));
+                    }
+                });
+            });
+
+            req.on('error', reject);
+            req.end();
+        });
+
+        console.log(`[PAYMENT] Order ${paymentId} status: ${orderStatus.status}`);
 
         // Se aprovado, creditar Zions
-        if (result.status === 'approved' && result.external_reference) {
-            await creditZionsFromPayment(result.external_reference, String(result.id), userId);
+        if (orderStatus.status === 'processed' || orderStatus.status === 'paid') {
+            const paymentData = orderStatus.transactions?.payments?.[0];
+            if (paymentData?.status === 'approved' || orderStatus.status === 'processed') {
+                await creditZionsFromPayment(purchase.id, paymentId, userId);
+                return res.json({ 
+                    status: 'approved',
+                    statusDetail: 'accredited',
+                    completed: true,
+                    zionsAmount: purchase.amount
+                });
+            }
         }
 
         res.json({ 
-            status: result.status,
-            statusDetail: result.status_detail
+            status: orderStatus.status === 'action_required' ? 'pending' : orderStatus.status,
+            statusDetail: orderStatus.status_detail || 'waiting_payment',
+            completed: false
         });
 
     } catch (error: any) {

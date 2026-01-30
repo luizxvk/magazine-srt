@@ -36,6 +36,7 @@ const BADGE_URLS: Record<string, string> = {
     'badge_seal': 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000',
     'badge_shark': 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000',
     'badge_egghead': 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000',
+    'badge_xitada': '/assets/badges/ta-xitada.png',
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {

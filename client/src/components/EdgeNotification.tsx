@@ -37,7 +37,6 @@ function EdgeNotificationItem({ notification, onClose }: EdgeNotificationProps) 
     const isMGT = user?.membershipType === 'MGT';
     const [progress, setProgress] = useState(100);
     const [isHovered, setIsHovered] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
     const duration = notification.duration || 5000;
 
     // Drag to dismiss

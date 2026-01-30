@@ -508,13 +508,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
                             >
                                 {/* Top Bar with User + Actions */}
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
                                     {/* User Profile - Compact */}
                                     {user && (
                                         <Link 
                                             to="/profile" 
                                             onClick={() => setIsMobileDrawerOpen(false)}
-                                            className={`flex items-center gap-3 p-2 pr-4 rounded-full transition-all ${
+                                            className={`flex-1 flex items-center gap-3 p-2 pr-3 rounded-2xl transition-all ${
                                                 theme === 'light' 
                                                     ? 'bg-gray-50 hover:bg-gray-100' 
                                                     : 'bg-white/5 hover:bg-white/10'
@@ -529,8 +529,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                            <div className="flex flex-col min-w-0">
+                                                <span className={`text-sm font-semibold truncate ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                                                     {user.displayName || user.name}
                                                 </span>
                                                 <div className="flex items-center gap-1.5">
@@ -547,8 +547,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         </Link>
                                     )}
                                     
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-2">
+                                    {/* Actions - Stacked vertically */}
+                                    <div className="flex flex-col items-center gap-1.5 shrink-0">
                                         {!isVisitor && (
                                             <motion.button
                                                 whileHover={{ scale: 1.05 }}
@@ -557,7 +557,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     setIsMobileDrawerOpen(false);
                                                     logout();
                                                 }}
-                                                className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-all ${
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                                                     theme === 'light' 
                                                         ? 'bg-red-50 text-red-600 hover:bg-red-100' 
                                                         : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
@@ -571,9 +571,9 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             onClick={() => setIsMobileDrawerOpen(false)}
-                                            className={`p-2 rounded-full ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-500' : 'bg-white/5 hover:bg-white/10 text-white/60'} transition-colors`}
+                                            className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-500' : 'bg-white/5 hover:bg-white/10 text-white/60'} transition-colors`}
                                         >
-                                            <X className="w-5 h-5" />
+                                            <X className="w-4 h-4" />
                                         </motion.button>
                                     </div>
                                 </div>

@@ -217,7 +217,19 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        📦 Packs de Temas
+                                        🎨 Fundos
+                                    </span>
+                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
+                                        🏅 Badges
+                                    </span>
+                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
+                                        🎯 Cores
+                                    </span>
+                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
+                                        🖼️ Bordas
+                                    </span>
+                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
+                                        📦 Packs
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
                                         💰 10-500 Zions
@@ -343,14 +355,47 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                 Adicionados ao seu saldo
                                             </p>
                                         </div>
-                                    ) : (
-                                        // Regular item (Pack, Background, Badge, etc.)
+                                    ) : reward.rewardType === 'PACK' ? (
+                                        // ThemePack Display
                                         <ThemePackCard
                                             pack={reward.item}
                                             onPurchase={() => { }}
                                             loading={false}
                                             isReward={true}
                                         />
+                                    ) : (
+                                        // Individual Item Display (Background, Badge, Color, Border)
+                                        <div className={`rounded-2xl p-6 text-center ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'}`}>
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                transition={{ type: "spring", delay: 0.4 }}
+                                                className="flex justify-center mb-4"
+                                            >
+                                                <div 
+                                                    className="w-24 h-24 rounded-2xl flex items-center justify-center text-4xl"
+                                                    style={{ 
+                                                        background: `linear-gradient(135deg, ${userAccent}40, ${userAccent}20)`,
+                                                        border: `2px solid ${userAccent}60`,
+                                                        boxShadow: `0 0 30px ${userAccent}30`
+                                                    }}
+                                                >
+                                                    {reward.rewardType === 'BACKGROUND' && '🎨'}
+                                                    {reward.rewardType === 'BADGE' && '🏅'}
+                                                    {reward.rewardType === 'COLOR' && '🎯'}
+                                                    {reward.rewardType === 'BORDER' && '🖼️'}
+                                                </div>
+                                            </motion.div>
+                                            <h3 className={`text-xl font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                {reward.item.name}
+                                            </h3>
+                                            <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                {reward.rewardType === 'BACKGROUND' && 'Fundo de Perfil'}
+                                                {reward.rewardType === 'BADGE' && 'Badge de Perfil'}
+                                                {reward.rewardType === 'COLOR' && 'Cor de Destaque'}
+                                                {reward.rewardType === 'BORDER' && 'Borda de Perfil'}
+                                            </p>
+                                        </div>
                                     )}
                                 </motion.div>
                             )}

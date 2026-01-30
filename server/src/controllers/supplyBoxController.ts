@@ -4,19 +4,137 @@ import { AuthRequest } from '../middleware/authMiddleware';
 
 const prisma = new PrismaClient();
 
-// Zions compensation for duplicates
+// Zions compensation for duplicates based on rarity
 const DUPLICATE_COMPENSATION = {
-    [ThemePackRarity.COMMON]: 300,
-    [ThemePackRarity.RARE]: 500,
-    [ThemePackRarity.EPIC]: 800,
-    [ThemePackRarity.LEGENDARY]: 1500
+    COMMON: 100,
+    RARE: 200,
+    EPIC: 400,
+    LEGENDARY: 800
 };
 
 // Reward type weights (total = 100)
-// 70% chance for Pack, 30% chance for Zions
 const REWARD_TYPE_WEIGHTS = {
-    PACK: 70,
-    ZIONS: 30
+    PACK: 25,           // 25% - ThemePacks
+    BACKGROUND: 20,     // 20% - Backgrounds
+    BADGE: 15,          // 15% - Badges  
+    COLOR: 15,          // 15% - Colors
+    BORDER: 15,         // 15% - Borders
+    ZIONS: 10           // 10% - Zions bonus
+};
+
+// All items from CustomizationShop - organized by rarity based on price
+// COMMON: 0-400 Zions | RARE: 401-800 Zions | EPIC: 801-1500 Zions | LEGENDARY: 1501+ Zions
+
+const ITEM_POOLS = {
+    BACKGROUND: [
+        // COMMON (0-400)
+        { id: 'bg_default', name: 'Magazine Clássico', rarity: 'COMMON' },
+        { id: 'bg_forest', name: 'Floresta', rarity: 'COMMON' },
+        { id: 'bg_ocean', name: 'Oceano', rarity: 'COMMON' },
+        { id: 'bg_fire', name: 'Fogo', rarity: 'COMMON' },
+        // RARE (401-800)
+        { id: 'bg_aurora', name: 'Aurora Boreal', rarity: 'RARE' },
+        { id: 'bg_galaxy', name: 'Galáxia', rarity: 'RARE' },
+        { id: 'bg_matrix', name: 'Matrix', rarity: 'RARE' },
+        { id: 'bg_city', name: 'Cidade Neon', rarity: 'RARE' },
+        { id: 'bg_space', name: 'Espaço Profundo', rarity: 'RARE' },
+        { id: 'bg_sunset', name: 'Pôr do Sol', rarity: 'RARE' },
+        { id: 'bg_cyberpunk', name: 'Cyberpunk', rarity: 'RARE' },
+        { id: 'bg_lava', name: 'Lava', rarity: 'RARE' },
+        { id: 'bg_ice', name: 'Gelo Ártico', rarity: 'RARE' },
+        { id: 'bg_carbon', name: 'Fibra de Carbono', rarity: 'RARE' },
+        { id: 'bg_emerald', name: 'Esmeralda', rarity: 'RARE' },
+        // EPIC (801-1500)
+        { id: 'bg_neon_grid', name: 'Grade Neon', rarity: 'EPIC' },
+        { id: 'bg_royal', name: 'Real Púrpura', rarity: 'EPIC' },
+        // LEGENDARY (1501+)
+        { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', rarity: 'LEGENDARY' },
+        { id: 'anim-gradient-waves', name: 'Ondas Gradiente', rarity: 'LEGENDARY' },
+        { id: 'anim-rainbow-skies', name: 'Rainbow Skies', rarity: 'LEGENDARY' },
+        { id: 'anim-infinite-triangles', name: 'Infinite Triangles', rarity: 'LEGENDARY' },
+        { id: 'anim-moonlit-sky', name: 'Moonlit Sky', rarity: 'LEGENDARY' },
+    ],
+    BADGE: [
+        // COMMON (0-250)
+        { id: 'badge_crown', name: 'Coroa Magazine', rarity: 'COMMON' },
+        { id: 'badge_fire', name: 'Fogo', rarity: 'COMMON' },
+        { id: 'badge_heart', name: 'Coração', rarity: 'COMMON' },
+        { id: 'badge_pony', name: 'Unicórnio', rarity: 'COMMON' },
+        // RARE (251-400)
+        { id: 'badge_skull', name: 'Caveira', rarity: 'RARE' },
+        { id: 'badge_star', name: 'Estrela', rarity: 'RARE' },
+        { id: 'badge_moon', name: 'Lua', rarity: 'RARE' },
+        { id: 'badge_sun', name: 'Sol', rarity: 'RARE' },
+        { id: 'badge_lightning', name: 'Raio', rarity: 'RARE' },
+        // EPIC (401+)
+        { id: 'badge_diamond', name: 'Diamante', rarity: 'EPIC' },
+    ],
+    COLOR: [
+        // COMMON (0-350)
+        { id: 'color_gold', name: 'Dourado Magazine', rarity: 'COMMON' },
+        { id: 'color_pastel_pink', name: 'Rosa Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_lavender', name: 'Lavanda Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_mint', name: 'Menta Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_peach', name: 'Pêssego Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_sky', name: 'Céu Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_coral', name: 'Coral Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_lilac', name: 'Lilás Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_sage', name: 'Sálvia Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_butter', name: 'Manteiga Pastel', rarity: 'COMMON' },
+        { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', rarity: 'COMMON' },
+        // RARE (351-500)
+        { id: 'color_cyan', name: 'Ciano Neon', rarity: 'RARE' },
+        { id: 'color_magenta', name: 'Magenta Neon', rarity: 'RARE' },
+        { id: 'color_lime', name: 'Verde Limão', rarity: 'RARE' },
+        { id: 'color_orange', name: 'Laranja Neon', rarity: 'RARE' },
+        { id: 'color_purple', name: 'Roxo Neon', rarity: 'RARE' },
+        { id: 'color_pink', name: 'Rosa Neon', rarity: 'RARE' },
+        { id: 'color_blue', name: 'Azul Elétrico', rarity: 'RARE' },
+        { id: 'color_red', name: 'Vermelho Neon', rarity: 'RARE' },
+        // LEGENDARY (1000+)
+        { id: 'color_rgb', name: 'RGB Dinâmico', rarity: 'LEGENDARY' },
+    ],
+    BORDER: [
+        // COMMON (0-400)
+        { id: 'border_gold', name: 'Dourado Clássico', rarity: 'COMMON' },
+        { id: 'border_emerald', name: 'Esmeralda MGT', rarity: 'COMMON' },
+        { id: 'border_pastel_pink', name: 'Rosa Pastel', rarity: 'COMMON' },
+        { id: 'border_pastel_lavender', name: 'Lavanda Pastel', rarity: 'COMMON' },
+        { id: 'border_pastel_mint', name: 'Menta Pastel', rarity: 'COMMON' },
+        { id: 'border_pastel_peach', name: 'Pêssego Pastel', rarity: 'COMMON' },
+        { id: 'border_pastel_sky', name: 'Céu Pastel', rarity: 'COMMON' },
+        // RARE (401-800)
+        { id: 'border_rose', name: 'Rosa Neon', rarity: 'RARE' },
+        { id: 'border_blue', name: 'Azul Elétrico', rarity: 'RARE' },
+        { id: 'border_purple', name: 'Roxo Real', rarity: 'RARE' },
+        { id: 'border_green', name: 'Verde Esmeralda', rarity: 'RARE' },
+        { id: 'border_red', name: 'Vermelho Fogo', rarity: 'RARE' },
+        { id: 'border_cyan', name: 'Ciano Neon', rarity: 'RARE' },
+        { id: 'border_orange', name: 'Laranja Fogo', rarity: 'RARE' },
+        { id: 'border_midnight', name: 'Meia-Noite', rarity: 'RARE' },
+        { id: 'border_ocean', name: 'Oceano Profundo', rarity: 'RARE' },
+        { id: 'border_forest', name: 'Floresta', rarity: 'RARE' },
+        { id: 'border_cherry_blossom', name: 'Flor de Cerejeira', rarity: 'RARE' },
+        { id: 'border_autumn', name: 'Outono', rarity: 'RARE' },
+        { id: 'border_cotton_candy', name: 'Algodão Doce', rarity: 'RARE' },
+        { id: 'border_ice', name: 'Gelo Ártico', rarity: 'RARE' },
+        // EPIC (801-1500)
+        { id: 'border_sunset', name: 'Pôr do Sol', rarity: 'EPIC' },
+        { id: 'border_fire', name: 'Chamas', rarity: 'EPIC' },
+        { id: 'border_aurora', name: 'Aurora Boreal', rarity: 'EPIC' },
+        { id: 'border_neon', name: 'Neon Vibes', rarity: 'EPIC' },
+        { id: 'border_lava', name: 'Lava Vulcânica', rarity: 'EPIC' },
+        { id: 'border_electric', name: 'Elétrico', rarity: 'EPIC' },
+        { id: 'border_mystic', name: 'Místico', rarity: 'EPIC' },
+        { id: 'border_galaxy', name: 'Galáxia', rarity: 'EPIC' },
+        { id: 'border_rainbow', name: 'Arco-Íris', rarity: 'EPIC' },
+        // LEGENDARY (1501+)
+        { id: 'border_diamond', name: 'Diamante', rarity: 'LEGENDARY' },
+        { id: 'border_platinum', name: 'Platina', rarity: 'LEGENDARY' },
+        { id: 'border_holographic', name: 'Holográfico', rarity: 'LEGENDARY' },
+        { id: 'border_cosmic', name: 'Cósmico', rarity: 'LEGENDARY' },
+        { id: 'border_phoenix', name: 'Fênix', rarity: 'LEGENDARY' },
+    ]
 };
 
 // Zions bonus amounts by rarity
@@ -33,21 +151,44 @@ const COSTS = [0, 500, 1000, 2500, 5000];
 // Helper function to select reward type based on weights
 function selectRewardType(): string {
     const total = Object.values(REWARD_TYPE_WEIGHTS).reduce((a, b) => a + b, 0);
-    const rand = Math.random() * total;
+    let rand = Math.random() * total;
     
-    if (rand <= REWARD_TYPE_WEIGHTS.PACK) {
-        return 'PACK';
+    for (const [type, weight] of Object.entries(REWARD_TYPE_WEIGHTS)) {
+        rand -= weight;
+        if (rand <= 0) return type;
     }
-    return 'ZIONS';
+    return 'PACK';
 }
 
 // Helper function to select rarity
-function selectRarity(): ThemePackRarity {
+function selectRarity(): string {
     const rand = Math.random();
-    if (rand > 0.97) return ThemePackRarity.LEGENDARY;
-    if (rand > 0.85) return ThemePackRarity.EPIC;
-    if (rand > 0.60) return ThemePackRarity.RARE;
-    return ThemePackRarity.COMMON;
+    if (rand > 0.97) return 'LEGENDARY';  // 3%
+    if (rand > 0.85) return 'EPIC';       // 12%
+    if (rand > 0.60) return 'RARE';       // 25%
+    return 'COMMON';                       // 60%
+}
+
+// Helper to get random item from pool matching rarity
+function getRandomItemByRarity(pool: Array<{id: string, name: string, rarity: string}>, targetRarity: string) {
+    const matchingItems = pool.filter(item => item.rarity === targetRarity);
+    
+    if (matchingItems.length === 0) {
+        // Fallback: try lower rarities
+        const rarityOrder = ['LEGENDARY', 'EPIC', 'RARE', 'COMMON'];
+        const targetIndex = rarityOrder.indexOf(targetRarity);
+        
+        for (let i = targetIndex + 1; i < rarityOrder.length; i++) {
+            const fallbackItems = pool.filter(item => item.rarity === rarityOrder[i]);
+            if (fallbackItems.length > 0) {
+                return fallbackItems[Math.floor(Math.random() * fallbackItems.length)];
+            }
+        }
+        // Last resort: any item
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+    
+    return matchingItems[Math.floor(Math.random() * matchingItems.length)];
 }
 
 export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
@@ -81,14 +222,13 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 });
             }
 
-            // Deduct cost
             await prisma.user.update({
                 where: { id: userId },
                 data: { zionsPoints: { decrement: cost } }
             });
         }
 
-        // Log the attempt (even if free) to track count
+        // Log the attempt
         await prisma.zionHistory.create({
             data: {
                 userId,
@@ -97,7 +237,7 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             }
         });
 
-        // 1. Select reward type
+        // Select reward type and rarity
         const rewardType = selectRewardType();
         const selectedRarity = selectRarity();
         const nextCost = COSTS[Math.min(opensToday + 1, COSTS.length - 1)];
@@ -112,22 +252,19 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             nextCost
         };
 
-        // 2. Handle based on reward type
+        // Handle based on reward type
         if (rewardType === 'PACK') {
-            // Get packs from database - try to match rarity first
+            // ThemePack from database
             let packs = await prisma.themePack.findMany({
-                where: { rarity: selectedRarity, isActive: true }
+                where: { rarity: selectedRarity as ThemePackRarity, isActive: true }
             });
 
-            // If no packs of that rarity, get any active pack
             if (packs.length === 0) {
-                packs = await prisma.themePack.findMany({
-                    where: { isActive: true }
-                });
+                packs = await prisma.themePack.findMany({ where: { isActive: true } });
             }
 
             if (packs.length === 0) {
-                // No packs available - give Zions instead
+                // No packs - give Zions instead
                 const bonus = 100;
                 await prisma.user.update({
                     where: { id: userId },
@@ -143,18 +280,12 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             result.item = selectedPack;
             result.rarity = selectedPack.rarity;
 
-            // Check if user already owns it
             const existingOwnership = await prisma.userThemePack.findUnique({
-                where: {
-                    userId_packId: {
-                        userId,
-                        packId: selectedPack.id
-                    }
-                }
+                where: { userId_packId: { userId, packId: selectedPack.id } }
             });
 
             if (existingOwnership) {
-                const compensation = DUPLICATE_COMPENSATION[selectedPack.rarity] || 300;
+                const compensation = DUPLICATE_COMPENSATION[selectedPack.rarity as keyof typeof DUPLICATE_COMPENSATION] || 200;
                 await prisma.user.update({
                     where: { id: userId },
                     data: { zionsPoints: { increment: compensation } }
@@ -164,16 +295,12 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 result.message = `Duplicata: ${selectedPack.name}! Você recebeu ${compensation} Pontos.`;
             } else {
                 await prisma.userThemePack.create({
-                    data: {
-                        userId,
-                        packId: selectedPack.id,
-                        price: cost
-                    }
+                    data: { userId, packId: selectedPack.id, price: cost }
                 });
                 result.message = `Você ganhou o Pack: ${selectedPack.name}!`;
             }
 
-        } else {
+        } else if (rewardType === 'ZIONS') {
             // Zions bonus
             const bonusRange = ZIONS_BONUS[selectedRarity as keyof typeof ZIONS_BONUS] || ZIONS_BONUS.COMMON;
             const bonus = Math.floor(Math.random() * (bonusRange.max - bonusRange.min + 1)) + bonusRange.min;
@@ -185,6 +312,69 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
 
             result.item = { id: 'zions_bonus', name: `${bonus} Zions`, value: bonus };
             result.message = `Bônus de Zions! Você ganhou ${bonus} Pontos!`;
+
+        } else {
+            // Individual items (BACKGROUND, BADGE, COLOR, BORDER)
+            const pool = ITEM_POOLS[rewardType as keyof typeof ITEM_POOLS];
+            
+            if (!pool || pool.length === 0) {
+                // Fallback to Zions
+                const bonus = 50;
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { zionsPoints: { increment: bonus } }
+                });
+                result.rewardType = 'ZIONS';
+                result.item = { id: 'zions_bonus', name: `${bonus} Zions`, value: bonus };
+                result.message = `Bônus de Zions! Você ganhou ${bonus} Pontos!`;
+                return res.json(result);
+            }
+
+            const selectedItem = getRandomItemByRarity(pool, selectedRarity);
+            result.item = selectedItem;
+            result.rarity = selectedItem.rarity;
+
+            // Get user's owned customizations (stored as JSON string)
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { ownedCustomizations: true }
+            });
+
+            let ownedItems: string[] = [];
+            try {
+                if (user?.ownedCustomizations) {
+                    ownedItems = JSON.parse(user.ownedCustomizations);
+                }
+            } catch {
+                ownedItems = [];
+            }
+
+            if (ownedItems.includes(selectedItem.id)) {
+                // Duplicate
+                const compensation = DUPLICATE_COMPENSATION[selectedItem.rarity as keyof typeof DUPLICATE_COMPENSATION] || 100;
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { zionsPoints: { increment: compensation } }
+                });
+                result.type = 'DUPLICATE';
+                result.compensation = compensation;
+                result.message = `Duplicata: ${selectedItem.name}! Você recebeu ${compensation} Pontos.`;
+            } else {
+                // Add to owned customizations
+                ownedItems.push(selectedItem.id);
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { ownedCustomizations: JSON.stringify(ownedItems) }
+                });
+                
+                const typeNames: Record<string, string> = {
+                    BACKGROUND: 'Fundo',
+                    BADGE: 'Badge',
+                    COLOR: 'Cor',
+                    BORDER: 'Borda'
+                };
+                result.message = `Você ganhou ${typeNames[rewardType] || 'Item'}: ${selectedItem.name}!`;
+            }
         }
 
         res.json(result);

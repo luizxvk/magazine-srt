@@ -295,13 +295,21 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 result.item = selectedItem;
                 result.rarity = selectedItem.rarity;
 
-                // Get user's owned customizations
+                // Get user's owned customizations (stored as JSON string)
                 const user = await prisma.user.findUnique({
                     where: { id: userId },
                     select: { ownedCustomizations: true }
                 });
 
-                const ownedItems = user?.ownedCustomizations || [];
+                // Parse owned items from JSON string
+                let ownedItems: string[] = [];
+                try {
+                    if (user?.ownedCustomizations) {
+                        ownedItems = JSON.parse(user.ownedCustomizations);
+                    }
+                } catch {
+                    ownedItems = [];
+                }
 
                 if (ownedItems.includes(selectedItem.id)) {
                     // Duplicate - give Zions compensation
@@ -314,13 +322,12 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                     result.compensation = compensation;
                     result.message = `Duplicata: ${selectedItem.name}! Você recebeu ${compensation} Pontos.`;
                 } else {
-                    // Add to owned customizations
+                    // Add to owned customizations (as JSON string)
+                    ownedItems.push(selectedItem.id);
                     await prisma.user.update({
                         where: { id: userId },
                         data: {
-                            ownedCustomizations: {
-                                push: selectedItem.id
-                            }
+                            ownedCustomizations: JSON.stringify(ownedItems)
                         }
                     });
                     

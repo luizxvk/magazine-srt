@@ -30,12 +30,11 @@ const ITEM_POOLS = {
         // COMMON (0-400)
         { id: 'bg_default', name: 'Magazine Clássico', rarity: 'COMMON' },
         { id: 'bg_forest', name: 'Floresta', rarity: 'COMMON' },
-        { id: 'bg_ocean', name: 'Oceano', rarity: 'COMMON' },
         { id: 'bg_fire', name: 'Fogo', rarity: 'COMMON' },
         // RARE (401-800)
         { id: 'bg_aurora', name: 'Aurora Boreal', rarity: 'RARE' },
         { id: 'bg_galaxy', name: 'Galáxia', rarity: 'RARE' },
-        { id: 'bg_matrix', name: 'Matrix', rarity: 'RARE' },
+        { id: 'bg_retrowave', name: 'Retrowave', rarity: 'RARE' },
         { id: 'bg_city', name: 'Cidade Neon', rarity: 'RARE' },
         { id: 'bg_space', name: 'Espaço Profundo', rarity: 'RARE' },
         { id: 'bg_sunset', name: 'Pôr do Sol', rarity: 'RARE' },
@@ -44,8 +43,9 @@ const ITEM_POOLS = {
         { id: 'bg_ice', name: 'Gelo Ártico', rarity: 'RARE' },
         { id: 'bg_carbon', name: 'Fibra de Carbono', rarity: 'RARE' },
         { id: 'bg_emerald', name: 'Esmeralda', rarity: 'RARE' },
+        { id: 'bg_oceano', name: 'Oceano', rarity: 'RARE' },
         // EPIC (801-1500)
-        { id: 'bg_neon_grid', name: 'Grade Neon', rarity: 'EPIC' },
+        { id: 'bg_chuva_neon', name: 'Chuva Neon', rarity: 'EPIC' },
         { id: 'bg_royal', name: 'Real Púrpura', rarity: 'EPIC' },
         // LEGENDARY (1501+)
         { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', rarity: 'LEGENDARY' },

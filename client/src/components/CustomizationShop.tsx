@@ -39,9 +39,9 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     defaultItems.background,
     { id: 'bg_aurora', name: 'Aurora Boreal', description: 'Ondas suaves de luz em movimento', price: 600, type: 'background', preview: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)' },
     { id: 'bg_galaxy', name: 'Galáxia', description: 'Estrelas e constelações', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)' },
-    { id: 'bg_matrix', name: 'Matrix', description: 'Código caindo estilo matrix', price: 450, type: 'background', preview: 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 50%, #0a0f0a 100%)' },
+    { id: 'bg_retrowave', name: 'Retrowave', description: 'Synthwave retrô com sol e grid neon', price: 850, type: 'background', preview: 'linear-gradient(180deg, #1a0028 0%, #2d004a 30%, #ff006e 60%, #ff6b35 100%)' },
     { id: 'bg_fire', name: 'Fogo', description: 'Fogo dançante nas bordas', price: 400, type: 'background', preview: 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)' },
-    { id: 'bg_ocean', name: 'Oceano', description: 'Ondas calmas em azul', price: 350, type: 'background', preview: 'linear-gradient(180deg, #0a1628 0%, #0c2340 50%, #0a1628 100%)' },
+    { id: 'bg_oceano', name: 'Oceano', description: 'Oceano noturno com montanhas e estrelas', price: 800, type: 'background', preview: 'linear-gradient(180deg, #0a0a1a 0%, #1a2a4a 40%, #2a4a6a 70%, #1a3a5a 100%)' },
     { id: 'bg_forest', name: 'Floresta', description: 'Verde natural e sereno', price: 300, type: 'background', preview: 'linear-gradient(180deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)' },
     { id: 'bg_city', name: 'Cidade Neon', description: 'Luzes urbanas vibrantes', price: 550, type: 'background', preview: 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)' },
     { id: 'bg_space', name: 'Espaço Profundo', description: 'Vastidão do cosmos', price: 700, type: 'background', preview: 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)' },
@@ -50,7 +50,7 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'bg_cyberpunk', name: 'Cyberpunk', description: 'Néon rosa e azul futurista', price: 750, type: 'background', preview: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)' },
     { id: 'bg_lava', name: 'Lava', description: 'Magma incandescente em movimento', price: 800, type: 'background', preview: 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)' },
     { id: 'bg_ice', name: 'Gelo Ártico', description: 'Cristais de gelo azulados', price: 600, type: 'background', preview: 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)' },
-    { id: 'bg_neon_grid', name: 'Grade Neon', description: 'Grid retro synthwave', price: 850, type: 'background', preview: 'linear-gradient(135deg, #0d0d0d 0%, #1a0d1a 25%, #2a0d2a 50%, #1a0d1a 75%, #0d0d0d 100%)' },
+    { id: 'bg_chuva_neon', name: 'Chuva Neon', description: 'Chuva digital estilo cyberpunk', price: 850, type: 'background', preview: 'linear-gradient(180deg, #0d0015 0%, #1a0030 40%, #00ff88 50%, #0d0015 100%)' },
     { id: 'bg_emerald', name: 'Esmeralda', description: 'Verde profundo luxuoso', price: 700, type: 'background', preview: 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)' },
     { id: 'bg_royal', name: 'Real Púrpura', description: 'Púrpura majestoso', price: 900, type: 'background', preview: 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)' },
     { id: 'bg_carbon', name: 'Fibra de Carbono', description: 'Textura escura premium', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)' },
@@ -58,11 +58,11 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 
 // FEATURED - Premium animated backgrounds
 const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
-    { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', description: 'Triângulos 3D coloridos em movimento hipnótico', price: 2500, type: 'background', preview: 'radial-gradient(circle at center, #111 0%, #000 60%)' },
+    { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', description: 'Triângulos 3D coloridos em movimento hipnótico', price: 2500, type: 'background', preview: 'radial-gradient(circle at 30% 30%, #ff0080 0%, transparent 30%), radial-gradient(circle at 70% 70%, #00ffff 0%, transparent 30%), radial-gradient(circle at center, #111 0%, #000 100%)' },
     { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%)' },
     { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
-    { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, #000 100%)' },
-    { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'Céu noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
+    { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, rgba(212,175,55,0.3) 50%, #000 100%)' },
+    { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'Céu noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'radial-gradient(circle at 70% 20%, rgba(255,255,200,0.3) 0%, transparent 20%), linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
 ];
 
 // Predefined badges (profile decorations)

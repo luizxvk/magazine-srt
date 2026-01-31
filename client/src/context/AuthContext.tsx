@@ -106,10 +106,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const BACKGROUND_STYLES: Record<string, string> = {
     'bg_aurora': 'linear-gradient(125deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #16213e 75%, #1a1a2e 100%)',
     'bg_sunset': 'linear-gradient(125deg, #1a0a0a 0%, #2d1f1f 25%, #4a2020 50%, #2d1f1f 75%, #1a0a0a 100%)',
-    'bg_ocean': 'linear-gradient(125deg, #0a1628 0%, #0c2340 33%, #0a1628 66%, #0c2340 100%)',
     'bg_forest': 'linear-gradient(125deg, #0a1a0a 0%, #0f2a0f 33%, #0a1a0a 66%, #0f2a0f 100%)',
     'bg_galaxy': 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #2d1b4e 50%, #1a0a2e 75%, #0c0c0c 100%)',
-    'bg_matrix': 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 33%, #0a0f0a 66%, #0a1a0a 100%)',
     'bg_fire': 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 25%, #4a2a0a 50%, #2d1a0a 75%, #1a0a0a 100%)',
     'bg_city': 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 33%, #1a1a2e 66%, #0f0f1a 100%)',
     'bg_space': 'linear-gradient(135deg, #000005 0%, #0a0a1a 33%, #000005 66%, #0a0a1a 100%)',
@@ -117,11 +115,17 @@ const BACKGROUND_STYLES: Record<string, string> = {
     'bg_cyberpunk': 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)',
     'bg_lava': 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)',
     'bg_ice': 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)',
-    'bg_neon_grid': 'linear-gradient(135deg, #0d0d0d 0%, #1a0d1a 25%, #2a0d2a 50%, #1a0d1a 75%, #0d0d0d 100%)',
     'bg_emerald': 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)',
     'bg_royal': 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)',
     'bg_carbon': 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)',
 };
+
+// Class-based backgrounds (require CSS class instead of inline gradient)
+const CLASS_BASED_BACKGROUNDS = [
+    'bg_oceano',
+    'bg_chuva_neon', 
+    'bg_retrowave',
+];
 
 // Accent color configurations
 const ACCENT_COLORS: Record<string, string> = {
@@ -213,12 +217,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (previewTheme.background.startsWith('anim-')) {
                 return `class:${previewTheme.background}`;
             }
+            // Check if it's one of the new class-based backgrounds
+            if (CLASS_BASED_BACKGROUNDS.includes(previewTheme.background)) {
+                return `class:${previewTheme.background}`;
+            }
             // Otherwise it's a gradient CSS value, return as-is
             return previewTheme.background;
         }
         // Check if it's an animated background (class-based)
         if (user?.equippedBackground?.startsWith('anim-')) {
             return `class:${user.equippedBackground}`; // Special marker for class-based
+        }
+        // Check if it's one of the new class-based backgrounds
+        if (user?.equippedBackground && CLASS_BASED_BACKGROUNDS.includes(user.equippedBackground)) {
+            return `class:${user.equippedBackground}`;
         }
         // Traditional gradient backgrounds
         if (user?.equippedBackground && BACKGROUND_STYLES[user.equippedBackground]) {
@@ -470,7 +482,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isAuthenticated = user && user.role !== 'VISITOR';
 
         // First, remove any existing animation classes from body
-        const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-'));
+        const existingAnimClasses = Array.from(document.body.classList).filter(cls => cls.startsWith('anim-') || cls.startsWith('bg_'));
         existingAnimClasses.forEach(cls => document.body.classList.remove(cls));
 
         // Helper function to clean up rainbow elements

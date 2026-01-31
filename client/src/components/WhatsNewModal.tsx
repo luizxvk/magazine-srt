@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Package, Eye, Check, Palette, Coins, Loader, Image } from 'lucide-react';
+import { X, Sparkles, Package, Shield, Cloud, Zap, Globe, Check, Server } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.4.25';
+const CURRENT_VERSION = '5.0.0-rc.1';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,41 +33,41 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.4.25 - Zions Cash, Badges icons8, SupplyBox loader, Header icons personalizados
+    // v5.0.0-rc.1 - Integração Rovex, Multi-tenant, Feature Gates, Suspension System
     const updates: UpdateItem[] = [
         {
-            icon: <Coins className="w-5 h-5 text-emerald-400" />,
-            title: 'Zions Cash - Sistema Monetário',
-            description: 'Nova moeda premium! Compre com PIX via MercadoPago. Sistema completo com abas Points/Cash na loja.',
+            icon: <Globe className="w-5 h-5 text-purple-400" />,
+            title: 'Integração Rovex Platform',
+            description: 'Conexão completa com a Rovex Platform! Webhooks, métricas e configuração remota.',
             isNew: true
         },
         {
-            icon: <Image className="w-5 h-5 text-pink-400" />,
-            title: 'Badges com Ícones Visuais',
-            description: 'Todas as badges agora têm ícones PNG do icons8! Foca, Grande Norke, Cabeça de Ovo e muito mais.',
+            icon: <Shield className="w-5 h-5 text-emerald-400" />,
+            title: 'Sistema de Feature Gates',
+            description: 'Features modulares por plano! FREE, STARTER, GROWTH e ENTERPRISE com acesso controlado.',
             isNew: true
         },
         {
-            icon: <Palette className="w-5 h-5 text-purple-400" />,
-            title: 'Ícones Personalizados no Header',
-            description: 'Todos os ícones do menu agora mudam de cor com sua accent color! Visual único pra cada usuário.',
+            icon: <Cloud className="w-5 h-5 text-blue-400" />,
+            title: 'Multi-Tenant Architecture',
+            description: 'Suporte a múltiplas comunidades! Cada uma com branding, cores e moeda própria.',
             isNew: true
         },
         {
-            icon: <Loader className="w-5 h-5 text-blue-400" />,
-            title: 'Loader Apple no Supply Box',
-            description: 'Animação estilo Apple enquanto abre a caixa. Experiência premium de abertura.',
+            icon: <Server className="w-5 h-5 text-amber-400" />,
+            title: 'Health & Metrics API',
+            description: 'Endpoints de monitoramento para integração com dashboards externos.',
             isNew: true
         },
         {
-            icon: <Eye className="w-5 h-5 text-amber-400" />,
-            title: 'Preview Real no Supply Box',
-            description: 'Veja exatamente o item que você ganhou! Cores, fundos e bordas são exibidos com preview real.',
+            icon: <Zap className="w-5 h-5 text-yellow-400" />,
+            title: 'Suspension & Quota System',
+            description: 'Sistema de suspensão, limites de usuários e controle de storage por plano.',
         },
         {
             icon: <Package className="w-5 h-5 text-cyan-400" />,
-            title: 'Duplicatas = Zions Points',
-            description: 'Itens duplicados são convertidos automaticamente em Zions Points de acordo com a raridade.',
+            title: 'Push Events para Rovex',
+            description: 'Envio proativo de eventos e métricas para a plataforma central.',
         }
     ];
 

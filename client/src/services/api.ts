@@ -25,6 +25,37 @@ api.interceptors.response.use(
             // Dispatch custom event to show modal
             window.dispatchEvent(new CustomEvent('session-expired'));
         }
+        
+        // Handle community suspension
+        if (error.response?.data?.code === 'COMMUNITY_SUSPENDED') {
+            // Store suspension info
+            localStorage.setItem('suspensionReason', error.response.data.reason || 'unknown');
+            localStorage.setItem('suspensionMessage', error.response.data.message || '');
+            if (error.response.data.suspendedAt) {
+                localStorage.setItem('suspensionSince', error.response.data.suspendedAt);
+            }
+            if (error.response.data.resumesAt) {
+                localStorage.setItem('suspensionUntil', error.response.data.resumesAt);
+            }
+            
+            // Redirect to suspended page
+            if (window.location.pathname !== '/suspended') {
+                window.location.href = '/suspended';
+            }
+        }
+        
+        // Handle community deleted
+        if (error.response?.data?.code === 'COMMUNITY_DELETED') {
+            // Clear all data and show permanent message
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            if (window.location.pathname !== '/suspended') {
+                window.location.href = '/suspended?reason=deleted&message=' + 
+                    encodeURIComponent('Esta comunidade foi encerrada permanentemente.');
+            }
+        }
+        
         return Promise.reject(error);
     }
 );

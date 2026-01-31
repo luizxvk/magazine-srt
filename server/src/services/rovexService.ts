@@ -3,10 +3,12 @@
 // Reporta métricas do Magazine para a plataforma Rovex
 // ============================================
 
+import crypto from 'crypto';
 import prisma from '../utils/prisma';
 
 const ROVEX_API_URL = process.env.ROVEX_API_URL;
 const ROVEX_API_SECRET = process.env.ROVEX_API_SECRET;
+const COMMUNITY_ID = process.env.ROVEX_COMMUNITY_ID;
 
 interface RovexMetrics {
   totalUsers: number;
@@ -276,4 +278,95 @@ export async function testRovexConnection(): Promise<{
       error: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
+}
+
+// ============================================
+// PUSH EVENTS TO ROVEX
+// ============================================
+
+/**
+ * Gera assinatura HMAC-SHA256 para autenticar requests
+ */
+function generateSignature(timestamp: string, body: string): string {
+  if (!ROVEX_API_SECRET) return '';
+  return crypto
+    .createHmac('sha256', ROVEX_API_SECRET)
+    .update(`${timestamp}.${body}`)
+    .digest('hex');
+}
+
+/**
+ * Envia dados para a Rovex Platform (genérico)
+ */
+async function sendToRovex(
+  endpoint: 'metrics' | 'events' | 'health',
+  data: Record<string, unknown>
+): Promise<boolean> {
+  if (!ROVEX_API_URL || !ROVEX_API_SECRET) {
+    console.warn('[Rovex] Integration not configured');
+    return false;
+  }
+
+  const communityId = COMMUNITY_ID || 'magazine-srt';
+  const url = `${ROVEX_API_URL}/api/magazine/${communityId}/${endpoint}`;
+  const timestamp = Date.now().toString();
+  const body = JSON.stringify(data);
+  const signature = generateSignature(timestamp, body);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Rovex-Signature': signature,
+        'X-Rovex-Timestamp': timestamp,
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      console.error(`[Rovex] Failed to send ${endpoint}:`, await response.text());
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`[Rovex] Error sending ${endpoint}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Reporta um evento específico para a Rovex
+ * Útil para notificar sobre ações importantes (novo usuário VIP, erro crítico, etc)
+ */
+export async function reportEvent(
+  event: string,
+  data: Record<string, unknown>
+): Promise<boolean> {
+  return sendToRovex('events', { 
+    event, 
+    data, 
+    timestamp: new Date().toISOString() 
+  });
+}
+
+/**
+ * Envia métricas de push para a Rovex
+ * Alternativa ao modelo pull
+ */
+export async function pushMetrics(
+  metrics: Record<string, unknown>
+): Promise<boolean> {
+  return sendToRovex('metrics', metrics);
+}
+
+/**
+ * Reporta status de saúde para a Rovex
+ */
+export async function reportHealth(
+  status: 'ok' | 'degraded' | 'down',
+  details?: Record<string, unknown>
+): Promise<boolean> {
+  return sendToRovex('health', { status, ...details });
 }

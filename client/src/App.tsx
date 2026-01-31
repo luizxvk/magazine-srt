@@ -30,6 +30,7 @@ import ExplorePage from './pages/ExplorePage';
 import ProductDetails from './pages/ProductDetails';
 import FeedbackPage from './pages/FeedbackPage';
 import DevToolsPage from './pages/admin/DevToolsPage';
+import SuspendedPage from './pages/SuspendedPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
 import Toast from './components/Toast';
@@ -45,6 +46,7 @@ import MiniRadioPlayer from './components/MiniRadioPlayer';
 import { EdgeNotificationContainer } from './components/EdgeNotification';
 import VersionUpdateNotification from './components/VersionUpdateNotification';
 import BetaRewardPopup from './components/BetaRewardPopup';
+import BetaEndedOverlay from './components/BetaEndedOverlay';
 
 
 
@@ -66,6 +68,7 @@ function App() {
           <Routes>
           <Route path="/" element={<ModernLogin />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/suspended" element={<SuspendedPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/request-invite" element={<RequestInvite />} />
@@ -116,6 +119,7 @@ function App() {
         <DevBanner />
         <VersionUpdateNotification />
         <BetaRewardWrapper />
+        <BetaEndedOverlay />
       </Router>
     </RadioProvider>
     </AuthProvider>

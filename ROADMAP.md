@@ -1,24 +1,119 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.4.22 (Beta)  
-> **Última Atualização:** 30 de Janeiro de 2026
+> **Versão Atual:** v5.0.0-rc.1 (Release Candidate)  
+> **Última Atualização:** 31 de Janeiro de 2026  
+> **Lançamento v5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
 
 ## 📊 Status do Projeto
 
 ```
-🟢 Fase Beta Ativa
+🚀 Versão 5.0 em Preparação
 ├─ Sistema Base: 100% ✅
-├─ Features Sociais: 98% ✅
-├─ Gamificação: 95% ✅
-├─ E-commerce: 85% 🔄
-└─ Personalização: 85% 🔄
+├─ Features Sociais: 100% ✅
+├─ Gamificação: 100% ✅
+├─ E-commerce: 95% ✅
+├─ Personalização: 95% ✅
+├─ Integração Rovex: 100% ✅
+└─ Multi-Tenant: 100% ✅
 ```
 
 ---
 
-## ✅ Recentemente Implementado (v0.4.1 - v0.4.22)
+## 🆕 v5.0.0-rc.1 (Release Candidate - 31 Janeiro 2026)
+
+### 🌐 Integração Rovex Platform
+**Conexão completa com a plataforma de gestão de comunidades**
+
+- 🔗 **Endpoints de Integração**
+  - `GET /api/rovex/health` - Health check para monitoramento
+  - `GET /api/rovex/metrics` - Métricas reais do banco de dados
+  - `GET /api/rovex/config` - Configuração da comunidade
+  - `PUT /api/rovex/config` - Atualização remota de config
+  - `POST /api/rovex/webhook` - Recebimento de eventos
+
+- 🔐 **Segurança HMAC-SHA256**
+  - Validação de assinatura em todos os webhooks
+  - Verificação de timestamp (±5 minutos)
+  - Secret compartilhado entre Magazine e Rovex
+
+- 📊 **Push de Métricas**
+  - `reportEvent()` - Envio de eventos para Rovex
+  - `pushMetrics()` - Métricas periódicas
+  - `reportHealth()` - Status de saúde da comunidade
+
+### 🎛️ Sistema de Feature Gates
+**Controle de features por plano**
+
+- 📋 **Planos Disponíveis**
+  - FREE - Trial 14 dias (50 usuários)
+  - STARTER - R$ 247/mês (500 usuários)
+  - GROWTH - R$ 597/mês (2000 usuários)
+  - ENTERPRISE - R$ 1.497/mês (ilimitado)
+
+- 🔒 **Componente `<FeatureGate>`**
+  - Bloqueia UI baseado no plano
+  - Mostra preview com blur
+  - Modal de upgrade automático
+
+- 🛡️ **Middleware `requireFeature()`**
+  - Proteção de endpoints por feature
+  - Retorna plano mínimo necessário
+  - Mensagens de erro contextuais
+
+### 🏢 Arquitetura Multi-Tenant
+**Suporte a múltiplas comunidades**
+
+- 🎨 **Branding Dinâmico**
+  - Nome, logo e cores customizáveis
+  - Moeda virtual com nome próprio
+  - Tiers VIP/Standard configuráveis
+
+- 🌍 **Detecção por Subdomain**
+  - `{comunidade}.comunidades.rovex.app`
+  - Cache de configuração (5 minutos TTL)
+  - Fallback para Magazine SRT default
+
+- 📝 **CommunityContext**
+  - `formatCurrency()` - Formata moeda local
+  - `getTierName()` - Nome do tier
+  - `isFeatureEnabled()` - Verifica feature
+
+### ⚠️ Sistema de Suspensão
+**Gerenciamento de comunidades suspensas**
+
+- 🚫 **Middleware de Suspensão**
+  - Bloqueia todas as rotas (exceto Rovex)
+  - Retorna 503 com código `COMMUNITY_SUSPENDED`
+  - Suporte a suspensão temporária com data de retorno
+
+- 📄 **Página `/suspended`**
+  - UI estilizada com motivo da suspensão
+  - Contador até reativação (se aplicável)
+  - Link para contato de suporte
+
+- 🗑️ **Comunidade Deletada**
+  - Retorna 410 com código `COMMUNITY_DELETED`
+  - Limpa localStorage do usuário
+  - Redireciona para página de encerramento
+
+### 🎉 Encerramento da Beta
+**Agradecimento aos beta testers**
+
+- 🏆 **BetaEndedOverlay**
+  - Ativa às 00:00 de 01/02/2026
+  - Agradecimento aos 847+ beta testers
+  - Estatísticas da beta (posts, features)
+
+- ⏱️ **Countdown para v5.0**
+  - Contagem regressiva até 05/02/2026 13:00 BRT
+  - Animações de confetti
+  - Link para redes sociais
+
+---
+
+## ✅ Recentemente Implementado (v0.4.1 - v0.4.25)
 
 ### v0.4.22 (Atual - Janeiro 2026) 🎉
 **SOCIAL DISCOVERY & FRIEND REQUESTS**

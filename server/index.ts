@@ -35,6 +35,7 @@ import ogRoutes from './src/routes/ogRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
+import { suspensionMiddleware } from './src/middleware/suspensionMiddleware';
 import { runVerificationCronJobs } from './src/services/verificationCronService';
 import { reportMetricsToRovex, isRovexConfigured } from './src/services/rovexService';
 import { cleanupExpiredGroupMessages } from './src/services/groupMessageCleanupService';
@@ -99,6 +100,14 @@ app.use('/uploads', express.static('uploads'));
 // API Router
 const apiRouter = express.Router();
 
+// Rovex routes FIRST (always allowed, even when suspended)
+apiRouter.use('/rovex', rovexRoutes);
+
+// Suspension check middleware (applied to all routes below)
+// This will block access if community is suspended
+apiRouter.use(suspensionMiddleware);
+
+// Regular routes (subject to suspension check)
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/users', userRoutes);
 apiRouter.use('/feed', feedRoutes);
@@ -126,7 +135,6 @@ apiRouter.use('/feedback', feedbackRoutes);
 apiRouter.use('/products', productRoutes);
 apiRouter.use('/withdrawals', withdrawalRoutes);
 apiRouter.use('/theme-packs', themePackRoutes);
-apiRouter.use('/rovex', rovexRoutes);
 apiRouter.use('/features', featureRoutes);
 apiRouter.use('/og', ogRoutes);
 

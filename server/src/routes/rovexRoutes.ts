@@ -1,8 +1,49 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import prisma from '../utils/prisma';
-import { reportMetricsToRovex, testRovexConnection, isRovexConfigured } from '../services/rovexService';
+import { reportMetricsToRovex, testRovexConnection, isRovexConfigured, reportEvent } from '../services/rovexService';
+import {
+  getSuspensionState,
+  setSuspensionState,
+  setQuotaLimits,
+  updateBranding,
+  setDeletionState,
+  updateFeatureFlags,
+  getQuotaLimits,
+  invalidateSuspensionCache,
+} from '../services/suspensionService';
 
 const router = Router();
+
+// =====================================
+// HELPER FUNCTIONS
+// =====================================
+
+/**
+ * Verifica assinatura HMAC-SHA256 do webhook da Rovex
+ * OBRIGATÓRIO para garantir autenticidade dos webhooks
+ */
+function verifyRovexSignature(
+  signature: string,
+  timestamp: string,
+  body: string,
+  secret: string
+): boolean {
+  const signatureBase = `${timestamp}.${body}`;
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(signatureBase)
+    .digest('hex');
+  
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    );
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Middleware para validar secret da Rovex Platform
@@ -867,43 +908,199 @@ router.put('/plan', async (req: Request, res: Response) => {
 /**
  * POST /api/rovex/webhook
  * Recebe eventos da Rovex (suspensão, reativação, etc)
+ * Com verificação de assinatura HMAC-SHA256
  */
 router.post('/webhook', async (req: Request, res: Response) => {
   try {
-    const { event, data, timestamp } = req.body;
+    // Obter headers de autenticação
+    const signature = req.headers['x-rovex-signature'] as string | undefined;
+    const timestamp = req.headers['x-rovex-timestamp'] as string | undefined;
+    const eventHeader = req.headers['x-rovex-event'] as string | undefined;
     
-    console.log(`📨 Rovex webhook received: ${event}`, data);
-    
-    switch (event) {
-      case 'community.suspended':
-        // TODO: Lidar com suspensão da comunidade
-        // Pode ser: bloquear logins, mostrar mensagem de manutenção, etc
-        console.warn('⚠️ Community suspended by Rovex:', data?.reason);
-        break;
-      case 'community.reactivated':
-        // TODO: Lidar com reativação
-        console.log('✅ Community reactivated by Rovex');
-        break;
-      case 'community.plan_changed':
-        // Mudança de plano (STARTER, GROWTH, ENTERPRISE)
-        console.log('📊 Plan changed via Rovex:', data?.newPlan);
-        break;
-      case 'config.updated':
-        // Config foi atualizada no painel Rovex
-        console.log('📝 Config updated via Rovex:', data);
-        break;
-      case 'alert.triggered':
-        // Alertas de uso (ex: limite de usuários próximo)
-        console.warn('🚨 Alert triggered by Rovex:', data?.alertType, data?.message);
-        break;
-      default:
-        console.log(`❓ Unknown Rovex event: ${event}`);
+    // Verificar headers obrigatórios
+    if (!signature || !timestamp) {
+      console.warn('[Webhook] Missing required headers (signature/timestamp)');
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing required headers' 
+      });
     }
     
-    res.json({ success: true, received: true });
+    // Verificar timestamp (não aceitar webhooks com mais de 5 minutos)
+    const timestampMs = parseInt(timestamp);
+    if (isNaN(timestampMs) || Date.now() - timestampMs > 5 * 60 * 1000) {
+      console.warn('[Webhook] Timestamp too old or invalid:', timestamp);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Timestamp too old' 
+      });
+    }
+    
+    // Verificar assinatura HMAC-SHA256
+    const secret = process.env.ROVEX_API_SECRET;
+    if (secret) {
+      const rawBody = JSON.stringify(req.body);
+      const isValid = verifyRovexSignature(signature, timestamp, rawBody, secret);
+      
+      if (!isValid) {
+        console.warn('[Webhook] Invalid signature');
+        return res.status(401).json({ 
+          success: false, 
+          error: 'Invalid signature' 
+        });
+      }
+    }
+    
+    // Extrair evento e payload
+    const { event: bodyEvent, payload, data } = req.body;
+    const event = eventHeader || bodyEvent;
+    const eventData = payload || data;
+    
+    console.log(`📨 Rovex webhook received: ${event}`, eventData);
+    
+    try {
+      switch (event) {
+        // ============== PLAN EVENTS ==============
+        case 'plan.upgraded':
+        case 'plan.downgraded': {
+          const { oldPlan, newPlan, effectiveAt } = eventData;
+          console.log(`📈 Plan changed: ${oldPlan} → ${newPlan}`);
+          await updateFeatureFlags(newPlan);
+          // Notificar admins se necessário
+          break;
+        }
+        
+        // ============== SUSPENSION EVENTS ==============
+        case 'community.suspended': {
+          const { reason, suspendedAt, suspendedUntil } = eventData;
+          console.warn(`⚠️ Community suspended: ${reason}`);
+          await setSuspensionState({
+            suspended: true,
+            reason: reason || 'manual',
+            suspendedAt: suspendedAt || new Date().toISOString(),
+            suspendedUntil: suspendedUntil || null,
+          });
+          invalidateSuspensionCache();
+          break;
+        }
+        
+        case 'community.activated':
+        case 'community.reactivated': {
+          console.log('✅ Community reactivated');
+          await setSuspensionState({
+            suspended: false,
+            reason: null,
+            suspendedAt: null,
+            suspendedUntil: null,
+          });
+          invalidateSuspensionCache();
+          break;
+        }
+        
+        case 'community.deleted': {
+          console.error('🚨 Community marked as deleted');
+          await setDeletionState(true);
+          break;
+        }
+        
+        // ============== BILLING EVENTS ==============
+        case 'billing.success': {
+          const { amount, currency, invoiceId } = eventData;
+          console.log(`💰 Payment received: ${currency} ${amount} (Invoice: ${invoiceId})`);
+          // Log interno ou notificar admin
+          break;
+        }
+        
+        case 'billing.failed': {
+          const { amount, reason: failReason, failedAt } = eventData;
+          console.error(`❌ Payment failed: ${failReason}`);
+          // Alertar admin via notificação
+          break;
+        }
+        
+        // ============== CONFIG EVENTS ==============
+        case 'config.updated': {
+          const { changedFields } = eventData;
+          console.log('📝 Config updated via Rovex:', changedFields);
+          // Invalidar cache de configuração se necessário
+          break;
+        }
+        
+        case 'branding.updated': {
+          const { changes } = eventData;
+          console.log('🎨 Branding updated:', changes);
+          await updateBranding(changes);
+          break;
+        }
+        
+        case 'quotas.updated': {
+          const { quotas } = eventData;
+          console.log('📊 Quotas updated:', quotas);
+          await setQuotaLimits(quotas);
+          break;
+        }
+        
+        // ============== DOMAIN EVENTS ==============
+        case 'domain.added': {
+          const { domain } = eventData;
+          console.log(`🌐 Domain added: ${domain}`);
+          // Configurar novo domínio se necessário
+          break;
+        }
+        
+        case 'domain.removed': {
+          const { domain } = eventData;
+          console.log(`🗑️ Domain removed: ${domain}`);
+          break;
+        }
+        
+        case 'domain.verified': {
+          const { domain } = eventData;
+          console.log(`✅ Domain verified: ${domain}`);
+          break;
+        }
+        
+        // ============== ALERT EVENTS ==============
+        case 'alert.triggered': {
+          const { alertType, message } = eventData;
+          console.warn(`🚨 Alert triggered: ${alertType} - ${message}`);
+          break;
+        }
+        
+        // ============== LEGACY EVENTS ==============
+        case 'community.plan_changed': {
+          const { newPlan } = eventData;
+          console.log(`📊 Plan changed via legacy event: ${newPlan}`);
+          await updateFeatureFlags(newPlan);
+          break;
+        }
+        
+        default:
+          console.log(`❓ Unknown Rovex event: ${event}`);
+      }
+      
+      res.json({ 
+        success: true, 
+        received: true, 
+        event,
+        processedAt: new Date().toISOString()
+      });
+    } catch (handlerError) {
+      console.error(`[Webhook] Error handling ${event}:`, handlerError);
+      // Retornar sucesso mesmo com erro interno para evitar retries infinitos
+      res.json({ 
+        success: true, 
+        received: true, 
+        event,
+        warning: 'Internal processing error'
+      });
+    }
   } catch (error) {
     console.error('❌ Rovex webhook error:', error);
-    res.status(500).json({ success: false, error: 'Webhook processing failed' });
+    res.status(500).json({ 
+      success: false, 
+      error: 'Webhook processing failed' 
+    });
   }
 });
 

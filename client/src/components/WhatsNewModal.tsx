@@ -4,7 +4,7 @@ import { X, Sparkles, Package, Shield, Cloud, Zap, Globe, Check, Server } from '
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '5.0.0-rc.1';
+const CURRENT_VERSION = '0.5.0-rc.1';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,7 +33,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v5.0.0-rc.1 - Integração Rovex, Multi-tenant, Feature Gates, Suspension System
+    // v0.5.0-rc.1 - Integração Rovex, Multi-tenant, Feature Gates, Suspension System
     const updates: UpdateItem[] = [
         {
             icon: <Globe className="w-5 h-5 text-purple-400" />,

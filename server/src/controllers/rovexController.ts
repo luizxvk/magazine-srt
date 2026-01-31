@@ -28,7 +28,7 @@ export async function healthCheck(req: Request, res: Response) {
         subdomain: config.subdomain,
         plan: config.plan,
       },
-      version: process.env.APP_VERSION || '5.0.0',
+      version: process.env.APP_VERSION || '0.5.0',
       uptime: process.uptime(),
     });
   } catch (error) {

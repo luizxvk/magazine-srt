@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const TOUR_VERSION = '5.0.0-rc.1';
+const TOUR_VERSION = '0.5.0-rc.1';
 
 interface WelcomeTourProps {
     isOpen?: boolean;

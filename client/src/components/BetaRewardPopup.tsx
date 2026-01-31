@@ -5,10 +5,10 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import packageJson from '../../package.json';
 
-const BETA_REWARD_VERSION = '5.0'; // Versão que ativa o brinde
+const BETA_REWARD_VERSION = '0.5'; // Versão que ativa o brinde
 const BETA_REWARD_POINTS = 500;
 
-// Data de lançamento v5.0 - 05 de Fevereiro 2026 às 13:00 BRT (16:00 UTC)
+// Data de lançamento v0.5.0 - 05 de Fevereiro 2026 às 13:00 BRT (16:00 UTC)
 const LAUNCH_DATE = new Date('2026-02-05T16:00:00.000Z');
 
 export default function BetaRewardPopup() {
@@ -23,7 +23,7 @@ export default function BetaRewardPopup() {
     useEffect(() => {
         // Só mostrar se:
         // 1. Usuário está logado
-        // 2. Data atual é >= 05/02/2026 (lançamento v5.0)
+        // 2. Data atual é >= 05/02/2026 (lançamento v0.5.0)
         // 3. Versão atual é 5.0.x
         // 4. Usuário ainda não resgatou o brinde
         if (!user) return;

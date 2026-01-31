@@ -1,15 +1,15 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v5.0.0-rc.1 (Release Candidate)  
+> **Versão Atual:** v0.5.0-rc.1 (Release Candidate)  
 > **Última Atualização:** 31 de Janeiro de 2026  
-> **Lançamento v5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
+> **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
 
 ## 📊 Status do Projeto
 
 ```
-🚀 Versão 5.0 em Preparação
+🚀 Versão 0.5.0 em Preparação
 ├─ Sistema Base: 100% ✅
 ├─ Features Sociais: 100% ✅
 ├─ Gamificação: 100% ✅
@@ -21,7 +21,7 @@
 
 ---
 
-## 🆕 v5.0.0-rc.1 (Release Candidate - 31 Janeiro 2026)
+## 🆕 v0.5.0-rc.1 (Release Candidate - 31 Janeiro 2026)
 
 ### 🌐 Integração Rovex Platform
 **Conexão completa com a plataforma de gestão de comunidades**
@@ -106,7 +106,7 @@
   - Agradecimento aos 847+ beta testers
   - Estatísticas da beta (posts, features)
 
-- ⏱️ **Countdown para v5.0**
+- ⏱️ **Countdown para v0.5.0**
   - Contagem regressiva até 05/02/2026 13:00 BRT
   - Animações de confetti
   - Link para redes sociais

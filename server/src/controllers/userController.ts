@@ -248,7 +248,7 @@ export const updateProfileBackground = async (req: AuthRequest, res: Response) =
     }
 };
 
-// Claim Beta Reward - 500 Zions Points for beta users when v5.0 launches
+// Claim Beta Reward - 500 Zions Points for beta users when v0.5.0 launches
 const BETA_REWARD_POINTS = 500;
 
 export const claimBetaReward = async (req: AuthRequest, res: Response) => {

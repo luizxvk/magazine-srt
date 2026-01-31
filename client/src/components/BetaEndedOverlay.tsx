@@ -2,7 +2,7 @@
  * BetaEndedOverlay - Componente de bloqueio pós-beta
  * 
  * Exibe uma tela de agradecimento quando a beta termina (01/02/2026 00:00 BRT)
- * Com countdown para o lançamento da v5.0 (05/02/2026 13:00 BRT)
+ * Com countdown para o lançamento da v0.5.0 (05/02/2026 13:00 BRT)
  * 
  * NÃO afeta rotas da Rovex (/api/rovex/*)
  */
@@ -14,7 +14,7 @@ import { Sparkles, Clock, Heart, Rocket, Star, Trophy } from 'lucide-react';
 // Data de término da beta: 01/02/2026 às 00:00 horário de Brasília (UTC-3)
 const BETA_END_DATE = new Date('2026-02-01T03:00:00.000Z'); // 00:00 BRT = 03:00 UTC
 
-// Data de lançamento da v5.0: 05/02/2026 às 13:00 horário de Brasília (UTC-3)
+// Data de lançamento da v0.5.0: 05/02/2026 às 13:00 horário de Brasília (UTC-3)
 const LAUNCH_DATE = new Date('2026-02-05T16:00:00.000Z'); // 13:00 BRT = 16:00 UTC
 
 interface CountdownValues {
@@ -162,7 +162,7 @@ export default function BetaEndedOverlay() {
               Sua participação foi fundamental para chegarmos até aqui.
             </p>
             <p className="text-gray-400 mb-8">
-              A versão 5.0 está chegando com tudo que você pediu e muito mais!
+              A versão 0.5.0 está chegando com tudo que você pediu e muito mais!
             </p>
           </motion.div>
           
@@ -197,7 +197,7 @@ export default function BetaEndedOverlay() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Rocket className="w-5 h-5 text-gold-400" />
               <span className="text-gold-400 font-semibold uppercase tracking-wider text-sm">
-                Lançamento da v5.0
+                Lançamento da v0.5.0
               </span>
             </div>
             

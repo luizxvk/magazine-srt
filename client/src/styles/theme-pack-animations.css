@@ -1009,7 +1009,6 @@
 .bg_chuva_neon {
     background: linear-gradient(180deg, #0d0015 0%, #1a0030 50%, #0d0015 100%);
     position: relative;
-    overflow: hidden;
 }
 
 @keyframes chuva-neon-fall {
@@ -1108,7 +1107,6 @@
         #ffe66d 100%
     );
     position: relative;
-    overflow: hidden;
 }
 
 /* Synthwave sun */

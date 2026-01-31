@@ -8,6 +8,9 @@ import packageJson from '../../package.json';
 const BETA_REWARD_VERSION = '5.0'; // Versão que ativa o brinde
 const BETA_REWARD_POINTS = 500;
 
+// Data de lançamento v5.0 - 05 de Fevereiro 2026 às 13:00 BRT (16:00 UTC)
+const LAUNCH_DATE = new Date('2026-02-05T16:00:00.000Z');
+
 export default function BetaRewardPopup() {
     const { user, theme, updateUser, showSuccess } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
@@ -20,12 +23,18 @@ export default function BetaRewardPopup() {
     useEffect(() => {
         // Só mostrar se:
         // 1. Usuário está logado
-        // 2. Versão atual é 5.0.x
-        // 3. Usuário ainda não resgatou o brinde
+        // 2. Data atual é >= 05/02/2026 (lançamento v5.0)
+        // 3. Versão atual é 5.0.x
+        // 4. Usuário ainda não resgatou o brinde
         if (!user) return;
 
+        const now = new Date();
+        const isAfterLaunch = now >= LAUNCH_DATE;
         const versionMatch = currentVersion.startsWith(BETA_REWARD_VERSION);
         const hasClaimedReward = localStorage.getItem(`beta_reward_claimed_${user.id}`);
+
+        // NÃO mostrar antes do lançamento
+        if (!isAfterLaunch) return;
 
         if (versionMatch && !hasClaimedReward) {
             // Delay para não conflitar com outros modais
@@ -89,10 +98,26 @@ export default function BetaRewardPopup() {
                         theme === 'light' ? 'bg-white' : 'bg-zinc-900'
                     } shadow-2xl`}
                 >
-                    {/* Animated background gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${
-                        isMGT ? 'from-emerald-500/20 via-transparent to-emerald-500/10' : 'from-gold-500/20 via-transparent to-gold-500/10'
-                    } animate-pulse`} />
+                    {/* Animated background glow - centered pulse */}
+                    <motion.div 
+                        className={`absolute inset-0 ${
+                            isMGT ? 'bg-emerald-500' : 'bg-gold-500'
+                        }`}
+                        style={{
+                            background: isMGT 
+                                ? 'radial-gradient(circle at center, rgba(16, 185, 129, 0.25) 0%, transparent 70%)' 
+                                : 'radial-gradient(circle at center, rgba(212, 175, 55, 0.25) 0%, transparent 70%)'
+                        }}
+                        animate={{
+                            scale: [1, 1.3, 1],
+                            opacity: [0.5, 0.8, 0.5]
+                        }}
+                        transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: 'easeInOut'
+                        }}
+                    />
 
                     {/* Floating particles */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">

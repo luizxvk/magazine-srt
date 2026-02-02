@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
 import logoMgt from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';

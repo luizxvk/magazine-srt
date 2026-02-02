@@ -16,8 +16,67 @@ import {
 const router = Router();
 
 // =====================================
-// HELPER FUNCTIONS
+// CACHE E HELPER FUNCTIONS
 // =====================================
+
+// Cache em memória para o secret (evita consultas repetidas ao banco)
+let cachedSecret: string | null = null;
+let secretCacheExpiry: number = 0;
+const SECRET_CACHE_TTL = 60 * 1000; // 1 minuto
+
+/**
+ * Busca o secret do Rovex do banco de dados ou cache
+ * Fallback para env var se não configurado
+ */
+async function getStoredSecret(): Promise<string | null> {
+  // Verificar cache
+  if (cachedSecret && Date.now() < secretCacheExpiry) {
+    return cachedSecret;
+  }
+  
+  try {
+    const config = await prisma.systemConfig.findUnique({
+      where: { key: 'rovex_api_secret' },
+    });
+    
+    if (config?.value) {
+      // Atualizar cache
+      cachedSecret = config.value;
+      secretCacheExpiry = Date.now() + SECRET_CACHE_TTL;
+      return config.value;
+    }
+  } catch (error) {
+    console.warn('[Rovex] Could not fetch secret from database:', error);
+  }
+  
+  // Fallback para env var
+  return process.env.ROVEX_API_SECRET || null;
+}
+
+/**
+ * Salva o secret do Rovex no banco de dados
+ */
+async function saveSecret(secret: string): Promise<void> {
+  await prisma.systemConfig.upsert({
+    where: { key: 'rovex_api_secret' },
+    update: { value: secret },
+    create: { key: 'rovex_api_secret', value: secret },
+  });
+  
+  // Atualizar cache
+  cachedSecret = secret;
+  secretCacheExpiry = Date.now() + SECRET_CACHE_TTL;
+  
+  console.log('[Rovex] ✅ API Secret saved/updated in database');
+}
+
+/**
+ * Invalida o cache do secret (para forçar nova busca)
+ */
+function invalidateSecretCache(): void {
+  cachedSecret = null;
+  secretCacheExpiry = 0;
+}
 
 /**
  * Verifica assinatura HMAC-SHA256 do webhook da Rovex
@@ -50,10 +109,10 @@ function verifyRovexSignature(
  * Suporta dois formatos de autenticação:
  * 1. Header x-rovex-secret: <secret>
  * 2. Header Authorization: Bearer <secret>
+ * 
+ * Busca o secret dinamicamente do banco de dados com fallback para env var
  */
-const validateRovexSecret = (req: Request, res: Response, next: NextFunction) => {
-  const expectedSecret = process.env.ROVEX_API_SECRET;
-  
+const validateRovexSecret = async (req: Request, res: Response, next: NextFunction) => {
   // Tentar obter secret do header x-rovex-secret (formato legado)
   let secret = req.headers['x-rovex-secret'] as string | undefined;
   
@@ -65,11 +124,33 @@ const validateRovexSecret = (req: Request, res: Response, next: NextFunction) =>
     }
   }
   
-  if (!secret || secret !== expectedSecret) {
-    console.warn('⚠️ Unauthorized Rovex request attempt');
+  if (!secret) {
+    console.warn('⚠️ Unauthorized Rovex request - no secret provided');
     return res.status(401).json({ 
       success: false, 
-      error: 'Unauthorized - Invalid Rovex secret' 
+      error: 'Unauthorized - Missing Rovex secret',
+      code: 'MISSING_SECRET'
+    });
+  }
+  
+  // Buscar secret salvo do banco/cache (com fallback para env var)
+  const expectedSecret = await getStoredSecret();
+  
+  if (!expectedSecret) {
+    console.warn('⚠️ No Rovex secret configured - use /provision endpoint first');
+    return res.status(401).json({ 
+      success: false, 
+      error: 'Rovex secret not configured',
+      code: 'NOT_CONFIGURED'
+    });
+  }
+  
+  if (secret !== expectedSecret) {
+    console.warn('⚠️ Unauthorized Rovex request - invalid secret');
+    return res.status(401).json({ 
+      success: false, 
+      error: 'Unauthorized - Invalid Rovex secret',
+      code: 'INVALID_SECRET'
     });
   }
   
@@ -215,6 +296,232 @@ router.get('/cron/metrics', validateCronSecret, async (req: Request, res: Respon
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+/**
+ * POST /api/rovex/provision
+ * 
+ * Provisiona uma nova comunidade ou atualiza configuração completa.
+ * Este endpoint suporta AUTENTICAÇÃO FLEXÍVEL:
+ * 
+ * 1. PRIMEIRO SETUP (sem secret salvo): Aceita sem autenticação
+ * 2. ATUALIZAÇÕES: Requer x-rovex-secret header com o secret atual
+ * 
+ * O rovexApiSecret enviado no body é salvo no banco para futuras autenticações.
+ */
+router.post('/provision', async (req: Request, res: Response) => {
+  try {
+    const {
+      // Identificação
+      communityId,
+      subdomain,
+      name,
+      slogan,
+      
+      // Branding
+      logoUrl,
+      logoIconUrl,
+      faviconUrl,
+      ogImageUrl,
+      
+      // Cores
+      primaryColor,
+      secondaryColor,
+      accentColor,
+      
+      // Tiers
+      tierVipName,
+      tierVipColor,
+      tierStdName,
+      tierStdColor,
+      
+      // Economia
+      currencyName,
+      currencySymbol,
+      currencyIconUrl,
+      
+      // Plano
+      plan,
+      planExpiresAt,
+      
+      // Quotas
+      quotas,
+      
+      // URLs
+      baseUrl,
+      rovexApiUrl,
+      
+      // Database (não salvar no banco por segurança)
+      databaseUrl,
+      
+      // 🔑 CRÍTICO: API Secret
+      rovexApiSecret,
+      
+      // Legacy support
+      communityName,
+      adminUser,
+      features,
+    } = req.body;
+    
+    // Buscar secret atual do banco/cache
+    const savedSecret = await getStoredSecret();
+    
+    // Validar autenticação
+    if (savedSecret) {
+      // Já tem secret salvo - exigir autenticação no header
+      const headerSecret = req.headers['x-rovex-secret'] as string | undefined;
+      
+      if (!headerSecret || headerSecret !== savedSecret) {
+        console.warn('⚠️ Unauthorized provision attempt - invalid secret');
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized - Invalid Rovex secret',
+          code: 'INVALID_SECRET',
+        });
+      }
+    } else {
+      // Primeiro setup - aceitar sem autenticação
+      console.log('[Rovex] 🆕 First-time provisioning detected');
+    }
+    
+    // Validar campos obrigatórios
+    if (!rovexApiSecret) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: rovexApiSecret',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+    
+    console.log(`🚀 Provisioning community: ${name || communityName} (${subdomain})`);
+    
+    // Salvar o API Secret
+    await saveSecret(rovexApiSecret);
+    
+    // Criar configuração completa
+    const communityConfig = {
+      id: communityId || subdomain || 'magazine-srt',
+      subdomain: subdomain || 'magazine-srt',
+      name: name || communityName || 'Magazine MGT',
+      slogan: slogan || 'A comunidade definitiva de games e entretenimento',
+      plan: plan || 'STARTER',
+      
+      // Branding
+      logoUrl: logoUrl || null,
+      logoIconUrl: logoIconUrl || null,
+      faviconUrl: faviconUrl || null,
+      ogImageUrl: ogImageUrl || null,
+      
+      // Cores
+      primaryColor: primaryColor || '#d4af37',
+      secondaryColor: secondaryColor || '#10b981',
+      accentColor: accentColor || '#f59e0b',
+      
+      // Tiers
+      tierVipName: tierVipName || 'MAGAZINE',
+      tierVipColor: tierVipColor || '#d4af37',
+      tierStdName: tierStdName || 'MGT',
+      tierStdColor: tierStdColor || '#10b981',
+      
+      // Economia
+      currencyName: currencyName || 'Zions',
+      currencySymbol: currencySymbol || 'Z$',
+      currencyIconUrl: currencyIconUrl || null,
+      
+      // Plano
+      planExpiresAt: planExpiresAt || null,
+      
+      // URLs
+      baseUrl: baseUrl || null,
+      rovexApiUrl: rovexApiUrl || process.env.ROVEX_API_URL || null,
+      
+      // Features
+      features: features || {},
+      
+      // Quotas
+      quotas: quotas || null,
+      
+      // Timestamps
+      provisionedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    // Salvar config no banco
+    await prisma.systemConfig.upsert({
+      where: { key: 'community_config' },
+      update: { value: JSON.stringify(communityConfig) },
+      create: { key: 'community_config', value: JSON.stringify(communityConfig) },
+    });
+    
+    // Salvar quotas separadamente se fornecidas
+    if (quotas) {
+      await setQuotaLimits(quotas);
+    }
+    
+    // Atualizar feature flags baseado no plano
+    if (plan) {
+      await updateFeatureFlags(plan);
+    }
+    
+    // Criar usuário admin se fornecido (suporte legado)
+    let adminResult = null;
+    if (adminUser?.email && adminUser?.password) {
+      const bcrypt = await import('bcryptjs');
+      const hashedPassword = await bcrypt.hash(adminUser.password, 10);
+      
+      const existingAdmin = await prisma.user.findUnique({
+        where: { email: adminUser.email },
+      });
+      
+      if (existingAdmin) {
+        // Atualizar para admin
+        await prisma.user.update({
+          where: { id: existingAdmin.id },
+          data: { role: 'ADMIN' },
+        });
+        adminResult = { userId: existingAdmin.id, action: 'updated' };
+      } else {
+        // Criar novo admin
+        const newAdmin = await prisma.user.create({
+          data: {
+            email: adminUser.email,
+            name: adminUser.name || adminUser.email.split('@')[0],
+            passwordHash: hashedPassword,
+            role: 'ADMIN',
+            membershipType: 'MAGAZINE',
+            level: 1,
+            xp: 0,
+            zionsPoints: 1000,
+            zionsCash: 0,
+            trophies: 0,
+            isVerified: true,
+          },
+        });
+        adminResult = { userId: newAdmin.id, action: 'created' };
+      }
+    }
+    
+    console.log(`✅ Community provisioned successfully`);
+    
+    res.json({
+      success: true,
+      message: savedSecret ? 'Configuration updated successfully' : 'Initial provisioning complete',
+      data: {
+        communityId: communityConfig.id,
+        syncedAt: new Date().toISOString(),
+      },
+      config: communityConfig,
+      adminUser: adminResult,
+    });
+  } catch (error) {
+    console.error('❌ Provisioning error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to provision community',
+      code: 'PROVISIONING_ERROR',
+      details: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });
@@ -763,114 +1070,6 @@ router.put('/config', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'Failed to update configuration',
-    });
-  }
-});
-
-/**
- * POST /api/rovex/provision
- * Provisiona uma nova comunidade ou atualiza configuração completa
- * Cria o admin user se fornecido
- */
-router.post('/provision', async (req: Request, res: Response) => {
-  try {
-    const {
-      communityName,
-      subdomain,
-      plan,
-      tierVipName,
-      tierVipColor,
-      tierStdName,
-      tierStdColor,
-      currencyName,
-      currencySymbol,
-      primaryColor,
-      secondaryColor,
-      logoUrl,
-      adminUser,
-      features,
-    } = req.body;
-    
-    console.log(`🚀 Provisioning community: ${communityName} (${subdomain})`);
-    
-    // Criar configuração completa
-    const communityConfig = {
-      communityName: communityName || 'Magazine MGT',
-      communitySlug: subdomain || 'magazine-mgt',
-      plan: plan || 'STARTER',
-      tierVipName: tierVipName || 'MAGAZINE',
-      tierVipColor: tierVipColor || '#d4af37',
-      tierStdName: tierStdName || 'MGT',
-      tierStdColor: tierStdColor || '#10b981',
-      currencyName: currencyName || 'Zions',
-      currencySymbol: currencySymbol || 'Z$',
-      primaryColor: primaryColor || '#d4af37',
-      secondaryColor: secondaryColor || '#10b981',
-      logoUrl: logoUrl || null,
-      features: features || {},
-      provisionedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // Salvar config no banco
-    await prisma.systemConfig.upsert({
-      where: { key: 'community_config' },
-      update: { value: JSON.stringify(communityConfig) },
-      create: { key: 'community_config', value: JSON.stringify(communityConfig) },
-    });
-    
-    // Criar usuário admin se fornecido
-    let adminResult = null;
-    if (adminUser?.email && adminUser?.password) {
-      const bcrypt = await import('bcryptjs');
-      const hashedPassword = await bcrypt.hash(adminUser.password, 10);
-      
-      const existingAdmin = await prisma.user.findUnique({
-        where: { email: adminUser.email },
-      });
-      
-      if (existingAdmin) {
-        // Atualizar para admin
-        await prisma.user.update({
-          where: { id: existingAdmin.id },
-          data: { role: 'ADMIN' },
-        });
-        adminResult = { userId: existingAdmin.id, action: 'updated' };
-      } else {
-        // Criar novo admin
-        const newAdmin = await prisma.user.create({
-          data: {
-            email: adminUser.email,
-            name: adminUser.name || adminUser.email.split('@')[0],
-            passwordHash: hashedPassword,
-            role: 'ADMIN',
-            membershipType: 'MAGAZINE',
-            level: 1,
-            xp: 0,
-            zionsPoints: 1000,
-            zionsCash: 0,
-            trophies: 0,
-            isVerified: true,
-          },
-        });
-        adminResult = { userId: newAdmin.id, action: 'created' };
-      }
-    }
-    
-    console.log(`✅ Community provisioned successfully`);
-    
-    res.json({
-      success: true,
-      message: 'Community provisioned successfully',
-      config: communityConfig,
-      adminUser: adminResult,
-    });
-  } catch (error) {
-    console.error('❌ Provisioning error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to provision community',
-      details: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });

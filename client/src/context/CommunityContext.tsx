@@ -94,10 +94,11 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
       setIsLoading(true);
       setError(null);
       
-      // Tenta buscar config do backend
-      const response = await api.get('/rovex/config');
+      // Buscar config do endpoint público (não requer autenticação)
+      const response = await api.get('/rovex/public/config');
       
       if (response.data?.config) {
+        console.log('[CommunityContext] Config loaded from server:', response.data.config);
         setConfig(prev => ({
           ...prev,
           ...response.data.config,
@@ -105,7 +106,7 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
       }
     } catch (err) {
       // Se não conseguir, usa config padrão (não é erro crítico)
-      console.log('[CommunityContext] Using default config');
+      console.log('[CommunityContext] Using default config (server unavailable)');
     } finally {
       setIsLoading(false);
     }
@@ -128,10 +129,10 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
     console.log('[CommunityContext] Applied tier std color:', bgColor);
   }, [config.backgroundColor]);
 
-  // Carrega config na inicialização (opcional - pode descomentar se quiser)
-  // useEffect(() => {
-  //   refreshConfig();
-  // }, []);
+  // Carrega config do servidor na inicialização
+  useEffect(() => {
+    refreshConfig();
+  }, []);
 
   // Feature gating baseado no plano
   const checkFeatureEnabled = (feature: Feature): boolean => {

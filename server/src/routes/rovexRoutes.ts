@@ -255,6 +255,72 @@ router.get('/public/stats', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/rovex/public/config
+ * Retorna configurações da comunidade para o FRONTEND
+ * NÃO requer autenticação - usado pelo CommunityContext
+ */
+router.get('/public/config', async (req: Request, res: Response) => {
+  try {
+    // Tenta buscar config do banco
+    let savedConfig: Record<string, unknown> | null = null;
+    try {
+      const configRecord = await prisma.systemConfig.findUnique({
+        where: { key: 'community_config' },
+      });
+      if (configRecord?.value) {
+        savedConfig = JSON.parse(configRecord.value);
+      }
+    } catch {
+      // Tabela pode não existir ainda
+    }
+    
+    // Mescla config salva com defaults
+    const config = {
+      id: savedConfig?.id || 'magazine-srt',
+      subdomain: savedConfig?.subdomain || 'magazine-srt',
+      name: savedConfig?.name || 'Magazine MGT',
+      slogan: savedConfig?.slogan || 'A comunidade definitiva de games e entretenimento',
+      
+      // Cores
+      primaryColor: savedConfig?.primaryColor || '#d4af37',
+      secondaryColor: savedConfig?.secondaryColor || '#10b981',
+      accentColor: savedConfig?.accentColor || '#f59e0b',
+      backgroundColor: savedConfig?.backgroundColor || '#10b981',
+      
+      // Tiers
+      tierVipName: savedConfig?.tierVipName || 'MAGAZINE',
+      tierVipColor: savedConfig?.tierVipColor || '#d4af37',
+      tierVipSlogan: savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
+      tierStdName: savedConfig?.tierStdName || 'MGT',
+      tierStdSlogan: savedConfig?.tierStdSlogan || 'Velocidade e Poder',
+      
+      // Logos
+      logoUrl: savedConfig?.logoUrl || null,
+      logoIconUrl: savedConfig?.logoIconUrl || null,
+      faviconUrl: savedConfig?.faviconUrl || null,
+      
+      // Economia
+      currencyName: savedConfig?.currencyName || 'Zions',
+      currencySymbol: savedConfig?.currencySymbol || 'Z$',
+      
+      // Plano
+      plan: savedConfig?.plan || process.env.COMMUNITY_PLAN || 'ENTERPRISE',
+    };
+    
+    res.json({
+      success: true,
+      config,
+    });
+  } catch (error) {
+    console.error('❌ Public config error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch config',
+    });
+  }
+});
+
+/**
  * GET /api/rovex/cron/metrics
  * Endpoint de cron para Vercel - reporta métricas periodicamente
  * Autenticado via CRON_SECRET

@@ -10,6 +10,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Clock, Heart, Rocket, Star, Trophy, X } from 'lucide-react';
+import api from '../services/api';
 
 // Data de término da beta: 01/02/2026 às 00:00 horário de Brasília (UTC-3)
 const BETA_END_DATE = new Date('2026-02-01T03:00:00.000Z'); // 00:00 BRT = 03:00 UTC
@@ -22,6 +23,12 @@ interface CountdownValues {
   hours: number;
   minutes: number;
   seconds: number;
+}
+
+interface BetaStats {
+  betaTesters: number;
+  totalPosts: number;
+  totalFeatures: number;
 }
 
 function calculateCountdown(targetDate: Date): CountdownValues {
@@ -49,11 +56,30 @@ export function getLaunchDate(): Date {
   return LAUNCH_DATE;
 }
 
+// Gerar posições dos particles uma única vez (fora do componente para ser estável)
+const PARTICLE_POSITIONS = [...Array(15)].map(() => ({
+  left: Math.random() * 100,
+  top: Math.random() * 100,
+  size: 2 + Math.random() * 4,
+  duration: 3 + Math.random() * 4,
+  delay: Math.random() * 2,
+}));
+
+const CONFETTI_ITEMS = [...Array(30)].map((_, i) => ({
+  left: Math.random() * 100,
+  xOffset: (Math.random() - 0.5) * 100,
+  duration: 2 + Math.random() * 1.5,
+  delay: Math.random() * 1.5,
+  color: ['#d4af37', '#50c878', '#ff6b6b', '#4ecdc4', '#a855f7'][i % 5],
+  isCircle: i % 2 === 0,
+}));
+
 export default function BetaEndedOverlay() {
   const [countdown, setCountdown] = useState<CountdownValues>(calculateCountdown(LAUNCH_DATE));
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [stats, setStats] = useState<BetaStats>({ betaTesters: 0, totalPosts: 0, totalFeatures: 50 });
   
   // Verifica se a beta terminou
   const betaHasEnded = useMemo(() => {
@@ -64,6 +90,27 @@ export default function BetaEndedOverlay() {
   const hasLaunched = useMemo(() => {
     return new Date() >= LAUNCH_DATE;
   }, [countdown]);
+  
+  // Buscar estatísticas reais
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data } = await api.get('/rovex/public/stats');
+        if (data.success) {
+          setStats({
+            betaTesters: data.betaTesters || 0,
+            totalPosts: data.totalPosts || 0,
+            totalFeatures: data.totalFeatures || 50,
+          });
+        }
+      } catch (error) {
+        // Usar valores padrão se falhar
+        console.log('Could not fetch beta stats, using defaults');
+      }
+    };
+    
+    fetchStats();
+  }, []);
   
   useEffect(() => {
     // Se beta ainda não terminou, não mostrar
@@ -145,16 +192,18 @@ export default function BetaEndedOverlay() {
             <X className="w-5 h-5 text-white" />
           </button>
           
-          {/* Animated background particles */}
+          {/* Animated background particles - using pre-generated positions */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(15)].map((_, i) => (
+            {PARTICLE_POSITIONS.map((particle, i) => (
               <motion.div
-                key={i}
-                className="absolute w-2 h-2 rounded-full"
+                key={`particle-${i}`}
+                className="absolute rounded-full"
                 style={{
                   background: i % 2 === 0 ? '#d4af37' : '#50c878',
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
+                  left: `${particle.left}%`,
+                  top: `${particle.top}%`,
+                  width: particle.size,
+                  height: particle.size,
                 }}
                 animate={{
                   y: [0, -20, 0],
@@ -162,9 +211,9 @@ export default function BetaEndedOverlay() {
                   scale: [1, 1.3, 1],
                 }}
                 transition={{
-                  duration: 3 + Math.random() * 2,
+                  duration: particle.duration,
                   repeat: Infinity,
-                  delay: Math.random() * 2,
+                  delay: particle.delay,
                 }}
               />
             ))}
@@ -214,15 +263,15 @@ export default function BetaEndedOverlay() {
             >
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
                 <Heart className="w-3.5 h-3.5 text-red-400" />
-                <span className="text-white text-xs">847+ Beta Testers</span>
+                <span className="text-white text-xs">{stats.betaTesters}+ Beta Testers</span>
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
                 <Star className="w-3.5 h-3.5 text-yellow-400" />
-                <span className="text-white text-xs">2000+ Posts</span>
+                <span className="text-white text-xs">{stats.totalPosts}+ Posts</span>
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                <span className="text-white text-xs">50+ Features</span>
+                <span className="text-white text-xs">{stats.totalFeatures}+ Features</span>
               </div>
             </motion.div>
             
@@ -283,28 +332,28 @@ export default function BetaEndedOverlay() {
             </motion.div>
           </div>
           
-          {/* Confetti effect */}
+          {/* Confetti effect - using pre-generated positions */}
           {showConfetti && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[...Array(30)].map((_, i) => (
+              {CONFETTI_ITEMS.map((confetti, i) => (
                 <motion.div
                   key={`confetti-${i}`}
                   className="absolute w-2 h-2"
                   style={{
-                    background: ['#d4af37', '#50c878', '#ff6b6b', '#4ecdc4', '#a855f7'][i % 5],
-                    left: `${Math.random() * 100}%`,
+                    background: confetti.color,
+                    left: `${confetti.left}%`,
                     top: -20,
-                    borderRadius: i % 2 === 0 ? '50%' : '0%',
+                    borderRadius: confetti.isCircle ? '50%' : '0%',
                   }}
                   animate={{
                     y: [0, 400],
-                    x: [0, (Math.random() - 0.5) * 100],
-                    rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
+                    x: [0, confetti.xOffset],
+                    rotate: [0, 360 * (i % 2 === 0 ? 1 : -1)],
                     opacity: [1, 1, 0],
                   }}
                   transition={{
-                    duration: 2 + Math.random() * 1.5,
-                    delay: Math.random() * 1.5,
+                    duration: confetti.duration,
+                    delay: confetti.delay,
                     ease: 'easeOut',
                   }}
                 />

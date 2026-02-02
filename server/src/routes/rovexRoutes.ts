@@ -142,6 +142,38 @@ router.get('/public/health', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/rovex/public/stats
+ * Retorna estatísticas públicas da comunidade (para tela de beta)
+ * NÃO requer autenticação
+ */
+router.get('/public/stats', async (req: Request, res: Response) => {
+  try {
+    const [totalUsers, totalPosts, totalBadges] = await Promise.all([
+      prisma.user.count({ where: { deletedAt: null } }),
+      prisma.post.count(),
+      prisma.badge.count(),
+    ]);
+    
+    res.json({
+      success: true,
+      betaTesters: totalUsers,
+      totalPosts,
+      totalFeatures: 50, // Valor fixo baseado no roadmap
+      totalBadges,
+    });
+  } catch (error) {
+    console.error('❌ Public stats error:', error);
+    res.status(500).json({
+      success: false,
+      betaTesters: 0,
+      totalPosts: 0,
+      totalFeatures: 50,
+      totalBadges: 0,
+    });
+  }
+});
+
+/**
  * GET /api/rovex/cron/metrics
  * Endpoint de cron para Vercel - reporta métricas periodicamente
  * Autenticado via CRON_SECRET

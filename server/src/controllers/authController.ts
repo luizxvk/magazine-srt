@@ -29,9 +29,8 @@ const loginSchema = z.object({
 const MAINTENANCE_MODE = false;
 const MAINTENANCE_MESSAGE = 'Estamos em manutenção! 🚧 Aguarde, em breve lançaremos a versão Beta com novidades incríveis. Fique atento às nossas redes sociais!';
 
-// Admin-only mode - blocks all users except admin@magazine.com
+// Admin-only mode - blocks all users except those with ADMIN role
 const ADMIN_ONLY_MODE = true;
-const ADMIN_EMAIL = 'admin@magazine.com';
 const ADMIN_ONLY_MESSAGE = 'Acesso restrito. A plataforma está em modo de testes. Apenas administradores podem acessar no momento.';
 
 export const register = async (req: Request, res: Response) => {
@@ -196,26 +195,9 @@ export const login = async (req: Request, res: Response) => {
     try {
         console.log('Login attempt:', { email: req.body.email });
         
-        // Block login during maintenance (except admin)
-        const { email } = req.body;
-        if (MAINTENANCE_MODE && email !== ADMIN_EMAIL) {
-            return res.status(503).json({ 
-                error: 'maintenance',
-                message: MAINTENANCE_MESSAGE 
-            });
-        }
+        const { email, password } = loginSchema.parse(req.body);
 
-        // Block login in admin-only mode (except admin)
-        if (ADMIN_ONLY_MODE && email !== ADMIN_EMAIL) {
-            return res.status(503).json({ 
-                error: 'admin_only',
-                message: ADMIN_ONLY_MESSAGE 
-            });
-        }
-
-        const { email: parsedEmail, password } = loginSchema.parse(req.body);
-
-        const user = await prisma.user.findUnique({ where: { email: parsedEmail } });
+        const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
@@ -228,6 +210,22 @@ export const login = async (req: Request, res: Response) => {
         const validPassword = await bcrypt.compare(password, user.passwordHash);
         if (!validPassword) {
             return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        // Block login during maintenance (except admin)
+        if (MAINTENANCE_MODE && user.role !== 'ADMIN') {
+            return res.status(503).json({ 
+                error: 'maintenance',
+                message: MAINTENANCE_MESSAGE 
+            });
+        }
+
+        // Block login in admin-only mode (except admin)
+        if (ADMIN_ONLY_MODE && user.role !== 'ADMIN') {
+            return res.status(503).json({ 
+                error: 'admin_only',
+                message: ADMIN_ONLY_MESSAGE 
+            });
         }
 
         // Award "Primeiros Passos" badge and 10 trophies (fail-safe)

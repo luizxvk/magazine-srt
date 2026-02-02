@@ -7,8 +7,9 @@ import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff 
 import { AnimatePresence, motion } from 'framer-motion';
 
 import logo from '../assets/logo-mgzn.png';
-import logoMgt from '../assets/logo-mgt-full.png';
+import logoMgtFallback from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import LoginErrorPopup from '../components/LoginErrorPopup';
@@ -24,6 +25,10 @@ export default function ModernLogin() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login, loginAsVisitor } = useAuth();
+    const { config } = useCommunity();
+    
+    // Logo do tier Standard (MGT) - dinâmica
+    const logoMgt = config.logoIconUrl || logoMgtFallback;
 
 
 
@@ -163,15 +168,15 @@ export default function ModernLogin() {
                         onClick={toggleMembership}
                         className="md:hidden mt-6 w-full py-3 rounded-xl border border-emerald-500/50 text-emerald-500 font-bold uppercase tracking-widest text-xs"
                     >
-                        Acessar MGT
+                        Acessar {config.tierStdName}
                     </button>
                 </div>
 
                 {/* RIGHT PANEL (MGT Form) - Full width on mobile when active */}
                 <div className={`md:absolute md:top-0 md:right-0 md:w-1/2 w-full md:h-full flex flex-col justify-center p-6 md:p-12 transition-all duration-700 ease-in-out ${!isMGT ? 'hidden md:flex md:opacity-0 md:translate-x-20 md:pointer-events-none' : 'flex opacity-100 translate-x-0 z-10'}`}>
                     <div className="text-center mb-6 md:mb-8">
-                        <img src={logoMgt} alt="MGT" className="h-16 md:h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">MGT</h2>
+                        <img src={logoMgt} alt={config.tierStdName} className="h-16 md:h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{config.tierStdName}</h2>
                         <p className="text-emerald-500/80 text-xs uppercase tracking-widest">Velocidade e Poder</p>
                     </div>
 
@@ -233,9 +238,9 @@ export default function ModernLogin() {
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(16,185,129,0.15)_0%,_transparent_70%)]" />
                             <div className="relative z-10 flex flex-col items-center">
                                 <div className="mb-6 p-4 rounded-full bg-emerald-600/10 border border-emerald-600/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                                    <img src={logoMgt} alt="MGT" className="h-12 opacity-80" />
+                                    <img src={logoMgt} alt={config.tierStdName} className="h-12 opacity-80" />
                                 </div>
-                                <h2 className="text-3xl font-bold !text-white mb-4">Membro MGT?</h2>
+                                <h2 className="text-3xl font-bold !text-white mb-4">Membro {config.tierStdName}?</h2>
                                 <p className="text-emerald-200/60 mb-8 max-w-xs">
                                     Entre na pista e acelere para a vitória.
                                 </p>
@@ -243,7 +248,7 @@ export default function ModernLogin() {
                                     onClick={toggleMembership}
                                     className="px-8 py-3 rounded-full border border-emerald-600/50 text-emerald-500 hover:bg-emerald-600 hover:text-white transition-all duration-300 font-bold uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
                                 >
-                                    Acessar MGT
+                                    Acessar {config.tierStdName}
                                 </button>
                             </div>
                         </div>

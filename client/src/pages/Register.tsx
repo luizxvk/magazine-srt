@@ -4,9 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
-import logoMgt from '../assets/logo-mgt-full.png';
+import logoMgtFallback from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import TermsOfServiceModal from '../components/TermsOfServiceModal';
 
@@ -22,7 +23,11 @@ export default function Register() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
+    const { config } = useCommunity();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    // Logo dinâmica do MGT (usa config ou fallback)
+    const logoMgt = config.logoIconUrl || logoMgtFallback;
     
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -177,7 +182,7 @@ export default function Register() {
                         <div className="flex justify-center mb-4">
                             <img
                                 src={isMGT ? logoMgt : logo}
-                                alt={isMGT ? "MGT" : "MAGAZINE"}
+                                alt={isMGT ? config.tierStdName : "MAGAZINE"}
                                 className={`${isMGT ? 'h-14' : 'h-20'} drop-shadow-lg`}
                             />
                         </div>

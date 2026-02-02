@@ -1,5 +1,6 @@
 import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -14,8 +15,9 @@ import CustomizationShop from './CustomizationShop';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import RadioCard from './RadioCard';
 import api from '../services/api';
-import logoSrt from '../assets/logo-mgt.png';
+import logoSrtFallback from '../assets/logo-mgt.png';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
+import { useDynamicHead } from '../hooks/useDynamicHead';
 
 interface HeaderProps {
     onOpenShop?: () => void;
@@ -41,6 +43,14 @@ const BADGE_URLS: Record<string, string> = {
 
 export default function Header({ onOpenShop }: HeaderProps) {
     const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor, previewTheme } = useAuth();
+    const { config } = useCommunity();
+    
+    // Atualiza título e favicon dinamicamente
+    useDynamicHead();
+    
+    // Logo dinâmica: usa config ou fallback para asset local
+    const logoUrl = config.logoIconUrl || logoSrtFallback;
+    
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [hasGroupInvites, setHasGroupInvites] = useState(false);
@@ -186,8 +196,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     <Link to="/feed" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         {isMGT ? (
                             <img 
-                                src={logoSrt} 
-                                alt="MGT Logo" 
+                                src={logoUrl} 
+                                alt={config.tierStdName || "MGT"} 
                                 className={`h-12 sm:h-14 md:h-16 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
                             />
                         ) : (

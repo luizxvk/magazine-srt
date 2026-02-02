@@ -33,8 +33,10 @@ export interface CommunityConfig {
   currencyIcon?: string;         // URL do ícone da moeda
   tierVipName: string;           // Nome do tier VIP: "MAGAZINE", "ELITE", "PRO"
   tierVipColor: string;          // Cor do tier VIP: "#d4af37"
+  tierVipSlogan?: string;        // Slogan do tier VIP: "A Elite do Sucesso"
   tierStdName: string;           // Nome do tier padrão: "MGT", "MEMBER", "FREE"
-  tierStdColor: string;          // Cor do tier padrão: "#50c878"
+  tierStdSlogan?: string;        // Slogan do tier padrão: "Velocidade e Poder"
+  backgroundColor: string;       // Cor de fundo/tema do tier padrão: "#10b981"
   xpName?: string;               // Nome do XP: "XP", "EXP", "Experiência"
   
   // === URLs e Domínios ===
@@ -86,8 +88,10 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   currencyIcon: '/assets/zions/zion-50.png',
   tierVipName: 'MAGAZINE',
   tierVipColor: '#d4af37',
+  tierVipSlogan: 'A Elite do Sucesso',
   tierStdName: 'MGT',
-  tierStdColor: '#50c878',
+  tierStdSlogan: 'Velocidade e Poder',
+  backgroundColor: '#10b981',
   xpName: 'XP',
   
   // Credenciais (substituídas por env vars em prod)

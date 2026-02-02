@@ -29,6 +29,11 @@ const loginSchema = z.object({
 const MAINTENANCE_MODE = false;
 const MAINTENANCE_MESSAGE = 'Estamos em manutenção! 🚧 Aguarde, em breve lançaremos a versão Beta com novidades incríveis. Fique atento às nossas redes sociais!';
 
+// Admin-only mode - blocks all users except admin@magazine.com
+const ADMIN_ONLY_MODE = true;
+const ADMIN_EMAIL = 'admin@magazine.com';
+const ADMIN_ONLY_MESSAGE = 'Acesso restrito. A plataforma está em modo de testes. Apenas administradores podem acessar no momento.';
+
 export const register = async (req: Request, res: Response) => {
     try {
         // Block registration during maintenance
@@ -36,6 +41,14 @@ export const register = async (req: Request, res: Response) => {
             return res.status(503).json({ 
                 error: 'maintenance',
                 message: MAINTENANCE_MESSAGE 
+            });
+        }
+
+        // Block registration in admin-only mode (no new users allowed)
+        if (ADMIN_ONLY_MODE) {
+            return res.status(503).json({ 
+                error: 'admin_only',
+                message: ADMIN_ONLY_MESSAGE 
             });
         }
 
@@ -185,10 +198,18 @@ export const login = async (req: Request, res: Response) => {
         
         // Block login during maintenance (except admin)
         const { email } = req.body;
-        if (MAINTENANCE_MODE && email !== 'admin@magazine.com') {
+        if (MAINTENANCE_MODE && email !== ADMIN_EMAIL) {
             return res.status(503).json({ 
                 error: 'maintenance',
                 message: MAINTENANCE_MESSAGE 
+            });
+        }
+
+        // Block login in admin-only mode (except admin)
+        if (ADMIN_ONLY_MODE && email !== ADMIN_EMAIL) {
+            return res.status(503).json({ 
+                error: 'admin_only',
+                message: ADMIN_ONLY_MESSAGE 
             });
         }
 

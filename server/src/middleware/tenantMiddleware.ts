@@ -173,8 +173,10 @@ function mapRovexResponseToConfig(data: any): CommunityConfig {
     currencyIcon: data.currencyIcon,
     tierVipName: data.tierVipName || 'VIP',
     tierVipColor: data.tierVipColor || '#d4af37',
+    tierVipSlogan: data.tierVipSlogan || 'A Elite do Sucesso',
     tierStdName: data.tierStdName || 'MEMBER',
-    tierStdColor: data.tierStdColor || '#50c878',
+    tierStdSlogan: data.tierStdSlogan || 'Velocidade e Poder',
+    backgroundColor: data.backgroundColor || '#10b981',
     xpName: data.xpName || 'XP',
     
     baseUrl: data.baseUrl,

@@ -3,16 +3,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff, Clock, Rocket } from 'lucide-react';
+import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import logo from '../assets/logo-mgzn.png';
-import logoMgt from '../assets/logo-mgt-full.png';
+import logoMgtFallback from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import LoginErrorPopup from '../components/LoginErrorPopup';
-import { isBetaEnded } from '../components/BetaEndedOverlay';
 
 const loginSchema = z.object({
     email: z.string().trim().email('Email inválido'),
@@ -25,6 +25,10 @@ export default function ModernLogin() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login, loginAsVisitor } = useAuth();
+    const { config } = useCommunity();
+    
+    // Logo do tier Standard (MGT) - dinâmica
+    const logoMgt = config.logoIconUrl || logoMgtFallback;
 
 
 
@@ -39,7 +43,6 @@ export default function ModernLogin() {
     const [loginErrorMessage, setLoginErrorMessage] = useState('');
     const [notFoundEmail, setNotFoundEmail] = useState('');
     const [deniedMembershipType, setDeniedMembershipType] = useState<'MAGAZINE' | 'MGT'>('MAGAZINE');
-    const [showBetaBlockPopup, setShowBetaBlockPopup] = useState(false);
 
     // Form hooks - Separate forms to avoid input registration conflicts
     const magazineForm = useForm<LoginFormValues>({
@@ -64,12 +67,6 @@ export default function ModernLogin() {
     };
 
     const handleLogin = async (data: LoginFormValues, setError: any, membershipContext: 'MAGAZINE' | 'MGT') => {
-        // Bloquear login se beta terminou
-        if (isBetaEnded()) {
-            setShowBetaBlockPopup(true);
-            return;
-        }
-        
         try {
             console.log('Sending login request to server...');
             const response = await api.post('/auth/login', data);
@@ -171,16 +168,16 @@ export default function ModernLogin() {
                         onClick={toggleMembership}
                         className="md:hidden mt-6 w-full py-3 rounded-xl border border-emerald-500/50 text-emerald-500 font-bold uppercase tracking-widest text-xs"
                     >
-                        Acessar MGT
+                        Acessar {config.tierStdName}
                     </button>
                 </div>
 
                 {/* RIGHT PANEL (MGT Form) - Full width on mobile when active */}
                 <div className={`md:absolute md:top-0 md:right-0 md:w-1/2 w-full md:h-full flex flex-col justify-center p-6 md:p-12 transition-all duration-700 ease-in-out ${!isMGT ? 'hidden md:flex md:opacity-0 md:translate-x-20 md:pointer-events-none' : 'flex opacity-100 translate-x-0 z-10'}`}>
                     <div className="text-center mb-6 md:mb-8">
-                        <img src={logoMgt} alt="MGT" className="h-16 md:h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">MGT</h2>
-                        <p className="text-emerald-500/80 text-xs uppercase tracking-widest">Velocidade e Poder</p>
+                        <img src={logoMgt} alt={config.tierStdName} className="h-16 md:h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{config.tierStdName}</h2>
+                        <p className="text-emerald-500/80 text-xs uppercase tracking-widest">{config.tierStdSlogan}</p>
                     </div>
 
                     <LoginForm
@@ -241,9 +238,9 @@ export default function ModernLogin() {
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(16,185,129,0.15)_0%,_transparent_70%)]" />
                             <div className="relative z-10 flex flex-col items-center">
                                 <div className="mb-6 p-4 rounded-full bg-emerald-600/10 border border-emerald-600/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                                    <img src={logoMgt} alt="MGT" className="h-12 opacity-80" />
+                                    <img src={logoMgt} alt={config.tierStdName} className="h-12 opacity-80" />
                                 </div>
-                                <h2 className="text-3xl font-bold !text-white mb-4">Membro MGT?</h2>
+                                <h2 className="text-3xl font-bold !text-white mb-4">Membro {config.tierStdName}?</h2>
                                 <p className="text-emerald-200/60 mb-8 max-w-xs">
                                     Entre na pista e acelere para a vitória.
                                 </p>
@@ -251,7 +248,7 @@ export default function ModernLogin() {
                                     onClick={toggleMembership}
                                     className="px-8 py-3 rounded-full border border-emerald-600/50 text-emerald-500 hover:bg-emerald-600 hover:text-white transition-all duration-300 font-bold uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
                                 >
-                                    Acessar MGT
+                                    Acessar {config.tierStdName}
                                 </button>
                             </div>
                         </div>
@@ -483,63 +480,6 @@ export default function ModernLogin() {
                 )}
             </AnimatePresence>
 
-            {/* Beta Ended Block Popup */}
-            <AnimatePresence>
-                {showBetaBlockPopup && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                        onClick={() => setShowBetaBlockPopup(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="relative w-full max-w-md p-6 rounded-2xl border bg-neutral-950/95 border-gold-500/30 shadow-2xl"
-                        >
-                            <button
-                                onClick={() => setShowBetaBlockPopup(false)}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                            
-                            <div className="text-center">
-                                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gold-500/20">
-                                    <Clock className="w-8 h-8 text-gold-400" />
-                                </div>
-                                
-                                <h3 className="text-xl font-bold text-white mb-2">
-                                    Aguarde o Lançamento!
-                                </h3>
-                                
-                                <p className="text-gray-400 text-sm mb-4">
-                                    A <span className="font-semibold text-gold-400">versão 0.5.0</span> está quase pronta!
-                                </p>
-                                
-                                <p className="text-gray-500 text-xs mb-6">
-                                    O período beta foi encerrado. O login estará disponível novamente em <span className="text-gold-400 font-bold">5 de Fevereiro às 13:00</span> (Brasília).
-                                </p>
-                                
-                                <div className="flex items-center justify-center gap-2 mb-6 text-gold-400">
-                                    <Rocket className="w-5 h-5" />
-                                    <span className="text-sm font-semibold">Grandes novidades vindo aí!</span>
-                                </div>
-                                
-                                <button
-                                    onClick={() => setShowBetaBlockPopup(false)}
-                                    className="w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all bg-gold-500 text-black hover:bg-gold-400"
-                                >
-                                    Entendi
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

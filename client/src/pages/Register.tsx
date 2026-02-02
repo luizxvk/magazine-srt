@@ -3,14 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle, Clock, Rocket } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import logoMgt from '../assets/logo-mgt-full.png';
+import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
+import logoMgtFallback from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import TermsOfServiceModal from '../components/TermsOfServiceModal';
-import { isBetaEnded } from '../components/BetaEndedOverlay';
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -24,7 +23,11 @@ export default function Register() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
+    const { config } = useCommunity();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    // Logo dinâmica do MGT (usa config ou fallback)
+    const logoMgt = config.logoIconUrl || logoMgtFallback;
     
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -33,7 +36,6 @@ export default function Register() {
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [pendingSubmitData, setPendingSubmitData] = useState<RegisterForm | null>(null);
     const [capsLockOn, setCapsLockOn] = useState(false);
-    const [showBetaBlockPopup, setShowBetaBlockPopup] = useState(false);
     
     const handleCapsLock = (e: React.KeyboardEvent) => {
         setCapsLockOn(e.getModifierState('CapsLock'));
@@ -72,12 +74,6 @@ export default function Register() {
     };
 
     const onSubmit = async (data: RegisterForm) => {
-        // Bloquear registro se beta terminou
-        if (isBetaEnded()) {
-            setShowBetaBlockPopup(true);
-            return;
-        }
-        
         // If terms not accepted, show modal first
         if (!acceptedTerms) {
             setPendingSubmitData(data);
@@ -186,7 +182,7 @@ export default function Register() {
                         <div className="flex justify-center mb-4">
                             <img
                                 src={isMGT ? logoMgt : logo}
-                                alt={isMGT ? "MGT" : "MAGAZINE"}
+                                alt={isMGT ? config.tierStdName : "MAGAZINE"}
                                 className={`${isMGT ? 'h-14' : 'h-20'} drop-shadow-lg`}
                             />
                         </div>
@@ -194,7 +190,7 @@ export default function Register() {
                             Criar Conta
                         </h2>
                         <p className={`text-xs mt-2 tracking-widest uppercase ${isMGT ? 'text-emerald-400/50' : 'text-gold-400/50'}`}>
-                            {isMGT ? 'Velocidade e Poder' : 'A Elite do Sucesso'}
+                            {isMGT ? config.tierStdSlogan : config.tierVipSlogan}
                         </p>
                     </div>
 
@@ -355,64 +351,6 @@ export default function Register() {
                 }}
                 isMGT={isMGT}
             />
-
-            {/* Beta Ended Block Popup */}
-            <AnimatePresence>
-                {showBetaBlockPopup && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                        onClick={() => setShowBetaBlockPopup(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className={`relative w-full max-w-md p-6 rounded-2xl border shadow-2xl ${isMGT ? 'bg-neutral-950/95 border-emerald-500/30' : 'bg-neutral-950/95 border-gold-500/30'}`}
-                        >
-                            <button
-                                onClick={() => setShowBetaBlockPopup(false)}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                            
-                            <div className="text-center">
-                                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
-                                    <Clock className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
-                                </div>
-                                
-                                <h3 className="text-xl font-bold text-white mb-2">
-                                    Aguarde o Lançamento!
-                                </h3>
-                                
-                                <p className="text-gray-400 text-sm mb-4">
-                                    A <span className={`font-semibold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>versão 0.5.0</span> está quase pronta!
-                                </p>
-                                
-                                <p className="text-gray-500 text-xs mb-6">
-                                    O período beta foi encerrado. O registro estará disponível novamente em <span className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>5 de Fevereiro às 13:00</span> (Brasília).
-                                </p>
-                                
-                                <div className={`flex items-center justify-center gap-2 mb-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                                    <Rocket className="w-5 h-5" />
-                                    <span className="text-sm font-semibold">Grandes novidades vindo aí!</span>
-                                </div>
-                                
-                                <button
-                                    onClick={() => setShowBetaBlockPopup(false)}
-                                    className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${isMGT ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-gold-500 text-black hover:bg-gold-400'}`}
-                                >
-                                    Entendi
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

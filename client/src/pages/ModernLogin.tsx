@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff, Clock, Rocket } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import logo from '../assets/logo-mgzn.png';
@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import LoginErrorPopup from '../components/LoginErrorPopup';
+import { isBetaEnded } from '../components/BetaEndedOverlay';
 
 const loginSchema = z.object({
     email: z.string().trim().email('Email inválido'),
@@ -38,6 +39,7 @@ export default function ModernLogin() {
     const [loginErrorMessage, setLoginErrorMessage] = useState('');
     const [notFoundEmail, setNotFoundEmail] = useState('');
     const [deniedMembershipType, setDeniedMembershipType] = useState<'MAGAZINE' | 'MGT'>('MAGAZINE');
+    const [showBetaBlockPopup, setShowBetaBlockPopup] = useState(false);
 
     // Form hooks - Separate forms to avoid input registration conflicts
     const magazineForm = useForm<LoginFormValues>({
@@ -62,6 +64,12 @@ export default function ModernLogin() {
     };
 
     const handleLogin = async (data: LoginFormValues, setError: any, membershipContext: 'MAGAZINE' | 'MGT') => {
+        // Bloquear login se beta terminou
+        if (isBetaEnded()) {
+            setShowBetaBlockPopup(true);
+            return;
+        }
+        
         try {
             console.log('Sending login request to server...');
             const response = await api.post('/auth/login', data);
@@ -469,6 +477,64 @@ export default function ModernLogin() {
                                         </Link>
                                     )}
                                 </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Beta Ended Block Popup */}
+            <AnimatePresence>
+                {showBetaBlockPopup && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setShowBetaBlockPopup(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative w-full max-w-md p-6 rounded-2xl border bg-neutral-950/95 border-gold-500/30 shadow-2xl"
+                        >
+                            <button
+                                onClick={() => setShowBetaBlockPopup(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gold-500/20">
+                                    <Clock className="w-8 h-8 text-gold-400" />
+                                </div>
+                                
+                                <h3 className="text-xl font-bold text-white mb-2">
+                                    Aguarde o Lançamento!
+                                </h3>
+                                
+                                <p className="text-gray-400 text-sm mb-4">
+                                    A <span className="font-semibold text-gold-400">versão 0.5.0</span> está quase pronta!
+                                </p>
+                                
+                                <p className="text-gray-500 text-xs mb-6">
+                                    O período beta foi encerrado. O login estará disponível novamente em <span className="text-gold-400 font-bold">5 de Fevereiro às 13:00</span> (Brasília).
+                                </p>
+                                
+                                <div className="flex items-center justify-center gap-2 mb-6 text-gold-400">
+                                    <Rocket className="w-5 h-5" />
+                                    <span className="text-sm font-semibold">Grandes novidades vindo aí!</span>
+                                </div>
+                                
+                                <button
+                                    onClick={() => setShowBetaBlockPopup(false)}
+                                    className="w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all bg-gold-500 text-black hover:bg-gold-400"
+                                >
+                                    Entendi
+                                </button>
                             </div>
                         </motion.div>
                     </motion.div>

@@ -427,6 +427,12 @@ router.post('/provision', async (req: Request, res: Response) => {
       // 🔑 CRÍTICO: API Secret
       rovexApiSecret,
       
+      // Admin inicial (formato novo)
+      adminEmail,
+      adminPassword,
+      adminName,
+      ownerEmail,
+      
       // Legacy support
       communityName,
       adminUser,
@@ -535,14 +541,21 @@ router.post('/provision', async (req: Request, res: Response) => {
       await updateFeatureFlags(plan);
     }
     
-    // Criar usuário admin se fornecido (suporte legado)
+    // Criar usuário admin se fornecido
+    // Suporta dois formatos:
+    // 1. Novo: adminEmail, adminPassword, adminName (direto no body)
+    // 2. Legado: adminUser.email, adminUser.password, adminUser.name
     let adminResult = null;
-    if (adminUser?.email && adminUser?.password) {
+    const finalAdminEmail = adminEmail || adminUser?.email;
+    const finalAdminPassword = adminPassword || adminUser?.password;
+    const finalAdminName = adminName || adminUser?.name;
+    
+    if (finalAdminEmail && finalAdminPassword) {
       const bcrypt = await import('bcryptjs');
-      const hashedPassword = await bcrypt.hash(adminUser.password, 10);
+      const hashedPassword = await bcrypt.hash(finalAdminPassword, 10);
       
       const existingAdmin = await prisma.user.findUnique({
-        where: { email: adminUser.email },
+        where: { email: finalAdminEmail },
       });
       
       if (existingAdmin) {
@@ -551,13 +564,14 @@ router.post('/provision', async (req: Request, res: Response) => {
           where: { id: existingAdmin.id },
           data: { role: 'ADMIN' },
         });
-        adminResult = { userId: existingAdmin.id, action: 'updated' };
+        adminResult = { userId: existingAdmin.id, email: finalAdminEmail, action: 'updated' };
+        console.log(`👤 Admin updated: ${finalAdminEmail}`);
       } else {
         // Criar novo admin
         const newAdmin = await prisma.user.create({
           data: {
-            email: adminUser.email,
-            name: adminUser.name || adminUser.email.split('@')[0],
+            email: finalAdminEmail,
+            name: finalAdminName || finalAdminEmail.split('@')[0],
             passwordHash: hashedPassword,
             role: 'ADMIN',
             membershipType: 'MAGAZINE',
@@ -569,7 +583,8 @@ router.post('/provision', async (req: Request, res: Response) => {
             isVerified: true,
           },
         });
-        adminResult = { userId: newAdmin.id, action: 'created' };
+        adminResult = { userId: newAdmin.id, email: finalAdminEmail, action: 'created' };
+        console.log(`👤 Admin created: ${finalAdminEmail}`);
       }
     }
     

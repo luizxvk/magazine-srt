@@ -87,6 +87,17 @@ alt={config.tierStdName}
 - Overlay MGT INVITE - logo, título e botão
 - Botão mobile "Acessar MGT"
 
+#### 2.3 Slogan Dinâmico
+```tsx
+// ANTES
+<p className="text-emerald-500/80">Velocidade e Poder</p>
+
+// DEPOIS
+<p className="text-emerald-500/80">{config.tierStdSlogan}</p>
+```
+
+**Descrição abaixo do título:** O slogan que aparece sob o nome do tier (ex: "Velocidade e Poder") agora é dinâmico via `config.tierStdSlogan`.
+
 ---
 
 ### 3. Register.tsx (Página de Cadastro)
@@ -105,6 +116,9 @@ const logoMgt = config.logoIconUrl || logoMgtFallback;
 
 // No JSX
 <img src={isMGT ? logoMgt : logo} alt={isMGT ? config.tierStdName : "MAGAZINE"} />
+
+// Slogan dinâmico
+<p>{isMGT ? config.tierStdSlogan : config.tierVipSlogan}</p>
 ```
 
 ---
@@ -142,15 +156,17 @@ interface RovexProvisioningPayload {
   // ... campos existentes ...
   
   // ✅ CRÍTICOS para modularização
-  tierStdName: string;      // Ex: "MEMBER", "Recruta", "VIP" (substitui "MGT")
-  backgroundColor: string;  // Ex: "#10b981" (cor do tier padrão) ⚠️ NÃO usar tierStdColor!
+  tierStdName: string;       // Ex: "MEMBER", "Recruta", "GAMER" (substitui "MGT")
+  tierStdSlogan: string;     // Ex: "Velocidade e Poder" (descrição abaixo do título na tela de login)
+  backgroundColor: string;   // Ex: "#10b981" (cor do tier padrão) ⚠️ NÃO usar tierStdColor!
   
-  logoIconUrl?: string;     // URL do logo quadrado (substitui logo-mgt-full.png)
-  faviconUrl?: string;      // Favicon 32x32
+  logoIconUrl?: string;      // URL do logo quadrado (substitui logo-mgt-full.png)
+  faviconUrl?: string;       // Favicon 32x32
   
-  // Mantidos como referência (não usados para modularização)
-  tierVipName: string;      // Ignorado no frontend (MAGAZINE é fixo)
-  tierVipColor: string;     // "#d4af37" (usado para estilo)
+  // Mantidos como referência (MAGAZINE fixo, mas slogan customizável)
+  tierVipName: string;       // Ignorado no frontend (MAGAZINE é fixo)
+  tierVipColor: string;      // "#d4af37" (usado para estilo)
+  tierVipSlogan: string;     // Ex: "A Elite do Sucesso" (descrição abaixo de MAGAZINE)
 }
 ```
 
@@ -164,8 +180,10 @@ interface RovexProvisioningPayload {
   
   "tierVipName": "ELITE",
   "tierVipColor": "#d4af37",
+  "tierVipSlogan": "Os Melhores do Game",
   
   "tierStdName": "GAMER",
+  "tierStdSlogan": "Jogue. Conquiste. Domine.",
   "backgroundColor": "#3b82f6",
   
   "logoIconUrl": "https://cdn.rovex.app/gamerhub/logo-icon.png",
@@ -180,6 +198,7 @@ interface RovexProvisioningPayload {
 
 Com o payload acima:
 - Página de login mostrará "**GAMER**" no painel direito (ao invés de "MGT")
+- Abaixo do título aparecerá "**Jogue. Conquiste. Domine.**" (ao invés de "Velocidade e Poder")
 - A cor do tier GAMER será **azul (#3b82f6)** ao invés de emerald
 - Logo será a URL customizada do `logoIconUrl`
 - Favicon será atualizado dinamicamente
@@ -192,7 +211,7 @@ Com o payload acima:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                      ROVEX PLATFORM                              │
-│  POST /api/rovex/config { tierStdName, backgroundColor, ... }  │
+│  POST /api/rovex/config { tierStdName, tierStdSlogan, ... }    │
 └─────────────────────────────┬───────────────────────────────────┘
                               │
                               ▼
@@ -260,15 +279,15 @@ style={{ backgroundColor: 'rgba(var(--tier-std-color-rgb), 0.2)' }}
 | Arquivo | Tipo | Descrição |
 |---------|------|-----------|
 | `client/src/components/Header.tsx` | Modificado | MAGAZINE fixo (3 ocorrências) |
-| `client/src/pages/ModernLogin.tsx` | Modificado | MGT dinâmico + logo dinâmica |
-| `client/src/pages/Register.tsx` | Modificado | MGT dinâmico + logo dinâmica |
+| `client/src/pages/ModernLogin.tsx` | Modificado | MGT dinâmico + logo + slogan dinâmico |
+| `client/src/pages/Register.tsx` | Modificado | MGT dinâmico + logo + slogan dinâmico |
 | `client/src/hooks/useDynamicHead.ts` | **Novo** | Hook para favicon/title dinâmico |
 | `client/src/context/CommunityContext.tsx` | Modificado | Aplica CSS variables para backgroundColor |
 | `client/src/index.css` | Modificado | Adicionado --tier-std-color variables |
-| `client/src/config/community.config.ts` | Modificado | Renomeado tierStdColor → backgroundColor |
-| `server/src/config/community.config.ts` | Modificado | Renomeado tierStdColor → backgroundColor |
-| `server/src/middleware/tenantMiddleware.ts` | Modificado | Usa backgroundColor |
-| `server/src/routes/rovexRoutes.ts` | Modificado | Aceita backgroundColor no payload |
+| `client/src/config/community.config.ts` | Modificado | + tierVipSlogan, tierStdSlogan, backgroundColor |
+| `server/src/config/community.config.ts` | Modificado | + tierVipSlogan, tierStdSlogan, backgroundColor |
+| `server/src/middleware/tenantMiddleware.ts` | Modificado | Usa backgroundColor + slogans |
+| `server/src/routes/rovexRoutes.ts` | Modificado | Aceita backgroundColor + slogans no payload |
 
 ---
 
@@ -277,16 +296,20 @@ style={{ backgroundColor: 'rgba(var(--tier-std-color-rgb), 0.2)' }}
 Para a Rovex validar:
 
 - [ ] Endpoint `/api/rovex/config` retorna `tierStdName` corretamente
+- [ ] Endpoint `/api/rovex/config` retorna `tierStdSlogan` e `tierVipSlogan`
 - [ ] Endpoint `/api/rovex/config` retorna `backgroundColor` (não mais tierStdColor)
 - [ ] `logoIconUrl` é uma URL válida e acessível (CORS liberado)
 - [ ] `faviconUrl` é um arquivo .ico ou .png válido
-- [ ] Testar provisioning com payload customizado incluindo `backgroundColor`
+- [ ] Testar provisioning com payload customizado incluindo `backgroundColor` e slogans
 - [ ] Verificar que "MAGAZINE" permanece fixo após provisioning
+- [ ] Verificar slogan dinâmico aparece abaixo do título na tela de login
 - [ ] Verificar CSS variable `--tier-std-color` está sendo aplicada
 
 ---
 
-## ⚠️ MUDANÇA IMPORTANTE: tierStdColor → backgroundColor
+## ⚠️ MUDANÇAS IMPORTANTES
+
+### 1. tierStdColor → backgroundColor
 
 A Rovex deve **atualizar os payloads** para usar `backgroundColor` ao invés de `tierStdColor`:
 
@@ -297,6 +320,21 @@ A Rovex deve **atualizar os payloads** para usar `backgroundColor` ao invés de 
 + "backgroundColor": "#3b82f6",
 }
 ```
+
+### 2. Slogans dos Tiers (NOVO)
+
+Agora é possível customizar os slogans que aparecem **abaixo do nome do tier** na tela de login:
+
+```json
+{
+  "tierVipSlogan": "Os Melhores do Game",
+  "tierStdSlogan": "Jogue. Conquiste. Domine."
+}
+```
+
+**Defaults:**
+- `tierVipSlogan`: "A Elite do Sucesso"
+- `tierStdSlogan`: "Velocidade e Poder"
 
 ---
 

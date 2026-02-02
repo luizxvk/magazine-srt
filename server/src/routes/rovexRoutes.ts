@@ -334,7 +334,9 @@ router.post('/provision', async (req: Request, res: Response) => {
       // Tiers
       tierVipName,
       tierVipColor,
+      tierVipSlogan,
       tierStdName,
+      tierStdSlogan,
       backgroundColor,
       
       // Economia
@@ -422,7 +424,9 @@ router.post('/provision', async (req: Request, res: Response) => {
       // Tiers
       tierVipName: tierVipName || 'MAGAZINE',
       tierVipColor: tierVipColor || '#d4af37',
+      tierVipSlogan: tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: tierStdName || 'MGT',
+      tierStdSlogan: tierStdSlogan || 'Velocidade e Poder',
       backgroundColor: backgroundColor || '#10b981',
       
       // Economia
@@ -958,7 +962,9 @@ router.get('/config', async (req: Request, res: Response) => {
       accentColor: savedConfig?.accentColor || '#f59e0b',
       tierVipName: savedConfig?.tierVipName || 'MAGAZINE',
       tierVipColor: savedConfig?.tierVipColor || '#d4af37',
+      tierVipSlogan: savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: savedConfig?.tierStdName || 'MGT',
+      tierStdSlogan: savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       backgroundColor: savedConfig?.backgroundColor || '#10b981',
       currencyName: savedConfig?.currencyName || 'Zions',
       currencySymbol: savedConfig?.currencySymbol || 'Z$',

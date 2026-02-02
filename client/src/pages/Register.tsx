@@ -190,7 +190,7 @@ export default function Register() {
                             Criar Conta
                         </h2>
                         <p className={`text-xs mt-2 tracking-widest uppercase ${isMGT ? 'text-emerald-400/50' : 'text-gold-400/50'}`}>
-                            {isMGT ? 'Velocidade e Poder' : 'A Elite do Sucesso'}
+                            {isMGT ? config.tierStdSlogan : config.tierVipSlogan}
                         </p>
                     </div>
 

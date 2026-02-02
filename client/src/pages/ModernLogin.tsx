@@ -177,7 +177,7 @@ export default function ModernLogin() {
                     <div className="text-center mb-6 md:mb-8">
                         <img src={logoMgt} alt={config.tierStdName} className="h-16 md:h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{config.tierStdName}</h2>
-                        <p className="text-emerald-500/80 text-xs uppercase tracking-widest">Velocidade e Poder</p>
+                        <p className="text-emerald-500/80 text-xs uppercase tracking-widest">{config.tierStdSlogan}</p>
                     </div>
 
                     <LoginForm

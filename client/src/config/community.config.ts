@@ -35,7 +35,9 @@ export interface CommunityConfig {
   // === Tiers de Membership ===
   tierVipName: string;           // Nome do tier VIP (ex: "MAGAZINE")
   tierVipColor: string;          // Cor do tier VIP
+  tierVipSlogan: string;         // Slogan do tier VIP (ex: "A Elite do Sucesso")
   tierStdName: string;           // Nome do tier Standard (ex: "MGT")
+  tierStdSlogan: string;         // Slogan do tier Standard (ex: "Velocidade e Poder")
   backgroundColor: string;       // Cor de fundo/tema do tier Standard (ex: "#10b981")
   
   // === Economia ===
@@ -83,7 +85,9 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   // Tiers
   tierVipName: 'MAGAZINE',
   tierVipColor: '#d4af37',
+  tierVipSlogan: 'A Elite do Sucesso',
   tierStdName: 'MGT',
+  tierStdSlogan: 'Velocidade e Poder',
   backgroundColor: '#10b981',
   
   // Economia

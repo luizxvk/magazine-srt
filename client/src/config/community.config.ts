@@ -36,7 +36,7 @@ export interface CommunityConfig {
   tierVipName: string;           // Nome do tier VIP (ex: "MAGAZINE")
   tierVipColor: string;          // Cor do tier VIP
   tierStdName: string;           // Nome do tier Standard (ex: "MGT")
-  tierStdColor: string;          // Cor do tier Standard
+  backgroundColor: string;       // Cor de fundo/tema do tier Standard (ex: "#10b981")
   
   // === Economia ===
   currencyName: string;          // Nome da moeda virtual (ex: "Zions")
@@ -84,7 +84,7 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   tierVipName: 'MAGAZINE',
   tierVipColor: '#d4af37',
   tierStdName: 'MGT',
-  tierStdColor: '#10b981',
+  backgroundColor: '#10b981',
   
   // Economia
   currencyName: 'Zions',
@@ -123,7 +123,7 @@ export function formatCurrency(value: number, config: CommunityConfig): string {
  */
 export function getTierColor(membershipType: string, config: CommunityConfig): string {
   return membershipType === config.tierStdName 
-    ? config.tierStdColor 
+    ? config.backgroundColor 
     : config.tierVipColor;
 }
 

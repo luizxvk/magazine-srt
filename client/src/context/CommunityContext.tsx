@@ -10,7 +10,7 @@
  * ```
  */
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { 
   type CommunityConfig, 
   DEFAULT_COMMUNITY_CONFIG,
@@ -22,6 +22,14 @@ import {
 import { Plan, type Feature } from '../utils/features';
 import { isFeatureAvailable, getRequiredPlan } from '../hooks/useFeature';
 import api from '../services/api';
+
+// Helper para converter hex para RGB
+const hexToRgb = (hex: string): string => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+    : '16, 185, 129'; // fallback emerald
+};
 
 // ============================================
 // INTERFACE DO CONTEXTO
@@ -102,6 +110,23 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
       setIsLoading(false);
     }
   };
+
+  // Aplica CSS variables para cores dinâmicas do tier Standard (MGT)
+  useEffect(() => {
+    const root = document.documentElement;
+    const bgColor = config.backgroundColor || '#10b981';
+    
+    // CSS Variables para o tier Standard (MGT/MEMBER/etc)
+    root.style.setProperty('--tier-std-color', bgColor);
+    root.style.setProperty('--tier-std-color-rgb', hexToRgb(bgColor));
+    
+    // Gerar variações de opacidade automaticamente
+    // Essas variáveis podem ser usadas nos componentes:
+    // var(--tier-std-color) -> cor sólida
+    // rgba(var(--tier-std-color-rgb), 0.5) -> com opacidade
+    
+    console.log('[CommunityContext] Applied tier std color:', bgColor);
+  }, [config.backgroundColor]);
 
   // Carrega config na inicialização (opcional - pode descomentar se quiser)
   // useEffect(() => {

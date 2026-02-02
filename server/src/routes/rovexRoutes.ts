@@ -335,7 +335,7 @@ router.post('/provision', async (req: Request, res: Response) => {
       tierVipName,
       tierVipColor,
       tierStdName,
-      tierStdColor,
+      backgroundColor,
       
       // Economia
       currencyName,
@@ -423,7 +423,7 @@ router.post('/provision', async (req: Request, res: Response) => {
       tierVipName: tierVipName || 'MAGAZINE',
       tierVipColor: tierVipColor || '#d4af37',
       tierStdName: tierStdName || 'MGT',
-      tierStdColor: tierStdColor || '#10b981',
+      backgroundColor: backgroundColor || '#10b981',
       
       // Economia
       currencyName: currencyName || 'Zions',
@@ -959,7 +959,7 @@ router.get('/config', async (req: Request, res: Response) => {
       tierVipName: savedConfig?.tierVipName || 'MAGAZINE',
       tierVipColor: savedConfig?.tierVipColor || '#d4af37',
       tierStdName: savedConfig?.tierStdName || 'MGT',
-      tierStdColor: savedConfig?.tierStdColor || '#10b981',
+      backgroundColor: savedConfig?.backgroundColor || '#10b981',
       currencyName: savedConfig?.currencyName || 'Zions',
       currencySymbol: savedConfig?.currencySymbol || 'Z$',
       plan: savedConfig?.plan || process.env.COMMUNITY_PLAN || 'ENTERPRISE',
@@ -976,7 +976,7 @@ router.get('/config', async (req: Request, res: Response) => {
         currency: config.currencyName,
         currencySymbol: config.currencySymbol,
         tiers: [
-          { name: config.tierStdName, type: 'standard', color: config.tierStdColor },
+          { name: config.tierStdName, type: 'standard', color: config.backgroundColor },
           { name: config.tierVipName, type: 'vip', color: config.tierVipColor },
         ],
       },
@@ -1036,7 +1036,7 @@ router.put('/config', async (req: Request, res: Response) => {
       newConfig.tierVipName = payload.tiers.vip?.name || newConfig.tierVipName;
       newConfig.tierVipColor = payload.tiers.vip?.color || newConfig.tierVipColor;
       newConfig.tierStdName = payload.tiers.std?.name || newConfig.tierStdName;
-      newConfig.tierStdColor = payload.tiers.std?.color || newConfig.tierStdColor;
+      newConfig.backgroundColor = payload.tiers.std?.color || newConfig.backgroundColor;
     }
     if (payload.currency) {
       newConfig.currencyName = payload.currency.name || newConfig.currencyName;

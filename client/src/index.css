@@ -14,6 +14,10 @@
   --accent-500: var(--accent-color);
   --accent-600: color-mix(in srgb, var(--accent-color) 80%, black);
   --accent-700: color-mix(in srgb, var(--accent-color) 60%, black);
+  
+  /* Dynamic tier Standard color (MGT/MEMBER) - set via CommunityContext */
+  --tier-std-color: #10b981;
+  --tier-std-color-rgb: 16, 185, 129;
 }
 
 /* Swipe hint horizontal bounce animation */

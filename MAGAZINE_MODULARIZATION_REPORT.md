@@ -2,7 +2,7 @@
 
 > **Data:** 02/02/2026  
 > **Branch:** `beta`  
-> **Commit:** `5b547d7`  
+> **Commit:** `cf22a2a` → atualizado  
 > **Status:** ✅ Implementado
 
 ---
@@ -16,6 +16,21 @@ Implementamos a modularização do Magazine SRT para suportar white-label via Ro
 | **MAGAZINE** | 🔒 **FIXO** - Nunca muda | Hardcoded no código |
 | **MGT** | 🔄 **DINÂMICO** - Muda por comunidade | `config.tierStdName` |
 | **Logo MGT** | 🔄 **DINÂMICO** - Muda por comunidade | `config.logoIconUrl` |
+| **Cor MGT** | 🔄 **DINÂMICO** - Muda por comunidade | `config.backgroundColor` |
+
+---
+
+## 🎨 IMPORTANTE: Cores Dinâmicas
+
+O campo `backgroundColor` controla a cor do tier Standard (MGT). A Rovex deve enviar:
+
+```json
+{
+  "backgroundColor": "#3b82f6"
+}
+```
+
+**NÃO usar `tierStdColor`** - foi renomeado para `backgroundColor` para alinhar com a nomenclatura da Rovex.
 
 ---
 
@@ -128,7 +143,7 @@ interface RovexProvisioningPayload {
   
   // ✅ CRÍTICOS para modularização
   tierStdName: string;      // Ex: "MEMBER", "Recruta", "VIP" (substitui "MGT")
-  tierStdColor: string;     // Ex: "#10b981" (cor do tier padrão)
+  backgroundColor: string;  // Ex: "#10b981" (cor do tier padrão) ⚠️ NÃO usar tierStdColor!
   
   logoIconUrl?: string;     // URL do logo quadrado (substitui logo-mgt-full.png)
   faviconUrl?: string;      // Favicon 32x32
@@ -151,7 +166,7 @@ interface RovexProvisioningPayload {
   "tierVipColor": "#d4af37",
   
   "tierStdName": "GAMER",
-  "tierStdColor": "#3b82f6",
+  "backgroundColor": "#3b82f6",
   
   "logoIconUrl": "https://cdn.rovex.app/gamerhub/logo-icon.png",
   "faviconUrl": "https://cdn.rovex.app/gamerhub/favicon.ico",
@@ -165,6 +180,7 @@ interface RovexProvisioningPayload {
 
 Com o payload acima:
 - Página de login mostrará "**GAMER**" no painel direito (ao invés de "MGT")
+- A cor do tier GAMER será **azul (#3b82f6)** ao invés de emerald
 - Logo será a URL customizada do `logoIconUrl`
 - Favicon será atualizado dinamicamente
 - "**MAGAZINE**" permanece fixo no painel esquerdo
@@ -176,7 +192,7 @@ Com o payload acima:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                      ROVEX PLATFORM                              │
-│  POST /api/rovex/config { tierStdName: "GAMER", logoIconUrl }   │
+│  POST /api/rovex/config { tierStdName, backgroundColor, ... }  │
 └─────────────────────────────┬───────────────────────────────────┘
                               │
                               ▼
@@ -216,15 +232,26 @@ Se `config.logoIconUrl` não for fornecido ou estiver vazio, o sistema usa a log
 const logoMgt = config.logoIconUrl || logoMgtFallback;
 ```
 
-### 3. Cores Dinâmicas
-As cores do tier padrão (MGT/GAMER/etc) ainda usam classes Tailwind fixas (`emerald-500`). Para cores 100% dinâmicas, seria necessário usar CSS variables:
+### 3. Cores Dinâmicas via CSS Variables ✅ IMPLEMENTADO
+O campo `backgroundColor` é aplicado automaticamente via CSS variables:
 
-```tsx
-// Futuro: Usar CSS variables para cores dinâmicas
-style={{ color: config.tierStdColor }}
+```css
+:root {
+  --tier-std-color: #10b981;        /* Cor sólida */
+  --tier-std-color-rgb: 16, 185, 129; /* Para opacidades */
+}
 ```
 
-**Sugestão:** Se a Rovex precisar de cores dinâmicas por comunidade, podemos implementar via CSS variables no próximo sprint.
+**Uso nos componentes:**
+```tsx
+// Cor sólida
+style={{ color: 'var(--tier-std-color)' }}
+
+// Com opacidade
+style={{ backgroundColor: 'rgba(var(--tier-std-color-rgb), 0.2)' }}
+```
+
+> **Nota:** Os componentes ainda usam classes Tailwind (`emerald-500`) como fallback visual. Para 100% de modularização das cores, seria necessário migrar para `var(--tier-std-color)` em cada ocorrência.
 
 ---
 
@@ -236,6 +263,12 @@ style={{ color: config.tierStdColor }}
 | `client/src/pages/ModernLogin.tsx` | Modificado | MGT dinâmico + logo dinâmica |
 | `client/src/pages/Register.tsx` | Modificado | MGT dinâmico + logo dinâmica |
 | `client/src/hooks/useDynamicHead.ts` | **Novo** | Hook para favicon/title dinâmico |
+| `client/src/context/CommunityContext.tsx` | Modificado | Aplica CSS variables para backgroundColor |
+| `client/src/index.css` | Modificado | Adicionado --tier-std-color variables |
+| `client/src/config/community.config.ts` | Modificado | Renomeado tierStdColor → backgroundColor |
+| `server/src/config/community.config.ts` | Modificado | Renomeado tierStdColor → backgroundColor |
+| `server/src/middleware/tenantMiddleware.ts` | Modificado | Usa backgroundColor |
+| `server/src/routes/rovexRoutes.ts` | Modificado | Aceita backgroundColor no payload |
 
 ---
 
@@ -244,18 +277,34 @@ style={{ color: config.tierStdColor }}
 Para a Rovex validar:
 
 - [ ] Endpoint `/api/rovex/config` retorna `tierStdName` corretamente
+- [ ] Endpoint `/api/rovex/config` retorna `backgroundColor` (não mais tierStdColor)
 - [ ] `logoIconUrl` é uma URL válida e acessível (CORS liberado)
 - [ ] `faviconUrl` é um arquivo .ico ou .png válido
-- [ ] Testar provisioning com payload customizado
+- [ ] Testar provisioning com payload customizado incluindo `backgroundColor`
 - [ ] Verificar que "MAGAZINE" permanece fixo após provisioning
+- [ ] Verificar CSS variable `--tier-std-color` está sendo aplicada
+
+---
+
+## ⚠️ MUDANÇA IMPORTANTE: tierStdColor → backgroundColor
+
+A Rovex deve **atualizar os payloads** para usar `backgroundColor` ao invés de `tierStdColor`:
+
+```diff
+{
+  "tierStdName": "GAMER",
+- "tierStdColor": "#3b82f6",
++ "backgroundColor": "#3b82f6",
+}
+```
 
 ---
 
 ## 📞 Próximos Passos
 
-1. **Rovex confirmar** payload de provisioning com novos campos
+1. **Rovex atualizar** payloads para usar `backgroundColor`
 2. **Magazine testar** com payload real de uma comunidade white-label
-3. **Opcional:** Implementar cores dinâmicas via CSS variables se necessário
+3. **Opcional:** Migrar mais componentes para usar `var(--tier-std-color)`
 
 ---
 

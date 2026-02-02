@@ -8,6 +8,7 @@ import logoMgtFallback from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useDynamicHead } from '../hooks/useDynamicHead';
 import api from '../services/api';
 import TermsOfServiceModal from '../components/TermsOfServiceModal';
 
@@ -25,6 +26,9 @@ export default function Register() {
     const { login } = useAuth();
     const { config } = useCommunity();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    // Atualiza título e favicon dinamicamente
+    useDynamicHead();
     
     // Logo dinâmica do MGT (usa config ou fallback)
     const logoMgt = config.logoIconUrl || logoMgtFallback;

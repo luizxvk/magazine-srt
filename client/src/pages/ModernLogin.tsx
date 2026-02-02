@@ -10,6 +10,7 @@ import logo from '../assets/logo-mgzn.png';
 import logoMgtFallback from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useDynamicHead } from '../hooks/useDynamicHead';
 import api from '../services/api';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import LoginErrorPopup from '../components/LoginErrorPopup';
@@ -26,6 +27,9 @@ export default function ModernLogin() {
     const location = useLocation();
     const { login, loginAsVisitor } = useAuth();
     const { config } = useCommunity();
+    
+    // Atualiza título e favicon dinamicamente
+    useDynamicHead();
     
     // Logo do tier Standard (MGT) - dinâmica
     const logoMgt = config.logoIconUrl || logoMgtFallback;

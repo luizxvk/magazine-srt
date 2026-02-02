@@ -1073,6 +1073,76 @@ router.get('/config', async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/rovex/config
+ * Recebe atualizações de configuração da Rovex (sync button)
+ * Alias para PUT - alguns clientes preferem POST
+ */
+router.post('/config', async (req: Request, res: Response) => {
+  try {
+    const payload = req.body;
+    
+    console.log('📦 Config sync received from Rovex (POST):', JSON.stringify(payload, null, 2));
+    
+    // Buscar config existente
+    let existingConfig: Record<string, unknown> = {};
+    try {
+      const configRecord = await prisma.systemConfig.findUnique({
+        where: { key: 'community_config' },
+      });
+      if (configRecord?.value) {
+        existingConfig = JSON.parse(configRecord.value) as Record<string, unknown>;
+      }
+    } catch {
+      // Tabela pode não existir
+    }
+    
+    // Mesclar com novas configurações
+    const newConfig: Record<string, unknown> = {
+      ...existingConfig,
+      ...payload,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    // Converter payload legado para novo formato
+    if (payload.tiers) {
+      newConfig.tierVipName = payload.tiers.vip?.name || newConfig.tierVipName;
+      newConfig.tierVipColor = payload.tiers.vip?.color || newConfig.tierVipColor;
+      newConfig.tierStdName = payload.tiers.std?.name || newConfig.tierStdName;
+      newConfig.backgroundColor = payload.tiers.std?.color || newConfig.backgroundColor;
+    }
+    if (payload.currency) {
+      newConfig.currencyName = payload.currency.name || newConfig.currencyName;
+      newConfig.currencySymbol = payload.currency.symbol || newConfig.currencySymbol;
+    }
+    if (payload.theme) {
+      newConfig.primaryColor = payload.theme.primary || newConfig.primaryColor;
+      newConfig.secondaryColor = payload.theme.secondary || newConfig.secondaryColor;
+    }
+    
+    // Salvar no banco
+    await prisma.systemConfig.upsert({
+      where: { key: 'community_config' },
+      update: { value: JSON.stringify(newConfig) },
+      create: { key: 'community_config', value: JSON.stringify(newConfig) },
+    });
+    
+    console.log('✅ Config synced successfully');
+    
+    res.json({
+      success: true,
+      message: 'Configuration synced successfully',
+      config: newConfig,
+    });
+  } catch (error) {
+    console.error('❌ Rovex config sync error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to sync configuration',
+    });
+  }
+});
+
+/**
  * PUT /api/rovex/config
  * Recebe atualizações de configuração da Rovex (provisioning)
  * Salva no banco para persistência

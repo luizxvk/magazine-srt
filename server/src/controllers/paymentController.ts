@@ -94,110 +94,81 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
-        // Usar Orders API que funciona com contas de teste
-        // A Payment API não funciona com credenciais de teste para PIX
-        
-        // Detectar modo de teste explicitamente pela env var
-        const isSandbox = process.env.MERCADOPAGO_TEST_MODE === 'true';
+        // Usar Payment API para PIX (documentação oficial do MercadoPago)
         const payerEmail = user.email || 'customer@email.com';
         const payerFirstName = user.name?.split(' ')[0] || 'Usuario';
+        const payerLastName = user.name?.split(' ').slice(1).join(' ') || 'Usuario';
         
-        console.log(`[PAYMENT] Mode: ${isSandbox ? 'SANDBOX' : 'PRODUCTION'} - Payer: ${payerFirstName} - Email: ${payerEmail}`);
+        console.log(`[PAYMENT] Mode: PRODUCTION - Payer: ${payerFirstName} ${payerLastName} - Email: ${payerEmail}`);
         
-        // Descrições e benefícios por pacote
+        // Descrições por pacote
         const packageDescriptions: Record<number, string> = {
-            500: 'Pacote inicial de Zions para customização de perfil e itens exclusivos.',
-            1100: 'Pacote intermediário com bônus de 10%. Ideal para desbloquear backgrounds e cores.',
-            2500: 'Pacote avançado com 25% de bônus! Libere Theme Packs e conquistas premium.',
-            5500: 'Pacote premium com 37% de bônus! Acesso a itens raros e exclusivos.',
-            12000: 'Pacote supremo com 50% de bônus! Máximo valor, itens lendários disponíveis.'
+            100: 'Pacote de 100 Zions - Magazine MGT',
+            500: 'Pacote de 500 Zions - Magazine MGT',
+            1100: 'Pacote de 1.100 Zions com bônus - Magazine MGT',
+            2500: 'Pacote de 2.500 Zions com 25% bônus - Magazine MGT',
+            5500: 'Pacote de 5.500 Zions com 37% bônus - Magazine MGT',
+            12000: 'Pacote de 12.000 Zions com 50% bônus - Magazine MGT'
         };
-        
-        // Criar order via API REST diretamente (Orders API)
-        // Nota: Orders API tem campos diferentes da Preferences API
-        const orderData = JSON.stringify({
-            type: 'online',
-            external_reference: newPurchase.id,
-            total_amount: price.toFixed(2),
-            title: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
-            description: packageDescriptions[zions] || `Pacote de ${zions} Zions para customização e itens.`,
-            payer: {
-                email: payerEmail,
-                first_name: payerFirstName
-            },
-            transactions: {
-                payments: [{
-                    amount: price.toFixed(2),
-                    payment_method: {
-                        id: 'pix',
-                        type: 'bank_transfer'
-                    }
-                }]
-            }
-        });
 
         const idempotencyKey = `pix-${newPurchase.id}-${Date.now()}`;
         
-        const orderResult = await new Promise<any>((resolve, reject) => {
-            const options = {
-                hostname: 'api.mercadopago.com',
-                path: '/v1/orders',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
-                    'X-Idempotency-Key': idempotencyKey
+        try {
+            // Criar pagamento PIX usando SDK oficial do MercadoPago
+            const paymentResult = await payment.create({
+                body: {
+                    transaction_amount: price,
+                    description: packageDescriptions[zions] || `${zions} Zions - Magazine MGT`,
+                    payment_method_id: 'pix',
+                    payer: {
+                        email: payerEmail,
+                        first_name: payerFirstName,
+                        last_name: payerLastName
+                    },
+                    external_reference: newPurchase.id
+                },
+                requestOptions: {
+                    idempotencyKey
                 }
-            };
-
-            const req = https.request(options, (res) => {
-                let body = '';
-                res.on('data', (chunk) => body += chunk);
-                res.on('end', () => {
-                    try {
-                        const json = JSON.parse(body);
-                        if (res.statusCode === 201 || res.statusCode === 200) {
-                            resolve(json);
-                        } else {
-                            console.error(`[PAYMENT] Orders API error: ${res.statusCode}`, JSON.stringify(json, null, 2));
-                            reject(new Error(json.message || json.errors?.[0]?.description || json.errors?.[0]?.message || `HTTP ${res.statusCode}`));
-                        }
-                    } catch (e) {
-                        console.error(`[PAYMENT] Failed to parse response:`, body);
-                        reject(new Error(`Failed to parse response: ${body}`));
-                    }
-                });
             });
 
-            req.on('error', reject);
-            req.write(orderData);
-            req.end();
-        });
+            // Atualizar registro com ID do pagamento
+            await prisma.zionPurchase.update({
+                where: { id: newPurchase.id },
+                data: { 
+                    paymentId: paymentResult.id?.toString()
+                }
+            });
 
-        // Atualizar registro com ID do pagamento
-        const paymentData = orderResult.transactions?.payments?.[0];
-        await prisma.zionPurchase.update({
-            where: { id: newPurchase.id },
-            data: { 
-                paymentId: orderResult.id || paymentData?.id
-            }
-        });
+            console.log(`[PAYMENT] PIX created successfully - PaymentID: ${paymentResult.id} - Status: ${paymentResult.status}`);
 
-        console.log(`[PAYMENT] PIX created successfully - OrderID: ${orderResult.id} - Status: ${orderResult.status}`);
-
-        // Retornar dados do PIX
-        const pixInfo = paymentData?.payment_method;
-        
-        res.json({
-            paymentId: orderResult.id,
-            purchaseId: newPurchase.id,
-            qrCode: pixInfo?.qr_code,
-            qrCodeBase64: pixInfo?.qr_code_base64,
-            copyPaste: pixInfo?.qr_code,
-            ticketUrl: pixInfo?.ticket_url,
-            status: orderResult.status,
-            expirationDate: orderResult.expiration_time
-        });
+            // Retornar dados do PIX
+            const pixData = paymentResult.point_of_interaction?.transaction_data;
+            
+            res.json({
+                paymentId: paymentResult.id,
+                purchaseId: newPurchase.id,
+                qrCode: pixData?.qr_code,
+                qrCodeBase64: pixData?.qr_code_base64,
+                copyPaste: pixData?.qr_code,
+                ticketUrl: pixData?.ticket_url,
+                status: paymentResult.status,
+                expirationDate: paymentResult.date_of_expiration
+            });
+        } catch (paymentError: any) {
+            console.error('[PAYMENT] Error creating PIX payment:', paymentError.message || paymentError);
+            
+            // Marcar compra como falha
+            await prisma.zionPurchase.update({
+                where: { id: newPurchase.id },
+                data: { status: 'REJECTED' }
+            });
+            
+            return res.status(500).json({ 
+                error: 'Erro ao criar pagamento PIX', 
+                details: paymentError.message 
+            });
+        }
 
     } catch (error: any) {
         console.error('[PAYMENT] Error creating PIX payment:', error?.message || error);

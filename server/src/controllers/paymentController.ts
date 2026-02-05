@@ -97,10 +97,9 @@ export const createPixPayment = async (req: Request, res: Response) => {
         // Usar Orders API que funciona com contas de teste
         // A Payment API não funciona com credenciais de teste para PIX
         
-        // Em sandbox, o email PRECISA ser @testuser.com
-        // Detectar sandbox pelo token (contas de teste tem APP_USR- mas são sandbox)
-        const isSandbox = accessToken.includes('3116392914') || process.env.MERCADOPAGO_TEST_MODE === 'true';
-        const payerEmail = isSandbox ? 'test@testuser.com' : (user.email || 'customer@email.com');
+        // Detectar modo de teste explicitamente pela env var
+        const isSandbox = process.env.MERCADOPAGO_TEST_MODE === 'true';
+        const payerEmail = user.email || 'customer@email.com';
         const payerFirstName = user.name?.split(' ')[0] || 'Usuario';
         
         console.log(`[PAYMENT] Mode: ${isSandbox ? 'SANDBOX' : 'PRODUCTION'} - Payer: ${payerFirstName} - Email: ${payerEmail}`);
@@ -122,7 +121,7 @@ export const createPixPayment = async (req: Request, res: Response) => {
             description: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
             payer: {
                 email: payerEmail,
-                first_name: isSandbox ? 'APRO' : payerFirstName
+                first_name: payerFirstName
             },
             transactions: {
                 payments: [{

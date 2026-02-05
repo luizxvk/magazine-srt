@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Package, Shield, Cloud, Zap, Globe, Check, Server } from 'lucide-react';
+import { X, Sparkles, Package, Shield, Cloud, Zap, Globe, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.1';
+const CURRENT_VERSION = '0.5.0-rc.2';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,41 +33,38 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.5.0-rc.1 - Integração Rovex, Multi-tenant, Feature Gates, Suspension System
+    // v0.5.0-rc.2 - Welcome Tour Premium, Footer atualizado, Beta Reward fix
     const updates: UpdateItem[] = [
         {
-            icon: <Globe className="w-5 h-5 text-purple-400" />,
-            title: 'Integração Rovex Platform',
-            description: 'Conexão completa com a Rovex Platform! Webhooks, métricas e configuração remota.',
+            icon: <Sparkles className="w-5 h-5 text-purple-400" />,
+            title: 'Welcome Tour Premium',
+            description: 'Novo popup de boas-vindas estilo Apple Vision Pro com todas as features da comunidade!',
             isNew: true
         },
         {
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
             title: 'Sistema de Feature Gates',
             description: 'Features modulares por plano! FREE, STARTER, GROWTH e ENTERPRISE com acesso controlado.',
-            isNew: true
         },
         {
-            icon: <Cloud className="w-5 h-5 text-blue-400" />,
+            icon: <Globe className="w-5 h-5 text-blue-400" />,
+            title: 'Integração Rovex Platform',
+            description: 'Conexão completa com a Rovex Platform! Webhooks, métricas e configuração remota.',
+        },
+        {
+            icon: <Cloud className="w-5 h-5 text-cyan-400" />,
             title: 'Multi-Tenant Architecture',
             description: 'Suporte a múltiplas comunidades! Cada uma com branding, cores e moeda própria.',
-            isNew: true
-        },
-        {
-            icon: <Server className="w-5 h-5 text-amber-400" />,
-            title: 'Health & Metrics API',
-            description: 'Endpoints de monitoramento para integração com dashboards externos.',
-            isNew: true
         },
         {
             icon: <Zap className="w-5 h-5 text-yellow-400" />,
-            title: 'Suspension & Quota System',
-            description: 'Sistema de suspensão, limites de usuários e controle de storage por plano.',
+            title: 'Beta Reward System',
+            description: 'Beta testers ganham 500 Zions Points de agradecimento! Resgate seu brinde.',
         },
         {
-            icon: <Package className="w-5 h-5 text-cyan-400" />,
-            title: 'Push Events para Rovex',
-            description: 'Envio proativo de eventos e métricas para a plataforma central.',
+            icon: <Package className="w-5 h-5 text-amber-400" />,
+            title: 'Admin sem Ranking',
+            description: 'Conta admin não aparece mais no ranking elite - fair play garantido!',
         }
     ];
 

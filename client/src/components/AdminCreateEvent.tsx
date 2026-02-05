@@ -1,7 +1,17 @@
-import { useState } from 'react';
-import { Calendar, Clock, Car, Gamepad2, FileText, Plus, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calendar, Clock, Car, Gamepad2, FileText, Plus, Loader2, Gift, ChevronDown, X, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+
+interface Reward {
+    id: string;
+    title: string;
+    type: string;
+    costZions: number;
+    zionsReward?: number;
+    metadata?: { imageUrl?: string };
+    backgroundColor?: string;
+}
 
 interface AdminCreateEventProps {
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -22,12 +32,39 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
         game: '',
         description: ''
     });
+    
+    // Recompensa vinculada
+    const [availableRewards, setAvailableRewards] = useState<Reward[]>([]);
+    const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
+    const [showRewardDropdown, setShowRewardDropdown] = useState(false);
+    const [loadingRewards, setLoadingRewards] = useState(false);
 
     const themeColor = isMGT ? 'emerald' : 'gold';
     const borderColor = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const focusColor = isMGT ? 'focus:border-emerald-500/50' : 'focus:border-gold-500/50';
     const buttonBg = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500';
     const iconColor = isMGT ? 'text-emerald-400' : 'text-gold-400';
+
+    // Buscar recompensas disponíveis quando abre o form
+    useEffect(() => {
+        if (isOpen) {
+            fetchAvailableRewards();
+        }
+    }, [isOpen]);
+
+    const fetchAvailableRewards = async () => {
+        setLoadingRewards(true);
+        try {
+            const response = await api.get('/events/available-rewards');
+            setAvailableRewards(response.data);
+        } catch (error) {
+            console.error('Failed to fetch rewards', error);
+        } finally {
+            setLoadingRewards(false);
+        }
+    };
+
+    const selectedReward = availableRewards.find(r => r.id === selectedRewardId);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,11 +81,13 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                 date: `${formData.date}T${formData.time}:00`,
                 category: formData.category,
                 game: formData.game,
-                description: formData.description
+                description: formData.description,
+                linkedRewardId: selectedRewardId || undefined
             });
 
             showToast('Evento criado com sucesso!', 'success');
             setFormData({ title: '', date: '', time: '', category: '', game: '', description: '' });
+            setSelectedRewardId(null);
             setIsOpen(false);
             onEventCreated?.();
         } catch (error) {
@@ -157,6 +196,125 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                             rows={3}
                             className={`w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white ${focusColor} outline-none transition-colors placeholder-gray-500 resize-none`}
                         />
+                    </div>
+
+                    {/* Recompensa Exclusiva */}
+                    <div className={`p-4 rounded-xl border ${selectedRewardId ? 'bg-amber-500/5 border-amber-500/30' : 'bg-white/5 border-white/10'}`}>
+                        <label className="block text-xs text-amber-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Recompensa Exclusiva do Evento
+                        </label>
+                        
+                        {loadingRewards ? (
+                            <div className="flex items-center gap-2 text-gray-400 text-sm">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Carregando recompensas...
+                            </div>
+                        ) : availableRewards.length === 0 ? (
+                            <p className="text-sm text-gray-500">
+                                Nenhuma recompensa disponível. Crie uma recompensa primeiro.
+                            </p>
+                        ) : (
+                            <div className="relative">
+                                {/* Dropdown button */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRewardDropdown(!showRewardDropdown)}
+                                    className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg border transition-all ${
+                                        selectedReward 
+                                            ? 'bg-black/60 border-amber-500/50' 
+                                            : 'bg-black/40 border-white/10 hover:border-white/30'
+                                    }`}
+                                >
+                                    {selectedReward ? (
+                                        <div className="flex items-center gap-3">
+                                            <div 
+                                                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                                style={{ backgroundColor: selectedReward.backgroundColor || '#1a1a1a' }}
+                                            >
+                                                {selectedReward.metadata?.imageUrl ? (
+                                                    <img 
+                                                        src={selectedReward.metadata.imageUrl} 
+                                                        alt="" 
+                                                        className="w-full h-full object-cover rounded-lg"
+                                                    />
+                                                ) : (
+                                                    <Gift className="w-5 h-5 text-gold-400" />
+                                                )}
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-white font-medium text-sm">{selectedReward.title}</p>
+                                                <p className="text-xs text-gray-400">
+                                                    {selectedReward.costZions > 0 ? `${selectedReward.costZions} Z` : 'Gratuito'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-400 text-sm">Selecionar recompensa (opcional)</span>
+                                    )}
+                                    
+                                    <div className="flex items-center gap-2">
+                                        {selectedReward && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedRewardId(null);
+                                                }}
+                                                className="p-1 rounded-full hover:bg-white/10"
+                                            >
+                                                <X className="w-4 h-4 text-gray-400" />
+                                            </button>
+                                        )}
+                                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showRewardDropdown ? 'rotate-180' : ''}`} />
+                                    </div>
+                                </button>
+                                
+                                {/* Dropdown menu */}
+                                {showRewardDropdown && (
+                                    <div className="absolute z-50 w-full mt-2 py-2 bg-gray-900 border border-white/10 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                                        {availableRewards.map((reward) => (
+                                            <button
+                                                key={reward.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedRewardId(reward.id);
+                                                    setShowRewardDropdown(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors ${
+                                                    selectedRewardId === reward.id ? 'bg-amber-500/10' : ''
+                                                }`}
+                                            >
+                                                <div 
+                                                    className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                                                    style={{ backgroundColor: reward.backgroundColor || '#1a1a1a' }}
+                                                >
+                                                    {reward.metadata?.imageUrl ? (
+                                                        <img 
+                                                            src={reward.metadata.imageUrl} 
+                                                            alt="" 
+                                                            className="w-full h-full object-cover rounded-lg"
+                                                        />
+                                                    ) : (
+                                                        <Gift className="w-5 h-5 text-gold-400" />
+                                                    )}
+                                                </div>
+                                                <div className="text-left flex-1 min-w-0">
+                                                    <p className="text-white font-medium text-sm truncate">{reward.title}</p>
+                                                    <p className="text-xs text-gray-400">
+                                                        {reward.costZions > 0 ? `${reward.costZions} Zions` : 'Gratuito'}
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        <p className="mt-3 text-xs text-gray-500">
+                            💡 A recompensa será publicada automaticamente quando o evento finalizar.
+                        </p>
                     </div>
 
                     {/* Submit */}

@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-import { Plus, Image as ImageIcon, X, Gift, Tag, Box, Coins } from 'lucide-react';
+import { Plus, Image as ImageIcon, X, Gift, Tag, Box, Coins, Calendar, ChevronDown, Sparkles } from 'lucide-react';
 import api from '../services/api';
 
 interface AdminCreateRewardProps {
     showToast: (message: string, type: 'success' | 'error' | 'info') => void;
     onRewardCreated?: () => void;
+}
+
+interface Event {
+    id: string;
+    title: string;
+    date: string;
+    active: boolean;
 }
 
 export default function AdminCreateReward({ showToast, onRewardCreated }: AdminCreateRewardProps) {
@@ -18,6 +25,40 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
     const [imageUrl, setImageUrl] = useState('');
     const [backgroundColor, setBackgroundColor] = useState('');
     const [loading, setLoading] = useState(false);
+    
+    // Event linking state
+    const [isEventReward, setIsEventReward] = useState(false);
+    const [availableEvents, setAvailableEvents] = useState<Event[]>([]);
+    const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+    const [showEventDropdown, setShowEventDropdown] = useState(false);
+    const [loadingEvents, setLoadingEvents] = useState(false);
+
+    // Fetch available events when checkbox is checked
+    useEffect(() => {
+        if (isEventReward) {
+            fetchAvailableEvents();
+        } else {
+            setSelectedEventId(null);
+        }
+    }, [isEventReward]);
+
+    const fetchAvailableEvents = async () => {
+        setLoadingEvents(true);
+        try {
+            const response = await api.get('/events');
+            // Filter to show only future/active events that don't have a reward yet
+            const activeEvents = response.data.filter((e: Event & { linkedReward?: unknown }) => 
+                e.active && !e.linkedReward && new Date(e.date) > new Date()
+            );
+            setAvailableEvents(activeEvents);
+        } catch (error) {
+            console.error('Failed to fetch events', error);
+        } finally {
+            setLoadingEvents(false);
+        }
+    };
+
+    const selectedEvent = availableEvents.find(e => e.id === selectedEventId);
 
     const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -47,6 +88,10 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
             showToast('Os Zions de recompensa não podem ser negativos', 'error');
             return;
         }
+        if (isEventReward && !selectedEventId) {
+            showToast('Selecione um evento para vincular', 'error');
+            return;
+        }
 
         setLoading(true);
         try {
@@ -58,7 +103,9 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                 stock,
                 isUnlimited,
                 metadata: imageUrl ? { imageUrl } : undefined,
-                backgroundColor: backgroundColor || undefined
+                backgroundColor: backgroundColor || undefined,
+                isEventReward,
+                linkedEventId: isEventReward ? selectedEventId : undefined
             };
 
             await api.post('/gamification/rewards', rewardData);
@@ -72,6 +119,8 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
             setIsUnlimited(true);
             setImageUrl('');
             setBackgroundColor('');
+            setIsEventReward(false);
+            setSelectedEventId(null);
 
             showToast('Recompensa criada com sucesso!', 'success');
             if (onRewardCreated) onRewardCreated();
@@ -272,6 +321,101 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 <X className="w-4 h-4 text-gray-400" />
                             </button>
                         </div>
+                    </div>
+
+                    {/* Event Reward Section */}
+                    <div className={`p-4 rounded-xl border transition-all ${isEventReward ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white/5 border-white/10'}`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={isEventReward}
+                                    onChange={(e) => setIsEventReward(e.target.checked)}
+                                    className="w-4 h-4 rounded border-gray-600 bg-black/40 text-amber-500 focus:ring-amber-500/50"
+                                />
+                                <span className={`text-xs uppercase tracking-wider font-bold flex items-center gap-2 ${isEventReward ? 'text-amber-400' : 'text-gray-400'}`}>
+                                    <Calendar className="w-4 h-4" />
+                                    Recompensa de Evento
+                                </span>
+                            </label>
+                            {isEventReward && (
+                                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                            )}
+                        </div>
+                        <p className={`text-xs mb-4 ${isEventReward ? 'text-amber-400/70' : 'text-gray-500'}`}>
+                            {isEventReward 
+                                ? 'Esta recompensa ficará oculta até o evento terminar.'
+                                : 'Marque para vincular a um evento exclusivo.'
+                            }
+                        </p>
+
+                        {/* Event Dropdown */}
+                        {isEventReward && (
+                            <div className="relative animate-fade-in">
+                                <button
+                                    onClick={() => setShowEventDropdown(!showEventDropdown)}
+                                    disabled={loadingEvents}
+                                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border transition-all ${
+                                        selectedEventId 
+                                            ? 'bg-amber-500/20 border-amber-500/40 text-amber-400' 
+                                            : 'bg-black/40 border-white/10 text-gray-400 hover:border-amber-500/30'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Calendar className="w-4 h-4" />
+                                        <span className="font-medium">
+                                            {loadingEvents 
+                                                ? 'Carregando eventos...' 
+                                                : selectedEvent 
+                                                    ? selectedEvent.title 
+                                                    : 'Selecionar evento...'
+                                            }
+                                        </span>
+                                    </div>
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${showEventDropdown ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                {showEventDropdown && !loadingEvents && (
+                                    <div className="absolute z-50 w-full mt-2 py-2 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                                        {availableEvents.length === 0 ? (
+                                            <div className="px-4 py-3 text-center text-gray-500 text-sm">
+                                                Nenhum evento disponível
+                                            </div>
+                                        ) : (
+                                            availableEvents.map((event) => {
+                                                const eventDate = new Date(event.date);
+                                                return (
+                                                    <button
+                                                        key={event.id}
+                                                        onClick={() => {
+                                                            setSelectedEventId(event.id);
+                                                            setShowEventDropdown(false);
+                                                        }}
+                                                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-500/10 transition-colors text-left ${
+                                                            selectedEventId === event.id ? 'bg-amber-500/20' : ''
+                                                        }`}
+                                                    >
+                                                        <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex-shrink-0">
+                                                            <span className="text-lg font-bold text-amber-400">{eventDate.getDate()}</span>
+                                                            <span className="text-[10px] text-amber-400/70">
+                                                                {eventDate.toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '')}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-medium text-white truncate">{event.title}</p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Live Preview (Moved inside form flow for better mobile/narrow layout) */}

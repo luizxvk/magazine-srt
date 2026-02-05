@@ -1,12 +1,24 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calendar, MapPin, Clock } from 'lucide-react';
+import { X, Calendar, Clock, Gift, Sparkles, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 interface EventsModalProps {
     isOpen: boolean;
     onClose: () => void;
+}
+
+interface LinkedReward {
+    id: string;
+    title: string;
+    type: string;
+    costZions: number;
+    zionsReward?: number;
+    metadata?: { imageUrl?: string };
+    backgroundColor?: string;
+    isEventReward: boolean;
+    publishedAt?: string;
 }
 
 interface Event {
@@ -16,6 +28,9 @@ interface Event {
     date: string;
     imageUrl?: string;
     active: boolean;
+    category?: string;
+    game?: string;
+    linkedReward?: LinkedReward;
 }
 
 export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
@@ -46,23 +61,29 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
 
     const themeColor = isMGT ? 'emerald' : 'gold';
     const borderColor = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
-
-    const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900';
+    const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900/95';
 
     const modalContent = (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className={`relative w-full max-w-lg ${themeBg} rounded-2xl border ${borderColor} shadow-2xl overflow-hidden`}>
-                {/* Header */}
-                <div className={`p-6 border-b ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-black/40'}`}>
+            <div className={`relative w-full max-w-lg ${themeBg} rounded-3xl border ${borderColor} shadow-2xl overflow-hidden backdrop-blur-xl`}>
+                {/* Header - Apple Vision Pro style */}
+                <div className={`p-6 border-b ${borderColor} ${theme === 'light' ? 'bg-gray-50/80' : 'bg-black/40'}`}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg bg-${themeColor}-500/10 text-${themeColor}-500`}>
+                            <div className={`p-3 rounded-2xl bg-gradient-to-br from-${themeColor}-500/20 to-${themeColor}-600/10 text-${themeColor}-500 backdrop-blur-sm border border-${themeColor}-500/20`}>
                                 <Calendar className="w-5 h-5" />
                             </div>
-                            <h2 className={`text-xl font-serif text-${themeColor}-500`}>Eventos Exclusivos</h2>
+                            <div>
+                                <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Eventos Exclusivos</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Próximos encontros da comunidade</p>
+                            </div>
                         </div>
-                        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" title="Fechar">
-                            <X className="w-6 h-6" />
+                        <button 
+                            onClick={onClose} 
+                            className={`p-2 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors`}
+                            title="Fechar"
+                        >
+                            <X className="w-5 h-5 text-gray-400" />
                         </button>
                     </div>
                 </div>
@@ -70,45 +91,114 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                 {/* Content */}
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     {loading ? (
-                        <div className="flex justify-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        <div className="flex justify-center py-12">
+                            <div className={`animate-spin rounded-full h-10 w-10 border-2 border-${themeColor}-500/30 border-t-${themeColor}-500`}></div>
                         </div>
                     ) : events.length === 0 ? (
-                        <div className="text-center py-8">
-                            <p className="text-gray-400">Nenhum evento agendado no momento.</p>
-                            <p className="text-sm text-gray-600 mt-2">Fique atento para novidades!</p>
+                        <div className="text-center py-12">
+                            <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-${themeColor}-500/10 flex items-center justify-center`}>
+                                <Calendar className={`w-8 h-8 text-${themeColor}-500/50`} />
+                            </div>
+                            <p className={`font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Nenhum evento agendado</p>
+                            <p className={`text-sm mt-1 ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>Fique atento para novidades!</p>
                         </div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {events.map((event) => {
                                 const eventDate = new Date(event.date);
                                 const day = eventDate.getDate();
-                                const month = eventDate.toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase();
+                                const month = eventDate.toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
+                                const isUpcoming = eventDate > new Date();
+                                const hasReward = !!event.linkedReward;
 
                                 return (
-                                    <div key={event.id} className="group relative overflow-hidden rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
-                                        <div className="flex">
-                                            {/* Date Column */}
-                                            <div className={`flex flex-col items-center justify-center w-20 bg-${themeColor}-500/10 border-r border-white/5 p-4`}>
-                                                <span className={`text-2xl font-bold text-${themeColor}-500`}>{day}</span>
-                                                <span className="text-xs font-medium text-gray-400">{month}</span>
+                                    <div 
+                                        key={event.id} 
+                                        className={`group relative overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-gray-50 border border-gray-200/50' : 'bg-white/[0.03] border border-white/[0.06]'} hover:border-${themeColor}-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-${themeColor}-500/5`}
+                                    >
+                                        {/* Background glow effect */}
+                                        <div className={`absolute inset-0 bg-gradient-to-r from-${themeColor}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                                        
+                                        <div className="relative flex">
+                                            {/* Date Column - Apple style pill */}
+                                            <div className={`flex flex-col items-center justify-center w-20 py-4 ${theme === 'light' ? 'bg-gray-100/50' : 'bg-white/[0.02]'} border-r ${theme === 'light' ? 'border-gray-200/50' : 'border-white/[0.06]'}`}>
+                                                <span className={`text-3xl font-bold text-${themeColor}-500`}>{day}</span>
+                                                <span className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'} tracking-wider`}>{month}</span>
+                                                {isUpcoming && (
+                                                    <div className={`mt-2 px-2 py-0.5 rounded-full bg-${themeColor}-500/10 border border-${themeColor}-500/20`}>
+                                                        <span className={`text-[9px] font-bold text-${themeColor}-500 uppercase tracking-wider`}>Em breve</span>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Info Column */}
                                             <div className="flex-1 p-4">
-                                                <h3 className="font-bold text-white mb-1 group-hover:text-gold-400 transition-colors">{event.title}</h3>
-                                                <p className="text-sm text-gray-400 line-clamp-2 mb-3">{event.description}</p>
+                                                <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'} group-hover:text-${themeColor}-500 transition-colors`}>
+                                                    {event.title}
+                                                </h3>
+                                                
+                                                {event.description && (
+                                                    <p className={`text-sm line-clamp-2 mb-3 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                        {event.description}
+                                                    </p>
+                                                )}
 
-                                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Clock className="w-3.5 h-3.5" />
-                                                        {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                {/* Meta info pills */}
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
+                                                        <Clock className="w-3 h-3 text-gray-500" />
+                                                        <span className={`text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                            {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
                                                     </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <MapPin className="w-3.5 h-3.5" />
-                                                        CPM2 Server
-                                                    </div>
+                                                    
+                                                    {event.game && (
+                                                        <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${theme === 'light' ? 'bg-blue-50' : 'bg-blue-500/10'}`}>
+                                                            <Gamepad2 className="w-3 h-3 text-blue-500" />
+                                                            <span className={`text-xs font-medium ${theme === 'light' ? 'text-blue-700' : 'text-blue-400'}`}>{event.game}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
+
+                                                {/* Reward Preview - Apple Vision Pro style card */}
+                                                {hasReward && (
+                                                    <div className={`mt-4 p-3 rounded-xl ${theme === 'light' ? 'bg-amber-50/80 border border-amber-200/50' : 'bg-amber-500/5 border border-amber-500/20'} backdrop-blur-sm`}>
+                                                        <div className="flex items-center gap-3">
+                                                            {/* Reward image/icon */}
+                                                            <div 
+                                                                className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden shadow-lg"
+                                                                style={{ backgroundColor: event.linkedReward?.backgroundColor || '#1a1a1a' }}
+                                                            >
+                                                                {event.linkedReward?.metadata?.imageUrl ? (
+                                                                    <img 
+                                                                        src={event.linkedReward.metadata.imageUrl} 
+                                                                        alt="" 
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <Gift className="w-6 h-6 text-amber-400" />
+                                                                )}
+                                                            </div>
+                                                            
+                                                            {/* Reward info */}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2 mb-0.5">
+                                                                    <Sparkles className="w-3 h-3 text-amber-500" />
+                                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`}>
+                                                                        Recompensa do Evento
+                                                                    </span>
+                                                                </div>
+                                                                <p className={`font-semibold text-sm truncate ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                                    {event.linkedReward?.title}
+                                                                </p>
+                                                                <p className={`text-xs ${theme === 'light' ? 'text-amber-600' : 'text-amber-400/80'}`}>
+                                                                    {event.linkedReward?.costZions ? `${event.linkedReward.costZions} Zions` : 'Gratuito'}
+                                                                    {!isUpcoming && ' • Disponível agora!'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

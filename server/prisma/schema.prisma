@@ -246,6 +246,11 @@ model Reward {
   metadata        Json?
   backgroundColor String?
   redemptions     Redemption[]
+  // Evento vinculado (para recompensas que são postadas quando evento finaliza)
+  linkedEventId   String?      @unique
+  linkedEvent     Event?       @relation("EventReward", fields: [linkedEventId], references: [id], onDelete: SetNull)
+  isEventReward   Boolean      @default(false) // Marcado quando é recompensa de evento
+  publishedAt     DateTime?    // Quando a recompensa foi publicada automaticamente
 }
 
 model Redemption {
@@ -411,6 +416,8 @@ model Event {
   updatedAt   DateTime @updatedAt
   category    String?
   game        String?
+  // Recompensa vinculada (publicada quando evento finaliza)
+  linkedReward Reward? @relation("EventReward")
 }
 
 model Report {

@@ -15,6 +15,8 @@ const createRewardSchema = z.object({
     isUnlimited: z.boolean().optional(),
     metadata: z.record(z.string(), z.any()).optional(),
     backgroundColor: z.string().max(50).optional(),
+    linkedEventId: z.string().uuid().optional(), // Vincular a evento existente
+    isEventReward: z.boolean().optional(), // Marcar como recompensa de evento
 });
 
 export const getRanking = async (req: Request, res: Response) => {
@@ -100,9 +102,20 @@ export const getRewards = async (req: Request, res: Response) => {
     try {
         const rewards = await prisma.reward.findMany({
             where: {
-                OR: [
-                    { stock: { gt: 0 } },
-                    { isUnlimited: true }
+                AND: [
+                    {
+                        OR: [
+                            { stock: { gt: 0 } },
+                            { isUnlimited: true }
+                        ]
+                    },
+                    // Excluir recompensas de eventos que ainda não foram publicadas
+                    {
+                        OR: [
+                            { isEventReward: false },
+                            { isEventReward: true, publishedAt: { not: null } }
+                        ]
+                    }
                 ]
             },
             orderBy: { costZions: 'asc' }
@@ -121,27 +134,38 @@ export const createReward = async (req: Request, res: Response) => {
         }
 
         const data = createRewardSchema.parse(req.body);
+        
+        // If it's an event reward, set isEventReward to true (no publishedAt yet)
+        const rewardData: any = { ...data };
+        if (data.linkedEventId) {
+            rewardData.isEventReward = true;
+            // publishedAt stays null until event ends
+        }
+        
         const reward = await prisma.reward.create({
-            data: data as any
+            data: rewardData
         });
 
-        // Send push notification to all users about new reward
-        const allUsers = await prisma.user.findMany({
-            where: { deletedAt: null },
-            select: { id: true }
-        });
+        // Only send push notification if it's NOT an event reward (those are hidden until published)
+        if (!reward.isEventReward) {
+            // Send push notification to all users about new reward
+            const allUsers = await prisma.user.findMany({
+                where: { deletedAt: null },
+                select: { id: true }
+            });
 
-        // Send push to all users (async, don't wait)
-        Promise.all(
-            allUsers.map(user =>
-                sendPushToUser(
-                    user.id,
-                    '🎁 Nova Recompensa Exclusiva!',
-                    `${reward.title} está disponível para resgate!`,
-                    { url: '/rewards', rewardId: reward.id, type: 'new_reward' }
-                ).catch(() => {}) // Ignore individual failures
-            )
-        ).catch(err => console.error('[Push] Error sending new reward notifications:', err));
+            // Send push to all users (async, don't wait)
+            Promise.all(
+                allUsers.map(user =>
+                    sendPushToUser(
+                        user.id,
+                        '🎁 Nova Recompensa Exclusiva!',
+                        `${reward.title} está disponível para resgate!`,
+                        { url: '/rewards', rewardId: reward.id, type: 'new_reward' }
+                    ).catch(() => {}) // Ignore individual failures
+                )
+            ).catch(err => console.error('[Push] Error sending new reward notifications:', err));
+        }
 
         res.status(201).json(reward);
     } catch (error) {

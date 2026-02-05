@@ -478,6 +478,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
           userId,
           amount: -actualPrice,
           reason: `Compra no mercado: ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
+          currency: paymentMethod as 'CASH' | 'POINTS',
         },
       }),
       // Record zion history for seller
@@ -486,6 +487,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
           userId: listing.sellerId,
           amount: sellerReceives,
           reason: `Venda no mercado: ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (taxa: ${fee} ${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
+          currency: paymentMethod as 'CASH' | 'POINTS',
         },
       }),
       // Create notification for seller
@@ -537,6 +539,7 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
             userId: adminUser.id,
             amount: fee,
             reason: `Taxa de mercado (5%): ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
+            currency: paymentMethod as 'CASH' | 'POINTS',
           },
         })
       );

@@ -94,7 +94,7 @@ export const awardTrophies = async (userId: string, amount: number, reason: stri
     }
 };
 
-export const awardZions = async (userId: string, amount: number, reason: string) => {
+export const awardZions = async (userId: string, amount: number, reason: string, currency: 'POINTS' | 'CASH' = 'POINTS') => {
     try {
         // Update user zions
         const [updatedUser] = await prisma.$transaction([
@@ -108,7 +108,8 @@ export const awardZions = async (userId: string, amount: number, reason: string)
                 data: {
                     userId,
                     amount,
-                    reason
+                    reason,
+                    currency
                 }
             })
         ]);

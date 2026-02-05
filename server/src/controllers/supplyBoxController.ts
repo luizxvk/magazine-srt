@@ -236,7 +236,8 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
             data: {
                 userId,
                 amount: -cost,
-                reason: `Supply Box Open #${opensToday + 1}`
+                reason: `Supply Box Open #${opensToday + 1}`,
+                currency: 'POINTS'
             }
         });
 

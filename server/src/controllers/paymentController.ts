@@ -527,7 +527,8 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
                     amount: purchase.amount,
                     reason: isCashPurchase 
                         ? `Recarga de Z$${purchase.amount} Zions Cash por R$${purchase.price.toFixed(2)}`
-                        : `Compra de ${purchase.amount} Zions Points por R$${purchase.price.toFixed(2)}`
+                        : `Compra de ${purchase.amount} Zions Points por R$${purchase.price.toFixed(2)}`,
+                    currency: isCashPurchase ? 'CASH' : 'POINTS'
                 }
             })
         ]);
@@ -710,7 +711,8 @@ export const handleWebhook = async (req: Request, res: Response) => {
                             data: {
                                 userId: purchase.userId,
                                 amount: -purchase.amount,
-                                reason: `Reembolso de ${purchase.amount} Zions Cash`
+                                reason: `Reembolso de ${purchase.amount} Zions Cash`,
+                                currency: 'CASH'
                             }
                         })
                     ]);
@@ -858,7 +860,8 @@ const deliverProductKeysWebhook = async (orderId: string, product: any, quantity
                 data: {
                     userId,
                     amount: cashbackPoints,
-                    reason: `Cashback: ${product.name} (10%)`
+                    reason: `Cashback: ${product.name} (10%)`,
+                    currency: 'POINTS'
                 }
             });
         }

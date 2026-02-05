@@ -13,6 +13,78 @@ import prisma from '../utils/prisma';
 const router = Router();
 
 /**
+ * Inferir tipo de moeda baseado na descrição/reason
+ * Registros antigos não têm o campo currency, então inferimos
+ */
+function inferCurrency(reason: string, dbCurrency?: string): 'CASH' | 'POINTS' {
+    // Se já tem no banco, usar
+    if (dbCurrency === 'CASH' || dbCurrency === 'POINTS') {
+        return dbCurrency;
+    }
+    
+    const lower = reason.toLowerCase();
+    
+    // Zions CASH - transações com dinheiro real
+    if (
+        lower.includes('cash') ||
+        lower.includes('recarga') ||
+        lower.includes('compra de zions') ||
+        lower.includes('r$') ||
+        lower.includes('reais') ||
+        lower.includes('pix') ||
+        lower.includes('mercado pago') ||
+        lower.includes('saque') ||
+        lower.includes('withdraw') ||
+        lower.includes('produto') ||  // Compras na loja de produtos (game keys)
+        lower.includes('key') ||
+        lower.includes('gift card')
+    ) {
+        return 'CASH';
+    }
+    
+    // Zions POINTS - moeda virtual para customizações
+    // Daily login, badges, customizações, supply box, mercado P2P
+    return 'POINTS';
+}
+
+/**
+ * Categoriza a razão da transação em um tipo
+ */
+function categorizeReason(reason: string): string {
+    const lowerReason = reason.toLowerCase();
+    
+    if (lowerReason.includes('supply box') || lowerReason.includes('caixa')) {
+        return 'SUPPLY_BOX';
+    }
+    if (lowerReason.includes('compra') && (lowerReason.includes('loja') || lowerReason.includes('customização'))) {
+        return 'SHOP_PURCHASE';
+    }
+    if (lowerReason.includes('mercado') && lowerReason.includes('compra')) {
+        return 'MARKET_PURCHASE';
+    }
+    if (lowerReason.includes('mercado') && lowerReason.includes('venda')) {
+        return 'MARKET_SALE';
+    }
+    if (lowerReason.includes('produto') || lowerReason.includes('key') || lowerReason.includes('game')) {
+        return 'STORE_PURCHASE';
+    }
+    if (lowerReason.includes('daily') || lowerReason.includes('diário') || lowerReason.includes('login')) {
+        return 'DAILY_LOGIN';
+    }
+    if (lowerReason.includes('badge') || lowerReason.includes('conquista') || lowerReason.includes('level') || lowerReason.includes('nível')) {
+        return 'BADGE_REWARD';
+    }
+    if (lowerReason.includes('theme pack') || lowerReason.includes('tema')) {
+        return 'SHOP_PURCHASE';
+    }
+    if (lowerReason.includes('recarga') || lowerReason.includes('compra de zions') || lowerReason.includes('r$')) {
+        return 'ZION_PURCHASE';
+    }
+    
+    return 'OTHER';
+}
+
+/**
  * GET /api/admin/consumption-tracker
  * Retorna histórico de transações de Zions com detalhes
  * 
@@ -50,16 +122,11 @@ router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Reque
             whereClause.createdAt = { gte: dateFilter };
         }
         
-        // Filtro de moeda (POINTS ou CASH)
-        if (currency === 'POINTS' || currency === 'CASH') {
-            whereClause.currency = currency;
-        }
-        
         // Buscar histórico de Zions
         const zionHistory = await prisma.zionHistory.findMany({
             where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
             orderBy: { createdAt: 'desc' },
-            take: Number(limit),
+            take: Number(limit) * 2, // Buscar mais para compensar filtro posterior
             include: {
                 user: {
                     select: {
@@ -74,21 +141,44 @@ router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Reque
             }
         });
         
-        // Transformar em formato padronizado
-        const transactions = zionHistory.map(h => ({
-            id: h.id,
-            type: categorizeReason(h.reason),
-            amount: h.amount,
-            description: h.reason,
-            currency: h.currency || 'POINTS', // Default para registros antigos
-            createdAt: h.createdAt.toISOString(),
-            user: h.user
-        }));
+        // Transformar em formato padronizado com inferência de moeda
+        let transactions = zionHistory.map(h => {
+            const inferredCurrency = inferCurrency(h.reason, h.currency);
+            return {
+                id: h.id,
+                type: categorizeReason(h.reason),
+                amount: h.amount,
+                description: h.reason,
+                currency: inferredCurrency,
+                createdAt: h.createdAt.toISOString(),
+                user: h.user
+            };
+        });
         
-        // Calcular estatísticas
+        // Aplicar filtro de moeda (após inferência)
+        if (currency === 'POINTS' || currency === 'CASH') {
+            transactions = transactions.filter(t => t.currency === currency);
+        }
+        
+        // Limitar ao número solicitado
+        transactions = transactions.slice(0, Number(limit));
+        
+        // Calcular estatísticas SEPARADAS por tipo de moeda
+        const cashTransactions = transactions.filter(t => t.currency === 'CASH');
+        const pointsTransactions = transactions.filter(t => t.currency === 'POINTS');
+        
         const stats = {
-            totalSpent: transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0),
-            totalEarned: transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
+            // Cash (moeda real)
+            cashSpent: cashTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0),
+            cashEarned: cashTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
+            cashTransactions: cashTransactions.length,
+            
+            // Points (moeda virtual)
+            pointsSpent: pointsTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0),
+            pointsEarned: pointsTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
+            pointsTransactions: pointsTransactions.length,
+            
+            // Totais gerais
             totalTransactions: transactions.length,
             shopPurchases: transactions.filter(t => t.type === 'SHOP_PURCHASE').length,
             marketTransactions: transactions.filter(t => t.type === 'MARKET_PURCHASE' || t.type === 'MARKET_SALE').length,
@@ -119,13 +209,7 @@ router.get('/zion-history', authenticateToken, isAdmin, async (req: Request, res
     try {
         const { limit = 200, currency } = req.query;
         
-        const whereClause: any = {};
-        if (currency === 'POINTS' || currency === 'CASH') {
-            whereClause.currency = currency;
-        }
-        
         const history = await prisma.zionHistory.findMany({
-            where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
             orderBy: { createdAt: 'desc' },
             take: Number(limit),
             include: {
@@ -142,45 +226,22 @@ router.get('/zion-history', authenticateToken, isAdmin, async (req: Request, res
             }
         });
         
-        res.json(history);
+        // Adicionar inferência de moeda
+        const historyWithCurrency = history.map(h => ({
+            ...h,
+            currency: inferCurrency(h.reason, h.currency)
+        }));
+        
+        // Filtrar se necessário
+        if (currency === 'POINTS' || currency === 'CASH') {
+            return res.json(historyWithCurrency.filter(h => h.currency === currency));
+        }
+        
+        res.json(historyWithCurrency);
     } catch (error) {
         console.error('Error fetching zion history:', error);
         res.status(500).json({ error: 'Failed to fetch zion history' });
     }
 });
-
-/**
- * Categoriza a razão da transação em um tipo
- */
-function categorizeReason(reason: string): string {
-    const lowerReason = reason.toLowerCase();
-    
-    if (lowerReason.includes('supply box') || lowerReason.includes('caixa')) {
-        return 'SUPPLY_BOX';
-    }
-    if (lowerReason.includes('compra') && (lowerReason.includes('loja') || lowerReason.includes('customização'))) {
-        return 'SHOP_PURCHASE';
-    }
-    if (lowerReason.includes('mercado') && lowerReason.includes('compra')) {
-        return 'MARKET_PURCHASE';
-    }
-    if (lowerReason.includes('mercado') && lowerReason.includes('venda')) {
-        return 'MARKET_SALE';
-    }
-    if (lowerReason.includes('produto') || lowerReason.includes('key') || lowerReason.includes('game')) {
-        return 'STORE_PURCHASE';
-    }
-    if (lowerReason.includes('daily') || lowerReason.includes('diário') || lowerReason.includes('login')) {
-        return 'DAILY_LOGIN';
-    }
-    if (lowerReason.includes('badge') || lowerReason.includes('conquista') || lowerReason.includes('level') || lowerReason.includes('nível')) {
-        return 'BADGE_REWARD';
-    }
-    if (lowerReason.includes('theme pack') || lowerReason.includes('tema')) {
-        return 'SHOP_PURCHASE';
-    }
-    
-    return 'OTHER';
-}
 
 export default router;

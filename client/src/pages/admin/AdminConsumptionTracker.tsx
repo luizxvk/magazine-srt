@@ -18,8 +18,6 @@ import {
     Palette,
     Gift,
     Store,
-    ArrowDownRight,
-    ArrowUpRight,
     Calendar,
     Filter,
     ChevronDown,
@@ -57,8 +55,15 @@ interface Transaction {
 }
 
 interface Stats {
-    totalSpent: number;
-    totalEarned: number;
+    // Cash (moeda real)
+    cashSpent: number;
+    cashEarned: number;
+    cashTransactions: number;
+    // Points (moeda virtual)
+    pointsSpent: number;
+    pointsEarned: number;
+    pointsTransactions: number;
+    // Gerais
     totalTransactions: number;
     shopPurchases: number;
     marketTransactions: number;
@@ -138,13 +143,22 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                 
                 setTransactions(mappedTransactions);
                 
-                // Calcular stats
-                const spent = mappedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-                const earned = mappedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+                // Calcular stats separando por moeda
+                const cashTx = mappedTransactions.filter(t => t.currency === 'CASH');
+                const pointsTx = mappedTransactions.filter(t => t.currency === 'POINTS');
+                
+                const cashSpent = cashTx.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
+                const cashEarned = cashTx.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+                const pointsSpent = pointsTx.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
+                const pointsEarned = pointsTx.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
                 
                 setStats({
-                    totalSpent: spent,
-                    totalEarned: earned,
+                    cashSpent,
+                    cashEarned,
+                    cashTransactions: cashTx.length,
+                    pointsSpent,
+                    pointsEarned,
+                    pointsTransactions: pointsTx.length,
                     totalTransactions: mappedTransactions.length,
                     shopPurchases: mappedTransactions.filter(t => t.type === 'SHOP_PURCHASE').length,
                     marketTransactions: mappedTransactions.filter(t => t.type === 'MARKET_PURCHASE' || t.type === 'MARKET_SALE').length,
@@ -272,49 +286,95 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
 
             {/* Stats Cards - Glassmorphism */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Total Gasto */}
+                {/* Cash Gasto */}
                 <div className={`p-4 rounded-2xl border backdrop-blur-xl transition-all hover:scale-[1.02] ${
                     isDarkMode 
                         ? 'bg-red-500/10 border-red-500/20' 
                         : 'bg-red-50 border-red-200'
                 }`}>
                     <div className="flex items-center gap-2 mb-2">
-                        <ArrowDownRight className="w-4 h-4 text-red-400" />
+                        <Banknote className="w-4 h-4 text-red-400" />
                         <span className={`text-xs font-medium ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>
-                            Total Gasto
+                            Cash Gasto
                         </span>
                     </div>
                     <p className={`text-2xl font-bold ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
-                        {loading ? '...' : `Z$ ${(stats?.totalSpent || 0).toLocaleString('pt-BR')}`}
+                        {loading ? '...' : `Z$ ${(stats?.cashSpent || 0).toLocaleString('pt-BR')}`}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                        {stats?.cashTransactions || 0} transações
                     </p>
                 </div>
                 
-                {/* Total Ganho */}
+                {/* Cash Ganho */}
                 <div className={`p-4 rounded-2xl border backdrop-blur-xl transition-all hover:scale-[1.02] ${
                     isDarkMode 
                         ? 'bg-green-500/10 border-green-500/20' 
                         : 'bg-green-50 border-green-200'
                 }`}>
                     <div className="flex items-center gap-2 mb-2">
-                        <ArrowUpRight className="w-4 h-4 text-green-400" />
+                        <Banknote className="w-4 h-4 text-green-400" />
                         <span className={`text-xs font-medium ${isDarkMode ? 'text-green-300' : 'text-green-600'}`}>
-                            Total Ganho
+                            Cash Ganho
                         </span>
                     </div>
                     <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                        {loading ? '...' : `Z$ ${(stats?.totalEarned || 0).toLocaleString('pt-BR')}`}
+                        {loading ? '...' : `Z$ ${(stats?.cashEarned || 0).toLocaleString('pt-BR')}`}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                        Recargas e vendas
                     </p>
                 </div>
                 
+                {/* Points Gasto */}
+                <div className={`p-4 rounded-2xl border backdrop-blur-xl transition-all hover:scale-[1.02] ${
+                    isDarkMode 
+                        ? 'bg-purple-500/10 border-purple-500/20' 
+                        : 'bg-purple-50 border-purple-200'
+                }`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <Coins className="w-4 h-4 text-purple-400" />
+                        <span className={`text-xs font-medium ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
+                            Points Gasto
+                        </span>
+                    </div>
+                    <p className={`text-2xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+                        {loading ? '...' : `ZP ${(stats?.pointsSpent || 0).toLocaleString('pt-BR')}`}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                        Customizações e mercado
+                    </p>
+                </div>
+                
+                {/* Points Ganho */}
+                <div className={`p-4 rounded-2xl border backdrop-blur-xl transition-all hover:scale-[1.02] ${
+                    isDarkMode 
+                        ? 'bg-amber-500/10 border-amber-500/20' 
+                        : 'bg-amber-50 border-amber-200'
+                }`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <Coins className="w-4 h-4 text-amber-400" />
+                        <span className={`text-xs font-medium ${isDarkMode ? 'text-amber-300' : 'text-amber-600'}`}>
+                            Points Ganho
+                        </span>
+                    </div>
+                    <p className={`text-2xl font-bold ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                        {loading ? '...' : `ZP ${(stats?.pointsEarned || 0).toLocaleString('pt-BR')}`}
+                    </p>
+                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                        Daily, badges, vendas
+                    </p>
+                </div>
+            </div>
+            
+            {/* Stats secundárias */}
+            <div className="grid grid-cols-3 gap-4">
                 {/* Transações */}
                 <div className={`p-4 rounded-2xl border backdrop-blur-xl transition-all hover:scale-[1.02] ${
                     isDarkMode 
-                        ? `bg-${accentColor}-500/10 border-${accentColor}-500/20` 
-                        : `bg-${accentColor}-50 border-${accentColor}-200`
-                }`} style={{ 
-                    backgroundColor: isDarkMode ? `${accentHex}15` : undefined,
-                    borderColor: isDarkMode ? `${accentHex}30` : undefined
-                }}>
+                        ? 'bg-white/5 border-white/10' 
+                        : 'bg-white border-gray-200'
+                }`}>
                     <div className="flex items-center gap-2 mb-2">
                         <TrendingUp className="w-4 h-4" style={{ color: accentHex }} />
                         <span className="text-xs font-medium" style={{ color: accentHex }}>
@@ -340,6 +400,23 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                     </div>
                     <p className={`text-2xl font-bold ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
                         {loading ? '...' : (stats?.supplyBoxOpens || 0).toLocaleString('pt-BR')}
+                    </p>
+                </div>
+                
+                {/* Mercado P2P */}
+                <div className={`p-4 rounded-2xl border backdrop-blur-xl transition-all hover:scale-[1.02] ${
+                    isDarkMode 
+                        ? 'bg-blue-500/10 border-blue-500/20' 
+                        : 'bg-blue-50 border-blue-200'
+                }`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <Store className="w-4 h-4 text-blue-400" />
+                        <span className={`text-xs font-medium ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
+                            Mercado P2P
+                        </span>
+                    </div>
+                    <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                        {loading ? '...' : (stats?.marketTransactions || 0).toLocaleString('pt-BR')}
                     </p>
                 </div>
             </div>
@@ -604,7 +681,9 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                                                         <p className={`font-bold text-lg ${
                                                             isNegative ? 'text-red-400' : 'text-green-400'
                                                         }`}>
-                                                            {isNegative ? '-' : '+'}Z$ {Math.abs(transaction.amount).toLocaleString('pt-BR')}
+                                                            {isNegative ? '-' : '+'}
+                                                            {transaction.currency === 'CASH' ? 'Z$' : 'ZP'} 
+                                                            {Math.abs(transaction.amount).toLocaleString('pt-BR')}
                                                         </p>
                                                     </div>
                                                     <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>

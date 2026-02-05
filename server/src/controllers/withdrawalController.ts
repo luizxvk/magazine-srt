@@ -92,7 +92,8 @@ export const requestWithdrawal = async (req: Request, res: Response) => {
                 data: {
                     userId,
                     amount: -amountZions,
-                    reason: `Solicitação de saque - R$ ${amountBRL.toFixed(2)}`
+                    reason: `Solicitação de saque - R$ ${amountBRL.toFixed(2)}`,
+                    currency: 'CASH'
                 }
             })
         ]);
@@ -170,7 +171,8 @@ export const cancelWithdrawal = async (req: Request, res: Response) => {
                 data: {
                     userId,
                     amount: withdrawal.amountZions,
-                    reason: 'Saque cancelado - reembolso'
+                    reason: 'Saque cancelado - reembolso',
+                    currency: 'CASH'
                 }
             })
         ]);
@@ -397,7 +399,8 @@ export const rejectWithdrawal = async (req: Request, res: Response) => {
                 data: {
                     userId: withdrawal.userId,
                     amount: withdrawal.amountZions,
-                    reason: 'Saque rejeitado - reembolso'
+                    reason: 'Saque rejeitado - reembolso',
+                    currency: 'CASH'
                 }
             })
         ]);

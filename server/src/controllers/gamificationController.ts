@@ -20,6 +20,10 @@ const createRewardSchema = z.object({
 export const getRanking = async (req: Request, res: Response) => {
     try {
         const users = await prisma.user.findMany({
+            where: {
+                role: { not: 'ADMIN' }, // Excluir admins (contas dev) do ranking
+                deletedAt: null
+            },
             orderBy: { trophies: 'desc' },
             take: 10,
             select: {

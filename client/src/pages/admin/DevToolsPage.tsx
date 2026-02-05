@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Terminal, RefreshCw, Pause, Play, Trash2 } from 'lucide-react';
+import { Terminal, RefreshCw, Pause, Play, Trash2, AlertTriangle, Coins } from 'lucide-react';
 import api from '../../services/api';
 import Header from '../../components/Header';
 import LuxuriousBackground from '../../components/LuxuriousBackground';
+import { useAuth } from '../../context/AuthContext';
 
 interface Log {
     id: string;
@@ -18,7 +19,27 @@ export default function DevToolsPage() {
     const [loading, setLoading] = useState(true);
     const [autoRefresh, setAutoRefresh] = useState(true);
     const [filterSource, setFilterSource] = useState<'ALL' | 'FRONTEND' | 'BACKEND'>('ALL');
+    const [resettingZions, setResettingZions] = useState(false);
     const logsEndRef = useRef<HTMLDivElement>(null);
+    const { showSuccess, showError } = useAuth();
+
+    const handleResetZions = async () => {
+        if (!confirm('⚠️ ATENÇÃO: Isso irá ZERAR todos os Zions de TODOS os usuários (exceto admins).\n\nEssa ação é IRREVERSÍVEL!\n\nDeseja continuar?')) {
+            return;
+        }
+        
+        setResettingZions(true);
+        try {
+            const response = await api.post('/devtools/reset-zions');
+            showSuccess(`✅ ${response.data.message}`);
+            console.log('[DevTools] Reset Zions result:', response.data);
+        } catch (error) {
+            console.error('[DevTools] Failed to reset zions:', error);
+            showError('Erro ao resetar Zions');
+        } finally {
+            setResettingZions(false);
+        }
+    };
 
     const fetchLogs = async () => {
         try {
@@ -111,6 +132,27 @@ export default function DevToolsPage() {
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
+                    </div>
+
+                    {/* Danger Zone - Admin Actions */}
+                    <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <AlertTriangle className="w-5 h-5 text-red-400" />
+                            <h2 className="text-lg font-bold text-red-400">Zona de Perigo</h2>
+                        </div>
+                        <div className="flex flex-wrap gap-4">
+                            <button
+                                onClick={handleResetZions}
+                                disabled={resettingZions}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/40 rounded-lg text-red-400 hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Coins className="w-4 h-4" />
+                                {resettingZions ? 'Resetando...' : 'Reset Zions (Exceto Admins)'}
+                            </button>
+                        </div>
+                        <p className="text-red-400/60 text-xs mt-3">
+                            ⚠️ Essas ações são irreversíveis. Use com cuidado.
+                        </p>
                     </div>
 
                     {/* Console Window */}

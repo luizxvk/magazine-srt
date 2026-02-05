@@ -30,7 +30,7 @@ const MAINTENANCE_MODE = false;
 const MAINTENANCE_MESSAGE = 'Estamos em manutenção! 🚧 Aguarde, em breve lançaremos a versão Beta com novidades incríveis. Fique atento às nossas redes sociais!';
 
 // Admin-only mode - blocks all users except those with ADMIN role
-const ADMIN_ONLY_MODE = true;
+const ADMIN_ONLY_MODE = false; // Liberado para todos os usuários em 05/02/2026
 const ADMIN_ONLY_MESSAGE = 'Acesso restrito. A plataforma está em modo de testes. Apenas administradores podem acessar no momento.';
 
 export const register = async (req: Request, res: Response) => {

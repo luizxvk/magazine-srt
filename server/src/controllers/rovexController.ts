@@ -72,7 +72,7 @@ export async function getCommunityConfigEndpoint(req: Request, res: Response) {
       tierVipName: config.tierVipName,
       tierVipColor: config.tierVipColor,
       tierStdName: config.tierStdName,
-      tierStdColor: config.tierStdColor,
+      tierStdColor: config.backgroundColor, // backgroundColor é usado como cor do tier std
       xpName: config.xpName,
       
       limits: config.limits,

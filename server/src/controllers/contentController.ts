@@ -47,8 +47,12 @@ export const checkEliteRankingWinner = async (req: AuthRequest, res: Response) =
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        // Get top 1 user by trophies
+        // Get top 1 user by trophies (excluding ADMINs - dev accounts)
         const topUser = await prisma.user.findFirst({
+            where: {
+                role: { not: 'ADMIN' },
+                deletedAt: null
+            },
             orderBy: { trophies: 'desc' },
             select: { id: true, name: true, trophies: true }
         });
@@ -114,8 +118,12 @@ export const claimEliteRankingReward = async (req: AuthRequest, res: Response) =
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        // Verify user is the winner
+        // Verify user is the winner (excluding ADMINs - dev accounts)
         const topUser = await prisma.user.findFirst({
+            where: {
+                role: { not: 'ADMIN' },
+                deletedAt: null
+            },
             orderBy: { trophies: 'desc' },
             select: { id: true }
         });

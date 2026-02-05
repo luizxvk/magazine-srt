@@ -103,7 +103,7 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
         const fetchRanking = async () => {
             setLoading(true);
             try {
-                const response = await api.get('/users');
+                const response = await api.get('/gamification/ranking');
                 if (Array.isArray(response.data)) {
                     setUsers(response.data);
                 } else {

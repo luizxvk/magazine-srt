@@ -3,6 +3,7 @@
  * 
  * Rastreia consumo/gastos de Zions pelos usuários.
  * Usado no painel admin para acompanhar transações.
+ * Suporta filtro por tipo de moeda: POINTS ou CASH
  */
 
 import { Router, Request, Response } from 'express';
@@ -14,10 +15,15 @@ const router = Router();
 /**
  * GET /api/admin/consumption-tracker
  * Retorna histórico de transações de Zions com detalhes
+ * 
+ * Query params:
+ * - period: 'today' | 'week' | 'month' | 'all'
+ * - currency: 'POINTS' | 'CASH' | 'ALL' (default: 'ALL')
+ * - limit: number (default: 200)
  */
 router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Request, res: Response) => {
     try {
-        const { period, limit = 200 } = req.query;
+        const { period, currency = 'ALL', limit = 200 } = req.query;
         
         // Calcular data base do período
         let dateFilter: Date | undefined;
@@ -37,11 +43,21 @@ router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Reque
                 dateFilter = undefined;
         }
         
+        // Construir filtro
+        const whereClause: any = {};
+        
+        if (dateFilter) {
+            whereClause.createdAt = { gte: dateFilter };
+        }
+        
+        // Filtro de moeda (POINTS ou CASH)
+        if (currency === 'POINTS' || currency === 'CASH') {
+            whereClause.currency = currency;
+        }
+        
         // Buscar histórico de Zions
         const zionHistory = await prisma.zionHistory.findMany({
-            where: dateFilter ? {
-                createdAt: { gte: dateFilter }
-            } : undefined,
+            where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
             orderBy: { createdAt: 'desc' },
             take: Number(limit),
             include: {
@@ -64,6 +80,7 @@ router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Reque
             type: categorizeReason(h.reason),
             amount: h.amount,
             description: h.reason,
+            currency: h.currency || 'POINTS', // Default para registros antigos
             createdAt: h.createdAt.toISOString(),
             user: h.user
         }));
@@ -82,7 +99,11 @@ router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Reque
         res.json({
             success: true,
             transactions,
-            stats
+            stats,
+            filters: {
+                period: period || 'all',
+                currency: currency || 'ALL'
+            }
         });
     } catch (error) {
         console.error('Error fetching consumption data:', error);
@@ -96,9 +117,15 @@ router.get('/consumption-tracker', authenticateToken, isAdmin, async (req: Reque
  */
 router.get('/zion-history', authenticateToken, isAdmin, async (req: Request, res: Response) => {
     try {
-        const { limit = 200 } = req.query;
+        const { limit = 200, currency } = req.query;
+        
+        const whereClause: any = {};
+        if (currency === 'POINTS' || currency === 'CASH') {
+            whereClause.currency = currency;
+        }
         
         const history = await prisma.zionHistory.findMany({
+            where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
             orderBy: { createdAt: 'desc' },
             take: Number(limit),
             include: {

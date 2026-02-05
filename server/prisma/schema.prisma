@@ -271,12 +271,22 @@ model PointHistory {
 }
 
 model ZionHistory {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   userId    String
   amount    Int
   reason    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  currency  ZionCurrency @default(POINTS) // POINTS ou CASH
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([currency])
+  @@index([createdAt])
+}
+
+enum ZionCurrency {
+  POINTS // Zions Points - moeda para customizações
+  CASH   // Zions Cash - moeda real (1 cash = R$ 1,00)
 }
 
 model Friendship {

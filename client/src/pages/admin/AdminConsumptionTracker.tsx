@@ -24,8 +24,13 @@ import {
     Filter,
     ChevronDown,
     Sparkles,
-    X
+    X,
+    Coins,
+    Banknote
 } from 'lucide-react';
+
+// Tipo de moeda
+type CurrencyFilter = 'ALL' | 'POINTS' | 'CASH';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
@@ -39,6 +44,7 @@ interface Transaction {
     description: string;
     itemName?: string;
     itemType?: string;
+    currency: 'POINTS' | 'CASH'; // Tipo de moeda
     createdAt: string;
     user: {
         id: string;
@@ -87,6 +93,7 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState<TransactionType | 'ALL'>('ALL');
+    const [currencyFilter, setCurrencyFilter] = useState<CurrencyFilter>('ALL');
     const [showFilters, setShowFilters] = useState(false);
     const [dateRange, setDateRange] = useState<'today' | 'week' | 'month' | 'all'>('all');
     
@@ -99,13 +106,14 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
 
     useEffect(() => {
         fetchTransactions();
-    }, [dateRange]);
+    }, [dateRange, currencyFilter]);
 
     const fetchTransactions = async () => {
         setLoading(true);
         try {
             const params: Record<string, string> = {};
             if (dateRange !== 'all') params.period = dateRange;
+            if (currencyFilter !== 'ALL') params.currency = currencyFilter;
             
             const response = await api.get('/admin/consumption-tracker', { params });
             setTransactions(response.data.transactions || []);
@@ -123,6 +131,7 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                     type: categorizeReason(h.reason),
                     amount: h.amount,
                     description: h.reason,
+                    currency: h.currency || 'POINTS',
                     createdAt: h.createdAt,
                     user: h.user || { id: h.userId, name: 'Usuário', email: '', membershipType: 'MAGAZINE' }
                 }));
@@ -237,7 +246,12 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                                     Rastreio de Consumo
                                 </h2>
                                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Acompanhe todas as transações de Zions da comunidade
+                                    {currencyFilter === 'CASH' 
+                                        ? 'Transações de Zions Cash (moeda real)'
+                                        : currencyFilter === 'POINTS'
+                                            ? 'Transações de Zions Points (customizações)'
+                                            : 'Todas as transações de Zions da comunidade'
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -351,6 +365,51 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                                     : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-gray-300'
                             } focus:outline-none focus:ring-2 focus:ring-${accentColor}-500/20`}
                         />
+                    </div>
+                    
+                    {/* Filtro de Moeda (Cash / Points) */}
+                    <div className={`flex rounded-xl border overflow-hidden ${
+                        isDarkMode ? 'border-white/10' : 'border-gray-200'
+                    }`}>
+                        <button
+                            onClick={() => setCurrencyFilter('ALL')}
+                            className={`px-3 py-2 text-sm font-medium transition-all flex items-center gap-1.5 ${
+                                currencyFilter === 'ALL'
+                                    ? 'text-white'
+                                    : isDarkMode 
+                                        ? 'text-gray-400 hover:text-white hover:bg-white/5' 
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                            }`}
+                            style={currencyFilter === 'ALL' ? { backgroundColor: accentHex } : undefined}
+                        >
+                            Tudo
+                        </button>
+                        <button
+                            onClick={() => setCurrencyFilter('CASH')}
+                            className={`px-3 py-2 text-sm font-medium transition-all flex items-center gap-1.5 ${
+                                currencyFilter === 'CASH'
+                                    ? 'bg-green-500 text-white'
+                                    : isDarkMode 
+                                        ? 'text-gray-400 hover:text-white hover:bg-white/5' 
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                            }`}
+                        >
+                            <Banknote className="w-4 h-4" />
+                            <span className="hidden sm:inline">Cash</span>
+                        </button>
+                        <button
+                            onClick={() => setCurrencyFilter('POINTS')}
+                            className={`px-3 py-2 text-sm font-medium transition-all flex items-center gap-1.5 ${
+                                currencyFilter === 'POINTS'
+                                    ? 'bg-purple-500 text-white'
+                                    : isDarkMode 
+                                        ? 'text-gray-400 hover:text-white hover:bg-white/5' 
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                            }`}
+                        >
+                            <Coins className="w-4 h-4" />
+                            <span className="hidden sm:inline">Points</span>
+                        </button>
                     </div>
                     
                     {/* Período */}
@@ -536,16 +595,27 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                                                 
                                                 {/* Valor */}
                                                 <div className="text-right flex-shrink-0">
-                                                    <p className={`font-bold text-lg ${
-                                                        isNegative ? 'text-red-400' : 'text-green-400'
-                                                    }`}>
-                                                        {isNegative ? '-' : '+'}Z$ {Math.abs(transaction.amount).toLocaleString('pt-BR')}
-                                                    </p>
+                                                    <div className="flex items-center justify-end gap-1.5">
+                                                        {transaction.currency === 'CASH' ? (
+                                                            <Banknote className="w-4 h-4 text-green-500" />
+                                                        ) : (
+                                                            <Coins className="w-4 h-4 text-purple-400" />
+                                                        )}
+                                                        <p className={`font-bold text-lg ${
+                                                            isNegative ? 'text-red-400' : 'text-green-400'
+                                                        }`}>
+                                                            {isNegative ? '-' : '+'}Z$ {Math.abs(transaction.amount).toLocaleString('pt-BR')}
+                                                        </p>
+                                                    </div>
                                                     <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                                                         {new Date(transaction.createdAt).toLocaleTimeString('pt-BR', {
                                                             hour: '2-digit',
                                                             minute: '2-digit'
                                                         })}
+                                                        {' · '}
+                                                        <span className={transaction.currency === 'CASH' ? 'text-green-500' : 'text-purple-400'}>
+                                                            {transaction.currency === 'CASH' ? 'Cash' : 'Points'}
+                                                        </span>
                                                     </p>
                                                 </div>
                                             </div>

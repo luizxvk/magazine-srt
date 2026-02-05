@@ -4,7 +4,7 @@ import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import AdminGridDashboard from '../components/AdminGridDashboard';
-import { Trash2, Gift, Edit2, User as UserIcon, Check, X, Package, Wallet } from 'lucide-react';
+import { Trash2, Gift, Edit2, User as UserIcon, Check, X, Package, ShoppingBag } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import AdminCreatePost from '../components/AdminCreatePost';
@@ -16,7 +16,7 @@ import BadgeManager from '../components/BadgeManager';
 import AdminFeedbackCard from '../components/AdminFeedbackCard';
 import AdminEliteReward from '../components/AdminEliteReward';
 import AdminProducts from './admin/AdminProducts';
-import AdminWithdrawals from './admin/AdminWithdrawals';
+import AdminConsumptionTracker from './admin/AdminConsumptionTracker';
 
 interface Reward {
     id: string;
@@ -256,10 +256,10 @@ export default function AdminDashboard() {
                     </button>
                     <button
                         onClick={() => setShowWithdrawals(true)}
-                        className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 rounded-xl hover:from-green-500/30 hover:to-green-600/30 transition-all text-white font-medium"
+                        className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500/20 to-orange-600/20 border border-amber-500/30 rounded-xl hover:from-amber-500/30 hover:to-orange-600/30 transition-all text-white font-medium"
                     >
-                        <Wallet className="w-5 h-5 text-green-400" />
-                        <span>Gerenciar Saques</span>
+                        <ShoppingBag className="w-5 h-5 text-amber-400" />
+                        <span>Rastreio de Consumo</span>
                     </button>
                 </div>
 
@@ -551,11 +551,11 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {/* Withdrawals Modal */}
+            {/* Consumption Tracker Modal */}
             {showWithdrawals && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-gray-900/95 border border-white/10 rounded-2xl">
-                        <AdminWithdrawals onClose={() => setShowWithdrawals(false)} />
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="w-full max-w-5xl max-h-[90vh] overflow-hidden bg-gray-900/95 border border-white/10 rounded-3xl shadow-2xl">
+                        <AdminConsumptionTracker onClose={() => setShowWithdrawals(false)} />
                     </div>
                 </div>
             )}

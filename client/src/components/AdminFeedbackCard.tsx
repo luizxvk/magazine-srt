@@ -223,14 +223,14 @@ export default function AdminFeedbackCard() {
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <RatingDisplay label="Interface" value={Math.round(stats.averages.interface)} />
-                            <RatingDisplay label="Navegação" value={Math.round(stats.averages.navigation)} />
-                            <RatingDisplay label="Performance" value={Math.round(stats.averages.performance)} />
-                            <RatingDisplay label="Design" value={Math.round(stats.averages.design)} />
-                            <RatingDisplay label="Funcionalidades" value={Math.round(stats.averages.features)} />
-                            <RatingDisplay label="Comunidade" value={Math.round(stats.averages.community)} />
-                            <RatingDisplay label="Customização" value={Math.round(stats.averages.customization)} />
-                            <RatingDisplay label="Suporte" value={Math.round(stats.averages.support)} />
+                            <RatingDisplay label="Interface do site" value={Math.round(stats.averages.interface)} />
+                            <RatingDisplay label="Facilidade de navegação" value={Math.round(stats.averages.navigation)} />
+                            <RatingDisplay label="Velocidade e performance" value={Math.round(stats.averages.performance)} />
+                            <RatingDisplay label="Design visual" value={Math.round(stats.averages.design)} />
+                            <RatingDisplay label="Funcionalidades disponíveis" value={Math.round(stats.averages.features)} />
+                            <RatingDisplay label="Experiência com a comunidade" value={Math.round(stats.averages.community)} />
+                            <RatingDisplay label="Sistema de customização" value={Math.round(stats.averages.customization)} />
+                            <RatingDisplay label="Suporte e ajuda" value={Math.round(stats.averages.support)} />
                         </div>
                     </div>
                 )}
@@ -324,14 +324,14 @@ export default function AdminFeedbackCard() {
                                         <div>
                                             <h5 className={`text-xs font-semibold ${themeText} mb-2`}>Avaliações</h5>
                                             <div className="grid grid-cols-2 gap-x-4">
-                                                <RatingDisplay label="Interface" value={feedback.interfaceRating} />
-                                                <RatingDisplay label="Navegação" value={feedback.navigationRating} />
-                                                <RatingDisplay label="Performance" value={feedback.performanceRating} />
-                                                <RatingDisplay label="Design" value={feedback.designRating} />
-                                                <RatingDisplay label="Funcionalidades" value={feedback.featuresRating} />
-                                                <RatingDisplay label="Comunidade" value={feedback.communityRating} />
-                                                <RatingDisplay label="Customização" value={feedback.customizationRating} />
-                                                <RatingDisplay label="Suporte" value={feedback.supportRating} />
+                                                <RatingDisplay label="Interface do site" value={feedback.interfaceRating} />
+                                                <RatingDisplay label="Facilidade de navegação" value={feedback.navigationRating} />
+                                                <RatingDisplay label="Velocidade e performance" value={feedback.performanceRating} />
+                                                <RatingDisplay label="Design visual" value={feedback.designRating} />
+                                                <RatingDisplay label="Funcionalidades disponíveis" value={feedback.featuresRating} />
+                                                <RatingDisplay label="Experiência com a comunidade" value={feedback.communityRating} />
+                                                <RatingDisplay label="Sistema de customização" value={feedback.customizationRating} />
+                                                <RatingDisplay label="Suporte e ajuda" value={feedback.supportRating} />
                                             </div>
                                         </div>
                                         

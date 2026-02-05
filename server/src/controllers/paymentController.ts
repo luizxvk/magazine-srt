@@ -114,11 +114,13 @@ export const createPixPayment = async (req: Request, res: Response) => {
         };
         
         // Criar order via API REST diretamente (Orders API)
+        // Nota: Orders API tem campos diferentes da Preferences API
         const orderData = JSON.stringify({
             type: 'online',
             external_reference: newPurchase.id,
             total_amount: price.toFixed(2),
-            description: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
+            title: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
+            description: packageDescriptions[zions] || `Pacote de ${zions} Zions para customização e itens.`,
             payer: {
                 email: payerEmail,
                 first_name: payerFirstName
@@ -131,16 +133,7 @@ export const createPixPayment = async (req: Request, res: Response) => {
                         type: 'bank_transfer'
                     }
                 }]
-            },
-            items: [{
-                id: `zions-${zions}`,
-                title: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
-                description: packageDescriptions[zions] || `Pacote de ${zions} Zions para customização e itens.`,
-                picture_url: 'https://magazine-srt.vercel.app/assets/zions/zion-50.png',
-                category_id: 'virtual_goods',
-                quantity: 1,
-                unit_price: price.toFixed(2)
-            }]
+            }
         });
 
         const idempotencyKey = `pix-${newPurchase.id}-${Date.now()}`;

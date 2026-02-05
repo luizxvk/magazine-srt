@@ -40,6 +40,8 @@ interface User {
     profileBgScale?: number | null;
     profileBgPosX?: number | null;
     profileBgPosY?: number | null;
+    // Beta reward
+    betaRewardClaimed?: boolean;
 }
 
 export interface DailyLoginStatus {

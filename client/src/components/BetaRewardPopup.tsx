@@ -24,19 +24,32 @@ export default function BetaRewardPopup() {
         // Só mostrar se:
         // 1. Usuário está logado
         // 2. Data atual é >= 05/02/2026 (lançamento v0.5.0)
-        // 3. Versão atual é 5.0.x
-        // 4. Usuário ainda não resgatou o brinde
+        // 3. Versão atual é 0.5.x
+        // 4. Usuário ainda não resgatou o brinde (nem no servidor, nem no localStorage)
         if (!user) return;
 
         const now = new Date();
         const isAfterLaunch = now >= LAUNCH_DATE;
         const versionMatch = currentVersion.startsWith(BETA_REWARD_VERSION);
-        const hasClaimedReward = localStorage.getItem(`beta_reward_claimed_${user.id}`);
+        const hasClaimedLocal = localStorage.getItem(`beta_reward_claimed_${user.id}`);
+        const hasClaimedServer = (user as any).betaRewardClaimed === true;
+
+        console.log('[BetaReward] Check:', {
+            isAfterLaunch,
+            versionMatch,
+            currentVersion,
+            hasClaimedLocal,
+            hasClaimedServer,
+            userId: user.id
+        });
 
         // NÃO mostrar antes do lançamento
         if (!isAfterLaunch) return;
 
-        if (versionMatch && !hasClaimedReward) {
+        // NÃO mostrar se já resgatou (servidor OU local)
+        if (hasClaimedServer || hasClaimedLocal) return;
+
+        if (versionMatch) {
             // Delay para não conflitar com outros modais
             const timer = setTimeout(() => setIsOpen(true), 3000);
             return () => clearTimeout(timer);

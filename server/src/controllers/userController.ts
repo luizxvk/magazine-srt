@@ -332,6 +332,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 profileBgScale: true,
                 profileBgPosX: true,
                 profileBgPosY: true,
+                betaRewardClaimed: true,
                 _count: {
                     select: {
                         posts: true

@@ -105,14 +105,24 @@ export const createPixPayment = async (req: Request, res: Response) => {
         
         console.log(`[PAYMENT] Mode: ${isSandbox ? 'SANDBOX' : 'PRODUCTION'} - Payer: ${payerFirstName} - Email: ${payerEmail}`);
         
+        // Descrições e benefícios por pacote
+        const packageDescriptions: Record<number, string> = {
+            500: 'Pacote inicial de Zions para customização de perfil e itens exclusivos.',
+            1100: 'Pacote intermediário com bônus de 10%. Ideal para desbloquear backgrounds e cores.',
+            2500: 'Pacote avançado com 25% de bônus! Libere Theme Packs e conquistas premium.',
+            5500: 'Pacote premium com 37% de bônus! Acesso a itens raros e exclusivos.',
+            12000: 'Pacote supremo com 50% de bônus! Máximo valor, itens lendários disponíveis.'
+        };
+        
         // Criar order via API REST diretamente (Orders API)
         const orderData = JSON.stringify({
             type: 'online',
             external_reference: newPurchase.id,
             total_amount: price.toFixed(2),
+            description: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
             payer: {
                 email: payerEmail,
-                first_name: 'APRO' // APRO = aprovação automática em sandbox
+                first_name: isSandbox ? 'APRO' : payerFirstName
             },
             transactions: {
                 payments: [{
@@ -122,7 +132,16 @@ export const createPixPayment = async (req: Request, res: Response) => {
                         type: 'bank_transfer'
                     }
                 }]
-            }
+            },
+            items: [{
+                id: `zions-${zions}`,
+                title: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
+                description: packageDescriptions[zions] || `Pacote de ${zions} Zions para customização e itens.`,
+                picture_url: 'https://magazine-srt.vercel.app/assets/zions/zion-50.png',
+                category_id: 'virtual_goods',
+                quantity: 1,
+                unit_price: price.toFixed(2)
+            }]
         });
 
         const idempotencyKey = `pix-${newPurchase.id}-${Date.now()}`;
@@ -578,12 +597,24 @@ export const createZionsPreference = async (req: Request, res: Response) => {
             }
         });
 
+        // Descrições e benefícios por pacote
+        const packageDescriptions: Record<number, string> = {
+            500: 'Pacote inicial de Zions para customização de perfil e itens exclusivos.',
+            1100: 'Pacote intermediário com bônus de 10%. Ideal para desbloquear backgrounds e cores.',
+            2500: 'Pacote avançado com 25% de bônus! Libere Theme Packs e conquistas premium.',
+            5500: 'Pacote premium com 37% de bônus! Acesso a itens raros e exclusivos.',
+            12000: 'Pacote supremo com 50% de bônus! Máximo valor, itens lendários disponíveis.'
+        };
+
         const result = await preference.create({
             body: {
                 items: [
                     {
                         id: `zions-${zions}`,
-                        title: `${zions} Zions - Magazine MGT`,
+                        title: `${zions.toLocaleString('pt-BR')} Zions - Magazine MGT`,
+                        description: packageDescriptions[zions] || `Pacote de ${zions} Zions para a plataforma Magazine MGT. Use para customizar seu perfil, comprar itens na loja e participar do marketplace.`,
+                        picture_url: 'https://magazine-srt.vercel.app/assets/zions/zion-50.png',
+                        category_id: 'virtual_goods',
                         quantity: 1,
                         unit_price: price,
                         currency_id: 'BRL'
@@ -593,6 +624,7 @@ export const createZionsPreference = async (req: Request, res: Response) => {
                     email: (req as any).user.email
                 },
                 external_reference: newPurchase.id,
+                statement_descriptor: 'MAGAZINE MGT',
                 back_urls: {
                     success: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/profile?payment=success`,
                     failure: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/profile?payment=failure`,

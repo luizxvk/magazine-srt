@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight } from 'lucide-react';
+import { X, ChevronRight, Sparkles, Trophy, Coins, Users, Radio, ShoppingBag, Palette, MessageCircle, Crown, Zap, Gift, Target, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.1';
+const TOUR_VERSION = '0.5.0-rc.2';
 
 interface WelcomeTourProps {
     isOpen?: boolean;
@@ -14,6 +15,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
     const [step, setStep] = useState(0);
     const [internalIsVisible, setInternalIsVisible] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
+    const isDark = theme === 'dark';
 
     // Use external state if provided, otherwise use internal state
     const isVisible = externalIsOpen !== undefined ? externalIsOpen : internalIsVisible;
@@ -46,165 +48,382 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
         }
     };
 
-    const steps = isMGT ? [
-        {
-            title: "Bem-vindo à MGT",
-            description: "Você faz parte de uma comunidade exclusiva! Aqui você terá acesso a funcionalidades únicas, recompensas especiais e muito mais.",
-            emoji: "🌟",
-            features: ["Acesso exclusivo MGT", "Tema esmeralda personalizado", "Benefícios VIP"]
-        },
-        {
-            title: "Feed & Comunidade",
-            description: "Compartilhe momentos, crie posts com imagens, interaja com curtidas e comentários. Conecte-se com outros membros!",
-            emoji: "📱",
-            features: ["Posts com mídia", "Curtidas e comentários", "Stories temporários"]
-        },
-        {
-            title: "Sistema de Zions",
-            description: "Nossa moeda virtual! Ganhe Zions por engajamento: posts, curtidas, comentários e login diário.",
-            emoji: "⚡",
-            features: ["Recompensas diárias", "Bônus por engajamento", "Multiplicadores"]
-        },
-        {
-            title: "Loja & Recompensas",
-            description: "Troque seus Zions por recompensas reais! Gift cards, itens exclusivos e muito mais.",
-            emoji: "🛒",
-            features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
-        },
-        {
-            title: "Ranking & Conquistas",
-            description: "Suba de nível, desbloqueie badges exclusivos e dispute posições no ranking global!",
-            emoji: "🏆",
-            features: ["Sistema de níveis", "Badges colecionáveis", "Ranking semanal"]
-        },
-        {
-            title: "Eventos & Mais",
-            description: "Acesso a eventos VIP, rádio integrada, grupos e muito mais recursos por vir!",
-            emoji: "📅",
-            features: ["Eventos exclusivos", "Rádio Lo-Fi", "Grupos privados"]
-        }
-    ] : [
-        {
-            title: "Bem-vindo ao Magazine",
-            description: "Uma plataforma exclusiva que combina rede social, gamificação e recompensas reais. Explore tudo o que preparamos para você!",
-            emoji: "🌟",
-            features: ["Rede social premium", "Sistema de recompensas", "Comunidade exclusiva"]
-        },
-        {
-            title: "Feed & Posts",
-            description: "Compartilhe seus momentos com posts, imagens e interaja com a comunidade através de curtidas e comentários.",
-            emoji: "📱",
-            features: ["Posts com mídia", "Curtidas e comentários", "Stories 24h"]
-        },
-        {
-            title: "Sistema de Zions",
-            description: "Ganhe Zions (nossa moeda virtual) por tudo que você faz: posts, curtidas, comentários, login diário e mais!",
-            emoji: "⚡",
-            features: ["Moeda virtual", "Recompensas diárias", "Bônus de engajamento"]
-        },
-        {
-            title: "Loja Premium",
-            description: "Use seus Zions para resgatar recompensas reais! Gift cards, itens exclusivos e muito mais.",
-            emoji: "🛒",
-            features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
-        },
-        {
-            title: "Ranking & Níveis",
-            description: "Suba de nível com sua atividade, colecione badges exclusivos e dispute posições no ranking!",
-            emoji: "🏆",
-            features: ["15 níveis", "Badges únicos", "Ranking global"]
-        },
-        {
-            title: "Recursos Extras",
-            description: "Rádio integrada, eventos, grupos de chat, customização de perfil e muito mais funcionalidades!",
-            emoji: "✨",
-            features: ["Rádio Lo-Fi", "Eventos VIP", "Customização"]
-        }
+    // Features for the welcome screen
+    const welcomeFeatures = [
+        { icon: Users, label: 'Comunidade', desc: 'Conecte-se com outros membros' },
+        { icon: Coins, label: 'Zions', desc: 'Ganhe moedas virtuais' },
+        { icon: Trophy, label: 'Ranking', desc: 'Dispute as melhores posições' },
+        { icon: Gift, label: 'Recompensas', desc: 'Troque por prêmios reais' },
+        { icon: Palette, label: 'Customização', desc: 'Personalize seu perfil' },
+        { icon: MessageCircle, label: 'Chat', desc: 'Converse em tempo real' },
+        { icon: Radio, label: 'Rádio', desc: 'Lo-Fi 24/7' },
+        { icon: ShoppingBag, label: 'Loja', desc: 'Itens exclusivos' },
     ];
+
+    const steps = [
+        // Step 0: Welcome Hero Screen (NEW)
+        {
+            type: 'welcome-hero',
+            title: isMGT ? "Bem-vindo à MGT" : "Bem-vindo ao Magazine",
+            subtitle: isMGT 
+                ? "Velocidade e Poder" 
+                : "A Elite do Sucesso",
+            description: "Uma experiência social premium com gamificação, recompensas reais e uma comunidade exclusiva.",
+        },
+        // Regular steps
+        ...(isMGT ? [
+            {
+                title: "Sua Comunidade Exclusiva",
+                description: "Você faz parte de uma comunidade exclusiva! Aqui você terá acesso a funcionalidades únicas, recompensas especiais e muito mais.",
+                emoji: "🌟",
+                features: ["Acesso exclusivo MGT", "Tema esmeralda personalizado", "Benefícios VIP"]
+            },
+            {
+                title: "Feed & Comunidade",
+                description: "Compartilhe momentos, crie posts com imagens, interaja com curtidas e comentários. Conecte-se com outros membros!",
+                emoji: "📱",
+                features: ["Posts com mídia", "Curtidas e comentários", "Stories temporários"]
+            },
+            {
+                title: "Sistema de Zions",
+                description: "Nossa moeda virtual! Ganhe Zions por engajamento: posts, curtidas, comentários e login diário.",
+                emoji: "⚡",
+                features: ["Recompensas diárias", "Bônus por engajamento", "Multiplicadores"]
+            },
+            {
+                title: "Loja & Recompensas",
+                description: "Troque seus Zions por recompensas reais! Gift cards, itens exclusivos e muito mais.",
+                emoji: "🛒",
+                features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
+            },
+            {
+                title: "Ranking & Conquistas",
+                description: "Suba de nível, desbloqueie badges exclusivos e dispute posições no ranking global!",
+                emoji: "🏆",
+                features: ["Sistema de níveis", "Badges colecionáveis", "Ranking semanal"]
+            },
+            {
+                title: "Eventos & Mais",
+                description: "Acesso a eventos VIP, rádio integrada, grupos e muito mais recursos por vir!",
+                emoji: "📅",
+                features: ["Eventos exclusivos", "Rádio Lo-Fi", "Grupos privados"]
+            }
+        ] : [
+            {
+                title: "Sua Comunidade Premium",
+                description: "Uma plataforma exclusiva que combina rede social, gamificação e recompensas reais. Explore tudo o que preparamos para você!",
+                emoji: "🌟",
+                features: ["Rede social premium", "Sistema de recompensas", "Comunidade exclusiva"]
+            },
+            {
+                title: "Feed & Posts",
+                description: "Compartilhe seus momentos com posts, imagens e interaja com a comunidade através de curtidas e comentários.",
+                emoji: "📱",
+                features: ["Posts com mídia", "Curtidas e comentários", "Stories 24h"]
+            },
+            {
+                title: "Sistema de Zions",
+                description: "Ganhe Zions (nossa moeda virtual) por tudo que você faz: posts, curtidas, comentários, login diário e mais!",
+                emoji: "⚡",
+                features: ["Moeda virtual", "Recompensas diárias", "Bônus de engajamento"]
+            },
+            {
+                title: "Loja Premium",
+                description: "Use seus Zions para resgatar recompensas reais! Gift cards, itens exclusivos e muito mais.",
+                emoji: "🛒",
+                features: ["Gift Cards", "Itens exclusivos", "Recompensas rotativas"]
+            },
+            {
+                title: "Ranking & Níveis",
+                description: "Suba de nível com sua atividade, colecione badges exclusivos e dispute posições no ranking!",
+                emoji: "🏆",
+                features: ["15 níveis", "Badges únicos", "Ranking global"]
+            },
+            {
+                title: "Recursos Extras",
+                description: "Rádio integrada, eventos, grupos de chat, customização de perfil e muito mais funcionalidades!",
+                emoji: "✨",
+                features: ["Rádio Lo-Fi", "Eventos VIP", "Customização"]
+            }
+        ])
+    ];
+
+    const currentStep = steps[step];
+    const isWelcomeHero = currentStep.type === 'welcome-hero';
 
     if (!isVisible) return null;
 
+    // Accent colors based on membership
+    const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const accentGlow = isMGT ? 'shadow-[0_0_60px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_60px_rgba(212,175,55,0.3)]';
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4">
-            <div className={`${theme === 'light' ? 'bg-white' : (isMGT ? 'bg-emerald-950/90' : 'bg-[#0a0a0a]')} border ${theme === 'light' ? (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20') : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative shadow-[0_0_50px_rgba(212,175,55,0.2)]`}>
-                {/* BETA Badge */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
-                        BETA v0.4.22
-                    </span>
-                </div>
-
-                <button
-                    onClick={handleClose}
-                    className={`absolute top-4 right-4 ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-white'} transition-colors z-10`}
-                    aria-label="Fechar tour"
-                >
-                    <X className="w-6 h-6" />
-                </button>
-
-                {/* Emoji centered in card - pushed down to account for badge */}
-                <div className="pt-6 pb-4">
-                    <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
-                        <div className={`w-full h-full ${theme === 'light' ? (isMGT ? 'bg-emerald-50' : 'bg-gold-50') : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-                            <span className="text-4xl sm:text-5xl">{steps[step].emoji}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h2 className={`text-xl sm:text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-emerald-300' : 'text-gold-300')} mb-2`}>
-                    {steps[step].title}
-                </h2>
-                
-                <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} mb-4 leading-relaxed text-sm sm:text-base`}>
-                    {steps[step].description}
-                </p>
-
-                {/* Feature Pills */}
-                <div className="flex flex-wrap justify-center gap-2 mb-6">
-                    {steps[step].features.map((feature, i) => (
-                        <span 
-                            key={i}
-                            className={`px-3 py-1 text-xs rounded-full ${theme === 'light' 
-                                ? (isMGT ? 'bg-emerald-100 text-emerald-700' : 'bg-gold-100 text-gold-700')
-                                : (isMGT ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-gold-500/10 text-gold-400 border border-gold-500/20')
-                            }`}
-                        >
-                            {feature}
-                        </span>
-                    ))}
-                </div>
-
-                {/* Progress & Navigation */}
-                <div className="flex items-center justify-between">
-                    <div className="flex gap-1.5">
-                        {steps.map((_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setStep(i)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === step 
-                                    ? (isMGT ? 'bg-emerald-500 w-6' : 'bg-gold-500 w-6') 
-                                    : (theme === 'light' ? 'bg-gray-300 hover:bg-gray-400' : 'bg-gray-700 hover:bg-gray-600')
-                                }`}
-                            />
-                        ))}
-                    </div>
-                    <button
-                        onClick={handleNext}
-                        className={`flex items-center gap-2 ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'} text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg`}
+        <AnimatePresence>
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
+            >
+                {isWelcomeHero ? (
+                    // =============================================
+                    // WELCOME HERO SCREEN - Apple Vision Pro Style
+                    // =============================================
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                        className={`relative max-w-2xl w-full ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl rounded-[2rem] border ${accentBorder} ${accentGlow} overflow-hidden`}
                     >
-                        {step === steps.length - 1 ? 'Começar!' : 'Próximo'}
-                        <ChevronRight className="w-4 h-4" />
-                    </button>
-                </div>
+                        {/* Animated gradient background */}
+                        <div className="absolute inset-0 overflow-hidden">
+                            <div className={`absolute -top-1/2 -left-1/2 w-full h-full ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded-full blur-3xl animate-pulse`} />
+                            <div className={`absolute -bottom-1/2 -right-1/2 w-full h-full ${isMGT ? 'bg-emerald-600/5' : 'bg-amber-500/5'} rounded-full blur-3xl animate-pulse delay-1000`} />
+                        </div>
 
-                {/* Skip link */}
-                <button 
-                    onClick={handleClose}
-                    className={`mt-4 text-xs ${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-gray-300'} transition-colors`}
-                >
-                    Pular introdução
-                </button>
-            </div>
-        </div>
+                        {/* Close button */}
+                        <button
+                            onClick={handleClose}
+                            className={`absolute top-5 right-5 z-20 p-2 rounded-full ${isDark ? 'bg-white/10 hover:bg-white/20 text-white/60' : 'bg-black/5 hover:bg-black/10 text-black/40'} transition-all`}
+                            aria-label="Fechar"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="relative z-10 p-8 sm:p-10">
+                            {/* BETA Badge */}
+                            <motion.div 
+                                initial={{ y: -20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.2 }}
+                                className="flex justify-center mb-6"
+                            >
+                                <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold ${isDark ? `${isMGT ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}` : `${isMGT ? 'bg-emerald-100 text-emerald-700' : 'bg-gold-100 text-gold-700'}`} border backdrop-blur-sm`}>
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    BETA v{TOUR_VERSION}
+                                </span>
+                            </motion.div>
+
+                            {/* Logo/Icon */}
+                            <motion.div 
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.3, type: 'spring', damping: 15 }}
+                                className="flex justify-center mb-6"
+                            >
+                                <div className={`relative w-24 h-24 rounded-3xl ${isDark ? `${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`} flex items-center justify-center border ${accentBorder}`}>
+                                    <Crown className={`w-12 h-12 ${accentText}`} />
+                                    {/* Glow effect */}
+                                    <div className={`absolute inset-0 rounded-3xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} blur-xl animate-pulse`} />
+                                </div>
+                            </motion.div>
+
+                            {/* Title */}
+                            <motion.div 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                                className="text-center mb-2"
+                            >
+                                <h1 className={`text-3xl sm:text-4xl font-serif font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    {currentStep.title}
+                                </h1>
+                            </motion.div>
+
+                            {/* Subtitle */}
+                            <motion.div 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                                className="text-center mb-4"
+                            >
+                                <span className={`text-lg font-medium ${accentText}`}>
+                                    {currentStep.subtitle}
+                                </span>
+                            </motion.div>
+
+                            {/* Description */}
+                            <motion.p 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.6 }}
+                                className={`text-center ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-8 max-w-md mx-auto`}
+                            >
+                                {currentStep.description}
+                            </motion.p>
+
+                            {/* Features Grid - Apple Vision Pro style */}
+                            <motion.div 
+                                initial={{ y: 30, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.7 }}
+                                className="grid grid-cols-4 gap-3 mb-8"
+                            >
+                                {welcomeFeatures.map((feature, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ scale: 0.8, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ delay: 0.8 + idx * 0.05 }}
+                                        className={`group relative flex flex-col items-center p-3 rounded-2xl ${isDark ? 'bg-white/[0.04] hover:bg-white/[0.08]' : 'bg-gray-100/80 hover:bg-gray-200/80'} border ${isDark ? 'border-white/[0.06]' : 'border-gray-200'} transition-all cursor-default`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl ${isDark ? `${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
+                                            <feature.icon className={`w-5 h-5 ${accentText}`} />
+                                        </div>
+                                        <span className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                                            {feature.label}
+                                        </span>
+                                        {/* Tooltip on hover */}
+                                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                                            <div className={`px-2 py-1 rounded-lg text-[10px] whitespace-nowrap ${isDark ? 'bg-white/10 text-white' : 'bg-black/80 text-white'} backdrop-blur-sm`}>
+                                                {feature.desc}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+
+                            {/* Highlights row */}
+                            <motion.div 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 1.2 }}
+                                className="flex justify-center gap-6 mb-8"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Target className={`w-4 h-4 ${accentText}`} />
+                                    <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>15 Níveis</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <TrendingUp className={`w-4 h-4 ${accentText}`} />
+                                    <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>30+ Badges</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Zap className={`w-4 h-4 ${accentText}`} />
+                                    <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Bônus Diário</span>
+                                </div>
+                            </motion.div>
+
+                            {/* CTA Button */}
+                            <motion.div 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 1.3 }}
+                                className="flex flex-col items-center gap-4"
+                            >
+                                <button
+                                    onClick={handleNext}
+                                    className={`group relative px-8 py-4 ${accentBg} hover:brightness-110 text-black font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${isMGT ? 'shadow-emerald-500/25' : 'shadow-gold-500/25'}`}
+                                >
+                                    <span className="flex items-center gap-2">
+                                        Explorar Recursos
+                                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </span>
+                                </button>
+
+                                <button 
+                                    onClick={handleClose}
+                                    className={`text-sm ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors`}
+                                >
+                                    Pular introdução
+                                </button>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    // =============================================
+                    // REGULAR STEP CARDS - Features Detail
+                    // =============================================
+                    <motion.div
+                        key={step}
+                        initial={{ x: 50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -50, opacity: 0 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                        className={`${isDark ? (isMGT ? 'bg-emerald-950/90' : 'bg-[#0a0a0a]') : 'bg-white'} border ${isDark ? (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30') : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative ${accentGlow}`}
+                    >
+                        {/* BETA Badge */}
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                            <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
+                                BETA v{TOUR_VERSION}
+                            </span>
+                        </div>
+
+                        <button
+                            onClick={handleClose}
+                            className={`absolute top-4 right-4 ${isDark ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-gray-600'} transition-colors z-10`}
+                            aria-label="Fechar tour"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        {/* Emoji centered in card */}
+                        <div className="pt-6 pb-4">
+                            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+                                <div className={`w-full h-full ${isDark ? (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10') : (isMGT ? 'bg-emerald-50' : 'bg-gold-50')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                                    <span className="text-4xl sm:text-5xl">{currentStep.emoji}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 className={`text-xl sm:text-2xl font-serif ${isDark ? (isMGT ? 'text-emerald-300' : 'text-gold-300') : 'text-gray-900'} mb-2`}>
+                            {currentStep.title}
+                        </h2>
+                        
+                        <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4 leading-relaxed text-sm sm:text-base`}>
+                            {currentStep.description}
+                        </p>
+
+                        {/* Feature Pills */}
+                        <div className="flex flex-wrap justify-center gap-2 mb-6">
+                            {currentStep.features?.map((feature: string, i: number) => (
+                                <span 
+                                    key={i}
+                                    className={`px-3 py-1 text-xs rounded-full ${isDark 
+                                        ? (isMGT ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-gold-500/10 text-gold-400 border border-gold-500/20')
+                                        : (isMGT ? 'bg-emerald-100 text-emerald-700' : 'bg-gold-100 text-gold-700')
+                                    }`}
+                                >
+                                    {feature}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Progress & Navigation */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex gap-1.5">
+                                {steps.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setStep(i)}
+                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${i === step 
+                                            ? (isMGT ? 'bg-emerald-500 w-6' : 'bg-gold-500 w-6') 
+                                            : (isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400')
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                            <button
+                                onClick={handleNext}
+                                className={`flex items-center gap-2 ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'} text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg`}
+                            >
+                                {step === steps.length - 1 ? 'Começar!' : 'Próximo'}
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Skip link */}
+                        <button 
+                            onClick={handleClose}
+                            className={`mt-4 text-xs ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors`}
+                        >
+                            Pular introdução
+                        </button>
+                    </motion.div>
+                )}
+            </motion.div>
+        </AnimatePresence>
     );
 }

@@ -67,6 +67,7 @@ export default function AdminDashboard() {
     });
     const [resetPasswordModal, setResetPasswordModal] = useState<{ isOpen: boolean; userId: string; userName: string } | null>(null);
     const [rejectRequestModal, setRejectRequestModal] = useState<{ isOpen: boolean; requestId: string } | null>(null);
+    const [usersToShow, setUsersToShow] = useState(10);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
         message: '',
         isVisible: false,
@@ -487,7 +488,7 @@ export default function AdminDashboard() {
                                 </tr>
                             </thead>
                             <tbody className="text-sm divide-y divide-white/5">
-                                {usersList.map(u => (
+                                {usersList.slice(0, usersToShow).map(u => (
                                     <tr key={u.id} className="hover:bg-white/5 transition-colors group">
                                         <td className="p-3 text-white font-medium">{u.name}</td>
                                         <td className="p-3 text-gray-400">{u.email}</td>
@@ -538,6 +539,18 @@ export default function AdminDashboard() {
                                 ))}
                             </tbody>
                         </table>
+                        
+                        {/* Load More Button */}
+                        {usersToShow < usersList.length && (
+                            <div className="mt-4 flex justify-center">
+                                <button
+                                    onClick={() => setUsersToShow(prev => prev + 10)}
+                                    className="px-6 py-2 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 rounded-lg border border-gold-500/30 transition-colors text-sm font-medium"
+                                >
+                                    Carregar Mais ({usersList.length - usersToShow} restantes)
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

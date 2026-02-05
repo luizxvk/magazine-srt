@@ -8,5 +8,6 @@ router.get('/', authenticateToken, eventController.getEvents);
 router.get('/available-rewards', authenticateToken, isAdmin, eventController.getAvailableRewards);
 router.post('/', authenticateToken, isAdmin, eventController.createEvent);
 router.post('/publish-rewards', authenticateToken, isAdmin, eventController.publishEventRewards);
+router.delete('/:id', authenticateToken, isAdmin, eventController.deleteEvent);
 
 export default router;

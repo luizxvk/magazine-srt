@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calendar, Clock, Gift, Sparkles, Gamepad2 } from 'lucide-react';
+import { X, Calendar, Clock, Gift, Sparkles, Gamepad2, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -34,10 +34,12 @@ interface Event {
 }
 
 export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, showSuccess, showError } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
+    const isAdmin = user?.role === 'ADMIN';
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -54,6 +56,22 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
             console.error('Failed to fetch events', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteEvent = async (eventId: string) => {
+        if (!confirm('Tem certeza que deseja remover este evento?')) return;
+        
+        setDeleting(eventId);
+        try {
+            await api.delete(`/events/${eventId}`);
+            setEvents(prev => prev.filter(e => e.id !== eventId));
+            showSuccess('Evento removido com sucesso!');
+        } catch (error) {
+            console.error('Failed to delete event', error);
+            showError('Erro ao remover evento');
+        } finally {
+            setDeleting(null);
         }
     };
 
@@ -133,9 +151,25 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
 
                                             {/* Info Column */}
                                             <div className="flex-1 p-4">
-                                                <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'} group-hover:text-${themeColor}-500 transition-colors`}>
-                                                    {event.title}
-                                                </h3>
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'} group-hover:text-${themeColor}-500 transition-colors`}>
+                                                        {event.title}
+                                                    </h3>
+                                                    {isAdmin && (
+                                                        <button
+                                                            onClick={() => handleDeleteEvent(event.id)}
+                                                            disabled={deleting === event.id}
+                                                            className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-red-50 hover:bg-red-100 text-red-500' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400'} transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100`}
+                                                            title="Remover evento"
+                                                        >
+                                                            {deleting === event.id ? (
+                                                                <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="w-4 h-4" />
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
                                                 
                                                 {event.description && (
                                                     <p className={`text-sm line-clamp-2 mb-3 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>

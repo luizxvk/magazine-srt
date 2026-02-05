@@ -147,3 +147,41 @@ export const publishEventRewards = async (_req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to publish event rewards' });
     }
 };
+
+// Deletar evento (e desvincular recompensa se houver)
+export const deleteEvent = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        
+        // Buscar evento com recompensa vinculada
+        const event = await prisma.event.findUnique({
+            where: { id },
+            include: { linkedReward: true }
+        });
+        
+        if (!event) {
+            return res.status(404).json({ error: 'Evento não encontrado' });
+        }
+        
+        // Se tiver recompensa vinculada, desvincular (não deleta a recompensa)
+        if (event.linkedReward) {
+            await prisma.reward.update({
+                where: { id: event.linkedReward.id },
+                data: {
+                    linkedEventId: null,
+                    isEventReward: false
+                }
+            });
+        }
+        
+        // Deletar o evento
+        await prisma.event.delete({
+            where: { id }
+        });
+        
+        res.json({ success: true, message: 'Evento removido com sucesso' });
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        res.status(500).json({ error: 'Failed to delete event' });
+    }
+};

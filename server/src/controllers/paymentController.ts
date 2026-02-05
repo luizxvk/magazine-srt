@@ -113,6 +113,9 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         const idempotencyKey = `pix-${newPurchase.id}-${Date.now()}`;
         
+        // URL de webhook para receber notificações
+        const webhookUrl = `${process.env.BACKEND_URL || 'https://magazine-srt-react-server.vercel.app'}/api/payments/webhook`;
+        
         try {
             // Criar pagamento PIX usando SDK oficial do MercadoPago
             const paymentResult = await payment.create({
@@ -125,7 +128,8 @@ export const createPixPayment = async (req: Request, res: Response) => {
                         first_name: payerFirstName,
                         last_name: payerLastName
                     },
-                    external_reference: newPurchase.id
+                    external_reference: newPurchase.id,
+                    notification_url: webhookUrl
                 },
                 requestOptions: {
                     idempotencyKey
@@ -203,6 +207,9 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
+        const client = new MercadoPagoConfig({ accessToken });
+        const payment = new Payment(client);
+
         // Criar registro da compra
         const newPurchase = await prisma.zionPurchase.create({
             data: {
@@ -215,93 +222,78 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
 
         console.log(`[PAYMENT] Creating Cash PIX: Z$${totalCash} for R$${price} - User: ${userId}`);
 
-        // Em sandbox, o email PRECISA ser @testuser.com
-        const isSandbox = accessToken.includes('3116392914') || process.env.MERCADOPAGO_TEST_MODE === 'true';
-        const payerEmail = isSandbox ? 'test@testuser.com' : (user.email || 'customer@email.com');
+        const payerEmail = user.email || 'customer@email.com';
+        const payerFirstName = user.name?.split(' ')[0] || 'Usuario';
+        const payerLastName = user.name?.split(' ').slice(1).join(' ') || 'Usuario';
         
-        // Criar order via Orders API
-        const orderData = JSON.stringify({
-            type: 'online',
-            external_reference: newPurchase.id,
-            total_amount: price.toFixed(2),
-            payer: {
-                email: payerEmail,
-                first_name: 'APRO'
-            },
-            transactions: {
-                payments: [{
-                    amount: price.toFixed(2),
-                    payment_method: {
-                        id: 'pix',
-                        type: 'bank_transfer'
-                    }
-                }]
-            }
-        });
-
         const idempotencyKey = `cash-${newPurchase.id}-${Date.now()}`;
-        
-        const orderResult = await new Promise<any>((resolve, reject) => {
-            const options = {
-                hostname: 'api.mercadopago.com',
-                path: '/v1/orders',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
-                    'X-Idempotency-Key': idempotencyKey
-                }
-            };
 
-            const req = https.request(options, (res) => {
-                let body = '';
-                res.on('data', (chunk) => body += chunk);
-                res.on('end', () => {
-                    try {
-                        const json = JSON.parse(body);
-                        if (res.statusCode === 201 || res.statusCode === 200) {
-                            resolve(json);
-                        } else {
-                            console.error(`[PAYMENT] Orders API error: ${res.statusCode}`, JSON.stringify(json, null, 2));
-                            reject(new Error(json.message || json.errors?.[0]?.description || json.errors?.[0]?.message || `HTTP ${res.statusCode}`));
-                        }
-                    } catch (e) {
-                        console.error(`[PAYMENT] Failed to parse response:`, body);
-                        reject(new Error(`Failed to parse response: ${body}`));
-                    }
-                });
+        // Descrição do pacote
+        const description = bonus > 0 
+            ? `Z$${zions} + Z$${bonus} bônus Zions Cash - Magazine MGT`
+            : `Z$${zions} Zions Cash - Magazine MGT`;
+        
+        // URL de webhook para receber notificações
+        const webhookUrl = `${process.env.BACKEND_URL || 'https://magazine-srt-react-server.vercel.app'}/api/payments/webhook`;
+        
+        try {
+            // Criar pagamento PIX usando SDK oficial
+            const paymentResult = await payment.create({
+                body: {
+                    transaction_amount: price,
+                    description: description,
+                    payment_method_id: 'pix',
+                    payer: {
+                        email: payerEmail,
+                        first_name: payerFirstName,
+                        last_name: payerLastName
+                    },
+                    external_reference: newPurchase.id,
+                    notification_url: webhookUrl
+                },
+                requestOptions: {
+                    idempotencyKey
+                }
             });
 
-            req.on('error', reject);
-            req.write(orderData);
-            req.end();
-        });
+            // Atualizar registro com ID do pagamento
+            await prisma.zionPurchase.update({
+                where: { id: newPurchase.id },
+                data: { 
+                    paymentId: paymentResult.id?.toString()
+                }
+            });
 
-        // Atualizar registro com ID do pagamento
-        const paymentData = orderResult.transactions?.payments?.[0];
-        await prisma.zionPurchase.update({
-            where: { id: newPurchase.id },
-            data: { 
-                paymentId: orderResult.id || paymentData?.id
-            }
-        });
+            console.log(`[PAYMENT] Cash PIX created - PaymentID: ${paymentResult.id} - Status: ${paymentResult.status}`);
 
-        console.log(`[PAYMENT] Cash PIX created - OrderID: ${orderResult.id} - Status: ${orderResult.status}`);
-
-        const pixInfo = paymentData?.payment_method;
-        
-        res.json({
-            paymentId: orderResult.id,
-            purchaseId: newPurchase.id,
-            qrCode: pixInfo?.qr_code,
-            qrCodeBase64: pixInfo?.qr_code_base64,
-            copyPaste: pixInfo?.qr_code,
-            ticketUrl: pixInfo?.ticket_url,
-            status: orderResult.status,
-            expirationDate: orderResult.expiration_time,
-            cashAmount: totalCash,
-            bonus: bonus
-        });
+            const pixData = paymentResult.point_of_interaction?.transaction_data;
+            
+            res.json({
+                paymentId: paymentResult.id,
+                purchaseId: newPurchase.id,
+                qrCode: pixData?.qr_code,
+                qrCodeBase64: pixData?.qr_code_base64,
+                copyPaste: pixData?.qr_code,
+                ticketUrl: pixData?.ticket_url,
+                status: paymentResult.status,
+                expirationDate: paymentResult.date_of_expiration,
+                cashAmount: totalCash,
+                bonus: bonus
+            });
+        } catch (paymentError: any) {
+            console.error('[PAYMENT] Error creating Cash PIX:', paymentError.message || paymentError);
+            
+            // Marcar compra como falha
+            await prisma.zionPurchase.update({
+                where: { id: newPurchase.id },
+                data: { status: 'REJECTED' }
+            });
+            
+            return res.status(500).json({ 
+                error: 'Erro ao criar pagamento PIX', 
+                details: paymentError.message 
+            });
+        }
 
     } catch (error: any) {
         console.error('[PAYMENT] Error creating Cash PIX:', error?.message || error);
@@ -373,7 +365,7 @@ export const checkPaymentStatus = async (req: Request, res: Response) => {
             return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
         }
 
-        // Buscar a compra pelo paymentId (que na verdade é o orderId)
+        // Buscar a compra pelo paymentId
         const purchase = await prisma.zionPurchase.findFirst({
             where: { paymentId: paymentId },
             include: { user: true }
@@ -397,52 +389,28 @@ export const checkPaymentStatus = async (req: Request, res: Response) => {
             });
         }
 
-        // Verificar status no MercadoPago via Orders API
-        const orderStatus = await new Promise<any>((resolve, reject) => {
-            const options = {
-                hostname: 'api.mercadopago.com',
-                path: `/v1/orders/${paymentId}`,
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            };
+        // Verificar status no MercadoPago via Payment API
+        const client = new MercadoPagoConfig({ accessToken });
+        const payment = new Payment(client);
+        
+        const paymentResult = await payment.get({ id: Number(paymentId) });
 
-            const req = https.request(options, (res) => {
-                let body = '';
-                res.on('data', (chunk) => body += chunk);
-                res.on('end', () => {
-                    try {
-                        resolve(JSON.parse(body));
-                    } catch (e) {
-                        reject(new Error('Failed to parse response'));
-                    }
-                });
-            });
-
-            req.on('error', reject);
-            req.end();
-        });
-
-        console.log(`[PAYMENT] Order ${paymentId} status: ${orderStatus.status}`);
+        console.log(`[PAYMENT] Payment ${paymentId} status: ${paymentResult.status}`);
 
         // Se aprovado, creditar Zions
-        if (orderStatus.status === 'processed' || orderStatus.status === 'paid') {
-            const paymentData = orderStatus.transactions?.payments?.[0];
-            if (paymentData?.status === 'approved' || orderStatus.status === 'processed') {
-                await creditZionsFromPayment(purchase.id, paymentId, userId);
-                return res.json({ 
-                    status: 'approved',
-                    statusDetail: 'accredited',
-                    completed: true,
-                    zionsAmount: purchase.amount
-                });
-            }
+        if (paymentResult.status === 'approved') {
+            await creditZionsFromPayment(purchase.id, paymentId, userId);
+            return res.json({ 
+                status: 'approved',
+                statusDetail: paymentResult.status_detail || 'accredited',
+                completed: true,
+                zionsAmount: purchase.amount
+            });
         }
 
         res.json({ 
-            status: orderStatus.status === 'action_required' ? 'pending' : orderStatus.status,
-            statusDetail: orderStatus.status_detail || 'waiting_payment',
+            status: paymentResult.status || 'pending',
+            statusDetail: paymentResult.status_detail || 'waiting_payment',
             completed: false
         });
 

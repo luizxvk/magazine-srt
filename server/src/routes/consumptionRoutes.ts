@@ -14,14 +14,16 @@ const router = Router();
 
 /**
  * Inferir tipo de moeda baseado na descrição/reason
- * Registros antigos não têm o campo currency, então inferimos
+ * Registros antigos não têm o campo currency correto, então inferimos pela reason
+ * Se o banco diz CASH, confiamos. Se diz POINTS, verificamos pela reason.
  */
 function inferCurrency(reason: string, dbCurrency?: string): 'CASH' | 'POINTS' {
-    // Se já tem no banco, usar
-    if (dbCurrency === 'CASH' || dbCurrency === 'POINTS') {
-        return dbCurrency;
+    // Se o banco explicitamente diz CASH, confiar
+    if (dbCurrency === 'CASH') {
+        return 'CASH';
     }
     
+    // Para POINTS ou null, verificar pela reason (pode estar errado no banco)
     const lower = reason.toLowerCase();
     
     // Zions CASH - transações com dinheiro real

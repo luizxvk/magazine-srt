@@ -114,7 +114,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                 return (
                                     <div 
                                         key={event.id} 
-                                        className={`group relative overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-gray-50 border border-gray-200/50' : 'bg-white/[0.03] border border-white/[0.06]'} hover:border-${themeColor}-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-${themeColor}-500/5`}
+                                        className={`group relative overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-gray-50 border border-gray-200/50' : isMGT ? 'bg-emerald-950/30 border border-emerald-500/10' : 'bg-amber-950/20 border border-amber-500/10'} hover:border-${themeColor}-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-${themeColor}-500/5`}
                                     >
                                         {/* Background glow effect */}
                                         <div className={`absolute inset-0 bg-gradient-to-r from-${themeColor}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />

@@ -211,7 +211,13 @@ router.get('/zion-history', authenticateToken, isAdmin, async (req: Request, res
     try {
         const { limit = 200, currency } = req.query;
         
+        // Data de início da produção (2026-02-05) - ignora transações de teste
+        const productionStartDate = new Date('2026-02-05T00:00:00.000Z');
+        
         const history = await prisma.zionHistory.findMany({
+            where: {
+                createdAt: { gte: productionStartDate }
+            },
             orderBy: { createdAt: 'desc' },
             take: Number(limit),
             include: {

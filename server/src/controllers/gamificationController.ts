@@ -100,6 +100,23 @@ export const getBadges = async (req: Request, res: Response) => {
 
 export const getRewards = async (req: Request, res: Response) => {
     try {
+        // Auto-publicar recompensas de eventos finalizados (executa a cada request)
+        const now = new Date();
+        await prisma.reward.updateMany({
+            where: {
+                isEventReward: true,
+                publishedAt: null,
+                linkedEvent: {
+                    date: { lte: now },
+                    active: true
+                }
+            },
+            data: {
+                publishedAt: now,
+                isEventReward: false // Agora é uma recompensa normal visível
+            }
+        });
+        
         const rewards = await prisma.reward.findMany({
             where: {
                 AND: [
@@ -122,6 +139,7 @@ export const getRewards = async (req: Request, res: Response) => {
         });
         res.json(rewards);
     } catch (error) {
+        console.error('Error fetching rewards:', error);
         res.status(500).json({ error: 'Failed to fetch rewards' });
     }
 };

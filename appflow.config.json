@@ -2,7 +2,7 @@
   "root": "client",
   "apps": [
     {
-      "id": "magazine-srt",
+      "appId": "3de1f3a3",
       "root": "client"
     }
   ]

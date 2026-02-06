@@ -28,6 +28,11 @@ interface User {
     bio?: string;
     isVerified?: boolean;
     postCount?: number; // Total de posts do usuário
+    // Elite subscription fields
+    isElite?: boolean;
+    eliteUntil?: string;
+    eliteSince?: string;
+    eliteStreak?: number;
     // Customization fields
     ownedCustomizations?: string[];
     equippedBackground?: string | null;
@@ -127,7 +132,13 @@ const CLASS_BASED_BACKGROUNDS = [
     'bg_oceano',
     'bg_chuva_neon', 
     'bg_retrowave',
+    'bg_emerald',
+    'bg_ice',
+    'bg_fire',
 ];
+
+// Import backgrounds CSS
+import '../components/backgrounds/backgrounds.css';
 
 // Accent color configurations
 const ACCENT_COLORS: Record<string, string> = {
@@ -536,10 +547,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         };
 
+        // Cleanup functions for new backgrounds
+        const cleanupOrientalMatrixElements = () => {
+            const existingContainer = document.getElementById('oriental-matrix-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        };
+        
+        const cleanupConstellationElements = () => {
+            const existingContainer = document.getElementById('constellation-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        };
+        
+        const cleanupFireRainElements = () => {
+            const existingContainer = document.getElementById('fire-rain-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        };
+        
+        const cleanupNeonRainElements = () => {
+            const existingContainer = document.getElementById('neon-rain-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        };
+
         if (!isAuthenticated || !backgroundStyle) {
             // Reset to default when not authenticated or no custom background
             cleanupRainbowElements();
             cleanupInfiniteTrianglesElements();
+            cleanupMoonlitElements();
+            cleanupOrientalMatrixElements();
+            cleanupConstellationElements();
+            cleanupFireRainElements();
+            cleanupNeonRainElements();
             document.body.style.background = '';
             document.body.style.backgroundSize = '';
             document.body.style.backgroundAttachment = '';
@@ -569,6 +614,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 createRainbowElements();
                 cleanupInfiniteTrianglesElements();
                 cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
                 
                 // Save current theme for MGT before switching to light
                 if (user?.membershipType === 'MGT' && !localStorage.getItem('mgt-theme-before-rainbow')) {
@@ -580,15 +629,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else if (className === 'anim-infinite-triangles') {
                 cleanupRainbowElements();
                 cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
                 createInfiniteTrianglesElements();
             } else if (className === 'anim-moonlit-sky') {
                 cleanupRainbowElements();
                 cleanupInfiniteTrianglesElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
                 createMoonlitElements();
+            } else if (className === 'bg_emerald') {
+                cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
+                createOrientalMatrixElements();
+            } else if (className === 'bg_ice') {
+                cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
+                createConstellationElements();
+            } else if (className === 'bg_fire') {
+                cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupNeonRainElements();
+                createFireRainElements();
+            } else if (className === 'bg_chuva_neon') {
+                cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                createNeonRainElements();
             } else {
                 cleanupRainbowElements();
                 cleanupInfiniteTrianglesElements();
                 cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
             }
             
             // Clear inline styles
@@ -601,6 +694,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             cleanupRainbowElements();
             cleanupInfiniteTrianglesElements();
             cleanupMoonlitElements();
+            cleanupOrientalMatrixElements();
+            cleanupConstellationElements();
+            cleanupFireRainElements();
+            cleanupNeonRainElements();
             document.body.style.background = backgroundStyle;
             document.body.style.backgroundSize = '200% 200%';
             document.body.style.backgroundAttachment = 'fixed';
@@ -708,6 +805,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const blurOverlay = document.createElement('div');
             blurOverlay.className = 'moonlit-blur-overlay';
             container.appendChild(blurOverlay);
+            
+            document.body.appendChild(container);
+        }
+        
+        // Helper function to create Oriental Matrix elements
+        function createOrientalMatrixElements() {
+            cleanupOrientalMatrixElements();
+            
+            const container = document.createElement('div');
+            container.id = 'oriental-matrix-container';
+            container.className = 'jp-matrix';
+            
+            // Japanese katakana characters
+            const chars = [
+                'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ',
+                'サ', 'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト',
+                'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
+                'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ',
+                'ル', 'レ', 'ロ', 'ワ', 'ヲ', 'ン', 'ガ', 'ギ', 'グ', 'ゲ',
+                'ゴ', 'ザ', 'ジ', 'ズ', 'ゼ', 'ゾ', 'ダ', 'ヂ', 'ヅ', 'デ',
+                'ド', 'バ', 'ビ', 'ブ', 'ベ', 'ボ', 'パ', 'ピ', 'プ', 'ペ', 'ポ'
+            ];
+            
+            // Create 600 character spans for full screen coverage
+            for (let i = 0; i < 600; i++) {
+                const span = document.createElement('span');
+                span.textContent = chars[i % chars.length];
+                container.appendChild(span);
+            }
+            
+            document.body.appendChild(container);
+        }
+        
+        // Helper function to create Constellation elements
+        function createConstellationElements() {
+            cleanupConstellationElements();
+            
+            const container = document.createElement('div');
+            container.id = 'constellation-container';
+            container.className = 'constellation-container';
+            
+            // Create 3 star layers
+            const stars1 = document.createElement('div');
+            stars1.id = 'stars';
+            container.appendChild(stars1);
+            
+            const stars2 = document.createElement('div');
+            stars2.id = 'stars2';
+            container.appendChild(stars2);
+            
+            const stars3 = document.createElement('div');
+            stars3.id = 'stars3';
+            container.appendChild(stars3);
+            
+            document.body.appendChild(container);
+        }
+        
+        // Helper function to create Fire Rain elements
+        function createFireRainElements() {
+            cleanupFireRainElements();
+            
+            const container = document.createElement('div');
+            container.id = 'fire-rain-container';
+            container.className = 'fire-rain-container';
+            
+            const effect = document.createElement('div');
+            effect.className = 'fire-rain-effect';
+            container.appendChild(effect);
+            
+            document.body.appendChild(container);
+        }
+        
+        // Helper function to create Neon Rain elements
+        function createNeonRainElements() {
+            cleanupNeonRainElements();
+            
+            const container = document.createElement('div');
+            container.id = 'neon-rain-container';
+            container.className = 'neon-rain-container';
+            
+            const effect = document.createElement('div');
+            effect.className = 'neon-rain-effect';
+            container.appendChild(effect);
             
             document.body.appendChild(container);
         }

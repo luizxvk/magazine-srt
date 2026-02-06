@@ -22,7 +22,7 @@ interface CommentsModalProps {
 }
 
 export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded }: CommentsModalProps) {
-    const { user, showAchievement, updateUserZions, theme } = useAuth();
+    const { user, showAchievement, updateUserZions, theme, showEdgeNotification } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [isMobile, setIsMobile] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -101,8 +101,18 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
             setNewComment('');
             fetchComments();
             onCommentAdded();
-        } catch (error) {
-            console.error('Failed to add comment', error);
+        } catch (error: any) {
+            // Handle rate limit error
+            if (error.response?.status === 429 && error.response?.data?.error === 'COMMENT_RATE_LIMIT') {
+                showEdgeNotification(
+                    'warning',
+                    'Limite de Comentários',
+                    error.response.data.message || 'Você atingiu o limite de 10 comentários por hora.',
+                    { duration: 6000 }
+                );
+            } else {
+                console.error('Failed to add comment', error);
+            }
         } finally {
             setSubmitting(false);
         }

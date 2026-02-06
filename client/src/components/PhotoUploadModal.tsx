@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X, Upload, Loader2, Eye, EyeOff } from 'lucide-react';
+import { X, Upload, Eye, EyeOff } from 'lucide-react';
+import Loader from './Loader';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -155,7 +156,9 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
                                 <input {...getInputProps()} />
                                 {isCompressing ? (
                                     <div className="text-center p-8">
-                                        <Loader2 className="w-12 h-12 mx-auto mb-2 text-emerald-500 animate-spin" />
+                                        <div className="flex justify-center mb-2">
+                                            <Loader size="lg" />
+                                        </div>
                                         <p className="text-sm text-gray-400 font-medium">Otimizando imagem...</p>
                                     </div>
                                 ) : imageUrl ? (
@@ -266,7 +269,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
                             disabled={loading}
                             className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-white shadow-lg flex items-center justify-center gap-2 ${themeColors.button} ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.01] active:scale-[0.98]'} transition-all`}
                         >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+                            {loading ? <Loader size="sm" /> : <Upload className="w-5 h-5" />}
                             {loading ? 'Enviando...' : 'Adicionar Foto'}
                         </button>
                     </form>

@@ -39,17 +39,53 @@ export default function SupportButton() {
 
     // Calculate position based on window width
     const [bottomPosition, setBottomPosition] = useState('24px');
+    const [isMobile, setIsMobile] = useState(false);
+    
+    // Scroll hide/show behavior (same as bottom nav)
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
     
     useEffect(() => {
         const updatePosition = () => {
+            const mobile = window.innerWidth < 1024;
+            setIsMobile(mobile);
             // If mobile (less than 1024px), position above bottom nav
-            setBottomPosition(window.innerWidth < 1024 ? '100px' : '24px');
+            setBottomPosition(mobile ? '100px' : '24px');
         };
         
         updatePosition();
         window.addEventListener('resize', updatePosition);
         return () => window.removeEventListener('resize', updatePosition);
     }, []);
+    
+    // Scroll behavior - only on mobile
+    useEffect(() => {
+        if (!isMobile) {
+            setIsVisible(true);
+            return;
+        }
+        
+        let ticking = false;
+        const handleScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+                    const scrollingDown = currentScrollY > lastScrollY;
+                    const scrollThreshold = 20;
+                    
+                    if (Math.abs(currentScrollY - lastScrollY) > scrollThreshold) {
+                        setIsVisible(!scrollingDown || currentScrollY < 100);
+                        setLastScrollY(currentScrollY);
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+        
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isMobile, lastScrollY]);
 
     // Check if any admin is online (with error handling)
     useEffect(() => {
@@ -263,9 +299,15 @@ export default function SupportButton() {
                 )}
             </AnimatePresence>
 
-            {/* Floating Button - Always visible */}
-            <button
+            {/* Floating Button - Hides on scroll down (mobile only) */}
+            <motion.button
                 onClick={() => setIsOpen(!isOpen)}
+                initial={{ y: 0, opacity: 1 }}
+                animate={{ 
+                    y: isVisible ? 0 : 100, 
+                    opacity: isVisible ? 1 : 0 
+                }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
                 style={{
                     position: 'fixed',
                     bottom: bottomPosition,
@@ -281,10 +323,9 @@ export default function SupportButton() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s ease',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 aria-label="Abrir suporte"
             >
                 {isOpen ? (
@@ -309,7 +350,7 @@ export default function SupportButton() {
                         className="animate-pulse"
                     />
                 )}
-            </button>
+            </motion.button>
 
             {/* Support Chat Window */}
             {showChat && adminInfo && (

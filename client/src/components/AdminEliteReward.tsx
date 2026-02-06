@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Trophy, Coins, Package, Save, Loader2, Gift, Star } from 'lucide-react';
+import { Trophy, Coins, Package, Save, Gift, Star } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -80,7 +81,7 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
         return (
             <div className={`${cardBg} ${cardBorder} border rounded-2xl p-6`}>
                 <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-gold-500" />
+                    <Loader size="md" />
                 </div>
             </div>
         );
@@ -198,7 +199,7 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-400 text-black font-semibold rounded-xl transition-colors disabled:opacity-50"
             >
                 {saving ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader size="sm" />
                 ) : (
                     <Save className="w-5 h-5" />
                 )}

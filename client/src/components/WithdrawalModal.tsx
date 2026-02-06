@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Wallet, ArrowRightLeft, Loader2, Check, AlertCircle, Clock, Ban, DollarSign, Key, Mail, Phone, Hash } from 'lucide-react';
+import { X, Wallet, ArrowRightLeft, Check, AlertCircle, Clock, Ban, DollarSign, Key, Mail, Phone, Hash } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -39,7 +40,7 @@ const pixKeyTypes = [
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     PENDING: { label: 'Pendente', color: 'text-yellow-400 bg-yellow-500/10', icon: <Clock className="w-4 h-4" /> },
     APPROVED: { label: 'Aprovado', color: 'text-blue-400 bg-blue-500/10', icon: <Check className="w-4 h-4" /> },
-    PROCESSING: { label: 'Processando', color: 'text-purple-400 bg-purple-500/10', icon: <Loader2 className="w-4 h-4 animate-spin" /> },
+    PROCESSING: { label: 'Processando', color: 'text-purple-400 bg-purple-500/10', icon: <Loader size="sm" /> },
     COMPLETED: { label: 'Concluído', color: 'text-green-400 bg-green-500/10', icon: <Check className="w-4 h-4" /> },
     REJECTED: { label: 'Rejeitado', color: 'text-red-400 bg-red-500/10', icon: <Ban className="w-4 h-4" /> }
 };
@@ -202,7 +203,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
                     <div className="p-4 max-h-[60vh] overflow-y-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
-                                <Loader2 className={`w-8 h-8 animate-spin ${textAccent}`} />
+                                <Loader size="md" />
                             </div>
                         ) : activeTab === 'new' ? (
                             <div className="space-y-4">
@@ -346,7 +347,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
                                                 }`}
                                         >
                                             {submitting ? (
-                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <Loader size="sm" />
                                             ) : (
                                                 <>
                                                     <Wallet className="w-5 h-5" />

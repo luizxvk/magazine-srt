@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, BellOff, BellRing, CheckCircle, XCircle, Loader2, TestTube } from 'lucide-react';
+import { Bell, BellOff, BellRing, CheckCircle, XCircle, TestTube } from 'lucide-react';
+import Loader from './Loader';
 import pushService from '../services/pushNotificationService';
 
 interface PushNotificationSettingsProps {
@@ -111,7 +112,7 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
     if (loading) {
         return (
             <div className={`flex items-center justify-center ${compact ? 'py-2' : 'py-8'}`}>
-                <Loader2 className="w-6 h-6 animate-spin text-amber-400" />
+                <Loader size="md" />
             </div>
         );
     }
@@ -243,7 +244,7 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
                             className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-xl transition-colors disabled:opacity-50"
                         >
                             {actionLoading ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader size="sm" />
                             ) : (
                                 <BellOff className="w-4 h-4" />
                             )}
@@ -255,7 +256,7 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
                             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded-xl transition-colors disabled:opacity-50"
                         >
                             {actionLoading ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader size="sm" />
                             ) : (
                                 <TestTube className="w-4 h-4" />
                             )}
@@ -269,7 +270,7 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-medium rounded-xl transition-colors disabled:opacity-50"
                     >
                         {actionLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader size="sm" />
                         ) : (
                             <BellRing className="w-4 h-4" />
                         )}

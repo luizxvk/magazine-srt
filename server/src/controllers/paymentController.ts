@@ -1,44 +1,44 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import MercadoPagoConfig, { Preference, Payment } from 'mercadopago';
 import crypto from 'crypto';
 import https from 'https';
 
-// Packages configuration - valores fixos para evitar manipulação
-// Novos valores mais acessíveis e com melhor custo-benefício
+// Packages configuration - valores fixos para evitar manipulaÃ§Ã£o
+// Novos valores mais acessÃ­veis e com melhor custo-benefÃ­cio
 const ZION_PACKAGES: Record<number, number> = {
-    100: 4.90,      // Pacote inicial - acessível para todos
-    250: 9.90,      // Popular - bom custo-benefício
+    100: 4.90,      // Pacote inicial - acessÃ­vel para todos
+    250: 9.90,      // Popular - bom custo-benefÃ­cio
     500: 17.90,     // Entusiasta - 10% de economia
     1000: 29.90,    // Colecionador - 25% de economia
     2500: 59.90,    // Magnata - 40% de economia
 };
 
 // Pacotes de recarga de Zions Cash (com margem de lucro)
-// Usuário paga R$ X e recebe Z$ Y (onde Y < X para gerar margem)
+// UsuÃ¡rio paga R$ X e recebe Z$ Y (onde Y < X para gerar margem)
 const CASH_PACKAGES: Record<number, number> = {
     12: 15.00,      // Z$12 por R$15 (20% margem)
     25: 30.00,      // Z$25 por R$30 (16% margem)
     50: 60.00,      // Z$50 por R$60 (16% margem)
-    110: 130.00,    // Z$110 por R$130 + bônus (15% margem)
-    225: 260.00,    // Z$225 por R$260 + bônus (13% margem)
+    110: 130.00,    // Z$110 por R$130 + bÃ´nus (15% margem)
+    225: 260.00,    // Z$225 por R$260 + bÃ´nus (13% margem)
 };
 
-// Bônus para pacotes de Cash (incentiva compras maiores)
+// BÃ´nus para pacotes de Cash (incentiva compras maiores)
 const CASH_BONUS: Record<number, number> = {
     12: 0,
     25: 0,
     50: 0,
-    110: 5,   // +Z$5 bônus = Z$115 total
-    225: 15,  // +Z$15 bônus = Z$240 total
+    110: 5,   // +Z$5 bÃ´nus = Z$115 total
+    225: 15,  // +Z$15 bÃ´nus = Z$240 total
 };
 
-// Helper para verificar se o pacote é válido
+// Helper para verificar se o pacote Ã© vÃ¡lido
 const isValidPackage = (zions: number): boolean => {
     return zions in ZION_PACKAGES;
 };
 
-// Helper para gerar referência externa única
+// Helper para gerar referÃªncia externa Ãºnica
 const generateExternalRef = (userId: string, zions: number): string => {
     const timestamp = Date.now();
     const random = crypto.randomBytes(8).toString('hex');
@@ -51,19 +51,19 @@ export const createPixPayment = async (req: Request, res: Response) => {
         const userId = (req as any).user?.userId || (req as any).user?.id;
         const { zions } = req.body;
 
-        // Validação rigorosa
+        // ValidaÃ§Ã£o rigorosa
         if (!zions || typeof zions !== 'number' || !isValidPackage(zions)) {
             console.warn(`[PAYMENT] Invalid package attempt: ${zions} by user ${userId}`);
-            return res.status(400).json({ error: 'Pacote de Zions inválido' });
+            return res.status(400).json({ error: 'Pacote de Zions invÃ¡lido' });
         }
 
-        // Preço fixo do servidor - NUNCA confie no cliente
+        // PreÃ§o fixo do servidor - NUNCA confie no cliente
         const price = ZION_PACKAGES[zions];
 
         const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
         if (!accessToken) {
             console.error('[PAYMENT] MERCADOPAGO_ACCESS_TOKEN not configured');
-            return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
+            return res.status(500).json({ error: 'Sistema de pagamento nÃ£o configurado' });
         }
 
         // Debug: verificar tipo de credencial
@@ -74,10 +74,10 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado' });
+            return res.status(404).json({ error: 'UsuÃ¡rio nÃ£o encontrado' });
         }
 
-        // Gerar referência externa única para idempotência
+        // Gerar referÃªncia externa Ãºnica para idempotÃªncia
         const externalRef = generateExternalRef(userId, zions);
 
         const client = new MercadoPagoConfig({ accessToken });
@@ -95,26 +95,26 @@ export const createPixPayment = async (req: Request, res: Response) => {
 
         console.log(`[PAYMENT] Creating PIX payment: ${zions} Zions for R$${price} - User: ${userId} - PurchaseID: ${newPurchase.id}`);
 
-        // Usar Payment API para PIX (documentação oficial do MercadoPago)
+        // Usar Payment API para PIX (documentaÃ§Ã£o oficial do MercadoPago)
         const payerEmail = user.email || 'customer@email.com';
         const payerFirstName = user.name?.split(' ')[0] || 'Usuario';
         const payerLastName = user.name?.split(' ').slice(1).join(' ') || 'Usuario';
         
         console.log(`[PAYMENT] Mode: PRODUCTION - Payer: ${payerFirstName} ${payerLastName} - Email: ${payerEmail}`);
         
-        // Descrições por pacote
+        // DescriÃ§Ãµes por pacote
         const packageDescriptions: Record<number, string> = {
             100: 'Pacote de 100 Zions - Magazine MGT',
             500: 'Pacote de 500 Zions - Magazine MGT',
-            1100: 'Pacote de 1.100 Zions com bônus - Magazine MGT',
-            2500: 'Pacote de 2.500 Zions com 25% bônus - Magazine MGT',
-            5500: 'Pacote de 5.500 Zions com 37% bônus - Magazine MGT',
-            12000: 'Pacote de 12.000 Zions com 50% bônus - Magazine MGT'
+            1100: 'Pacote de 1.100 Zions com bÃ´nus - Magazine MGT',
+            2500: 'Pacote de 2.500 Zions com 25% bÃ´nus - Magazine MGT',
+            5500: 'Pacote de 5.500 Zions com 37% bÃ´nus - Magazine MGT',
+            12000: 'Pacote de 12.000 Zions com 50% bÃ´nus - Magazine MGT'
         };
 
         const idempotencyKey = `pix-${newPurchase.id}-${Date.now()}`;
         
-        // URL de webhook para receber notificações
+        // URL de webhook para receber notificaÃ§Ãµes
         const webhookUrl = `${process.env.BACKEND_URL || 'https://magazine-srt-react-server.vercel.app'}/api/payments/webhook`;
         
         try {
@@ -187,10 +187,10 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
         const userId = (req as any).user?.userId || (req as any).user?.id;
         const { zions } = req.body;
 
-        // Validação rigorosa
+        // ValidaÃ§Ã£o rigorosa
         if (!zions || typeof zions !== 'number' || !(zions in CASH_PACKAGES)) {
             console.warn(`[PAYMENT] Invalid cash package attempt: ${zions} by user ${userId}`);
-            return res.status(400).json({ error: 'Pacote de Zions Cash inválido' });
+            return res.status(400).json({ error: 'Pacote de Zions Cash invÃ¡lido' });
         }
 
         const price = CASH_PACKAGES[zions];
@@ -200,12 +200,12 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
         const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
         if (!accessToken) {
             console.error('[PAYMENT] MERCADOPAGO_ACCESS_TOKEN not configured');
-            return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
+            return res.status(500).json({ error: 'Sistema de pagamento nÃ£o configurado' });
         }
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado' });
+            return res.status(404).json({ error: 'UsuÃ¡rio nÃ£o encontrado' });
         }
 
         const client = new MercadoPagoConfig({ accessToken });
@@ -215,7 +215,7 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
         const newPurchase = await prisma.zionPurchase.create({
             data: {
                 userId,
-                amount: totalCash, // Total com bônus
+                amount: totalCash, // Total com bÃ´nus
                 price: price,
                 status: 'PENDING'
             }
@@ -229,12 +229,12 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
         
         const idempotencyKey = `cash-${newPurchase.id}-${Date.now()}`;
 
-        // Descrição do pacote
+        // DescriÃ§Ã£o do pacote
         const description = bonus > 0 
-            ? `Z$${zions} + Z$${bonus} bônus Zions Cash - Magazine MGT`
+            ? `Z$${zions} + Z$${bonus} bÃ´nus Zions Cash - Magazine MGT`
             : `Z$${zions} Zions Cash - Magazine MGT`;
         
-        // URL de webhook para receber notificações
+        // URL de webhook para receber notificaÃ§Ãµes
         const webhookUrl = `${process.env.BACKEND_URL || 'https://magazine-srt-react-server.vercel.app'}/api/payments/webhook`;
         
         try {
@@ -302,14 +302,14 @@ export const createCashPixPayment = async (req: Request, res: Response) => {
     }
 };
 
-// Simular confirmação de pagamento (apenas em modo simulação)
+// Simular confirmaÃ§Ã£o de pagamento (apenas em modo simulaÃ§Ã£o)
 export const simulatePaymentConfirmation = async (req: Request, res: Response) => {
     try {
         const { purchaseId } = req.body;
         const userId = (req as any).user?.userId || (req as any).user?.id;
 
         if (process.env.MERCADOPAGO_SIMULATION_MODE !== 'true') {
-            return res.status(403).json({ error: 'Simulação não está habilitada' });
+            return res.status(403).json({ error: 'SimulaÃ§Ã£o nÃ£o estÃ¡ habilitada' });
         }
 
         const purchase = await prisma.zionPurchase.findUnique({
@@ -318,7 +318,7 @@ export const simulatePaymentConfirmation = async (req: Request, res: Response) =
         });
 
         if (!purchase) {
-            return res.status(404).json({ error: 'Compra não encontrada' });
+            return res.status(404).json({ error: 'Compra nÃ£o encontrada' });
         }
 
         if (purchase.userId !== userId) {
@@ -326,7 +326,7 @@ export const simulatePaymentConfirmation = async (req: Request, res: Response) =
         }
 
         if (purchase.status === 'COMPLETED') {
-            return res.status(400).json({ error: 'Pagamento já foi confirmado' });
+            return res.status(400).json({ error: 'Pagamento jÃ¡ foi confirmado' });
         }
 
         // Creditar Zions
@@ -351,7 +351,7 @@ export const simulatePaymentConfirmation = async (req: Request, res: Response) =
 
     } catch (error: any) {
         console.error('[PAYMENT] Error simulating payment:', error?.message || error);
-        res.status(500).json({ error: 'Falha ao simular confirmação' });
+        res.status(500).json({ error: 'Falha ao simular confirmaÃ§Ã£o' });
     }
 };
 
@@ -363,7 +363,7 @@ export const checkPaymentStatus = async (req: Request, res: Response) => {
         const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
         if (!accessToken) {
-            return res.status(500).json({ error: 'Sistema de pagamento não configurado' });
+            return res.status(500).json({ error: 'Sistema de pagamento nÃ£o configurado' });
         }
 
         // Buscar a compra pelo paymentId
@@ -373,14 +373,14 @@ export const checkPaymentStatus = async (req: Request, res: Response) => {
         });
 
         if (!purchase) {
-            return res.status(404).json({ error: 'Compra não encontrada' });
+            return res.status(404).json({ error: 'Compra nÃ£o encontrada' });
         }
 
         if (purchase.userId !== userId) {
             return res.status(403).json({ error: 'Acesso negado' });
         }
 
-        // Se já foi processada, retornar sucesso
+        // Se jÃ¡ foi processada, retornar sucesso
         if (purchase.status === 'COMPLETED') {
             return res.json({ 
                 status: 'approved',
@@ -421,7 +421,7 @@ export const checkPaymentStatus = async (req: Request, res: Response) => {
     }
 };
 
-// Helper para creditar Zions de forma segura (evita duplicação)
+// Helper para creditar Zions de forma segura (evita duplicaÃ§Ã£o)
 const creditZionsFromPayment = async (purchaseId: string, paymentId: string, requestingUserId?: string): Promise<boolean> => {
     try {
         // Buscar a compra
@@ -435,26 +435,26 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
             return false;
         }
 
-        // Verificação de segurança - usuário só pode verificar suas próprias compras
+        // VerificaÃ§Ã£o de seguranÃ§a - usuÃ¡rio sÃ³ pode verificar suas prÃ³prias compras
         if (requestingUserId && purchase.userId !== requestingUserId) {
             console.warn(`[PAYMENT] User ${requestingUserId} tried to access purchase of user ${purchase.userId}`);
             return false;
         }
 
-        // Já foi processado? (idempotência)
+        // JÃ¡ foi processado? (idempotÃªncia)
         if (purchase.status === 'COMPLETED') {
             console.log(`[PAYMENT] Purchase already completed: ${purchaseId}`);
-            return true; // Já processado, não é erro
+            return true; // JÃ¡ processado, nÃ£o Ã© erro
         }
 
-        // Detectar se é Cash ou Points baseado no preço/valor
+        // Detectar se Ã© Cash ou Points baseado no preÃ§o/valor
         // Cash packages: 10, 25, 50, 105 (100+5), 220 (200+20)
         // Points packages: 100, 250, 500, 1000, 2500
         const isCashPurchase = purchase.price === purchase.amount || 
             [10, 25, 50, 100, 200].includes(purchase.price) ||
-            purchase.price >= 10 && purchase.amount === purchase.price; // Cash é 1:1
+            purchase.price >= 10 && purchase.amount === purchase.price; // Cash Ã© 1:1
 
-        // Atualizar status e creditar Zions em uma transação
+        // Atualizar status e creditar Zions em uma transaÃ§Ã£o
         await prisma.$transaction([
             prisma.user.update({
                 where: { id: purchase.userId },
@@ -471,7 +471,7 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
                     paymentId: paymentId
                 }
             }),
-            // Registrar no histórico de Zions
+            // Registrar no histÃ³rico de Zions
             prisma.zionHistory.create({
                 data: {
                     userId: purchase.userId,
@@ -484,7 +484,7 @@ const creditZionsFromPayment = async (purchaseId: string, paymentId: string, req
             })
         ]);
 
-        console.log(`[PAYMENT] ✅ ${isCashPurchase ? 'Cash' : 'Points'} credited: ${purchase.amount} to user ${purchase.userId} - PaymentID: ${paymentId}`);
+        console.log(`[PAYMENT] âœ… ${isCashPurchase ? 'Cash' : 'Points'} credited: ${purchase.amount} to user ${purchase.userId} - PaymentID: ${paymentId}`);
         return true;
 
     } catch (error: any) {
@@ -529,13 +529,13 @@ export const createZionsPreference = async (req: Request, res: Response) => {
             }
         });
 
-        // Descrições e benefícios por pacote
+        // DescriÃ§Ãµes e benefÃ­cios por pacote
         const packageDescriptions: Record<number, string> = {
-            500: 'Pacote inicial de Zions para customização de perfil e itens exclusivos.',
-            1100: 'Pacote intermediário com bônus de 10%. Ideal para desbloquear backgrounds e cores.',
-            2500: 'Pacote avançado com 25% de bônus! Libere Theme Packs e conquistas premium.',
-            5500: 'Pacote premium com 37% de bônus! Acesso a itens raros e exclusivos.',
-            12000: 'Pacote supremo com 50% de bônus! Máximo valor, itens lendários disponíveis.'
+            500: 'Pacote inicial de Zions para customizaÃ§Ã£o de perfil e itens exclusivos.',
+            1100: 'Pacote intermediÃ¡rio com bÃ´nus de 10%. Ideal para desbloquear backgrounds e cores.',
+            2500: 'Pacote avanÃ§ado com 25% de bÃ´nus! Libere Theme Packs e conquistas premium.',
+            5500: 'Pacote premium com 37% de bÃ´nus! Acesso a itens raros e exclusivos.',
+            12000: 'Pacote supremo com 50% de bÃ´nus! MÃ¡ximo valor, itens lendÃ¡rios disponÃ­veis.'
         };
 
         const result = await preference.create({
@@ -588,14 +588,14 @@ export const createZionsPreference = async (req: Request, res: Response) => {
 
 export const handleWebhook = async (req: Request, res: Response) => {
     try {
-        // Responder imediatamente ao Mercado Pago (ele espera resposta rápida)
+        // Responder imediatamente ao Mercado Pago (ele espera resposta rÃ¡pida)
         res.status(200).send('OK');
 
         const { type, data, action } = req.body;
         
         console.log(`[WEBHOOK] Received: type=${type}, action=${action}, data=${JSON.stringify(data)}`);
 
-        // Processar apenas notificações de pagamento
+        // Processar apenas notificaÃ§Ãµes de pagamento
         if (type !== 'payment' || !data?.id) {
             console.log('[WEBHOOK] Ignoring non-payment notification');
             return;
@@ -608,7 +608,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
             return;
         }
 
-        // Buscar detalhes do pagamento no Mercado Pago (verificação de autenticidade)
+        // Buscar detalhes do pagamento no Mercado Pago (verificaÃ§Ã£o de autenticidade)
         const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
         const payment = new Payment(client);
 
@@ -658,7 +658,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
                 break;
             
             case 'refunded':
-                // Se já foi creditado, precisa reverter
+                // Se jÃ¡ foi creditado, precisa reverter
                 if (purchase.status === 'COMPLETED') {
                     await prisma.$transaction([
                         prisma.user.update({
@@ -680,7 +680,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
                             }
                         })
                     ]);
-                    console.log(`[WEBHOOK] ⚠️ Refund processed: ${purchase.amount} Zions removed from user ${purchase.userId}`);
+                    console.log(`[WEBHOOK] âš ï¸ Refund processed: ${purchase.amount} Zions removed from user ${purchase.userId}`);
                 }
                 break;
             
@@ -691,7 +691,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error('[WEBHOOK] Error processing webhook:', error?.message || error);
-        // Não retornar erro - já respondemos 200
+        // NÃ£o retornar erro - jÃ¡ respondemos 200
     }
 };
 
@@ -848,5 +848,321 @@ const deliverProductKeysWebhook = async (orderId: string, product: any, quantity
         }
     }
 
-    console.log(`[WEBHOOK] ✅ Product keys delivered for order ${orderId}: ${keys.length} keys`);
+    console.log(`[WEBHOOK] âœ… Product keys delivered for order ${orderId}: ${keys.length} keys`);
+};
+
+// ============ PRODUTO - PAGAMENTO BRL VIA MERCADOPAGO ============
+export const createProductPayment = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user?.userId || (req as any).user?.id;
+        const { productId, quantity, paymentType } = req.body;
+
+        if (!productId || !quantity) {
+            return res.status(400).json({ error: 'productId e quantity sÃ£o obrigatÃ³rios' });
+        }
+
+        // Buscar produto
+        const product = await prisma.product.findUnique({
+            where: { id: productId, isActive: true }
+        });
+
+        if (!product) {
+            return res.status(404).json({ error: 'Produto nÃ£o encontrado' });
+        }
+
+        if (!product.priceBRL) {
+            return res.status(400).json({ error: 'Este produto nÃ£o aceita pagamento em BRL' });
+        }
+
+        // Verificar estoque
+        if (!product.isUnlimited) {
+            const availableKeys = await prisma.productKey.count({
+                where: { productId, isUsed: false }
+            });
+            if (availableKeys < quantity) {
+                return res.status(400).json({ error: 'Estoque insuficiente' });
+            }
+        }
+
+        // Verificar desconto Magazine
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { membershipType: true, email: true, name: true }
+        });
+        
+        const hasDiscount = product.magazineDiscount && user?.membershipType === 'MAGAZINE';
+        const unitPrice = hasDiscount ? Number((product.priceBRL * 0.9).toFixed(2)) : product.priceBRL;
+        const totalPrice = Number((unitPrice * quantity).toFixed(2));
+
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+        if (!accessToken) {
+            console.error('[PRODUCT_PAYMENT] MERCADOPAGO_ACCESS_TOKEN not configured');
+            return res.status(500).json({ error: 'Sistema de pagamento nÃ£o configurado' });
+        }
+
+        // Modo simulaÃ§Ã£o (dev)
+        const isSimulationMode = process.env.MERCADOPAGO_SIMULATION_MODE === 'true';
+        
+        if (isSimulationMode) {
+            // Criar pedido pendente
+            const order = await prisma.order.create({
+                data: {
+                    buyerId: userId,
+                    productId,
+                    quantity,
+                    totalBRL: totalPrice,
+                    paymentMethod: 'MERCADO_PAGO',
+                    paymentStatus: 'PENDING',
+                    paymentId: `SIM_${Date.now()}`
+                }
+            });
+
+            return res.json({
+                simulation: true,
+                message: 'Modo simulaÃ§Ã£o ativo - pagamento simulado',
+                orderId: order.id,
+                init_point: `${process.env.CLIENT_URL || 'http://localhost:5173'}/store?payment=simulate&orderId=${order.id}`,
+                total: totalPrice
+            });
+        }
+
+        // Criar preferÃªncia no MercadoPago
+        const client = new MercadoPagoConfig({ accessToken });
+        const preference = new Preference(client);
+        
+        const webhookUrl = `${process.env.BACKEND_URL || process.env.SERVER_URL || 'https://magazine-srt-react-server.vercel.app'}/api/payments/webhook/product`;
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+        const result = await preference.create({
+            body: {
+                items: [
+                    {
+                        id: productId,
+                        title: product.name,
+                        description: product.description?.substring(0, 200) || '',
+                        quantity: quantity,
+                        unit_price: unitPrice,
+                        currency_id: 'BRL'
+                    }
+                ],
+                payer: {
+                    email: user?.email || '',
+                    name: user?.name || ''
+                },
+                payment_methods: {
+                    excluded_payment_types: [],
+                    installments: 12
+                },
+                back_urls: {
+                    success: `${clientUrl}/store?payment=success`,
+                    failure: `${clientUrl}/store?payment=failure`,
+                    pending: `${clientUrl}/store?payment=pending`
+                },
+                notification_url: webhookUrl,
+                auto_return: 'approved',
+                external_reference: JSON.stringify({ userId, productId, quantity }),
+                statement_descriptor: 'MAGAZINE SRT'
+            }
+        });
+
+        // Criar pedido pendente
+        const order = await prisma.order.create({
+            data: {
+                buyerId: userId,
+                productId,
+                quantity,
+                totalBRL: totalPrice,
+                paymentMethod: 'MERCADO_PAGO',
+                paymentStatus: 'PENDING',
+                paymentId: result.id
+            }
+        });
+
+        console.log(`[PRODUCT_PAYMENT] Created preference ${result.id} for order ${order.id}`);
+
+        res.json({
+            id: result.id,
+            init_point: result.init_point,
+            sandbox_init_point: result.sandbox_init_point,
+            orderId: order.id,
+            total: totalPrice
+        });
+
+    } catch (error: any) {
+        console.error('[PRODUCT_PAYMENT] Error creating product preference:', error?.message || error);
+        res.status(500).json({ error: 'Erro ao criar preferÃªncia de pagamento' });
+    }
+};
+
+// Simular pagamento aprovado (DEV)
+export const simulateProductPayment = async (req: Request, res: Response) => {
+    const isSimulationMode = process.env.MERCADOPAGO_SIMULATION_MODE === 'true';
+    if (!isSimulationMode) {
+        return res.status(403).json({ error: 'SimulaÃ§Ã£o nÃ£o disponÃ­vel em produÃ§Ã£o' });
+    }
+
+    try {
+        const { orderId } = req.body;
+        const userId = (req as any).user?.userId || (req as any).user?.id;
+
+        const order = await prisma.order.findFirst({
+            where: { id: orderId, buyerId: userId, paymentStatus: 'PENDING' },
+            include: { product: true }
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: 'Pedido nÃ£o encontrado' });
+        }
+
+        // Entregar keys
+        if (!order.product.isUnlimited) {
+            const keys = await prisma.productKey.findMany({
+                where: { productId: order.productId, isUsed: false },
+                take: order.quantity
+            });
+
+            for (const key of keys) {
+                await prisma.productKey.update({
+                    where: { id: key.id },
+                    data: { isUsed: true, orderId: order.id }
+                });
+            }
+        }
+
+        // Atualizar para aprovado
+        await prisma.order.update({
+            where: { id: order.id },
+            data: { paymentStatus: 'COMPLETED' }
+        });
+
+        // Notificar usuÃ¡rio
+        await prisma.notification.create({
+            data: {
+                userId,
+                type: 'SYSTEM',
+                content: `Sua compra de ${order.product.name} foi confirmada! ðŸŽ‰`
+            }
+        });
+
+        res.json({ success: true, message: 'Pagamento simulado com sucesso!' });
+    } catch (error: any) {
+        console.error('[SIMULATE_PAYMENT] Error:', error?.message || error);
+        res.status(500).json({ error: 'Erro ao simular pagamento' });
+    }
+};
+
+// Webhook para pagamentos de produtos
+export const handleProductWebhook = async (req: Request, res: Response) => {
+    try {
+        const { type, data } = req.body;
+
+        console.log('[PRODUCT_WEBHOOK] Received:', { type, data });
+
+        if (type === 'payment') {
+            const paymentId = data?.id;
+            
+            if (!paymentId) {
+                return res.sendStatus(200);
+            }
+
+            const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+            if (!accessToken) {
+                console.error('[PRODUCT_WEBHOOK] No access token');
+                return res.sendStatus(200);
+            }
+
+            // Buscar detalhes do pagamento
+            const client = new MercadoPagoConfig({ accessToken });
+            const paymentClient = new Payment(client);
+            const payment = await paymentClient.get({ id: paymentId });
+
+            console.log('[PRODUCT_WEBHOOK] Payment status:', payment.status);
+
+            if (payment.status === 'approved') {
+                const externalRef = payment.external_reference;
+                if (!externalRef) {
+                    console.error('[PRODUCT_WEBHOOK] No external reference');
+                    return res.sendStatus(200);
+                }
+
+                const { userId, productId, quantity } = JSON.parse(externalRef);
+
+                // Buscar pedido pendente
+                const order = await prisma.order.findFirst({
+                    where: {
+                        buyerId: userId,
+                        productId,
+                        paymentStatus: 'PENDING'
+                    },
+                    include: { product: true }
+                });
+
+                if (!order) {
+                    console.error('[PRODUCT_WEBHOOK] Order not found');
+                    return res.sendStatus(200);
+                }
+
+                // Entregar keys
+                if (!order.product.isUnlimited) {
+                    const keys = await prisma.productKey.findMany({
+                        where: { productId, isUsed: false },
+                        take: quantity
+                    });
+
+                    for (const key of keys) {
+                        await prisma.productKey.update({
+                            where: { id: key.id },
+                            data: { isUsed: true, orderId: order.id }
+                        });
+                    }
+                }
+
+                // Atualizar pedido para aprovado
+                await prisma.order.update({
+                    where: { id: order.id },
+                    data: {
+                        paymentStatus: 'COMPLETED',
+                        paymentId: String(paymentId)
+                    }
+                });
+
+                // Notificar usuÃ¡rio
+                await prisma.notification.create({
+                    data: {
+                        userId,
+                        type: 'SYSTEM',
+                        content: `Sua compra de ${order.product.name} foi confirmada! ðŸŽ‰`
+                    }
+                });
+
+                console.log(`[PRODUCT_WEBHOOK] âœ… Order ${order.id} completed`);
+
+                // Enviar email com keys
+                const user = await prisma.user.findUnique({ where: { id: userId } });
+                const deliveredKeys = await prisma.productKey.findMany({ 
+                    where: { orderId: order.id } 
+                });
+                
+                if (user?.email && deliveredKeys.length > 0) {
+                    try {
+                        const { sendProductKeysEmail } = await import('../services/emailService');
+                        await sendProductKeysEmail(
+                            user.email,
+                            user.displayName || user.name || 'Cliente',
+                            order.product.name,
+                            deliveredKeys.map(k => k.key),
+                            order.id
+                        );
+                    } catch (emailError) {
+                        console.error('[PRODUCT_WEBHOOK] Failed to send email:', emailError);
+                    }
+                }
+            }
+        }
+
+        res.sendStatus(200);
+    } catch (error: any) {
+        console.error('[PRODUCT_WEBHOOK] Error:', error?.message || error);
+        res.sendStatus(200); // Sempre retornar 200
+    }
 };

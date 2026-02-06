@@ -2,6 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Liquid Gradient Effect Styles */
+.liquid-gradient {
+  overflow: hidden;
+  mix-blend-mode: overlay;
+}
+
+.liquid-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0.6;
+  filter: blur(20px);
+  transition: all 0.5s ease;
+}
+
+.liquid-layer-1 {
+  background: radial-gradient(circle at 30% 30%, var(--liquid-color-2) 0%, transparent 50%);
+  animation: liquid-move-1 4s ease-in-out infinite;
+}
+
+.liquid-layer-2 {
+  background: radial-gradient(circle at 70% 60%, var(--liquid-color-3) 0%, transparent 50%);
+  animation: liquid-move-2 5s ease-in-out infinite;
+}
+
+.liquid-layer-3 {
+  background: radial-gradient(circle at 50% 80%, var(--liquid-color-8) 0%, transparent 40%);
+  animation: liquid-move-3 6s ease-in-out infinite;
+}
+
+.liquid-layer-4 {
+  background: radial-gradient(circle at 20% 70%, var(--liquid-color-11) 0%, transparent 45%);
+  animation: liquid-move-4 4.5s ease-in-out infinite;
+}
+
+.liquid-layer-5 {
+  background: radial-gradient(circle at 80% 20%, var(--liquid-color-7) 0%, transparent 50%);
+  animation: liquid-move-5 5.5s ease-in-out infinite;
+}
+
+.liquid-active .liquid-layer {
+  opacity: 0.85;
+  filter: blur(15px);
+}
+
+@keyframes liquid-move-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(10%, 5%) scale(1.1); }
+  50% { transform: translate(5%, 10%) scale(0.95); }
+  75% { transform: translate(-5%, 5%) scale(1.05); }
+}
+
+@keyframes liquid-move-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-10%, -5%) scale(1.05); }
+  50% { transform: translate(-5%, 10%) scale(1.1); }
+  75% { transform: translate(5%, -5%) scale(0.95); }
+}
+
+@keyframes liquid-move-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8%, -8%) scale(1.08); }
+  66% { transform: translate(-8%, 5%) scale(0.92); }
+}
+
+@keyframes liquid-move-4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(15%, 10%) scale(1.15); }
+}
+
+@keyframes liquid-move-5 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10%, -10%) scale(1.1); }
+}
+
 /* Dynamic accent color CSS variables */
 :root {
   --accent-color: #d4af37;
@@ -1004,4 +1078,103 @@ html.rgb-dynamic [class*="border-accent"] {
 /* Safe area padding for mobile */
 .pb-safe {
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+/* iOS-style Spinner */
+.spinner {
+  font-size: 28px;
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
+.spinner.center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.spinner .spinner-blade {
+  position: absolute;
+  left: 0.4629em;
+  bottom: 0;
+  width: 0.074em;
+  height: 0.2777em;
+  border-radius: 0.0555em;
+  background-color: transparent;
+  transform-origin: center -0.2222em;
+  animation: spinner-fade 1s infinite linear;
+}
+
+.spinner .spinner-blade:nth-child(1) {
+  animation-delay: 0s;
+  transform: rotate(0deg);
+}
+
+.spinner .spinner-blade:nth-child(2) {
+  animation-delay: 0.083s;
+  transform: rotate(30deg);
+}
+
+.spinner .spinner-blade:nth-child(3) {
+  animation-delay: 0.166s;
+  transform: rotate(60deg);
+}
+
+.spinner .spinner-blade:nth-child(4) {
+  animation-delay: 0.249s;
+  transform: rotate(90deg);
+}
+
+.spinner .spinner-blade:nth-child(5) {
+  animation-delay: 0.332s;
+  transform: rotate(120deg);
+}
+
+.spinner .spinner-blade:nth-child(6) {
+  animation-delay: 0.415s;
+  transform: rotate(150deg);
+}
+
+.spinner .spinner-blade:nth-child(7) {
+  animation-delay: 0.498s;
+  transform: rotate(180deg);
+}
+
+.spinner .spinner-blade:nth-child(8) {
+  animation-delay: 0.581s;
+  transform: rotate(210deg);
+}
+
+.spinner .spinner-blade:nth-child(9) {
+  animation-delay: 0.664s;
+  transform: rotate(240deg);
+}
+
+.spinner .spinner-blade:nth-child(10) {
+  animation-delay: 0.747s;
+  transform: rotate(270deg);
+}
+
+.spinner .spinner-blade:nth-child(11) {
+  animation-delay: 0.83s;
+  transform: rotate(300deg);
+}
+
+.spinner .spinner-blade:nth-child(12) {
+  animation-delay: 0.913s;
+  transform: rotate(330deg);
+}
+
+@keyframes spinner-fade {
+  0% {
+    background-color: #69717d;
+  }
+  100% {
+    background-color: transparent;
+  }
 }

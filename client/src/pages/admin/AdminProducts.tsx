@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Plus, Edit2, Trash2, Key, Loader2, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Key, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent } from 'lucide-react';
+import Loader from '../../components/Loader';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
@@ -293,7 +294,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             {/* Products Table */}
             {loading ? (
                 <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                    <Loader size="md" />
                 </div>
             ) : (
                 <div className="overflow-x-auto">
@@ -760,7 +761,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                     className="w-full py-3 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {submitting ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader size="sm" />
                                     ) : (
                                         <>
                                             {editingProduct ? <Edit2 className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
@@ -823,7 +824,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                     className="w-full py-3 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {submitting ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader size="sm" />
                                     ) : (
                                         <>
                                             <Upload className="w-5 h-5" />

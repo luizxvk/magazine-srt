@@ -1,4 +1,4 @@
-import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles } from 'lucide-react';
+import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -169,6 +169,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
         }
     }, [isMobileDrawerOpen, setIsMobileDrawerOpen]);
 
+    const isElite = user?.isElite && user?.eliteUntil && new Date(user.eliteUntil) > new Date();
+    
     const menuItems = [
         { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
         { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
@@ -178,6 +180,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <MessageCircle className="w-5 h-5" />, label: 'Grupos', path: '/groups' },
         { icon: <Store className="w-5 h-5" />, label: 'Mercado', path: '/market' },
         { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
+        { icon: <Crown className="w-5 h-5 text-amber-400" />, label: isElite ? 'Minha Assinatura' : 'ELITE ✨', path: '/elite', highlight: !isElite },
         { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
         { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
         { icon: <Settings className="w-5 h-5" />, label: 'Configurações', path: '/settings' },

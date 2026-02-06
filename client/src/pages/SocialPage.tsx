@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield, UserCheck, X, Check, ChevronDown, Loader2, UserPlus } from 'lucide-react';
+import { Users, Shield, UserCheck, X, Check, ChevronDown, UserPlus } from 'lucide-react';
+import Loader from '../components/Loader';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
@@ -440,7 +441,7 @@ export default function SocialPage() {
                                                     title="Enviar solicitação de amizade"
                                                 >
                                                     {sendingRequest === rec.id ? (
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader size="sm" />
                                                     ) : (
                                                         <UserPlus className="w-4 h-4" />
                                                     )}
@@ -463,7 +464,7 @@ export default function SocialPage() {
                                             >
                                                 {loadingMore ? (
                                                     <>
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader size="sm" />
                                                         Carregando...
                                                     </>
                                                 ) : (

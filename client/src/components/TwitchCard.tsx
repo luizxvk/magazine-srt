@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Tv, Eye, ExternalLink, Loader2 } from 'lucide-react';
+import { Tv, Eye, ExternalLink } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -101,7 +102,7 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
     if (loading) {
         return (
             <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-6 flex items-center justify-center transition-all duration-300`}>
-                <Loader2 className="w-6 h-6 animate-spin" style={{ color: accentColor }} />
+                <Loader size="md" />
             </div>
         );
     }

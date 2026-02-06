@@ -61,18 +61,108 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
 
         const { id } = req.params;
 
-        // Delete all related data (cascading manually if needed, but Prisma handles most if configured, 
-        // here we rely on Prisma's onDelete: Cascade or manual cleanup if strictly required. 
-        // For safety, we'll just delete the user and let Prisma error if constraints fail, 
-        // or we can wrap in transaction to delete relations first)
-
-        // Soft delete
-        await prisma.user.update({
-            where: { id },
-            data: { deletedAt: new Date() }
+        // HARD DELETE - Wipe total do usuário e todos os dados relacionados
+        // Ordem importa para evitar violações de FK
+        await prisma.$transaction(async (tx) => {
+            // Mensagens de grupo (reações primeiro)
+            await tx.groupMessageReaction.deleteMany({ where: { userId: id } });
+            await tx.groupMessageRead.deleteMany({ where: { userId: id } });
+            
+            // Mensagens privadas
+            await tx.message.deleteMany({ where: { OR: [{ senderId: id }, { receiverId: id }] } });
+            
+            // Posts (comentários, likes, poll votes primeiro)
+            const userPosts = await tx.post.findMany({ where: { userId: id }, select: { id: true } });
+            const postIds = userPosts.map(p => p.id);
+            
+            if (postIds.length > 0) {
+                // Buscar poll options dos posts para deletar os votes
+                const pollOptions = await tx.pollOption.findMany({ where: { postId: { in: postIds } }, select: { id: true } });
+                const optionIds = pollOptions.map(o => o.id);
+                if (optionIds.length > 0) {
+                    await tx.pollVote.deleteMany({ where: { optionId: { in: optionIds } } });
+                }
+                await tx.pollOption.deleteMany({ where: { postId: { in: postIds } } });
+                await tx.comment.deleteMany({ where: { postId: { in: postIds } } });
+                await tx.like.deleteMany({ where: { postId: { in: postIds } } });
+            }
+            
+            // Comentários e likes do usuário em posts de outros
+            await tx.comment.deleteMany({ where: { userId: id } });
+            await tx.like.deleteMany({ where: { userId: id } });
+            await tx.pollVote.deleteMany({ where: { userId: id } });
+            
+            // Posts do usuário
+            await tx.post.deleteMany({ where: { userId: id } });
+            
+            // Stories
+            await tx.storyView.deleteMany({ where: { viewerId: id } });
+            const userStories = await tx.story.findMany({ where: { userId: id }, select: { id: true } });
+            if (userStories.length > 0) {
+                await tx.storyView.deleteMany({ where: { storyId: { in: userStories.map(s => s.id) } } });
+            }
+            await tx.story.deleteMany({ where: { userId: id } });
+            
+            // Badges
+            await tx.userBadge.deleteMany({ where: { userId: id } });
+            
+            // Redemptions
+            await tx.redemption.deleteMany({ where: { userId: id } });
+            
+            // Notifications
+            await tx.notification.deleteMany({ where: { userId: id } });
+            
+            // Feedbacks
+            await tx.feedback.deleteMany({ where: { userId: id } });
+            
+            // Point/Zion History
+            await tx.pointHistory.deleteMany({ where: { userId: id } });
+            await tx.zionHistory.deleteMany({ where: { userId: id } });
+            
+            // Event Drop Claims
+            await tx.eventDropClaim.deleteMany({ where: { userId: id } });
+            
+            // Group memberships e mensagens
+            await tx.groupMessage.deleteMany({ where: { senderId: id } });
+            await tx.groupMember.deleteMany({ where: { userId: id } });
+            
+            // Theme packs
+            await tx.userThemePack.deleteMany({ where: { userId: id } });
+            
+            // Social connections
+            await tx.socialConnection.deleteMany({ where: { userId: id } });
+            await tx.socialActivity.deleteMany({ where: { userId: id } });
+            
+            // Catalog photos
+            await tx.catalogPhoto.deleteMany({ where: { userId: id } });
+            
+            // ZionPurchase
+            await tx.zionPurchase.deleteMany({ where: { userId: id } });
+            
+            // Friendships (both directions)
+            await tx.friendship.deleteMany({ where: { OR: [{ requesterId: id }, { addresseeId: id }] } });
+            
+            // Orders
+            await tx.order.deleteMany({ where: { buyerId: id } });
+            
+            // Withdrawal requests
+            await tx.withdrawalRequest.deleteMany({ where: { userId: id } });
+            
+            // Push subscriptions
+            await tx.pushSubscription.deleteMany({ where: { userId: id } });
+            
+            // Admin badges
+            await tx.adminBadge.deleteMany({ where: { userId: id } });
+            
+            // Market listings e transactions
+            await tx.marketTransaction.deleteMany({ where: { OR: [{ buyerId: id }, { sellerId: id }] } });
+            await tx.marketListing.deleteMany({ where: { sellerId: id } });
+            
+            // Finalmente, deletar o usuário
+            await tx.user.delete({ where: { id } });
         });
 
-        res.json({ message: 'User deleted successfully' });
+        res.json({ message: 'User and all data permanently deleted' });
     } catch (error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -375,6 +465,11 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 profileBgPosX: true,
                 profileBgPosY: true,
                 betaRewardClaimed: true,
+                // Elite subscription
+                isElite: true,
+                eliteUntil: true,
+                eliteSince: true,
+                eliteStreak: true,
                 _count: {
                     select: {
                         posts: true

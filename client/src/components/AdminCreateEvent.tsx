@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, Car, Gamepad2, FileText, Plus, Loader2, Gift, ChevronDown, X, Sparkles } from 'lucide-react';
+import { Calendar, Clock, Car, Gamepad2, FileText, Plus, Gift, ChevronDown, X, Sparkles, Palette, Image, Award, CircleDot, Key } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -39,6 +40,13 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
     const [showRewardDropdown, setShowRewardDropdown] = useState(false);
     const [loadingRewards, setLoadingRewards] = useState(false);
 
+    // Drop exclusivo do evento (itens do Meu Estilo)
+    const [showDropSection, setShowDropSection] = useState(false);
+    const [dropItemType, setDropItemType] = useState<'background' | 'badge' | 'color' | 'profileBorder' | ''>('');
+    const [dropItemId, setDropItemId] = useState('');
+    const [dropKeyword, setDropKeyword] = useState('');
+    const [dropClaimHours, setDropClaimHours] = useState(24); // Horas após evento para resgatar
+
     const themeColor = isMGT ? 'emerald' : 'gold';
     const borderColor = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const focusColor = isMGT ? 'focus:border-emerald-500/50' : 'focus:border-gold-500/50';
@@ -66,6 +74,51 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
 
     const selectedReward = availableRewards.find(r => r.id === selectedRewardId);
 
+    // Itens disponíveis para drop (simplificado - itens mais populares)
+    const dropItems = {
+        background: [
+            { id: 'bg_aurora', name: 'Aurora Boreal' },
+            { id: 'bg_galaxy', name: 'Galáxia' },
+            { id: 'bg_retrowave', name: 'Retrowave' },
+            { id: 'bg_fire', name: 'Fogo' },
+            { id: 'bg_oceano', name: 'Oceano' },
+            { id: 'bg_cyberpunk', name: 'Cyberpunk' },
+            { id: 'bg_lava', name: 'Lava' },
+            { id: 'bg_emerald', name: 'Esmeralda' },
+            { id: 'bg_royal', name: 'Real Púrpura' },
+            { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos (Premium)' },
+            { id: 'anim-gradient-waves', name: 'Ondas Gradiente (Premium)' },
+            { id: 'anim-rainbow-skies', name: 'Rainbow Skies (Premium)' },
+            { id: 'anim-moonlit-sky', name: 'Moonlit Sky (Premium)' },
+        ],
+        badge: [
+            { id: 'badge_diamond', name: 'Diamante' },
+            { id: 'badge_fire', name: 'Fogo' },
+            { id: 'badge_lightning', name: 'Raio' },
+            { id: 'badge_skull', name: 'Caveira' },
+            { id: 'badge_moon', name: 'Lua' },
+            { id: 'badge_sun', name: 'Sol' },
+            { id: 'badge_shark', name: 'Grande Norke' },
+            { id: 'badge_event_exclusive', name: '⭐ Exclusivo de Evento' },
+        ],
+        color: [
+            { id: 'color_rgb', name: 'RGB Dinâmico' },
+            { id: 'color_cyan', name: 'Ciano Neon' },
+            { id: 'color_magenta', name: 'Magenta Neon' },
+            { id: 'color_purple', name: 'Roxo Neon' },
+            { id: 'color_pink', name: 'Rosa Neon' },
+            { id: 'color_orange', name: 'Laranja Neon' },
+        ],
+        profileBorder: [
+            { id: 'border_diamond', name: 'Diamante' },
+            { id: 'border_fire', name: 'Fogo' },
+            { id: 'border_ice', name: 'Gelo' },
+            { id: 'border_rainbow', name: 'Arco-íris' },
+            { id: 'border_galaxy', name: 'Galáxia' },
+            { id: 'border_royal', name: 'Royal' },
+        ],
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -76,18 +129,35 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
 
         setIsSubmitting(true);
         try {
+            // Calcular dropClaimUntil baseado no horário do evento + horas de resgate
+            let dropClaimUntilDate = null;
+            if (showDropSection && dropItemId && dropItemType) {
+                const eventDate = new Date(`${formData.date}T${formData.time}:00`);
+                dropClaimUntilDate = new Date(eventDate.getTime() + (dropClaimHours * 60 * 60 * 1000));
+            }
+
             await api.post('/events', {
                 title: formData.title,
                 date: `${formData.date}T${formData.time}:00`,
                 category: formData.category,
                 game: formData.game,
                 description: formData.description,
-                linkedRewardId: selectedRewardId || undefined
+                linkedRewardId: selectedRewardId || undefined,
+                // Drop exclusivo
+                dropItemId: showDropSection && dropItemId ? dropItemId : undefined,
+                dropItemType: showDropSection && dropItemType ? dropItemType : undefined,
+                dropKeyword: showDropSection && dropKeyword ? dropKeyword : undefined,
+                dropClaimUntil: dropClaimUntilDate ? dropClaimUntilDate.toISOString() : undefined,
             });
 
             showToast('Evento criado com sucesso!', 'success');
             setFormData({ title: '', date: '', time: '', category: '', game: '', description: '' });
             setSelectedRewardId(null);
+            setShowDropSection(false);
+            setDropItemId('');
+            setDropItemType('');
+            setDropKeyword('');
+            setDropClaimHours(24);
             setIsOpen(false);
             onEventCreated?.();
         } catch (error) {
@@ -207,7 +277,7 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                         
                         {loadingRewards ? (
                             <div className="flex items-center gap-2 text-gray-400 text-sm">
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader size="sm" />
                                 Carregando recompensas...
                             </div>
                         ) : availableRewards.length === 0 ? (
@@ -317,6 +387,130 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                         </p>
                     </div>
 
+                    {/* Drop Exclusivo - Itens do Meu Estilo */}
+                    <div className={`p-4 rounded-xl border ${showDropSection ? 'bg-purple-500/5 border-purple-500/30' : 'bg-white/5 border-white/10'}`}>
+                        <button
+                            type="button"
+                            onClick={() => setShowDropSection(!showDropSection)}
+                            className="w-full flex items-center justify-between"
+                        >
+                            <label className="text-xs text-purple-400 uppercase tracking-wider flex items-center gap-2 cursor-pointer">
+                                <Palette className="w-4 h-4" />
+                                Drop Exclusivo (Meu Estilo)
+                            </label>
+                            <ChevronDown className={`w-4 h-4 text-purple-400 transition-transform ${showDropSection ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {showDropSection && (
+                            <div className="mt-4 space-y-4">
+                                {/* Tipo de Item */}
+                                <div>
+                                    <label className="block text-xs text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-1">
+                                        <Award className="w-3 h-3" /> Tipo de Item *
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            { type: 'background' as const, label: 'Background', icon: Image },
+                                            { type: 'badge' as const, label: 'Badge', icon: Award },
+                                            { type: 'color' as const, label: 'Cor', icon: Palette },
+                                            { type: 'profileBorder' as const, label: 'Borda', icon: CircleDot },
+                                        ].map(({ type, label, icon: Icon }) => (
+                                            <button
+                                                key={type}
+                                                type="button"
+                                                onClick={() => {
+                                                    setDropItemType(type);
+                                                    setDropItemId('');
+                                                }}
+                                                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${
+                                                    dropItemType === type
+                                                        ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
+                                                        : 'bg-black/40 border-white/10 text-gray-400 hover:border-white/30'
+                                                }`}
+                                            >
+                                                <Icon className="w-4 h-4" />
+                                                <span className="text-sm">{label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Seleção do Item */}
+                                {dropItemType && (
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-2 uppercase tracking-wider">
+                                            Selecionar {dropItemType === 'background' ? 'Background' : dropItemType === 'badge' ? 'Badge' : dropItemType === 'color' ? 'Cor' : 'Borda'} *
+                                        </label>
+                                        <select
+                                            value={dropItemId}
+                                            onChange={(e) => setDropItemId(e.target.value)}
+                                            className={`w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white ${focusColor} outline-none transition-colors`}
+                                        >
+                                            <option value="">Selecione...</option>
+                                            {dropItems[dropItemType as keyof typeof dropItems]?.map((item) => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {/* Palavra-chave secreta */}
+                                <div>
+                                    <label className="block text-xs text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-1">
+                                        <Key className="w-3 h-3" /> Palavra-chave Secreta *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={dropKeyword}
+                                        onChange={(e) => setDropKeyword(e.target.value.toUpperCase())}
+                                        placeholder="Ex: EVENTO2024, MGT, SUPERCARS"
+                                        className={`w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white ${focusColor} outline-none transition-colors placeholder-gray-500 uppercase`}
+                                    />
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Será revelada durante a live/evento
+                                    </p>
+                                </div>
+
+                                {/* Tempo para resgate */}
+                                <div>
+                                    <label className="block text-xs text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-1">
+                                        <Clock className="w-3 h-3" /> Tempo para Resgate (horas)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={dropClaimHours}
+                                        onChange={(e) => setDropClaimHours(Number(e.target.value))}
+                                        min={1}
+                                        max={168}
+                                        className={`w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white ${focusColor} outline-none transition-colors`}
+                                    />
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Após o horário do evento, usuários terão {dropClaimHours}h para resgatar
+                                    </p>
+                                </div>
+
+                                {/* Preview */}
+                                {dropItemId && dropKeyword && (
+                                    <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
+                                        <p className="text-xs text-purple-300 font-medium mb-1">Preview do Drop:</p>
+                                        <p className="text-sm text-white">
+                                            Item: <span className="text-purple-400">{dropItems[dropItemType as keyof typeof dropItems]?.find(i => i.id === dropItemId)?.name}</span>
+                                        </p>
+                                        <p className="text-sm text-white">
+                                            Keyword: <span className="text-purple-400 font-mono">{dropKeyword}</span>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        <p className="mt-3 text-xs text-gray-500">
+                            🎁 Item exclusivo que participantes podem resgatar com a palavra-chave.
+                        </p>
+                    </div>
+
                     {/* Submit */}
                     <button
                         type="submit"
@@ -325,7 +519,7 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                     >
                         {isSubmitting ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader size="sm" />
                                 Criando...
                             </>
                         ) : (

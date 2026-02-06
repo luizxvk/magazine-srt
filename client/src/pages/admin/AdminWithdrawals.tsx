@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, Check, X, Loader2, Clock, Ban, DollarSign, Search, User, AlertCircle } from 'lucide-react';
+import { Wallet, Check, X, Clock, Ban, DollarSign, Search, User, AlertCircle } from 'lucide-react';
+import Loader from '../../components/Loader';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
@@ -213,7 +214,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
             {/* Withdrawals List */}
             {loading ? (
                 <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                    <Loader size="md" />
                 </div>
             ) : filteredWithdrawals.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
@@ -390,7 +391,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
                                     disabled={submitting}
                                     className="flex-1 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
+                                    {submitting ? <Loader size="sm" /> : <Ban className="w-4 h-4" />}
                                     Rejeitar
                                 </button>
                             </div>

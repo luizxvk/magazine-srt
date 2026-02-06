@@ -84,8 +84,18 @@ model User {
   pushSubscriptions      PushSubscription[]
   pollVotes              PollVote[]
   betaRewardClaimed      Boolean        @default(false) // Track if user claimed v0.5.0 beta reward
+  eventDropClaims        EventDropClaim[]
+  // Elite Subscription
+  isElite                Boolean        @default(false)
+  eliteUntil             DateTime?      // Quando a assinatura expira
+  eliteSince             DateTime?      // Quando se tornou Elite
+  eliteStreak            Int            @default(0) // Meses consecutivos como Elite
+  streakProtectedUntil   DateTime?      // Proteção de streak do login diário
+  subscriptions          Subscription[]
+  orders                 Order[]
 
   @@index([membershipType])
+  @@index([isElite])
   @@index([isOnline])
   @@index([createdAt])
   @@index([trophies])
@@ -418,6 +428,26 @@ model Event {
   game        String?
   // Recompensa vinculada (publicada quando evento finaliza)
   linkedReward Reward? @relation("EventReward")
+  // Drop exclusivo de evento (item do "Meu Estilo")
+  dropItemId     String?       // ID do item (ex: "bg_aurora", "badge_diamond")
+  dropItemType   String?       // "background" | "badge" | "color" | "profileBorder"
+  dropKeyword    String?       // Palavra-chave secreta (revelada no evento)
+  dropClaimUntil DateTime?     // Até quando pode resgatar
+  dropClaims     EventDropClaim[]
+}
+
+// Registro de quem resgatou o drop exclusivo do evento
+model EventDropClaim {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  claimedAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId]) // Cada usuário só resgata uma vez por evento
+  @@index([eventId])
+  @@index([userId])
 }
 
 model Report {
@@ -681,6 +711,7 @@ model ProductKey {
 model Order {
   id            String        @id @default(uuid())
   buyerId       String
+  buyer         User          @relation(fields: [buyerId], references: [id])
   productId     String
   quantity      Int           @default(1)
   totalZions    Int?          // Total paid in Zions
@@ -801,6 +832,44 @@ enum Role {
 enum MembershipType {
   MAGAZINE
   MGT
+}
+
+// ========== ELITE SUBSCRIPTION SYSTEM ==========
+
+model Subscription {
+  id                String             @id @default(uuid())
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            SubscriptionStatus @default(PENDING)
+  planType          ElitePlanType      @default(MONTHLY)
+  priceAtPurchase   Float              // Preço pago (R$)
+  paymentProvider   String?            // "mercadopago", "pix", "manual"
+  externalId        String?            // ID do pagamento externo
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelledAt       DateTime?
+  cancelReason      String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+}
+
+enum SubscriptionStatus {
+  PENDING     // Aguardando pagamento
+  ACTIVE      // Ativa
+  CANCELLED   // Cancelada pelo usuário
+  EXPIRED     // Expirou
+  PAST_DUE    // Pagamento atrasado
+}
+
+enum ElitePlanType {
+  MONTHLY     // R$ 9,90/mês
+  QUARTERLY   // R$ 24,90/trimestre (desconto)
+  YEARLY      // R$ 89,90/ano (melhor valor)
+  LIFETIME    // R$ 199,90 uma vez (para sempre)
 }
 
 enum RewardType {

@@ -7,10 +7,12 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Settings, ChevronDown, Loader2 } from 'lucide-react';
+import { Sparkles, Settings, ChevronDown } from 'lucide-react';
+import Loader from '../components/Loader';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import ModernLoader from '../components/ModernLoader';
+import { TimelineAnimation, feedItemVariants } from '../components/TimelineAnimation';
 
 import AnnouncementCard from '../components/AnnouncementCard';
 import StoriesBar from '../components/StoriesBar';
@@ -27,6 +29,7 @@ import LeftSidebar from '../components/LeftSidebar';
 import ToolsCarousel from '../components/ToolsCarousel';
 import CreatePostCard from '../components/CreatePostCard';
 import SupplyBoxModal from '../components/SupplyBoxModal';
+import EventDropPopup from '../components/EventDropPopup';
 
 interface PollOption {
     id: string;
@@ -98,6 +101,7 @@ export default function FeedPage() {
     const [isEventsOpen, setIsEventsOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [isSupplyBoxOpen, setIsSupplyBoxOpen] = useState(false);
+    const [showEventDropPopup, setShowEventDropPopup] = useState(false);
 
     const fetchPosts = async (silent = false, page = 1, append = false) => {
         try {
@@ -183,6 +187,26 @@ export default function FeedPage() {
             window.removeEventListener('openRadio', handleOpenRadio);
         };
     }, []);
+
+    // Check for available event drops
+    useEffect(() => {
+        const checkEventDrops = async () => {
+            try {
+                const { data } = await api.get('/events/available-drops');
+                if (data && data.length > 0) {
+                    // Delay the popup slightly so it doesn't interrupt initial load
+                    setTimeout(() => setShowEventDropPopup(true), 2000);
+                }
+            } catch (err) {
+                // Silent fail - drops are optional
+            }
+        };
+
+        // Check after posts load
+        if (!loading && user) {
+            checkEventDrops();
+        }
+    }, [loading, user]);
 
     const handlePostCreated = () => {
         fetchPosts();
@@ -315,7 +339,7 @@ export default function FeedPage() {
                     {/* Main Feed Column */}
                     <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
                         {/* Welcome Header */}
-                        <div className="mb-8 animate-fade-in-down">
+                        <TimelineAnimation animationNum={0} className="mb-8">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
@@ -333,22 +357,24 @@ export default function FeedPage() {
                                     <Settings className="w-5 h-5" />
                                 </Link>
                             </div>
-                        </div>
+                        </TimelineAnimation>
 
                         {/* Stories Bar */}
-                        <div className="mb-6 animate-fade-in relative z-10">
+                        <TimelineAnimation animationNum={1} className="mb-6 relative z-10">
                             <StoriesBar
                                 viewingStoryId={viewingStoryId}
                                 onViewStory={setViewingStoryId}
                                 onCloseStory={() => setViewingStoryId(null)}
                             />
-                        </div>
+                        </TimelineAnimation>
 
                         {/* Create Post Card - Right after welcome */}
-                        <CreatePostCard onPostCreated={handlePostCreated} />
+                        <TimelineAnimation animationNum={2}>
+                            <CreatePostCard onPostCreated={handlePostCreated} />
+                        </TimelineAnimation>
 
                         {/* Mobile Carousel - Quick Access Cards */}
-                        <div className="mb-8 lg:hidden">
+                        <TimelineAnimation animationNum={3} className="mb-8 lg:hidden">
                             <MobileCarousel
                                 dailyLoginStatus={dailyLoginStatus}
                                 onDailyLoginClick={openDailyLoginModal}
@@ -356,12 +382,12 @@ export default function FeedPage() {
                                 onEventsClick={() => setIsEventsOpen(true)}
                                 onSupplyBoxClick={() => setIsSupplyBoxOpen(true)}
                             />
-                        </div>
+                        </TimelineAnimation>
 
                         {/* SRT Log Card - Mobile Only */}
-                        <div className="xl:hidden mb-8 transform active:scale-95 transition-transform duration-300">
+                        <TimelineAnimation animationNum={4} className="xl:hidden mb-8">
                             <AnnouncementCard />
-                        </div>
+                        </TimelineAnimation>
 
                         {/* Feed Carousel & Feed Items */}
                         {loading ? (
@@ -369,72 +395,81 @@ export default function FeedPage() {
                         ) : (
                             <>
                                 {highlightedPosts.length > 0 && (
-                                    <FeedCarousel posts={highlightedPosts.map(p => ({
-                                        id: p.id,
-                                        title: p.content,
-                                        image: p.image,
-                                        category: p.tags[0] || 'DESTAQUE',
-                                        author: p.author,
-                                        linkedProduct: p.linkedProduct || null
-                                    }))} />
+                                    <TimelineAnimation animationNum={5}>
+                                        <FeedCarousel posts={highlightedPosts.map(p => ({
+                                            id: p.id,
+                                            title: p.content,
+                                            image: p.image,
+                                            category: p.tags[0] || 'DESTAQUE',
+                                            author: p.author,
+                                            linkedProduct: p.linkedProduct || null
+                                        }))} />
+                                    </TimelineAnimation>
                                 )}
 
                                 {posts.length === 0 ? (
-                                    <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
-                                        <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
-                                        <p className="text-gray-400 font-serif text-xl">Nenhuma postagem no momento</p>
-                                        <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
-                                    </div>
+                                    <TimelineAnimation animationNum={6}>
+                                        <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                                            <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
+                                            <p className="text-gray-400 font-serif text-xl">Nenhuma postagem no momento</p>
+                                            <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
+                                        </div>
+                                    </TimelineAnimation>
                                 ) : (
                                     <div className="space-y-6">
-                                        {regularPosts.map(post => (
-                                            <FeedItem
+                                        {regularPosts.map((post, index) => (
+                                            <TimelineAnimation 
                                                 key={post.id}
-                                                id={post.id}
-                                                image={post.image}
-                                                video={post.video}
-                                                title={post.content}
-                                                category={post.tags[0] || 'GERAL'}
-                                                author={post.author.name}
-                                                authorAvatar={post.author.avatarUrl}
-                                                authorId={post.author.id}
-                                                authorProfileBorder={post.author.equippedProfileBorder}
-                                                authorMembershipType={post.author.membershipType}
-                                                likes={post.likes}
-                                                comments={post.comments}
-                                                isLiked={post.isLiked}
-                                                isHighlight={post.isHighlight}
-                                                poll={post.poll}
-                                                onLike={() => handleLike(post.id)}
-                                                onComment={() => setActiveCommentPostId(post.id)}
-                                                onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}
-                                                onShare={() => handleShare(post.id)}
-                                                onPollVote={(postId, optionId) => {
-                                                    // Update local state after vote
-                                                    setPosts(prev => prev.map(p => {
-                                                        if (p.id !== postId || !p.poll) return p;
-                                                        const totalVotes = (p.poll.totalVotes || 0) + 1;
-                                                        return {
-                                                            ...p,
-                                                            poll: {
-                                                                ...p.poll,
-                                                                totalVotes,
-                                                                userVotedOptionId: optionId,
-                                                                options: p.poll.options.map(opt => {
-                                                                    const currentVotes = opt.voteCount || 0;
-                                                                    const newVoteCount = opt.id === optionId ? currentVotes + 1 : currentVotes;
-                                                                    const percentage = totalVotes > 0 ? Math.round((newVoteCount / totalVotes) * 100) : 0;
-                                                                    return {
-                                                                        ...opt,
-                                                                        voteCount: newVoteCount,
-                                                                        percentage: isNaN(percentage) ? 0 : percentage
-                                                                    };
-                                                                })
-                                                            }
-                                                        };
-                                                    }));
-                                                }}
-                                            />
+                                                animationNum={index}
+                                                customVariants={feedItemVariants}
+                                            >
+                                                <FeedItem
+                                                    id={post.id}
+                                                    image={post.image}
+                                                    video={post.video}
+                                                    title={post.content}
+                                                    category={post.tags[0] || 'GERAL'}
+                                                    author={post.author.name}
+                                                    authorAvatar={post.author.avatarUrl}
+                                                    authorId={post.author.id}
+                                                    authorProfileBorder={post.author.equippedProfileBorder}
+                                                    authorMembershipType={post.author.membershipType}
+                                                    likes={post.likes}
+                                                    comments={post.comments}
+                                                    isLiked={post.isLiked}
+                                                    isHighlight={post.isHighlight}
+                                                    poll={post.poll}
+                                                    onLike={() => handleLike(post.id)}
+                                                    onComment={() => setActiveCommentPostId(post.id)}
+                                                    onDelete={() => setDeleteModal({ isOpen: true, postId: post.id })}
+                                                    onShare={() => handleShare(post.id)}
+                                                    onPollVote={(postId, optionId) => {
+                                                        // Update local state after vote
+                                                        setPosts(prev => prev.map(p => {
+                                                            if (p.id !== postId || !p.poll) return p;
+                                                            const totalVotes = (p.poll.totalVotes || 0) + 1;
+                                                            return {
+                                                                ...p,
+                                                                poll: {
+                                                                    ...p.poll,
+                                                                    totalVotes,
+                                                                    userVotedOptionId: optionId,
+                                                                    options: p.poll.options.map(opt => {
+                                                                        const currentVotes = opt.voteCount || 0;
+                                                                        const newVoteCount = opt.id === optionId ? currentVotes + 1 : currentVotes;
+                                                                        const percentage = totalVotes > 0 ? Math.round((newVoteCount / totalVotes) * 100) : 0;
+                                                                        return {
+                                                                            ...opt,
+                                                                            voteCount: newVoteCount,
+                                                                            percentage: isNaN(percentage) ? 0 : percentage
+                                                                        };
+                                                                    })
+                                                                }
+                                                            };
+                                                        }));
+                                                    }}
+                                                />
+                                            </TimelineAnimation>
                                         ))}
                                         
                                         {/* Load More Button */}
@@ -451,7 +486,7 @@ export default function FeedPage() {
                                                 >
                                                     {loadingMore ? (
                                                         <>
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            <Loader size="sm" />
                                                             Carregando...
                                                         </>
                                                     ) : (
@@ -503,6 +538,10 @@ export default function FeedPage() {
                 isOpen={isSupplyBoxOpen} 
                 onClose={() => setIsSupplyBoxOpen(false)} 
             />
+            
+            {showEventDropPopup && (
+                <EventDropPopup onClose={() => setShowEventDropPopup(false)} />
+            )}
         </div>
     );
 }

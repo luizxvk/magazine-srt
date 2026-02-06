@@ -21,19 +21,23 @@ export const getLevelFromXP = (xp: number): number => {
 
 export const awardXP = async (userId: string, amount: number, reason: string) => {
     try {
-        // 1. Get current user data
+        // 1. Get current user data (incluindo status Elite)
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, xp: true, level: true }
+            select: { id: true, xp: true, level: true, isElite: true, eliteUntil: true }
         });
 
         if (!user) throw new Error('User not found');
 
-        const newXP = user.xp + amount;
+        // 2. Aplicar multiplicador ELITE (2x XP)
+        const isElite = user.isElite && user.eliteUntil && user.eliteUntil > new Date();
+        const finalAmount = isElite ? amount * 2 : amount;
+
+        const newXP = user.xp + finalAmount;
         const newLevel = getLevelFromXP(newXP);
         const levelUp = newLevel > user.level;
 
-        // 2. Update User
+        // 3. Update User
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
@@ -42,7 +46,7 @@ export const awardXP = async (userId: string, amount: number, reason: string) =>
             }
         });
 
-        // 3. Log/Notify if Level Up
+        // 4. Log/Notify if Level Up
         if (levelUp) {
             console.log(`User ${userId} leveled up to ${newLevel}!`);
 
@@ -65,7 +69,8 @@ export const awardXP = async (userId: string, amount: number, reason: string) =>
 
         return {
             user: updatedUser,
-            xpEarned: amount,
+            xpEarned: finalAmount,
+            eliteBonus: isElite,
             levelUp,
             newLevel
         };
@@ -78,16 +83,24 @@ export const awardXP = async (userId: string, amount: number, reason: string) =>
 
 export const awardTrophies = async (userId: string, amount: number, reason: string) => {
     try {
+        // Verificar status Elite (2x troféus)
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { isElite: true, eliteUntil: true }
+        });
+        const isElite = user?.isElite && user?.eliteUntil && user.eliteUntil > new Date();
+        const finalAmount = isElite ? amount * 2 : amount;
+
         // Update user trophies
-        const user = await prisma.user.update({
+        const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
-                trophies: { increment: amount }
+                trophies: { increment: finalAmount }
             }
         });
 
-        console.log(`Awarded ${amount} trophies to user ${userId} for ${reason}`);
-        return user;
+        console.log(`Awarded ${finalAmount} trophies to user ${userId} for ${reason}${isElite ? ' (ELITE 2x)' : ''}`);
+        return updatedUser;
     } catch (error) {
         console.error('Error awarding trophies:', error);
         throw error;

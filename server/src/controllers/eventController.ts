@@ -19,6 +19,9 @@ export const getEvents = async (_req: Request, res: Response) => {
                         isEventReward: true,
                         publishedAt: true,
                     }
+                },
+                _count: {
+                    select: { dropClaims: true }
                 }
             }
         });
@@ -31,7 +34,10 @@ export const getEvents = async (_req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
     try {
-        const { title, description, date, category, game, imageUrl, linkedRewardId } = req.body;
+        const { 
+            title, description, date, category, game, imageUrl, linkedRewardId,
+            dropItemId, dropItemType, dropKeyword, dropClaimUntil
+        } = req.body;
 
         const event = await prisma.event.create({
             data: {
@@ -40,7 +46,12 @@ export const createEvent = async (req: Request, res: Response) => {
                 date: new Date(date),
                 category,
                 game,
-                imageUrl
+                imageUrl,
+                // Drop exclusivo
+                dropItemId: dropItemId || null,
+                dropItemType: dropItemType || null,
+                dropKeyword: dropKeyword || null,
+                dropClaimUntil: dropClaimUntil ? new Date(dropClaimUntil) : null,
             }
         });
 
@@ -183,5 +194,240 @@ export const deleteEvent = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error deleting event:', error);
         res.status(500).json({ error: 'Failed to delete event' });
+    }
+};
+
+// ========== DROP EXCLUSIVO DE EVENTO ==========
+
+// Atualizar evento (incluindo drop)
+export const updateEvent = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { 
+            title, description, date, category, game, imageUrl,
+            dropItemId, dropItemType, dropKeyword, dropClaimUntil
+        } = req.body;
+
+        const event = await prisma.event.update({
+            where: { id },
+            data: {
+                title,
+                description,
+                date: date ? new Date(date) : undefined,
+                category,
+                game,
+                imageUrl,
+                dropItemId: dropItemId ?? undefined,
+                dropItemType: dropItemType ?? undefined,
+                dropKeyword: dropKeyword ?? undefined,
+                dropClaimUntil: dropClaimUntil ? new Date(dropClaimUntil) : undefined,
+            }
+        });
+
+        res.json(event);
+    } catch (error) {
+        console.error('Error updating event:', error);
+        res.status(500).json({ error: 'Failed to update event' });
+    }
+};
+
+// Verificar se usuário tem drop disponível para resgatar
+export const getEventDrop = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = (req as any).user.id;
+
+        const event = await prisma.event.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                title: true,
+                date: true,
+                dropItemId: true,
+                dropItemType: true,
+                dropClaimUntil: true,
+                dropClaims: {
+                    where: { userId },
+                    select: { id: true, claimedAt: true }
+                }
+            }
+        });
+
+        if (!event) {
+            return res.status(404).json({ error: 'Evento não encontrado' });
+        }
+
+        // Verificar se tem drop configurado
+        if (!event.dropItemId || !event.dropItemType) {
+            return res.json({ hasDrop: false });
+        }
+
+        // Verificar se evento já terminou
+        const now = new Date();
+        if (event.date > now) {
+            return res.json({ hasDrop: false, reason: 'event_not_finished' });
+        }
+
+        // Verificar se ainda pode resgatar
+        if (event.dropClaimUntil && event.dropClaimUntil < now) {
+            return res.json({ hasDrop: false, reason: 'claim_expired' });
+        }
+
+        // Verificar se já resgatou
+        const alreadyClaimed = event.dropClaims.length > 0;
+
+        res.json({
+            hasDrop: true,
+            eventId: event.id,
+            eventTitle: event.title,
+            dropItemId: event.dropItemId,
+            dropItemType: event.dropItemType,
+            dropClaimUntil: event.dropClaimUntil,
+            alreadyClaimed,
+            claimedAt: alreadyClaimed ? event.dropClaims[0].claimedAt : null
+        });
+    } catch (error) {
+        console.error('Error fetching event drop:', error);
+        res.status(500).json({ error: 'Failed to fetch event drop' });
+    }
+};
+
+// Listar eventos com drops disponíveis para o usuário (não resgatados ainda)
+export const getAvailableDrops = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user.id;
+        const now = new Date();
+
+        // Buscar eventos finalizados com drops não resgatados pelo usuário
+        const events = await prisma.event.findMany({
+            where: {
+                active: true,
+                date: { lte: now }, // Evento já passou
+                dropItemId: { not: null },
+                dropItemType: { not: null },
+                OR: [
+                    { dropClaimUntil: null },
+                    { dropClaimUntil: { gte: now } }
+                ],
+                // Não resgatado pelo usuário
+                dropClaims: {
+                    none: { userId }
+                }
+            },
+            select: {
+                id: true,
+                title: true,
+                imageUrl: true,
+                date: true,
+                dropItemId: true,
+                dropItemType: true,
+                dropClaimUntil: true
+            },
+            orderBy: { date: 'desc' }
+        });
+
+        res.json(events);
+    } catch (error) {
+        console.error('Error fetching available drops:', error);
+        res.status(500).json({ error: 'Failed to fetch available drops' });
+    }
+};
+
+// Resgatar drop do evento
+export const claimEventDrop = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { keyword } = req.body;
+        const userId = (req as any).user.id;
+
+        // Buscar evento
+        const event = await prisma.event.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                title: true,
+                date: true,
+                dropItemId: true,
+                dropItemType: true,
+                dropKeyword: true,
+                dropClaimUntil: true,
+                dropClaims: {
+                    where: { userId }
+                }
+            }
+        });
+
+        if (!event) {
+            return res.status(404).json({ error: 'Evento não encontrado' });
+        }
+
+        // Verificações
+        if (!event.dropItemId || !event.dropItemType) {
+            return res.status(400).json({ error: 'Este evento não possui drop exclusivo' });
+        }
+
+        const now = new Date();
+        if (event.date > now) {
+            return res.status(400).json({ error: 'O evento ainda não terminou' });
+        }
+
+        if (event.dropClaimUntil && event.dropClaimUntil < now) {
+            return res.status(400).json({ error: 'O prazo para resgate expirou' });
+        }
+
+        if (event.dropClaims.length > 0) {
+            return res.status(400).json({ error: 'Você já resgatou este drop' });
+        }
+
+        // Verificar palavra-chave (case-insensitive)
+        if (event.dropKeyword) {
+            const normalizedInput = (keyword || '').trim().toLowerCase();
+            const normalizedKeyword = event.dropKeyword.trim().toLowerCase();
+            
+            if (normalizedInput !== normalizedKeyword) {
+                return res.status(400).json({ error: 'Palavra-chave incorreta' });
+            }
+        }
+
+        // Dar o item ao usuário baseado no tipo
+        // ownedCustomizations é uma string com IDs separados por vírgula
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { ownedCustomizations: true }
+        });
+        
+        const currentOwned = user?.ownedCustomizations ? user.ownedCustomizations.split(',').filter(Boolean) : [];
+        const itemId = event.dropItemId!;
+        
+        // Não duplicar se já tiver
+        if (currentOwned.includes(itemId)) {
+            return res.status(400).json({ error: 'Você já possui este item!' });
+        }
+        
+        currentOwned.push(itemId);
+        
+        // Atualizar usuário com o item
+        await prisma.user.update({
+            where: { id: userId },
+            data: { ownedCustomizations: currentOwned.join(',') }
+        });
+
+        // Registrar claim
+        await prisma.eventDropClaim.create({
+            data: {
+                eventId: event.id,
+                userId
+            }
+        });
+
+        res.json({
+            success: true,
+            message: 'Drop resgatado com sucesso!',
+            itemId: event.dropItemId,
+            itemType: event.dropItemType
+        });
+    } catch (error) {
+        console.error('Error claiming event drop:', error);
+        res.status(500).json({ error: 'Failed to claim event drop' });
     }
 };

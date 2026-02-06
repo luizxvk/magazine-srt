@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, X, ShieldCheck, AlertTriangle, Loader2, ArrowRight, Send } from 'lucide-react';
+import { Mail, X, ShieldCheck, AlertTriangle, ArrowRight, Send } from 'lucide-react';
+import Loader from './Loader';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -215,7 +216,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                             >
                                 {resending ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader size="sm" />
                                         Enviando...
                                     </>
                                 ) : (
@@ -287,7 +288,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                 >
                                     {loading ? (
                                         <>
-                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <Loader size="sm" />
                                             Verificando...
                                         </>
                                     ) : (

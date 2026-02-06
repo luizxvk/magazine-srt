@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Loader2, Coins } from 'lucide-react';
+import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Coins } from 'lucide-react';
+import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -310,7 +311,7 @@ export default function ProductStore() {
                             {/* Products Grid */}
                             {loading ? (
                                 <div className="flex items-center justify-center py-20">
-                                    <Loader2 className="w-8 h-8 animate-spin" style={{ color }} />
+                                    <Loader size="md" />
                                 </div>
                             ) : products.length === 0 ? (
                                 <div className="text-center py-20 text-gray-400">
@@ -339,7 +340,7 @@ export default function ProductStore() {
                             {/* Orders List */}
                             {loading ? (
                                 <div className="flex items-center justify-center py-20">
-                                    <Loader2 className="w-8 h-8 animate-spin" style={{ color }} />
+                                    <Loader size="md" />
                                 </div>
                             ) : orders.length === 0 ? (
                                 <div className="text-center py-20 text-gray-400">

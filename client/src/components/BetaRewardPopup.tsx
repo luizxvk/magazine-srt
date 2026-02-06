@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gift, Sparkles, Check, Loader2 } from 'lucide-react';
+import { Gift, Sparkles, Check } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import packageJson from '../../package.json';
@@ -215,7 +216,7 @@ export default function BetaRewardPopup() {
                             } disabled:opacity-80`}
                         >
                             {claiming ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader size="sm" />
                             ) : claimed ? (
                                 <>
                                     <Check className="w-5 h-5" />

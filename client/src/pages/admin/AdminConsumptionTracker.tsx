@@ -13,7 +13,6 @@ import {
     TrendingUp, 
     Search, 
     User, 
-    Loader2, 
     Package,
     Palette,
     Gift,
@@ -26,6 +25,7 @@ import {
     Coins,
     Banknote
 } from 'lucide-react';
+import Loader from '../../components/Loader';
 
 // Tipo de moeda
 type CurrencyFilter = 'ALL' | 'POINTS' | 'CASH';
@@ -581,7 +581,7 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
             {/* Lista de Transações */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-16">
-                    <Loader2 className={`w-10 h-10 animate-spin ${isMGT ? 'text-emerald-500' : 'text-amber-500'}`} />
+                    <Loader size="lg" />
                     <p className={`mt-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         Carregando transações...
                     </p>

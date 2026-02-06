@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, ChevronLeft, ChevronRight, Coins, Loader2 } from 'lucide-react';
+import { ShoppingBag, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
+import Loader from './Loader';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -76,7 +77,7 @@ export default function ProductStoreCard() {
             <div className="relative px-4 pb-3">
                 {loading ? (
                     <div className="h-28 flex items-center justify-center">
-                        <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
+                        <Loader size="sm" />
                     </div>
                 ) : products.length === 0 ? (
                     <div className="h-28 flex items-center justify-center text-gray-500 text-sm">

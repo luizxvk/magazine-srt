@@ -8,12 +8,15 @@ import {
     Gamepad2,
     Gift,
     Sparkles,
-    Loader2,
     Mail,
     AlertCircle,
     Banknote,
-    Percent
+    Percent,
+    QrCode,
+    Receipt,
+    ExternalLink
 } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -55,8 +58,9 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComplete, onGoToOrders }: PurchaseModalProps) {
-    const { user, accentColor, updateUserZions } = useAuth();
+    const { user, accentColor, updateUserZions, showEdgeNotification } = useAuth();
     const [paymentMethod, setPaymentMethod] = useState<'zions' | 'brl' | null>(null);
+    const [brlPaymentType, setBrlPaymentType] = useState<'pix' | 'card' | 'boleto' | null>(null);
     const [quantity, setQuantity] = useState(1);
     const [isPurchasing, setIsPurchasing] = useState(false);
     const [purchaseComplete, setPurchaseComplete] = useState(false);
@@ -97,16 +101,30 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                     quantity
                 });
                 updateUserZions(-totalZions);
+                setPurchaseComplete(true);
+                onPurchaseComplete?.();
             } else {
-                // BRL payment would redirect to payment gateway
-                // For now, just show a message
-                setError('Pagamento em BRL em breve! Use Zions por enquanto.');
-                setIsPurchasing(false);
-                return;
-            }
+                // BRL payment via MercadoPago
+                const { data } = await api.post('/payments/product/create-preference', {
+                    productId: product.id,
+                    quantity,
+                    paymentType: brlPaymentType
+                });
 
-            setPurchaseComplete(true);
-            onPurchaseComplete?.();
+                if (data.simulation) {
+                    // Modo simulação - simular pagamento aprovado
+                    await api.post('/payments/product/simulate', { orderId: data.orderId });
+                    showEdgeNotification?.('success', 'Compra Simulada!', 'Pagamento processado com sucesso (modo dev)');
+                    setPurchaseComplete(true);
+                    onPurchaseComplete?.();
+                } else if (data.init_point) {
+                    // Redirecionar para checkout MercadoPago
+                    showEdgeNotification?.('info', 'Redirecionando...', 'Você será redirecionado para o checkout do MercadoPago');
+                    
+                    // Abrir em nova aba ou redirecionar
+                    window.open(data.init_point, '_blank');
+                }
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Erro ao processar compra');
         } finally {
@@ -118,6 +136,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
         if (!isPurchasing) {
             setPurchaseComplete(false);
             setPaymentMethod(null);
+            setBrlPaymentType(null);
             setQuantity(1);
             setError(null);
             onClose();
@@ -374,12 +393,71 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                                         R$ {totalBRL.toFixed(2)}
                                                     </p>
                                                 )}
-                                                <p className="text-xs text-gray-500 mt-1">
-                                                    Em breve
+                                                <p className="text-xs text-green-400/70 mt-1">
+                                                    MercadoPago
                                                 </p>
                                             </button>
                                         )}
                                     </div>
+
+                                    {/* BRL Payment Type Selection */}
+                                    <AnimatePresence>
+                                        {paymentMethod === 'brl' && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="mt-3 overflow-hidden"
+                                            >
+                                                <p className="text-xs text-gray-400 mb-2">Escolha a forma de pagamento:</p>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    <button
+                                                        onClick={() => setBrlPaymentType('pix')}
+                                                        className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1.5 ${
+                                                            brlPaymentType === 'pix'
+                                                                ? 'border-cyan-500 bg-cyan-500/10'
+                                                                : 'border-white/10 hover:border-white/30 bg-white/5'
+                                                        }`}
+                                                    >
+                                                        <QrCode className={`w-5 h-5 ${brlPaymentType === 'pix' ? 'text-cyan-400' : 'text-gray-400'}`} />
+                                                        <span className={`text-xs font-medium ${brlPaymentType === 'pix' ? 'text-cyan-400' : 'text-gray-400'}`}>
+                                                            PIX
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setBrlPaymentType('card')}
+                                                        className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1.5 ${
+                                                            brlPaymentType === 'card'
+                                                                ? 'border-purple-500 bg-purple-500/10'
+                                                                : 'border-white/10 hover:border-white/30 bg-white/5'
+                                                        }`}
+                                                    >
+                                                        <CreditCard className={`w-5 h-5 ${brlPaymentType === 'card' ? 'text-purple-400' : 'text-gray-400'}`} />
+                                                        <span className={`text-xs font-medium ${brlPaymentType === 'card' ? 'text-purple-400' : 'text-gray-400'}`}>
+                                                            Cartão
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setBrlPaymentType('boleto')}
+                                                        className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-1.5 ${
+                                                            brlPaymentType === 'boleto'
+                                                                ? 'border-orange-500 bg-orange-500/10'
+                                                                : 'border-white/10 hover:border-white/30 bg-white/5'
+                                                        }`}
+                                                    >
+                                                        <Receipt className={`w-5 h-5 ${brlPaymentType === 'boleto' ? 'text-orange-400' : 'text-gray-400'}`} />
+                                                        <span className={`text-xs font-medium ${brlPaymentType === 'boleto' ? 'text-orange-400' : 'text-gray-400'}`}>
+                                                            Boleto
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                <p className="text-[10px] text-gray-500 mt-2 flex items-center gap-1">
+                                                    <ExternalLink className="w-3 h-3" />
+                                                    Você será redirecionado para o checkout seguro do MercadoPago
+                                                </p>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
 
                                 {/* Error Message */}
@@ -409,7 +487,12 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                 {/* Purchase Button */}
                                 <button
                                     onClick={handlePurchase}
-                                    disabled={!paymentMethod || isPurchasing || (paymentMethod === 'zions' && !canBuyWithZions)}
+                                    disabled={
+                                        !paymentMethod || 
+                                        isPurchasing || 
+                                        (paymentMethod === 'zions' && !canBuyWithZions) ||
+                                        (paymentMethod === 'brl' && !brlPaymentType)
+                                    }
                                     className="w-full py-3.5 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                                     style={{
                                         background: paymentMethod ? `linear-gradient(135deg, ${color}, ${color}dd)` : '#374151'
@@ -417,8 +500,13 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                 >
                                     {isPurchasing ? (
                                         <>
-                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <Loader size="sm" />
                                             <span>Processando...</span>
+                                        </>
+                                    ) : paymentMethod === 'brl' ? (
+                                        <>
+                                            <ExternalLink className="w-5 h-5" />
+                                            <span>Ir para Checkout</span>
                                         </>
                                     ) : (
                                         <>

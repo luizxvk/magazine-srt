@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Wallet, Zap } from 'lucide-react';
+import { X, Check, QrCode, Copy, CheckCircle, Coins, Wallet, Zap } from 'lucide-react';
+import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -441,7 +442,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                             className={`w-full py-3 rounded-xl font-bold text-white ${themeColors.button} flex items-center justify-center gap-2 disabled:opacity-50`}
                         >
                             {checkingPayment ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader size="sm" />
                             ) : (
                                 <>
                                     <CheckCircle className="w-5 h-5" />
@@ -567,7 +568,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                     className={`w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-lg flex items-center justify-center gap-2 ${themeColors.button} transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
                                     {loading === pkg.zions ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <Loader size="sm" />
                                     ) : (
                                         <>
                                             <QrCode className="w-3.5 h-3.5" />
@@ -623,7 +624,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                         className={`w-full py-2.5 rounded-xl font-bold text-white text-sm shadow-lg flex items-center justify-center gap-2 ${themeColors.button} transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
                                     >
                                         {loading === pkg.amount ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <Loader size="sm" />
                                         ) : (
                                             <>
                                                 <QrCode className="w-3.5 h-3.5" />

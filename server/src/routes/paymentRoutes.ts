@@ -18,4 +18,9 @@ router.post('/simulate-confirm', authenticateToken, paymentController.simulatePa
 // Webhook
 router.post('/webhook', paymentController.handleWebhook);
 
+// ============ PRODUTOS - PAGAMENTO BRL ============
+router.post('/product/create-preference', authenticateToken, paymentController.createProductPayment);
+router.post('/product/simulate', authenticateToken, paymentController.simulateProductPayment);
+router.post('/webhook/product', paymentController.handleProductWebhook);
+
 export default router;

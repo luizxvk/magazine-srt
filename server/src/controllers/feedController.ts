@@ -445,6 +445,32 @@ export const commentPost = async (req: AuthRequest, res: Response) => {
         const { id } = req.params;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
+        // Verificar se é Elite (ignora rate limit)
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { isElite: true, eliteUntil: true }
+        });
+        const isElite = user?.isElite && user?.eliteUntil && user.eliteUntil > new Date();
+
+        // Rate limit: 10 comments per hour (Elite ignora)
+        if (!isElite) {
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+            const recentCommentsCount = await prisma.comment.count({
+                where: {
+                    userId,
+                    createdAt: { gte: oneHourAgo }
+                }
+            });
+
+            if (recentCommentsCount >= 10) {
+                return res.status(429).json({ 
+                    error: 'COMMENT_RATE_LIMIT',
+                    message: 'Você atingiu o limite de 10 comentários por hora. Aguarde um pouco antes de comentar novamente.',
+                    remainingTime: 60 // minutos aproximados
+                });
+            }
+        }
+
         const { text } = commentSchema.parse(req.body);
 
         const post = await prisma.post.findUnique({ where: { id } });

@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Store, Search, Tag, ShoppingCart,
   X, Zap, History, Package,
-  Image, Award, Palette, Loader2
+  Image, Award, Palette
 } from 'lucide-react';
+import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Header from '../components/Header';
@@ -491,7 +492,7 @@ export default function MarketPage() {
             {/* Listings Grid */}
             {loading ? (
               <div className="flex justify-center py-16">
-                <Loader2 className={`w-8 h-8 animate-spin text-${themeColor}-400`} />
+                <Loader size="md" />
               </div>
             ) : filteredListings.length === 0 ? (
               <div className={`${themeCard} rounded-2xl p-16 text-center border ${themeBorder}`}>
@@ -548,7 +549,7 @@ export default function MarketPage() {
                             className={`px-3 py-1.5 rounded-lg bg-${themeColor}-500 text-white text-sm font-medium hover:bg-${themeColor}-600 disabled:opacity-50 flex items-center gap-1`}
                           >
                             {buyingId === listing.id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
+                              <Loader size="sm" />
                             ) : (
                               <ShoppingCart className="w-3 h-3" />
                             )}
@@ -607,7 +608,7 @@ export default function MarketPage() {
           <div className="space-y-4">
             {loading ? (
               <div className="flex justify-center py-16">
-                <Loader2 className={`w-8 h-8 animate-spin text-${themeColor}-400`} />
+                <Loader size="md" />
               </div>
             ) : myListings.length === 0 ? (
               <div className={`${themeCard} rounded-2xl p-16 text-center border ${themeBorder}`}>
@@ -654,7 +655,7 @@ export default function MarketPage() {
           <div className="space-y-4">
             {loading ? (
               <div className="flex justify-center py-16">
-                <Loader2 className={`w-8 h-8 animate-spin text-${themeColor}-400`} />
+                <Loader size="md" />
               </div>
             ) : transactions.length === 0 ? (
               <div className={`${themeCard} rounded-2xl p-16 text-center border ${themeBorder}`}>
@@ -800,7 +801,7 @@ export default function MarketPage() {
                   className={`flex-1 py-3 rounded-xl font-medium bg-${themeColor}-500 text-white hover:bg-${themeColor}-600 disabled:opacity-50 transition-colors flex items-center justify-center gap-2`}
                 >
                   {creating ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader size="sm" />
                   ) : (
                     <Tag className="w-4 h-4" />
                   )}

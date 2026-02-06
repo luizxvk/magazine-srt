@@ -6,16 +6,23 @@ import buildInfo from '../buildInfo.json';
 
 const CURRENT_BUILD_TIME = buildInfo.buildTime;
 const CHECK_INTERVAL = 60000; // Check every 60 seconds
+// Use absolute URL to ensure it works in Capacitor (which loads from Vercel)
+const BUILD_INFO_URL = import.meta.env.PROD 
+    ? 'https://magazine-frontend.vercel.app/buildInfo.json'
+    : '/buildInfo.json';
 
 export default function VersionUpdateNotification() {
-    const { theme } = useAuth();
+    const { theme, user } = useAuth();
     const [hasNewVersion, setHasNewVersion] = useState(false);
     const [dismissed, setDismissed] = useState(false);
 
     const checkForUpdates = useCallback(async () => {
+        // Only check if user is logged in
+        if (!user) return;
+        
         try {
             // Fetch the latest buildInfo.json with cache busting
-            const response = await fetch(`/buildInfo.json?t=${Date.now()}`, {
+            const response = await fetch(`${BUILD_INFO_URL}?t=${Date.now()}`, {
                 cache: 'no-store'
             });
             
@@ -31,9 +38,12 @@ export default function VersionUpdateNotification() {
             // Silently fail - network errors shouldn't affect UX
             console.debug('Version check failed:', error);
         }
-    }, []);
+    }, [user]);
 
     useEffect(() => {
+        // Only start checking if user is logged in
+        if (!user) return;
+        
         // Initial check after 10 seconds
         const initialTimer = setTimeout(checkForUpdates, 10000);
         
@@ -44,7 +54,7 @@ export default function VersionUpdateNotification() {
             clearTimeout(initialTimer);
             clearInterval(interval);
         };
-    }, [checkForUpdates]);
+    }, [checkForUpdates, user]);
 
     const handleUpdate = () => {
         // Force reload without cache
@@ -57,7 +67,7 @@ export default function VersionUpdateNotification() {
         setTimeout(() => setDismissed(false), 5 * 60 * 1000);
     };
 
-    if (!hasNewVersion || dismissed) return null;
+    if (!user || !hasNewVersion || dismissed) return null;
 
     return (
         <AnimatePresence>

@@ -200,7 +200,11 @@ function SessionExpiredWrapper() {
 }
 
 function MessagePopupWrapper() {
-  const { activeChatUserId } = useAuth();
+  const { activeChatUserId, user } = useAuth();
+  
+  // Only show for logged in users
+  if (!user) return null;
+  
   return <MessagePopup activeChatUserId={activeChatUserId} />;
 }
 

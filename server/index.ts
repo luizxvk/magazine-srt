@@ -56,14 +56,30 @@ app.use(compression());
 const allowedOrigins = [
     'https://magazine-frontend.vercel.app',
     'https://magazine-srt.vercel.app',
+    'https://magazine-mgt.vercel.app',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    // Capacitor origins (Android/iOS apps)
+    'capacitor://localhost',
+    'ionic://localhost',
+    'http://localhost',
+    'https://localhost'
 ];
 
 const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
+
+        // Allow Capacitor/Ionic apps
+        if (origin.startsWith('capacitor://') || origin.startsWith('ionic://')) {
+            return callback(null, true);
+        }
+        
+        // Allow file:// protocol (WebView local files)
+        if (origin.startsWith('file://')) {
+            return callback(null, true);
+        }
 
         if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
             callback(null, true);

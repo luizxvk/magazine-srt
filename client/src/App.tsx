@@ -47,6 +47,7 @@ import { EdgeNotificationContainer } from './components/EdgeNotification';
 import VersionUpdateNotification from './components/VersionUpdateNotification';
 import BetaRewardPopup from './components/BetaRewardPopup';
 import BetaEndedOverlay from './components/BetaEndedOverlay';
+import SupportButton from './components/SupportButton';
 
 
 
@@ -122,6 +123,7 @@ function App() {
         <VersionUpdateNotification />
         <BetaRewardWrapper />
         <BetaEndedOverlay />
+        <SupportButtonWrapper />
       </Router>
     </RadioProvider>
     </AuthProvider>
@@ -209,6 +211,15 @@ function BetaRewardWrapper() {
   if (!user) return null;
   
   return <BetaRewardPopup />;
+}
+
+function SupportButtonWrapper() {
+  const { user } = useAuth();
+  
+  // Only show for logged in users
+  if (!user) return null;
+  
+  return <SupportButton />;
 }
 
 export default App;

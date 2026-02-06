@@ -1,0 +1,11 @@
+{
+  "name": "magazine-srt",
+  "version": "0.5.0-rc.1",
+  "private": true,
+  "description": "Magazine SRT - Social Platform",
+  "scripts": {
+    "install": "cd client && npm install",
+    "build": "cd client && npm run build",
+    "sync": "cd client && npx cap sync android"
+  }
+}

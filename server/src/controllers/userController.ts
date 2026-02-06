@@ -298,6 +298,30 @@ export const claimBetaReward = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// Check if any admin is currently online (for support button)
+export const checkAdminOnline = async (req: AuthRequest, res: Response) => {
+    try {
+        // Check if any admin user is online (seen in last 5 minutes)
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        
+        const onlineAdmin = await prisma.user.findFirst({
+            where: {
+                role: 'ADMIN',
+                OR: [
+                    { isOnline: true },
+                    { lastSeenAt: { gte: fiveMinutesAgo } }
+                ]
+            },
+            select: { id: true }
+        });
+
+        res.json({ isOnline: !!onlineAdmin });
+    } catch (error) {
+        console.error('Error checking admin online status:', error);
+        res.json({ isOnline: false });
+    }
+};
+
 export const getMe = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;

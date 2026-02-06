@@ -12,6 +12,7 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 // Apple Vision Pro spring animation config
 const visionProSpring = {
@@ -39,27 +40,25 @@ export default function SupportButton() {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [isOpen, setIsOpen] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
-    const [lastScrollY, setLastScrollY] = useState(0);
+    const [isAdminOnline, setIsAdminOnline] = useState(false);
     const [hasNewMessage] = useState(false);
 
-    // Hide button when scrolling down, show when scrolling up
+    // Check if any admin is online
     useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsVisible(false);
-            } else {
-                setIsVisible(true);
+        const checkAdminOnline = async () => {
+            try {
+                const { data } = await api.get('/users/admin-online');
+                setIsAdminOnline(data.isOnline);
+            } catch {
+                setIsAdminOnline(false);
             }
-            
-            setLastScrollY(currentScrollY);
         };
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY]);
+        checkAdminOnline();
+        // Check every 30 seconds
+        const interval = setInterval(checkAdminOnline, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Close on escape key
     useEffect(() => {
@@ -160,7 +159,7 @@ export default function SupportButton() {
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={visionProSpring}
                         className={`
-                            fixed bottom-24 right-4 sm:right-6 z-[9999]
+                            fixed bottom-40 lg:bottom-24 right-4 lg:right-6 z-[9999]
                             w-[calc(100vw-2rem)] sm:w-80
                             ${glassPanel}
                             rounded-3xl overflow-hidden
@@ -191,8 +190,8 @@ export default function SupportButton() {
                                     <div>
                                         <h3 className="text-white font-semibold text-base">Suporte</h3>
                                         <p className="text-white/50 text-xs flex items-center gap-1">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                                            Online agora
+                                            <span className={`w-1.5 h-1.5 rounded-full ${isAdminOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
+                                            {isAdminOnline ? 'Online agora' : 'Offline'}
                                         </p>
                                     </div>
                                 </div>
@@ -291,64 +290,66 @@ export default function SupportButton() {
             </AnimatePresence>
 
             {/* Floating Support Button */}
-            <AnimatePresence>
-                {isVisible && (
-                    <motion.button
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={visionProSpring}
-                        onClick={() => setIsOpen(!isOpen)}
-                        className={`
-                            fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[9999]
-                            w-14 h-14 rounded-2xl
-                            bg-gradient-to-br ${isMGT ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-yellow-600'}
-                            shadow-[0_8px_24px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]
-                            flex items-center justify-center
-                            group relative overflow-hidden
-                            border border-white/20
-                        `}
-                        style={{
-                            boxShadow: `0 8px 32px ${accentColorHex}40, 0 4px 16px rgba(0,0,0,0.3)`,
-                        }}
-                        aria-label="Abrir suporte"
-                    >
-                        {/* Shine effect */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
-                        {/* Pulse ring */}
-                        <div 
-                            className="absolute inset-0 rounded-2xl animate-ping opacity-20"
-                            style={{ backgroundColor: accentColorHex }}
-                        />
-                        
-                        {/* Icon with rotation animation on open */}
-                        <motion.div
-                            animate={{ rotate: isOpen ? 135 : 0 }}
-                            transition={visionProSpring}
-                        >
-                            {isOpen ? (
-                                <X className="w-6 h-6 text-white" />
-                            ) : (
-                                <Headphones className="w-6 h-6 text-white" />
-                            )}
-                        </motion.div>
-
-                        {/* Notification badge */}
-                        {hasNewMessage && !isOpen && (
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center shadow-lg border-2 border-neutral-900"
-                            >
-                                <span className="text-[10px] font-bold text-white">1</span>
-                            </motion.div>
-                        )}
-                    </motion.button>
+            <motion.button
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={visionProSpring}
+                onClick={() => setIsOpen(!isOpen)}
+                className={`
+                    fixed bottom-24 lg:bottom-6 right-4 lg:right-6 z-[9999]
+                    w-14 h-14 rounded-2xl
+                    bg-gradient-to-br ${isMGT ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-yellow-600'}
+                    shadow-[0_8px_24px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]
+                    flex items-center justify-center
+                    group relative overflow-hidden
+                    border border-white/20
+                `}
+                style={{
+                    boxShadow: `0 8px 32px ${accentColorHex}40, 0 4px 16px rgba(0,0,0,0.3)`,
+                }}
+                aria-label="Abrir suporte"
+            >
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                {/* Pulse ring when admin is online */}
+                {isAdminOnline && (
+                    <div 
+                        className="absolute inset-0 rounded-2xl animate-ping opacity-20"
+                        style={{ backgroundColor: accentColorHex }}
+                    />
                 )}
-            </AnimatePresence>
+                
+                {/* Icon with rotation animation on open */}
+                <motion.div
+                    animate={{ rotate: isOpen ? 135 : 0 }}
+                    transition={visionProSpring}
+                >
+                    {isOpen ? (
+                        <X className="w-6 h-6 text-white" />
+                    ) : (
+                        <Headphones className="w-6 h-6 text-white" />
+                    )}
+                </motion.div>
+
+                {/* Notification badge */}
+                {hasNewMessage && !isOpen && (
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center shadow-lg border-2 border-neutral-900"
+                    >
+                        <span className="text-[10px] font-bold text-white">1</span>
+                    </motion.div>
+                )}
+
+                {/* Online indicator on button */}
+                {isAdminOnline && (
+                    <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-900 animate-pulse" />
+                )}
+            </motion.button>
         </>
     );
 }

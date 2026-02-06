@@ -1,4 +1,4 @@
-package com.magazinesrt.app;
+package com.rovex.mgt;
 
 import com.getcapacitor.BridgeActivity;
 

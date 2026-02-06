@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.magazinesrt.app"
+    namespace = "com.rovex.mgt"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.magazinesrt.app"
+        applicationId "com.rovex.mgt"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

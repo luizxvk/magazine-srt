@@ -27,7 +27,8 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
             setIsSupported(supported);
             
             if (supported) {
-                setPermission(pushService.getPermissionStatus());
+                const permStatus = await pushService.getPermissionStatus();
+                setPermission(permStatus);
                 const subscribed = await pushService.isSubscribed();
                 setIsSubscribed(subscribed);
             }
@@ -116,13 +117,17 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
     }
 
     if (!isSupported) {
+        const platformInfo = pushService.getPlatformInfo();
         return (
-            <div className={`${compact ? 'p-3' : 'p-6'} bg-red-500/10 border border-red-500/30 rounded-xl`}>
-                <div className="flex items-center gap-3 text-red-400">
+            <div className={`${compact ? 'p-3' : 'p-6'} bg-amber-500/10 border border-amber-500/30 rounded-xl`}>
+                <div className="flex items-center gap-3 text-amber-400">
                     <BellOff className="w-5 h-5" />
-                    <span className="text-sm">
-                        Seu navegador não suporta notificações push.
-                    </span>
+                    <div className="text-sm">
+                        <p>Notificações push não estão disponíveis.</p>
+                        {platformInfo.isNative && (
+                            <p className="text-amber-300/70 mt-1">Configure o Firebase para ativar no app.</p>
+                        )}
+                    </div>
                 </div>
             </div>
         );

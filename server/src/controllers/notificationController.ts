@@ -155,8 +155,12 @@ export const sendPushToUser = async (userId: string, title: string, body: string
     }
 
     try {
+        // Get only web push subscriptions (those with endpoint)
         const subscriptions = await prisma.pushSubscription.findMany({
-            where: { userId }
+            where: { 
+                userId,
+                endpoint: { not: null }
+            }
         });
 
         if (subscriptions.length === 0) {
@@ -174,6 +178,8 @@ export const sendPushToUser = async (userId: string, title: string, body: string
 
         const results = await Promise.allSettled(
             subscriptions.map(async (sub) => {
+                if (!sub.endpoint) return { success: false, endpoint: null };
+                
                 try {
                     await webpush.sendNotification(
                         {
@@ -244,5 +250,70 @@ export const sendTestNotification = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error sending test notification:', error);
         res.status(500).json({ error: 'Failed to send test notification' });
+    }
+};
+
+// Subscribe to FCM push notifications (Android/iOS native apps)
+export const subscribeToFcm = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { token, platform } = req.body;
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        if (!token) {
+            return res.status(400).json({ error: 'FCM token required' });
+        }
+
+        // Store FCM token in database
+        await prisma.pushSubscription.upsert({
+            where: {
+                fcmToken: token
+            },
+            update: {
+                userId: userId,
+                platform: platform || 'android',
+                userAgent: req.headers['user-agent'] || null,
+                updatedAt: new Date()
+            },
+            create: {
+                fcmToken: token,
+                platform: platform || 'android',
+                userId: userId,
+                userAgent: req.headers['user-agent'] || null
+            }
+        });
+
+        console.log(`[Push FCM] User ${userId} subscribed on platform ${platform}`);
+
+        res.json({ success: true, message: 'Subscribed to FCM push notifications' });
+    } catch (error) {
+        console.error('Error subscribing to FCM push notifications:', error);
+        res.status(500).json({ error: 'Failed to subscribe' });
+    }
+};
+
+// Unsubscribe from FCM push notifications
+export const unsubscribeFromFcm = async (req: AuthRequest, res: Response) => {
+    try {
+        const { token } = req.body;
+        const userId = req.user?.userId;
+
+        if (!token) {
+            return res.status(400).json({ error: 'FCM token required' });
+        }
+
+        await prisma.pushSubscription.deleteMany({
+            where: { fcmToken: token, userId }
+        });
+
+        console.log(`[Push FCM] User ${userId} unsubscribed from FCM`);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error unsubscribing from FCM:', error);
+        res.status(500).json({ error: 'Failed to unsubscribe' });
     }
 };

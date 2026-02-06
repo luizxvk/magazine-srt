@@ -6,7 +6,9 @@ import {
     subscribeToPush,
     unsubscribeFromPush,
     getPushStatus,
-    sendTestNotification
+    sendTestNotification,
+    subscribeToFcm,
+    unsubscribeFromFcm
 } from '../controllers/notificationController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -16,11 +18,15 @@ const router = Router();
 router.get('/', authenticateToken, getNotifications);
 router.put('/:id/read', authenticateToken, markAsRead);
 
-// Push notifications
+// Push notifications (Web Push)
 router.get('/push/vapid-key', getVapidKey);
 router.post('/push/subscribe', authenticateToken, subscribeToPush);
 router.post('/push/unsubscribe', authenticateToken, unsubscribeFromPush);
 router.get('/push/status', authenticateToken, getPushStatus);
 router.post('/push/test', authenticateToken, sendTestNotification);
+
+// Push notifications (FCM - Android/iOS native)
+router.post('/push/subscribe-fcm', authenticateToken, subscribeToFcm);
+router.post('/push/unsubscribe-fcm', authenticateToken, unsubscribeFromFcm);
 
 export default router;

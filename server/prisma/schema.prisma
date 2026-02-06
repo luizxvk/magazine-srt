@@ -975,8 +975,10 @@ model SocialActivity {
 model PushSubscription {
   id        String   @id @default(uuid())
   userId    String
-  endpoint  String   @unique
-  keys      Json     // { p256dh: string, auth: string }
+  endpoint  String?  @unique // For Web Push
+  keys      Json?    // { p256dh: string, auth: string } - For Web Push
+  fcmToken  String?  @unique // For Firebase Cloud Messaging (Android/iOS)
+  platform  String?  // 'web', 'android', 'ios'
   userAgent String?  // Browser/device info
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

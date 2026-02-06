@@ -320,6 +320,7 @@ export default function SupportButton() {
                     otherUserMembershipType={adminInfo.membershipType}
                     otherUserProfileBorder={adminInfo.equippedProfileBorder}
                     onClose={() => setShowChat(false)}
+                    isSupport={true}
                 />
             )}
         </>

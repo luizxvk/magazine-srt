@@ -28,9 +28,10 @@ interface ChatWindowProps {
     otherUserMembershipType?: string;
     otherUserProfileBorder?: string | null;
     onClose: () => void;
+    isSupport?: boolean;
 }
 
-export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, otherUserProfileBorder, onClose }: ChatWindowProps) {
+export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar, otherUserMembershipType, otherUserProfileBorder, onClose, isSupport = false }: ChatWindowProps) {
     const { user, theme, setActiveChatUserId, showError } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -171,7 +172,14 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
                         </div>
                         <div>
-                            <h3 className="font-bold text-white text-base leading-tight tracking-wide font-serif">{otherUserName}</h3>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-white text-base leading-tight tracking-wide font-serif">{otherUserName}</h3>
+                                {isSupport && (
+                                    <span className="px-1.5 py-0.5 text-[9px] font-bold bg-cyan-500/20 text-cyan-400 rounded border border-cyan-500/30 uppercase tracking-wider">
+                                        Suporte
+                                    </span>
+                                )}
+                            </div>
                             <span className={`text-[10px] font-bold tracking-widest uppercase ${isOtherMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                                 Membro {isOtherMGT ? 'MGT' : 'MAGAZINE'}
                             </span>

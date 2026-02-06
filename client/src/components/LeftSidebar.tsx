@@ -1,4 +1,4 @@
-import { Users, Camera, Calendar, UserPlus, Star, Lock } from 'lucide-react';
+import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
@@ -48,6 +48,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             label: 'Grupos',
             to: '/groups',
             feature: Feature.GROUPS
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5" />,
+            label: 'Loja de Produtos',
+            to: '/store'
         },
         {
             icon: <Camera className="w-5 h-5" />,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -36,9 +36,23 @@ export default function ModernLogin() {
 
 
 
-    // Determine initial state based on navigation or storage
-    const initialMembership = location.state?.membershipType || localStorage.getItem('lastMembershipType') || 'MAGAZINE';
+    // Determine initial state based on URL path, navigation state, or storage
+    const getMembershipFromPath = () => {
+        if (location.pathname === '/login/mgt') return 'MGT';
+        if (location.pathname === '/login/magazine') return 'MAGAZINE';
+        return null;
+    };
+    const pathMembership = getMembershipFromPath();
+    const initialMembership = pathMembership || location.state?.membershipType || localStorage.getItem('lastMembershipType') || 'MAGAZINE';
     const [isMGT, setIsMGT] = useState(initialMembership === 'MGT');
+    
+    // Update state when URL path changes
+    useEffect(() => {
+        const membership = getMembershipFromPath();
+        if (membership) {
+            setIsMGT(membership === 'MGT');
+        }
+    }, [location.pathname]);
 
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
     const [showUserNotFoundPopup, setShowUserNotFoundPopup] = useState(false);
@@ -457,8 +471,14 @@ export default function ModernLogin() {
                                     <button
                                         onClick={() => {
                                             setShowPermissionDeniedPopup(false);
-                                            // Switch to the correct membership type
-                                            setIsMGT(deniedMembershipType === 'MGT');
+                                            // Navigate to the correct login page
+                                            if (deniedMembershipType === 'MGT') {
+                                                // User is MGT, redirect to MGT login
+                                                navigate('/login/mgt');
+                                            } else {
+                                                // User is MAGAZINE, redirect to Magazine login
+                                                navigate('/login');
+                                            }
                                         }}
                                         className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all
                                             ${deniedMembershipType === 'MAGAZINE' 

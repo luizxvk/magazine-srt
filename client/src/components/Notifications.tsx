@@ -95,10 +95,10 @@ export default function Notifications({ onClose }: NotificationsProps) {
 
             case 'LIKE':
             case 'COMMENT':
-                // Navigate to the post
+                // Navigate to the specific post page
                 if (parsedContent.postId) {
                     onClose?.();
-                    navigate(`/feed?postId=${parsedContent.postId}`);
+                    navigate(`/post/${parsedContent.postId}`);
                 }
                 break;
 

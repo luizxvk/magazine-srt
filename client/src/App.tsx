@@ -68,6 +68,8 @@ function App() {
           <Routes>
           <Route path="/" element={<ModernLogin />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/login/mgt" element={<ModernLogin />} />
+          <Route path="/login/magazine" element={<ModernLogin />} />
           <Route path="/suspended" element={<SuspendedPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />

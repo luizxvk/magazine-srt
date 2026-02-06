@@ -4,11 +4,8 @@ const config: CapacitorConfig = {
   appId: 'com.rovex.mgt',
   appName: 'Rovex MGT',
   webDir: 'dist',
-  // Frontend é carregado do Vercel - atualizações automáticas sem rebuild do APK
-  server: {
-    url: 'https://magazinemgt.com',
-    cleartext: false, // HTTPS only
-  },
+  // Frontend bundled localmente - mais estável para produção
+  // Para updates automáticos, adicionar: server: { url: 'https://SEU_DOMINIO' }
   android: {
     // Permite mixed content (http em https)
     allowMixedContent: true,

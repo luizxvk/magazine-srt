@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:874265390963:android:ad31d9a582b838546d5f06",
+        "mobilesdk_app_id": "1:874265390963:android:4eebab27d2819d3f6d5f06",
         "android_client_info": {
-          "package_name": "io.rovex.magazine"
+          "package_name": "com.rovex.mgt"
         }
       },
       "oauth_client": [],

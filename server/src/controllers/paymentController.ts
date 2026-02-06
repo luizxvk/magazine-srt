@@ -14,22 +14,23 @@ const ZION_PACKAGES: Record<number, number> = {
     2500: 59.90,    // Magnata - 40% de economia
 };
 
-// Pacotes de recarga de Zions Cash (1:1 com Real)
+// Pacotes de recarga de Zions Cash (com margem de lucro)
+// Usuário paga R$ X e recebe Z$ Y (onde Y < X para gerar margem)
 const CASH_PACKAGES: Record<number, number> = {
-    10: 10.00,      // Básico
-    25: 25.00,      // Padrão
-    50: 50.00,      // Plus
-    100: 100.00,    // Premium (5% bônus = 105 cash)
-    200: 200.00,    // Elite (10% bônus = 220 cash)
+    12: 15.00,      // Z$12 por R$15 (20% margem)
+    25: 30.00,      // Z$25 por R$30 (16% margem)
+    50: 60.00,      // Z$50 por R$60 (16% margem)
+    110: 130.00,    // Z$110 por R$130 + bônus (15% margem)
+    225: 260.00,    // Z$225 por R$260 + bônus (13% margem)
 };
 
-// Bônus para pacotes de Cash
+// Bônus para pacotes de Cash (incentiva compras maiores)
 const CASH_BONUS: Record<number, number> = {
-    10: 0,
+    12: 0,
     25: 0,
     50: 0,
-    100: 5,   // 5% bônus
-    200: 20,  // 10% bônus
+    110: 5,   // +Z$5 bônus = Z$115 total
+    225: 15,  // +Z$15 bônus = Z$240 total
 };
 
 // Helper para verificar se o pacote é válido

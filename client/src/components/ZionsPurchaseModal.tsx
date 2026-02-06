@@ -20,13 +20,14 @@ const PACKAGES = [
     { zions: 2500, price: 59.90, label: 'Magnata', bonus: '40% economia', image: zionPointsImg },
 ];
 
-// Valores de recarga para ZIONS CASH (moeda real)
+// Valores de recarga para ZIONS CASH (com margem de lucro)
+// Usuário paga R$ X e recebe Z$ Y
 const CASH_PACKAGES = [
-    { amount: 10, price: 10.00, label: 'Básico', image: zionCashImg },
-    { amount: 25, price: 25.00, label: 'Padrão', popular: true, image: zionCashImg },
-    { amount: 50, price: 50.00, label: 'Plus', bonus: 'Mais usado', image: zionCashImg },
-    { amount: 100, price: 100.00, label: 'Premium', bonus: '5% bônus', image: zionCashImg },
-    { amount: 200, price: 200.00, label: 'Elite', bonus: '10% bônus', image: zionCashImg },
+    { amount: 12, price: 15.00, label: 'Básico', image: zionCashImg },
+    { amount: 25, price: 30.00, label: 'Padrão', popular: true, image: zionCashImg },
+    { amount: 50, price: 60.00, label: 'Plus', image: zionCashImg },
+    { amount: 110, price: 130.00, label: 'Premium', bonus: '+Z$5 bônus', image: zionCashImg },
+    { amount: 225, price: 260.00, label: 'Elite', bonus: '+Z$15 bônus', image: zionCashImg },
 ];
 
 type TabType = 'points' | 'cash';

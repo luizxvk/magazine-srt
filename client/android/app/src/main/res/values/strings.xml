@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Magazine SRT</string>
+    <string name="title_activity_main">Magazine SRT</string>
+    <string name="package_name">com.magazinesrt.app</string>
+    <string name="custom_url_scheme">com.magazinesrt.app</string>
+</resources>

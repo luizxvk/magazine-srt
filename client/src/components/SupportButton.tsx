@@ -42,6 +42,15 @@ export default function SupportButton() {
     const [isOpen, setIsOpen] = useState(false);
     const [isAdminOnline, setIsAdminOnline] = useState(false);
     const [hasNewMessage] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check if mobile on mount and resize
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Check if any admin is online
     useEffect(() => {
@@ -159,11 +168,14 @@ export default function SupportButton() {
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={visionProSpring}
                         className={`
-                            fixed bottom-40 lg:bottom-24 right-4 lg:right-6 z-[9999]
+                            fixed right-4 z-[10000]
                             w-[calc(100vw-2rem)] sm:w-80
                             ${glassPanel}
                             rounded-3xl overflow-hidden
                         `}
+                        style={{
+                            bottom: isMobile ? '170px' : '90px',
+                        }}
                     >
                         {/* Header with gradient accent */}
                         <div className={`
@@ -298,7 +310,7 @@ export default function SupportButton() {
                 transition={visionProSpring}
                 onClick={() => setIsOpen(!isOpen)}
                 className={`
-                    fixed bottom-24 lg:bottom-6 right-4 lg:right-6 z-[9999]
+                    fixed right-4 z-[10000]
                     w-14 h-14 rounded-2xl
                     bg-gradient-to-br ${isMGT ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-yellow-600'}
                     shadow-[0_8px_24px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]
@@ -307,6 +319,7 @@ export default function SupportButton() {
                     border border-white/20
                 `}
                 style={{
+                    bottom: isMobile ? '100px' : '24px',
                     boxShadow: `0 8px 32px ${accentColorHex}40, 0 4px 16px rgba(0,0,0,0.3)`,
                 }}
                 aria-label="Abrir suporte"

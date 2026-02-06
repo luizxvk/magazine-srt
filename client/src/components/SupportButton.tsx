@@ -168,13 +168,14 @@ export default function SupportButton() {
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={visionProSpring}
                         className={`
-                            fixed right-4 z-[10000]
+                            fixed z-[10000]
                             w-[calc(100vw-2rem)] sm:w-80
                             ${glassPanel}
                             rounded-3xl overflow-hidden
                         `}
                         style={{
                             bottom: isMobile ? '170px' : '90px',
+                            right: '16px',
                         }}
                     >
                         {/* Header with gradient accent */}
@@ -303,14 +304,14 @@ export default function SupportButton() {
 
             {/* Floating Support Button */}
             <motion.button
-                initial={{ scale: 0, opacity: 0 }}
+                initial={false}
                 animate={{ scale: 1, opacity: 1 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={visionProSpring}
                 onClick={() => setIsOpen(!isOpen)}
                 className={`
-                    fixed right-4 z-[10000]
+                    fixed z-[10000]
                     w-14 h-14 rounded-2xl
                     bg-gradient-to-br ${isMGT ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-yellow-600'}
                     shadow-[0_8px_24px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]
@@ -320,6 +321,7 @@ export default function SupportButton() {
                 `}
                 style={{
                     bottom: isMobile ? '100px' : '24px',
+                    right: '16px',
                     boxShadow: `0 8px 32px ${accentColorHex}40, 0 4px 16px rgba(0,0,0,0.3)`,
                 }}
                 aria-label="Abrir suporte"

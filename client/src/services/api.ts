@@ -1,7 +1,32 @@
 import axios from 'axios';
 
+// Detectar se está rodando no Capacitor (app nativo)
+const isCapacitor = typeof (window as any).Capacitor !== 'undefined';
+
+// Em produção web usa /api (mesmo domínio)
+// No Capacitor app usa URL completa da API
+const getBaseURL = () => {
+    // Se tem variável de ambiente definida, usa ela
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL;
+    }
+    
+    // Se é Capacitor (app nativo), precisa URL completa
+    if (isCapacitor) {
+        return 'https://magazine-srt.vercel.app/api';
+    }
+    
+    // Em produção web, usa path relativo
+    if (import.meta.env.PROD) {
+        return '/api';
+    }
+    
+    // Em desenvolvimento local
+    return 'http://localhost:3000/api';
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3000/api'),
+    baseURL: getBaseURL(),
 });
 
 api.interceptors.request.use((config) => {

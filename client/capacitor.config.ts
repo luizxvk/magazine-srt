@@ -4,11 +4,8 @@ const config: CapacitorConfig = {
   appId: 'com.magazinesrt.app',
   appName: 'Magazine SRT',
   webDir: 'dist',
-  server: {
-    // URL do servidor em produção
-    url: 'https://magazine-srt.vercel.app',
-    cleartext: true,
-  },
+  // Frontend é servido localmente do APK
+  // API calls vão para o backend no Vercel via axios
   android: {
     // Permite mixed content (http em https)
     allowMixedContent: true,

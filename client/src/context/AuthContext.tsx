@@ -813,6 +813,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setEdgeNotifications(prev => prev.filter(n => n.id !== id));
     }, []);
 
+    // Friend request notifications polling
+    useEffect(() => {
+        if (!user) return;
+
+        let lastKnownRequestIds: Set<string> = new Set();
+        let isFirstCheck = true;
+
+        const checkFriendRequests = async () => {
+            try {
+                const { data } = await api.get('/social/requests');
+                const currentIds = new Set<string>(data.map((r: { id: string }) => r.id));
+
+                // Skip notification on first check (page load)
+                if (isFirstCheck) {
+                    lastKnownRequestIds = currentIds;
+                    isFirstCheck = false;
+                    return;
+                }
+
+                // Find new requests (ids that weren't in last check)
+                data.forEach((request: { id: string; requester: { displayName?: string; name: string; avatarUrl?: string } }) => {
+                    if (!lastKnownRequestIds.has(request.id)) {
+                        const senderName = request.requester.displayName || request.requester.name;
+                        showEdgeNotification(
+                            'friend',
+                            'Solicitação de amizade',
+                            `${senderName} quer ser seu amigo!`,
+                            {
+                                avatar: request.requester.avatarUrl,
+                                action: {
+                                    label: 'Ver',
+                                    onClick: () => {
+                                        window.location.href = '/social?tab=requests';
+                                    }
+                                },
+                                duration: 8000
+                            }
+                        );
+                    }
+                });
+
+                lastKnownRequestIds = currentIds;
+            } catch (error) {
+                console.debug('Friend request check failed:', error);
+            }
+        };
+
+        // Initial check after 3 seconds
+        const initialTimeout = setTimeout(checkFriendRequests, 3000);
+        // Poll every 30 seconds
+        const interval = setInterval(checkFriendRequests, 30000);
+
+        return () => {
+            clearTimeout(initialTimeout);
+            clearInterval(interval);
+        };
+    }, [user, showEdgeNotification]);
+
     // Achievement popup - NOW USES EDGE NOTIFICATION
     const showAchievement = useCallback((title: string, description: string) => {
         showEdgeNotification('achievement', title, description, { duration: 6000 });

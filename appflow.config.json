@@ -1,0 +1,9 @@
+{
+  "root": "client",
+  "apps": [
+    {
+      "id": "magazine-srt",
+      "root": "client"
+    }
+  ]
+}

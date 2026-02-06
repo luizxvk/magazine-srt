@@ -723,7 +723,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         const loadUser = async () => {
-            const token = localStorage.getItem('token');
+            // Check localStorage first (remember me), then sessionStorage (session only)
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (token) {
                 try {
                     // 1. Load User
@@ -774,7 +775,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     }
                 } catch (error) {
                     console.error('Failed to load user', error);
+                    // Clear both storages on error
                     localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
                 }
             }
             setLoading(false);
@@ -915,7 +918,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         });
         
-        localStorage.setItem('token', token);
+        // Check rememberMe preference - if true, use localStorage (persists), else sessionStorage (clears on close)
+        const rememberMe = localStorage.getItem('rememberMe') === 'true';
+        
+        // Clear both first to avoid conflicts
+        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
+        
+        if (rememberMe) {
+            localStorage.setItem('token', token);
+        } else {
+            sessionStorage.setItem('token', token);
+        }
 
         if (membershipContext) {
             localStorage.setItem('sessionMembershipType', membershipContext);
@@ -1001,7 +1015,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.removeItem('lastMembershipType');
         }
 
+        // Clear token from both storages
         localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         localStorage.removeItem('sessionMembershipType');
         setUser(null);
 

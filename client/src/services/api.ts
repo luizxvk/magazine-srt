@@ -30,7 +30,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    // Check localStorage first (remember me), then sessionStorage (session only)
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -42,8 +43,9 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.data?.code === 'SESSION_EXPIRED') {
-            // Clear all auth data
+            // Clear all auth data from both storages
             localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
             localStorage.removeItem('sessionMembershipType');
             localStorage.removeItem('dailyLoginModalShown');
             

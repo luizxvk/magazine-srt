@@ -107,8 +107,9 @@ export default function ModernLogin() {
                 return;
             }
             
-            // Store token first
-            localStorage.setItem('token', response.data.token);
+            // Temporarily store token in sessionStorage for the /users/me call
+            // The login() function will handle proper storage based on rememberMe preference
+            sessionStorage.setItem('token', response.data.token);
             
             // Fetch complete user data from /users/me to ensure all fields are loaded
             try {

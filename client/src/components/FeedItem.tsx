@@ -412,6 +412,12 @@ export default function FeedItem({
                 {/* Poll Section */}
                 {poll && poll.options.length > 0 && (
                     <div className="mb-4">
+                        {/* Poll Question */}
+                        {poll.question && (
+                            <p className={`text-sm font-medium mb-3 ${theme === 'light' ? 'text-gray-800' : 'text-white/90'}`}>
+                                {poll.question}
+                            </p>
+                        )}
                         <div className="flex items-center gap-2 mb-3">
                             <BarChart3 className="w-4 h-4" style={{ color: userAccent }} />
                             <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>

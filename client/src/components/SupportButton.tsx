@@ -5,24 +5,37 @@ import {
     X, 
     MessageCircle, 
     Mail, 
-    Phone, 
     ExternalLink,
     Sparkles,
     Clock,
-    CheckCircle2
+    CheckCircle2,
+    Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import ChatWindow from './ChatWindow';
 
 // WhatsApp number for support
 const SUPPORT_WHATSAPP = '+551999269715';
 const SUPPORT_EMAIL = 'suporte@magazinemgt.com';
+
+// Admin info for internal chat
+interface AdminInfo {
+    id: string;
+    name: string;
+    displayName?: string;
+    avatarUrl?: string;
+    membershipType?: string;
+    equippedProfileBorder?: string | null;
+}
 
 export default function SupportButton() {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [isOpen, setIsOpen] = useState(false);
     const [isAdminOnline, setIsAdminOnline] = useState(false);
+    const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
+    const [showChat, setShowChat] = useState(false);
 
     // Calculate position based on window width
     const [bottomPosition, setBottomPosition] = useState('24px');
@@ -47,6 +60,9 @@ export default function SupportButton() {
                 const { data } = await api.get('/users/admin-online');
                 if (mounted) {
                     setIsAdminOnline(data?.isOnline || false);
+                    if (data?.admin) {
+                        setAdminInfo(data.admin);
+                    }
                 }
             } catch (error) {
                 // Silently fail - don't crash the component
@@ -88,9 +104,11 @@ export default function SupportButton() {
         setIsOpen(false);
     };
 
-    const handleCall = () => {
-        window.open(`tel:${SUPPORT_WHATSAPP}`, '_blank');
-        setIsOpen(false);
+    const handleChat = () => {
+        if (adminInfo) {
+            setShowChat(true);
+            setIsOpen(false);
+        }
     };
 
     const panelBottom = window.innerWidth < 1024 ? '170px' : '90px';
@@ -205,20 +223,25 @@ export default function SupportButton() {
                                 </div>
                             </button>
 
-                            {/* Call */}
+                            {/* Chat Interno */}
                             <button
-                                onClick={handleCall}
-                                className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-left"
+                                onClick={handleChat}
+                                disabled={!adminInfo}
+                                className={`w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-left ${!adminInfo ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                                        <Phone className="w-5 h-5" style={{ color: accentColorHex }} />
+                                        <Send className="w-5 h-5" style={{ color: accentColorHex }} />
                                     </div>
                                     <div>
-                                        <span className="text-white font-medium text-sm">Ligar</span>
-                                        <p className="text-white/40 text-xs">Atendimento por voz</p>
+                                        <span className="text-white font-medium text-sm">Chat</span>
+                                        <p className="text-white/40 text-xs">
+                                            {adminInfo ? 'Fale direto com a equipe' : 'Admin offline'}
+                                        </p>
                                     </div>
-                                    <ExternalLink className="w-4 h-4 text-white/20 ml-auto" />
+                                    {isAdminOnline && (
+                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-auto" />
+                                    )}
                                 </div>
                             </button>
                         </div>
@@ -287,6 +310,18 @@ export default function SupportButton() {
                     />
                 )}
             </button>
+
+            {/* Support Chat Window */}
+            {showChat && adminInfo && (
+                <ChatWindow
+                    otherUserId={adminInfo.id}
+                    otherUserName={adminInfo.displayName || adminInfo.name}
+                    otherUserAvatar={adminInfo.avatarUrl}
+                    otherUserMembershipType={adminInfo.membershipType}
+                    otherUserProfileBorder={adminInfo.equippedProfileBorder}
+                    onClose={() => setShowChat(false)}
+                />
+            )}
         </>
     );
 }

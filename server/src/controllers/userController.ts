@@ -312,13 +312,31 @@ export const checkAdminOnline = async (req: AuthRequest, res: Response) => {
                     { lastSeenAt: { gte: fiveMinutesAgo } }
                 ]
             },
-            select: { id: true }
+            select: { 
+                id: true,
+                name: true,
+                displayName: true,
+                avatarUrl: true,
+                membershipType: true,
+                equippedProfileBorder: true
+            },
+            orderBy: { lastSeenAt: 'desc' }
         });
 
-        res.json({ isOnline: !!onlineAdmin });
+        res.json({ 
+            isOnline: !!onlineAdmin,
+            admin: onlineAdmin ? {
+                id: onlineAdmin.id,
+                name: onlineAdmin.name,
+                displayName: onlineAdmin.displayName,
+                avatarUrl: onlineAdmin.avatarUrl,
+                membershipType: onlineAdmin.membershipType,
+                equippedProfileBorder: onlineAdmin.equippedProfileBorder
+            } : null
+        });
     } catch (error) {
         console.error('Error checking admin online status:', error);
-        res.json({ isOnline: false });
+        res.json({ isOnline: false, admin: null });
     }
 };
 

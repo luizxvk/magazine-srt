@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "874265390963",
+    "project_id": "rovex-magazine",
+    "storage_bucket": "rovex-magazine.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:874265390963:android:ad31d9a582b838546d5f06",
+        "android_client_info": {
+          "package_name": "io.rovex.magazine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2H0_hd4f689Yj8T_hqY7AT2d6k60tcUc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -92,6 +92,7 @@ interface AuthContextType {
     toggleTheme: () => void;
     // Customization
     accentColor: string;
+    accentGradient: string | null; // Gradient for backgrounds (null = use solid color)
     backgroundStyle: string | null;
     equippedBadge: string | null;
     // Theme Preview Mode
@@ -165,7 +166,7 @@ const ACCENT_COLORS: Record<string, string> = {
     'color_pastel_sage': '#9dc183',
     'color_pastel_butter': '#fffacd',
     'color_pastel_periwinkle': '#ccccff',
-    // Gradient colors (use primary color for accent)
+    // Gradient colors (use primary color for text fallback)
     'color_gradient_sunset': '#ff6b35',
     'color_gradient_ocean': '#0077b6',
     'color_gradient_aurora': '#7b4397',
@@ -176,6 +177,20 @@ const ACCENT_COLORS: Record<string, string> = {
     'color_gradient_gold': '#d4af37',
     'color_gradient_midnight': '#302b63',
     'color_gradient_candy': '#ff9a9e',
+};
+
+// Gradient definitions for background usage
+const ACCENT_GRADIENTS: Record<string, string> = {
+    'color_gradient_sunset': 'linear-gradient(135deg, #ff6b35, #f72585)',
+    'color_gradient_ocean': 'linear-gradient(135deg, #0077b6, #00f5d4)',
+    'color_gradient_aurora': 'linear-gradient(135deg, #7b4397, #00d9ff)',
+    'color_gradient_fire': 'linear-gradient(135deg, #ff0000, #ffc300)',
+    'color_gradient_galaxy': 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)',
+    'color_gradient_neon': 'linear-gradient(135deg, #ff00ff, #00ffff)',
+    'color_gradient_forest': 'linear-gradient(135deg, #134e5e, #71b280)',
+    'color_gradient_gold': 'linear-gradient(135deg, #8b7335, #d4af37, #f4e4a6)',
+    'color_gradient_midnight': 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
+    'color_gradient_candy': 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)',
 };
 
 // Helper to convert hex to rgb
@@ -234,6 +249,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Default colors based on membership
         return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
     }, [user?.equippedColor, user?.membershipType, previewTheme?.color]);
+
+    // Compute accent gradient (for background usage)
+    const accentGradient = React.useMemo(() => {
+        if (user?.equippedColor && ACCENT_GRADIENTS[user.equippedColor]) {
+            return ACCENT_GRADIENTS[user.equippedColor];
+        }
+        return null; // No gradient, use solid color
+    }, [user?.equippedColor]);
 
     // Compute background style from user's equipped customization (or preview)
     const backgroundStyle = React.useMemo(() => {
@@ -485,6 +508,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         root.style.setProperty('--accent-600', mixHex(accentColor, '#000000', 0.80));
         root.style.setProperty('--accent-700', mixHex(accentColor, '#000000', 0.60));
 
+        // Set gradient variable (for background usage)
+        if (accentGradient) {
+            root.style.setProperty('--accent-gradient', accentGradient);
+            root.classList.add('has-gradient-accent');
+        } else {
+            root.style.setProperty('--accent-gradient', accentColor);
+            root.classList.remove('has-gradient-accent');
+        }
+
         // Add class when custom color is equipped to enable global color replacement
         if (user?.equippedColor) {
             root.classList.add('custom-accent');
@@ -500,7 +532,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             root.classList.remove('custom-accent');
             root.classList.remove('rgb-dynamic');
         }
-    }, [accentColor, user?.equippedColor, user]);
+    }, [accentColor, accentGradient, user?.equippedColor, user]);
 
     // Apply custom background
     useEffect(() => {
@@ -1295,6 +1327,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             toggleTheme,
             // Customization values
             accentColor,
+            accentGradient,
             backgroundStyle,
             equippedBadge: user?.equippedBadge || null,
             // Theme Preview Mode

@@ -24,7 +24,7 @@ interface SidebarItem {
 }
 
 export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick, dailyLoginStatus }: LeftSidebarProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, accentColor, accentGradient } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
     // Theme styles - consistent with project pattern
@@ -185,8 +185,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
                             </div>
                             <div className={`mt-2 h-1.5 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
                                 <div 
-                                    className={`h-full rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} transition-all duration-500`}
-                                    style={{ width: `${progressPercent}%` }}
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{ 
+                                        width: `${progressPercent}%`,
+                                        background: accentGradient || accentColor || (isMGT ? '#10b981' : '#d4af37')
+                                    }}
                                 />
                             </div>
                         </>

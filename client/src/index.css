@@ -55,6 +55,37 @@ body::-webkit-scrollbar-thumb:hover {
   background: #a0a0a0;
 }
 
+/* ============================================
+   GRADIENT ACCENT COLOR STYLES
+   When user equips a gradient color, apply it to accented elements
+   ============================================ */
+
+/* Gradient text effect - for titles and prominent text */
+.has-gradient-accent .gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gradient background for buttons and cards */
+.has-gradient-accent .accent-gradient-bg {
+  background: var(--accent-gradient) !important;
+}
+
+/* Gradient border effect */
+.has-gradient-accent .accent-gradient-border {
+  border-color: transparent;
+  background: linear-gradient(var(--bg-color, #0a0a0a), var(--bg-color, #0a0a0a)) padding-box,
+              var(--accent-gradient) border-box;
+}
+
+/* Apply gradient to progress bars when gradient accent is active */
+.has-gradient-accent [class*="bg-gold-"],
+.has-gradient-accent [class*="bg-emerald-"] {
+  background: var(--accent-gradient) !important;
+}
+
 /* Liquid Gradient Effect Styles */
 .liquid-gradient {
   overflow: hidden;

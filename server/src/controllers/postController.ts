@@ -145,6 +145,8 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
                         trophies: true,
                         membershipType: true,
                         equippedProfileBorder: true,
+                        isElite: true,
+                        eliteUntil: true,
                     }
                 },
                 tags: true,
@@ -176,6 +178,8 @@ export const getPostById = async (req: AuthRequest, res: Response) => {
                         trophies: true,
                         membershipType: true,
                         equippedProfileBorder: true,
+                        isElite: true,
+                        eliteUntil: true,
                     }
                 },
                 tags: true,

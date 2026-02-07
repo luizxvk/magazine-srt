@@ -33,6 +33,8 @@ interface FeedItemProps {
     authorId?: string; // To check ownership
     authorProfileBorder?: string | null;
     authorMembershipType?: string;
+    authorIsElite?: boolean;
+    authorEliteUntil?: string | null;
     likes: number;
     comments: number;
     isLiked?: boolean;
@@ -129,6 +131,8 @@ export default function FeedItem({
     authorId,
     authorProfileBorder,
     authorMembershipType,
+    authorIsElite,
+    authorEliteUntil,
     likes,
     comments,
     isLiked,
@@ -274,6 +278,12 @@ export default function FeedItem({
                         </div>
                         <div className="flex items-center gap-2">
                             <span className={`text-xs font-medium uppercase tracking-wider`} style={{ color: userAccent }}>{author}</span>
+                            {/* Elite Badge */}
+                            {authorIsElite && authorEliteUntil && new Date(authorEliteUntil) > new Date() && (
+                                <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-black rounded-full shadow-sm">
+                                    Elite
+                                </span>
+                            )}
                             {authorId && <BadgeDisplay userId={authorId} />}
                         </div>
                     </div>

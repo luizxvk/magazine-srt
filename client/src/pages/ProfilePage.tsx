@@ -431,6 +431,12 @@ export default function ProfilePage() {
                                 <div>
                                     <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start mb-1">
                                         <h2 className={`text-2xl font-serif ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{profileUser.displayName || profileUser.name}</h2>
+                                        {/* Elite Badge */}
+                                        {profileUser.isElite && profileUser.eliteUntil && new Date(profileUser.eliteUntil) > new Date() && (
+                                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-black rounded-full shadow-lg shadow-amber-500/30 animate-pulse">
+                                                Elite
+                                            </span>
+                                        )}
                                         {profileUser.isVerified && (
                                             <div 
                                                 className="relative group cursor-pointer"

@@ -39,6 +39,10 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
                         displayName: true,
                         avatarUrl: true,
                         trophies: true,
+                        membershipType: true,
+                        equippedProfileBorder: true,
+                        isElite: true,
+                        eliteUntil: true,
                     },
                 },
                 likes: {

@@ -54,6 +54,8 @@ interface Post {
         trophies: number;
         membershipType?: string;
         equippedProfileBorder?: string | null;
+        isElite?: boolean;
+        eliteUntil?: string | null;
     };
     content: string;
     image?: string;
@@ -434,6 +436,8 @@ export default function FeedPage() {
                                                     authorId={post.author.id}
                                                     authorProfileBorder={post.author.equippedProfileBorder}
                                                     authorMembershipType={post.author.membershipType}
+                                                    authorIsElite={post.author.isElite}
+                                                    authorEliteUntil={post.author.eliteUntil}
                                                     likes={post.likes}
                                                     comments={post.comments}
                                                     isLiked={post.isLiked}

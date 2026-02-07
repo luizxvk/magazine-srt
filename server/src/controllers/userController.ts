@@ -846,6 +846,17 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'color_pastel_sage', name: 'Sálvia Pastel', price: 350, hex: '#9dc183' },
         { id: 'color_pastel_butter', name: 'Manteiga Pastel', price: 350, hex: '#fffacd' },
         { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', price: 350, hex: '#ccccff' },
+        // Gradient colors
+        { id: 'color_gradient_sunset', name: 'Pôr do Sol', price: 600, hex: 'linear-gradient(135deg, #ff6b35, #f72585)' },
+        { id: 'color_gradient_ocean', name: 'Oceano', price: 600, hex: 'linear-gradient(135deg, #0077b6, #00f5d4)' },
+        { id: 'color_gradient_aurora', name: 'Aurora Boreal', price: 600, hex: 'linear-gradient(135deg, #7b4397, #00d9ff)' },
+        { id: 'color_gradient_fire', name: 'Fogo Infernal', price: 600, hex: 'linear-gradient(135deg, #ff0000, #ffc300)' },
+        { id: 'color_gradient_galaxy', name: 'Galáxia', price: 600, hex: 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)' },
+        { id: 'color_gradient_neon', name: 'Neon Elétrico', price: 600, hex: 'linear-gradient(135deg, #ff00ff, #00ffff)' },
+        { id: 'color_gradient_forest', name: 'Floresta Mística', price: 600, hex: 'linear-gradient(135deg, #134e5e, #71b280)' },
+        { id: 'color_gradient_gold', name: 'Dourado Premium', price: 600, hex: 'linear-gradient(135deg, #8b7335, #d4af37, #f4e4a6)' },
+        { id: 'color_gradient_midnight', name: 'Meia-Noite', price: 600, hex: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
+        { id: 'color_gradient_candy', name: 'Doce Intenso', price: 600, hex: 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)' },
     ],
     profileBorders: [
         // Free defaults

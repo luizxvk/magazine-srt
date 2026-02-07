@@ -207,10 +207,24 @@ export default function MobileCarousel({
 
     return (
         <div className="xl:hidden mb-6 relative group w-full">
+            {/* Subtle glow background for visibility */}
+            <div 
+                className="absolute -inset-2 rounded-2xl opacity-30 blur-xl pointer-events-none"
+                style={{ background: `linear-gradient(135deg, ${color}20 0%, transparent 60%)` }}
+            />
+            
             {/* Header - Arrows only visible on larger tablets (sm+) */}
-            <div className="flex items-center justify-between mb-3 px-1">
+            <div className="flex items-center justify-between mb-3 px-1 relative">
                 <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-medium text-gray-400">Acesso Rápido</h3>
+                    <div 
+                        className="w-1.5 h-4 rounded-full"
+                        style={{ backgroundColor: color }}
+                    />
+                    <h3 
+                        className="text-sm font-bold text-white"
+                    >
+                        Acesso Rápido
+                    </h3>
                     {/* Swipe hint for mobile */}
                     <div className="flex sm:hidden items-center gap-1 text-gray-500">
                         <Hand className="w-3 h-3 animate-pulse" />

@@ -612,7 +612,7 @@ export const sendEventReminders = async (req: Request, res: Response) => {
 export const attendEvent = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = (req as any).user.id;
+        const userId = (req as any).user.userId;
 
         // Verificar se evento existe e está ativo
         const event = await prisma.event.findUnique({
@@ -653,7 +653,7 @@ export const attendEvent = async (req: Request, res: Response) => {
 export const unattendEvent = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = (req as any).user.id;
+        const userId = (req as any).user.userId;
 
         // Remover presença
         await prisma.eventAttendee.deleteMany({

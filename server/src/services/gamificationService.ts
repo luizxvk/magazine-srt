@@ -109,11 +109,16 @@ export const awardTrophies = async (userId: string, amount: number, reason: stri
 
 export const awardZions = async (userId: string, amount: number, reason: string, currency: 'POINTS' | 'CASH' = 'POINTS') => {
     try {
-        // Update user zions
+        // Decide which field to update based on currency type
+        const updateField = currency === 'CASH' ? 'zionsCash' : 'zionsPoints';
+        
+        // Update user zions (correct field based on currency)
         const [updatedUser] = await prisma.$transaction([
             prisma.user.update({
                 where: { id: userId },
                 data: {
+                    [updateField]: { increment: amount },
+                    // Also update deprecated zions for backwards compatibility
                     zions: { increment: amount }
                 }
             }),
@@ -127,10 +132,10 @@ export const awardZions = async (userId: string, amount: number, reason: string,
             })
         ]);
 
-        console.log(`Awarded ${amount} Zions to user ${userId} for ${reason}`);
+        console.log(`Awarded ${amount} Zions (${currency}) to user ${userId} for ${reason}`);
 
-        // Check for Zion-related badges
-        const newZionsTotal = updatedUser.zions;
+        // Check for Zion-related badges (use zionsPoints for tracking)
+        const newZionsTotal = updatedUser.zionsPoints;
 
         // Helper function to award badge
         const awardZionBadge = async (badgeName: string, threshold: number) => {

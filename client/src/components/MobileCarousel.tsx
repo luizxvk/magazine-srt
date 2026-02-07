@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -129,6 +129,14 @@ export default function MobileCarousel({
             icon: <MessageSquare className="w-6 h-6" />,
             gradient: cardStyle,
             onClick: () => navigate('/feedback')
+        },
+        {
+            id: 'about-rovex',
+            title: 'Quem Somos',
+            subtitle: 'Conheça a Rovex',
+            icon: <Info className="w-6 h-6" />,
+            gradient: 'from-purple-500/20 to-purple-900/40',
+            onClick: () => navigate('/sobre-rovex')
         }
     ];
 

@@ -4,6 +4,7 @@ import { Package, X, Sparkles, Gift, Coins, TrendingUp, Zap } from 'lucide-react
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ThemePackCard from './ThemePackCard';
+import { RARITY_CONFIG, getRarityColor, getRarityLabel } from '../utils/raritySystem';
 
 interface SupplyBoxModalProps {
     isOpen: boolean;
@@ -11,13 +12,13 @@ interface SupplyBoxModalProps {
     onSuccess?: () => void;
 }
 
-// Rarity configuration
-const RARITIES = [
-    { name: 'COMMON', label: 'Comum', color: '#9ca3af', chance: 60, gradient: 'from-gray-400 to-gray-500' },
-    { name: 'RARE', label: 'Raro', color: '#3b82f6', chance: 25, gradient: 'from-blue-400 to-blue-600' },
-    { name: 'EPIC', label: 'Épico', color: '#a855f7', chance: 12, gradient: 'from-purple-400 to-purple-600' },
-    { name: 'LEGENDARY', label: 'Lendário', color: '#f59e0b', chance: 3, gradient: 'from-amber-400 to-orange-500' }
-];
+// Array format for UI rendering
+const RARITIES_DISPLAY = Object.values(RARITY_CONFIG).map(r => ({
+    name: r.name,
+    label: r.label,
+    color: r.color,
+    chance: r.chance
+}));
 
 // Preview configurations for items
 const BACKGROUND_PREVIEWS: Record<string, string> = {
@@ -181,16 +182,6 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
         onClose();
     };
 
-    const getRarityColor = (rarity: string) => {
-        const r = RARITIES.find(r => r.name === rarity);
-        return r?.color || '#9ca3af';
-    };
-
-    const getRarityLabel = (rarity: string) => {
-        const r = RARITIES.find(r => r.name === rarity);
-        return r?.label || 'Comum';
-    };
-
     if (!isOpen) return null;
 
     return (
@@ -287,7 +278,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-4 gap-2">
-                                    {RARITIES.map((rarity) => (
+                                    {RARITIES_DISPLAY.map((rarity) => (
                                         <div key={rarity.name} className="text-center">
                                             <div 
                                                 className="w-full h-1.5 rounded-full mb-1"

@@ -1,4 +1,4 @@
-import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag } from 'lucide-react';
+import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
@@ -75,6 +75,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             label: 'Destaques da Semana',
             to: '/highlights',
             feature: Feature.HIGHLIGHTS
+        },
+        {
+            icon: <Info className="w-5 h-5" />,
+            label: 'Quem Somos',
+            to: '/sobre-rovex'
         }
     ];
 

@@ -964,6 +964,8 @@ enum RewardType {
 enum NotificationType {
   LIKE
   COMMENT
+  COMMENT_REPLY
+  COMMENT_LIKE
   SYSTEM
   BADGE
   ACHIEVEMENT

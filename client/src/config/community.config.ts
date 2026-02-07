@@ -58,6 +58,12 @@ export interface CommunityConfig {
   // === Flags ===
   isWhiteLabel: boolean;         // Remove branding Rovex
   maintenanceMode: boolean;      // Modo manutenção
+  
+  // === Ads Configuration ===
+  adsEnabled: boolean;           // Enable/disable ads globally
+  adsCarouselEnabled: boolean;   // Show ads in feed carousel
+  adsClientId?: string;          // Google AdSense Client ID (ca-pub-XXX)
+  adsCarouselSlot?: string;      // AdSense slot ID for carousel
 }
 
 // ============================================
@@ -108,6 +114,12 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   // Flags
   isWhiteLabel: false,
   maintenanceMode: false,
+  
+  // Ads (desabilitado por padrão, admin pode ativar)
+  adsEnabled: false,
+  adsCarouselEnabled: false,
+  adsClientId: import.meta.env.VITE_ADSENSE_CLIENT_ID,
+  adsCarouselSlot: import.meta.env.VITE_ADSENSE_CAROUSEL_SLOT,
 };
 
 // ============================================

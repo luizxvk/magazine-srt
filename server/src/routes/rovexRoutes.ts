@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import prisma from '../utils/prisma';
+import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
 import { reportMetricsToRovex, testRovexConnection, isRovexConfigured, reportEvent } from '../services/rovexService';
 import {
   getSuspensionState,
@@ -305,6 +306,12 @@ router.get('/public/config', async (req: Request, res: Response) => {
       
       // Plano
       plan: savedConfig?.plan || process.env.COMMUNITY_PLAN || 'ENTERPRISE',
+      
+      // Ads Configuration
+      adsEnabled: savedConfig?.adsEnabled ?? false,
+      adsCarouselEnabled: savedConfig?.adsCarouselEnabled ?? false,
+      adsClientId: savedConfig?.adsClientId || process.env.ADSENSE_CLIENT_ID || null,
+      adsCarouselSlot: savedConfig?.adsCarouselSlot || process.env.ADSENSE_CAROUSEL_SLOT || null,
     };
     
     res.json({
@@ -1541,6 +1548,101 @@ router.get('/connection-test', async (req: Request, res: Response) => {
       connected: false,
       error: 'Test failed',
     });
+  }
+});
+
+// =====================================
+// ADMIN: ADS CONFIGURATION
+// =====================================
+
+/**
+ * GET /api/rovex/admin/ads
+ * Retorna configurações de anúncios (requer admin)
+ */
+router.get('/admin/ads', authenticateToken, isAdmin, async (req: Request, res: Response) => {
+  try {
+    const configRecord = await prisma.systemConfig.findUnique({
+      where: { key: 'community_config' },
+    });
+    
+    let savedConfig: Record<string, unknown> = {};
+    if (configRecord?.value) {
+      savedConfig = JSON.parse(configRecord.value);
+    }
+    
+    res.json({
+      success: true,
+      ads: {
+        adsEnabled: savedConfig.adsEnabled ?? false,
+        adsCarouselEnabled: savedConfig.adsCarouselEnabled ?? false,
+        adsClientId: savedConfig.adsClientId || process.env.ADSENSE_CLIENT_ID || '',
+        adsCarouselSlot: savedConfig.adsCarouselSlot || process.env.ADSENSE_CAROUSEL_SLOT || '',
+      },
+    });
+  } catch (error) {
+    console.error('❌ Get ads config error:', error);
+    res.status(500).json({ success: false, error: 'Failed to get ads config' });
+  }
+});
+
+/**
+ * POST /api/rovex/admin/ads
+ * Atualiza configurações de anúncios (requer admin)
+ * 
+ * Body:
+ * - adsEnabled: boolean
+ * - adsCarouselEnabled: boolean  
+ * - adsClientId: string (opcional)
+ * - adsCarouselSlot: string (opcional)
+ */
+router.post('/admin/ads', authenticateToken, isAdmin, async (req: Request, res: Response) => {
+  try {
+    const { adsEnabled, adsCarouselEnabled, adsClientId, adsCarouselSlot } = req.body;
+    
+    // Buscar config existente
+    const configRecord = await prisma.systemConfig.findUnique({
+      where: { key: 'community_config' },
+    });
+    
+    let existingConfig: Record<string, unknown> = {};
+    if (configRecord?.value) {
+      existingConfig = JSON.parse(configRecord.value);
+    }
+    
+    // Mesclar com novos valores de ads
+    const updatedConfig = {
+      ...existingConfig,
+      adsEnabled: adsEnabled ?? existingConfig.adsEnabled ?? false,
+      adsCarouselEnabled: adsCarouselEnabled ?? existingConfig.adsCarouselEnabled ?? false,
+      adsClientId: adsClientId ?? existingConfig.adsClientId ?? '',
+      adsCarouselSlot: adsCarouselSlot ?? existingConfig.adsCarouselSlot ?? '',
+    };
+    
+    // Salvar config atualizada
+    await prisma.systemConfig.upsert({
+      where: { key: 'community_config' },
+      update: { value: JSON.stringify(updatedConfig) },
+      create: { key: 'community_config', value: JSON.stringify(updatedConfig) },
+    });
+    
+    console.log('[Admin] ✅ Ads config updated:', {
+      adsEnabled: updatedConfig.adsEnabled,
+      adsCarouselEnabled: updatedConfig.adsCarouselEnabled,
+    });
+    
+    res.json({
+      success: true,
+      message: 'Ads configuration updated',
+      ads: {
+        adsEnabled: updatedConfig.adsEnabled,
+        adsCarouselEnabled: updatedConfig.adsCarouselEnabled,
+        adsClientId: updatedConfig.adsClientId,
+        adsCarouselSlot: updatedConfig.adsCarouselSlot,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Update ads config error:', error);
+    res.status(500).json({ success: false, error: 'Failed to update ads config' });
   }
 });
 

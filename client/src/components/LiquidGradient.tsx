@@ -381,7 +381,7 @@ export const LiquidButton = memo(({ children, onClick, disabled, className = '',
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <span className="flex items-center justify-center px-6 py-4 gap-2 rounded-lg text-white text-xl font-semibold tracking-wide whitespace-nowrap group-hover:text-yellow-400 transition-colors drop-shadow-lg">
+                <span className="flex items-center justify-center px-6 py-4 gap-2 rounded-lg text-white text-base font-semibold tracking-wide whitespace-nowrap group-hover:text-violet-300 transition-colors drop-shadow-lg">
                     {children}
                 </span>
             </button>

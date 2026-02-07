@@ -465,6 +465,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 profileBgPosX: true,
                 profileBgPosY: true,
                 betaRewardClaimed: true,
+                showWelcomeCard: true,
                 // Elite subscription
                 isElite: true,
                 eliteUntil: true,
@@ -1168,17 +1169,18 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// Update user preferences (doNotDisturb, liteMode)
+// Update user preferences (doNotDisturb, liteMode, showWelcomeCard)
 export const updatePreferences = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        const { doNotDisturb, liteMode } = req.body;
+        const { doNotDisturb, liteMode, showWelcomeCard } = req.body;
 
         const updateData: any = {};
         if (typeof doNotDisturb === 'boolean') updateData.doNotDisturb = doNotDisturb;
         if (typeof liteMode === 'boolean') updateData.liteMode = liteMode;
+        if (typeof showWelcomeCard === 'boolean') updateData.showWelcomeCard = showWelcomeCard;
 
         const user = await prisma.user.update({
             where: { id: userId },
@@ -1187,6 +1189,7 @@ export const updatePreferences = async (req: AuthRequest, res: Response) => {
                 id: true,
                 doNotDisturb: true,
                 liteMode: true,
+                showWelcomeCard: true,
                 isOnline: true
             }
         });

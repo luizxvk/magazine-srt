@@ -43,6 +43,7 @@ model User {
   verificationExpiry     DateTime?
   verificationSentAt     DateTime?
   doNotDisturb           Boolean        @default(false)
+  showWelcomeCard        Boolean        @default(true) // Toggle para mostrar/esconder card de boas-vindas no feed
   // Profile card background settings
   profileBgUrl           String?        // URL da imagem de fundo do card de perfil
   profileBgScale         Float?         @default(1) // Escala do background (1 = 100%)
@@ -974,6 +975,7 @@ enum NotificationType {
   MESSAGE
   GROUP_INVITE
   GROUP_MENTION
+  EVENT_REMINDER
 }
 
 enum MediaType {

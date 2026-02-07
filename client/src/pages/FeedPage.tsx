@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import FeedItem from '../components/FeedItem';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -7,7 +7,7 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Settings, ChevronDown } from 'lucide-react';
+import { Sparkles, ChevronDown } from 'lucide-react';
 import Loader from '../components/Loader';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
@@ -31,6 +31,7 @@ import CreatePostCard from '../components/CreatePostCard';
 import SupplyBoxModal from '../components/SupplyBoxModal';
 import EventDropPopup from '../components/EventDropPopup';
 import ElitePromoCard from '../components/ElitePromoCard';
+import WelcomeCard from '../components/WelcomeCard';
 
 interface PollOption {
     id: string;
@@ -78,11 +79,8 @@ interface Post {
 }
 
 export default function FeedPage() {
-    const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser, theme } = useAuth();
+    const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
-    const themeTextGradient = isMGT
-        ? (theme === 'light' ? 'from-gray-800 via-gray-600 to-gray-800' : 'from-white via-gray-200 to-gray-100')
-        : 'from-gold-200 via-gold-400 to-gold-200';
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
@@ -286,9 +284,6 @@ export default function FeedPage() {
     const highlightedPosts = posts.filter(post => post.isHighlight);
     const regularPosts = posts.filter(post => !post.isHighlight);
 
-    const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
-    const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
-
 
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative overflow-x-hidden">
@@ -352,35 +347,27 @@ export default function FeedPage() {
                     />
                     {/* Main Feed Column */}
                     <main className="flex-1 max-w-2xl mx-auto space-y-8 w-full">
-                        {/* Welcome Header */}
-                        <TimelineAnimation animationNum={0} className="mb-8">
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <h1 className={`text-3xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r ${themeTextGradient} mb-2`}>
-                                        Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
-                                    </h1>
-                                    <p className="text-gray-400 text-lg font-light tracking-wide">
-                                        {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
-                                    </p>
-                                </div>
-                                <Link
-                                    to="/settings"
-                                    className={`p-2 rounded-lg ${themeIconBg} ${themeIconColor} hover:opacity-80 transition-all duration-200`}
-                                    title="Configurações"
-                                >
-                                    <Settings className="w-5 h-5" />
-                                </Link>
-                            </div>
-                        </TimelineAnimation>
+                        {/* Welcome Card with Stories (toggleable) */}
+                        {user?.showWelcomeCard !== false && (
+                            <TimelineAnimation animationNum={0} className="mb-8">
+                                <WelcomeCard
+                                    viewingStoryId={viewingStoryId}
+                                    onViewStory={setViewingStoryId}
+                                    onCloseStory={() => setViewingStoryId(null)}
+                                />
+                            </TimelineAnimation>
+                        )}
 
-                        {/* Stories Bar */}
-                        <TimelineAnimation animationNum={1} className="mb-6 relative z-10">
-                            <StoriesBar
-                                viewingStoryId={viewingStoryId}
-                                onViewStory={setViewingStoryId}
-                                onCloseStory={() => setViewingStoryId(null)}
-                            />
-                        </TimelineAnimation>
+                        {/* Stories Bar (shown standalone if WelcomeCard disabled) */}
+                        {user?.showWelcomeCard === false && (
+                            <TimelineAnimation animationNum={1} className="mb-6 relative z-10">
+                                <StoriesBar
+                                    viewingStoryId={viewingStoryId}
+                                    onViewStory={setViewingStoryId}
+                                    onCloseStory={() => setViewingStoryId(null)}
+                                />
+                            </TimelineAnimation>
+                        )}
 
                         {/* Create Post Card - Right after welcome */}
                         <TimelineAnimation animationNum={2}>

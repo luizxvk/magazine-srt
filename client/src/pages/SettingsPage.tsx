@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle } from 'lucide-react';
+import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
@@ -9,7 +9,7 @@ import PushNotificationSettings from '../components/PushNotificationSettings';
 import api from '../services/api';
 
 export default function SettingsPage() {
-    const { user, logout, theme, toggleTheme, showToast } = useAuth();
+    const { user, logout, theme, toggleTheme, showToast, updateUser } = useAuth();
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     
@@ -21,6 +21,9 @@ export default function SettingsPage() {
     );
     const [liteMode, setLiteMode] = useState(
         localStorage.getItem('liteMode') === 'true'
+    );
+    const [showWelcomeCard, setShowWelcomeCard] = useState(
+        user?.showWelcomeCard !== false
     );
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -56,6 +59,19 @@ export default function SettingsPage() {
         setLiteMode(newValue);
         localStorage.setItem('liteMode', String(newValue));
         document.documentElement.classList.toggle('lite-mode', newValue);
+    };
+
+    const handleToggleWelcomeCard = async () => {
+        const newValue = !showWelcomeCard;
+        setShowWelcomeCard(newValue);
+        
+        try {
+            await api.put('/users/me/preferences', { showWelcomeCard: newValue });
+            updateUser({ showWelcomeCard: newValue });
+        } catch (error) {
+            console.error('Error updating showWelcomeCard:', error);
+            setShowWelcomeCard(!newValue); // Revert on error
+        }
     };
 
     const handleLogout = () => {
@@ -242,6 +258,27 @@ export default function SettingsPage() {
                             >
                                 <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
                                     liteMode ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
+                                }`} />
+                            </button>
+                        </div>
+
+                        {/* Welcome Card Toggle */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0 pr-4">
+                                <p className={`font-medium ${textMain} flex items-center gap-2`}>
+                                    <LayoutDashboard className="w-4 h-4" />
+                                    Card de Boas-vindas
+                                </p>
+                                <p className={`text-sm ${textSub}`}>Exibir card com saudação e stories no feed</p>
+                            </div>
+                            <button
+                                onClick={handleToggleWelcomeCard}
+                                className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
+                                    showWelcomeCard ? `bg-${themeColor}-500` : 'bg-gray-600'
+                                }`}
+                            >
+                                <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                                    showWelcomeCard ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
                         </div>

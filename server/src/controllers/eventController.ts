@@ -501,3 +501,83 @@ export const getEventTags = async (_req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to fetch event tags' });
     }
 };
+
+// Cron job: Send push notifications 1 minute before events start
+export const sendEventReminders = async (req: Request, res: Response) => {
+    try {
+        const now = new Date();
+        const oneMinuteFromNow = new Date(now.getTime() + 60 * 1000);
+        const twoMinutesFromNow = new Date(now.getTime() + 2 * 60 * 1000);
+
+        // Find events starting in the next 1-2 minutes that haven't had reminders sent yet
+        const upcomingEvents = await prisma.event.findMany({
+            where: {
+                active: true,
+                date: {
+                    gte: oneMinuteFromNow,
+                    lt: twoMinutesFromNow
+                }
+            }
+        });
+
+        if (upcomingEvents.length === 0) {
+            return res.json({ message: 'No events starting soon', count: 0 });
+        }
+
+        // Get all users to notify
+        const allUsers = await prisma.user.findMany({
+            where: { 
+                deletedAt: null,
+                doNotDisturb: false
+            },
+            select: { id: true }
+        });
+
+        let totalSent = 0;
+
+        for (const event of upcomingEvents) {
+            const eventTime = event.date.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'America/Sao_Paulo'
+            });
+
+            // Send push to all users
+            await Promise.all(
+                allUsers.map(user =>
+                    sendPushToUser(
+                        user.id,
+                        '⏰ Evento Começa em 1 Minuto!',
+                        `${event.title} às ${eventTime}`,
+                        { url: '/feed?openEvents=true', eventId: event.id, type: 'event_reminder' }
+                    ).catch(() => {}) // Ignore individual failures
+                )
+            );
+
+            totalSent += allUsers.length;
+
+            // Also create in-app notification
+            await prisma.notification.createMany({
+                data: allUsers.map(u => ({
+                    userId: u.id,
+                    type: 'EVENT_REMINDER',
+                    title: '⏰ Evento Começa em 1 Minuto!',
+                    content: `${event.title} às ${eventTime}`,
+                    link: '/feed?openEvents=true'
+                })),
+                skipDuplicates: true
+            });
+        }
+
+        console.log(`[EventReminder] Sent reminders for ${upcomingEvents.length} events to ${allUsers.length} users`);
+        res.json({ 
+            message: 'Reminders sent',
+            events: upcomingEvents.length, 
+            usersNotified: allUsers.length,
+            totalSent 
+        });
+    } catch (error) {
+        console.error('Error sending event reminders:', error);
+        res.status(500).json({ error: 'Failed to send event reminders' });
+    }
+};

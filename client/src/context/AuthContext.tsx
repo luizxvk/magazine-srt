@@ -47,6 +47,8 @@ interface User {
     profileBgPosY?: number | null;
     // Beta reward
     betaRewardClaimed?: boolean;
+    // UI preferences
+    showWelcomeCard?: boolean;
 }
 
 export interface DailyLoginStatus {
@@ -59,7 +61,7 @@ export interface DailyLoginStatus {
 interface AuthContextType {
     user: User | null;
     login: (token: string, user: User, membershipContext?: 'MAGAZINE' | 'MGT') => void;
-    updateUser: (user: User) => void;
+    updateUser: (user: Partial<User>) => void;
     updateUserZions: (amount: number) => void; // DEPRECATED - usa updateUserPoints ou updateUserCash
     updateUserPoints: (amount: number) => void; // Atualiza Zions Points
     updateUserCash: (amount: number) => void; // Atualiza Zions Cash

@@ -490,9 +490,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             case 'color': {
                 // Categorize colors
                 const allColors = filterMagazineExclusive(colors) as typeof colors;
-                const basicColors = allColors.filter(c => !c.id.includes('pastel'));
+                const basicColors = allColors.filter(c => !c.id.includes('pastel') && !c.id.includes('gradient'));
                 const pastelColors = allColors.filter(c => c.id.includes('pastel'));
-                return { basicColors, pastelColors };
+                const gradientColors = allColors.filter(c => c.id.includes('gradient'));
+                return { basicColors, pastelColors, gradientColors };
             }
             case 'profileBorder': {
                 // Categorize borders - basic and special
@@ -697,7 +698,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                         ) : activeTab === 'color' ? (
                             // Render color categories
                             (() => {
-                                const { basicColors, pastelColors } = getItems() as { basicColors: typeof colors; pastelColors: typeof colors };
+                                const { basicColors, pastelColors, gradientColors } = getItems() as { basicColors: typeof colors; pastelColors: typeof colors; gradientColors: typeof colors };
                                 return (
                                     <>
                                         {/* Basic Colors */}
@@ -809,6 +810,79 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         }}
                                                                     />
                                                                 )}
+                                                                {equipped && (
+                                                                    <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
+                                                                        <Check className="w-3 h-3 text-black" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                                <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
+                                                                <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
+                                                                <div className="mt-2">
+                                                                    {owned ? (
+                                                                        <button
+                                                                            onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item)}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${equipped
+                                                                                ? `${isDarkMode ? 'bg-white/10 text-gray-400 hover:bg-white/20' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {equipped ? 'Desequipar' : 'Equipar'}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handlePurchase(item)}
+                                                                            disabled={purchasing === item.id || (user?.zionsPoints || 0) < item.price}
+                                                                            className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${(user?.zionsPoints || 0) < item.price
+                                                                                ? 'bg-red-500/10 text-red-400 cursor-not-allowed'
+                                                                                : `bg-${themeColor}-500/20 text-${themeColor}-400 hover:bg-${themeColor}-500/30`
+                                                                                }`}
+                                                                        >
+                                                                            {purchasing === item.id ? (
+                                                                                <span className="animate-spin">⏳</span>
+                                                                            ) : (user?.zionsPoints || 0) < item.price ? (
+                                                                                <>
+                                                                                    <Lock className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Zap className="w-3 h-3" />
+                                                                                    {item.price}
+                                                                                </>
+                                                                            )}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        {/* Gradient Colors */}
+                                        <div>
+                                            <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
+                                                <Palette className={`w-4 h-4 text-${themeColor}-400`} />
+                                                Tom Gradiente
+                                            </h3>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {gradientColors.map(item => {
+                                                    const owned = isOwned(item.id);
+                                                    const equipped = isEquipped(item);
+                                                    return (
+                                                        <motion.div
+                                                            key={item.id}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
+                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                        >
+                                                            <div className="aspect-square relative flex items-center justify-center overflow-hidden">
+                                                                <div
+                                                                    className="w-16 h-16 rounded-full shadow-lg"
+                                                                    style={{ background: item.preview }}
+                                                                />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />

@@ -495,6 +495,17 @@ export default function MarketPage() {
     color_pastel_sage: { name: 'Sálvia Pastel', type: 'color', preview: '#9dc183' },
     color_pastel_butter: { name: 'Manteiga Pastel', type: 'color', preview: '#fffacd' },
     color_pastel_periwinkle: { name: 'Pervinca Pastel', type: 'color', preview: '#ccccff' },
+    // Gradient Colors
+    color_gradient_sunset: { name: 'Pôr do Sol', type: 'color', preview: 'linear-gradient(135deg, #ff6b35, #f72585)' },
+    color_gradient_ocean: { name: 'Oceano', type: 'color', preview: 'linear-gradient(135deg, #0077b6, #00f5d4)' },
+    color_gradient_aurora: { name: 'Aurora Boreal', type: 'color', preview: 'linear-gradient(135deg, #7b4397, #00d9ff)' },
+    color_gradient_fire: { name: 'Fogo Infernal', type: 'color', preview: 'linear-gradient(135deg, #ff0000, #ffc300)' },
+    color_gradient_galaxy: { name: 'Galáxia', type: 'color', preview: 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)' },
+    color_gradient_neon: { name: 'Neon Elétrico', type: 'color', preview: 'linear-gradient(135deg, #ff00ff, #00ffff)' },
+    color_gradient_forest: { name: 'Floresta Mística', type: 'color', preview: 'linear-gradient(135deg, #134e5e, #71b280)' },
+    color_gradient_gold: { name: 'Dourado Premium', type: 'color', preview: 'linear-gradient(135deg, #8b7335, #d4af37, #f4e4a6)' },
+    color_gradient_midnight: { name: 'Meia-Noite', type: 'color', preview: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
+    color_gradient_candy: { name: 'Doce Intenso', type: 'color', preview: 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)' },
   };
 
   const DEFAULT_ITEMS = ['bg_default', 'badge_crown', 'color_gold'];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Package, Shield, Cloud, Zap, Globe, Check } from 'lucide-react';
+import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, Crown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -33,38 +33,42 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.5.0-rc.2 - Welcome Tour Premium, Footer atualizado, Beta Reward fix
+    // v0.5.0-rc.2 - Market 6.0 Features
     const updates: UpdateItem[] = [
         {
-            icon: <Sparkles className="w-5 h-5 text-purple-400" />,
-            title: 'Welcome Tour Premium',
-            description: 'Novo popup de boas-vindas estilo Apple Vision Pro com todas as features da comunidade!',
+            icon: <Heart className="w-5 h-5 text-red-400" />,
+            title: 'Favoritos no Mercado',
+            description: 'Salve anúncios favoritos e acompanhe itens que você quer comprar!',
+            isNew: true
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5 text-purple-400" />,
+            title: 'Sistema de Ofertas',
+            description: 'Faça propostas aos vendedores! Negocie preços e feche negócios melhores.',
+            isNew: true
+        },
+        {
+            icon: <Star className="w-5 h-5 text-yellow-400" />,
+            title: 'Anúncios em Destaque',
+            description: 'Pague 50 Zions e seu anúncio fica no topo por 24h com selo dourado!',
             isNew: true
         },
         {
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
-            title: 'Sistema de Feature Gates',
-            description: 'Features modulares por plano! FREE, STARTER, GROWTH e ENTERPRISE com acesso controlado.',
+            title: 'Vendedor Confiável',
+            description: 'Badge exclusivo para vendedores com 10+ vendas realizadas!',
+            isNew: true
         },
         {
-            icon: <Globe className="w-5 h-5 text-blue-400" />,
-            title: 'Integração Rovex Platform',
-            description: 'Conexão completa com a Rovex Platform! Webhooks, métricas e configuração remota.',
+            icon: <Crown className="w-5 h-5 text-violet-400" />,
+            title: 'Itens Elite-Only',
+            description: 'Membros Elite podem marcar anúncios como exclusivos para assinantes!',
+            isNew: true
         },
         {
-            icon: <Cloud className="w-5 h-5 text-cyan-400" />,
-            title: 'Multi-Tenant Architecture',
-            description: 'Suporte a múltiplas comunidades! Cada uma com branding, cores e moeda própria.',
-        },
-        {
-            icon: <Zap className="w-5 h-5 text-yellow-400" />,
-            title: 'Beta Reward System',
-            description: 'Beta testers ganham 500 Zions Points de agradecimento! Resgate seu brinde.',
-        },
-        {
-            icon: <Package className="w-5 h-5 text-amber-400" />,
-            title: 'Admin sem Ranking',
-            description: 'Conta admin não aparece mais no ranking elite - fair play garantido!',
+            icon: <Zap className="w-5 h-5 text-gold-400" />,
+            title: 'Elite Badge Aprimorado',
+            description: 'Assinantes que cancelaram ainda aparecem como Elite até o fim do período.',
         }
     ];
 

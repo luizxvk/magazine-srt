@@ -253,11 +253,11 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         >
                             <X className="w-4 h-4" />
                         </button>
-                        <div className="rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.2)] border border-white/10">
+                        <div className="rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.2)] border border-white/10 bg-black/50">
                             {mediaType === 'IMAGE' ? (
-                                <img src={mediaUrl} alt="Preview" className="w-full max-h-80 object-cover" />
+                                <img src={mediaUrl} alt="Preview" className="w-full max-h-80 object-contain" />
                             ) : (
-                                <video src={mediaUrl} className="w-full max-h-80 object-cover" controls />
+                                <video src={mediaUrl} className="w-full max-h-80 object-contain" controls />
                             )}
                         </div>
                     </motion.div>

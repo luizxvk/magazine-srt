@@ -28,6 +28,19 @@ export default function ModernLogin() {
     const { login, loginAsVisitor } = useAuth();
     const { config } = useCommunity();
     
+    // Clear any stale tokens when accessing login page to prevent SESSION_EXPIRED loop
+    useEffect(() => {
+        // Only clear if there's a token but no user loaded (stale session)
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+            // Clear stale tokens to prevent SESSION_EXPIRED on page load
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            localStorage.removeItem('sessionMembershipType');
+            localStorage.removeItem('dailyLoginModalShown');
+        }
+    }, []);
+    
     // Atualiza título e favicon dinamicamente
     useDynamicHead();
     

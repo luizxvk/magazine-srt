@@ -49,8 +49,12 @@ api.interceptors.response.use(
             localStorage.removeItem('sessionMembershipType');
             localStorage.removeItem('dailyLoginModalShown');
             
-            // Dispatch custom event to show modal
-            window.dispatchEvent(new CustomEvent('session-expired'));
+            // Only dispatch session-expired event if NOT already on login page
+            // This prevents the modal from showing when user is already logging in
+            const isOnLoginPage = window.location.pathname.startsWith('/login');
+            if (!isOnLoginPage) {
+                window.dispatchEvent(new CustomEvent('session-expired'));
+            }
         }
         
         // Handle community suspension

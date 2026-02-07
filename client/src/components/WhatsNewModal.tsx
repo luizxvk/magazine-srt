@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, Crown } from 'lucide-react';
+import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, Crown, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.2';
+const CURRENT_VERSION = '0.5.0-rc.3';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -33,37 +33,38 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.5.0-rc.2 - Market 6.0 Features
+    // v0.5.0-rc.3 - Comments 2.0
     const updates: UpdateItem[] = [
+        {
+            icon: <MessageCircle className="w-5 h-5 text-blue-400" />,
+            title: 'Comentários Estilo YouTube',
+            description: 'Agora você pode responder comentários e curtir! Interface completamente redesenhada.',
+            isNew: true
+        },
         {
             icon: <Heart className="w-5 h-5 text-red-400" />,
             title: 'Favoritos no Mercado',
             description: 'Salve anúncios favoritos e acompanhe itens que você quer comprar!',
-            isNew: true
         },
         {
             icon: <ShoppingBag className="w-5 h-5 text-purple-400" />,
             title: 'Sistema de Ofertas',
             description: 'Faça propostas aos vendedores! Negocie preços e feche negócios melhores.',
-            isNew: true
         },
         {
             icon: <Star className="w-5 h-5 text-yellow-400" />,
             title: 'Anúncios em Destaque',
             description: 'Pague 50 Zions e seu anúncio fica no topo por 24h com selo dourado!',
-            isNew: true
         },
         {
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
             title: 'Vendedor Confiável',
             description: 'Badge exclusivo para vendedores com 10+ vendas realizadas!',
-            isNew: true
         },
         {
             icon: <Crown className="w-5 h-5 text-violet-400" />,
             title: 'Itens Elite-Only',
             description: 'Membros Elite podem marcar anúncios como exclusivos para assinantes!',
-            isNew: true
         },
         {
             icon: <Zap className="w-5 h-5 text-gold-400" />,

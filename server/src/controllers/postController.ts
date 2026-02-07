@@ -292,8 +292,14 @@ export const deletePost = async (req: AuthRequest, res: Response) => {
 export const getComments = async (req: AuthRequest, res: Response) => {
     try {
         const { postId } = req.params;
+        const userId = req.user?.userId;
+        
+        // Get top-level comments only (not replies)
         const comments = await prisma.comment.findMany({
-            where: { postId },
+            where: { 
+                postId,
+                parentId: null // Only top-level comments
+            },
             orderBy: { createdAt: 'asc' },
             include: {
                 user: {
@@ -302,12 +308,55 @@ export const getComments = async (req: AuthRequest, res: Response) => {
                         name: true,
                         displayName: true,
                         avatarUrl: true,
+                        equippedColor: true,
+                        membershipType: true,
+                    }
+                },
+                likes: {
+                    select: {
+                        userId: true
+                    }
+                },
+                replies: {
+                    orderBy: { createdAt: 'asc' },
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                displayName: true,
+                                avatarUrl: true,
+                                equippedColor: true,
+                                membershipType: true,
+                            }
+                        },
+                        likes: {
+                            select: {
+                                userId: true
+                            }
+                        }
                     }
                 }
             }
         });
-        res.json(comments);
+        
+        // Transform to include like counts and user's like status
+        const transformedComments = comments.map(comment => ({
+            ...comment,
+            likesCount: comment.likes.length,
+            isLikedByMe: userId ? comment.likes.some(like => like.userId === userId) : false,
+            likes: undefined, // Remove raw likes array
+            replies: comment.replies.map(reply => ({
+                ...reply,
+                likesCount: reply.likes.length,
+                isLikedByMe: userId ? reply.likes.some(like => like.userId === userId) : false,
+                likes: undefined
+            }))
+        }));
+        
+        res.json(transformedComments);
     } catch (error) {
+        console.error('Error fetching comments:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -362,5 +411,199 @@ export const votePoll = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error voting on poll:', error);
         res.status(500).json({ error: 'Erro ao votar' });
+    }
+};
+
+// ============ COMMENT REPLIES & LIKES ============
+
+/**
+ * Reply to a comment
+ * POST /posts/:postId/comments/:commentId/reply
+ */
+export const replyToComment = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { postId, commentId } = req.params;
+        const { text } = req.body;
+        
+        if (!userId) return res.status(401).json({ error: 'Não autorizado' });
+        if (!text || text.trim().length === 0) {
+            return res.status(400).json({ error: 'Texto é obrigatório' });
+        }
+        if (text.length > 500) {
+            return res.status(400).json({ error: 'Texto muito longo (máximo 500 caracteres)' });
+        }
+
+        // Verify parent comment exists
+        const parentComment = await prisma.comment.findUnique({
+            where: { id: commentId },
+            include: { user: true, post: true }
+        });
+        
+        if (!parentComment) {
+            return res.status(404).json({ error: 'Comentário não encontrado' });
+        }
+        
+        if (parentComment.postId !== postId) {
+            return res.status(400).json({ error: 'Comentário não pertence a este post' });
+        }
+
+        // Create reply
+        const reply = await prisma.comment.create({
+            data: {
+                postId,
+                userId,
+                text: text.trim(),
+                parentId: commentId
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayName: true,
+                        avatarUrl: true,
+                        equippedColor: true,
+                        membershipType: true,
+                    }
+                }
+            }
+        });
+
+        // Update post comment count
+        await prisma.post.update({
+            where: { id: postId },
+            data: { commentsCount: { increment: 1 } }
+        });
+
+        // Create notification for parent comment author (if not self-reply)
+        if (parentComment.userId !== userId) {
+            const actor = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { id: true, name: true, avatarUrl: true }
+            });
+
+            await prisma.notification.create({
+                data: {
+                    userId: parentComment.userId,
+                    type: 'COMMENT_REPLY',
+                    content: JSON.stringify({
+                        text: `respondeu seu comentário: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`,
+                        actor: {
+                            id: actor?.id,
+                            name: actor?.name || 'Alguém',
+                            avatarUrl: actor?.avatarUrl
+                        },
+                        postId,
+                        commentId: reply.id,
+                        parentCommentId: commentId
+                    })
+                }
+            });
+        }
+
+        // Award XP and Zions
+        await awardZions(userId, 1, 'Replied to a comment');
+        await awardXP(userId, 50, 'Replied to a comment');
+
+        res.json({
+            ...reply,
+            likesCount: 0,
+            isLikedByMe: false
+        });
+    } catch (error) {
+        console.error('Error replying to comment:', error);
+        res.status(500).json({ error: 'Erro ao responder comentário' });
+    }
+};
+
+/**
+ * Like/Unlike a comment
+ * POST /posts/:postId/comments/:commentId/like
+ */
+export const likeComment = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const { commentId } = req.params;
+        
+        if (!userId) return res.status(401).json({ error: 'Não autorizado' });
+
+        // Verify comment exists
+        const comment = await prisma.comment.findUnique({
+            where: { id: commentId },
+            include: { user: true }
+        });
+        
+        if (!comment) {
+            return res.status(404).json({ error: 'Comentário não encontrado' });
+        }
+
+        // Check if already liked
+        const existingLike = await prisma.commentLike.findUnique({
+            where: {
+                commentId_userId: {
+                    commentId,
+                    userId
+                }
+            }
+        });
+
+        if (existingLike) {
+            // Unlike
+            await prisma.commentLike.delete({
+                where: { id: existingLike.id }
+            });
+            
+            const likesCount = await prisma.commentLike.count({
+                where: { commentId }
+            });
+            
+            return res.json({ liked: false, likesCount });
+        }
+
+        // Like
+        await prisma.commentLike.create({
+            data: {
+                commentId,
+                userId
+            }
+        });
+
+        const likesCount = await prisma.commentLike.count({
+            where: { commentId }
+        });
+
+        // Create notification for comment author (if not self-like)
+        if (comment.userId !== userId) {
+            const actor = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { id: true, name: true, avatarUrl: true }
+            });
+
+            await prisma.notification.create({
+                data: {
+                    userId: comment.userId,
+                    type: 'COMMENT_LIKE',
+                    content: JSON.stringify({
+                        text: `curtiu seu comentário`,
+                        actor: {
+                            id: actor?.id,
+                            name: actor?.name || 'Alguém',
+                            avatarUrl: actor?.avatarUrl
+                        },
+                        postId: comment.postId,
+                        commentId
+                    })
+                }
+            });
+        }
+
+        // Award XP to liker
+        await awardXP(userId, 10, 'Liked a comment');
+
+        res.json({ liked: true, likesCount });
+    } catch (error) {
+        console.error('Error liking comment:', error);
+        res.status(500).json({ error: 'Erro ao curtir comentário' });
     }
 };

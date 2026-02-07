@@ -99,6 +99,7 @@ model User {
   marketFavorites        MarketFavorite[]  // Itens salvos/favoritos
   marketOffersSent       MarketOffer[]  @relation("OfferBuyer")
   marketOffersReceived   MarketOffer[]  @relation("OfferSeller")
+  commentLikes           CommentLike[]
 
   @@index([membershipType])
   @@index([isElite])
@@ -214,12 +215,34 @@ model Comment {
   userId    String
   text      String
   createdAt DateTime @default(now())
+  
+  // Reply threading
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  
+  // Relations
   post      Post     @relation(fields: [postId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+  likes     CommentLike[]
 
   @@index([postId])
   @@index([userId])
+  @@index([parentId])
   @@index([createdAt])
+}
+
+model CommentLike {
+  id        String   @id @default(uuid())
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
 }
 
 model Like {

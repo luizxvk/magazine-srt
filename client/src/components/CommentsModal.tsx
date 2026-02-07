@@ -1,17 +1,35 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, User, MessageCircle } from 'lucide-react';
+import { X, Send, User, MessageCircle, Heart, Reply, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
+interface CommentAuthor {
+    id: string;
+    name: string;
+    displayName?: string;
+    avatarUrl: string;
+    equippedColor?: string;
+    membershipType?: 'MAGAZINE' | 'MGT';
+}
+
+interface CommentReply {
+    id: string;
+    text: string;
+    user: CommentAuthor;
+    createdAt: string;
+    likesCount: number;
+    isLikedByMe: boolean;
+}
+
 interface Comment {
     id: string;
-    content: string;
-    author: {
-        name: string;
-        avatarUrl: string;
-    };
+    text: string;
+    user: CommentAuthor;
     createdAt: string;
+    likesCount: number;
+    isLikedByMe: boolean;
+    replies: CommentReply[];
 }
 
 interface CommentsModalProps {
@@ -50,11 +68,19 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [replyingTo, setReplyingTo] = useState<{ id: string; authorName: string } | null>(null);
+    const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+    const [likingComment, setLikingComment] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen && postId) {
             fetchComments();
             setTimeout(() => inputRef.current?.focus(), 300);
+        }
+        // Reset state when modal closes
+        if (!isOpen) {
+            setReplyingTo(null);
+            setNewComment('');
         }
     }, [isOpen, postId]);
 
@@ -62,16 +88,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
         try {
             setLoading(true);
             const response = await api.get(`/posts/${postId}/comments`);
-            const mappedComments = response.data.map((c: any) => ({
-                id: c.id,
-                content: c.text,
-                author: {
-                    name: c.user?.displayName || c.user?.name || 'Usuário Desconhecido',
-                    avatarUrl: c.user?.avatarUrl
-                },
-                createdAt: c.createdAt
-            }));
-            setComments(mappedComments);
+            setComments(response.data);
         } catch (error) {
             console.error('Failed to fetch comments', error);
         } finally {
@@ -85,24 +102,33 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
 
         try {
             setSubmitting(true);
-            const response = await api.post(`/posts/${postId}/comments`, { text: newComment });
+            
+            if (replyingTo) {
+                // Submit reply
+                await api.post(`/posts/${postId}/comments/${replyingTo.id}/reply`, { text: newComment });
+                setReplyingTo(null);
+                // Auto-expand replies for the parent comment
+                setExpandedReplies(prev => new Set([...prev, replyingTo.id]));
+            } else {
+                // Submit new comment
+                const response = await api.post(`/posts/${postId}/comments`, { text: newComment });
 
-            if (response.data.newBadges && response.data.newBadges.length > 0) {
-                response.data.newBadges.forEach((badge: string) => {
-                    showAchievement('Nova Conquista!', `Você desbloqueou a medalha: ${badge}`);
-                });
-            }
+                if (response.data.newBadges && response.data.newBadges.length > 0) {
+                    response.data.newBadges.forEach((badge: string) => {
+                        showAchievement('Nova Conquista!', `Você desbloqueou a medalha: ${badge}`);
+                    });
+                }
 
-            if (response.data.zionsEarned) {
-                showAchievement('Recompensa!', `Você ganhou ${response.data.zionsEarned} Zions!`);
-                updateUserZions(response.data.zionsEarned);
+                if (response.data.zionsEarned) {
+                    showAchievement('Recompensa!', `Você ganhou ${response.data.zionsEarned} Zions!`);
+                    updateUserZions(response.data.zionsEarned);
+                }
             }
 
             setNewComment('');
             fetchComments();
             onCommentAdded();
         } catch (error: any) {
-            // Handle rate limit error
             if (error.response?.status === 429 && error.response?.data?.error === 'COMMENT_RATE_LIMIT') {
                 showEdgeNotification(
                     'warning',
@@ -116,6 +142,67 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleLikeComment = async (commentId: string) => {
+        if (likingComment) return;
+        
+        try {
+            setLikingComment(commentId);
+            const response = await api.post(`/posts/${postId}/comments/${commentId}/like`);
+            
+            // Update local state
+            setComments(prevComments => 
+                prevComments.map(comment => {
+                    if (comment.id === commentId) {
+                        return {
+                            ...comment,
+                            likesCount: response.data.likesCount,
+                            isLikedByMe: response.data.liked
+                        };
+                    }
+                    // Check replies
+                    return {
+                        ...comment,
+                        replies: comment.replies.map(reply => 
+                            reply.id === commentId 
+                                ? { ...reply, likesCount: response.data.likesCount, isLikedByMe: response.data.liked }
+                                : reply
+                        )
+                    };
+                })
+            );
+        } catch (error) {
+            console.error('Failed to like comment', error);
+        } finally {
+            setLikingComment(null);
+        }
+    };
+
+    const handleReply = (commentId: string, authorName: string) => {
+        setReplyingTo({ id: commentId, authorName });
+        inputRef.current?.focus();
+    };
+
+    const cancelReply = () => {
+        setReplyingTo(null);
+        setNewComment('');
+    };
+
+    const toggleReplies = (commentId: string) => {
+        setExpandedReplies(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(commentId)) {
+                newSet.delete(commentId);
+            } else {
+                newSet.add(commentId);
+            }
+            return newSet;
+        });
+    };
+
+    const getTotalComments = () => {
+        return comments.reduce((acc, c) => acc + 1 + (c.replies?.length || 0), 0);
     };
 
     const formatTimeAgo = (dateStr: string): string => {
@@ -191,7 +278,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                         Comentários
                                     </h3>
                                     <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                        {comments.length} {comments.length === 1 ? 'comentário' : 'comentários'}
+                                        {getTotalComments()} {getTotalComments() === 1 ? 'comentário' : 'comentários'}
                                     </p>
                                 </div>
                             </div>
@@ -220,43 +307,194 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                     </p>
                                 </div>
                             ) : (
-                                comments.map((comment, index) => (
-                                    <motion.div 
-                                        key={comment.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.05 }}
-                                        className="flex gap-3"
-                                    >
-                                        <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ${isMGT ? 'ring-emerald-500/30' : 'ring-amber-500/30'}`}>
-                                            {comment.author.avatarUrl ? (
-                                                <img src={comment.author.avatarUrl} alt={comment.author.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className={`w-full h-full flex items-center justify-center ${isMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
-                                                    <User className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-amber-500'}`} />
-                                                </div>
-                                            )}
-                                        </div>
+                                comments.map((comment, index) => {
+                                    const authorName = comment.user?.displayName || comment.user?.name || 'Usuário';
+                                    const authorMGT = comment.user?.membershipType === 'MGT';
+                                    const hasReplies = comment.replies && comment.replies.length > 0;
+                                    const isExpanded = expandedReplies.has(comment.id);
 
-                                        <div className="flex-1 min-w-0">
-                                            <div className={`${commentBubble} rounded-2xl rounded-tl-md p-4 border shadow-sm`}>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <p className={`text-sm font-semibold truncate ${isMGT ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                                                        {comment.author.name}
-                                                    </p>
-                                                    <span className={`text-[10px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                        • {formatTimeAgo(comment.createdAt)}
-                                                    </span>
+                                    return (
+                                        <motion.div 
+                                            key={comment.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            className="space-y-2"
+                                        >
+                                            {/* Main Comment */}
+                                            <div className="flex gap-3">
+                                                <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ${authorMGT ? 'ring-emerald-500/30' : 'ring-amber-500/30'}`}>
+                                                    {comment.user?.avatarUrl ? (
+                                                        <img src={comment.user.avatarUrl} alt={authorName} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className={`w-full h-full flex items-center justify-center ${authorMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
+                                                            <User className={`w-5 h-5 ${authorMGT ? 'text-emerald-500' : 'text-amber-500'}`} />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <p className={`text-sm leading-relaxed ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
-                                                    {comment.content}
-                                                </p>
+
+                                                <div className="flex-1 min-w-0">
+                                                    <div className={`${commentBubble} rounded-2xl rounded-tl-md p-4 border shadow-sm`}>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <p 
+                                                                className="text-sm font-semibold truncate"
+                                                                style={{ color: comment.user?.equippedColor || (authorMGT ? '#10b981' : '#f59e0b') }}
+                                                            >
+                                                                {authorName}
+                                                            </p>
+                                                            <span className={`text-[10px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                • {formatTimeAgo(comment.createdAt)}
+                                                            </span>
+                                                        </div>
+                                                        <p className={`text-sm leading-relaxed ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                                                            {comment.text}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Actions Row */}
+                                                    <div className="flex items-center gap-4 mt-2 ml-1">
+                                                        {/* Like button */}
+                                                        <button
+                                                            onClick={() => handleLikeComment(comment.id)}
+                                                            disabled={likingComment === comment.id}
+                                                            className={`flex items-center gap-1.5 text-xs transition-all ${
+                                                                comment.isLikedByMe
+                                                                    ? 'text-red-500'
+                                                                    : theme === 'light' ? 'text-gray-500 hover:text-red-500' : 'text-gray-400 hover:text-red-400'
+                                                            }`}
+                                                        >
+                                                            <Heart className={`w-4 h-4 ${comment.isLikedByMe ? 'fill-current' : ''}`} />
+                                                            {comment.likesCount > 0 && <span>{comment.likesCount}</span>}
+                                                        </button>
+
+                                                        {/* Reply button */}
+                                                        <button
+                                                            onClick={() => handleReply(comment.id, authorName)}
+                                                            className={`flex items-center gap-1.5 text-xs transition-all ${
+                                                                theme === 'light' ? 'text-gray-500 hover:text-blue-500' : 'text-gray-400 hover:text-blue-400'
+                                                            }`}
+                                                        >
+                                                            <Reply className="w-4 h-4" />
+                                                            <span>Responder</span>
+                                                        </button>
+
+                                                        {/* Show replies button */}
+                                                        {hasReplies && (
+                                                            <button
+                                                                onClick={() => toggleReplies(comment.id)}
+                                                                className={`flex items-center gap-1 text-xs font-medium transition-all ${
+                                                                    isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-amber-500 hover:text-amber-400'
+                                                                }`}
+                                                            >
+                                                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                                                <span>{comment.replies.length} {comment.replies.length === 1 ? 'resposta' : 'respostas'}</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                ))
+
+                                            {/* Replies Section */}
+                                            <AnimatePresence>
+                                                {hasReplies && isExpanded && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto' }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className="ml-8 pl-5 border-l-2 border-gray-300/30 space-y-3"
+                                                    >
+                                                        {comment.replies.map((reply, replyIndex) => {
+                                                            const replyAuthorName = reply.user?.displayName || reply.user?.name || 'Usuário';
+                                                            const replyAuthorMGT = reply.user?.membershipType === 'MGT';
+
+                                                            return (
+                                                                <motion.div
+                                                                    key={reply.id}
+                                                                    initial={{ opacity: 0, x: -10 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: replyIndex * 0.05 }}
+                                                                    className="flex gap-2"
+                                                                >
+                                                                    <div className={`w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ${replyAuthorMGT ? 'ring-emerald-500/20' : 'ring-amber-500/20'}`}>
+                                                                        {reply.user?.avatarUrl ? (
+                                                                            <img src={reply.user.avatarUrl} alt={replyAuthorName} className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <div className={`w-full h-full flex items-center justify-center ${replyAuthorMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
+                                                                                <User className={`w-4 h-4 ${replyAuthorMGT ? 'text-emerald-500' : 'text-amber-500'}`} />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className={`${theme === 'light' ? 'bg-gray-100/80' : 'bg-white/5'} rounded-xl rounded-tl-sm p-3 border ${theme === 'light' ? 'border-gray-200/50' : 'border-white/5'}`}>
+                                                                            <div className="flex items-center gap-2 mb-1">
+                                                                                <p 
+                                                                                    className="text-xs font-semibold truncate"
+                                                                                    style={{ color: reply.user?.equippedColor || (replyAuthorMGT ? '#10b981' : '#f59e0b') }}
+                                                                                >
+                                                                                    {replyAuthorName}
+                                                                                </p>
+                                                                                <span className={`text-[10px] ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                                    • {formatTimeAgo(reply.createdAt)}
+                                                                                </span>
+                                                                            </div>
+                                                                            <p className={`text-xs leading-relaxed ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+                                                                                {reply.text}
+                                                                            </p>
+                                                                        </div>
+
+                                                                        {/* Reply Actions */}
+                                                                        <div className="flex items-center gap-3 mt-1.5 ml-1">
+                                                                            <button
+                                                                                onClick={() => handleLikeComment(reply.id)}
+                                                                                disabled={likingComment === reply.id}
+                                                                                className={`flex items-center gap-1 text-[11px] transition-all ${
+                                                                                    reply.isLikedByMe
+                                                                                        ? 'text-red-500'
+                                                                                        : theme === 'light' ? 'text-gray-400 hover:text-red-500' : 'text-gray-500 hover:text-red-400'
+                                                                                }`}
+                                                                            >
+                                                                                <Heart className={`w-3.5 h-3.5 ${reply.isLikedByMe ? 'fill-current' : ''}`} />
+                                                                                {reply.likesCount > 0 && <span>{reply.likesCount}</span>}
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </motion.div>
+                                                            );
+                                                        })}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                    );
+                                })
                             )}
                         </div>
+
+                        {/* Replying Indicator */}
+                        <AnimatePresence>
+                            {replyingTo && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className={`px-4 py-2 border-t ${theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-blue-900/20 border-blue-500/20'}`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className={`text-sm ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`}>
+                                            Respondendo a <strong>{replyingTo.authorName}</strong>
+                                        </span>
+                                        <button
+                                            onClick={cancelReply}
+                                            className={`p-1 rounded-full ${theme === 'light' ? 'hover:bg-blue-100' : 'hover:bg-blue-500/20'}`}
+                                        >
+                                            <X className={`w-4 h-4 ${theme === 'light' ? 'text-blue-500' : 'text-blue-400'}`} />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Input Area - Apple Vision Pro style */}
                         <form 
@@ -269,7 +507,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                     type="text"
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder="Escreva um comentário..."
+                                    placeholder={replyingTo ? `Responder ${replyingTo.authorName}...` : "Escreva um comentário..."}
                                     className={`flex-1 px-3 py-2 bg-transparent text-sm ${theme === 'light' ? 'text-gray-900' : 'text-white'} focus:outline-none placeholder-gray-400`}
                                 />
                                 <motion.button

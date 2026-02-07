@@ -620,6 +620,8 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
                 profileBgPosY: true,
                 deletedAt: true,
                 isVerified: true,
+                isElite: true,
+                eliteUntil: true,
             },
         });
 

@@ -42,28 +42,28 @@ export const RADIO_STATIONS: RadioStation[] = [
         id: 'lofi',
         name: 'Lo-Fi Hip Hop',
         genre: 'Lo-Fi / Chill Beats',
-        streamUrl: 'https://stream.zeno.fm/0r0xa792kwzuv',
+        streamUrl: 'https://play.streamafrica.net/lofiradio',
         color: '#98D8AA'
     },
     {
         id: 'jazz',
         name: 'Smooth Jazz',
         genre: 'Jazz / Relaxing',
-        streamUrl: 'https://stream.zeno.fm/4d6my9a2hauuv',
+        streamUrl: 'https://strm112.1.fm/smoothjazz_mobile_mp3',
         color: '#F97316'
     },
     {
         id: 'electronic',
         name: 'Electronic',
         genre: 'EDM / House',
-        streamUrl: 'https://stream.zeno.fm/s44rmn2a3wzuv',
+        streamUrl: 'https://strm112.1.fm/electronica_mobile_mp3',
         color: '#EC4899'
     },
     {
         id: 'rock',
         name: 'Classic Rock',
         genre: 'Rock / Classic',
-        streamUrl: 'https://stream.zeno.fm/yn65fsaurfhvv',
+        streamUrl: 'https://strm112.1.fm/crock_mobile_mp3',
         color: '#EF4444'
     }
 ];

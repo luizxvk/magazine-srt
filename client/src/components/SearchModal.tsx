@@ -41,6 +41,7 @@ const NAVIGATION_PAGES = [
     { id: 'store', title: 'Loja de Produtos', subtitle: 'Produtos físicos exclusivos', keywords: ['loja', 'store', 'produtos', 'produto', 'merch', 'merchandise', 'camiseta', 'adesivo', 'físico', 'fisico', 'comprar'], icon: '🛒', path: '/store' },
     { id: 'radio', title: 'Rádio', subtitle: 'Ouça a rádio ao vivo', keywords: ['radio', 'rádio', 'musica', 'música', 'som', 'audio', 'ouvir', 'live', 'ao vivo'], icon: '📻', path: '/feed', action: 'radio' },
     { id: 'roadmap', title: 'Roadmap', subtitle: 'Próximas atualizações', keywords: ['roadmap', 'atualização', 'atualizacoes', 'futuro', 'novidades', 'próximo', 'proximo', 'plano', 'planejamento'], icon: '🗺️', path: '/roadmap' },
+    { id: 'elite', title: 'ELITE', subtitle: 'Assinatura premium com benefícios exclusivos', keywords: ['elite', 'premium', 'assinatura', 'vip', 'beneficios', 'benefício', 'assinar', 'subscription', '2x xp', 'xp dobro', 'zions', 'exclusivo'], icon: '👑', path: '/elite' },
 ];
 
 // Fuzzy match function - checks if query matches any part of keywords

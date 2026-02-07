@@ -280,7 +280,7 @@ export default function FeedItem({
                             <span className={`text-xs font-medium uppercase tracking-wider`} style={{ color: userAccent }}>{author}</span>
                             {/* Elite Badge */}
                             {authorIsElite && authorEliteUntil && new Date(authorEliteUntil) > new Date() && (
-                                <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-black rounded-full shadow-sm">
+                                <span className="elite-badge-shine px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-widest bg-gradient-to-r from-violet-600 via-blue-500 to-indigo-600 text-white rounded shadow-sm shadow-indigo-500/30">
                                     Elite
                                 </span>
                             )}

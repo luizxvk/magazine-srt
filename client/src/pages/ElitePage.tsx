@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Crown, Zap, Trophy, Gift, MessageCircle, Shield, Palette, 
-    Sparkles, Star, Check, ChevronRight, X,
+    Sparkles, Star, Check, X,
     Rocket, Heart, Package
 } from 'lucide-react';
 import Loader from '../components/Loader';
@@ -290,11 +290,10 @@ export default function ElitePage() {
                                 <LiquidButton
                                     onClick={() => setShowConfirmModal(true)}
                                     disabled={!selectedPlan}
-                                    className="w-64 h-14 mx-auto"
+                                    className="w-48 h-[2.7em] mx-auto"
                                 >
-                                    <Crown className="w-5 h-5" />
+                                    <Crown className="w-5 h-5 group-hover:fill-yellow-400 fill-white shrink-0" />
                                     ASSINAR ELITE
-                                    <ChevronRight className="w-5 h-5" />
                                 </LiquidButton>
                                 
                                 <p className="text-sm text-gray-500 mt-6">

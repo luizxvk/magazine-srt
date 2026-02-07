@@ -158,6 +158,37 @@
   background-size: 200% 200%;
 }
 
+/* Elite Badge Shine Effect */
+@keyframes elite-badge-shine {
+  0% {
+    background-position: -100% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.elite-badge-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.elite-badge-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: elite-badge-shine 2.5s ease-in-out infinite;
+}
+
 @layer base {
   html {
     /* Prevent iOS zoom on input focus */

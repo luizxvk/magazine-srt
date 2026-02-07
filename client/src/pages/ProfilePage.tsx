@@ -36,7 +36,7 @@ const BADGE_URLS: Record<string, string> = {
 };
 
 export default function ProfilePage() {
-    const { user: currentUser, theme, equippedBadge, previewTheme } = useAuth();
+    const { user: currentUser, theme, equippedBadge, previewTheme, accentColor, accentGradient } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const paramId = searchParams.get('id');
@@ -449,7 +449,10 @@ export default function ProfilePage() {
                                         )}
                                         <BadgeDisplay userId={profileUser.id} isElite={profileUser.isElite} eliteUntil={profileUser.eliteUntil} />
                                     </div>
-                                    <p className={`text-sm uppercase tracking-widest mb-2 font-medium ${isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold'}`}>
+                                    <p 
+                                        className={`text-sm uppercase tracking-widest mb-2 font-medium text-transparent bg-clip-text ${!accentGradient && (isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold')}`}
+                                        style={accentGradient ? { backgroundImage: accentGradient } : { backgroundImage: `linear-gradient(to right, ${accentColor}, ${accentColor})` }}
+                                    >
                                         {isMGT ? 'Membro MGT' : 'Membro Magazine'}
                                     </p>
                                     {profileUser.bio && <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} text-sm italic mb-4 max-w-md mx-auto md:mx-0`}>"{profileUser.bio}"</p>}

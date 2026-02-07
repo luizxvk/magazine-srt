@@ -8,7 +8,7 @@ interface CreatePostPillProps {
 }
 
 export default function CreatePostPill({ onClick }: CreatePostPillProps) {
-    const { user, isMobileDrawerOpen, accentColor } = useAuth();
+    const { user, isMobileDrawerOpen, accentColor, accentGradient } = useAuth();
     const [isExpanded, setIsExpanded] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
     
@@ -27,10 +27,10 @@ export default function CreatePostPill({ onClick }: CreatePostPillProps) {
         setIsExpanded(false);
     };
     
-    // Dynamic button style based on accent color
+    // Dynamic button style based on accent color/gradient
     const buttonStyle = isMGT 
         ? {} 
-        : { backgroundColor: accentColor, boxShadow: `0 0 20px ${accentColor}50` };
+        : { background: accentGradient || accentColor, boxShadow: `0 0 20px ${accentColor}50` };
     
     const hoverStyle = isMGT
         ? {}

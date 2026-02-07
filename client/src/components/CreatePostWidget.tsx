@@ -19,7 +19,7 @@ interface MentionUser {
 }
 
 export default function CreatePostWidget({ onPostCreated, inline = false }: CreatePostWidgetProps) {
-    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen, accentColor, showToast } = useAuth();
+    const { user, isVisitor, showAchievement, updateUserZions, updateUser, theme, isMobileDrawerOpen, accentColor, accentGradient, showToast } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -602,7 +602,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
                             disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
                         `}
                         style={!isMGT ? {
-                            background: accentColor,
+                            background: accentGradient || accentColor,
                             boxShadow: `0 0 15px ${accentColor}60`
                         } : undefined}
                         title="Publicar"

@@ -30,7 +30,7 @@ interface Group {
 }
 
 export default function GroupsPage() {
-  const { user, theme, accentColor } = useAuth();
+  const { user, theme, accentColor, accentGradient } = useAuth();
   const navigate = useNavigate();
   const isMGT = user?.membershipType === 'MGT';
 
@@ -42,10 +42,10 @@ export default function GroupsPage() {
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
 
-  // Dynamic button style based on accent color
+  // Dynamic button style based on accent color/gradient
   const buttonStyle = isMGT 
     ? {} 
-    : { background: `linear-gradient(to right, ${accentColor}, ${accentColor})`, boxShadow: `0 10px 25px ${accentColor}40` };
+    : { background: accentGradient || accentColor, boxShadow: `0 10px 25px ${accentColor}40` };
 
   useEffect(() => {
     fetchGroups();

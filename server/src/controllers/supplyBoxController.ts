@@ -53,6 +53,8 @@ const ITEM_POOLS = {
         { id: 'anim-rainbow-skies', name: 'Rainbow Skies', rarity: 'LEGENDARY' },
         { id: 'anim-infinite-triangles', name: 'Infinite Triangles', rarity: 'LEGENDARY' },
         { id: 'anim-moonlit-sky', name: 'Moonlit Sky', rarity: 'LEGENDARY' },
+        { id: 'anim-dark-veil', name: 'Véu Sombrio', rarity: 'LEGENDARY' },
+        { id: 'anim-iridescence', name: 'Prisma Iridescente', rarity: 'LEGENDARY' },
     ],
     BADGE: [
         // COMMON (0-250)

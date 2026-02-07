@@ -44,6 +44,8 @@ const BACKGROUND_PREVIEWS: Record<string, string> = {
     'anim-rainbow-skies': 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%)',
     'anim-infinite-triangles': 'linear-gradient(135deg, #2d1b4e 0%, #4a2c7d 50%, #2d1b4e 100%)',
     'anim-moonlit-sky': 'linear-gradient(135deg, #0a0a2e 0%, #1a1a4e 50%, #0a0a2e 100%)',
+    'anim-dark-veil': 'radial-gradient(ellipse at center, #2a0845 0%, #1a0530 30%, #0a0115 100%)',
+    'anim-iridescence': 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #1a1a2e 100%)',
 };
 
 const COLOR_PREVIEWS: Record<string, string> = {

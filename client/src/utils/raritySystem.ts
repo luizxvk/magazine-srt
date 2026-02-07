@@ -101,6 +101,8 @@ export const BACKGROUND_RARITY: Record<string, RarityTier> = {
     'anim-rainbow-skies': 'LEGENDARY',
     'anim-infinite-triangles': 'LEGENDARY',
     'anim-moonlit-sky': 'LEGENDARY',
+    'anim-dark-veil': 'LEGENDARY',
+    'anim-iridescence': 'LEGENDARY',
 };
 
 // Colors

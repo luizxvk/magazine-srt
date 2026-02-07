@@ -91,6 +91,8 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
             { id: 'anim-gradient-waves', name: 'Ondas Gradiente (Premium)' },
             { id: 'anim-rainbow-skies', name: 'Rainbow Skies (Premium)' },
             { id: 'anim-moonlit-sky', name: 'Moonlit Sky (Premium)' },
+            { id: 'anim-dark-veil', name: 'Véu Sombrio (Premium WebGL)' },
+            { id: 'anim-iridescence', name: 'Prisma Iridescente (Premium WebGL)' },
         ],
         badge: [
             { id: 'badge_diamond', name: 'Diamante' },

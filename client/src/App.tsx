@@ -50,6 +50,7 @@ import VersionUpdateNotification from './components/VersionUpdateNotification';
 import BetaRewardPopup from './components/BetaRewardPopup';
 import BetaEndedOverlay from './components/BetaEndedOverlay';
 import SupportButton from './components/SupportButton';
+import WebGLBackgroundRenderer from './components/WebGLBackgroundRenderer';
 
 
 
@@ -128,6 +129,7 @@ function App() {
         <BetaRewardWrapper />
         <BetaEndedOverlay />
         <SupportButtonWrapper />
+        <WebGLBackgroundRenderer />
       </Router>
     </RadioProvider>
     </AuthProvider>

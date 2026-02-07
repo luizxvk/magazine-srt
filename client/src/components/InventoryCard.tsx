@@ -35,6 +35,8 @@ const ITEM_DATA: Record<string, { name: string; type: 'background' | 'badge' | '
     'anim-rainbow-skies': { name: 'Rainbow Skies', type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     'anim-infinite-triangles': { name: 'Infinite Triangles', type: 'background', preview: 'linear-gradient(135deg, #d4af37 0%, #000 100%)' },
     'anim-moonlit-sky': { name: 'Moonlit Sky', type: 'background', preview: 'linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
+    'anim-dark-veil': { name: 'Véu Sombrio', type: 'background', preview: 'radial-gradient(ellipse at center, #2a0845 0%, #1a0530 30%, #0a0115 100%)' },
+    'anim-iridescence': { name: 'Prisma Iridescente', type: 'background', preview: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #1a1a2e 100%)' },
     // Badges - using icons8 URLs
     badge_crown: { name: 'Coroa', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000' },
     badge_skull: { name: 'Caveira', type: 'badge', preview: 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000' },

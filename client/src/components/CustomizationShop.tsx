@@ -63,6 +63,8 @@ const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, rgba(212,175,55,0.3) 50%, #000 100%)' },
     { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'Céu noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'radial-gradient(circle at 70% 20%, rgba(255,255,200,0.3) 0%, transparent 20%), linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
+    { id: 'anim-dark-veil', name: 'Véu Sombrio', description: 'Rede neural CPPN gerando padrões orgânicos hipnóticos', price: 5000, type: 'background', preview: 'radial-gradient(ellipse at center, #2a0845 0%, #1a0530 30%, #0a0115 100%)' },
+    { id: 'anim-iridescence', name: 'Prisma Iridescente', description: 'Aurora iridescente que reage ao movimento do mouse', price: 4500, type: 'background', preview: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #1a1a2e 100%)' },
 ];
 
 // Predefined badges (profile decorations)

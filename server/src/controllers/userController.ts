@@ -808,6 +808,8 @@ const CUSTOMIZATION_ITEMS = {
         { id: 'anim-rainbow-skies', name: 'Rainbow Skies', price: 3000, type: 'animated', preview: '🌈' },
         { id: 'anim-infinite-triangles', name: 'Infinite Triangles', price: 3500, type: 'animated', preview: '🔷' },
         { id: 'anim-moonlit-sky', name: 'Moonlit Sky', price: 4000, type: 'animated', preview: '🌙' },
+        { id: 'anim-dark-veil', name: 'Véu Sombrio', price: 5000, type: 'animated', preview: '🌑' },
+        { id: 'anim-iridescence', name: 'Prisma Iridescente', price: 4500, type: 'animated', preview: '🔮' },
     ],
     badges: [
         { id: 'badge_skull', name: 'Caveira', price: 300, preview: 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000' },

@@ -80,12 +80,6 @@ body::-webkit-scrollbar-thumb:hover {
               var(--accent-gradient) border-box;
 }
 
-/* Apply gradient to progress bars when gradient accent is active */
-.has-gradient-accent [class*="bg-gold-"],
-.has-gradient-accent [class*="bg-emerald-"] {
-  background: var(--accent-gradient) !important;
-}
-
 /* Liquid Gradient Effect Styles */
 .liquid-gradient {
   overflow: hidden;

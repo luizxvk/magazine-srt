@@ -1,4 +1,4 @@
-﻿import { Router, Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/authMiddleware';
@@ -13,7 +13,7 @@ const client = new MercadoPagoConfig({
 
 const isSimulationMode = process.env.MERCADOPAGO_SIMULATION_MODE === 'true';
 
-// Duração em dias
+// Dura��o em dias
 const PLAN_DURATION_DAYS: Record<string, number> = {
     MONTHLY: 30,
     QUARTERLY: 90,
@@ -39,9 +39,9 @@ router.post('/create-preference', async (req, res) => {
                     }
                 ],
                 back_urls: {
-                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/mgt-log?status=success`,
-                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/mgt-log?status=failure`,
-                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/mgt-log?status=pending`
+                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/mgt-log?status=success`,
+                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/mgt-log?status=failure`,
+                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/mgt-log?status=pending`
                 },
                 auto_return: 'approved',
             }
@@ -65,17 +65,17 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
         const { planType } = req.body;
 
         if (!userId) {
-            res.status(401).json({ error: 'Usuário não autenticado' });
+            res.status(401).json({ error: 'Usu�rio n�o autenticado' });
             return;
         }
 
         // Validar plano
         if (!['MONTHLY', 'QUARTERLY', 'YEARLY', 'LIFETIME'].includes(planType)) {
-            res.status(400).json({ error: 'Plano inválido' });
+            res.status(400).json({ error: 'Plano inv�lido' });
             return;
         }
 
-        // Verificar se já tem assinatura ativa
+        // Verificar se j� tem assinatura ativa
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { 
@@ -86,14 +86,14 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
         });
 
         if (!user) {
-            res.status(404).json({ error: 'Usuário não encontrado' });
+            res.status(404).json({ error: 'Usu�rio n�o encontrado' });
             return;
         }
 
         const now = new Date();
         if (user.isElite && user.eliteUntil && user.eliteUntil > now) {
             res.status(400).json({ 
-                error: 'Você já possui uma assinatura ELITE ativa',
+                error: 'Voc� j� possui uma assinatura ELITE ativa',
                 eliteUntil: user.eliteUntil
             });
             return;
@@ -104,13 +104,13 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
             MONTHLY: 'Mensal',
             QUARTERLY: 'Trimestral', 
             YEARLY: 'Anual',
-            LIFETIME: 'Vitalício'
+            LIFETIME: 'Vital�cio'
         };
 
-        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
         const serverUrl = process.env.SERVER_URL || 'https://magazine-srt-react-server.vercel.app';
 
-        // Modo simulação (dev)
+        // Modo simula��o (dev)
         if (isSimulationMode) {
             // Simular pagamento imediato
             const durationDays = PLAN_DURATION_DAYS[planType];
@@ -130,7 +130,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 }
             });
 
-            // Atualizar usuário
+            // Atualizar usu�rio
             const existingUser = await prisma.user.findUnique({
                 where: { id: userId },
                 select: { eliteSince: true, eliteStreak: true }
@@ -151,7 +151,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 data: {
                     userId,
                     amount: ELITE_BENEFITS.monthlyZions,
-                    reason: 'Bônus mensal ELITE',
+                    reason: 'B�nus mensal ELITE',
                     currency: 'POINTS'
                 }
             });
@@ -160,21 +160,21 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 data: {
                     userId,
                     type: 'SYSTEM',
-                    content: 'Bem-vindo ao ELITE! 🎉 Seus benefícios já estão ativos.'
+                    content: 'Bem-vindo ao ELITE! ?? Seus benef�cios j� est�o ativos.'
                 }
             });
 
             res.json({
                 simulation: true,
                 success: true,
-                message: 'Assinatura ELITE ativada (modo simulação)',
+                message: 'Assinatura ELITE ativada (modo simula��o)',
                 eliteUntil: periodEnd,
                 init_point: `${clientUrl}/elite?status=success`
             });
             return;
         }
 
-        // Criar preferência no Mercado Pago
+        // Criar prefer�ncia no Mercado Pago
         const preference = new Preference(client);
 
         const result = await preference.create({
@@ -183,7 +183,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                     {
                         id: `elite_${planType.toLowerCase()}`,
                         title: `MGT ELITE - Plano ${planNames[planType]}`,
-                        description: 'Assinatura MGT ELITE com benefícios exclusivos: XP em dobro, 500 Zions/mês, desconto na loja e mais.',
+                        description: 'Assinatura MGT ELITE com benef�cios exclusivos: XP em dobro, 500 Zions/m�s, desconto na loja e mais.',
                         quantity: 1,
                         unit_price: price,
                         currency_id: 'BRL'
@@ -226,7 +226,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
 
     } catch (error) {
         console.error('[ELITE] Error creating preference:', error);
-        res.status(500).json({ error: 'Erro ao criar preferência de pagamento' });
+        res.status(500).json({ error: 'Erro ao criar prefer�ncia de pagamento' });
     }
 });
 
@@ -268,7 +268,7 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
                     return;
                 }
 
-                // Verificar se é uma assinatura Elite
+                // Verificar se � uma assinatura Elite
                 if (parsed.type !== 'elite_subscription') {
                     console.log('[ELITE WEBHOOK] Not an elite subscription, ignoring');
                     res.sendStatus(200);
@@ -277,7 +277,7 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
 
                 const { userId, planType, price } = parsed;
 
-                // Verificar se já processou (idempotência)
+                // Verificar se j� processou (idempot�ncia)
                 const existingSubscription = await prisma.subscription.findFirst({
                     where: { externalId: String(paymentId) }
                 });
@@ -306,7 +306,7 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
                     }
                 });
 
-                // Atualizar usuário
+                // Atualizar usu�rio
                 const user = await prisma.user.findUnique({
                     where: { id: userId },
                     select: { eliteSince: true, eliteStreak: true }
@@ -323,22 +323,22 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
                     }
                 });
 
-                // Registrar bônus de Zions
+                // Registrar b�nus de Zions
                 await prisma.zionHistory.create({
                     data: {
                         userId,
                         amount: ELITE_BENEFITS.monthlyZions,
-                        reason: 'Bônus mensal ELITE',
+                        reason: 'B�nus mensal ELITE',
                         currency: 'POINTS'
                     }
                 });
 
-                // Notificar usuário
+                // Notificar usu�rio
                 await prisma.notification.create({
                     data: {
                         userId,
                         type: 'SYSTEM',
-                        content: 'Bem-vindo ao ELITE! 🎉 Seus benefícios já estão ativos.'
+                        content: 'Bem-vindo ao ELITE! ?? Seus benef�cios j� est�o ativos.'
                     }
                 });
 
@@ -360,12 +360,12 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
         const { productId, quantity, paymentType } = req.body;
 
         if (!userId) {
-            res.status(401).json({ error: 'Usuário não autenticado' });
+            res.status(401).json({ error: 'Usu�rio n�o autenticado' });
             return;
         }
 
         if (!productId || !quantity) {
-            res.status(400).json({ error: 'productId e quantity são obrigatórios' });
+            res.status(400).json({ error: 'productId e quantity s�o obrigat�rios' });
             return;
         }
 
@@ -375,12 +375,12 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
         });
 
         if (!product) {
-            res.status(404).json({ error: 'Produto nÃ£o encontrado' });
+            res.status(404).json({ error: 'Produto não encontrado' });
             return;
         }
 
         if (!product.priceBRL) {
-            res.status(400).json({ error: 'Este produto nÃ£o aceita pagamento em BRL' });
+            res.status(400).json({ error: 'Este produto não aceita pagamento em BRL' });
             return;
         }
 
@@ -405,7 +405,7 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
         const unitPrice = hasDiscount ? Number((product.priceBRL * 0.9).toFixed(2)) : product.priceBRL;
         const totalPrice = Number((unitPrice * quantity).toFixed(2));
 
-        // Modo simulaÃ§Ã£o (dev)
+        // Modo simulação (dev)
         if (isSimulationMode) {
             // Criar pedido pendente
             const order = await prisma.order.create({
@@ -422,15 +422,15 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
 
             res.json({
                 simulation: true,
-                message: 'Modo simulaÃ§Ã£o ativo - pagamento simulado',
+                message: 'Modo simulação ativo - pagamento simulado',
                 orderId: order.id,
-                init_point: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/store?payment=simulate&orderId=${order.id}`,
+                init_point: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=simulate&orderId=${order.id}`,
                 total: totalPrice
             });
             return;
         }
 
-        // Criar preferÃªncia no MercadoPago
+        // Criar preferência no MercadoPago
         const preference = new Preference(client);
 
         const result = await preference.create({
@@ -449,14 +449,14 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
                     email: user?.email || ''
                 },
                 payment_methods: {
-                    // Aceitar todos os mÃ©todos: PIX, cartÃ£o, boleto
+                    // Aceitar todos os métodos: PIX, cartão, boleto
                     excluded_payment_types: [],
                     installments: 12
                 },
                 back_urls: {
-                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/store?payment=success`,
-                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/store?payment=failure`,
-                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/store?payment=pending`
+                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=success`,
+                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=failure`,
+                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=pending`
                 },
                 notification_url: `${process.env.SERVER_URL || 'http://localhost:3000'}/api/payment/webhook`,
                 auto_return: 'approved',
@@ -487,7 +487,7 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
 
     } catch (error) {
         console.error('Error creating product preference:', error);
-        res.status(500).json({ error: 'Erro ao criar preferÃªncia de pagamento' });
+        res.status(500).json({ error: 'Erro ao criar preferência de pagamento' });
     }
 });
 
@@ -532,7 +532,7 @@ router.post('/webhook', async (req: Request, res: Response): Promise<void> => {
                 });
 
                 if (!order) {
-                    // Criar pedido se nÃ£o existir
+                    // Criar pedido se não existir
                     const product = await prisma.product.findUnique({ where: { id: productId } });
                     if (!product) {
                         console.error('Product not found:', productId);
@@ -579,12 +579,12 @@ router.post('/webhook', async (req: Request, res: Response): Promise<void> => {
                     }
                 }
 
-                // Notificar usuÃ¡rio (criar notificaÃ§Ã£o)
+                // Notificar usuário (criar notificação)
                 await prisma.notification.create({
                     data: {
                         userId,
                         type: 'SYSTEM',
-                        content: `Sua compra de ${product?.name || 'produto'} foi confirmada! ðŸŽ‰`
+                        content: `Sua compra de ${product?.name || 'produto'} foi confirmada! 🎉`
                     }
                 });
 
@@ -602,7 +602,7 @@ router.post('/webhook', async (req: Request, res: Response): Promise<void> => {
 // ============ SIMULAR PAGAMENTO (DEV) ============
 router.post('/simulate-payment', authenticateToken, async (req: Request, res: Response): Promise<void> => {
     if (!isSimulationMode) {
-        res.status(403).json({ error: 'SimulaÃ§Ã£o nÃ£o disponÃ­vel em produÃ§Ã£o' });
+        res.status(403).json({ error: 'Simulação não disponível em produção' });
         return;
     }
 
@@ -611,7 +611,7 @@ router.post('/simulate-payment', authenticateToken, async (req: Request, res: Re
         const userId = (req as any).user?.userId;
 
         if (!userId) {
-            res.status(401).json({ error: 'Usuário não autenticado' });
+            res.status(401).json({ error: 'Usu�rio n�o autenticado' });
             return;
         }
 
@@ -621,7 +621,7 @@ router.post('/simulate-payment', authenticateToken, async (req: Request, res: Re
         });
 
         if (!order) {
-            res.status(404).json({ error: 'Pedido nÃ£o encontrado' });
+            res.status(404).json({ error: 'Pedido não encontrado' });
             return;
         }
 

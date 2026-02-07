@@ -174,7 +174,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
             return;
         }
 
-        // Criar prefer�ncia no Mercado Pago
+        // Criar preferência no Mercado Pago
         const preference = new Preference(client);
 
         const result = await preference.create({
@@ -183,7 +183,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                     {
                         id: `elite_${planType.toLowerCase()}`,
                         title: `Assinatura Elite - ${planNames[planType]}`,
-                        description: 'Assinatura MGT ELITE com benefícios exclusivos: XP em dobro, 500 Zions/mês, desconto na loja e mais.',
+                        description: `Assinatura Elite - ${planNames[planType]} | Benefícios: XP em dobro, 500 Zions/mês, desconto na loja e mais.`,
                         quantity: 1,
                         unit_price: price,
                         currency_id: 'BRL'

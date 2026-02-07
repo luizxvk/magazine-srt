@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calendar, Clock, Gift, Sparkles, Gamepad2, Trash2 } from 'lucide-react';
+import { X, Calendar, Clock, Gift, Sparkles, Gamepad2, Trash2, UserCheck, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -21,6 +21,14 @@ interface LinkedReward {
     publishedAt?: string;
 }
 
+interface EventAttendee {
+    id: string;
+    name: string;
+    displayName?: string;
+    avatarUrl?: string;
+    membershipType: string;
+}
+
 interface Event {
     id: string;
     title: string;
@@ -31,6 +39,9 @@ interface Event {
     category?: string;
     game?: string;
     linkedReward?: LinkedReward;
+    attendeeCount?: number;
+    isAttending?: boolean;
+    attendees?: EventAttendee[];
 }
 
 export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
@@ -40,6 +51,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const [attending, setAttending] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -56,6 +68,45 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
             console.error('Failed to fetch events', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleToggleAttend = async (eventId: string, isCurrentlyAttending: boolean) => {
+        setAttending(eventId);
+        try {
+            if (isCurrentlyAttending) {
+                await api.delete(`/events/${eventId}/attend`);
+                setEvents(prev => prev.map(e => 
+                    e.id === eventId 
+                        ? { ...e, isAttending: false, attendeeCount: Math.max(0, (e.attendeeCount || 1) - 1) }
+                        : e
+                ));
+                showSuccess('Presença cancelada');
+            } else {
+                await api.post(`/events/${eventId}/attend`);
+                setEvents(prev => prev.map(e => 
+                    e.id === eventId 
+                        ? { 
+                            ...e, 
+                            isAttending: true, 
+                            attendeeCount: (e.attendeeCount || 0) + 1,
+                            attendees: [...(e.attendees || []), { 
+                                id: user?.id || '', 
+                                name: user?.name || '', 
+                                displayName: user?.displayName,
+                                avatarUrl: user?.avatarUrl, 
+                                membershipType: user?.membershipType || 'MAGAZINE' 
+                            }]
+                        }
+                        : e
+                ));
+                showSuccess('Presença confirmada! Você receberá notificação quando o evento terminar.');
+            }
+        } catch (error: any) {
+            console.error('Failed to toggle attendance', error);
+            showError(error.response?.data?.error || 'Erro ao confirmar presença');
+        } finally {
+            setAttending(null);
         }
     };
 
@@ -193,6 +244,66 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                                         </div>
                                                     )}
                                                 </div>
+
+                                                {/* RSVP Section - Attendees + Button */}
+                                                {isUpcoming && (
+                                                    <div className={`mt-3 flex items-center justify-between gap-2 p-2 rounded-xl ${theme === 'light' ? 'bg-gray-50 border border-gray-200/50' : 'bg-white/[0.02] border border-white/[0.05]'}`}>
+                                                        {/* Attendee Avatars Stack */}
+                                                        <div className="flex items-center gap-2">
+                                                            {event.attendees && event.attendees.length > 0 ? (
+                                                                <div className="flex -space-x-2">
+                                                                    {event.attendees.slice(0, 4).map((attendee, idx) => (
+                                                                        <div 
+                                                                            key={attendee.id} 
+                                                                            className={`w-7 h-7 rounded-full border-2 ${theme === 'light' ? 'border-gray-50' : 'border-gray-900'} overflow-hidden flex-shrink-0`}
+                                                                            style={{ zIndex: 5 - idx }}
+                                                                            title={attendee.displayName || attendee.name}
+                                                                        >
+                                                                            {attendee.avatarUrl ? (
+                                                                                <img src={attendee.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                                            ) : (
+                                                                                <div className={`w-full h-full flex items-center justify-center text-[10px] font-bold ${attendee.membershipType === 'MGT' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                                                                    {(attendee.displayName || attendee.name).charAt(0).toUpperCase()}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
+                                                                    {(event.attendeeCount || 0) > 4 && (
+                                                                        <div className={`w-7 h-7 rounded-full border-2 ${theme === 'light' ? 'border-gray-50 bg-gray-200' : 'border-gray-900 bg-gray-800'} flex items-center justify-center text-[10px] font-bold ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                            +{(event.attendeeCount || 0) - 4}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <Users className={`w-4 h-4 ${theme === 'light' ? 'text-gray-400' : 'text-gray-600'}`} />
+                                                            )}
+                                                            <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                {(event.attendeeCount || 0) === 0 
+                                                                    ? 'Seja o primeiro!' 
+                                                                    : `${event.attendeeCount} confirmad${(event.attendeeCount || 0) === 1 ? 'o' : 'os'}`
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        {/* Attend Button */}
+                                                        <button
+                                                            onClick={() => handleToggleAttend(event.id, event.isAttending || false)}
+                                                            disabled={attending === event.id}
+                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                                                event.isAttending 
+                                                                    ? `bg-${themeColor}-500/20 text-${themeColor}-500 border border-${themeColor}-500/30` 
+                                                                    : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
+                                                            }`}
+                                                        >
+                                                            {attending === event.id ? (
+                                                                <div className={`w-3.5 h-3.5 border-2 border-current/30 border-t-current rounded-full animate-spin`} />
+                                                            ) : (
+                                                                <UserCheck className="w-3.5 h-3.5" />
+                                                            )}
+                                                            {event.isAttending ? 'Confirmado' : 'Vou!'}
+                                                        </button>
+                                                    </div>
+                                                )}
 
                                                 {/* Reward Preview - Apple Vision Pro style card */}
                                                 {hasReward && (

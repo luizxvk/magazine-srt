@@ -101,6 +101,7 @@ model User {
   marketOffersSent       MarketOffer[]  @relation("OfferBuyer")
   marketOffersReceived   MarketOffer[]  @relation("OfferSeller")
   commentLikes           CommentLike[]
+  eventAttendance        EventAttendee[]
 
   @@index([membershipType])
   @@index([isElite])
@@ -466,6 +467,21 @@ model Event {
   dropKeyword    String?       // Palavra-chave secreta (revelada no evento)
   dropClaimUntil DateTime?     // Até quando pode resgatar
   dropClaims     EventDropClaim[]
+  attendees      EventAttendee[]
+}
+
+// Registro de quem confirmou presença no evento
+model EventAttendee {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId]) // Cada usuário só confirma uma vez por evento
+  @@index([eventId])
+  @@index([userId])
 }
 
 // Registro de quem resgatou o drop exclusivo do evento

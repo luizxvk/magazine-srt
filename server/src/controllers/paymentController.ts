@@ -558,9 +558,9 @@ export const createZionsPreference = async (req: Request, res: Response) => {
                 external_reference: newPurchase.id,
                 statement_descriptor: 'MAGAZINE MGT',
                 back_urls: {
-                    success: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/profile?payment=success`,
-                    failure: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/profile?payment=failure`,
-                    pending: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/profile?payment=pending`
+                    success: `${process.env.FRONTEND_URL || process.env.CLIENT_URL || 'https://magazine-srt.vercel.app'}/profile?payment=success`,
+                    failure: `${process.env.FRONTEND_URL || process.env.CLIENT_URL || 'https://magazine-srt.vercel.app'}/profile?payment=failure`,
+                    pending: `${process.env.FRONTEND_URL || process.env.CLIENT_URL || 'https://magazine-srt.vercel.app'}/profile?payment=pending`
                 },
                 auto_return: 'approved'
             }
@@ -921,7 +921,7 @@ export const createProductPayment = async (req: Request, res: Response) => {
                 simulation: true,
                 message: 'Modo simulaÃ§Ã£o ativo - pagamento simulado',
                 orderId: order.id,
-                init_point: `${process.env.CLIENT_URL || 'http://localhost:5173'}/store?payment=simulate&orderId=${order.id}`,
+                init_point: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app'}/store?payment=simulate&orderId=${order.id}`,
                 total: totalPrice
             });
         }
@@ -931,7 +931,7 @@ export const createProductPayment = async (req: Request, res: Response) => {
         const preference = new Preference(client);
         
         const webhookUrl = `${process.env.BACKEND_URL || process.env.SERVER_URL || 'https://magazine-srt-react-server.vercel.app'}/api/payments/webhook/product`;
-        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-srt.vercel.app';
 
         const result = await preference.create({
             body: {

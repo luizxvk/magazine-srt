@@ -68,12 +68,29 @@ const DEFAULT_ITEMS = ['bg_default', 'badge_crown', 'color_gold'];
 // Get all active market listings
 export const getListings = async (req: AuthRequest, res: Response) => {
   try {
-    const { type, minPrice, maxPrice, sortBy } = req.query;
+    const { type, minPrice, maxPrice, sortBy, eliteOnly: eliteOnlyFilter } = req.query;
     const userId = req.user?.userId;
+
+    // Check if user is Elite for filtering Elite-only listings
+    let userIsElite = false;
+    if (userId) {
+      const user = await prisma.user.findUnique({ 
+        where: { id: userId },
+        select: { isElite: true, eliteUntil: true }
+      });
+      userIsElite = !!(user?.isElite && user?.eliteUntil && user.eliteUntil > new Date());
+    }
 
     const where: any = {
       status: 'ACTIVE',
     };
+
+    // Filter by Elite-only (if not Elite, exclude Elite-only listings)
+    if (!userIsElite) {
+      where.eliteOnly = false;
+    } else if (eliteOnlyFilter === 'true') {
+      where.eliteOnly = true;
+    }
 
     if (type && type !== 'all') {
       where.itemType = type;
@@ -87,11 +104,12 @@ export const getListings = async (req: AuthRequest, res: Response) => {
       where.price = { ...where.price, lte: parseInt(maxPrice as string) };
     }
 
-    let orderBy: any = { createdAt: 'desc' };
-    if (sortBy === 'price_asc') orderBy = { price: 'asc' };
-    if (sortBy === 'price_desc') orderBy = { price: 'desc' };
-    if (sortBy === 'newest') orderBy = { createdAt: 'desc' };
-    if (sortBy === 'oldest') orderBy = { createdAt: 'asc' };
+    // Updated orderBy: Featured listings first, then by selected sort
+    let orderBy: any[] = [{ isFeatured: 'desc' }];
+    if (sortBy === 'price_asc') orderBy.push({ price: 'asc' });
+    else if (sortBy === 'price_desc') orderBy.push({ price: 'desc' });
+    else if (sortBy === 'oldest') orderBy.push({ createdAt: 'asc' });
+    else orderBy.push({ createdAt: 'desc' }); // newest is default
 
     const listings = await prisma.marketListing.findMany({
       where,
@@ -103,10 +121,22 @@ export const getListings = async (req: AuthRequest, res: Response) => {
             name: true,
             displayName: true,
             avatarUrl: true,
+            isTrustedSeller: true,
+            marketSalesCount: true,
           },
         },
       },
     });
+
+    // Get user's favorites to mark isFavorited
+    let userFavorites: string[] = [];
+    if (userId) {
+      const favorites = await prisma.marketFavorite.findMany({
+        where: { userId },
+        select: { listingId: true }
+      });
+      userFavorites = favorites.map(f => f.listingId);
+    }
 
     // Enrich with item data
     const packIds = listings
@@ -120,6 +150,7 @@ export const getListings = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    const now = new Date();
     const enrichedListings = listings.map((listing: any) => {
       let itemName = ITEM_DATA[listing.itemId]?.name || listing.itemId;
       let itemPreview = ITEM_DATA[listing.itemId]?.preview || '';
@@ -132,11 +163,16 @@ export const getListings = async (req: AuthRequest, res: Response) => {
         }
       }
 
+      // Check if featured is still active
+      const isStillFeatured = listing.isFeatured && listing.featuredUntil && listing.featuredUntil > now;
+
       return {
         ...listing,
         itemName,
         itemPreview,
         isOwnListing: userId === listing.sellerId,
+        isFavorited: userFavorites.includes(listing.id),
+        isFeatured: isStillFeatured, // Only true if not expired
       };
     });
 
@@ -397,7 +433,15 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
     }
 
     // Get seller
-    const seller = await prisma.user.findUnique({ where: { id: listing.sellerId } });
+    const seller = await prisma.user.findUnique({ 
+      where: { id: listing.sellerId },
+      select: { 
+        id: true, 
+        ownedCustomizations: true,
+        marketSalesCount: true,
+        isTrustedSeller: true
+      }
+    });
     if (!seller) {
       return res.status(404).json({ error: 'Vendedor não encontrado' });
     }
@@ -438,7 +482,8 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
       ...(paymentMethod === 'CASH'
         ? { zionsCash: { increment: sellerReceives } }
         : { zionsPoints: { increment: sellerReceives } }
-      )
+      ),
+      marketSalesCount: { increment: 1 }
     };
     if (!isThemePack) {
       sellerUpdate.ownedCustomizations = JSON.stringify(sellerOwned.filter((id: string) => id !== listing.itemId));
@@ -541,6 +586,24 @@ export const buyItem = async (req: AuthRequest, res: Response) => {
             reason: `Taxa de mercado (5%): ${ITEM_DATA[listing.itemId]?.name || listing.itemId} (${paymentMethod === 'CASH' ? 'Cash' : 'Points'})`,
             currency: paymentMethod as 'CASH' | 'POINTS',
           },
+        })
+      );
+    }
+
+    // Check if seller should become trusted seller (10+ sales)
+    const newSalesCount = (seller.marketSalesCount || 0) + 1;
+    if (newSalesCount >= 10 && !seller.isTrustedSeller) {
+      transactionOperations.push(
+        prisma.user.update({
+          where: { id: listing.sellerId },
+          data: { isTrustedSeller: true }
+        }),
+        prisma.notification.create({
+          data: {
+            userId: listing.sellerId,
+            type: 'SYSTEM',
+            content: '🏆 Parabéns! Você agora é um Vendedor Confiável no Mercado!'
+          }
         })
       );
     }
@@ -680,5 +743,523 @@ export const getMarketStats = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error fetching market stats:', error);
     res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+  }
+};
+
+// ========== MARKET 6.0 FEATURES ==========
+
+// Get user's favorited listings
+export const getFavorites = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const favorites = await prisma.marketFavorite.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        listing: {
+          include: {
+            seller: {
+              select: { id: true, name: true, displayName: true, avatarUrl: true, isTrustedSeller: true }
+            }
+          }
+        }
+      }
+    });
+
+    // Enrich with item data
+    const enriched = favorites.map((fav: any) => {
+      const listing = fav.listing;
+      return {
+        ...fav,
+        listing: {
+          ...listing,
+          itemName: ITEM_DATA[listing.itemId]?.name || listing.itemId,
+          itemPreview: ITEM_DATA[listing.itemId]?.preview || '',
+        }
+      };
+    });
+
+    res.json(enriched);
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    res.status(500).json({ error: 'Erro ao buscar favoritos' });
+  }
+};
+
+// Add listing to favorites
+export const addFavorite = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { listingId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    // Check if listing exists and is active
+    const listing = await prisma.marketListing.findUnique({ where: { id: listingId } });
+    if (!listing || listing.status !== 'ACTIVE') {
+      return res.status(404).json({ error: 'Anúncio não encontrado' });
+    }
+
+    // Check if it's own listing
+    if (listing.sellerId === userId) {
+      return res.status(400).json({ error: 'Você não pode favoritar seu próprio anúncio' });
+    }
+
+    // Check if already favorited
+    const existing = await prisma.marketFavorite.findUnique({
+      where: { userId_listingId: { userId, listingId } }
+    });
+    if (existing) {
+      return res.status(400).json({ error: 'Já está nos favoritos' });
+    }
+
+    await prisma.marketFavorite.create({
+      data: { userId, listingId }
+    });
+
+    res.json({ success: true, message: 'Adicionado aos favoritos' });
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+    res.status(500).json({ error: 'Erro ao adicionar favorito' });
+  }
+};
+
+// Remove listing from favorites
+export const removeFavorite = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { listingId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    await prisma.marketFavorite.deleteMany({
+      where: { userId, listingId }
+    });
+
+    res.json({ success: true, message: 'Removido dos favoritos' });
+  } catch (error) {
+    console.error('Error removing favorite:', error);
+    res.status(500).json({ error: 'Erro ao remover favorito' });
+  }
+};
+
+// Get offers received on user's listings
+export const getOffersReceived = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const offers = await prisma.marketOffer.findMany({
+      where: { sellerId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        buyer: {
+          select: { id: true, name: true, displayName: true, avatarUrl: true }
+        },
+        listing: {
+          select: { id: true, itemId: true, itemType: true, price: true, status: true }
+        }
+      }
+    });
+
+    const enriched = offers.map((offer: any) => ({
+      ...offer,
+      listing: {
+        ...offer.listing,
+        itemName: ITEM_DATA[offer.listing.itemId]?.name || offer.listing.itemId,
+        itemPreview: ITEM_DATA[offer.listing.itemId]?.preview || '',
+      }
+    }));
+
+    res.json(enriched);
+  } catch (error) {
+    console.error('Error fetching received offers:', error);
+    res.status(500).json({ error: 'Erro ao buscar ofertas' });
+  }
+};
+
+// Get offers user has sent
+export const getOffersSent = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const offers = await prisma.marketOffer.findMany({
+      where: { buyerId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        seller: {
+          select: { id: true, name: true, displayName: true, avatarUrl: true }
+        },
+        listing: {
+          select: { id: true, itemId: true, itemType: true, price: true, status: true }
+        }
+      }
+    });
+
+    const enriched = offers.map((offer: any) => ({
+      ...offer,
+      listing: {
+        ...offer.listing,
+        itemName: ITEM_DATA[offer.listing.itemId]?.name || offer.listing.itemId,
+        itemPreview: ITEM_DATA[offer.listing.itemId]?.preview || '',
+      }
+    }));
+
+    res.json(enriched);
+  } catch (error) {
+    console.error('Error fetching sent offers:', error);
+    res.status(500).json({ error: 'Erro ao buscar ofertas enviadas' });
+  }
+};
+
+// Make an offer on a listing
+export const makeOffer = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { listingId } = req.params;
+    const { amount, message } = req.body;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    if (!amount || amount < 1) {
+      return res.status(400).json({ error: 'Valor da oferta inválido' });
+    }
+
+    // Check listing
+    const listing = await prisma.marketListing.findUnique({
+      where: { id: listingId },
+      include: { seller: { select: { id: true, name: true } } }
+    });
+
+    if (!listing || listing.status !== 'ACTIVE') {
+      return res.status(404).json({ error: 'Anúncio não encontrado' });
+    }
+
+    if (listing.sellerId === userId) {
+      return res.status(400).json({ error: 'Você não pode fazer oferta no seu próprio item' });
+    }
+
+    // Check if user has enough zions
+    const user = await prisma.user.findUnique({ 
+      where: { id: userId },
+      select: { zionsPoints: true }
+    });
+    if (!user || user.zionsPoints < amount) {
+      return res.status(400).json({ error: 'Zions Points insuficientes' });
+    }
+
+    // Check if user already has pending offer on this listing
+    const existingOffer = await prisma.marketOffer.findFirst({
+      where: { listingId, buyerId: userId, status: 'PENDING' }
+    });
+    if (existingOffer) {
+      return res.status(400).json({ error: 'Você já tem uma oferta pendente neste item' });
+    }
+
+    // Create offer
+    const offer = await prisma.marketOffer.create({
+      data: {
+        listingId,
+        buyerId: userId,
+        sellerId: listing.sellerId,
+        amount,
+        message: message?.slice(0, 200) || null
+      }
+    });
+
+    // Notify seller
+    await prisma.notification.create({
+      data: {
+        userId: listing.sellerId,
+        type: 'SYSTEM',
+        content: `Nova oferta de ${amount} Zions no seu item "${ITEM_DATA[listing.itemId]?.name || listing.itemId}"`
+      }
+    });
+
+    res.status(201).json({ success: true, offer });
+  } catch (error) {
+    console.error('Error making offer:', error);
+    res.status(500).json({ error: 'Erro ao fazer oferta' });
+  }
+};
+
+// Accept an offer
+export const acceptOffer = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { offerId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const offer = await prisma.marketOffer.findUnique({
+      where: { id: offerId },
+      include: { 
+        listing: true,
+        buyer: { select: { id: true, zionsPoints: true, ownedCustomizations: true } }
+      }
+    });
+
+    if (!offer) return res.status(404).json({ error: 'Oferta não encontrada' });
+    if (offer.sellerId !== userId) return res.status(403).json({ error: 'Não autorizado' });
+    if (offer.status !== 'PENDING') return res.status(400).json({ error: 'Oferta não está pendente' });
+    if (offer.listing.status !== 'ACTIVE') return res.status(400).json({ error: 'Anúncio não está ativo' });
+
+    // Verify buyer still has funds
+    if (offer.buyer.zionsPoints < offer.amount) {
+      await prisma.marketOffer.update({
+        where: { id: offerId },
+        data: { status: 'CANCELLED' }
+      });
+      return res.status(400).json({ error: 'Comprador não tem Zions suficientes' });
+    }
+
+    // Get seller
+    const seller = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { ownedCustomizations: true, marketSalesCount: true }
+    });
+    if (!seller) return res.status(404).json({ error: 'Vendedor não encontrado' });
+
+    const sellerOwned = JSON.parse(seller.ownedCustomizations || '[]');
+    const buyerOwned = JSON.parse(offer.buyer.ownedCustomizations || '[]');
+    const isThemePack = offer.listing.itemType === 'theme_pack';
+
+    // Calculate fee (5%)
+    const fee = Math.floor(offer.amount * 0.05);
+    const sellerReceives = offer.amount - fee;
+
+    const operations: any[] = [
+      // Update offer status
+      prisma.marketOffer.update({
+        where: { id: offerId },
+        data: { status: 'ACCEPTED', respondedAt: new Date() }
+      }),
+      // Mark listing as sold
+      prisma.marketListing.update({
+        where: { id: offer.listingId },
+        data: { status: 'SOLD' }
+      }),
+      // Deduct from buyer
+      prisma.user.update({
+        where: { id: offer.buyerId },
+        data: {
+          zionsPoints: { decrement: offer.amount },
+          ...(isThemePack ? {} : { ownedCustomizations: JSON.stringify([...buyerOwned, offer.listing.itemId]) })
+        }
+      }),
+      // Add to seller + increment sales count
+      prisma.user.update({
+        where: { id: userId },
+        data: {
+          zionsPoints: { increment: sellerReceives },
+          marketSalesCount: { increment: 1 },
+          ...(isThemePack ? {} : { ownedCustomizations: JSON.stringify(sellerOwned.filter((id: string) => id !== offer.listing.itemId)) })
+        }
+      }),
+      // Create transaction record
+      prisma.marketTransaction.create({
+        data: {
+          listingId: offer.listingId,
+          buyerId: offer.buyerId,
+          sellerId: userId,
+          itemId: offer.listing.itemId,
+          itemType: offer.listing.itemType,
+          price: offer.amount
+        }
+      }),
+      // Notify buyer
+      prisma.notification.create({
+        data: {
+          userId: offer.buyerId,
+          type: 'SYSTEM',
+          content: `Sua oferta de ${offer.amount} Zions foi aceita! Você adquiriu "${ITEM_DATA[offer.listing.itemId]?.name || offer.listing.itemId}"`
+        }
+      }),
+      // Reject all other pending offers on this listing
+      prisma.marketOffer.updateMany({
+        where: { listingId: offer.listingId, status: 'PENDING', id: { not: offerId } },
+        data: { status: 'REJECTED', respondedAt: new Date() }
+      })
+    ];
+
+    // Handle theme pack transfer
+    if (isThemePack) {
+      operations.push(
+        prisma.userThemePack.deleteMany({
+          where: { userId, packId: offer.listing.itemId }
+        }),
+        prisma.userThemePack.create({
+          data: { userId: offer.buyerId, packId: offer.listing.itemId, price: 0 }
+        })
+      );
+    }
+
+    // Check if seller should become trusted (10+ sales)
+    const newSalesCount = (seller.marketSalesCount || 0) + 1;
+    if (newSalesCount >= 10) {
+      operations.push(
+        prisma.user.update({
+          where: { id: userId },
+          data: { isTrustedSeller: true }
+        })
+      );
+    }
+
+    await prisma.$transaction(operations);
+
+    res.json({ success: true, message: 'Oferta aceita! Venda realizada.' });
+  } catch (error) {
+    console.error('Error accepting offer:', error);
+    res.status(500).json({ error: 'Erro ao aceitar oferta' });
+  }
+};
+
+// Reject an offer
+export const rejectOffer = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { offerId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const offer = await prisma.marketOffer.findUnique({ where: { id: offerId } });
+    if (!offer) return res.status(404).json({ error: 'Oferta não encontrada' });
+    if (offer.sellerId !== userId) return res.status(403).json({ error: 'Não autorizado' });
+    if (offer.status !== 'PENDING') return res.status(400).json({ error: 'Oferta não está pendente' });
+
+    await prisma.marketOffer.update({
+      where: { id: offerId },
+      data: { status: 'REJECTED', respondedAt: new Date() }
+    });
+
+    // Notify buyer
+    await prisma.notification.create({
+      data: {
+        userId: offer.buyerId,
+        type: 'SYSTEM',
+        content: `Sua oferta de ${offer.amount} Zions foi recusada.`
+      }
+    });
+
+    res.json({ success: true, message: 'Oferta recusada' });
+  } catch (error) {
+    console.error('Error rejecting offer:', error);
+    res.status(500).json({ error: 'Erro ao recusar oferta' });
+  }
+};
+
+// Cancel own offer
+export const cancelOffer = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { offerId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const offer = await prisma.marketOffer.findUnique({ where: { id: offerId } });
+    if (!offer) return res.status(404).json({ error: 'Oferta não encontrada' });
+    if (offer.buyerId !== userId) return res.status(403).json({ error: 'Não autorizado' });
+    if (offer.status !== 'PENDING') return res.status(400).json({ error: 'Oferta não está pendente' });
+
+    await prisma.marketOffer.update({
+      where: { id: offerId },
+      data: { status: 'CANCELLED' }
+    });
+
+    res.json({ success: true, message: 'Oferta cancelada' });
+  } catch (error) {
+    console.error('Error cancelling offer:', error);
+    res.status(500).json({ error: 'Erro ao cancelar oferta' });
+  }
+};
+
+// Feature a listing (costs 50 Zions Points for 24h)
+const FEATURE_COST = 50;
+const FEATURE_DURATION_HOURS = 24;
+
+export const featureListing = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { listingId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const listing = await prisma.marketListing.findUnique({ where: { id: listingId } });
+    if (!listing) return res.status(404).json({ error: 'Anúncio não encontrado' });
+    if (listing.sellerId !== userId) return res.status(403).json({ error: 'Não autorizado' });
+    if (listing.status !== 'ACTIVE') return res.status(400).json({ error: 'Anúncio não está ativo' });
+
+    // Check if already featured
+    if (listing.isFeatured && listing.featuredUntil && listing.featuredUntil > new Date()) {
+      return res.status(400).json({ error: 'Anúncio já está em destaque' });
+    }
+
+    // Check user balance
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { zionsPoints: true } });
+    if (!user || user.zionsPoints < FEATURE_COST) {
+      return res.status(400).json({ error: `Precisa de ${FEATURE_COST} Zions Points para destacar` });
+    }
+
+    const featuredUntil = new Date(Date.now() + FEATURE_DURATION_HOURS * 60 * 60 * 1000);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: userId },
+        data: { zionsPoints: { decrement: FEATURE_COST } }
+      }),
+      prisma.marketListing.update({
+        where: { id: listingId },
+        data: { isFeatured: true, featuredUntil }
+      }),
+      prisma.zionHistory.create({
+        data: {
+          userId,
+          amount: -FEATURE_COST,
+          reason: 'Destaque de anúncio no mercado (24h)',
+          currency: 'POINTS'
+        }
+      })
+    ]);
+
+    res.json({ success: true, message: 'Anúncio destacado por 24 horas!', featuredUntil });
+  } catch (error) {
+    console.error('Error featuring listing:', error);
+    res.status(500).json({ error: 'Erro ao destacar anúncio' });
+  }
+};
+
+// Toggle Elite-only on a listing
+export const toggleEliteOnly = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { listingId } = req.params;
+    if (!userId) return res.status(401).json({ error: 'Não autenticado' });
+
+    const listing = await prisma.marketListing.findUnique({ where: { id: listingId } });
+    if (!listing) return res.status(404).json({ error: 'Anúncio não encontrado' });
+    if (listing.sellerId !== userId) return res.status(403).json({ error: 'Não autorizado' });
+    if (listing.status !== 'ACTIVE') return res.status(400).json({ error: 'Anúncio não está ativo' });
+
+    // Check if seller is Elite (only Elite can make Elite-only listings)
+    const user = await prisma.user.findUnique({ 
+      where: { id: userId },
+      select: { isElite: true, eliteUntil: true }
+    });
+    const isElite = user?.isElite && user?.eliteUntil && user.eliteUntil > new Date();
+    if (!isElite) {
+      return res.status(403).json({ error: 'Apenas membros Elite podem criar anúncios exclusivos' });
+    }
+
+    const newEliteOnly = !listing.eliteOnly;
+
+    await prisma.marketListing.update({
+      where: { id: listingId },
+      data: { eliteOnly: newEliteOnly }
+    });
+
+    res.json({ 
+      success: true, 
+      eliteOnly: newEliteOnly,
+      message: newEliteOnly ? 'Anúncio agora é exclusivo para Elite' : 'Anúncio aberto para todos'
+    });
+  } catch (error) {
+    console.error('Error toggling elite only:', error);
+    res.status(500).json({ error: 'Erro ao alterar exclusividade' });
   }
 };

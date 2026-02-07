@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Store, Search, Tag, ShoppingCart,
   X, Zap, History, Package,
-  Image, Award, Palette
+  Image, Award, Palette, Heart, MessageCircle,
+  Star, Crown, ShieldCheck, Send
 } from 'lucide-react';
 import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
@@ -26,12 +27,29 @@ interface Listing {
   status: string;
   createdAt: string;
   isOwnListing: boolean;
+  isFavorited?: boolean;
+  isFeatured?: boolean;
+  eliteOnly?: boolean;
   seller: {
     id: string;
     name: string;
     displayName: string;
     avatarUrl: string;
+    isTrustedSeller?: boolean;
+    marketSalesCount?: number;
   };
+}
+
+interface Offer {
+  id: string;
+  listingId: string;
+  amount: number;
+  message: string | null;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'CANCELLED';
+  createdAt: string;
+  buyer?: { id: string; name: string; displayName: string; avatarUrl: string };
+  seller?: { id: string; name: string; displayName: string; avatarUrl: string };
+  listing: { id: string; itemId: string; itemName: string; itemPreview: string; price: number; status: string };
 }
 
 interface Transaction {
@@ -54,8 +72,8 @@ interface MarketStats {
   recentSales: any[];
 }
 
-type TabType = 'browse' | 'sell' | 'my-listings' | 'history';
-type FilterType = 'all' | 'background' | 'badge' | 'color';
+type TabType = 'browse' | 'sell' | 'my-listings' | 'history' | 'favorites' | 'offers';
+type FilterType = 'all' | 'background' | 'badge' | 'color' | 'elite';
 type SortType = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
 export default function MarketPage() {
@@ -80,6 +98,17 @@ export default function MarketPage() {
   const [buyingId, setBuyingId] = useState<string | null>(null);
 
   const [userPacks, setUserPacks] = useState<any[]>([]);
+
+  // Market 6.0 - Favorites and Offers
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [offersReceived, setOffersReceived] = useState<Offer[]>([]);
+  const [offersSent, setOffersSent] = useState<Offer[]>([]);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerListingId, setOfferListingId] = useState<string | null>(null);
+  const [offerAmount, setOfferAmount] = useState('');
+  const [offerMessage, setOfferMessage] = useState('');
+  const [makingOffer, setMakingOffer] = useState(false);
+  const [togglingFavorite, setTogglingFavorite] = useState<string | null>(null);
 
   // Filters
   const [filterType, setFilterType] = useState<FilterType>('all');
@@ -112,8 +141,10 @@ export default function MarketPage() {
     setLoading(true);
     try {
       if (activeTab === 'browse') {
+        const eliteOnlyParam = filterType === 'elite' ? '&eliteOnly=true' : '';
+        const typeParam = filterType === 'elite' ? 'all' : filterType;
         const [listingsRes, statsRes] = await Promise.all([
-          api.get(`/market/listings?type=${filterType}&sortBy=${sortBy}`),
+          api.get(`/market/listings?type=${typeParam}&sortBy=${sortBy}${eliteOnlyParam}`),
           api.get('/market/stats'),
         ]);
         setListings(listingsRes.data);
@@ -131,6 +162,16 @@ export default function MarketPage() {
         ]);
         setOwnedItems(itemsRes.data.owned || []);
         setUserPacks(packsRes.data || []);
+      } else if (activeTab === 'favorites') {
+        const res = await api.get('/market/favorites');
+        setFavorites(res.data);
+      } else if (activeTab === 'offers') {
+        const [receivedRes, sentRes] = await Promise.all([
+          api.get('/market/offers/received'),
+          api.get('/market/offers/sent')
+        ]);
+        setOffersReceived(receivedRes.data);
+        setOffersSent(sentRes.data);
       }
     } catch (error) {
       console.error('Error fetching market data:', error);
@@ -219,6 +260,97 @@ export default function MarketPage() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Market 6.0 Handlers
+  const handleToggleFavorite = async (listing: Listing) => {
+    if (isVisitor) {
+      setShowVisitorBlock(true);
+      return;
+    }
+    if (togglingFavorite) return;
+    setTogglingFavorite(listing.id);
+    try {
+      if (listing.isFavorited) {
+        await api.delete(`/market/favorites/${listing.id}`);
+        showNotification('success', 'Removido dos favoritos');
+      } else {
+        await api.post(`/market/favorites/${listing.id}`);
+        showNotification('success', 'Adicionado aos favoritos');
+      }
+      // Update listings locally
+      setListings(prev => prev.map(l => l.id === listing.id ? { ...l, isFavorited: !l.isFavorited } : l));
+    } catch (error: any) {
+      showNotification('error', error.response?.data?.error || 'Erro');
+    } finally {
+      setTogglingFavorite(null);
+    }
+  };
+
+  const handleMakeOffer = async () => {
+    if (!offerListingId || !offerAmount || makingOffer) return;
+    if (isVisitor) {
+      setShowVisitorBlock(true);
+      return;
+    }
+    const amount = parseInt(offerAmount);
+    if (isNaN(amount) || amount < 1) {
+      showNotification('error', 'Valor inválido');
+      return;
+    }
+    setMakingOffer(true);
+    try {
+      await api.post(`/market/offers/${offerListingId}`, { amount, message: offerMessage || null });
+      showNotification('success', 'Oferta enviada!');
+      setShowOfferModal(false);
+      setOfferListingId(null);
+      setOfferAmount('');
+      setOfferMessage('');
+    } catch (error: any) {
+      showNotification('error', error.response?.data?.error || 'Erro ao enviar oferta');
+    } finally {
+      setMakingOffer(false);
+    }
+  };
+
+  const handleOfferAction = async (offerId: string, action: 'accept' | 'reject' | 'cancel') => {
+    try {
+      if (action === 'cancel') {
+        await api.delete(`/market/offers/${offerId}`);
+      } else {
+        await api.post(`/market/offers/${offerId}/${action}`);
+      }
+      showNotification('success', action === 'accept' ? 'Oferta aceita!' : action === 'reject' ? 'Oferta recusada' : 'Oferta cancelada');
+      fetchData();
+      api.get('/users/me').then(res => updateUser(res.data));
+    } catch (error: any) {
+      showNotification('error', error.response?.data?.error || 'Erro');
+    }
+  };
+
+  const handleFeatureListing = async (listingId: string) => {
+    if (isVisitor) {
+      setShowVisitorBlock(true);
+      return;
+    }
+    try {
+      await api.post(`/market/listings/${listingId}/feature`);
+      showNotification('success', 'Anúncio destacado por 24h!');
+      fetchData();
+      api.get('/users/me').then(res => updateUser(res.data));
+    } catch (error: any) {
+      showNotification('error', error.response?.data?.error || 'Erro ao destacar');
+    }
+  };
+
+  const handleToggleEliteOnly = async (listingId: string) => {
+    try {
+      const res = await api.post(`/market/listings/${listingId}/elite-only`);
+      showNotification('success', res.data.message);
+      fetchData();
+    } catch (error: any) {
+      showNotification('error', error.response?.data?.error || 'Erro');
+    }
+  };
+
   const filteredListings = listings.filter(l =>
     l.itemName.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -300,6 +432,8 @@ export default function MarketPage() {
 
   const tabs = [
     { id: 'browse' as const, label: 'Explorar', icon: Store },
+    { id: 'favorites' as const, label: 'Favoritos', icon: Heart },
+    { id: 'offers' as const, label: 'Ofertas', icon: MessageCircle },
     { id: 'sell' as const, label: 'Vender', icon: Tag },
     { id: 'my-listings' as const, label: 'Meus Anúncios', icon: Package },
     { id: 'history' as const, label: 'Histórico', icon: History },
@@ -475,6 +609,7 @@ export default function MarketPage() {
                   <option value="background">Fundos</option>
                   <option value="badge">Badges</option>
                   <option value="color">Cores</option>
+                  {user?.isElite && <option value="elite">🔒 Elite</option>}
                 </select>
                 <select
                   value={sortBy}
@@ -507,8 +642,35 @@ export default function MarketPage() {
                     key={listing.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`${themeCard} rounded-xl border ${themeBorder} overflow-hidden hover:border-${themeColor}-500/50 transition-all`}
+                    className={`${themeCard} rounded-xl border ${listing.isFeatured ? 'border-yellow-500/50 ring-1 ring-yellow-500/20' : themeBorder} overflow-hidden hover:border-${themeColor}-500/50 transition-all relative`}
                   >
+                    {/* Featured/Elite Badges */}
+                    <div className="absolute top-2 left-2 flex gap-1 z-10">
+                      {listing.isFeatured && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500 text-black flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-current" /> DESTAQUE
+                        </span>
+                      )}
+                      {listing.eliteOnly && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-500 text-white flex items-center gap-1">
+                          <Crown className="w-3 h-3" /> ELITE
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Favorite Button */}
+                    {!listing.isOwnListing && (
+                      <button
+                        onClick={() => handleToggleFavorite(listing)}
+                        disabled={togglingFavorite === listing.id}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 transition-colors z-10"
+                      >
+                        <Heart 
+                          className={`w-4 h-4 ${listing.isFavorited ? 'fill-red-500 text-red-500' : 'text-white'}`}
+                        />
+                      </button>
+                    )}
+
                     {/* Item Preview */}
                     <div className={`aspect-square flex items-center justify-center ${isDarkMode ? 'bg-black/20' : 'bg-gray-50'} p-4`}>
                       {renderItemPreview({ itemType: listing.itemType, itemPreview: listing.itemPreview }, 'lg')}
@@ -530,6 +692,9 @@ export default function MarketPage() {
                         <span className={`text-xs ${themeSecondary} truncate`}>
                           {listing.seller.displayName || listing.seller.name}
                         </span>
+                        {listing.seller.isTrustedSeller && (
+                          <span title="Vendedor Confiável"><ShieldCheck className="w-4 h-4 text-green-500" /></span>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
@@ -539,22 +704,60 @@ export default function MarketPage() {
                         </div>
 
                         {listing.isOwnListing ? (
-                          <span className={`text-xs ${themeSecondary}`}>Seu anúncio</span>
-                        ) : (
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => handleBuy(listing)}
-                            disabled={buyingId === listing.id}
-                            className={`px-3 py-1.5 rounded-lg bg-${themeColor}-500 text-white text-sm font-medium hover:bg-${themeColor}-600 disabled:opacity-50 flex items-center gap-1`}
-                          >
-                            {buyingId === listing.id ? (
-                              <Loader size="sm" />
-                            ) : (
-                              <ShoppingCart className="w-3 h-3" />
+                          <div className="flex gap-1">
+                            {!listing.isFeatured && (
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleFeatureListing(listing.id)}
+                                className={`px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-400 text-xs font-medium hover:bg-yellow-500/30`}
+                                title="Destacar (50 Zions)"
+                              >
+                                <Star className="w-3 h-3" />
+                              </motion.button>
                             )}
-                            Comprar
-                          </motion.button>
+                            {user?.isElite && (
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleToggleEliteOnly(listing.id)}
+                                className={`px-2 py-1 rounded-lg ${listing.eliteOnly ? 'bg-violet-500/30 text-violet-300' : 'bg-violet-500/10 text-violet-400'} text-xs font-medium`}
+                                title={listing.eliteOnly ? 'Remover Elite Only' : 'Marcar Elite Only'}
+                              >
+                                <Crown className="w-3 h-3" />
+                              </motion.button>
+                            )}
+                            <span className={`text-xs ${themeSecondary} self-center ml-1`}>Seu</span>
+                          </div>
+                        ) : (
+                          <div className="flex gap-1">
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => {
+                                setOfferListingId(listing.id);
+                                setShowOfferModal(true);
+                              }}
+                              className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
+                              title="Fazer Oferta"
+                            >
+                              <Send className="w-4 h-4" />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleBuy(listing)}
+                              disabled={buyingId === listing.id}
+                              className={`px-3 py-1.5 rounded-lg bg-${themeColor}-500 text-white text-sm font-medium hover:bg-${themeColor}-600 disabled:opacity-50 flex items-center gap-1`}
+                            >
+                              {buyingId === listing.id ? (
+                                <Loader size="sm" />
+                              ) : (
+                                <ShoppingCart className="w-3 h-3" />
+                              )}
+                              Comprar
+                            </motion.button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -697,7 +900,215 @@ export default function MarketPage() {
             )}
           </div>
         )}
+
+        {/* Favorites Tab */}
+        {activeTab === 'favorites' && (
+          <div className="space-y-4">
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <Loader size="md" />
+              </div>
+            ) : favorites.length === 0 ? (
+              <div className={`${themeCard} rounded-2xl p-16 text-center border ${themeBorder}`}>
+                <Heart className={`w-16 h-16 mx-auto mb-4 ${themeSecondary}`} />
+                <h3 className={`text-xl font-bold ${themeText} mb-2`}>Sem favoritos</h3>
+                <p className={themeSecondary}>Clique no ❤️ para salvar itens</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {favorites.map((fav: any) => (
+                  <motion.div
+                    key={fav.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`${themeCard} rounded-xl border ${themeBorder} overflow-hidden`}
+                  >
+                    <div className={`aspect-square flex items-center justify-center ${isDarkMode ? 'bg-black/20' : 'bg-gray-50'} p-4`}>
+                      {renderItemPreview({ itemType: fav.listing.itemType, itemPreview: fav.listing.itemPreview }, 'lg')}
+                    </div>
+                    <div className="p-4">
+                      <h3 className={`font-semibold ${themeText} truncate`}>{fav.listing.itemName}</h3>
+                      <div className="flex items-center justify-between mt-3">
+                        <div className="flex items-center gap-1">
+                          <Zap className={`w-4 h-4 text-${themeColor}-400`} />
+                          <span className={`font-bold text-${themeColor}-400`}>{fav.listing.price}</span>
+                        </div>
+                        {fav.listing.status === 'ACTIVE' ? (
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleBuy(fav.listing)}
+                            disabled={buyingId === fav.listing.id}
+                            className={`px-3 py-1.5 rounded-lg bg-${themeColor}-500 text-white text-sm font-medium`}
+                          >
+                            Comprar
+                          </motion.button>
+                        ) : (
+                          <span className="text-xs text-gray-500">Vendido</span>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Offers Tab */}
+        {activeTab === 'offers' && (
+          <div className="space-y-6">
+            {/* Offers Received */}
+            <div>
+              <h3 className={`text-lg font-bold ${themeText} mb-4 flex items-center gap-2`}>
+                <MessageCircle className="w-5 h-5" /> Ofertas Recebidas
+              </h3>
+              {offersReceived.filter(o => o.status === 'PENDING').length === 0 ? (
+                <p className={themeSecondary}>Nenhuma oferta pendente</p>
+              ) : (
+                <div className="space-y-3">
+                  {offersReceived.filter(o => o.status === 'PENDING').map((offer) => (
+                    <div key={offer.id} className={`${themeCard} rounded-xl border ${themeBorder} p-4`}>
+                      <div className="flex items-center gap-4">
+                        {renderItemPreview({ itemType: offer.listing.itemId.includes('bg_') ? 'background' : 'badge', itemPreview: offer.listing.itemPreview }, 'sm')}
+                        <div className="flex-1">
+                          <h4 className={`font-semibold ${themeText}`}>{offer.listing.itemName}</h4>
+                          <p className={themeSecondary}>
+                            <span className="font-medium">{offer.buyer?.displayName || offer.buyer?.name}</span> oferece{' '}
+                            <span className={`text-${themeColor}-400 font-bold`}>{offer.amount} Zions</span>
+                          </p>
+                          {offer.message && <p className={`text-sm ${themeSecondary} italic mt-1`}>"{offer.message}"</p>}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleOfferAction(offer.id, 'accept')}
+                            className="px-3 py-1.5 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600"
+                          >
+                            Aceitar
+                          </button>
+                          <button
+                            onClick={() => handleOfferAction(offer.id, 'reject')}
+                            className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/30"
+                          >
+                            Recusar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Offers Sent */}
+            <div>
+              <h3 className={`text-lg font-bold ${themeText} mb-4 flex items-center gap-2`}>
+                <Send className="w-5 h-5" /> Ofertas Enviadas
+              </h3>
+              {offersSent.length === 0 ? (
+                <p className={themeSecondary}>Você não enviou nenhuma oferta</p>
+              ) : (
+                <div className="space-y-3">
+                  {offersSent.map((offer) => (
+                    <div key={offer.id} className={`${themeCard} rounded-xl border ${themeBorder} p-4`}>
+                      <div className="flex items-center gap-4">
+                        {renderItemPreview({ itemType: offer.listing.itemId.includes('bg_') ? 'background' : 'badge', itemPreview: offer.listing.itemPreview }, 'sm')}
+                        <div className="flex-1">
+                          <h4 className={`font-semibold ${themeText}`}>{offer.listing.itemName}</h4>
+                          <p className={themeSecondary}>
+                            Sua oferta: <span className={`text-${themeColor}-400 font-bold`}>{offer.amount} Zions</span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            offer.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' :
+                            offer.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-400' :
+                            offer.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            {offer.status === 'PENDING' ? 'Pendente' :
+                             offer.status === 'ACCEPTED' ? 'Aceita' :
+                             offer.status === 'REJECTED' ? 'Recusada' :
+                             'Cancelada'}
+                          </span>
+                          {offer.status === 'PENDING' && (
+                            <button
+                              onClick={() => handleOfferAction(offer.id, 'cancel')}
+                              className="text-xs text-red-400 hover:underline"
+                            >
+                              Cancelar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Offer Modal */}
+      <AnimatePresence>
+        {showOfferModal && offerListingId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowOfferModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`w-full max-w-md ${isDarkMode ? 'bg-neutral-900' : 'bg-white'} rounded-2xl border ${themeBorder} p-6`}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-xl font-bold ${themeText}`}>Fazer Oferta</h2>
+                <button onClick={() => setShowOfferModal(false)} className="p-2 rounded-lg hover:bg-white/10">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className={`block text-sm font-medium ${themeSecondary} mb-2`}>Valor (Zions Points)</label>
+                  <input
+                    type="number"
+                    value={offerAmount}
+                    onChange={(e) => setOfferAmount(e.target.value)}
+                    placeholder="Ex: 500"
+                    className={`w-full px-4 py-3 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'} border ${themeBorder} ${themeText}`}
+                  />
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium ${themeSecondary} mb-2`}>Mensagem (opcional)</label>
+                  <textarea
+                    value={offerMessage}
+                    onChange={(e) => setOfferMessage(e.target.value)}
+                    placeholder="Escreva algo para o vendedor..."
+                    maxLength={200}
+                    rows={3}
+                    className={`w-full px-4 py-3 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'} border ${themeBorder} ${themeText} resize-none`}
+                  />
+                </div>
+                <button
+                  onClick={handleMakeOffer}
+                  disabled={makingOffer || !offerAmount}
+                  className={`w-full py-3 rounded-xl bg-${themeColor}-500 text-white font-bold hover:bg-${themeColor}-600 disabled:opacity-50 flex items-center justify-center gap-2`}
+                >
+                  {makingOffer ? <Loader size="sm" /> : <Send className="w-5 h-5" />}
+                  Enviar Oferta
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sell Modal */}
       <AnimatePresence>

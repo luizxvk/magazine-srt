@@ -38,6 +38,7 @@ interface SubscriptionStatus {
     eliteStreak: number;
     daysRemaining: number;
     activeSubscription: any;
+    isCancelled?: boolean;
     benefits: any;
     prices: Record<string, number>;
 }
@@ -400,8 +401,20 @@ export default function ElitePage() {
                                 </div>
                             </div>
 
-                            {/* Cancel Button */}
-                            {status.activeSubscription && status.activeSubscription.status === 'ACTIVE' && (
+                            {/* Cancel Button or Cancelled Notice */}
+                            {status.isCancelled ? (
+                                <div className="mt-6 pt-4 border-t border-white/10 text-center">
+                                    <p className="text-amber-400 font-medium flex items-center justify-center gap-2">
+                                        <Shield className="w-4 h-4" />
+                                        Assinatura cancelada
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Você mantém os benefícios até {status.eliteUntil 
+                                            ? new Date(status.eliteUntil).toLocaleDateString('pt-BR')
+                                            : 'o fim do período'}
+                                    </p>
+                                </div>
+                            ) : status.activeSubscription && status.activeSubscription.status === 'ACTIVE' && (
                                 <div className="mt-6 pt-4 border-t border-white/10">
                                     <button
                                         onClick={() => setShowCancelModal(true)}

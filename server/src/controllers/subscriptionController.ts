@@ -49,7 +49,10 @@ export const getSubscriptionStatus = async (req: AuthRequest, res: Response) => 
                 eliteStreak: true,
                 streakProtectedUntil: true,
                 subscriptions: {
-                    where: { status: 'ACTIVE' },
+                    where: { 
+                        status: { in: ['ACTIVE', 'CANCELLED'] },
+                        currentPeriodEnd: { gt: new Date() }
+                    },
                     orderBy: { createdAt: 'desc' },
                     take: 1
                 }
@@ -59,10 +62,14 @@ export const getSubscriptionStatus = async (req: AuthRequest, res: Response) => 
         if (!user) return res.status(404).json({ error: 'User not found' });
 
         const now = new Date();
+        // Usuário é Elite se tem flag ativa E data não expirou
         const isActive = user.isElite && user.eliteUntil && user.eliteUntil > now;
         const daysRemaining = isActive && user.eliteUntil
             ? Math.ceil((user.eliteUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
             : 0;
+
+        const subscription = user.subscriptions[0] || null;
+        const isCancelled = subscription?.status === 'CANCELLED';
 
         res.json({
             isElite: isActive,
@@ -71,7 +78,8 @@ export const getSubscriptionStatus = async (req: AuthRequest, res: Response) => 
             eliteStreak: user.eliteStreak,
             daysRemaining,
             streakProtectedUntil: user.streakProtectedUntil,
-            activeSubscription: user.subscriptions[0] || null,
+            activeSubscription: subscription,
+            isCancelled, // Nova flag para indicar cancelamento
             benefits: isActive ? ELITE_BENEFITS : null,
             prices: ELITE_PRICES
         });
@@ -339,10 +347,10 @@ export const getTrophyMultiplier = async (userId: string): Promise<number> => {
 export const processExpiredSubscriptions = async () => {
     const now = new Date();
 
-    // Encontrar assinaturas expiradas
+    // Encontrar assinaturas expiradas (ACTIVE ou CANCELLED)
     const expired = await prisma.subscription.findMany({
         where: {
-            status: 'ACTIVE',
+            status: { in: ['ACTIVE', 'CANCELLED'] },
             currentPeriodEnd: { lt: now }
         }
     });

@@ -93,6 +93,12 @@ model User {
   streakProtectedUntil   DateTime?      // Proteção de streak do login diário
   subscriptions          Subscription[]
   orders                 Order[]
+  // Market 6.0
+  isTrustedSeller        Boolean        @default(false) // Badge de vendedor confiável
+  marketSalesCount       Int            @default(0) // Total de vendas no mercado
+  marketFavorites        MarketFavorite[]  // Itens salvos/favoritos
+  marketOffersSent       MarketOffer[]  @relation("OfferBuyer")
+  marketOffersReceived   MarketOffer[]  @relation("OfferSeller")
 
   @@index([membershipType])
   @@index([isElite])
@@ -100,6 +106,7 @@ model User {
   @@index([createdAt])
   @@index([trophies])
   @@index([zions])
+  @@index([isTrustedSeller])
 }
 
 model Story {
@@ -613,14 +620,23 @@ model MarketListing {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   status       MarketListingStatus @default(ACTIVE)
+  // Market 6.0 - Features
+  isFeatured   Boolean             @default(false) // Anúncio em destaque (pago)
+  featuredUntil DateTime?          // Até quando está em destaque
+  eliteOnly    Boolean             @default(false) // Apenas Elite pode comprar
+  itemName     String?             // Nome do item para busca/display
   seller       User                @relation("MarketSeller", fields: [sellerId], references: [id])
   transactions MarketTransaction[]
+  favorites    MarketFavorite[]    // Quem favoritou
+  offers       MarketOffer[]       // Ofertas recebidas
 
   @@index([sellerId])
   @@index([itemType])
   @@index([status])
   @@index([price])
   @@index([createdAt])
+  @@index([isFeatured])
+  @@index([eliteOnly])
 }
 
 model MarketTransaction {
@@ -645,6 +661,50 @@ enum MarketListingStatus {
   ACTIVE
   SOLD
   CANCELLED
+}
+
+// Favoritos/Watchlist do Mercado
+model MarketFavorite {
+  id        String        @id @default(uuid())
+  userId    String
+  listingId String
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   MarketListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+}
+
+// Ofertas/Propostas no Mercado
+model MarketOffer {
+  id         String            @id @default(uuid())
+  listingId  String
+  buyerId    String
+  sellerId   String
+  amount     Int               // Valor oferecido em Zions
+  message    String?           // Mensagem opcional do comprador
+  status     MarketOfferStatus @default(PENDING)
+  createdAt  DateTime          @default(now())
+  respondedAt DateTime?        // Quando vendedor respondeu
+  listing    MarketListing     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer      User              @relation("OfferBuyer", fields: [buyerId], references: [id])
+  seller     User              @relation("OfferSeller", fields: [sellerId], references: [id])
+
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum MarketOfferStatus {
+  PENDING    // Aguardando resposta
+  ACCEPTED   // Aceita (venda realizada)
+  REJECTED   // Recusada pelo vendedor
+  EXPIRED    // Expirou (24h)
+  CANCELLED  // Cancelada pelo comprador
 }
 
 // ========== PRODUCT STORE SYSTEM ==========

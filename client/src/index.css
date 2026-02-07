@@ -2,6 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   GLOBAL SCROLLBAR STYLES
+   ============================================ */
+body {
+  --sb-track-color: #38393a;
+  --sb-thumb-color: #c7c7c7;
+  --sb-size: 13px;
+}
+
+body::-webkit-scrollbar {
+  width: var(--sb-size);
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 15px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 15px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  body {
+    scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+  }
+}
+
+/* Apply same scrollbar to all scrollable elements */
+*::-webkit-scrollbar {
+  width: var(--sb-size);
+  height: var(--sb-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 15px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 15px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
 /* Liquid Gradient Effect Styles */
 .liquid-gradient {
   overflow: hidden;

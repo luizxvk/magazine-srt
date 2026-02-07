@@ -7,8 +7,8 @@ interface AdBannerProps {
     className?: string;
 }
 
-// Google AdSense Publisher ID - substitua pelo seu ID real
-const ADSENSE_CLIENT_ID = import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-XXXXXXXXXXXXXXXX';
+// Google AdSense Publisher ID
+const ADSENSE_CLIENT_ID = 'ca-pub-5337827655553735';
 
 declare global {
     interface Window {

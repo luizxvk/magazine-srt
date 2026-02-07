@@ -118,8 +118,8 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   // Ads (desabilitado por padrão, admin pode ativar)
   adsEnabled: false,
   adsCarouselEnabled: false,
-  adsClientId: import.meta.env.VITE_ADSENSE_CLIENT_ID,
-  adsCarouselSlot: import.meta.env.VITE_ADSENSE_CAROUSEL_SLOT,
+  adsClientId: import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-5337827655553735',
+  adsCarouselSlot: import.meta.env.VITE_ADSENSE_CAROUSEL_SLOT || '1989194771',
 };
 
 // ============================================

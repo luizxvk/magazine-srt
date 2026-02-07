@@ -310,8 +310,8 @@ router.get('/public/config', async (req: Request, res: Response) => {
       // Ads Configuration
       adsEnabled: savedConfig?.adsEnabled ?? false,
       adsCarouselEnabled: savedConfig?.adsCarouselEnabled ?? false,
-      adsClientId: savedConfig?.adsClientId || process.env.ADSENSE_CLIENT_ID || null,
-      adsCarouselSlot: savedConfig?.adsCarouselSlot || process.env.ADSENSE_CAROUSEL_SLOT || null,
+      adsClientId: savedConfig?.adsClientId || process.env.ADSENSE_CLIENT_ID || 'ca-pub-5337827655553735',
+      adsCarouselSlot: savedConfig?.adsCarouselSlot || process.env.ADSENSE_CAROUSEL_SLOT || '1989194771',
     };
     
     res.json({

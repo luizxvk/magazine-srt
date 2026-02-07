@@ -95,7 +95,7 @@ export const getPlans = async (_req: AuthRequest, res: Response) => {
         const plans = [
             {
                 id: 'MONTHLY',
-                name: 'Mensal',
+                name: 'Assinatura Elite - 1 Mês',
                 price: ELITE_PRICES.MONTHLY,
                 pricePerMonth: ELITE_PRICES.MONTHLY,
                 duration: '1 mês',
@@ -104,7 +104,7 @@ export const getPlans = async (_req: AuthRequest, res: Response) => {
             },
             {
                 id: 'QUARTERLY',
-                name: 'Trimestral',
+                name: 'Assinatura Elite - 3 Meses',
                 price: ELITE_PRICES.QUARTERLY,
                 pricePerMonth: (ELITE_PRICES.QUARTERLY / 3).toFixed(2),
                 duration: '3 meses',
@@ -113,7 +113,7 @@ export const getPlans = async (_req: AuthRequest, res: Response) => {
             },
             {
                 id: 'YEARLY',
-                name: 'Anual',
+                name: 'Assinatura Elite - 12 Meses',
                 price: ELITE_PRICES.YEARLY,
                 pricePerMonth: (ELITE_PRICES.YEARLY / 12).toFixed(2),
                 duration: '12 meses',
@@ -122,7 +122,7 @@ export const getPlans = async (_req: AuthRequest, res: Response) => {
             },
             {
                 id: 'LIFETIME',
-                name: 'Vitalício',
+                name: 'Assinatura Elite - Vitalício',
                 price: ELITE_PRICES.LIFETIME,
                 pricePerMonth: null,
                 duration: 'Para sempre',

@@ -101,10 +101,10 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
 
         const price = ELITE_PRICES[planType as keyof typeof ELITE_PRICES];
         const planNames: Record<string, string> = {
-            MONTHLY: 'Mensal',
-            QUARTERLY: 'Trimestral', 
-            YEARLY: 'Anual',
-            LIFETIME: 'Vital�cio'
+            MONTHLY: '1 Mês',
+            QUARTERLY: '3 Meses', 
+            YEARLY: '12 Meses',
+            LIFETIME: 'Vitalício'
         };
 
         const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
@@ -182,8 +182,8 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 items: [
                     {
                         id: `elite_${planType.toLowerCase()}`,
-                        title: `MGT ELITE - Plano ${planNames[planType]}`,
-                        description: 'Assinatura MGT ELITE com benef�cios exclusivos: XP em dobro, 500 Zions/m�s, desconto na loja e mais.',
+                        title: `Assinatura Elite - ${planNames[planType]}`,
+                        description: 'Assinatura MGT ELITE com benefícios exclusivos: XP em dobro, 500 Zions/mês, desconto na loja e mais.',
                         quantity: 1,
                         unit_price: price,
                         currency_id: 'BRL'

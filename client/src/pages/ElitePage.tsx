@@ -53,6 +53,8 @@ export default function ElitePage() {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     const [subscribing, setSubscribing] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -139,6 +141,22 @@ export default function ElitePage() {
             showEdgeNotification('error', 'Erro', error.response?.data?.error || 'Erro ao processar assinatura');
         } finally {
             setSubscribing(false);
+        }
+    };
+
+    const handleCancelSubscription = async () => {
+        setCancelling(true);
+        try {
+            const { data } = await api.post('/subscriptions/cancel', {
+                reason: 'Cancelado pelo usuário'
+            });
+            showEdgeNotification('success', 'Assinatura cancelada', data.message);
+            setShowCancelModal(false);
+            fetchData();
+        } catch (error: any) {
+            showEdgeNotification('error', 'Erro', error.response?.data?.error || 'Erro ao cancelar assinatura');
+        } finally {
+            setCancelling(false);
         }
     };
 
@@ -381,6 +399,21 @@ export default function ElitePage() {
                                     <span className="text-violet-400 font-bold">{status.eliteStreak} 🔥</span>
                                 </div>
                             </div>
+
+                            {/* Cancel Button */}
+                            {status.activeSubscription && status.activeSubscription.status === 'ACTIVE' && (
+                                <div className="mt-6 pt-4 border-t border-white/10">
+                                    <button
+                                        onClick={() => setShowCancelModal(true)}
+                                        className="w-full py-2 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                    >
+                                        Cancelar assinatura
+                                    </button>
+                                    <p className="text-xs text-gray-500 text-center mt-2">
+                                        Você mantém os benefícios até o fim do período atual
+                                    </p>
+                                </div>
+                            )}
                         </motion.div>
                     )}
                 </div>
@@ -449,6 +482,71 @@ export default function ElitePage() {
                                     </>
                                 )}
                             </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+
+                {/* Cancel Subscription Modal */}
+                {showCancelModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowCancelModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-6"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="text-center mb-6">
+                                <div className="inline-flex p-4 rounded-full bg-red-500/20 mb-4">
+                                    <X className="w-10 h-10 text-red-400" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Cancelar Assinatura?</h3>
+                                <p className="text-gray-400">
+                                    Tem certeza que deseja cancelar sua assinatura ELITE?
+                                </p>
+                            </div>
+
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-6">
+                                <p className="text-sm text-gray-300 mb-2">
+                                    <span className="text-green-400">✓</span> Seus benefícios continuam ativos até:
+                                </p>
+                                <p className="text-violet-400 font-bold text-lg">
+                                    {status?.eliteUntil 
+                                        ? new Date(status.eliteUntil).toLocaleDateString('pt-BR', { 
+                                            day: '2-digit', 
+                                            month: 'long', 
+                                            year: 'numeric' 
+                                        })
+                                        : '-'
+                                    }
+                                </p>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowCancelModal(false)}
+                                    className="flex-1 py-3 rounded-xl font-medium bg-white/10 text-white hover:bg-white/20 transition-colors"
+                                >
+                                    Manter assinatura
+                                </button>
+                                <button
+                                    onClick={handleCancelSubscription}
+                                    disabled={cancelling}
+                                    className="flex-1 py-3 rounded-xl font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {cancelling ? (
+                                        <Loader size="sm" />
+                                    ) : (
+                                        'Confirmar'
+                                    )}
+                                </button>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}

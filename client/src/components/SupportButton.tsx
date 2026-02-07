@@ -16,7 +16,7 @@ import api from '../services/api';
 import ChatWindow from './ChatWindow';
 
 // WhatsApp number for support
-const SUPPORT_WHATSAPP = '+551999269715';
+const SUPPORT_WHATSAPP = '+5519992697215';
 const SUPPORT_EMAIL = 'suporte@magazinemgt.com';
 
 // Admin info for internal chat

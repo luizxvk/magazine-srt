@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, MoreVertical, Eye, Heart, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -262,7 +263,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
         return `${Math.floor(seconds / 3600)}h`;
     };
 
-    return (
+    const content = (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -599,4 +600,6 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
             />
         </motion.div>
     );
+
+    return createPortal(content, document.body);
 }

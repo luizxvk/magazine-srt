@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import StoriesBar from './StoriesBar';
+import GradientText from './GradientText';
 
 interface WelcomeCardProps {
     viewingStoryId: string | null;
@@ -11,7 +12,7 @@ interface WelcomeCardProps {
 }
 
 export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory }: WelcomeCardProps) {
-    const { user, theme, accentColor, accentGradient } = useAuth();
+    const { user, theme, accentColor, accentGradient, accentGradientColors } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
     // Theme-based styling
@@ -53,14 +54,24 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
                 {/* Welcome Header */}
                 <div className="flex items-start justify-between">
                     <div>
-                        <h1 
-                            className="text-3xl md:text-4xl font-serif text-transparent bg-clip-text mb-2"
-                            style={{
-                                backgroundImage: accentGradient || `linear-gradient(to right, ${userAccent}, ${userAccent})`
-                            }}
-                        >
-                            Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
-                        </h1>
+                        {accentGradientColors ? (
+                            <GradientText
+                                colors={accentGradientColors}
+                                animationSpeed={6}
+                                className="text-3xl md:text-4xl font-serif mb-2"
+                            >
+                                Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                            </GradientText>
+                        ) : (
+                            <h1 
+                                className="text-3xl md:text-4xl font-serif text-transparent bg-clip-text mb-2"
+                                style={{
+                                    backgroundImage: accentGradient || `linear-gradient(to right, ${userAccent}, ${userAccent})`
+                                }}
+                            >
+                                Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                            </h1>
+                        )}
                         <p className={theme === 'light' ? 'text-gray-500 text-lg font-light tracking-wide' : 'text-gray-400 text-lg font-light tracking-wide'}>
                             {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
                         </p>

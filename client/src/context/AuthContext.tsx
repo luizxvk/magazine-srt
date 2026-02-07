@@ -93,6 +93,7 @@ interface AuthContextType {
     // Customization
     accentColor: string;
     accentGradient: string | null; // Gradient for backgrounds (null = use solid color)
+    accentGradientColors: string[] | null; // Array of colors for animated GradientText
     backgroundStyle: string | null;
     equippedBadge: string | null;
     // Theme Preview Mode
@@ -193,6 +194,20 @@ const ACCENT_GRADIENTS: Record<string, string> = {
     'color_gradient_candy': 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)',
 };
 
+// Gradient colors as arrays for animated GradientText component
+const ACCENT_GRADIENT_COLORS: Record<string, string[]> = {
+    'color_gradient_sunset': ['#ff6b35', '#f72585', '#ff6b35'],
+    'color_gradient_ocean': ['#0077b6', '#00f5d4', '#0077b6'],
+    'color_gradient_aurora': ['#7b4397', '#00d9ff', '#7b4397'],
+    'color_gradient_fire': ['#ff0000', '#ffc300', '#ff0000'],
+    'color_gradient_galaxy': ['#1a0033', '#7303c0', '#ec38bc', '#1a0033'],
+    'color_gradient_neon': ['#ff00ff', '#00ffff', '#ff00ff'],
+    'color_gradient_forest': ['#134e5e', '#71b280', '#134e5e'],
+    'color_gradient_gold': ['#8b7335', '#d4af37', '#f4e4a6', '#d4af37', '#8b7335'],
+    'color_gradient_midnight': ['#0f0c29', '#302b63', '#24243e', '#302b63', '#0f0c29'],
+    'color_gradient_candy': ['#ff9a9e', '#fecfef', '#a18cd1', '#fecfef', '#ff9a9e'],
+};
+
 // Helper to convert hex to rgb
 const hexToRgb = (hex: string): string => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -256,6 +271,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return ACCENT_GRADIENTS[user.equippedColor];
         }
         return null; // No gradient, use solid color
+    }, [user?.equippedColor]);
+
+    // Compute accent gradient colors array (for animated GradientText)
+    const accentGradientColors = React.useMemo(() => {
+        if (user?.equippedColor && ACCENT_GRADIENT_COLORS[user.equippedColor]) {
+            return ACCENT_GRADIENT_COLORS[user.equippedColor];
+        }
+        return null; // No gradient colors, use solid color
     }, [user?.equippedColor]);
 
     // Compute background style from user's equipped customization (or preview)
@@ -1328,6 +1351,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Customization values
             accentColor,
             accentGradient,
+            accentGradientColors,
             backgroundStyle,
             equippedBadge: user?.equippedBadge || null,
             // Theme Preview Mode

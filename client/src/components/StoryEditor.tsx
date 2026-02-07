@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile, Move, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -148,7 +149,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
         }
     };
 
-    return (
+    const editorContent = (
         <motion.div
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -161,6 +162,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 }
             }}
             className="fixed inset-0 z-[10000] bg-black overflow-y-auto overflow-x-hidden"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
         >
             <canvas ref={canvasRef} className="hidden" />
 
@@ -441,4 +443,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
             </div>
         </motion.div>
     );
+
+    // Use createPortal to render directly in document.body for true fullscreen
+    return createPortal(editorContent, document.body);
 }

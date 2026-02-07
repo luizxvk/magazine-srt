@@ -130,6 +130,18 @@ export const COLOR_RARITY: Record<string, RarityTier> = {
     'color_pastel_butter': 'EPIC',
     'color_pastel_periwinkle': 'EPIC',
     
+    // Epic gradient colors
+    'color_gradient_sunset': 'EPIC',
+    'color_gradient_ocean': 'EPIC',
+    'color_gradient_aurora': 'EPIC',
+    'color_gradient_fire': 'EPIC',
+    'color_gradient_galaxy': 'EPIC',
+    'color_gradient_neon': 'EPIC',
+    'color_gradient_forest': 'EPIC',
+    'color_gradient_gold': 'EPIC',
+    'color_gradient_midnight': 'EPIC',
+    'color_gradient_candy': 'EPIC',
+    
     // Legendary colors
     'color_rgb': 'LEGENDARY',
 };

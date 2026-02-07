@@ -94,6 +94,17 @@ const ITEM_POOLS = {
         { id: 'color_pink', name: 'Rosa Neon', rarity: 'RARE' },
         { id: 'color_blue', name: 'Azul Elétrico', rarity: 'RARE' },
         { id: 'color_red', name: 'Vermelho Neon', rarity: 'RARE' },
+        // EPIC (600+) - Gradient Colors
+        { id: 'color_gradient_sunset', name: 'Pôr do Sol', rarity: 'EPIC' },
+        { id: 'color_gradient_ocean', name: 'Oceano', rarity: 'EPIC' },
+        { id: 'color_gradient_aurora', name: 'Aurora Boreal', rarity: 'EPIC' },
+        { id: 'color_gradient_fire', name: 'Fogo Infernal', rarity: 'EPIC' },
+        { id: 'color_gradient_galaxy', name: 'Galáxia', rarity: 'EPIC' },
+        { id: 'color_gradient_neon', name: 'Neon Elétrico', rarity: 'EPIC' },
+        { id: 'color_gradient_forest', name: 'Floresta Mística', rarity: 'EPIC' },
+        { id: 'color_gradient_gold', name: 'Dourado Premium', rarity: 'EPIC' },
+        { id: 'color_gradient_midnight', name: 'Meia-Noite', rarity: 'EPIC' },
+        { id: 'color_gradient_candy', name: 'Doce Intenso', rarity: 'EPIC' },
         // LEGENDARY (1000+)
         { id: 'color_rgb', name: 'RGB Dinâmico', rarity: 'LEGENDARY' },
     ],

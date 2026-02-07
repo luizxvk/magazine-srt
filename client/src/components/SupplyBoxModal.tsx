@@ -40,7 +40,7 @@ const BACKGROUND_PREVIEWS: Record<string, string> = {
     'bg_royal': 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)',
     'bg_carbon': 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)',
     'anim-cosmic-triangles': 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%)',
-    'anim-gradient-waves': 'linear-gradient(135deg, #0a1628 0%, #1a3050 50%, #0a1628 100%)',
+    'anim-gradient-waves': 'linear-gradient(135deg, #1e140a 0%, #8b7335 25%, #d4af37 50%, #8b7335 75%, #1e140a 100%)',
     'anim-rainbow-skies': 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%)',
     'anim-infinite-triangles': 'linear-gradient(135deg, #2d1b4e 0%, #4a2c7d 50%, #2d1b4e 100%)',
     'anim-moonlit-sky': 'linear-gradient(135deg, #0a0a2e 0%, #1a1a4e 50%, #0a0a2e 100%)',
@@ -67,6 +67,17 @@ const COLOR_PREVIEWS: Record<string, string> = {
     'color_pastel_sage': '#9dc183',
     'color_pastel_butter': '#fffacd',
     'color_pastel_periwinkle': '#ccccff',
+    // Gradient Colors
+    'color_gradient_sunset': 'linear-gradient(135deg, #ff6b35, #f72585)',
+    'color_gradient_ocean': 'linear-gradient(135deg, #0077b6, #00f5d4)',
+    'color_gradient_aurora': 'linear-gradient(135deg, #7b4397, #00d9ff)',
+    'color_gradient_fire': 'linear-gradient(135deg, #ff0000, #ffc300)',
+    'color_gradient_galaxy': 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)',
+    'color_gradient_neon': 'linear-gradient(135deg, #ff00ff, #00ffff)',
+    'color_gradient_forest': 'linear-gradient(135deg, #134e5e, #71b280)',
+    'color_gradient_gold': 'linear-gradient(135deg, #8b7335, #d4af37, #f4e4a6)',
+    'color_gradient_midnight': 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
+    'color_gradient_candy': 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)',
 };
 
 const BORDER_PREVIEWS: Record<string, string> = {

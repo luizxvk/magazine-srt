@@ -59,7 +59,7 @@ const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 // FEATURED - Premium animated backgrounds
 const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', description: 'Triângulos 3D coloridos em movimento hipnótico', price: 2500, type: 'background', preview: 'radial-gradient(circle at 30% 30%, #ff0080 0%, transparent 30%), radial-gradient(circle at 70% 70%, #00ffff 0%, transparent 30%), radial-gradient(circle at center, #111 0%, #000 100%)' },
-    { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%)' },
+    { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente dourado animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(30,20,10,1) 0%, rgba(139,115,55,1) 25%, rgba(212,175,55,1) 50%, rgba(139,115,55,1) 75%, rgba(30,20,10,1) 100%)' },
     { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
     { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, rgba(212,175,55,0.3) 50%, #000 100%)' },
     { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'Céu noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'radial-gradient(circle at 70% 20%, rgba(255,255,200,0.3) 0%, transparent 20%), linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
@@ -106,6 +106,17 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'color_pastel_sage', name: 'Sálvia Pastel', description: 'Terroso e natural', price: 350, type: 'color', preview: '#9dc183' },
     { id: 'color_pastel_butter', name: 'Manteiga Pastel', description: 'Amarelo suave', price: 350, type: 'color', preview: '#fffacd' },
     { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', description: 'Azul-violeta delicado', price: 350, type: 'color', preview: '#ccccff' },
+    // Gradient Colors
+    { id: 'color_gradient_sunset', name: 'Pôr do Sol', description: 'Gradiente laranja para rosa', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff6b35, #f72585)' },
+    { id: 'color_gradient_ocean', name: 'Oceano', description: 'Gradiente azul profundo', price: 600, type: 'color', preview: 'linear-gradient(135deg, #0077b6, #00f5d4)' },
+    { id: 'color_gradient_aurora', name: 'Aurora Boreal', description: 'Verde e roxo mágico', price: 600, type: 'color', preview: 'linear-gradient(135deg, #7b4397, #00d9ff)' },
+    { id: 'color_gradient_fire', name: 'Fogo Infernal', description: 'Vermelho para amarelo intenso', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff0000, #ffc300)' },
+    { id: 'color_gradient_galaxy', name: 'Galáxia', description: 'Roxo espacial cósmico', price: 600, type: 'color', preview: 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)' },
+    { id: 'color_gradient_neon', name: 'Neon Elétrico', description: 'Rosa e ciano vibrante', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff00ff, #00ffff)' },
+    { id: 'color_gradient_forest', name: 'Floresta Mística', description: 'Verde natureza profundo', price: 600, type: 'color', preview: 'linear-gradient(135deg, #134e5e, #71b280)' },
+    { id: 'color_gradient_gold', name: 'Dourado Premium', description: 'Ouro luxuoso Magazine', price: 600, type: 'color', preview: 'linear-gradient(135deg, #8b7335, #d4af37, #f4e4a6)' },
+    { id: 'color_gradient_midnight', name: 'Meia-Noite', description: 'Azul escuro misterioso', price: 600, type: 'color', preview: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
+    { id: 'color_gradient_candy', name: 'Doce Intenso', description: 'Rosa para roxo doce', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)' },
 ];
 
 // Profile border styles (circular border around avatar)

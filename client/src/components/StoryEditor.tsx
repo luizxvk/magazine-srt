@@ -160,7 +160,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                     ease: [0.32, 0.72, 0, 1] // Apple Vision Pro easing
                 }
             }}
-            className="fixed inset-0 z-[10000] bg-black overflow-y-auto"
+            className="fixed inset-0 z-[10000] bg-black overflow-y-auto overflow-x-hidden"
         >
             <canvas ref={canvasRef} className="hidden" />
 
@@ -172,9 +172,9 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 <X className="w-6 h-6 text-white" />
             </button>
 
-            <div className="min-h-screen flex flex-col p-4 pt-24">
+            <div className="flex flex-col p-4 pt-24 pb-32">
                 {/* Story Preview - CENTRALIZADO */}
-                <div className="flex-1 flex items-center justify-center">
+                <div className="flex items-center justify-center mb-6">
                     <div className="relative w-full max-w-md mx-auto">
                         {/* Controles de Zoom */}
                         <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">

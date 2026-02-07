@@ -190,10 +190,11 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                     }
                 ],
                 payer: {
-                    email: user.email || ''
+                    email: user.email || 'test_user@test.com'
                 },
                 payment_methods: {
-                    // Aceitar PIX, cartão, boleto
+                    default_payment_method_id: 'pix',
+                    excluded_payment_methods: [],
                     excluded_payment_types: [],
                     installments: planType === 'LIFETIME' ? 12 : (planType === 'YEARLY' ? 6 : 1)
                 },
@@ -210,15 +211,23 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                     planType,
                     price
                 }),
-                statement_descriptor: 'MGT ELITE'
+                statement_descriptor: 'MGT ELITE',
+                expires: true,
+                expiration_date_from: new Date().toISOString(),
+                expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h
             }
         });
 
         console.log('[ELITE] Preference created:', result.id);
 
+        // Use sandbox_init_point for test tokens
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+        const isTestToken = accessToken.includes('TEST') || accessToken.startsWith('TEST');
+        const checkoutUrl = isTestToken ? (result.sandbox_init_point || result.init_point) : result.init_point;
+
         res.json({
             id: result.id,
-            init_point: result.init_point,
+            init_point: checkoutUrl,
             sandbox_init_point: result.sandbox_init_point,
             planType,
             price

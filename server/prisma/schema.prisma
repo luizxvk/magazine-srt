@@ -456,6 +456,7 @@ model Event {
   updatedAt   DateTime @updatedAt
   category    String?
   game        String?
+  tag         String?   // Tag para posts relacionados ao evento (ex: "EncontroBR")
   // Recompensa vinculada (publicada quando evento finaliza)
   linkedReward Reward? @relation("EventReward")
   // Drop exclusivo de evento (item do "Meu Estilo")

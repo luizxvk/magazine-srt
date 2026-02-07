@@ -1,10 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock, BarChart3, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock, BarChart3, Sparkles, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
+
+interface EventTag {
+    tag: string;
+    eventTitle: string;
+    eventDate: string;
+    eventId: string;
+    isActive: boolean;
+}
 
 interface CreatePostCardProps {
     onPostCreated: () => void;
@@ -22,6 +30,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const [showPollInput, setShowPollInput] = useState(false);
     const [pollQuestion, setPollQuestion] = useState('');
     const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
+    const [eventTags, setEventTags] = useState<EventTag[]>([]);
     
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +39,19 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const canUseCarousel = (user?.zionsPoints || 0) >= 300;
     const defaultAccent = isMGT ? '#10b981' : '#d4af37';
     const userAccent = accentColor || defaultAccent;
+
+    // Fetch event tags on mount
+    useEffect(() => {
+        const fetchEventTags = async () => {
+            try {
+                const response = await api.get('/events/tags');
+                setEventTags(response.data);
+            } catch (error) {
+                console.error('Failed to fetch event tags:', error);
+            }
+        };
+        fetchEventTags();
+    }, []);
 
     // Themed Glass Morphism Style - MGT (emerald) vs Magazine (dark/gold)
     const cardBg = theme === 'light' 
@@ -293,6 +315,38 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                                 if (e.key === 'Escape') setShowTagInput(false);
                             }}
                         />
+                        
+                        {/* Event Tag Suggestions */}
+                        {eventTags.length > 0 && (
+                            <div className="mt-2">
+                                <p className={`text-xs ${textMuted} mb-1.5 flex items-center gap-1`}>
+                                    <Calendar className="w-3 h-3" />
+                                    Tags de eventos:
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {eventTags
+                                        .filter(et => et.tag && !selectedTags.includes(et.tag.toUpperCase()))
+                                        .map(eventTag => (
+                                        <button
+                                            key={eventTag.eventId}
+                                            type="button"
+                                            onClick={() => {
+                                                if (eventTag.tag && !selectedTags.includes(eventTag.tag.toUpperCase())) {
+                                                    setSelectedTags([...selectedTags, eventTag.tag.toUpperCase()]);
+                                                }
+                                            }}
+                                            className="bg-purple-500/10 text-purple-400 text-xs px-2 py-1 rounded-full flex items-center gap-1 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+                                            title={eventTag.eventTitle}
+                                        >
+                                            #{eventTag.tag}
+                                            {eventTag.isActive && (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { X, Image as ImageIcon, Video, Tag, Sparkles, MoreHorizontal } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Image as ImageIcon, Video, Tag, Sparkles, MoreHorizontal, Calendar } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+
+interface EventTag {
+    tag: string;
+    eventTitle: string;
+    eventDate: string;
+    eventId: string;
+    isActive: boolean;
+}
 
 interface CreatePostModalProps {
     isOpen: boolean;
@@ -19,6 +27,23 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
     const [isHighlight, setIsHighlight] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [eventTags, setEventTags] = useState<EventTag[]>([]);
+
+    // Fetch event tags when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            fetchEventTags();
+        }
+    }, [isOpen]);
+
+    const fetchEventTags = async () => {
+        try {
+            const response = await api.get('/events/tags');
+            setEventTags(response.data);
+        } catch (error) {
+            console.error('Failed to fetch event tags:', error);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -288,6 +313,39 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                             </button>
                                         </span>
                                     ))}
+                                </div>
+                            )}
+
+                            {/* Event Tag Suggestions */}
+                            {eventTags.length > 0 && (
+                                <div className="border-t border-white/10 pt-3">
+                                    <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                                        <Calendar className="w-3 h-3" />
+                                        Tags de eventos recentes:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {eventTags
+                                            .filter(et => et.tag && !tags.includes(et.tag))
+                                            .map(eventTag => (
+                                            <button
+                                                key={eventTag.eventId}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (eventTag.tag && !tags.includes(eventTag.tag)) {
+                                                        setTags([...tags, eventTag.tag]);
+                                                    }
+                                                }}
+                                                className="bg-purple-500/10 text-purple-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all group"
+                                                title={eventTag.eventTitle}
+                                            >
+                                                <span className="text-purple-300">#</span>
+                                                {eventTag.tag}
+                                                {eventTag.isActive && (
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" title="Evento ativo" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </form>

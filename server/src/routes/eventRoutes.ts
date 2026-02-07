@@ -5,6 +5,7 @@ import * as eventController from '../controllers/eventController';
 const router = Router();
 
 router.get('/', authenticateToken, eventController.getEvents);
+router.get('/tags', authenticateToken, eventController.getEventTags);
 router.get('/available-rewards', authenticateToken, isAdmin, eventController.getAvailableRewards);
 router.get('/available-drops', authenticateToken, eventController.getAvailableDrops);
 router.post('/', authenticateToken, isAdmin, eventController.createEvent);

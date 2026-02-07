@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
+import { sendPushToUser } from './notificationController';
 
 export const getEvents = async (_req: Request, res: Response) => {
     try {
@@ -36,7 +37,7 @@ export const createEvent = async (req: Request, res: Response) => {
     try {
         const { 
             title, description, date, category, game, imageUrl, linkedRewardId,
-            dropItemId, dropItemType, dropKeyword, dropClaimUntil
+            dropItemId, dropItemType, dropKeyword, dropClaimUntil, tag
         } = req.body;
 
         const event = await prisma.event.create({
@@ -47,6 +48,7 @@ export const createEvent = async (req: Request, res: Response) => {
                 category,
                 game,
                 imageUrl,
+                tag: tag || null,
                 // Drop exclusivo
                 dropItemId: dropItemId || null,
                 dropItemType: dropItemType || null,
@@ -73,6 +75,30 @@ export const createEvent = async (req: Request, res: Response) => {
                 linkedReward: true
             }
         });
+
+        // Enviar push notification para todos os usuários
+        const eventTime = new Date(date).toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            timeZone: 'America/Sao_Paulo'
+        });
+        
+        const allUsers = await prisma.user.findMany({
+            where: { deletedAt: null },
+            select: { id: true }
+        });
+
+        // Enviar push para todos (async, não esperar)
+        Promise.all(
+            allUsers.map(user =>
+                sendPushToUser(
+                    user.id,
+                    '📅 Novo Evento Anunciado!',
+                    `${title} às ${eventTime}`,
+                    { url: '/feed?openEvents=true', eventId: event.id, type: 'new_event' }
+                ).catch(() => {}) // Ignorar falhas individuais
+            )
+        ).catch(err => console.error('[Push] Error sending event notifications:', err));
 
         res.status(201).json(eventWithReward);
     } catch (error) {
@@ -429,5 +455,49 @@ export const claimEventDrop = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error claiming event drop:', error);
         res.status(500).json({ error: 'Failed to claim event drop' });
+    }
+};
+
+// Buscar tags de eventos recentes (para sugestões no post)
+export const getEventTags = async (_req: Request, res: Response) => {
+    try {
+        // Buscar eventos ativos ou recentes (últimos 30 dias) que tenham tag
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const events = await prisma.event.findMany({
+            where: {
+                tag: { not: null },
+                OR: [
+                    { active: true },
+                    { date: { gte: thirtyDaysAgo } }
+                ]
+            },
+            select: {
+                id: true,
+                title: true,
+                tag: true,
+                date: true,
+                active: true
+            },
+            orderBy: { date: 'desc' },
+            take: 10
+        });
+
+        // Retornar tags únicas com info do evento
+        const tags = events
+            .filter(e => e.tag)
+            .map(e => ({
+                tag: e.tag,
+                eventTitle: e.title,
+                eventDate: e.date,
+                eventId: e.id,
+                isActive: e.active
+            }));
+
+        res.json(tags);
+    } catch (error) {
+        console.error('Error fetching event tags:', error);
+        res.status(500).json({ error: 'Failed to fetch event tags' });
     }
 };

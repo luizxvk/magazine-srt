@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import FeedItem from '../components/FeedItem';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -105,6 +105,17 @@ export default function FeedPage() {
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [isSupplyBoxOpen, setIsSupplyBoxOpen] = useState(false);
     const [showEventDropPopup, setShowEventDropPopup] = useState(false);
+
+    // Check URL params to auto-open events modal (from push notification)
+    const [searchParams, setSearchParams] = useSearchParams();
+    useEffect(() => {
+        if (searchParams.get('openEvents') === 'true') {
+            setIsEventsOpen(true);
+            // Remove the query param after opening
+            searchParams.delete('openEvents');
+            setSearchParams(searchParams, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
 
     const fetchPosts = async (silent = false, page = 1, append = false) => {
         try {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, Car, Gamepad2, FileText, Plus, Gift, ChevronDown, X, Sparkles, Palette, Image, Award, CircleDot, Key } from 'lucide-react';
+import { Calendar, Clock, Car, Gamepad2, FileText, Plus, Gift, ChevronDown, X, Sparkles, Palette, Image, Award, CircleDot, Key, Hash } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -31,7 +31,8 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
         time: '',
         category: '',
         game: '',
-        description: ''
+        description: '',
+        tag: ''
     });
     
     // Recompensa vinculada
@@ -142,6 +143,7 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                 category: formData.category,
                 game: formData.game,
                 description: formData.description,
+                tag: formData.tag || undefined,
                 linkedRewardId: selectedRewardId || undefined,
                 // Drop exclusivo
                 dropItemId: showDropSection && dropItemId ? dropItemId : undefined,
@@ -151,7 +153,7 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
             });
 
             showToast('Evento criado com sucesso!', 'success');
-            setFormData({ title: '', date: '', time: '', category: '', game: '', description: '' });
+            setFormData({ title: '', date: '', time: '', category: '', game: '', description: '', tag: '' });
             setSelectedRewardId(null);
             setShowDropSection(false);
             setDropItemId('');
@@ -198,6 +200,23 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
                             placeholder="Ex: Encontro de Supercarros"
                             className={`w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white ${focusColor} outline-none transition-colors placeholder-gray-500`}
                         />
+                    </div>
+
+                    {/* Tag do Evento */}
+                    <div>
+                        <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider flex items-center gap-1">
+                            <Hash className="w-3 h-3" /> Tag do Evento
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.tag}
+                            onChange={(e) => setFormData({ ...formData, tag: e.target.value.replace(/\s/g, '') })}
+                            placeholder="Ex: EncontroBR, RaceSRT"
+                            className={`w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white ${focusColor} outline-none transition-colors placeholder-gray-500`}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                            Esta tag aparecerá como sugestão para posts relacionados ao evento
+                        </p>
                     </div>
 
                     {/* Date & Time */}

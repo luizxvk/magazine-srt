@@ -13,7 +13,7 @@ const client = new MercadoPagoConfig({
 
 const isSimulationMode = process.env.MERCADOPAGO_SIMULATION_MODE === 'true';
 
-// Duração em dias
+// Duraï¿½ï¿½o em dias
 const PLAN_DURATION_DAYS: Record<string, number> = {
     MONTHLY: 30,
     QUARTERLY: 90,
@@ -65,17 +65,17 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
         const { planType } = req.body;
 
         if (!userId) {
-            res.status(401).json({ error: 'Usuário não autenticado' });
+            res.status(401).json({ error: 'Usuï¿½rio nï¿½o autenticado' });
             return;
         }
 
         // Validar plano
         if (!['MONTHLY', 'QUARTERLY', 'YEARLY', 'LIFETIME'].includes(planType)) {
-            res.status(400).json({ error: 'Plano inválido' });
+            res.status(400).json({ error: 'Plano invï¿½lido' });
             return;
         }
 
-        // Verificar se já tem assinatura ativa
+        // Verificar se jï¿½ tem assinatura ativa
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { 
@@ -86,14 +86,14 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
         });
 
         if (!user) {
-            res.status(404).json({ error: 'Usuário não encontrado' });
+            res.status(404).json({ error: 'Usuï¿½rio nï¿½o encontrado' });
             return;
         }
 
         const now = new Date();
         if (user.isElite && user.eliteUntil && user.eliteUntil > now) {
             res.status(400).json({ 
-                error: 'Você já possui uma assinatura ELITE ativa',
+                error: 'Vocï¿½ jï¿½ possui uma assinatura ELITE ativa',
                 eliteUntil: user.eliteUntil
             });
             return;
@@ -104,13 +104,13 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
             MONTHLY: 'Mensal',
             QUARTERLY: 'Trimestral', 
             YEARLY: 'Anual',
-            LIFETIME: 'Vitalício'
+            LIFETIME: 'Vitalï¿½cio'
         };
 
         const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
         const serverUrl = process.env.SERVER_URL || 'https://magazine-srt-react-server.vercel.app';
 
-        // Modo simulação (dev)
+        // Modo simulaï¿½ï¿½o (dev)
         if (isSimulationMode) {
             // Simular pagamento imediato
             const durationDays = PLAN_DURATION_DAYS[planType];
@@ -130,7 +130,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 }
             });
 
-            // Atualizar usuário
+            // Atualizar usuï¿½rio
             const existingUser = await prisma.user.findUnique({
                 where: { id: userId },
                 select: { eliteSince: true, eliteStreak: true }
@@ -151,7 +151,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 data: {
                     userId,
                     amount: ELITE_BENEFITS.monthlyZions,
-                    reason: 'Bônus mensal ELITE',
+                    reason: 'Bï¿½nus mensal ELITE',
                     currency: 'POINTS'
                 }
             });
@@ -160,21 +160,21 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                 data: {
                     userId,
                     type: 'SYSTEM',
-                    content: 'Bem-vindo ao ELITE! ?? Seus benefícios já estão ativos.'
+                    content: 'Bem-vindo ao ELITE! ?? Seus benefï¿½cios jï¿½ estï¿½o ativos.'
                 }
             });
 
             res.json({
                 simulation: true,
                 success: true,
-                message: 'Assinatura ELITE ativada (modo simulação)',
+                message: 'Assinatura ELITE ativada (modo simulaï¿½ï¿½o)',
                 eliteUntil: periodEnd,
                 init_point: `${clientUrl}/elite?status=success`
             });
             return;
         }
 
-        // Criar preferência no Mercado Pago
+        // Criar preferï¿½ncia no Mercado Pago
         const preference = new Preference(client);
 
         const result = await preference.create({
@@ -183,7 +183,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
                     {
                         id: `elite_${planType.toLowerCase()}`,
                         title: `MGT ELITE - Plano ${planNames[planType]}`,
-                        description: 'Assinatura MGT ELITE com benefícios exclusivos: XP em dobro, 500 Zions/mês, desconto na loja e mais.',
+                        description: 'Assinatura MGT ELITE com benefï¿½cios exclusivos: XP em dobro, 500 Zions/mï¿½s, desconto na loja e mais.',
                         quantity: 1,
                         unit_price: price,
                         currency_id: 'BRL'
@@ -226,7 +226,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
 
     } catch (error) {
         console.error('[ELITE] Error creating preference:', error);
-        res.status(500).json({ error: 'Erro ao criar preferência de pagamento' });
+        res.status(500).json({ error: 'Erro ao criar preferï¿½ncia de pagamento' });
     }
 });
 
@@ -268,7 +268,7 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
                     return;
                 }
 
-                // Verificar se é uma assinatura Elite
+                // Verificar se ï¿½ uma assinatura Elite
                 if (parsed.type !== 'elite_subscription') {
                     console.log('[ELITE WEBHOOK] Not an elite subscription, ignoring');
                     res.sendStatus(200);
@@ -277,7 +277,7 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
 
                 const { userId, planType, price } = parsed;
 
-                // Verificar se já processou (idempotência)
+                // Verificar se jï¿½ processou (idempotï¿½ncia)
                 const existingSubscription = await prisma.subscription.findFirst({
                     where: { externalId: String(paymentId) }
                 });
@@ -306,7 +306,7 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
                     }
                 });
 
-                // Atualizar usuário
+                // Atualizar usuï¿½rio
                 const user = await prisma.user.findUnique({
                     where: { id: userId },
                     select: { eliteSince: true, eliteStreak: true }
@@ -323,22 +323,22 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
                     }
                 });
 
-                // Registrar bônus de Zions
+                // Registrar bï¿½nus de Zions
                 await prisma.zionHistory.create({
                     data: {
                         userId,
                         amount: ELITE_BENEFITS.monthlyZions,
-                        reason: 'Bônus mensal ELITE',
+                        reason: 'Bï¿½nus mensal ELITE',
                         currency: 'POINTS'
                     }
                 });
 
-                // Notificar usuário
+                // Notificar usuï¿½rio
                 await prisma.notification.create({
                     data: {
                         userId,
                         type: 'SYSTEM',
-                        content: 'Bem-vindo ao ELITE! ?? Seus benefícios já estão ativos.'
+                        content: 'Bem-vindo ao ELITE! ?? Seus benefï¿½cios jï¿½ estï¿½o ativos.'
                     }
                 });
 
@@ -360,12 +360,12 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
         const { productId, quantity, paymentType } = req.body;
 
         if (!userId) {
-            res.status(401).json({ error: 'Usuário não autenticado' });
+            res.status(401).json({ error: 'Usuï¿½rio nï¿½o autenticado' });
             return;
         }
 
         if (!productId || !quantity) {
-            res.status(400).json({ error: 'productId e quantity são obrigatórios' });
+            res.status(400).json({ error: 'productId e quantity sï¿½o obrigatï¿½rios' });
             return;
         }
 
@@ -611,7 +611,7 @@ router.post('/simulate-payment', authenticateToken, async (req: Request, res: Re
         const userId = (req as any).user?.userId;
 
         if (!userId) {
-            res.status(401).json({ error: 'Usuário não autenticado' });
+            res.status(401).json({ error: 'Usuï¿½rio nï¿½o autenticado' });
             return;
         }
 

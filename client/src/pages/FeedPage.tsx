@@ -30,6 +30,7 @@ import ToolsCarousel from '../components/ToolsCarousel';
 import CreatePostCard from '../components/CreatePostCard';
 import SupplyBoxModal from '../components/SupplyBoxModal';
 import EventDropPopup from '../components/EventDropPopup';
+import ElitePromoCard from '../components/ElitePromoCard';
 
 interface PollOption {
     id: string;
@@ -514,6 +515,9 @@ export default function FeedPage() {
                         <div id="radio-card" className="transition-all duration-300 rounded-2xl">
                             <ToolsCarousel />
                         </div>
+
+                        {/* Elite Promo Card - Apple Vision Pro style */}
+                        <ElitePromoCard />
 
                         {/* Market Card */}
                         <MarketCard />

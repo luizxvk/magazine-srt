@@ -50,7 +50,8 @@ export default function SupportButton() {
             const mobile = window.innerWidth < 1024;
             setIsMobile(mobile);
             // If mobile (less than 1024px), position above bottom nav
-            setBottomPosition(mobile ? '100px' : '24px');
+            // Desktop: 40px to avoid covering version info
+            setBottomPosition(mobile ? '100px' : '40px');
         };
         
         updatePosition();

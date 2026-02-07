@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Crown, Zap, Trophy, Gift, MessageCircle, Shield, Palette, 
@@ -43,6 +44,7 @@ interface SubscriptionStatus {
 
 export default function ElitePage() {
     const { user, showEdgeNotification } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
     
     const [plans, setPlans] = useState<Plan[]>([]);
     const [benefits, setBenefits] = useState<Benefit[]>([]);
@@ -51,10 +53,6 @@ export default function ElitePage() {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     const [subscribing, setSubscribing] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     const fetchData = async () => {
         try {
@@ -72,6 +70,37 @@ export default function ElitePage() {
         }
     };
 
+    // Tratar retorno do Mercado Pago
+    useEffect(() => {
+        const paymentStatus = searchParams.get('status');
+        
+        if (paymentStatus) {
+            // Limpar parâmetros da URL
+            setSearchParams({});
+            
+            if (paymentStatus === 'success') {
+                // Pagamento aprovado!
+                confetti({
+                    particleCount: 200,
+                    spread: 120,
+                    origin: { y: 0.5 },
+                    colors: ['#8B5CF6', '#6366F1', '#4F46E5', '#818CF8', '#A78BFA']
+                });
+                showEdgeNotification('success', 'Bem-vindo ao ELITE! 🎉', 'Seus benefícios já estão ativos');
+                // Recarregar dados
+                fetchData();
+            } else if (paymentStatus === 'pending') {
+                showEdgeNotification('info', 'Pagamento pendente', 'Aguardando confirmação do pagamento');
+            } else if (paymentStatus === 'failure') {
+                showEdgeNotification('error', 'Pagamento falhou', 'Tente novamente ou use outro método');
+            }
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     const handleSubscribe = async () => {
         if (!selectedPlan) return;
         if (!user) {
@@ -81,22 +110,31 @@ export default function ElitePage() {
         
         setSubscribing(true);
         try {
-            const { data } = await api.post('/subscriptions/subscribe', {
-                planType: selectedPlan,
-                paymentMethod: 'pix'
+            // Criar preferência no Mercado Pago
+            const { data } = await api.post('/payment/elite/create-preference', {
+                planType: selectedPlan
             });
 
-            // Trigger confetti
-            confetti({
-                particleCount: 150,
-                spread: 100,
-                origin: { y: 0.6 },
-                colors: ['#FFD700', '#FFA500', '#FF6B35', '#E91E63']
-            });
+            // Se for modo simulação, já foi ativado
+            if (data.simulation) {
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#8B5CF6', '#6366F1', '#4F46E5', '#818CF8']
+                });
+                showEdgeNotification('success', 'Bem-vindo ao ELITE! 🎉', data.message);
+                setShowConfirmModal(false);
+                fetchData();
+                return;
+            }
 
-            showEdgeNotification('success', 'Bem-vindo ao ELITE! 🎉', data.message);
-            setShowConfirmModal(false);
-            fetchData();
+            // Redirecionar para o Mercado Pago
+            if (data.init_point) {
+                window.location.href = data.init_point;
+            } else {
+                throw new Error('Link de pagamento não gerado');
+            }
         } catch (error: any) {
             showEdgeNotification('error', 'Erro', error.response?.data?.error || 'Erro ao processar assinatura');
         } finally {
@@ -292,12 +330,12 @@ export default function ElitePage() {
                                     disabled={!selectedPlan}
                                     className="w-48 h-[2.7em] mx-auto"
                                 >
-                                    <Crown className="w-5 h-5 group-hover:fill-yellow-400 fill-white shrink-0" />
+                                    <Crown className="w-5 h-5 group-hover:fill-violet-300 fill-white shrink-0" />
                                     ASSINAR ELITE
                                 </LiquidButton>
                                 
                                 <p className="text-sm text-gray-500 mt-6">
-                                    Pagamento seguro via PIX
+                                    Pagamento seguro via Mercado Pago (PIX, Cartão ou Boleto)
                                 </p>
                             </motion.div>
                         </motion.div>
@@ -390,7 +428,7 @@ export default function ElitePage() {
                                     </span>
                                 </div>
                                 <p className="text-xs text-gray-500">
-                                    Pagamento via PIX. Seus benefícios serão ativados imediatamente.
+                                    Você será redirecionado ao Mercado Pago para concluir o pagamento.
                                 </p>
                             </div>
 
@@ -402,12 +440,12 @@ export default function ElitePage() {
                                 {subscribing ? (
                                     <>
                                         <Loader size="sm" />
-                                        Processando...
+                                        Redirecionando...
                                     </>
                                 ) : (
                                     <>
                                         <Crown className="w-5 h-5" />
-                                        CONFIRMAR E PAGAR
+                                        IR PARA PAGAMENTO
                                     </>
                                 )}
                             </button>

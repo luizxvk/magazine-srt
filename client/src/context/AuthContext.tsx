@@ -433,6 +433,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     localStorage.setItem('theme', 'light');
                     document.documentElement.classList.remove('dark');
                     document.documentElement.classList.add('light');
+                } else if (userData.equippedBackground === 'anim-iridescence') {
+                    // Iridescence also activates light mode
+                    cleanupRainbowElements();
+                    
+                    // Save current theme for MGT before switching to light
+                    if (userData.membershipType === 'MGT') {
+                        const currentTheme = localStorage.getItem('theme') || 'dark';
+                        localStorage.setItem('mgt-theme-before-rainbow', currentTheme);
+                    }
+                    
+                    // Iridescence activates light mode for everyone
+                    localStorage.setItem('theme', 'light');
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
                 } else {
                     cleanupRainbowElements();
                 }
@@ -693,6 +707,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
                 
                 // Rainbow Skies activates light mode for everyone
+                setTheme('light');
+            } else if (className === 'anim-iridescence') {
+                // Prisma Iridescente also activates light mode like Rainbow Skies
+                cleanupRainbowElements();
+                cleanupInfiniteTrianglesElements();
+                cleanupMoonlitElements();
+                cleanupOrientalMatrixElements();
+                cleanupConstellationElements();
+                cleanupFireRainElements();
+                cleanupNeonRainElements();
+                
+                // Save current theme for MGT before switching to light
+                if (user?.membershipType === 'MGT' && !localStorage.getItem('mgt-theme-before-rainbow')) {
+                    localStorage.setItem('mgt-theme-before-rainbow', theme);
+                }
+                
+                // Iridescence activates light mode for everyone
                 setTheme('light');
             } else if (className === 'anim-infinite-triangles') {
                 cleanupRainbowElements();

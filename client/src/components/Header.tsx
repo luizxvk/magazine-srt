@@ -373,7 +373,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         <div className="text-right hidden lg:block">
                             <div className="flex items-center gap-2 justify-end">
                                 <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
-                                {!isVisitor && user?.id && <BadgeDisplay userId={user.id} isElite={user.isElite} eliteUntil={user.eliteUntil} />}
+                                {!isVisitor && user?.id && <BadgeDisplay userId={user.id} isElite={user.isElite} eliteUntil={user.eliteUntil} size="sm" />}
                             </div>
                             <div className="h-4 relative overflow-hidden w-32 flex justify-end">
                                 {isVisitor ? (

@@ -122,48 +122,44 @@ export const LiquidButton = memo(({ children, onClick, disabled, className = '',
 
     return (
         <div 
-            className={`relative inline-block group dark:bg-black bg-white dark:border-white border-black border-2 rounded-lg ${className}`}
-            style={{ minWidth: '8rem', minHeight: '2.7em' }}
+            className={`relative inline-block group rounded-lg ${className}`}
+            style={{ minWidth: '12rem', minHeight: '3.5em' }}
         >
-            {/* Glow Effect Background */}
-            <div className="absolute w-[112.81%] h-[128.57%] top-[8.57%] left-1/2 -translate-x-1/2 filter blur-[19px] opacity-70">
-                <span className="absolute inset-0 rounded-lg bg-[#d9d9d9] filter blur-[6.5px]" />
-                <div className="relative w-full h-full overflow-hidden rounded-lg">
-                    <Liquid isHovered={isHovered} colors={colors} />
-                </div>
-            </div>
+            {/* Outer glow effect */}
+            <div 
+                className="absolute -inset-1 rounded-xl opacity-75 blur-lg transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                    background: `linear-gradient(90deg, ${colors.color2}, ${colors.color8}, ${colors.color11})`,
+                }}
+            />
             
-            {/* Shadow Layer */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[40%] w-[92.23%] h-[112.85%] rounded-lg bg-[#010128] filter blur-[7.3px]" />
-            
-            {/* Main Button Container */}
-            <div className="relative w-full h-full overflow-hidden rounded-lg">
-                <span className="absolute inset-0 rounded-lg bg-[#d9d9d9]" />
-                <span className="absolute inset-0 rounded-lg bg-black" />
+            {/* Main Button Container with liquid effect */}
+            <div className="relative w-full h-full overflow-hidden rounded-lg border-2 border-white/20">
+                {/* Dark base */}
+                <div className="absolute inset-0 bg-black/90" />
+                
+                {/* Liquid gradient effect */}
                 <Liquid isHovered={isHovered} colors={colors} />
                 
-                {/* Border Glow Layers */}
-                {[1, 2, 3, 4, 5].map((i) => (
-                    <span
-                        key={i}
-                        className={`absolute inset-0 rounded-lg border-solid border-[3px] border-gradient-to-b from-transparent to-white mix-blend-overlay blur-xs`}
-                    />
-                ))}
-                
-                {/* Inner Shadow */}
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[40%] w-[70.8%] h-[42.85%] rounded-lg filter blur-[15px] bg-[#006]" />
+                {/* Shine overlay */}
+                <div 
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                        background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+                    }}
+                />
             </div>
             
             {/* Clickable Button */}
             <button
-                className="absolute inset-0 rounded-lg bg-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="absolute inset-0 rounded-lg bg-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 z-10"
                 type="button"
                 disabled={disabled}
                 onClick={onClick}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <span className="flex items-center justify-center px-4 py-4 gap-2 rounded-lg text-white text-xl font-semibold tracking-wide whitespace-nowrap group-hover:text-yellow-400 transition-colors">
+                <span className="flex items-center justify-center px-6 py-4 gap-2 rounded-lg text-white text-xl font-semibold tracking-wide whitespace-nowrap group-hover:text-yellow-400 transition-colors drop-shadow-lg">
                     {children}
                 </span>
             </button>

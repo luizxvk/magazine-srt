@@ -278,13 +278,7 @@ export default function FeedItem({
                         </div>
                         <div className="flex items-center gap-2">
                             <span className={`text-xs font-medium uppercase tracking-wider`} style={{ color: userAccent }}>{author}</span>
-                            {/* Elite Badge */}
-                            {authorIsElite && authorEliteUntil && new Date(authorEliteUntil) > new Date() && (
-                                <span className="elite-badge-shine px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-widest bg-gradient-to-r from-violet-600 via-blue-500 to-indigo-600 text-white rounded shadow-sm shadow-indigo-500/30">
-                                    Elite
-                                </span>
-                            )}
-                            {authorId && <BadgeDisplay userId={authorId} isElite={authorIsElite} eliteUntil={authorEliteUntil} />}
+                            {authorId && <BadgeDisplay userId={authorId} isElite={authorIsElite} eliteUntil={authorEliteUntil} size="sm" />}
                         </div>
                     </div>
 

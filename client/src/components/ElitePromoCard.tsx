@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 /**
  * Apple Vision Pro inspired Elite promotion card
- * Sleek glassmorphism design with subtle animations
+ * Sleek glassmorphism design with animated glow border
  */
 export default function ElitePromoCard() {
     const navigate = useNavigate();
@@ -21,53 +21,63 @@ export default function ElitePromoCard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             onClick={() => navigate('/elite')}
-            className="group relative cursor-pointer overflow-hidden rounded-2xl"
-            style={{
-                background: 'linear-gradient(135deg, rgba(20, 20, 25, 0.9) 0%, rgba(15, 15, 20, 0.95) 100%)',
-                backdropFilter: 'blur(40px)',
-                WebkitBackdropFilter: 'blur(40px)',
-            }}
+            className="group relative cursor-pointer overflow-hidden rounded-2xl p-[2px]"
         >
-            {/* Subtle animated gradient border */}
-            <div 
-                className="absolute inset-0 rounded-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+            {/* Animated glow border */}
+            <motion.div
+                className="absolute inset-0 rounded-2xl"
                 style={{
-                    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(99, 102, 241, 0.15) 100%)',
-                    padding: '1px',
+                    background: 'linear-gradient(90deg, transparent 0%, #7c3aed 25%, #3b82f6 50%, #6366f1 75%, transparent 100%)',
+                    backgroundSize: '200% 100%',
+                }}
+                animate={{
+                    backgroundPosition: ['200% 0%', '-200% 0%'],
+                }}
+                transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'linear',
                 }}
             />
             
-            {/* Floating glow effect */}
-            <motion.div
-                className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-700"
+            {/* Inner container */}
+            <div 
+                className="relative rounded-2xl overflow-hidden"
                 style={{
-                    background: 'radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%)',
-                    filter: 'blur(30px)',
+                    background: 'linear-gradient(135deg, rgba(20, 20, 25, 0.98) 0%, rgba(15, 15, 20, 0.99) 100%)',
                 }}
-                animate={{
-                    scale: [1, 1.1, 1],
-                    x: [0, 5, 0],
-                    y: [0, -5, 0],
-                }}
-                transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                }}
-            />
+            >
+                {/* Floating glow effect */}
+                <motion.div
+                    className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-700"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%)',
+                        filter: 'blur(30px)',
+                    }}
+                    animate={{
+                        scale: [1, 1.1, 1],
+                        x: [0, 5, 0],
+                        y: [0, -5, 0],
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
+                />
 
-            {/* Content */}
-            <div className="relative p-4">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                        <div 
-                            className="w-8 h-8 rounded-xl flex items-center justify-center"
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%)',
-                                boxShadow: '0 0 20px rgba(124, 58, 237, 0.1)',
-                            }}
-                        >
+                {/* Content */}
+                <div className="relative p-4">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <div 
+                                className="w-8 h-8 rounded-xl flex items-center justify-center"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%)',
+                                    boxShadow: '0 0 20px rgba(124, 58, 237, 0.1)',
+                                }}
+                            >
                             <Crown className="w-4 h-4 text-violet-400" />
                         </div>
                         <span 
@@ -143,24 +153,25 @@ export default function ElitePromoCard() {
                         <span className="text-xs font-medium text-violet-400">Assinar</span>
                     </motion.div>
                 </div>
-            </div>
+                </div>
 
-            {/* Shine effect on hover */}
-            <motion.div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{
-                    background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.03) 55%, transparent 60%)',
-                }}
-                animate={{
-                    x: ['-100%', '100%'],
-                }}
-                transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatDelay: 3,
-                    ease: 'easeInOut',
-                }}
-            />
+                {/* Shine effect on hover */}
+                <motion.div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                    style={{
+                        background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.03) 55%, transparent 60%)',
+                    }}
+                    animate={{
+                        x: ['-100%', '100%'],
+                    }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        repeatDelay: 3,
+                        ease: 'easeInOut',
+                    }}
+                />
+            </div>
         </motion.div>
     );
 }

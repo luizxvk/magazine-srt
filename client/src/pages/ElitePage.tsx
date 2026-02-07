@@ -149,13 +149,13 @@ export default function ElitePage() {
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2, type: 'spring' }}
-                            className="inline-flex p-6 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 mb-6"
+                            className="inline-flex p-6 rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-500/30 mb-6"
                         >
-                            <Crown className="w-16 h-16 text-amber-400" />
+                            <Crown className="w-16 h-16 text-violet-400" />
                         </motion.div>
                         
                         <h1 className="text-5xl md:text-6xl font-black mb-4">
-                            <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-violet-300 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
                                 MGT ELITE
                             </span>
                         </h1>
@@ -168,10 +168,10 @@ export default function ElitePage() {
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/50"
+                                className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-violet-500/20 to-indigo-500/20 border border-violet-500/50"
                             >
-                                <Crown className="w-5 h-5 text-amber-400" />
-                                <span className="text-amber-300 font-bold">Você é ELITE!</span>
+                                <Crown className="w-5 h-5 text-violet-400" />
+                                <span className="text-violet-300 font-bold">Você é ELITE!</span>
                                 <span className="text-gray-400">•</span>
                                 <span className="text-gray-300">{status?.daysRemaining} dias restantes</span>
                             </motion.div>
@@ -198,11 +198,11 @@ export default function ElitePage() {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.1 * index }}
-                                        className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/30 transition-all group"
+                                        className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all group"
                                     >
                                         <div className="flex items-start gap-4">
-                                            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 group-hover:from-amber-500/30 group-hover:to-orange-500/30 transition-colors">
-                                                <Icon className="w-6 h-6 text-amber-400" />
+                                            <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 group-hover:from-violet-500/30 group-hover:to-indigo-500/30 transition-colors">
+                                                <Icon className="w-6 h-6 text-violet-400" />
                                             </div>
                                             <div>
                                                 <h3 className="font-bold text-white mb-1">{benefit.name}</h3>
@@ -236,12 +236,12 @@ export default function ElitePage() {
                                         onClick={() => setSelectedPlan(plan.id)}
                                         className={`relative p-6 rounded-2xl border-2 transition-all text-left ${
                                             selectedPlan === plan.id
-                                                ? 'border-amber-500 bg-amber-500/10'
+                                                ? 'border-violet-500 bg-violet-500/10'
                                                 : 'border-white/10 bg-white/5 hover:border-white/30'
                                         }`}
                                     >
                                         {plan.popular && (
-                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-xs font-bold text-black">
+                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-xs font-bold text-white">
                                                 POPULAR
                                             </div>
                                         )}
@@ -249,7 +249,7 @@ export default function ElitePage() {
                                         <h3 className="text-lg font-bold text-white mb-2">{plan.name}</h3>
                                         
                                         <div className="mb-3">
-                                            <span className="text-3xl font-black text-amber-400">
+                                            <span className="text-3xl font-black text-violet-400">
                                                 R$ {plan.price.toFixed(2).replace('.', ',')}
                                             </span>
                                             {plan.pricePerMonth && (
@@ -273,7 +273,7 @@ export default function ElitePage() {
                                                 animate={{ scale: 1 }}
                                                 className="absolute top-4 right-4"
                                             >
-                                                <Check className="w-6 h-6 text-amber-400" />
+                                                <Check className="w-6 h-6 text-violet-400" />
                                             </motion.div>
                                         )}
                                     </motion.button>
@@ -308,9 +308,9 @@ export default function ElitePage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="max-w-lg mx-auto p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30"
+                            className="max-w-lg mx-auto p-6 rounded-2xl bg-gradient-to-br from-violet-500/10 to-indigo-500/10 border border-violet-500/30"
                         >
-                            <h3 className="text-xl font-bold text-amber-400 mb-4 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-violet-400 mb-4 flex items-center gap-2">
                                 <Crown className="w-6 h-6" />
                                 Seu Status ELITE
                             </h3>
@@ -336,11 +336,11 @@ export default function ElitePage() {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-400">Dias restantes</span>
-                                    <span className="text-amber-400 font-bold">{status.daysRemaining}</span>
+                                    <span className="text-violet-400 font-bold">{status.daysRemaining}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-400">Streak de meses</span>
-                                    <span className="text-amber-400 font-bold">{status.eliteStreak} 🔥</span>
+                                    <span className="text-violet-400 font-bold">{status.eliteStreak} 🔥</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -373,8 +373,8 @@ export default function ElitePage() {
                             </button>
 
                             <div className="text-center mb-6">
-                                <div className="inline-flex p-4 rounded-full bg-amber-500/20 mb-4">
-                                    <Crown className="w-10 h-10 text-amber-400" />
+                                <div className="inline-flex p-4 rounded-full bg-violet-500/20 mb-4">
+                                    <Crown className="w-10 h-10 text-violet-400" />
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Confirmar Assinatura</h3>
                                 <p className="text-gray-400">
@@ -385,7 +385,7 @@ export default function ElitePage() {
                             <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-6">
                                 <div className="flex justify-between mb-2">
                                     <span className="text-gray-400">Total</span>
-                                    <span className="text-2xl font-bold text-amber-400">
+                                    <span className="text-2xl font-bold text-violet-400">
                                         R$ {plans.find(p => p.id === selectedPlan)?.price.toFixed(2).replace('.', ',')}
                                     </span>
                                 </div>
@@ -397,7 +397,7 @@ export default function ElitePage() {
                             <button
                                 onClick={handleSubscribe}
                                 disabled={subscribing}
-                                className="w-full py-4 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-black flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full py-4 rounded-xl font-bold bg-gradient-to-r from-violet-500 to-indigo-500 text-white flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {subscribing ? (
                                     <>

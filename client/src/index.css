@@ -5,14 +5,14 @@
 /* Liquid Gradient Effect Styles */
 .liquid-gradient {
   overflow: hidden;
-  mix-blend-mode: overlay;
+  border-radius: 0.5rem;
 }
 
 .liquid-layer {
   position: absolute;
   inset: 0;
-  opacity: 0.6;
-  filter: blur(20px);
+  opacity: 0.9;
+  filter: blur(12px);
   transition: all 0.5s ease;
 }
 
@@ -42,8 +42,8 @@
 }
 
 .liquid-active .liquid-layer {
-  opacity: 0.85;
-  filter: blur(15px);
+  opacity: 1;
+  filter: blur(8px);
 }
 
 @keyframes liquid-move-1 {

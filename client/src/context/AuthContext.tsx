@@ -1201,6 +1201,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
         localStorage.removeItem('sessionMembershipType');
+        
+        // Clear user state FIRST to prevent any API calls
         setUser(null);
 
         // Force Dark Mode immediately and persist it
@@ -1208,6 +1210,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('theme', 'dark');
         document.documentElement.classList.remove('light');
         document.documentElement.classList.add('dark');
+        
+        // Unsubscribe from push notifications (async, don't block logout)
+        import('../services/pushNotificationService').then(module => {
+            module.default.unsubscribe().catch(() => {
+                console.log('[Logout] Could not unsubscribe from push');
+            });
+        }).catch(() => {});
 
         window.location.href = '/login';
     };

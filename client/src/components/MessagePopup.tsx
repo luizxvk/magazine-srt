@@ -43,7 +43,13 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     }, []);
 
     useEffect(() => {
-        if (isVisitor || !user) return;
+        // Don't run any polling if user is not logged in
+        if (isVisitor || !user?.id) {
+            // Clear any existing popup
+            setIsVisible(false);
+            setUnreadMessage(null);
+            return;
+        }
 
         const doNotDisturb = localStorage.getItem('doNotDisturb') === 'true';
         if (doNotDisturb) return;

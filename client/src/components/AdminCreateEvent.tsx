@@ -130,16 +130,20 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
 
         setIsSubmitting(true);
         try {
+            // Criar data/hora com timezone local (Brasil UTC-3)
+            // Usar o formato ISO com timezone para evitar problemas de conversão
+            const localDateTimeString = `${formData.date}T${formData.time}:00`;
+            const eventDateLocal = new Date(localDateTimeString);
+            
             // Calcular dropClaimUntil baseado no horário do evento + horas de resgate
             let dropClaimUntilDate = null;
             if (showDropSection && dropItemId && dropItemType) {
-                const eventDate = new Date(`${formData.date}T${formData.time}:00`);
-                dropClaimUntilDate = new Date(eventDate.getTime() + (dropClaimHours * 60 * 60 * 1000));
+                dropClaimUntilDate = new Date(eventDateLocal.getTime() + (dropClaimHours * 60 * 60 * 1000));
             }
 
             await api.post('/events', {
                 title: formData.title,
-                date: `${formData.date}T${formData.time}:00`,
+                date: eventDateLocal.toISOString(), // Enviar como ISO com timezone correto
                 category: formData.category,
                 game: formData.game,
                 description: formData.description,

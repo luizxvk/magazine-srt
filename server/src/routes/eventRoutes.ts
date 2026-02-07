@@ -4,6 +4,9 @@ import * as eventController from '../controllers/eventController';
 
 const router = Router();
 
+// Cron endpoint MUST be before parameterized routes to avoid /:id matching
+router.post('/cron/reminders', eventController.sendEventReminders);
+
 router.get('/', authenticateToken, eventController.getEvents);
 router.get('/tags', authenticateToken, eventController.getEventTags);
 router.get('/available-rewards', authenticateToken, isAdmin, eventController.getAvailableRewards);
@@ -14,9 +17,5 @@ router.post('/publish-rewards', authenticateToken, isAdmin, eventController.publ
 router.get('/:id/drop', authenticateToken, eventController.getEventDrop);
 router.post('/:id/claim-drop', authenticateToken, eventController.claimEventDrop);
 router.delete('/:id', authenticateToken, isAdmin, eventController.deleteEvent);
-
-// Cron endpoint for event reminders (1 minute before events)
-// Called by external cron service every minute
-router.post('/cron/reminders', eventController.sendEventReminders);
 
 export default router;

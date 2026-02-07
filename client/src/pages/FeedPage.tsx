@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import Header from '../components/Header';
 import FeedItem from '../components/FeedItem';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -7,7 +7,7 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, ChevronDown } from 'lucide-react';
+import { Sparkles, ChevronDown, Settings } from 'lucide-react';
 import Loader from '../components/Loader';
 import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
@@ -358,15 +358,33 @@ export default function FeedPage() {
                             </TimelineAnimation>
                         )}
 
-                        {/* Stories Bar (shown standalone if WelcomeCard disabled) */}
+                        {/* Simple header + Stories Bar when WelcomeCard disabled */}
                         {user?.showWelcomeCard === false && (
-                            <TimelineAnimation animationNum={1} className="mb-6 relative z-10">
-                                <StoriesBar
-                                    viewingStoryId={viewingStoryId}
-                                    onViewStory={setViewingStoryId}
-                                    onCloseStory={() => setViewingStoryId(null)}
-                                />
-                            </TimelineAnimation>
+                            <>
+                                <TimelineAnimation animationNum={0} className="mb-4">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h1 className={`text-2xl md:text-3xl font-serif ${isMGT ? 'text-white' : 'text-gold-400'}`}>
+                                                Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                                            </h1>
+                                        </div>
+                                        <Link
+                                            to="/settings"
+                                            className="p-2 rounded-lg bg-white/10 hover:bg-white/15 text-gray-300 transition-all"
+                                            title="Configurações"
+                                        >
+                                            <Settings className="w-5 h-5" />
+                                        </Link>
+                                    </div>
+                                </TimelineAnimation>
+                                <TimelineAnimation animationNum={1} className="mb-6 relative z-10">
+                                    <StoriesBar
+                                        viewingStoryId={viewingStoryId}
+                                        onViewStory={setViewingStoryId}
+                                        onCloseStory={() => setViewingStoryId(null)}
+                                    />
+                                </TimelineAnimation>
+                            </>
                         )}
 
                         {/* Create Post Card - Right after welcome */}

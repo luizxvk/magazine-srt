@@ -154,11 +154,13 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                 <span className={`absolute bottom-0 right-0 w-3 h-3 ${friend.doNotDisturb ? 'bg-red-500' : 'bg-green-500'} rounded-full border-2 border-black`} />
                                             </div>
                                             <div>
-                                                <div className="flex items-center gap-2">
-                                                    <p className={`text-sm font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                                                <div className="flex items-center gap-1 flex-wrap max-w-[120px]">
+                                                    <p className={`text-sm font-medium truncate max-w-[70px] ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                                                         {friend.displayName || friend.name}
                                                     </p>
-                                                    <BadgeDisplay userId={friend.id} isElite={friend.isElite} eliteUntil={friend.eliteUntil} />
+                                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                                        <BadgeDisplay userId={friend.id} isElite={friend.isElite} eliteUntil={friend.eliteUntil} size="sm" />
+                                                    </div>
                                                 </div>
                                                 <p className={`text-[10px] uppercase tracking-wider ${friendMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                                                     {friendMGT ? 'MGT' : 'MAGAZINE'} • {friend.isOnline ? 'online' : getTimeAgo(friend.lastSeenAt)}

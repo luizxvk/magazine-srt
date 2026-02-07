@@ -30,7 +30,7 @@ interface AdminInfo {
 }
 
 export default function SupportButton() {
-    const { user } = useAuth();
+    const { user, isMobileDrawerOpen } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [isOpen, setIsOpen] = useState(false);
     const [isAdminOnline, setIsAdminOnline] = useState(false);
@@ -87,6 +87,13 @@ export default function SupportButton() {
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isMobile, lastScrollY]);
+
+    // Close panel when drawer opens
+    useEffect(() => {
+        if (isMobileDrawerOpen && isOpen) {
+            setIsOpen(false);
+        }
+    }, [isMobileDrawerOpen]);
 
     // Check if any admin is online (with error handling)
     useEffect(() => {
@@ -300,13 +307,13 @@ export default function SupportButton() {
                 )}
             </AnimatePresence>
 
-            {/* Floating Button - Hides on scroll down (mobile only) */}
+            {/* Floating Button - Hides on scroll down (mobile only) and when drawer is open */}
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
                 initial={{ y: 0, opacity: 1 }}
                 animate={{ 
-                    y: isVisible ? 0 : 100, 
-                    opacity: isVisible ? 1 : 0 
+                    y: (isVisible && !isMobileDrawerOpen) ? 0 : 100, 
+                    opacity: (isVisible && !isMobileDrawerOpen) ? 1 : 0 
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 style={{

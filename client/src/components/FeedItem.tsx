@@ -284,7 +284,7 @@ export default function FeedItem({
                                     Elite
                                 </span>
                             )}
-                            {authorId && <BadgeDisplay userId={authorId} />}
+                            {authorId && <BadgeDisplay userId={authorId} isElite={authorIsElite} eliteUntil={authorEliteUntil} />}
                         </div>
                     </div>
 

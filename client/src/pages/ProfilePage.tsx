@@ -453,7 +453,7 @@ export default function ProfilePage() {
                                                 </div>
                                             </div>
                                         )}
-                                        <BadgeDisplay userId={profileUser.id} />
+                                        <BadgeDisplay userId={profileUser.id} isElite={profileUser.isElite} eliteUntil={profileUser.eliteUntil} />
                                     </div>
                                     <p className={`text-sm uppercase tracking-widest mb-2 font-medium ${isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold'}`}>
                                         {isMGT ? 'Membro MGT' : 'Membro Magazine'}

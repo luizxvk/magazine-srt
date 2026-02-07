@@ -11,9 +11,11 @@ interface AdminBadge {
 interface BadgeDisplayProps {
     userId: string;
     className?: string;
+    isElite?: boolean;
+    eliteUntil?: string | null;
 }
 
-const BadgeDisplay: React.FC<BadgeDisplayProps> = ({ userId, className = '' }) => {
+const BadgeDisplay: React.FC<BadgeDisplayProps> = ({ userId, className = '', isElite, eliteUntil }) => {
     const [badges, setBadges] = useState<AdminBadge[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -31,6 +33,24 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({ userId, className = '' }) =
             setLoading(false);
         }
     };
+
+    // Check if user is Elite and has valid subscription
+    const isActiveElite = isElite && eliteUntil && new Date(eliteUntil) > new Date();
+
+    // Show Elite badge if no admin badges but user is Elite
+    if (!loading && badges.length === 0 && isActiveElite) {
+        return (
+            <span
+                className={`elite-badge-shine px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded ${className}`}
+                style={{ 
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #3b82f6 50%, #6366f1 100%)',
+                    color: '#FFFFFF'
+                }}
+            >
+                Elite
+            </span>
+        );
+    }
 
     if (loading || badges.length === 0) return null;
 

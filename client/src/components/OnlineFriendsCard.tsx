@@ -17,6 +17,8 @@ interface OnlineFriend {
     membershipType?: string;
     doNotDisturb?: boolean;
     equippedProfileBorder?: string | null;
+    isElite?: boolean;
+    eliteUntil?: string | null;
 }
 
 interface OnlineFriendsCardProps {
@@ -156,7 +158,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                     <p className={`text-sm font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                                                         {friend.displayName || friend.name}
                                                     </p>
-                                                    <BadgeDisplay userId={friend.id} />
+                                                    <BadgeDisplay userId={friend.id} isElite={friend.isElite} eliteUntil={friend.eliteUntil} />
                                                 </div>
                                                 <p className={`text-[10px] uppercase tracking-wider ${friendMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
                                                     {friendMGT ? 'MGT' : 'MAGAZINE'} • {friend.isOnline ? 'online' : getTimeAgo(friend.lastSeenAt)}

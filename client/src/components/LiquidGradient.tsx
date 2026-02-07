@@ -121,7 +121,10 @@ export const LiquidButton = memo(({ children, onClick, disabled, className = '',
     const colors = isMGT ? MGT_COLORS : ELITE_COLORS;
 
     return (
-        <div className={`relative inline-block group ${className}`}>
+        <div 
+            className={`relative inline-block group dark:bg-black bg-white dark:border-white border-black border-2 rounded-lg ${className}`}
+            style={{ minWidth: '8rem', minHeight: '2.7em' }}
+        >
             {/* Glow Effect Background */}
             <div className="absolute w-[112.81%] h-[128.57%] top-[8.57%] left-1/2 -translate-x-1/2 filter blur-[19px] opacity-70">
                 <span className="absolute inset-0 rounded-lg bg-[#d9d9d9] filter blur-[6.5px]" />
@@ -143,9 +146,7 @@ export const LiquidButton = memo(({ children, onClick, disabled, className = '',
                 {[1, 2, 3, 4, 5].map((i) => (
                     <span
                         key={i}
-                        className={`absolute inset-0 rounded-lg border-solid border-[3px] border-gradient-to-b from-transparent to-white mix-blend-overlay ${
-                            i <= 2 ? 'blur-[3px]' : i === 3 ? 'blur-[5px]' : 'blur-xs'
-                        }`}
+                        className={`absolute inset-0 rounded-lg border-solid border-[3px] border-gradient-to-b from-transparent to-white mix-blend-overlay blur-xs`}
                     />
                 ))}
                 

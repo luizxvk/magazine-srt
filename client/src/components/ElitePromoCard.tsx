@@ -32,7 +32,7 @@ export default function ElitePromoCard() {
             <div 
                 className="absolute inset-0 rounded-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700"
                 style={{
-                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(251, 191, 36, 0.08) 50%, rgba(212, 175, 55, 0.15) 100%)',
+                    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(99, 102, 241, 0.15) 100%)',
                     padding: '1px',
                 }}
             />
@@ -41,7 +41,7 @@ export default function ElitePromoCard() {
             <motion.div
                 className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-700"
                 style={{
-                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%)',
+                    background: 'radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%)',
                     filter: 'blur(30px)',
                 }}
                 animate={{
@@ -64,16 +64,16 @@ export default function ElitePromoCard() {
                         <div 
                             className="w-8 h-8 rounded-xl flex items-center justify-center"
                             style={{
-                                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%)',
-                                boxShadow: '0 0 20px rgba(212, 175, 55, 0.1)',
+                                background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%)',
+                                boxShadow: '0 0 20px rgba(124, 58, 237, 0.1)',
                             }}
                         >
-                            <Crown className="w-4 h-4 text-amber-400" />
+                            <Crown className="w-4 h-4 text-violet-400" />
                         </div>
                         <span 
                             className="text-xs font-medium tracking-widest uppercase"
                             style={{
-                                background: 'linear-gradient(90deg, #D4AF37 0%, #FFD700 50%, #D4AF37 100%)',
+                                background: 'linear-gradient(90deg, #7c3aed 0%, #3b82f6 50%, #6366f1 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
@@ -84,7 +84,7 @@ export default function ElitePromoCard() {
                     </div>
                     
                     <motion.div
-                        className="flex items-center gap-1 text-white/40 group-hover:text-amber-400/80 transition-colors duration-300"
+                        className="flex items-center gap-1 text-white/40 group-hover:text-violet-400/80 transition-colors duration-300"
                         animate={{ x: [0, 3, 0] }}
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                     >
@@ -112,9 +112,9 @@ export default function ElitePromoCard() {
                             key={i}
                             className="px-2 py-0.5 text-[9px] font-medium rounded-full"
                             style={{
-                                background: 'rgba(212, 175, 55, 0.1)',
-                                color: 'rgba(251, 191, 36, 0.8)',
-                                border: '1px solid rgba(212, 175, 55, 0.15)',
+                                background: 'rgba(124, 58, 237, 0.1)',
+                                color: 'rgba(167, 139, 250, 0.9)',
+                                border: '1px solid rgba(124, 58, 237, 0.15)',
                             }}
                         >
                             {feature}
@@ -133,14 +133,14 @@ export default function ElitePromoCard() {
                     <motion.div 
                         className="flex items-center gap-1 px-3 py-1.5 rounded-full"
                         style={{
-                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%)',
-                            border: '1px solid rgba(212, 175, 55, 0.2)',
+                            background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%)',
+                            border: '1px solid rgba(124, 58, 237, 0.2)',
                         }}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <Sparkles className="w-3 h-3 text-amber-400" />
-                        <span className="text-xs font-medium text-amber-400">Assinar</span>
+                        <Sparkles className="w-3 h-3 text-violet-400" />
+                        <span className="text-xs font-medium text-violet-400">Assinar</span>
                     </motion.div>
                 </div>
             </div>

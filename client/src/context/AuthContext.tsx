@@ -165,6 +165,17 @@ const ACCENT_COLORS: Record<string, string> = {
     'color_pastel_sage': '#9dc183',
     'color_pastel_butter': '#fffacd',
     'color_pastel_periwinkle': '#ccccff',
+    // Gradient colors (use primary color for accent)
+    'color_gradient_sunset': '#ff6b35',
+    'color_gradient_ocean': '#0077b6',
+    'color_gradient_aurora': '#7b4397',
+    'color_gradient_fire': '#ff0000',
+    'color_gradient_galaxy': '#7303c0',
+    'color_gradient_neon': '#ff00ff',
+    'color_gradient_forest': '#134e5e',
+    'color_gradient_gold': '#d4af37',
+    'color_gradient_midnight': '#302b63',
+    'color_gradient_candy': '#ff9a9e',
 };
 
 // Helper to convert hex to rgb

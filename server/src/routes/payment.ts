@@ -61,8 +61,13 @@ router.post('/create-preference', async (req, res) => {
 // ============ ELITE - ASSINATURA MERCADO PAGO ============
 router.post('/elite/create-preference', authenticateToken, async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = (req as any).userId;
+        const userId = (req as any).user?.userId;
         const { planType } = req.body;
+
+        if (!userId) {
+            res.status(401).json({ error: 'Usuário não autenticado' });
+            return;
+        }
 
         // Validar plano
         if (!['MONTHLY', 'QUARTERLY', 'YEARLY', 'LIFETIME'].includes(planType)) {
@@ -351,11 +356,16 @@ router.post('/elite/webhook', async (req: Request, res: Response): Promise<void>
 // ============ PRODUTOS - PAGAMENTO BRL ============
 router.post('/product/create-preference', authenticateToken, async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = (req as any).userId;
+        const userId = (req as any).user?.userId;
         const { productId, quantity, paymentType } = req.body;
 
+        if (!userId) {
+            res.status(401).json({ error: 'Usuário não autenticado' });
+            return;
+        }
+
         if (!productId || !quantity) {
-            res.status(400).json({ error: 'productId e quantity sÃ£o obrigatÃ³rios' });
+            res.status(400).json({ error: 'productId e quantity são obrigatórios' });
             return;
         }
 
@@ -598,7 +608,12 @@ router.post('/simulate-payment', authenticateToken, async (req: Request, res: Re
 
     try {
         const { orderId } = req.body;
-        const userId = (req as any).userId;
+        const userId = (req as any).user?.userId;
+
+        if (!userId) {
+            res.status(401).json({ error: 'Usuário não autenticado' });
+            return;
+        }
 
         const order = await prisma.order.findFirst({
             where: { id: orderId, buyerId: userId, paymentStatus: 'PENDING' },

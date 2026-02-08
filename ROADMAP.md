@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.1 (Release Candidate)  
-> **Última Atualização:** 31 de Janeiro de 2026  
+> **Versão Atual:** v0.5.0-rc.4 (Release Candidate)  
+> **Última Atualização:** 08 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
@@ -14,10 +14,37 @@
 ├─ Features Sociais: 100% ✅
 ├─ Gamificação: 100% ✅
 ├─ E-commerce: 95% ✅
-├─ Personalização: 95% ✅
+├─ Personalização: 100% ✅
 ├─ Integração Rovex: 100% ✅
 └─ Multi-Tenant: 100% ✅
 ```
+
+---
+
+## 🆕 v0.5.0-rc.4 (Release Candidate - 08 Fevereiro 2026)
+
+### 🎨 Gradientes Dinâmicos em Botões & Ícones
+**Aplicação de cor de destaque personalizada em toda a interface**
+
+- ✨ **Botões com Gradiente Customizado**
+  - Botões principais usam o gradiente da cor equipada
+  - Fallback automático para cores padrão (Gold/Emerald)
+  - Efeito de brilho (brightness) no hover
+
+- 🎭 **Ícones de Destaque**
+  - Ícones de navegação e features usam `accentColor`
+  - Glows e backgrounds adaptam-se à cor personalizada
+  - Suporte a todas as cores gradiente da loja
+
+- 🔧 **Componentes Atualizados**
+  - `WhatsNewModal` - Header e botão com gradiente
+  - `WelcomeTour` - Todos os CTAs e ícones de features
+  - Indicadores de progresso (dots) com cor dinâmica
+
+- 📦 **AuthContext Enhancements**
+  - `accentColor` - Cor primária do tema
+  - `accentGradient` - CSS gradient para backgrounds
+  - `accentGradientColors` - Array para animações
 
 ---
 

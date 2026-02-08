@@ -3,7 +3,7 @@ import { X, ChevronRight, Sparkles, Trophy, Coins, Users, Radio, ShoppingBag, Pa
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.2';
+const TOUR_VERSION = '0.5.0-rc.4';
 
 interface WelcomeTourProps {
     isOpen?: boolean;
@@ -11,11 +11,12 @@ interface WelcomeTourProps {
 }
 
 export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalOnClose }: WelcomeTourProps = {}) {
-    const { theme, user } = useAuth();
+    const { theme, user, accentColor: userAccentColor, accentGradient } = useAuth();
     const [step, setStep] = useState(0);
     const [internalIsVisible, setInternalIsVisible] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
     const isDark = theme === 'dark';
+    const hasCustomGradient = !!accentGradient;
 
     // Use external state if provided, otherwise use internal state
     const isVisible = externalIsOpen !== undefined ? externalIsOpen : internalIsVisible;
@@ -153,11 +154,19 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
 
     if (!isVisible) return null;
 
-    // Accent colors based on membership
+    // Accent colors based on membership (with custom gradient support)
     const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
     const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const accentGlow = isMGT ? 'shadow-[0_0_60px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_60px_rgba(212,175,55,0.3)]';
+
+    // Custom gradient styles for buttons and icons
+    const buttonGradientStyle = hasCustomGradient 
+        ? { background: accentGradient } 
+        : undefined;
+    const iconColorStyle = hasCustomGradient 
+        ? { color: userAccentColor } 
+        : undefined;
 
     return (
         <AnimatePresence>
@@ -206,17 +215,26 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 </span>
                             </motion.div>
 
-                            {/* Logo/Icon */}
+                            {/* Logo/Icon - with custom color support */}
                             <motion.div 
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.3, type: 'spring', damping: 15 }}
                                 className="flex justify-center mb-6"
                             >
-                                <div className={`relative w-24 h-24 rounded-3xl ${isDark ? `${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`} flex items-center justify-center border ${accentBorder}`}>
-                                    <Crown className={`w-12 h-12 ${accentText}`} />
+                                <div 
+                                    className={`relative w-24 h-24 rounded-3xl flex items-center justify-center border ${accentBorder} ${isDark ? `${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`}`}
+                                    style={hasCustomGradient ? { backgroundColor: `${userAccentColor}20` } : undefined}
+                                >
+                                    <Crown 
+                                        className={`w-12 h-12 ${!hasCustomGradient ? accentText : ''}`} 
+                                        style={iconColorStyle}
+                                    />
                                     {/* Glow effect */}
-                                    <div className={`absolute inset-0 rounded-3xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} blur-xl animate-pulse`} />
+                                    <div 
+                                        className={`absolute inset-0 rounded-3xl blur-xl animate-pulse ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`} 
+                                        style={hasCustomGradient ? { backgroundColor: `${userAccentColor}20` } : undefined}
+                                    />
                                 </div>
                             </motion.div>
 
@@ -232,14 +250,17 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 </h1>
                             </motion.div>
 
-                            {/* Subtitle */}
+                            {/* Subtitle - with custom color support */}
                             <motion.div 
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.5 }}
                                 className="text-center mb-4"
                             >
-                                <span className={`text-lg font-medium ${accentText}`}>
+                                <span 
+                                    className={`text-lg font-medium ${!hasCustomGradient ? accentText : ''}`}
+                                    style={iconColorStyle}
+                                >
                                     {currentStep.subtitle}
                                 </span>
                             </motion.div>
@@ -254,7 +275,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 {currentStep.description}
                             </motion.p>
 
-                            {/* Features Grid - Apple Vision Pro style */}
+                            {/* Features Grid - Apple Vision Pro style with custom colors */}
                             <motion.div 
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -269,8 +290,14 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                         transition={{ delay: 0.8 + idx * 0.05 }}
                                         className={`group relative flex flex-col items-center p-3 rounded-2xl ${isDark ? 'bg-white/[0.04] hover:bg-white/[0.08]' : 'bg-gray-100/80 hover:bg-gray-200/80'} border ${isDark ? 'border-white/[0.06]' : 'border-gray-200'} transition-all cursor-default`}
                                     >
-                                        <div className={`w-10 h-10 rounded-xl ${isDark ? `${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
-                                            <feature.icon className={`w-5 h-5 ${accentText}`} />
+                                        <div 
+                                            className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform ${isDark ? `${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`}`}
+                                            style={hasCustomGradient ? { backgroundColor: `${userAccentColor}15` } : undefined}
+                                        >
+                                            <feature.icon 
+                                                className={`w-5 h-5 ${!hasCustomGradient ? accentText : ''}`} 
+                                                style={iconColorStyle}
+                                            />
                                         </div>
                                         <span className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
                                             {feature.label}
@@ -293,20 +320,20 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 className="flex justify-center gap-6 mb-8"
                             >
                                 <div className="flex items-center gap-2">
-                                    <Target className={`w-4 h-4 ${accentText}`} />
+                                    <Target className={`w-4 h-4 ${!hasCustomGradient ? accentText : ''}`} style={iconColorStyle} />
                                     <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>15 Níveis</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <TrendingUp className={`w-4 h-4 ${accentText}`} />
+                                    <TrendingUp className={`w-4 h-4 ${!hasCustomGradient ? accentText : ''}`} style={iconColorStyle} />
                                     <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>30+ Badges</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Zap className={`w-4 h-4 ${accentText}`} />
+                                    <Zap className={`w-4 h-4 ${!hasCustomGradient ? accentText : ''}`} style={iconColorStyle} />
                                     <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Bônus Diário</span>
                                 </div>
                             </motion.div>
 
-                            {/* CTA Button */}
+                            {/* CTA Button - with custom gradient support */}
                             <motion.div 
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -315,7 +342,8 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                             >
                                 <button
                                     onClick={handleNext}
-                                    className={`group relative px-8 py-4 ${accentBg} hover:brightness-110 text-black font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${isMGT ? 'shadow-emerald-500/25' : 'shadow-gold-500/25'}`}
+                                    className={`group relative px-8 py-4 hover:brightness-110 text-black font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${!hasCustomGradient ? `${accentBg} ${isMGT ? 'shadow-emerald-500/25' : 'shadow-gold-500/25'}` : ''}`}
+                                    style={buttonGradientStyle}
                                 >
                                     <span className="flex items-center gap-2">
                                         Explorar Recursos
@@ -391,7 +419,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                             ))}
                         </div>
 
-                        {/* Progress & Navigation */}
+                        {/* Progress & Navigation - with custom gradient support */}
                         <div className="flex items-center justify-between">
                             <div className="flex gap-1.5">
                                 {steps.map((_, i) => (
@@ -399,15 +427,17 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                         key={i}
                                         onClick={() => setStep(i)}
                                         className={`w-2 h-2 rounded-full transition-all duration-300 ${i === step 
-                                            ? (isMGT ? 'bg-emerald-500 w-6' : 'bg-gold-500 w-6') 
+                                            ? (!hasCustomGradient ? (isMGT ? 'bg-emerald-500 w-6' : 'bg-gold-500 w-6') : 'w-6') 
                                             : (isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400')
                                         }`}
+                                        style={i === step && hasCustomGradient ? { backgroundColor: userAccentColor } : undefined}
                                     />
                                 ))}
                             </div>
                             <button
                                 onClick={handleNext}
-                                className={`flex items-center gap-2 ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'} text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg`}
+                                className={`flex items-center gap-2 text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg hover:brightness-110 ${!hasCustomGradient ? (isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400') : ''}`}
+                                style={buttonGradientStyle}
                             >
                                 {step === steps.length - 1 ? 'Começar!' : 'Próximo'}
                                 <ChevronRight className="w-4 h-4" />

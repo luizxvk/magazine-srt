@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, Crown, MessageCircle } from 'lucide-react';
+import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, Crown, MessageCircle, Palette } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.3';
+const CURRENT_VERSION = '0.5.0-rc.4';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -19,7 +19,7 @@ interface WhatsNewModalProps {
 }
 
 export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externalOnClose }: WhatsNewModalProps = {}) {
-    const { user } = useAuth();
+    const { user, accentColor: userAccentColor, accentGradient } = useAuth();
     const location = useLocation();
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isMGT = user?.membershipType === 'MGT';
@@ -27,19 +27,34 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Use external state if provided, otherwise use internal state
     const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
 
+    // Theme-aware styling with user's custom accent gradient
+    const hasCustomGradient = !!accentGradient;
     const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
     const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
-    const accentColor = isMGT ? 'text-emerald-400' : 'text-yellow-400';
+    const accentTextColor = isMGT ? 'text-emerald-400' : 'text-yellow-400';
     const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
     const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
 
-    // v0.5.0-rc.3 - Comments 2.0
+    // Compute dynamic gradient styles for buttons and icons
+    const gradientStyle = hasCustomGradient 
+        ? { background: accentGradient } 
+        : undefined;
+    const iconStyle = hasCustomGradient 
+        ? { color: userAccentColor } 
+        : undefined;
+
+    // v0.5.0-rc.4 - Gradient Accent System
     const updates: UpdateItem[] = [
+        {
+            icon: <Palette className="w-5 h-5 text-pink-400" />,
+            title: 'Gradientes nos Botões',
+            description: 'Botões e ícones agora usam sua cor de destaque personalizada com gradientes animados!',
+            isNew: true
+        },
         {
             icon: <MessageCircle className="w-5 h-5 text-blue-400" />,
             title: 'Comentários Estilo YouTube',
             description: 'Agora você pode responder comentários e curtir! Interface completamente redesenhada.',
-            isNew: true
         },
         {
             icon: <Heart className="w-5 h-5 text-red-400" />,
@@ -111,8 +126,11 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
 
             {/* Modal */}
             <div className="relative w-full max-w-lg bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-800 overflow-hidden animate-in fade-in zoom-in duration-300">
-                {/* Header com gradiente */}
-                <div className={`relative bg-gradient-to-r ${gradientFrom} ${gradientTo} p-6 pb-12`}>
+                {/* Header com gradiente - usa gradient customizado se disponível */}
+                <div 
+                    className={`relative p-6 pb-12 ${!hasCustomGradient ? `bg-gradient-to-r ${gradientFrom} ${gradientTo}` : ''}`}
+                    style={hasCustomGradient ? { background: accentGradient } : undefined}
+                >
                     <button
                         onClick={handleClose}
                         className="absolute top-4 right-4 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
@@ -142,7 +160,10 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
                                 key={index}
                                 className={`flex items-center gap-3 p-3 rounded-xl ${bgAccent} border ${borderAccent}`}
                             >
-                                <div className={`p-2 rounded-lg bg-zinc-800 ${accentColor} shrink-0`}>
+                                <div 
+                                className={`p-2 rounded-lg bg-zinc-800 shrink-0 ${!hasCustomGradient ? accentTextColor : ''}`}
+                                style={iconStyle}
+                            >
                                     {update.icon}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -161,11 +182,12 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
                     </div>
                 </div>
 
-                {/* Footer */}
+                {/* Footer - botão com gradient customizado */}
                 <div className="p-6 pt-0">
                     <button
                         onClick={handleClose}
-                        className={`w-full py-3 rounded-xl bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity`}
+                        className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity ${!hasCustomGradient ? `bg-gradient-to-r ${gradientFrom} ${gradientTo}` : ''}`}
+                        style={gradientStyle}
                     >
                         <Check className="w-5 h-5" />
                         Vamos lá!

@@ -17,6 +17,7 @@ uniform float uTime;
 uniform vec3 uColor1;
 uniform vec3 uColor2;
 uniform vec3 uColor3;
+uniform float uMouseReactive;
 
 #define TAU 6.28318530718
 
@@ -34,17 +35,25 @@ vec3 lerp(vec3 a,vec3 b,float t){return a+(b-a)*t;}
 
 void main(){
     vec2 uv=(gl_FragCoord.xy-0.5*uResolution.xy)/uResolution.y;
-    vec2 mouse=uMouse-0.5;
-    float dist=length(uv-mouse)*2.;
-
-    float n=noise(uv*3.+uTime*0.3);
-    float t=(sin(dist*TAU-uTime+n*TAU)+1.)*0.5;
-    float distFade=smoothstep(1.5,0.,dist);
-
-    vec3 col=lerp(lerp(uColor1,uColor2,t),uColor3,1.-distFade);
-    col+=0.04*noise(uv*800.);
-
-    gl_FragColor=vec4(col,1.);
+    
+    // Flowing waves without mouse reactivity
+    float n1 = noise(uv * 2.0 + uTime * 0.2);
+    float n2 = noise(uv * 3.0 - uTime * 0.15 + 10.0);
+    float n3 = noise(uv * 1.5 + uTime * 0.1 + 20.0);
+    
+    // Create smooth flowing patterns
+    float wave1 = sin(uv.x * 3.0 + uv.y * 2.0 + uTime * 0.3 + n1 * TAU) * 0.5 + 0.5;
+    float wave2 = sin(uv.x * 2.0 - uv.y * 3.0 + uTime * 0.4 + n2 * TAU) * 0.5 + 0.5;
+    float wave3 = sin(length(uv) * 4.0 - uTime * 0.2 + n3 * TAU) * 0.5 + 0.5;
+    
+    // Blend colors based on waves
+    vec3 col = uColor1 * wave1 + uColor2 * wave2 * 0.8 + uColor3 * wave3 * 0.6;
+    col = col / (wave1 + wave2 * 0.8 + wave3 * 0.6 + 0.1);
+    
+    // Subtle grain
+    col += 0.02 * noise(uv * 800.);
+    
+    gl_FragColor = vec4(col, 1.);
 }
 `;
 
@@ -57,11 +66,11 @@ interface IridescenceBackgroundProps {
 }
 
 export default function IridescenceBackground({
-    color1 = [0.5, 0.3, 0.9],
+    color1 = [0.5, 0.6, 0.8],
     color2 = [0.9, 0.4, 0.6],
-    color3 = [0.1, 0.1, 0.2],
+    color3 = [0.6, 0.9, 0.7],
     speed = 1,
-    mouseReactive = true
+    mouseReactive = false
 }: IridescenceBackgroundProps) {
     const ref = useRef<HTMLCanvasElement>(null);
 
@@ -90,7 +99,8 @@ export default function IridescenceBackground({
                 uMouse: { value: mouse },
                 uColor1: { value: color1 },
                 uColor2: { value: color2 },
-                uColor3: { value: color3 }
+                uColor3: { value: color3 },
+                uMouseReactive: { value: mouseReactive ? 1.0 : 0.0 }
             }
         });
 
@@ -103,17 +113,7 @@ export default function IridescenceBackground({
             program.uniforms.uResolution.value.set(w, h);
         };
 
-        const onMouse = (e: MouseEvent) => {
-            if (!mouseReactive) return;
-            const rect = canvas.getBoundingClientRect();
-            mouse.set(
-                (e.clientX - rect.left) / rect.width,
-                1 - (e.clientY - rect.top) / rect.height
-            );
-        };
-
         window.addEventListener('resize', resize);
-        window.addEventListener('mousemove', onMouse);
         resize();
 
         const start = performance.now();
@@ -133,7 +133,6 @@ export default function IridescenceBackground({
         return () => {
             cancelAnimationFrame(frame);
             window.removeEventListener('resize', resize);
-            window.removeEventListener('mousemove', onMouse);
         };
     }, [color1, color2, color3, speed, mouseReactive]);
 

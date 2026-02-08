@@ -20,9 +20,15 @@ export default function WebGLBackgroundRenderer() {
     const renderBackground = () => {
         switch (bgClass) {
             case 'anim-dark-veil':
-                return <DarkVeilBackground speed={0.3} hueShift={0} warpAmount={0.5} />;
+                return <DarkVeilBackground speed={0.3} hueShift={0} warpAmount={0.5} resolutionScale={1} />;
             case 'anim-iridescence':
-                return <IridescenceBackground speed={0.8} />;
+                return <IridescenceBackground 
+                    speed={1} 
+                    mouseReactive={false}
+                    color1={[0.5, 0.6, 0.8]}  // Cyan/Blue
+                    color2={[0.9, 0.4, 0.6]}  // Pink
+                    color3={[0.6, 0.9, 0.7]}  // Mint
+                />;
             default:
                 return null;
         }

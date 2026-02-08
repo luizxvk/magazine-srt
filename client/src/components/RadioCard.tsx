@@ -103,7 +103,7 @@ const VolumeBars = React.memo(({ isPlaying, color }: { isPlaying: boolean; color
 VolumeBars.displayName = "VolumeBars";
 
 export default function RadioCard() {
-    const { user, theme } = useAuth();
+    const { user, theme, accentGradient } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const filterId = React.useId();
     
@@ -147,7 +147,7 @@ export default function RadioCard() {
 
     return (
         <>
-            <div className={`group relative w-full ${themeBg} backdrop-blur-[2px] rounded-3xl border ${themeBorder} transition-all duration-300 overflow-hidden`}>
+            <div className={`group relative w-full ${themeBg} backdrop-blur-[2px] rounded-3xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} transition-all duration-300 overflow-hidden`}>
                 {/* Liquid Glass Shadow Layer */}
                 <div className={`pointer-events-none absolute inset-0 rounded-3xl transition-all ${theme === 'light' ? GLASS_SHADOW_LIGHT : GLASS_SHADOW_DARK}`} />
                 

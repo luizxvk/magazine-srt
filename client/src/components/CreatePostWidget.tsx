@@ -461,7 +461,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
                 className={`
                     relative overflow-hidden
                     ${themePillBg} backdrop-blur-2xl
-                    border ${themePillBorder}
+                    ${accentGradient ? 'border-gradient-accent' : `border ${themePillBorder}`}
                     rounded-full ${themePillShadow}
                     p-2 flex items-center gap-4 transition-all duration-500 ease-out
                     group ${themePillHoverShadow} ${themePillHoverBorder}
@@ -469,7 +469,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
                 `}
                 style={{
                     background: isMGT ? undefined : `linear-gradient(135deg, ${accentColor}15, ${accentColor}08)`,
-                    borderColor: isMGT ? undefined : `${accentColor}30`
+                    borderColor: accentGradient ? undefined : (isMGT ? undefined : `${accentColor}30`)
                 }}
             >
                 {/* Subtle internal glow */}

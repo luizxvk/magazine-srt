@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function MarketCard() {
     const navigate = useNavigate();
-    const { user, accentColor, theme } = useAuth();
+    const { user, accentColor, accentGradient, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
     // Use accentColor from context (already resolved from equippedColor key to hex)
@@ -18,12 +18,12 @@ export default function MarketCard() {
 
     return (
         <div 
-            className={`${themeBg} backdrop-blur-xl rounded-xl p-5 border transition-all duration-300 group cursor-pointer relative overflow-hidden`}
+            className={`${themeBg} backdrop-blur-xl rounded-xl p-5 ${accentGradient ? 'border-gradient-accent' : 'border'} transition-all duration-300 group cursor-pointer relative overflow-hidden`}
             style={{ 
-                borderColor: `${backgroundAccent}33`,
+                borderColor: accentGradient ? undefined : `${backgroundAccent}33`,
             }}
-            onMouseEnter={(e) => e.currentTarget.style.borderColor = `${backgroundAccent}80`}
-            onMouseLeave={(e) => e.currentTarget.style.borderColor = `${backgroundAccent}33`}
+            onMouseEnter={(e) => !accentGradient && (e.currentTarget.style.borderColor = `${backgroundAccent}80`)}
+            onMouseLeave={(e) => !accentGradient && (e.currentTarget.style.borderColor = `${backgroundAccent}33`)}
         >
             <div 
                 className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"

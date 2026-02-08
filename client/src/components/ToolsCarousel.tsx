@@ -46,7 +46,7 @@ const tools = [
 ];
 
 export default function ToolsCarousel() {
-    const { user, theme } = useAuth();
+    const { user, theme, accentGradient } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef<HTMLDivElement>(null);
@@ -122,7 +122,7 @@ export default function ToolsCarousel() {
     };
 
     return (
-        <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-4 transition-all duration-300`}>
+        <div className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-4 transition-all duration-300`}>
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">

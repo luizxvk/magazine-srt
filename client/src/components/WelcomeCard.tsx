@@ -28,7 +28,7 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-3xl overflow-hidden"
+            className={`relative rounded-3xl overflow-hidden ${accentGradient ? 'border-gradient-accent' : ''}`}
             style={{
                 background: theme === 'light'
                     ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,250,250,0.9) 100%)'

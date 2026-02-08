@@ -90,7 +90,7 @@ interface InventoryCardProps {
 }
 
 export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
-    const { user, theme, accentColor } = useAuth();
+    const { user, theme, accentColor, accentGradient } = useAuth();
     const [items, setItems] = useState<InventoryItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -171,7 +171,7 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
 
     if (loading) {
         return (
-            <div className={`rounded-2xl border ${themeBorder} ${bgColor} backdrop-blur-xl ${themeGlow} p-4`}>
+            <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${bgColor} backdrop-blur-xl ${themeGlow} p-4`}>
                 <div className="flex items-center gap-2 mb-4">
                     <Package className={`w-4 h-4 ${themeAccent}`} />
                     <h3 className={`font-serif text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
@@ -187,7 +187,7 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
     }
 
     return (
-        <div className={`rounded-2xl border ${themeBorder} ${bgColor} backdrop-blur-xl ${themeGlow} overflow-hidden transition-all duration-300`}>
+        <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${bgColor} backdrop-blur-xl ${themeGlow} overflow-hidden transition-all duration-300`}>
             {/* Header */}
             <div className="p-4 flex justify-between items-center border-b border-white/10">
                 <div className="flex items-center gap-2">

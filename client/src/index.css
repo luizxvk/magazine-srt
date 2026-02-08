@@ -318,6 +318,47 @@ body::-webkit-scrollbar-thumb:hover {
 .border-accent\/30 { border-color: rgba(var(--accent-color-rgb), 0.3) !important; }
 .border-accent\/50 { border-color: rgba(var(--accent-color-rgb), 0.5) !important; }
 
+/* Gradient border using pseudo-element */
+.border-gradient-accent {
+  position: relative;
+  border: 1px solid transparent !important;
+  background-clip: padding-box !important;
+}
+.border-gradient-accent::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--accent-gradient, var(--accent-color));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Thicker gradient border variant */
+.border-gradient-accent-2 {
+  position: relative;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+}
+.border-gradient-accent-2::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--accent-gradient, var(--accent-color));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .ring-accent { --tw-ring-color: var(--accent-color) !important; }
 .shadow-accent { box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4) !important; }
 

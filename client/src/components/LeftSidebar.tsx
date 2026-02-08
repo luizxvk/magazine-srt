@@ -148,7 +148,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
 
     return (
         <aside className="hidden lg:block w-56 sticky top-24 h-fit animate-fade-in-right">
-            <nav className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-3 transition-all duration-300`}>
+            <nav className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-3 transition-all duration-300`}>
                 <ul className="space-y-1">
                     {items.map((item, index) => (
                         <MenuItem key={index} item={item} index={index} />
@@ -157,7 +157,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             </nav>
 
             {/* Quick Stats */}
-            <div className={`mt-4 ${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-4 transition-all duration-300`}>
+            <div className={`mt-4 ${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} p-4 transition-all duration-300`}>
                 <p className={`text-xs ${textSub} mb-2`}>Seu progresso</p>
                 {(() => {
                     // XP Table matching server: Level X requires XP_TABLE[X-1] total XP

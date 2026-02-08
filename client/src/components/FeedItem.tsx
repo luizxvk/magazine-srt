@@ -145,7 +145,7 @@ export default function FeedItem({
     onPollVote,
     isExpanded = false
 }: FeedItemProps) {
-    const { user, theme, isVisitor, showToast, accentColor } = useAuth();
+    const { user, theme, isVisitor, showToast, accentColor, accentGradient } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
@@ -247,7 +247,7 @@ export default function FeedItem({
             onMouseLeave={() => setIsPressed(false)}
             onTouchStart={() => setIsPressed(true)}
             onTouchEnd={() => setIsPressed(false)}
-            className={`${cardBg} rounded-2xl border ${cardBorder} ${cardShadow} backdrop-blur-2xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-300 ${cardHoverBorder} ${isPressed && theme === 'light' ? 'ring-2 ring-gray-300' : ''}`}
+            className={`${cardBg} rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${cardBorder}`} ${cardShadow} backdrop-blur-2xl overflow-hidden group h-full w-full flex flex-col relative transition-all duration-300 ${!accentGradient ? cardHoverBorder : ''} ${isPressed && theme === 'light' ? 'ring-2 ring-gray-300' : ''}`}
         >
             {(image || video) && (
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-square md:aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>

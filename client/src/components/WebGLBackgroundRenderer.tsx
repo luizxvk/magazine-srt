@@ -12,8 +12,13 @@ export default function WebGLBackgroundRenderer() {
     // Only render for WebGL backgrounds
     if (!backgroundStyle) return null;
 
+    // Extract actual background class (remove 'class:' prefix if present)
+    const bgClass = backgroundStyle.startsWith('class:') 
+        ? backgroundStyle.replace('class:', '') 
+        : backgroundStyle;
+
     const renderBackground = () => {
-        switch (backgroundStyle) {
+        switch (bgClass) {
             case 'anim-dark-veil':
                 return <DarkVeilBackground speed={0.3} hueShift={0} warpAmount={0.5} />;
             case 'anim-iridescence':

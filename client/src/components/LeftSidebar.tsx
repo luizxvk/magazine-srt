@@ -27,6 +27,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
     const { user, theme, accentColor, accentGradient } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
+    // Use accent color from context (with fallback)
+    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const userAccent = accentColor || defaultAccent;
+    const hasCustomAccent = !!accentColor;
+
     // Theme styles - consistent with project pattern
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT 
@@ -109,7 +114,10 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
 
         const content = (
             <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${themeHoverBg} transition-all duration-200 cursor-pointer group ${isLocked ? 'opacity-60' : ''}`}>
-                <span className={`${themeIconColor} group-hover:scale-110 transition-transform duration-200`}>
+                <span 
+                    className={`${!hasCustomAccent ? themeIconColor : ''} group-hover:scale-110 transition-transform duration-200`}
+                    style={hasCustomAccent ? { color: userAccent } : undefined}
+                >
                     {item.icon}
                 </span>
                 <span className={`flex-1 text-sm font-medium ${textMain} group-hover:${isMGT ? 'text-emerald-400' : 'text-gold-400'} transition-colors`}>

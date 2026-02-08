@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, Crown, MessageCircle, Palette } from 'lucide-react';
+import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, MessageCircle, Palette } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.4';
+const CURRENT_VERSION = '0.5.0-rc.5';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,12 +43,18 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.4 - Gradient Accent System
+    // v0.5.0-rc.5 - Iridescence Fix & Universal Gradients
     const updates: UpdateItem[] = [
         {
+            icon: <Sparkles className="w-5 h-5 text-violet-400" />,
+            title: 'Tema Iridescente Corrigido',
+            description: 'O background Prisma Iridescente foi restaurado ao visual original com efeitos de shader aprimorados!',
+            isNew: true
+        },
+        {
             icon: <Palette className="w-5 h-5 text-pink-400" />,
-            title: 'Gradientes nos Botões',
-            description: 'Botões e ícones agora usam sua cor de destaque personalizada com gradientes animados!',
+            title: 'Gradientes em Todos os Cards',
+            description: 'Cards de bônus diário, amigos online, inventário e menu lateral agora usam sua cor de destaque!',
             isNew: true
         },
         {
@@ -75,11 +81,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
             title: 'Vendedor Confiável',
             description: 'Badge exclusivo para vendedores com 10+ vendas realizadas!',
-        },
-        {
-            icon: <Crown className="w-5 h-5 text-violet-400" />,
-            title: 'Itens Elite-Only',
-            description: 'Membros Elite podem marcar anúncios como exclusivos para assinantes!',
         },
         {
             icon: <Zap className="w-5 h-5 text-gold-400" />,

@@ -32,7 +32,10 @@ export default function MarketCard() {
             
             {/* Header */}
             <div className="flex items-center gap-3 mb-4 relative z-10">
-                <div className={`p-2.5 rounded-xl shadow-lg`} style={{ background: `linear-gradient(135deg, ${backgroundAccent}, ${backgroundAccent}dd)` }}>
+                <div 
+                    className="p-2.5 rounded-xl shadow-lg"
+                    style={{ background: accentGradient || `linear-gradient(135deg, ${backgroundAccent}, ${backgroundAccent}dd)` }}
+                >
                     <Store className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
@@ -72,11 +75,11 @@ export default function MarketCard() {
                 </button>
             </div>
 
-            {/* CTA */}
+            {/* CTA - with gradient support */}
             <button
                 onClick={() => navigate('/market')}
-                className={`w-full mt-4 py-2.5 rounded-lg text-white text-sm font-bold hover:shadow-lg transition-all relative z-10`}
-                style={{ background: `linear-gradient(90deg, ${backgroundAccent}, ${backgroundAccent}dd)` }}
+                className="w-full mt-4 py-2.5 rounded-lg text-white text-sm font-bold hover:shadow-lg hover:brightness-110 transition-all relative z-10"
+                style={{ background: accentGradient || `linear-gradient(90deg, ${backgroundAccent}, ${backgroundAccent}dd)` }}
             >
                 Ir ao Mercado
             </button>

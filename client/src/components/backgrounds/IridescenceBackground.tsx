@@ -1,140 +1,139 @@
-import { useRef, useEffect } from 'react';
-import { Renderer, Program, Mesh, Triangle, Vec2 } from 'ogl';
+import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
+import { useEffect, useRef } from 'react';
 
-const vertex = `
+const vertexShader = `
+attribute vec2 uv;
 attribute vec2 position;
-void main(){gl_Position=vec4(position,0.0,1.0);}
+
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position, 0, 1);
+}
 `;
 
-const fragment = `
-#ifdef GL_ES
-precision mediump float;
-#endif
+const fragmentShader = `
+precision highp float;
 
-uniform vec2 uResolution;
-uniform vec2 uMouse;
 uniform float uTime;
-uniform vec3 uColor1;
-uniform vec3 uColor2;
-uniform vec3 uColor3;
-uniform float uMouseReactive;
+uniform vec3 uColor;
+uniform vec3 uResolution;
+uniform vec2 uMouse;
+uniform float uAmplitude;
+uniform float uSpeed;
 
-#define TAU 6.28318530718
+varying vec2 vUv;
 
-float noise(in vec2 p) {
-    const vec2 d = vec2(0., 1.);
-    vec2 b = floor(p), f = smoothstep(vec2(0.), vec2(1.), fract(p));
-    return mix(
-        mix(fract(sin(dot(b,vec2(127.1,311.7)))*43758.5453123),
-            fract(sin(dot(b+d.yx,vec2(127.1,311.7)))*43758.5453123),f.x),
-        mix(fract(sin(dot(b+d.xy,vec2(127.1,311.7)))*43758.5453123),
-            fract(sin(dot(b+d.yy,vec2(127.1,311.7)))*43758.5453123),f.x),f.y);
-}
+void main() {
+  float mr = min(uResolution.x, uResolution.y);
+  vec2 uv = (vUv.xy * 2.0 - 1.0) * uResolution.xy / mr;
 
-vec3 lerp(vec3 a,vec3 b,float t){return a+(b-a)*t;}
+  uv += (uMouse - vec2(0.5)) * uAmplitude;
 
-void main(){
-    vec2 uv=(gl_FragCoord.xy-0.5*uResolution.xy)/uResolution.y;
-    
-    // Flowing waves without mouse reactivity
-    float n1 = noise(uv * 2.0 + uTime * 0.2);
-    float n2 = noise(uv * 3.0 - uTime * 0.15 + 10.0);
-    float n3 = noise(uv * 1.5 + uTime * 0.1 + 20.0);
-    
-    // Create smooth flowing patterns
-    float wave1 = sin(uv.x * 3.0 + uv.y * 2.0 + uTime * 0.3 + n1 * TAU) * 0.5 + 0.5;
-    float wave2 = sin(uv.x * 2.0 - uv.y * 3.0 + uTime * 0.4 + n2 * TAU) * 0.5 + 0.5;
-    float wave3 = sin(length(uv) * 4.0 - uTime * 0.2 + n3 * TAU) * 0.5 + 0.5;
-    
-    // Blend colors based on waves
-    vec3 col = uColor1 * wave1 + uColor2 * wave2 * 0.8 + uColor3 * wave3 * 0.6;
-    col = col / (wave1 + wave2 * 0.8 + wave3 * 0.6 + 0.1);
-    
-    // Subtle grain
-    col += 0.02 * noise(uv * 800.);
-    
-    gl_FragColor = vec4(col, 1.);
+  float d = -uTime * 0.5 * uSpeed;
+  float a = 0.0;
+  for (float i = 0.0; i < 8.0; ++i) {
+    a += cos(i - d - a * uv.x);
+    d += sin(uv.y * i + a);
+  }
+  d += uTime * 0.5 * uSpeed;
+  vec3 col = vec3(cos(uv * vec2(d, a)) * 0.6 + 0.4, cos(a + d) * 0.5 + 0.5);
+  col = cos(col * cos(vec3(d, a, 2.5)) * 0.5 + 0.5) * uColor;
+  gl_FragColor = vec4(col, 1.0);
 }
 `;
 
 interface IridescenceBackgroundProps {
-    color1?: [number, number, number];
-    color2?: [number, number, number];
-    color3?: [number, number, number];
-    speed?: number;
-    mouseReactive?: boolean;
+  color?: [number, number, number];
+  speed?: number;
+  amplitude?: number;
+  mouseReact?: boolean;
 }
 
 export default function IridescenceBackground({
-    color1 = [0.5, 0.6, 0.8],
-    color2 = [0.9, 0.4, 0.6],
-    color3 = [0.6, 0.9, 0.7],
-    speed = 1,
-    mouseReactive = false
+  color = [1, 1, 1],
+  speed = 1.0,
+  amplitude = 0.1,
+  mouseReact = true,
 }: IridescenceBackgroundProps) {
-    const ref = useRef<HTMLCanvasElement>(null);
+  const ctnDom = useRef<HTMLDivElement>(null);
+  const mousePos = useRef({ x: 0.5, y: 0.5 });
 
-    useEffect(() => {
-        const canvas = ref.current;
-        if (!canvas) return;
-        const parent = canvas.parentElement;
-        if (!parent) return;
+  useEffect(() => {
+    if (!ctnDom.current) return;
+    const ctn = ctnDom.current;
+    const renderer = new Renderer();
+    const gl = renderer.gl;
+    gl.clearColor(1, 1, 1, 1);
 
-        const renderer = new Renderer({
-            dpr: Math.min(window.devicePixelRatio, 2),
-            canvas
-        });
+    let program: Program;
 
-        const gl = renderer.gl;
-        const geometry = new Triangle(gl);
+    function resize() {
+      const scale = 1;
+      renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
+      if (program) {
+        program.uniforms.uResolution.value = new Color(
+          gl.canvas.width,
+          gl.canvas.height,
+          gl.canvas.width / gl.canvas.height
+        );
+      }
+    }
+    window.addEventListener('resize', resize, false);
+    resize();
 
-        const mouse = new Vec2(0.5, 0.5);
+    const geometry = new Triangle(gl);
+    program = new Program(gl, {
+      vertex: vertexShader,
+      fragment: fragmentShader,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new Color(...color) },
+        uResolution: {
+          value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
+        },
+        uMouse: { value: new Float32Array([mousePos.current.x, mousePos.current.y]) },
+        uAmplitude: { value: amplitude },
+        uSpeed: { value: speed }
+      }
+    });
 
-        const program = new Program(gl, {
-            vertex,
-            fragment,
-            uniforms: {
-                uTime: { value: 0 },
-                uResolution: { value: new Vec2() },
-                uMouse: { value: mouse },
-                uColor1: { value: color1 },
-                uColor2: { value: color2 },
-                uColor3: { value: color3 },
-                uMouseReactive: { value: mouseReactive ? 1.0 : 0.0 }
-            }
-        });
+    const mesh = new Mesh(gl, { geometry, program });
+    let animateId: number;
 
-        const mesh = new Mesh(gl, { geometry, program });
+    function update(t: number) {
+      animateId = requestAnimationFrame(update);
+      program.uniforms.uTime.value = t * 0.001;
+      renderer.render({ scene: mesh });
+    }
+    animateId = requestAnimationFrame(update);
+    ctn.appendChild(gl.canvas);
 
-        const resize = () => {
-            const w = parent.clientWidth;
-            const h = parent.clientHeight;
-            renderer.setSize(w, h);
-            program.uniforms.uResolution.value.set(w, h);
-        };
+    function handleMouseMove(e: MouseEvent) {
+      const rect = ctn.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = 1.0 - (e.clientY - rect.top) / rect.height;
+      mousePos.current = { x, y };
+      program.uniforms.uMouse.value[0] = x;
+      program.uniforms.uMouse.value[1] = y;
+    }
+    if (mouseReact) {
+      ctn.addEventListener('mousemove', handleMouseMove);
+    }
 
-        window.addEventListener('resize', resize);
-        resize();
+    return () => {
+      cancelAnimationFrame(animateId);
+      window.removeEventListener('resize', resize);
+      if (mouseReact) {
+        ctn.removeEventListener('mousemove', handleMouseMove);
+      }
+      if (gl.canvas.parentNode === ctn) {
+        ctn.removeChild(gl.canvas);
+      }
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+    };
+  }, [color, speed, amplitude, mouseReact]);
 
-        const start = performance.now();
-        let frame = 0;
-
-        const loop = () => {
-            program.uniforms.uTime.value = ((performance.now() - start) / 1000) * speed;
-            program.uniforms.uColor1.value = color1;
-            program.uniforms.uColor2.value = color2;
-            program.uniforms.uColor3.value = color3;
-            renderer.render({ scene: mesh });
-            frame = requestAnimationFrame(loop);
-        };
-
-        loop();
-
-        return () => {
-            cancelAnimationFrame(frame);
-            window.removeEventListener('resize', resize);
-        };
-    }, [color1, color2, color3, speed, mouseReactive]);
-
-    return <canvas ref={ref} className="w-full h-full block" />;
+  return <div ref={ctnDom} className="w-full h-full" />;
 }

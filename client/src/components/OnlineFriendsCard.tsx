@@ -26,12 +26,18 @@ interface OnlineFriendsCardProps {
 }
 
 export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardProps) {
-    const { user, theme } = useAuth();
+    const { user, theme, accentColor, accentGradient } = useAuth();
     const [onlineFriends, setOnlineFriends] = useState<OnlineFriend[]>([]);
     const [loading, setLoading] = useState(true);
     const [chatOpen, setChatOpen] = useState<OnlineFriend | null>(null);
 
     const isMGT = user?.membershipType === 'MGT';
+    
+    // Use accent color from context (with fallback)
+    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const userAccent = accentColor || defaultAccent;
+    const hasCustomGradient = !!accentGradient;
+    
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
@@ -89,7 +95,10 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
         return (
             <div className={`rounded-2xl border ${themeBorder} ${bgColor} backdrop-blur-xl ${themeGlow} p-4`}>
                 <div className="flex items-center gap-2 mb-4">
-                    <Wifi className={`w-4 h-4 ${themeAccent}`} />
+                    <Wifi 
+                        className={`w-4 h-4 ${!hasCustomGradient ? themeAccent : ''}`}
+                        style={hasCustomGradient ? { color: userAccent } : undefined}
+                    />
                     <h3 className={`font-serif text-lg ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                         Amigos Online
                     </h3>
@@ -114,7 +123,13 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                             Amigos Online
                         </h3>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${themeBg} ${themeAccent}`}>
+                    <span 
+                        className={`text-xs px-2 py-0.5 rounded-full ${!hasCustomGradient ? `${themeBg} ${themeAccent}` : ''}`}
+                        style={hasCustomGradient ? { 
+                            backgroundColor: `${userAccent}1A`,
+                            color: userAccent 
+                        } : undefined}
+                    >
                         {onlineFriends.length}
                     </span>
                 </div>
@@ -146,7 +161,10 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                         />
                                                     ) : (
                                                         <div className={`w-full h-full rounded-full flex items-center justify-center bg-black`}>
-                                                            <User className={`w-5 h-5 ${themeAccent}`} />
+                                                            <User 
+                                                                className={`w-5 h-5 ${!hasCustomGradient ? themeAccent : ''}`}
+                                                                style={hasCustomGradient ? { color: userAccent } : undefined}
+                                                            />
                                                         </div>
                                                     )}
                                                 </div>

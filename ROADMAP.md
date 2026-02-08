@@ -1,6 +1,6 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.4 (Release Candidate)  
+> **Versão Atual:** v0.5.0-rc.5 (Release Candidate)  
 > **Última Atualização:** 08 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
@@ -18,6 +18,46 @@
 ├─ Integração Rovex: 100% ✅
 └─ Multi-Tenant: 100% ✅
 ```
+
+---
+
+## 🆕 v0.5.0-rc.5 (Release Candidate - 08 Fevereiro 2026)
+
+### 🌈 Tema Iridescente Restaurado
+**Shader WebGL corrigido para o visual original**
+
+- ✨ **Iridescence Background Reescrito**
+  - Código shader restaurado ao original do React Bits
+  - Uniforms: `uColor`, `uAmplitude`, `uSpeed`, `uMouse`
+  - Fórmula de cor com `cos()` para efeito arco-íris
+
+- 🎨 **WebGLBackgroundRenderer Atualizado**
+  - Props simplificadas: `color`, `speed`, `amplitude`, `mouseReact`
+  - Cores em formato RGB array [1, 1, 1]
+  - Mouse reactivity opcional
+
+### 🎯 Gradientes Universais em Cards
+**Cor de destaque aplicada em todos os componentes**
+
+- 📅 **DailyLoginCard**
+  - Ícone de presente usa `accentColor`
+  - Contador de streak com cor dinâmica
+  - Background do calendário com tema
+
+- 👥 **OnlineFriendsCard**
+  - Badge de contagem com cor personalizada
+  - Ícones de usuário com accent
+  - Ícone de WiFi com cor dinâmica
+
+- 📋 **LeftSidebar**
+  - Ícones do menu lateral usam `accentColor`
+  - Barra de progresso com `accentGradient`
+  - Suporte a hover com cor customizada
+
+- 🛒 **MarketCard**
+  - Botão CTA "Ir ao Mercado" com gradiente
+  - Ícone de sacola com accent color
+  - Border gradiente quando disponível
 
 ---
 

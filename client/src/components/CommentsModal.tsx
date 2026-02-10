@@ -3,6 +3,7 @@ import { X, Send, User, MessageCircle, Heart, Reply, ChevronDown, ChevronUp } fr
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import Loader from './Loader';
 
 interface CommentAuthor {
     id: string;
@@ -294,8 +295,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                         <div className="flex-1 overflow-y-auto p-5 space-y-4 scrollbar-thin scrollbar-thumb-gray-500/20 scrollbar-track-transparent">
                             {loading ? (
                                 <div className="flex flex-col items-center justify-center py-12 gap-3">
-                                    <div className={`w-10 h-10 border-3 rounded-full animate-spin ${isMGT ? 'border-emerald-500/30 border-t-emerald-500' : 'border-amber-500/30 border-t-amber-500'}`} />
-                                    <p className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>Carregando...</p>
+                                    <Loader size="md" />
                                 </div>
                             ) : comments.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -523,7 +523,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                     }}
                                 >
                                     {submitting ? (
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <Loader size="sm" />
                                     ) : (
                                         <Send className="w-5 h-5" />
                                     )}

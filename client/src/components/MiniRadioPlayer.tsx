@@ -4,6 +4,7 @@ import { useRadio, RADIO_STATIONS } from '../context/RadioContext';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import Loader from './Loader';
 
 export default function MiniRadioPlayer() {
     const { 
@@ -183,10 +184,7 @@ export default function MiniRadioPlayer() {
                                         disabled={isLoading}
                                     >
                                         {isLoading ? (
-                                            <div 
-                                                className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                                                style={{ borderColor: accentColor, borderTopColor: 'transparent' }}
-                                            />
+                                            <Loader size="sm" />
                                         ) : isPlaying ? (
                                             <Pause size={20} style={{ color: accentColor }} />
                                         ) : (

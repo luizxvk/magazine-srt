@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MessageSquare, Star, User, ChevronDown, ChevronUp, Check, Trash2, Filter, BarChart3, ThumbsUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Loader from './Loader';
 
 interface FeedbackUser {
     id: string;
@@ -161,7 +162,7 @@ export default function AdminFeedbackCard() {
         return (
             <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6`}>
                 <div className="flex items-center justify-center py-8">
-                    <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: activeColor }} />
+                    <Loader size="sm" />
                 </div>
             </div>
         );

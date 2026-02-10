@@ -12,6 +12,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import PurchaseModal from '../components/PurchaseModal';
+import Loader from '../components/Loader';
 
 interface Product {
     id: string;
@@ -107,7 +108,7 @@ export default function ProductDetails() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <LuxuriousBackground />
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: color }} />
+                <Loader size="lg" />
             </div>
         );
     }

@@ -7,6 +7,7 @@ import api from '../services/api';
 import CreateGroupModal from '../components/CreateGroupModal';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
+import Loader from '../components/Loader';
 
 interface Group {
   id: string;
@@ -79,7 +80,7 @@ export default function GroupsPage() {
         <LuxuriousBackground />
         <Header />
         <div className="flex items-center justify-center min-h-[80vh]">
-          <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-${accentColor}`}></div>
+          <Loader size="lg" />
         </div>
       </div>
     );

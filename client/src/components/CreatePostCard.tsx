@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
+import Loader from './Loader';
 
 interface EventTag {
     tag: string;
@@ -568,7 +569,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     }}
                 >
                     {loading ? (
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        <Loader size="sm" />
                     ) : (
                         <Send className="w-4 h-4" />
                     )}

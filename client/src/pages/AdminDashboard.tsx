@@ -13,6 +13,7 @@ import AdminCreateReward from '../components/AdminCreateReward';
 import AdminEditRewardModal from '../components/AdminEditRewardModal';
 import AdminCreateEvent from '../components/AdminCreateEvent';
 import BadgeManager from '../components/BadgeManager';
+import Loader from '../components/Loader';
 import AdminFeedbackCard from '../components/AdminFeedbackCard';
 import AdminEliteReward from '../components/AdminEliteReward';
 import AdminAdsSettings from '../components/AdminAdsSettings';
@@ -430,7 +431,9 @@ export default function AdminDashboard() {
                             </h2>
 
                             {loading ? (
-                                <div className="text-center py-10 text-gray-500">Carregando...</div>
+                                <div className="flex justify-center py-10">
+                                    <Loader size="md" />
+                                </div>
                             ) : rewards.length === 0 ? (
                                 <div className="text-center py-10 text-gray-500">Nenhuma recompensa cadastrada.</div>
                             ) : (

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
+import Loader from './Loader';
 
 interface RankingModalProps {
     isOpen: boolean;
@@ -320,7 +321,7 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                                             } ${claiming ? 'opacity-50' : ''}`}
                                         >
                                             {claiming ? (
-                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                <Loader size="sm" />
                                             ) : (
                                                 <Sparkles className="w-4 h-4" />
                                             )}
@@ -373,7 +374,9 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                 {/* List */}
                 <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                     {loading ? (
-                        <div className="text-center py-10 text-gray-500">Carregando elite...</div>
+                        <div className="flex justify-center py-10">
+                            <Loader size="md" />
+                        </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
                             <thead>

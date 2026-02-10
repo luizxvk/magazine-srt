@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, CircleDot } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
 import SupplyBoxModal from './SupplyBoxModal';
+import Loader from './Loader';
 
 interface ShopItem {
     id: string;
@@ -25,12 +26,12 @@ interface CustomizationShopProps {
 
 // Default items (free, always owned)
 const defaultItems = {
-    background: { id: 'bg_default', name: 'Magazine Clássico', description: 'O visual padrão do Magazine', price: 0, type: 'background' as const, preview: 'linear-gradient(125deg, #0a0a0a 0%, #1a1a1a 100%)' },
-    badge: { id: 'badge_crown', name: 'Coroa Magazine', description: 'Símbolo de elite', price: 0, type: 'badge' as const, preview: 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000' },
-    badgeMGT: { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 0, type: 'badge' as const, preview: '⭐' },
-    color: { id: 'color_gold', name: 'Dourado Magazine', description: 'A cor clássica Magazine', price: 0, type: 'color' as const, preview: '#d4af37' },
-    colorMGT: { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 0, type: 'color' as const, preview: '#00ffff' },
-    profileBorder: { id: 'border_gold', name: 'Dourado Clássico', description: 'A borda padrão Magazine', price: 0, type: 'profileBorder' as const, preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
+    background: { id: 'bg_default', name: 'Magazine ClÃ¡ssico', description: 'O visual padrÃ£o do Magazine', price: 0, type: 'background' as const, preview: 'linear-gradient(125deg, #0a0a0a 0%, #1a1a1a 100%)' },
+    badge: { id: 'badge_crown', name: 'Coroa Magazine', description: 'SÃ­mbolo de elite', price: 0, type: 'badge' as const, preview: 'https://img.icons8.com/?size=100&id=hcZ65S78dSp6&format=png&color=000000' },
+    badgeMGT: { id: 'badge_star', name: 'Estrela', description: 'Brilhe sempre', price: 0, type: 'badge' as const, preview: 'â­' },
+    color: { id: 'color_gold', name: 'Dourado Magazine', description: 'A cor clÃ¡ssica Magazine', price: 0, type: 'color' as const, preview: '#d4af37' },
+    colorMGT: { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elÃ©trico vibrante', price: 0, type: 'color' as const, preview: '#00ffff' },
+    profileBorder: { id: 'border_gold', name: 'Dourado ClÃ¡ssico', description: 'A borda padrÃ£o Magazine', price: 0, type: 'profileBorder' as const, preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
     profileBorderMGT: { id: 'border_emerald', name: 'Esmeralda MGT', description: 'Verde MGT exclusivo', price: 0, type: 'profileBorder' as const, preview: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%)' },
 };
 
@@ -38,32 +39,32 @@ const defaultItems = {
 const backgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     defaultItems.background,
     { id: 'bg_aurora', name: 'Aurora Boreal', description: 'Ondas suaves de luz em movimento', price: 600, type: 'background', preview: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)' },
-    { id: 'bg_galaxy', name: 'Galáxia', description: 'Estrelas e constelações', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)' },
-    { id: 'bg_retrowave', name: 'Retrowave', description: 'Synthwave retrô com sol e grid neon', price: 850, type: 'background', preview: 'linear-gradient(180deg, #1a0028 0%, #2d004a 30%, #ff006e 60%, #ff6b35 100%)' },
+    { id: 'bg_galaxy', name: 'GalÃ¡xia', description: 'Estrelas e constelaÃ§Ãµes', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 30%, #2d1b4e 50%, #1a0a2e 70%, #0c0c0c 100%)' },
+    { id: 'bg_retrowave', name: 'Retrowave', description: 'Synthwave retrÃ´ com sol e grid neon', price: 850, type: 'background', preview: 'linear-gradient(180deg, #1a0028 0%, #2d004a 30%, #ff006e 60%, #ff6b35 100%)' },
     { id: 'bg_fire', name: 'Chuva de Fogo', description: 'Chuva flamejante com cores quentes', price: 400, type: 'background', preview: 'linear-gradient(135deg, #1a0a0a 0%, #2d1a0a 30%, #4a2a0a 50%, #2d1a0a 70%, #1a0a0a 100%)' },
     { id: 'bg_oceano', name: 'Oceano', description: 'Oceano noturno com montanhas e estrelas', price: 800, type: 'background', preview: 'linear-gradient(180deg, #0a0a1a 0%, #1a2a4a 40%, #2a4a6a 70%, #1a3a5a 100%)' },
     { id: 'bg_forest', name: 'Floresta', description: 'Verde natural e sereno', price: 300, type: 'background', preview: 'linear-gradient(180deg, #0a1a0a 0%, #0f2a0f 50%, #0a1a0a 100%)' },
     { id: 'bg_city', name: 'Cidade Neon', description: 'Luzes urbanas vibrantes', price: 550, type: 'background', preview: 'linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 50%, #1a1a2e 100%)' },
-    { id: 'bg_space', name: 'Espaço Profundo', description: 'Vastidão do cosmos', price: 700, type: 'background', preview: 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)' },
+    { id: 'bg_space', name: 'EspaÃ§o Profundo', description: 'VastidÃ£o do cosmos', price: 700, type: 'background', preview: 'linear-gradient(135deg, #000005 0%, #0a0a1a 50%, #000005 100%)' },
     // NOVOS FUNDOS ANIMADOS
-    { id: 'bg_sunset', name: 'Pôr do Sol', description: 'Transição laranja-rosa vibrante', price: 650, type: 'background', preview: 'linear-gradient(135deg, #1a0505 0%, #2a0a0a 25%, #3a1515 50%, #2a0a0a 75%, #1a0505 100%)' },
-    { id: 'bg_cyberpunk', name: 'Cyberpunk', description: 'Néon rosa e azul futurista', price: 750, type: 'background', preview: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)' },
+    { id: 'bg_sunset', name: 'PÃ´r do Sol', description: 'TransiÃ§Ã£o laranja-rosa vibrante', price: 650, type: 'background', preview: 'linear-gradient(135deg, #1a0505 0%, #2a0a0a 25%, #3a1515 50%, #2a0a0a 75%, #1a0505 100%)' },
+    { id: 'bg_cyberpunk', name: 'Cyberpunk', description: 'NÃ©on rosa e azul futurista', price: 750, type: 'background', preview: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #2a0a3a 50%, #1a0a2a 75%, #0a0a1a 100%)' },
     { id: 'bg_lava', name: 'Lava', description: 'Magma incandescente em movimento', price: 800, type: 'background', preview: 'linear-gradient(135deg, #2a0a00 0%, #4a1500 25%, #6a2000 50%, #4a1500 75%, #2a0a00 100%)' },
-    { id: 'bg_ice', name: 'Constelações', description: 'Estrelas em movimento no céu noturno', price: 600, type: 'background', preview: 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)' },
+    { id: 'bg_ice', name: 'ConstelaÃ§Ãµes', description: 'Estrelas em movimento no cÃ©u noturno', price: 600, type: 'background', preview: 'linear-gradient(135deg, #0a1a2a 0%, #0f2535 25%, #143040 50%, #0f2535 75%, #0a1a2a 100%)' },
     { id: 'bg_chuva_neon', name: 'Chuva Neon', description: 'Chuva digital estilo cyberpunk', price: 850, type: 'background', preview: 'linear-gradient(180deg, #0d0015 0%, #1a0030 40%, #00ff88 50%, #0d0015 100%)' },
     { id: 'bg_emerald', name: 'Matrix Oriental', description: 'Caracteres japoneses pulsantes com efeitos neon', price: 700, type: 'background', preview: 'linear-gradient(135deg, #05050a 0%, #0a1020 50%, #05050a 100%)' },
-    { id: 'bg_royal', name: 'Real Púrpura', description: 'Púrpura majestoso', price: 900, type: 'background', preview: 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)' },
+    { id: 'bg_royal', name: 'Real PÃºrpura', description: 'PÃºrpura majestoso', price: 900, type: 'background', preview: 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)' },
     { id: 'bg_carbon', name: 'Fibra de Carbono', description: 'Textura escura premium', price: 500, type: 'background', preview: 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)' },
 ];
 
 // FEATURED - Premium animated backgrounds
 const featuredBackgrounds: Omit<ShopItem, 'owned' | 'equipped'>[] = [
-    { id: 'anim-cosmic-triangles', name: 'Triângulos Cósmicos', description: 'Triângulos 3D coloridos em movimento hipnótico', price: 2500, type: 'background', preview: 'radial-gradient(circle at 30% 30%, #ff0080 0%, transparent 30%), radial-gradient(circle at 70% 70%, #00ffff 0%, transparent 30%), radial-gradient(circle at center, #111 0%, #000 100%)' },
+    { id: 'anim-cosmic-triangles', name: 'TriÃ¢ngulos CÃ³smicos', description: 'TriÃ¢ngulos 3D coloridos em movimento hipnÃ³tico', price: 2500, type: 'background', preview: 'radial-gradient(circle at 30% 30%, #ff0080 0%, transparent 30%), radial-gradient(circle at 70% 70%, #00ffff 0%, transparent 30%), radial-gradient(circle at center, #111 0%, #000 100%)' },
     { id: 'anim-gradient-waves', name: 'Ondas Gradiente', description: 'Gradiente dourado animado com ondas fluidas', price: 2000, type: 'background', preview: 'linear-gradient(315deg, rgba(30,20,10,1) 0%, rgba(139,115,55,1) 25%, rgba(212,175,55,1) 50%, rgba(139,115,55,1) 75%, rgba(30,20,10,1) 100%)' },
     { id: 'anim-rainbow-skies', name: 'Rainbow Skies', description: 'Raios coloridos deslizando em fundo gradiente (Modo Claro)', price: 3000, type: 'background', preview: 'linear-gradient(315deg, rgba(232,121,249,1) 10%, rgba(96,165,250,1) 50%, rgba(94,234,212,1) 90%)' },
-    { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triângulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, rgba(212,175,55,0.3) 50%, #000 100%)' },
-    { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'Céu noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'radial-gradient(circle at 70% 20%, rgba(255,255,200,0.3) 0%, transparent 20%), linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
-    { id: 'anim-dark-veil', name: 'Véu Sombrio', description: 'Rede neural CPPN gerando padrões orgânicos hipnóticos', price: 5000, type: 'background', preview: 'radial-gradient(ellipse at center, #2a0845 0%, #1a0530 30%, #0a0115 100%)' },
+    { id: 'anim-infinite-triangles', name: 'Infinite Triangles', description: 'Grade hexagonal com triÃ¢ngulos infinitos na cor de destaque', price: 3500, type: 'background', preview: 'linear-gradient(135deg, var(--accent-color, #d4af37) 0%, rgba(212,175,55,0.3) 50%, #000 100%)' },
+    { id: 'anim-moonlit-sky', name: 'Moonlit Sky', description: 'CÃ©u noturno com lua, estrelas e nuvens em movimento', price: 4000, type: 'background', preview: 'radial-gradient(circle at 70% 20%, rgba(255,255,200,0.3) 0%, transparent 20%), linear-gradient(180deg, #000011 0%, #0a0a2e 50%, #1a1a4a 100%)' },
+    { id: 'anim-dark-veil', name: 'VÃ©u Sombrio', description: 'Rede neural CPPN gerando padrÃµes orgÃ¢nicos hipnÃ³ticos', price: 5000, type: 'background', preview: 'radial-gradient(ellipse at center, #2a0845 0%, #1a0530 30%, #0a0115 100%)' },
     { id: 'anim-iridescence', name: 'Prisma Iridescente', description: 'Aurora iridescente que reage ao movimento do mouse', price: 4500, type: 'background', preview: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #1a1a2e 100%)' },
 ];
 
@@ -73,49 +74,49 @@ const badges: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'badge_skull', name: 'Caveira', description: 'Estilo rebelde', price: 300, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=1aDNYh2zesKP&format=png&color=000000' },
     { id: 'badge_fire', name: 'Fogo', description: 'Queima tudo!', price: 200, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=NjzqV0aREXb6&format=png&color=000000' },
     { id: 'badge_diamond', name: 'Diamante', description: 'Precioso e raro', price: 500, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=8k9NF5LzoTVC&format=png&color=000000' },
-    { id: 'badge_lightning', name: 'Raio', description: 'Velocidade máxima', price: 400, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
-    { id: 'badge_pony', name: 'Unicórnio', description: 'Mágico e único', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=16114&format=png&color=000000' },
-    { id: 'badge_heart', name: 'Coração', description: 'Com amor', price: 200, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000' },
+    { id: 'badge_lightning', name: 'Raio', description: 'Velocidade mÃ¡xima', price: 400, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=PEfxi3mNT0kR&format=png&color=000000' },
+    { id: 'badge_pony', name: 'UnicÃ³rnio', description: 'MÃ¡gico e Ãºnico', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=16114&format=png&color=000000' },
+    { id: 'badge_heart', name: 'CoraÃ§Ã£o', description: 'Com amor', price: 200, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=yQTLnfG3Agzl&format=png&color=000000' },
     { id: 'badge_moon', name: 'Lua', description: 'Noturno', price: 300, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=6DXM8bs2tFSU&format=png&color=000000' },
     { id: 'badge_sun', name: 'Sol', description: 'Radiante', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=OIr0zJdeXCbg&format=png&color=000000' },
     // Novos badges
     { id: 'badge_seal', name: 'Foca', description: 'Fofinho e focado', price: 250, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=FVRVluUvxBrh&format=png&color=000000' },
     { id: 'badge_shark', name: 'Grande Norke', description: 'Predador dos mares', price: 450, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=81021&format=png&color=000000' },
-    { id: 'badge_egghead', name: 'Cabeça de Ovo', description: 'Pensador único', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
+    { id: 'badge_egghead', name: 'CabeÃ§a de Ovo', description: 'Pensador Ãºnico', price: 350, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=_jtfUqyZM2Pw&format=png&color=000000' },
     { id: 'badge_xitada', name: 'Ta Xitada', description: 'Xitou geral!', price: 400, type: 'badge', preview: 'https://img.icons8.com/?size=100&id=8S7SkmQtNOry&format=png&color=000000' },
 ];
 
 // Neon accent colors (excluding gold for Magazine exclusivity)
 const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     defaultItems.color,
-    { id: 'color_rgb', name: 'RGB Dinâmico', description: 'Troca entre Red, Green, Blue ao vivo!', price: 1000, type: 'color', preview: 'rgb-dynamic' },
-    { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elétrico vibrante', price: 400, type: 'color', preview: '#00ffff' },
+    { id: 'color_rgb', name: 'RGB DinÃ¢mico', description: 'Troca entre Red, Green, Blue ao vivo!', price: 1000, type: 'color', preview: 'rgb-dynamic' },
+    { id: 'color_cyan', name: 'Ciano Neon', description: 'Azul elÃ©trico vibrante', price: 400, type: 'color', preview: '#00ffff' },
     { id: 'color_magenta', name: 'Magenta Neon', description: 'Rosa intenso', price: 400, type: 'color', preview: '#ff00ff' },
-    { id: 'color_lime', name: 'Verde Limão', description: 'Verde vibrante', price: 400, type: 'color', preview: '#00ff00' },
-    { id: 'color_orange', name: 'Laranja Neon', description: 'Quente e energético', price: 400, type: 'color', preview: '#ff6600' },
+    { id: 'color_lime', name: 'Verde LimÃ£o', description: 'Verde vibrante', price: 400, type: 'color', preview: '#00ff00' },
+    { id: 'color_orange', name: 'Laranja Neon', description: 'Quente e energÃ©tico', price: 400, type: 'color', preview: '#ff6600' },
     { id: 'color_purple', name: 'Roxo Neon', description: 'Misterioso e elegante', price: 400, type: 'color', preview: '#9933ff' },
     { id: 'color_pink', name: 'Rosa Neon', description: 'Doce e marcante', price: 400, type: 'color', preview: '#ff69b4' },
-    { id: 'color_blue', name: 'Azul Elétrico', description: 'Clássico e moderno', price: 400, type: 'color', preview: '#0066ff' },
+    { id: 'color_blue', name: 'Azul ElÃ©trico', description: 'ClÃ¡ssico e moderno', price: 400, type: 'color', preview: '#0066ff' },
     { id: 'color_red', name: 'Vermelho Neon', description: 'Intenso e poderoso', price: 400, type: 'color', preview: '#ff0033' },
     // Pastel Colors
     { id: 'color_pastel_pink', name: 'Rosa Pastel', description: 'Delicado e suave', price: 350, type: 'color', preview: '#ffb6c1' },
     { id: 'color_pastel_lavender', name: 'Lavanda Pastel', description: 'Relaxante e elegante', price: 350, type: 'color', preview: '#e6e6fa' },
     { id: 'color_pastel_mint', name: 'Menta Pastel', description: 'Fresco e natural', price: 350, type: 'color', preview: '#98fb98' },
-    { id: 'color_pastel_peach', name: 'Pêssego Pastel', description: 'Acolhedor e quente', price: 350, type: 'color', preview: '#ffdab9' },
-    { id: 'color_pastel_sky', name: 'Céu Pastel', description: 'Sereno e calmo', price: 350, type: 'color', preview: '#87ceeb' },
+    { id: 'color_pastel_peach', name: 'PÃªssego Pastel', description: 'Acolhedor e quente', price: 350, type: 'color', preview: '#ffdab9' },
+    { id: 'color_pastel_sky', name: 'CÃ©u Pastel', description: 'Sereno e calmo', price: 350, type: 'color', preview: '#87ceeb' },
     { id: 'color_pastel_coral', name: 'Coral Pastel', description: 'Vibrante mas suave', price: 350, type: 'color', preview: '#ffb5a7' },
-    { id: 'color_pastel_lilac', name: 'Lilás Pastel', description: 'Romântico e místico', price: 350, type: 'color', preview: '#dda0dd' },
-    { id: 'color_pastel_sage', name: 'Sálvia Pastel', description: 'Terroso e natural', price: 350, type: 'color', preview: '#9dc183' },
+    { id: 'color_pastel_lilac', name: 'LilÃ¡s Pastel', description: 'RomÃ¢ntico e mÃ­stico', price: 350, type: 'color', preview: '#dda0dd' },
+    { id: 'color_pastel_sage', name: 'SÃ¡lvia Pastel', description: 'Terroso e natural', price: 350, type: 'color', preview: '#9dc183' },
     { id: 'color_pastel_butter', name: 'Manteiga Pastel', description: 'Amarelo suave', price: 350, type: 'color', preview: '#fffacd' },
     { id: 'color_pastel_periwinkle', name: 'Pervinca Pastel', description: 'Azul-violeta delicado', price: 350, type: 'color', preview: '#ccccff' },
     // Gradient Colors
-    { id: 'color_gradient_sunset', name: 'Pôr do Sol', description: 'Gradiente laranja para rosa', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff6b35, #f72585)' },
+    { id: 'color_gradient_sunset', name: 'PÃ´r do Sol', description: 'Gradiente laranja para rosa', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff6b35, #f72585)' },
     { id: 'color_gradient_ocean', name: 'Oceano', description: 'Gradiente azul profundo', price: 600, type: 'color', preview: 'linear-gradient(135deg, #0077b6, #00f5d4)' },
-    { id: 'color_gradient_aurora', name: 'Aurora Boreal', description: 'Verde e roxo mágico', price: 600, type: 'color', preview: 'linear-gradient(135deg, #7b4397, #00d9ff)' },
+    { id: 'color_gradient_aurora', name: 'Aurora Boreal', description: 'Verde e roxo mÃ¡gico', price: 600, type: 'color', preview: 'linear-gradient(135deg, #7b4397, #00d9ff)' },
     { id: 'color_gradient_fire', name: 'Fogo Infernal', description: 'Vermelho para amarelo intenso', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff0000, #ffc300)' },
-    { id: 'color_gradient_galaxy', name: 'Galáxia', description: 'Roxo espacial cósmico', price: 600, type: 'color', preview: 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)' },
-    { id: 'color_gradient_neon', name: 'Neon Elétrico', description: 'Rosa e ciano vibrante', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff00ff, #00ffff)' },
-    { id: 'color_gradient_forest', name: 'Floresta Mística', description: 'Verde natureza profundo', price: 600, type: 'color', preview: 'linear-gradient(135deg, #134e5e, #71b280)' },
+    { id: 'color_gradient_galaxy', name: 'GalÃ¡xia', description: 'Roxo espacial cÃ³smico', price: 600, type: 'color', preview: 'linear-gradient(135deg, #1a0033, #7303c0, #ec38bc)' },
+    { id: 'color_gradient_neon', name: 'Neon ElÃ©trico', description: 'Rosa e ciano vibrante', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff00ff, #00ffff)' },
+    { id: 'color_gradient_forest', name: 'Floresta MÃ­stica', description: 'Verde natureza profundo', price: 600, type: 'color', preview: 'linear-gradient(135deg, #134e5e, #71b280)' },
     { id: 'color_gradient_gold', name: 'Dourado Premium', description: 'Ouro luxuoso Magazine', price: 600, type: 'color', preview: 'linear-gradient(135deg, #8b7335, #d4af37, #f4e4a6)' },
     { id: 'color_gradient_midnight', name: 'Meia-Noite', description: 'Azul escuro misterioso', price: 600, type: 'color', preview: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
     { id: 'color_gradient_candy', name: 'Doce Intenso', description: 'Rosa para roxo doce', price: 600, type: 'color', preview: 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1)' },
@@ -124,24 +125,24 @@ const colors: Omit<ShopItem, 'owned' | 'equipped'>[] = [
 // Profile border styles (circular border around avatar)
 const profileBorders: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     // Free defaults
-    { id: 'border_gold', name: 'Dourado Clássico', description: 'A borda padrão Magazine', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
+    { id: 'border_gold', name: 'Dourado ClÃ¡ssico', description: 'A borda padrÃ£o Magazine', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%)' },
     { id: 'border_emerald', name: 'Esmeralda MGT', description: 'Verde MGT exclusivo', price: 0, type: 'profileBorder', preview: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%)' },
     
     // Pastel (400 Zions)
     { id: 'border_pastel_pink', name: 'Rosa Pastel', description: 'Suave e delicado', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 50%, #ffb6c1 100%)' },
     { id: 'border_pastel_lavender', name: 'Lavanda Pastel', description: 'Relaxante e elegante', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #e6e6fa 0%, #dda0dd 50%, #e6e6fa 100%)' },
     { id: 'border_pastel_mint', name: 'Menta Pastel', description: 'Refrescante e suave', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #98fb98 0%, #90ee90 50%, #98fb98 100%)' },
-    { id: 'border_pastel_peach', name: 'Pêssego Pastel', description: 'Aconchegante e doce', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffdab9 0%, #ffefd5 50%, #ffdab9 100%)' },
-    { id: 'border_pastel_sky', name: 'Céu Pastel', description: 'Leve como nuvens', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #87ceeb 0%, #add8e6 50%, #87ceeb 100%)' },
+    { id: 'border_pastel_peach', name: 'PÃªssego Pastel', description: 'Aconchegante e doce', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffdab9 0%, #ffefd5 50%, #ffdab9 100%)' },
+    { id: 'border_pastel_sky', name: 'CÃ©u Pastel', description: 'Leve como nuvens', price: 400, type: 'profileBorder', preview: 'linear-gradient(135deg, #87ceeb 0%, #add8e6 50%, #87ceeb 100%)' },
     
     // Classic colors (500 Zions)
     { id: 'border_rose', name: 'Rosa Neon', description: 'Rosa vibrante e feminino', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%)' },
-    { id: 'border_blue', name: 'Azul Elétrico', description: 'Azul intenso e moderno', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00bfff 0%, #1e90ff 50%, #00bfff 100%)' },
-    { id: 'border_purple', name: 'Roxo Real', description: 'Púrpura majestoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #9933ff 0%, #cc66ff 50%, #9933ff 100%)' },
+    { id: 'border_blue', name: 'Azul ElÃ©trico', description: 'Azul intenso e moderno', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00bfff 0%, #1e90ff 50%, #00bfff 100%)' },
+    { id: 'border_purple', name: 'Roxo Real', description: 'PÃºrpura majestoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #9933ff 0%, #cc66ff 50%, #9933ff 100%)' },
     { id: 'border_green', name: 'Verde Esmeralda', description: 'Verde luxuoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ff7f 0%, #32cd32 50%, #00ff7f 100%)' },
     { id: 'border_red', name: 'Vermelho Fogo', description: 'Vermelho intenso e poderoso', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4444 0%, #ff0000 50%, #ff4444 100%)' },
-    { id: 'border_cyan', name: 'Ciano Neon', description: 'Azul-esverdeado elétrico', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ffff 0%, #00ced1 50%, #00ffff 100%)' },
-    { id: 'border_orange', name: 'Laranja Fogo', description: 'Laranja quente e energético', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff8c00 0%, #ff6600 50%, #ff8c00 100%)' },
+    { id: 'border_cyan', name: 'Ciano Neon', description: 'Azul-esverdeado elÃ©trico', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ffff 0%, #00ced1 50%, #00ffff 100%)' },
+    { id: 'border_orange', name: 'Laranja Fogo', description: 'Laranja quente e energÃ©tico', price: 500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff8c00 0%, #ff6600 50%, #ff8c00 100%)' },
     
     // Mid-tier (600-800 Zions)
     { id: 'border_midnight', name: 'Meia-Noite', description: 'Escuro e misterioso', price: 600, type: 'profileBorder', preview: 'linear-gradient(135deg, #191970 0%, #000080 50%, #191970 100%)' },
@@ -149,26 +150,26 @@ const profileBorders: Omit<ShopItem, 'owned' | 'equipped'>[] = [
     { id: 'border_forest', name: 'Floresta', description: 'Verde natureza', price: 700, type: 'profileBorder', preview: 'linear-gradient(135deg, #228b22 0%, #32cd32 25%, #90ee90 50%, #32cd32 75%, #228b22 100%)' },
     { id: 'border_cherry_blossom', name: 'Flor de Cerejeira', description: 'Rosa primavera japonesa', price: 750, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb7c5 0%, #ff69b4 25%, #ffc0cb 50%, #ff69b4 75%, #ffb7c5 100%)' },
     { id: 'border_autumn', name: 'Outono', description: 'Tons terrosos de folhas', price: 750, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b4513 0%, #d2691e 25%, #ff8c00 50%, #d2691e 75%, #8b4513 100%)' },
-    { id: 'border_cotton_candy', name: 'Algodão Doce', description: 'Rosa e azul bebê', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb3de 0%, #89cff0 50%, #ffb3de 100%)' },
-    { id: 'border_ice', name: 'Gelo Ártico', description: 'Cristais de gelo', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #e0ffff 0%, #87ceeb 25%, #00bfff 50%, #87ceeb 75%, #e0ffff 100%)' },
+    { id: 'border_cotton_candy', name: 'AlgodÃ£o Doce', description: 'Rosa e azul bebÃª', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #ffb3de 0%, #89cff0 50%, #ffb3de 100%)' },
+    { id: 'border_ice', name: 'Gelo Ãrtico', description: 'Cristais de gelo', price: 800, type: 'profileBorder', preview: 'linear-gradient(135deg, #e0ffff 0%, #87ceeb 25%, #00bfff 50%, #87ceeb 75%, #e0ffff 100%)' },
     
     // Premium (900-1200 Zions)
-    { id: 'border_sunset', name: 'Pôr do Sol', description: 'Cores do entardecer', price: 900, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 25%, #ff6b6b 50%, #feb47b 75%, #ff7e5f 100%)' },
+    { id: 'border_sunset', name: 'PÃ´r do Sol', description: 'Cores do entardecer', price: 900, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 25%, #ff6b6b 50%, #feb47b 75%, #ff7e5f 100%)' },
     { id: 'border_fire', name: 'Chamas', description: 'Fogo ardente', price: 1000, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff4500 0%, #ff6600 25%, #ffcc00 50%, #ff6600 75%, #ff4500 100%)' },
     { id: 'border_aurora', name: 'Aurora Boreal', description: 'Luzes do norte', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #00ff87 0%, #60efff 25%, #00ff87 50%, #60efff 75%, #00ff87 100%)' },
     { id: 'border_neon', name: 'Neon Vibes', description: 'Ciberpunk colorido', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff00ff 0%, #00ffff 25%, #ff00ff 50%, #00ffff 75%, #ff00ff 100%)' },
-    { id: 'border_lava', name: 'Lava Vulcânica', description: 'Magma incandescente', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b0000 0%, #ff4500 25%, #ffd700 50%, #ff4500 75%, #8b0000 100%)' },
-    { id: 'border_electric', name: 'Elétrico', description: 'Energia pura', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #fff700 0%, #00ff00 25%, #00ffff 50%, #00ff00 75%, #fff700 100%)' },
-    { id: 'border_mystic', name: 'Místico', description: 'Magia e mistério', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #4b0082 0%, #9400d3 25%, #ff1493 50%, #9400d3 75%, #4b0082 100%)' },
-    { id: 'border_galaxy', name: 'Galáxia', description: 'Estrelas e cosmos', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #4b0082 50%, #1a0a2e 75%, #0c0c0c 100%)' },
+    { id: 'border_lava', name: 'Lava VulcÃ¢nica', description: 'Magma incandescente', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b0000 0%, #ff4500 25%, #ffd700 50%, #ff4500 75%, #8b0000 100%)' },
+    { id: 'border_electric', name: 'ElÃ©trico', description: 'Energia pura', price: 1100, type: 'profileBorder', preview: 'linear-gradient(135deg, #fff700 0%, #00ff00 25%, #00ffff 50%, #00ff00 75%, #fff700 100%)' },
+    { id: 'border_mystic', name: 'MÃ­stico', description: 'Magia e mistÃ©rio', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #4b0082 0%, #9400d3 25%, #ff1493 50%, #9400d3 75%, #4b0082 100%)' },
+    { id: 'border_galaxy', name: 'GalÃ¡xia', description: 'Estrelas e cosmos', price: 1200, type: 'profileBorder', preview: 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #4b0082 50%, #1a0a2e 75%, #0c0c0c 100%)' },
     
     // Ultra Premium (1500-2500 Zions)
-    { id: 'border_rainbow', name: 'Arco-Íris', description: 'Todas as cores em harmonia', price: 1500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 17%, #ffff00 33%, #00ff00 50%, #0080ff 67%, #8000ff 83%, #ff0080 100%)' },
+    { id: 'border_rainbow', name: 'Arco-Ãris', description: 'Todas as cores em harmonia', price: 1500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 17%, #ffff00 33%, #00ff00 50%, #0080ff 67%, #8000ff 83%, #ff0080 100%)' },
     { id: 'border_diamond', name: 'Diamante', description: 'Brilho de diamante raro', price: 2000, type: 'profileBorder', preview: 'linear-gradient(135deg, #b9f2ff 0%, #e0ffff 20%, #ffffff 40%, #e0ffff 60%, #b9f2ff 80%, #ffffff 100%)' },
     { id: 'border_platinum', name: 'Platina', description: 'Metal precioso', price: 2000, type: 'profileBorder', preview: 'linear-gradient(135deg, #e5e4e2 0%, #c0c0c0 25%, #ffffff 50%, #c0c0c0 75%, #e5e4e2 100%)' },
-    { id: 'border_holographic', name: 'Holográfico', description: 'Efeito iridescente', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 12.5%, #ffff00 25%, #80ff00 37.5%, #00ff00 50%, #00ff80 62.5%, #00ffff 75%, #0080ff 87.5%, #ff00ff 100%)' },
-    { id: 'border_cosmic', name: 'Cósmico', description: 'Nebulosas espaciais', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #000033 0%, #4b0082 20%, #8b008b 40%, #ff1493 60%, #ff69b4 80%, #ffffff 100%)' },
-    { id: 'border_phoenix', name: 'Fênix', description: 'Renascimento em chamas', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b0000 0%, #ff0000 20%, #ff4500 40%, #ffa500 60%, #ffd700 80%, #ffffff 100%)' },
+    { id: 'border_holographic', name: 'HologrÃ¡fico', description: 'Efeito iridescente', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #ff0000 0%, #ff8000 12.5%, #ffff00 25%, #80ff00 37.5%, #00ff00 50%, #00ff80 62.5%, #00ffff 75%, #0080ff 87.5%, #ff00ff 100%)' },
+    { id: 'border_cosmic', name: 'CÃ³smico', description: 'Nebulosas espaciais', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #000033 0%, #4b0082 20%, #8b008b 40%, #ff1493 60%, #ff69b4 80%, #ffffff 100%)' },
+    { id: 'border_phoenix', name: 'FÃªnix', description: 'Renascimento em chamas', price: 2500, type: 'profileBorder', preview: 'linear-gradient(135deg, #8b0000 0%, #ff0000 20%, #ff4500 40%, #ffa500 60%, #ffd700 80%, #ffffff 100%)' },
 ];
 
 export default function CustomizationShop({ isOpen, onClose }: CustomizationShopProps) {
@@ -283,7 +284,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
 
         // Check if user has made at least one post
         if (!user?.postCount || user.postCount < 1) {
-            setNotification({ type: 'error', message: 'Faça sua primeira postagem para desbloquear a loja!' });
+            setNotification({ type: 'error', message: 'FaÃ§a sua primeira postagem para desbloquear a loja!' });
             setTimeout(() => setNotification(null), 4000);
             return;
         }
@@ -607,7 +608,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                             <div>
                                 {loadingPacks ? (
                                     <div className="flex items-center justify-center py-20">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400"></div>
+                                        <Loader size="lg" />
                                     </div>
                                 ) : themePacks.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -616,10 +617,10 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         </div>
                                         <h3 className={`text-xl font-bold ${textMain} mb-2`}>Packs de Tema</h3>
                                         <p className={`${textSub} max-w-md mb-4`}>
-                                            Pacotes temáticos exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque única.
+                                            Pacotes temÃ¡ticos exclusivos inspirados em jogos! Cada pack inclui fundo animado + cor destaque Ãºnica.
                                         </p>
                                         <div className={`px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm`}>
-                                            Nenhum pack disponível no momento
+                                            Nenhum pack disponÃ­vel no momento
                                         </div>
                                     </div>
                                 ) : (
@@ -631,7 +632,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                 return (
                                                     <div className="mb-8">
                                                         <h3 className={`text-lg font-bold ${textMain} mb-4`}>
-                                                            Packs Lendários
+                                                            Packs LendÃ¡rios
                                                         </h3>
                                                         <div className="relative">
                                                             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory">
@@ -707,7 +708,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         <div className="mb-6">
                                             <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
                                                 <Palette className={`w-4 h-4 text-${themeColor}-400`} />
-                                                Cores Básicas
+                                                Cores BÃ¡sicas
                                             </h3>
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                                 {basicColors.map(item => {
@@ -762,7 +763,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -842,7 +843,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -915,7 +916,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -949,7 +950,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         <div className="mb-6">
                                             <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
                                                 <CircleDot className={`w-4 h-4 text-${themeColor}-400`} />
-                                                Bordas Básicas
+                                                Bordas BÃ¡sicas
                                             </h3>
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                                 {basicBorders.map(item => {
@@ -1006,7 +1007,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -1089,7 +1090,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -1169,7 +1170,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -1194,7 +1195,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                         <div>
                                             <h3 className={`text-sm font-bold ${textMain} mb-3 flex items-center gap-2`}>
                                                 <Image className={`w-4 h-4 text-${themeColor}-400`} />
-                                                Fundos Básicos
+                                                Fundos BÃ¡sicos
                                             </h3>
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                                 {regularBgs.map(item => {
@@ -1217,7 +1218,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                 )}
                                                                 {isFree && !(isMGT && item.id === 'bg_default') && (
                                                                     <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
-                                                                        <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
+                                                                        <span className="text-[10px] font-bold text-green-400">GRÃTIS</span>
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -1245,7 +1246,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                                 }`}
                                                                         >
                                                                             {purchasing === item.id ? (
-                                                                                <span className="animate-spin">⏳</span>
+                                                                                <span className="animate-spin">â³</span>
                                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                                 <>
                                                                                     <Lock className="w-3 h-3" />
@@ -1319,7 +1320,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                 {/* Free badge for default items - Only show for Magazine Classico for Magazine members */}
                                                 {isFree && !(isMGT && item.id === 'bg_default') && (
                                                     <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30">
-                                                        <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
+                                                        <span className="text-[10px] font-bold text-green-400">GRÃTIS</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -1351,7 +1352,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                 }`}
                                                         >
                                                             {purchasing === item.id ? (
-                                                                <span className="animate-spin">⏳</span>
+                                                                <span className="animate-spin">â³</span>
                                                             ) : (user?.zionsPoints || 0) < item.price ? (
                                                                 <>
                                                                     <Lock className="w-3 h-3" />

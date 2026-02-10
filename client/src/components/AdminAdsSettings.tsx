@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Megaphone, Radio, DollarSign, Save, Loader2 } from 'lucide-react';
+import { Megaphone, Radio, DollarSign, Save } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Loader from './Loader';
 
 interface AdsConfig {
     adsEnabled: boolean;
@@ -79,7 +80,7 @@ export default function AdminAdsSettings() {
         return (
             <div className={`${themeCard} rounded-2xl p-6 border ${themeBorder}`}>
                 <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-gold-500" />
+                    <Loader size="sm" />
                 </div>
             </div>
         );
@@ -189,7 +190,7 @@ export default function AdminAdsSettings() {
                     className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold flex items-center justify-center gap-2 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50"
                 >
                     {saving ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loader size="sm" />
                     ) : (
                         <Save className="w-5 h-5" />
                     )}

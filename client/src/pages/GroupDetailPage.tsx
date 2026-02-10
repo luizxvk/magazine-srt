@@ -7,6 +7,7 @@ import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import GroupSettingsModal from '../components/GroupSettingsModal';
+import Loader from '../components/Loader';
 
 interface GroupMessage {
   id: string;
@@ -175,7 +176,7 @@ export default function GroupDetailPage() {
   if (loading) {
     return (
       <div className={`min-h-screen ${themeBg} ${themeText} flex items-center justify-center`}>
-        <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-${accentColor}`}></div>
+        <Loader size="lg" />
       </div>
     );
   }

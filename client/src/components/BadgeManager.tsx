@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tag, Plus, X, User } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import Loader from './Loader';
 
 interface AdminBadge {
     id: string;
@@ -132,7 +133,7 @@ const BadgeManager: React.FC = () => {
                     <Tag className="w-6 h-6 text-purple-500" />
                     <h2 className="text-xl font-bold">Gerenciar Selos</h2>
                 </div>
-                <p className="text-gray-400">Carregando...</p>
+                <Loader size="sm" />
             </div>
         );
     }

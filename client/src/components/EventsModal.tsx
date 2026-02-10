@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Calendar, Clock, Gift, Sparkles, Gamepad2, Trash2, UserCheck, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Loader from './Loader';
 
 interface EventsModalProps {
     isOpen: boolean;
@@ -161,7 +162,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     {loading ? (
                         <div className="flex justify-center py-12">
-                            <div className={`animate-spin rounded-full h-10 w-10 border-2 border-${themeColor}-500/30 border-t-${themeColor}-500`}></div>
+                            <Loader size="md" />
                         </div>
                     ) : events.length === 0 ? (
                         <div className="text-center py-12">
@@ -214,7 +215,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                                             title="Remover evento"
                                                         >
                                                             {deleting === event.id ? (
-                                                                <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                                                                <Loader size="sm" />
                                                             ) : (
                                                                 <Trash2 className="w-4 h-4" />
                                                             )}
@@ -296,7 +297,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                                             }`}
                                                         >
                                                             {attending === event.id ? (
-                                                                <div className={`w-3.5 h-3.5 border-2 border-current/30 border-t-current rounded-full animate-spin`} />
+                                                                <Loader size="sm" />
                                                             ) : (
                                                                 <UserCheck className="w-3.5 h-3.5" />
                                                             )}

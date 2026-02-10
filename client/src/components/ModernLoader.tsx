@@ -1,4 +1,17 @@
+/**
+ * ModernLoader — Full-featured loading component
+ *
+ * Uses the Aceternity-style bouncing dots (LoaderOne pattern).
+ * Supports fullScreen mode, text, and sizes.
+ * 
+ * Also re-exports SkeletonCard and DotsLoader for backward compat.
+ */
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+
+// ============================================
+// MAIN LOADER
+// ============================================
 
 interface ModernLoaderProps {
     text?: string;
@@ -7,84 +20,86 @@ interface ModernLoaderProps {
     fullScreen?: boolean;
 }
 
+const sizeMap = {
+    sm: { dot: 'h-2 w-2',   gap: 'gap-1',   bounce: 5 },
+    md: { dot: 'h-3.5 w-3.5', gap: 'gap-1.5', bounce: 10 },
+    lg: { dot: 'h-5 w-5',   gap: 'gap-2',   bounce: 14 },
+};
+
+const textSizeMap = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
+};
+
 export default function ModernLoader({ text, size = 'md', className = '', fullScreen = false }: ModernLoaderProps) {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
-    const sizeClasses = {
-        sm: 'w-6 h-6',
-        md: 'w-10 h-10',
-        lg: 'w-14 h-14'
-    };
+    const { dot, gap, bounce } = sizeMap[size];
 
-    const dotSizeClasses = {
-        sm: 'w-1.5 h-1.5',
-        md: 'w-2 h-2',
-        lg: 'w-3 h-3'
-    };
+    const gradientClass = isMGT
+        ? 'border-emerald-400/50 bg-gradient-to-b from-emerald-400 to-emerald-500'
+        : 'border-gold-400/50 bg-gradient-to-b from-gold-400 to-gold-500';
 
-    const textSizeClasses = {
-        sm: 'text-xs',
-        md: 'text-sm',
-        lg: 'text-base'
-    };
+    const textColor = isMGT ? 'text-emerald-400/60' : 'text-gold-400/60';
 
-    const accentColor = isMGT ? 'bg-emerald-500' : 'bg-accent';
-    const textColor = isMGT ? 'text-emerald-500/70' : 'text-accent';
+    const transition = (delay: number) => ({
+        duration: 1,
+        repeat: Infinity,
+        repeatType: 'loop' as const,
+        delay: delay * 0.2,
+        ease: 'easeInOut' as const,
+    });
 
-    const containerClass = fullScreen 
+    const containerClass = fullScreen
         ? 'min-h-screen flex flex-col items-center justify-center bg-black/90 w-full'
         : `flex flex-col items-center justify-center py-16 w-full ${className}`;
 
     return (
         <div className={containerClass}>
-            {/* Apple-style spinner */}
-            <div className={`relative ${sizeClasses[size]}`}>
-                {[...Array(8)].map((_, i) => (
-                    <div
+            {/* Bouncing dots */}
+            <div className={`flex items-center ${gap}`}>
+                {[0, 1, 2].map((i) => (
+                    <motion.div
                         key={i}
-                        className={`absolute ${dotSizeClasses[size]} rounded-full ${accentColor}`}
-                        style={{
-                            top: '50%',
-                            left: '50%',
-                            transform: `rotate(${i * 45}deg) translateY(-150%)`,
-                            transformOrigin: '0 0',
-                            opacity: 1 - (i * 0.1),
-                            animation: `spinnerFade 0.8s linear infinite`,
-                            animationDelay: `${i * 0.1}s`
-                        }}
+                        initial={{ y: 0 }}
+                        animate={{ y: [0, bounce, 0] }}
+                        transition={transition(i)}
+                        className={`${dot} rounded-full border ${gradientClass}`}
                     />
                 ))}
             </div>
 
-            {/* Text */}
+            {/* Optional text */}
             {text && (
-                <p className={`mt-4 ${textSizeClasses[size]} ${textColor} font-medium animate-pulse`}>
+                <motion.p
+                    className={`mt-4 ${textSizeMap[size]} ${textColor} font-light tracking-wider`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
                     {text}
-                </p>
+                </motion.p>
             )}
-
-            {/* CSS Animation */}
-            <style>{`
-                @keyframes spinnerFade {
-                    0%, 100% { opacity: 0.2; }
-                    50% { opacity: 1; }
-                }
-            `}</style>
         </div>
     );
 }
 
-// Skeleton loader for cards
+// ============================================
+// SKELETON CARD  (unchanged API)
+// ============================================
+
 export function SkeletonCard({ className = '' }: { className?: string }) {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
-    const shimmerBg = isMGT ? 'from-emerald-500/5 via-emerald-500/10 to-emerald-500/5' : 'from-yellow-500/5 via-yellow-500/10 to-yellow-500/5';
+    const shimmerBg = isMGT
+        ? 'from-emerald-500/5 via-emerald-500/10 to-emerald-500/5'
+        : 'from-yellow-500/5 via-yellow-500/10 to-yellow-500/5';
 
     return (
         <div className={`relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 p-6 ${className}`}>
             <div className="space-y-4">
-                {/* Avatar */}
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
                     <div className="space-y-2 flex-1">
@@ -92,17 +107,13 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
                         <div className="h-3 bg-white/10 rounded-lg w-20 animate-pulse" />
                     </div>
                 </div>
-                {/* Content lines */}
                 <div className="h-3 bg-white/10 rounded-lg w-full animate-pulse" />
                 <div className="h-3 bg-white/10 rounded-lg w-3/4 animate-pulse" />
             </div>
-
-            {/* Shimmer effect */}
-            <div 
-                className={`absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r ${shimmerBg}`}
+            <div
+                className={`absolute inset-0 -translate-x-full bg-gradient-to-r ${shimmerBg}`}
                 style={{ animation: 'shimmer 2s infinite' }}
             />
-
             <style>{`
                 @keyframes shimmer {
                     0% { transform: translateX(-100%); }
@@ -113,30 +124,37 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
     );
 }
 
-// Simple dots loader
+// ============================================
+// DOTS LOADER  (compact, for inline use)
+// ============================================
+
 export function DotsLoader({ className = '' }: { className?: string }) {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
-    const dotColor = isMGT ? 'bg-emerald-500' : 'bg-yellow-500';
+
+    const gradientClass = isMGT
+        ? 'border-emerald-400/50 bg-gradient-to-b from-emerald-400 to-emerald-500'
+        : 'border-gold-400/50 bg-gradient-to-b from-gold-400 to-gold-500';
+
+    const transition = (delay: number) => ({
+        duration: 1,
+        repeat: Infinity,
+        repeatType: 'loop' as const,
+        delay: delay * 0.2,
+        ease: 'easeInOut' as const,
+    });
 
     return (
         <div className={`flex items-center justify-center gap-1 ${className}`}>
             {[0, 1, 2].map((i) => (
-                <div
+                <motion.div
                     key={i}
-                    className={`w-2 h-2 rounded-full ${dotColor}`}
-                    style={{
-                        animation: 'dotBounce 1.4s ease-in-out infinite',
-                        animationDelay: `${i * 0.16}s`
-                    }}
+                    initial={{ y: 0 }}
+                    animate={{ y: [0, 5, 0] }}
+                    transition={transition(i)}
+                    className={`w-2 h-2 rounded-full border ${gradientClass}`}
                 />
             ))}
-            <style>{`
-                @keyframes dotBounce {
-                    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-                    40% { transform: scale(1); opacity: 1; }
-                }
-            `}</style>
         </div>
     );
 }

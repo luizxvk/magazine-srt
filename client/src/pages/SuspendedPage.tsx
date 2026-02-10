@@ -133,7 +133,7 @@ export default function SuspendedPage() {
             disabled={checking}
             className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-5 h-5 ${checking ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${checking ? 'animate-pulse' : ''}`} />
             {checking ? 'Verificando...' : 'Verificar Status'}
           </button>
 

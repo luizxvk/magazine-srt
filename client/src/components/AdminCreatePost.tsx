@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import { Image as ImageIcon, Send, X, Layers, Sparkles, ShoppingBag, ChevronDown, Check } from 'lucide-react';
 import api from '../services/api';
+import Loader from './Loader';
 
 interface Product {
     id: string;
@@ -240,8 +241,8 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
                             {showProductDropdown && (
                                 <div className="absolute left-0 bottom-full mb-2 w-80 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
                                     {loadingProducts ? (
-                                        <div className="p-4 text-center text-gray-400">
-                                            Carregando produtos...
+                                        <div className="p-4 flex justify-center">
+                                            <Loader size="sm" />
                                         </div>
                                     ) : products.length === 0 ? (
                                         <div className="p-4 text-center text-gray-400">

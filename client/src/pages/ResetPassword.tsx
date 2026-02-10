@@ -4,6 +4,7 @@ import { Lock, Check, AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
 import logo from '../assets/logo-mgzn.png';
 import logoMgt from '../assets/logo-mgt-full.png';
 import api from '../services/api';
+import Loader from '../components/Loader';
 
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();
@@ -174,7 +175,7 @@ export default function ResetPassword() {
                             >
                                 {loading ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        <Loader size="sm" />
                                         Redefinindo...
                                     </>
                                 ) : (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Image as ImageIcon, Video, Tag, Sparkles, MoreHorizontal, Calendar } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import Loader from './Loader';
 
 interface EventTag {
     tag: string;
@@ -294,7 +295,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                         title="Publicar"
                                     >
                                         {loading ? (
-                                            <div className="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                            <Loader size="sm" />
                                         ) : (
                                             <Sparkles className="w-6 h-6" />
                                         )}

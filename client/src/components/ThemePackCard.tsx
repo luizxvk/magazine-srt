@@ -1,5 +1,6 @@
 import { Sparkles, Check, Lock, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Loader from './Loader';
 
 interface ThemePack {
     id: string;
@@ -220,7 +221,7 @@ export default function ThemePackCard({ pack, onPurchase, onEquip, onUnequip, on
                             }}
                         >
                             {loading ? (
-                                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                <Loader size="sm" />
                             ) : pack.isEquipped ? (
                                 'Desequipar'
                             ) : pack.isOwned ? (

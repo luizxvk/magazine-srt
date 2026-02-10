@@ -1,5 +1,6 @@
 import { Calendar, Check, Gift } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Loader from './Loader';
 
 interface DailyLoginCardProps {
     status: {
@@ -34,7 +35,7 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
         return (
             <div className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-2xl border ${themeBorder} ${themeGlow} relative overflow-hidden`}>
                 <div className="flex justify-center items-center py-4">
-                    <div className={`w-6 h-6 border-2 ${isMGT ? 'border-emerald-500' : 'border-gold-500'} border-t-transparent rounded-full animate-spin`}></div>
+                    <Loader size="sm" />
                 </div>
             </div>
         );

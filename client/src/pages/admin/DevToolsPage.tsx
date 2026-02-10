@@ -4,6 +4,7 @@ import api from '../../services/api';
 import Header from '../../components/Header';
 import LuxuriousBackground from '../../components/LuxuriousBackground';
 import { useAuth } from '../../context/AuthContext';
+import Loader from '../../components/Loader';
 
 interface Log {
     id: string;
@@ -186,7 +187,9 @@ export default function DevToolsPage() {
                         {/* Logs Area */}
                         <div className="h-[600px] overflow-y-auto p-4 font-mono text-xs space-y-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                             {loading && logs.length === 0 ? (
-                                <div className="text-center text-gray-500 py-20">Carregando logs...</div>
+                                <div className="flex justify-center py-20">
+                                    <Loader size="md" />
+                                </div>
                             ) : logs.length === 0 ? (
                                 <div className="text-center text-gray-500 py-20">Nenhum log registrado.</div>
                             ) : (

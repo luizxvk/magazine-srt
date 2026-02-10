@@ -8,6 +8,7 @@ import logoMgtFallback from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import Loader from '../components/Loader';
 import { useDynamicHead } from '../hooks/useDynamicHead';
 import api from '../services/api';
 import TermsOfServiceModal from '../components/TermsOfServiceModal';
@@ -315,7 +316,7 @@ export default function Register() {
                         >
                             {isSubmitting ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    <Loader size="sm" />
                                     Criando...
                                 </>
                             ) : (

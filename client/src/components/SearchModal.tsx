@@ -4,6 +4,7 @@ import { Search, X, User, FileText, Hash, Clock, TrendingUp, Navigation } from '
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Loader from './Loader';
 
 interface SearchResult {
     id: string;
@@ -303,7 +304,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     <div className="max-h-[60vh] overflow-y-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
-                                <div className={`w-8 h-8 border-2 border-${themeColor}-500 border-t-transparent rounded-full animate-spin`} />
+                                <Loader size="md" />
                             </div>
                         ) : query.length < 2 ? (
                             <div className="p-4">

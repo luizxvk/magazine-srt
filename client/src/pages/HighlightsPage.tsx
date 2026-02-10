@@ -5,6 +5,7 @@ import api from '../services/api';
 import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter, Star } from 'lucide-react';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
+import Loader from '../components/Loader';
 
 interface HighlightPost {
     id: string;
@@ -74,7 +75,6 @@ export default function HighlightsPage() {
     // Explicit theme classes for Tailwind JIT
     const themeTagActive = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
     const themeBadge = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
-    const themeSpinner = isMGT ? 'border-emerald-500' : 'border-gold-500';
 
     return (
         <div className="min-h-screen text-white font-sans relative">
@@ -164,7 +164,7 @@ export default function HighlightsPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${themeSpinner}`}></div>
+                        <Loader size="lg" />
                     </div>
                 ) : filteredPosts.length === 0 ? (
                     <div className="text-center py-20">

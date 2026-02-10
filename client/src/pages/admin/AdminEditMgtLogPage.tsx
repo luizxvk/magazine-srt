@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import LuxuriousBackground from '../../components/LuxuriousBackground';
 import Header from '../../components/Header';
+import Loader from '../../components/Loader';
 
 interface Plan {
     id: string;
@@ -125,7 +126,7 @@ export default function AdminEditSrtLogPage() {
         updatePlan(index, 'features', features);
     };
 
-    if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center">Carregando...</div>;
+    if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center"><Loader size="lg" /></div>;
 
     return (
         <div className="min-h-screen text-white font-sans selection:bg-gold-500/30 relative">

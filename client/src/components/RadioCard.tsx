@@ -2,6 +2,7 @@ import React from 'react';
 import { Radio, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRadio, RADIO_STATIONS } from '../context/RadioContext';
+import Loader from './Loader';
 
 // Liquid Glass Effect Constants
 const GLASS_SHADOW_LIGHT =
@@ -185,7 +186,7 @@ export default function RadioCard() {
                                 style={{ backgroundColor: accentColor }}
                             >
                                 {isLoading ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <Loader size="sm" />
                                 ) : isPlaying ? (
                                     <Pause className="w-6 h-6 text-white" fill="white" />
                                 ) : (
@@ -283,7 +284,7 @@ export default function RadioCard() {
                                 }`}
                             >
                                 {isLoading ? (
-                                    <div className="w-5 h-5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                                    <Loader size="sm" />
                                 ) : isPlaying ? (
                                     <Pause className="w-5 h-5" />
                                 ) : (

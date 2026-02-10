@@ -7,6 +7,7 @@ import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
 import PushNotificationSettings from '../components/PushNotificationSettings';
 import api from '../services/api';
+import Loader from '../components/Loader';
 
 export default function SettingsPage() {
     const { user, logout, theme, toggleTheme, showToast, updateUser } = useAuth();
@@ -162,7 +163,7 @@ export default function SettingsPage() {
                                 </>
                             ) : sendingVerification ? (
                                 <>
-                                    <span className="animate-spin">⏳</span>
+                                    <Loader size="sm" />
                                     Enviando...
                                 </>
                             ) : (

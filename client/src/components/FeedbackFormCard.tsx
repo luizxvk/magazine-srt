@@ -3,6 +3,7 @@ import { MessageSquare, Star, Send, CheckCircle, Clock, Bug, Heart, Lightbulb, U
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import VisitorBlockPopup from './VisitorBlockPopup';
+import Loader from './Loader';
 
 interface FeedbackFormCardProps {
     onClose?: () => void;
@@ -149,7 +150,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
         return (
             <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6`}>
                 <div className="flex items-center justify-center py-8">
-                    <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: activeColor }} />
+                    <Loader size="sm" />
                 </div>
             </div>
         );
@@ -428,7 +429,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
                     >
                         {submitting ? (
                             <>
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <Loader size="sm" />
                                 Enviando...
                             </>
                         ) : (

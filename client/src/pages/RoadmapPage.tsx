@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Trophy } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Smartphone, Globe, Bot, Swords } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -287,6 +287,24 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Palette className="w-5 h-5" />,
         category: 'feature'
     },
+    {
+        id: '29g',
+        title: 'Cards Animados & Login Liquid Glass',
+        description: 'Cards com animações canvas (DottedGlowBackground), login com efeito Apple Vision Pro liquid glass e shimmer nos botões.',
+        status: 'completed',
+        version: 'v0.5.0',
+        icon: <Sparkles className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29h',
+        title: 'Loader Moderno (Aceternity)',
+        description: 'Todos os 44 spinners do app substituídos por loader 3 pontos bouncing em estilo Aceternity. Performance mobile otimizada.',
+        status: 'completed',
+        version: 'v0.5.0',
+        icon: <Zap className="w-5 h-5" />,
+        category: 'improvement'
+    },
     
     // ===== IN PROGRESS =====
     {
@@ -305,16 +323,16 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Zap className="w-5 h-5" />,
         category: 'feature'
     },
-    
-    // ===== PLANNED =====
     {
-        id: '32',
-        title: 'Cards Animados (GIF)',
-        description: 'Substitua seu wallpaper estático por um GIF animado e destaque-se na comunidade.',
-        status: 'planned',
-        icon: <Sparkles className="w-5 h-5" />,
+        id: '31b',
+        title: 'App Mobile Nativo',
+        description: 'Aplicativo para Android via Capacitor com notificações push Firebase. Build APK funcionando, publicação na Play Store em breve.',
+        status: 'in-progress',
+        icon: <Smartphone className="w-5 h-5" />,
         category: 'feature'
     },
+    
+    // ===== PLANNED =====
     {
         id: '33',
         title: 'Revista Digital com IA',
@@ -324,28 +342,36 @@ const roadmapItems: RoadmapItem[] = [
         category: 'feature'
     },
     {
-        id: '34',
-        title: 'App Mobile Nativo',
-        description: 'Aplicativo nativo para iOS e Android com notificações push e melhor performance.',
-        status: 'planned',
-        icon: <Rocket className="w-5 h-5" />,
-        category: 'feature'
-    },
-    {
         id: '35',
         title: 'Sistema de Prestígio',
-        description: 'Ao atingir nível 30, faça prestígio: recomece do zero e ganhe badge exclusiva e benefícios permanentes.',
+        description: 'Ao atingir nível 30, faça prestígio: recomece do zero com badge exclusiva e bônus permanente de XP. 10 níveis de prestígio!',
         status: 'planned',
         icon: <Crown className="w-5 h-5" />,
         category: 'feature'
     },
     {
         id: '36',
-        title: 'Sistema de Eventos e Torneios',
-        description: 'Crie e participe de eventos exclusivos. Rankings, prêmios e transmissões ao vivo.',
+        title: 'Torneios Competitivos',
+        description: 'Brackets automáticos, rankings ao vivo, premiação em Zions e matchmaking. Solo, duo e equipes.',
         status: 'planned',
-        icon: <Trophy className="w-5 h-5" />,
+        icon: <Swords className="w-5 h-5" />,
         category: 'community'
+    },
+    {
+        id: '37',
+        title: 'Sistema de Idiomas (i18n)',
+        description: 'Suporte a múltiplos idiomas: Português, English e Español. Detecção automática do navegador.',
+        status: 'planned',
+        icon: <Globe className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '38',
+        title: 'Auto-Moderação com IA',
+        description: 'Filtro automático de conteúdo impróprio (NSFW) e discurso de ódio usando Google Vision e Perspective API.',
+        status: 'planned',
+        icon: <Bot className="w-5 h-5" />,
+        category: 'security'
     }
 ];
 

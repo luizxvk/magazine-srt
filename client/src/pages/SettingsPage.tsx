@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -14,7 +14,30 @@ export default function SettingsPage() {
     const { user, logout, theme, toggleTheme, showToast, updateUser } = useAuth();
     const { t } = useTranslation('settings');
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const isMGT = user?.membershipType === 'MGT';
+
+    // Handle OAuth callback success messages
+    useEffect(() => {
+        const social = searchParams.get('social');
+        const status = searchParams.get('status');
+        
+        if (social && status === 'connected') {
+            const platformNames: Record<string, string> = {
+                discord: 'Discord',
+                steam: 'Steam',
+                twitch: 'Twitch'
+            };
+            const platformName = platformNames[social] || social;
+            showToast(`✅ ${platformName} conectado com sucesso!`);
+            
+            // Clear URL params
+            setSearchParams({});
+        } else if (social && status === 'error') {
+            showToast(`❌ Erro ao conectar ${social}. Tente novamente.`);
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams, showToast]);
     
     const [soundsEnabled, setSoundsEnabled] = useState(
         localStorage.getItem('soundsEnabled') !== 'false'

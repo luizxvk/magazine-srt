@@ -70,6 +70,28 @@ class Logger {
             dbLoggingEnabled = false;
         }
     }
+
+    // Convenience methods for direct logging
+    public info(message: string, ...args: any[]) {
+        this.originalConsoleLog(`[INFO]`, message, ...args);
+        if (dbLoggingEnabled) {
+            this.log('INFO', 'BACKEND', [message, ...args]);
+        }
+    }
+
+    public warn(message: string, ...args: any[]) {
+        this.originalConsoleWarn(`[WARN]`, message, ...args);
+        if (dbLoggingEnabled) {
+            this.log('WARN', 'BACKEND', [message, ...args]);
+        }
+    }
+
+    public error(message: string, ...args: any[]) {
+        this.originalConsoleError(`[ERROR]`, message, ...args);
+        if (dbLoggingEnabled) {
+            this.log('ERROR', 'BACKEND', [message, ...args]);
+        }
+    }
 }
 
 export const logger = Logger.getInstance();

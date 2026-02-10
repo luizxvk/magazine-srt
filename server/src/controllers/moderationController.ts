@@ -17,7 +17,7 @@ export const getLogs = async (req: AuthRequest, res: Response) => {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 20;
         const type = req.query.type as 'IMAGE' | 'TEXT' | undefined;
-        const action = req.query.action as 'BLOCKED' | 'FLAGGED' | 'WARNED' | 'ALLOWED' | undefined;
+        const action = req.query.action as 'BLOCKED' | 'FLAGGED' | 'WARNED' | undefined;
 
         const result = await getModerationLogs({ page, limit, type, action });
         res.json(result);

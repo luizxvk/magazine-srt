@@ -27,6 +27,7 @@ import {
   getMessageReactions,
 } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
+import { moderateTextContent } from '../middleware/moderationMiddleware';
 
 const router = express.Router();
 

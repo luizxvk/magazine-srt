@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { sendPushToUser } from './notificationController';
@@ -948,17 +948,21 @@ export const twitchCallback = async (req: AuthRequest, res: Response) => {
 };
 
 // Get followed streams for connected user (live channels the user follows)
-export const getTwitchFollowedStreams = async (req: AuthRequest, res: Response) => {
+export const getTwitchFollowedStreams = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const userId = req.user?.userId;
-        if (!userId) return res.status(401).json({ message: 'Não autenticado' });
+        if (!userId) {
+            res.status(401).json({ message: 'Não autenticado' });
+            return;
+        }
 
         const connection = await prisma.socialConnection.findUnique({
             where: { userId_platform: { userId, platform: SocialPlatform.TWITCH } },
         });
 
         if (!connection || !connection.accessToken) {
-            return res.status(404).json({ message: 'Twitch não conectada', streams: [] });
+            res.status(404).json({ message: 'Twitch não conectada', streams: [] });
+            return;
         }
 
         const clientId = process.env.TWITCH_CLIENT_ID;
@@ -992,10 +996,12 @@ export const getTwitchFollowedStreams = async (req: AuthRequest, res: Response) 
                 const refreshed = await refreshTwitchToken(req.user!.userId);
                 if (refreshed) {
                     // Retry with new token
-                    return getTwitchFollowedStreams(req, res);
+                    await getTwitchFollowedStreams(req, res);
+                    return;
                 }
             } catch {}
-            return res.json({ streams: [], error: 'Token expirado. Reconecte sua Twitch.' });
+            res.json({ streams: [], error: 'Token expirado. Reconecte sua Twitch.' });
+            return;
         }
         console.error('Error fetching followed streams:', error.response?.data || error.message);
         res.json({ streams: [], error: 'Erro ao carregar streams' });
@@ -1114,12 +1120,13 @@ export const syncTwitchNotifications = async (userId: string) => {
 };
 
 // Buscar streams da Twitch
-export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
+export const getTwitchStreams = async (req: Request, res: Response): Promise<void> => {
     try {
         const { usernames } = req.query; // Lista de usernames separados por vírgula
 
         if (!usernames) {
-            return res.status(400).json({ message: 'Forneça usernames da Twitch' });
+            res.status(400).json({ message: 'Forneça usernames da Twitch' });
+            return;
         }
 
         const clientId = process.env.TWITCH_CLIENT_ID;
@@ -1127,7 +1134,8 @@ export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
 
         if (!clientId || !clientSecret) {
             console.warn('[Twitch] Credenciais não configuradas');
-            return res.json({ streams: [], error: 'Twitch não configurada' });
+            res.json({ streams: [], error: 'Twitch não configurada' });
+            return;
         }
 
         // Get fresh access token using client credentials
@@ -1145,7 +1153,8 @@ export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
             accessToken = tokenResponse.data.access_token;
         } catch (tokenError) {
             console.error('[Twitch] Failed to get access token:', tokenError);
-            return res.json({ streams: [], error: 'Falha ao autenticar com Twitch' });
+            res.json({ streams: [], error: 'Falha ao autenticar com Twitch' });
+            return;
         }
 
         const usernameList = (usernames as string).split(',');

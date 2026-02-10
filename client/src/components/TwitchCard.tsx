@@ -110,22 +110,38 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
 
     const loadStreams = async () => {
         try {
-            // Try followed streams first if connected, fallback to default
-            let response;
+            const allStreams: TwitchStream[] = [];
+            const seenUserIds = new Set<string>();
+
+            // Always load admin-configured channels first
             try {
-                response = await api.get('/social/twitch/followed');
-                if (response.data.streams?.length > 0) {
-                    setStreams(response.data.streams);
-                    setLoading(false);
-                    return;
+                const adminResponse = await api.get('/social/twitch/streams', {
+                    params: { usernames: usernames.join(',') },
+                });
+                if (adminResponse.data.streams?.length > 0) {
+                    for (const stream of adminResponse.data.streams) {
+                        if (!seenUserIds.has(stream.userId)) {
+                            allStreams.push(stream);
+                            seenUserIds.add(stream.userId);
+                        }
+                    }
                 }
             } catch {}
 
-            // Fallback: load default streams
-            response = await api.get('/social/twitch/streams', {
-                params: { usernames: usernames.join(',') },
-            });
-            setStreams(response.data.streams);
+            // Then add followed streams if connected (avoiding duplicates)
+            try {
+                const followedResponse = await api.get('/social/twitch/followed');
+                if (followedResponse.data.streams?.length > 0) {
+                    for (const stream of followedResponse.data.streams) {
+                        if (!seenUserIds.has(stream.userId)) {
+                            allStreams.push(stream);
+                            seenUserIds.add(stream.userId);
+                        }
+                    }
+                }
+            } catch {}
+
+            setStreams(allStreams);
         } catch (error) {
             console.error('Error loading Twitch streams:', error);
         } finally {

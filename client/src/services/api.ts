@@ -57,6 +57,17 @@ api.interceptors.response.use(
             }
         }
         
+        // Handle content moderation block
+        if (error.response?.data?.code === 'CONTENT_MODERATED' || error.response?.data?.code === 'IMAGE_MODERATED') {
+            const moderationType = error.response.data.code === 'IMAGE_MODERATED' ? 'image' : 'text';
+            window.dispatchEvent(new CustomEvent('content-moderated', {
+                detail: {
+                    type: moderationType,
+                    reason: error.response.data.moderationReason || error.response.data.error,
+                }
+            }));
+        }
+        
         // Handle community suspension
         if (error.response?.data?.code === 'COMMUNITY_SUSPENDED') {
             // Store suspension info

@@ -53,6 +53,7 @@ import BetaEndedOverlay from './components/BetaEndedOverlay';
 import SupportButton from './components/SupportButton';
 import WebGLBackgroundRenderer from './components/WebGLBackgroundRenderer';
 import FeedbackReminderNotification from './components/FeedbackReminderNotification';
+import ModerationBlockModal from './components/ModerationBlockModal';
 
 
 
@@ -122,6 +123,7 @@ function App() {
         <EdgeNotificationWrapper />
         <ZionsModalWrapper />
         <SessionExpiredWrapper />
+        <ModerationBlockWrapper />
         <OnboardingModals />
         <MessagePopupWrapper />
         <BottomNavigation />
@@ -207,6 +209,31 @@ function SessionExpiredWrapper() {
   };
 
   return <SessionExpiredModal isOpen={isExpired} onConfirm={handleConfirm} />;
+}
+
+function ModerationBlockWrapper() {
+  const [moderation, setModeration] = useState<{ isOpen: boolean; type: 'text' | 'image'; reason?: string }>({
+    isOpen: false,
+    type: 'text',
+  });
+
+  useEffect(() => {
+    const handleModeration = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setModeration({ isOpen: true, type: detail.type, reason: detail.reason });
+    };
+    window.addEventListener('content-moderated', handleModeration);
+    return () => window.removeEventListener('content-moderated', handleModeration);
+  }, []);
+
+  return (
+    <ModerationBlockModal
+      isOpen={moderation.isOpen}
+      onClose={() => setModeration(prev => ({ ...prev, isOpen: false }))}
+      type={moderation.type}
+      reason={moderation.reason}
+    />
+  );
 }
 
 function MessagePopupWrapper() {

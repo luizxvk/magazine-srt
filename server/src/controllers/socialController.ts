@@ -1298,3 +1298,140 @@ export const updateTwitchChannels = async (req: AuthRequest, res: Response): Pro
         res.status(500).json({ message: 'Erro ao salvar canais' });
     }
 };
+
+// ============ Twitch Full Config (carousel, free games, etc) ============
+
+interface TwitchConfig {
+    carouselEnabled: boolean;
+    freeGamesEnabled: boolean;
+    dropsEnabled: boolean;
+    channels: string[];
+}
+
+interface FreeGame {
+    id: string;
+    title: string;
+    imageUrl: string;
+    claimUrl: string;
+    platform: 'prime' | 'twitch' | 'epic' | 'other';
+    expiresAt?: string;
+}
+
+const DEFAULT_TWITCH_CONFIG: TwitchConfig = {
+    carouselEnabled: true,
+    freeGamesEnabled: true,
+    dropsEnabled: false,
+    channels: DEFAULT_TWITCH_CHANNELS,
+};
+
+export const getTwitchConfig = async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const [configSetting, channelsSetting, freeGamesSetting] = await Promise.all([
+            prisma.appSettings.findUnique({ where: { key: 'twitch_config' } }),
+            prisma.appSettings.findUnique({ where: { key: 'twitch_channels' } }),
+            prisma.appSettings.findUnique({ where: { key: 'twitch_free_games' } }),
+        ]);
+
+        const config: TwitchConfig = configSetting?.value 
+            ? { ...DEFAULT_TWITCH_CONFIG, ...(configSetting.value as object) }
+            : DEFAULT_TWITCH_CONFIG;
+
+        if (channelsSetting?.value && Array.isArray(channelsSetting.value)) {
+            config.channels = channelsSetting.value as string[];
+        }
+
+        const freeGames: FreeGame[] = freeGamesSetting?.value 
+            ? (freeGamesSetting.value as unknown as FreeGame[])
+            : [];
+
+        res.json({ config, freeGames });
+    } catch (error) {
+        console.error('Error reading twitch config:', error);
+        res.status(500).json({ message: 'Erro ao buscar configuração' });
+    }
+};
+
+export const updateTwitchConfig = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { carouselEnabled, freeGamesEnabled, dropsEnabled, channels, freeGames } = req.body;
+
+        // Save config toggles
+        const configData = {
+            carouselEnabled: carouselEnabled ?? true,
+            freeGamesEnabled: freeGamesEnabled ?? true,
+            dropsEnabled: dropsEnabled ?? false,
+        };
+
+        await prisma.appSettings.upsert({
+            where: { key: 'twitch_config' },
+            update: { value: configData },
+            create: { key: 'twitch_config', value: configData },
+        });
+
+        // Save channels if provided
+        if (Array.isArray(channels)) {
+            const sanitizedChannels = channels
+                .filter((c: any) => typeof c === 'string')
+                .map((c: string) => c.trim().toLowerCase())
+                .filter((c: string) => c.length > 0);
+            await saveTwitchChannelsToDB(sanitizedChannels);
+        }
+
+        // Save free games if provided
+        if (Array.isArray(freeGames)) {
+            const sanitizedGames = freeGames.filter((g: any) => 
+                g && typeof g.title === 'string' && typeof g.claimUrl === 'string'
+            ).map((g: any) => ({
+                id: g.id || `game_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                title: g.title.trim(),
+                imageUrl: g.imageUrl || '',
+                claimUrl: g.claimUrl.trim(),
+                platform: g.platform || 'prime',
+                expiresAt: g.expiresAt || null,
+            }));
+            
+            await prisma.appSettings.upsert({
+                where: { key: 'twitch_free_games' },
+                update: { value: sanitizedGames },
+                create: { key: 'twitch_free_games', value: sanitizedGames },
+            });
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating twitch config:', error);
+        res.status(500).json({ message: 'Erro ao salvar configuração' });
+    }
+};
+
+// Public endpoint to get free games for display
+export const getTwitchFreeGames = async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const [configSetting, gamesSetting] = await Promise.all([
+            prisma.appSettings.findUnique({ where: { key: 'twitch_config' } }),
+            prisma.appSettings.findUnique({ where: { key: 'twitch_free_games' } }),
+        ]);
+
+        const config = configSetting?.value as { freeGamesEnabled?: boolean } | null;
+        if (!config?.freeGamesEnabled) {
+            res.json({ games: [], enabled: false });
+            return;
+        }
+
+        const games: FreeGame[] = gamesSetting?.value 
+            ? (gamesSetting.value as unknown as FreeGame[])
+            : [];
+
+        // Filter expired games
+        const now = new Date();
+        const activeGames = games.filter(g => {
+            if (!g.expiresAt) return true;
+            return new Date(g.expiresAt) > now;
+        });
+
+        res.json({ games: activeGames, enabled: true });
+    } catch (error) {
+        console.error('Error fetching free games:', error);
+        res.json({ games: [], enabled: false });
+    }
+};

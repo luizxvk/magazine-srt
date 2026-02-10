@@ -52,14 +52,26 @@ export default function ToolsCarousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef<HTMLDivElement>(null);
     const [twitchChannels, setTwitchChannels] = useState<string[]>(['gaules', 'alanzoka', 'loud_coringa', 'nobru']);
+    const [twitchEnabled, setTwitchEnabled] = useState(true);
 
     useEffect(() => {
-        api.get('/social/twitch/channels')
+        api.get('/social/twitch/config')
             .then(({ data }) => {
-                if (data.channels?.length > 0) setTwitchChannels(data.channels);
+                if (data.config) {
+                    setTwitchEnabled(data.config.carouselEnabled !== false);
+                    if (data.config.channels?.length > 0) {
+                        setTwitchChannels(data.config.channels);
+                    }
+                }
             })
             .catch(() => {});
     }, []);
+
+    // Filter tools based on config
+    const activeTools = tools.filter(t => {
+        if (t.id === 'twitch' && !twitchEnabled) return false;
+        return true;
+    });
 
     // Get the actual color hex from user's equipped color ID
     const getUserAccentColor = () => {
@@ -86,11 +98,11 @@ export default function ToolsCarousel() {
     };
 
     const goToPrevious = () => {
-        setCurrentIndex(prev => (prev === 0 ? tools.length - 1 : prev - 1));
+        setCurrentIndex(prev => (prev === 0 ? activeTools.length - 1 : prev - 1));
     };
 
     const goToNext = () => {
-        setCurrentIndex(prev => (prev === tools.length - 1 ? 0 : prev + 1));
+        setCurrentIndex(prev => (prev === activeTools.length - 1 ? 0 : prev + 1));
     };
 
     // Handle swipe gestures
@@ -117,7 +129,9 @@ export default function ToolsCarousel() {
     };
 
     const renderCurrentTool = () => {
-        switch (tools[currentIndex].id) {
+        const currentTool = activeTools[currentIndex];
+        if (!currentTool) return null;
+        switch (currentTool.id) {
             case 'radio':
                 return <RadioCard />;
             case 'discord':
@@ -170,7 +184,7 @@ export default function ToolsCarousel() {
 
             {/* Tab Indicator */}
             <div className="flex items-center gap-2 mb-4">
-                {tools.map((tool, index) => (
+                {activeTools.map((tool, index) => (
                     <button
                         key={tool.id}
                         onClick={() => goToSlide(index)}
@@ -206,7 +220,7 @@ export default function ToolsCarousel() {
 
             {/* Dots Indicator */}
             <div className="flex items-center justify-center gap-2 mt-4">
-                {tools.map((_, index) => (
+                {activeTools.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => goToSlide(index)}

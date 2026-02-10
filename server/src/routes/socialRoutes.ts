@@ -23,6 +23,9 @@ import {
     getTwitchFollowedStreams,
     getTwitchChannels,
     updateTwitchChannels,
+    getTwitchConfig,
+    updateTwitchConfig,
+    getTwitchFreeGames,
     disconnectSocial,
     getSocialConnections
 } from '../controllers/socialController';
@@ -63,5 +66,8 @@ router.get('/twitch/followed', authenticateToken, getTwitchFollowedStreams);
 router.get('/twitch/streams', getTwitchStreams);
 router.get('/twitch/channels', getTwitchChannels);
 router.put('/twitch/channels', authenticateToken, isAdmin, updateTwitchChannels);
+router.get('/twitch/config', getTwitchConfig);
+router.put('/twitch/config', authenticateToken, isAdmin, updateTwitchConfig);
+router.get('/twitch/free-games', getTwitchFreeGames);
 
 export default router;

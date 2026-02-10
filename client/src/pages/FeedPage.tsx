@@ -29,6 +29,7 @@ import InventoryCard from '../components/InventoryCard';
 import MobileCarousel from '../components/MobileCarousel';
 import LeftSidebar from '../components/LeftSidebar';
 import ToolsCarousel from '../components/ToolsCarousel';
+import FreeGamesCard from '../components/FreeGamesCard';
 import CreatePostCard from '../components/CreatePostCard';
 import SupplyBoxModal from '../components/SupplyBoxModal';
 import EventDropPopup from '../components/EventDropPopup';
@@ -534,6 +535,9 @@ export default function FeedPage() {
                         <div id="radio-card" className="transition-all duration-300 rounded-2xl">
                             <ToolsCarousel />
                         </div>
+
+                        {/* Free Games Card */}
+                        <FreeGamesCard />
 
                         {/* Elite Promo Card - Apple Vision Pro style */}
                         <ElitePromoCard />

@@ -9,6 +9,8 @@ import {
     getProduct,
     purchaseWithZions,
     purchaseWithBRL,
+    purchaseWithPixDirect,
+    confirmPixPayment,
     checkProductPaymentStatus,
     getUserOrders,
     getAllOrders,
@@ -30,6 +32,9 @@ router.post('/purchase/zions', authenticateToken, purchaseWithZions);
 
 // Purchase a product with BRL (Mercado Pago PIX)
 router.post('/purchase/brl', authenticateToken, purchaseWithBRL);
+
+// Purchase a product with PIX Direct (seller's key)
+router.post('/purchase/pix-direct', authenticateToken, purchaseWithPixDirect);
 
 // Check product order payment status
 router.get('/orders/:orderId/status', authenticateToken, checkProductPaymentStatus);
@@ -55,5 +60,8 @@ router.delete('/admin/:id', authenticateToken, requireAdmin, deleteProduct);
 
 // Add keys to a product (admin)
 router.post('/admin/:id/keys', authenticateToken, requireAdmin, addProductKeys);
+
+// Confirm PIX direct payment and deliver keys (admin)
+router.post('/admin/orders/:orderId/confirm-pix', authenticateToken, requireAdmin, confirmPixPayment);
 
 export default router;

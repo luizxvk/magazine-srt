@@ -17,7 +17,8 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
         const { 
             name, description, imageBase64, screenshotBase64, category, 
             priceZions, priceBRL, stock, isUnlimited, magazineDiscount,
-            developer, releaseDate, sizeGB, platform, tags 
+            developer, releaseDate, sizeGB, platform, tags,
+            acceptedPaymentMethods, pixKey, pixKeyType
         } = req.body;
         const userId = req.user?.userId;
 
@@ -54,6 +55,9 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
                 stock: stock || 0,
                 isUnlimited: isUnlimited || false,
                 magazineDiscount: magazineDiscount || false,
+                acceptedPaymentMethods: acceptedPaymentMethods || [],
+                pixKey: pixKey || null,
+                pixKeyType: pixKeyType || null,
                 developer: developer || null,
                 releaseDate: releaseDate || null,
                 sizeGB: sizeGB || null,
@@ -84,7 +88,8 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
         const { 
             name, description, imageBase64, screenshotBase64, category, 
             priceZions, priceBRL, stock, isUnlimited, isActive, magazineDiscount,
-            developer, releaseDate, sizeGB, platform, tags 
+            developer, releaseDate, sizeGB, platform, tags,
+            acceptedPaymentMethods, pixKey, pixKeyType
         } = req.body;
         const userId = req.user?.userId;
 
@@ -123,6 +128,9 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
             isUnlimited,
             isActive,
             magazineDiscount: magazineDiscount || false,
+            acceptedPaymentMethods: acceptedPaymentMethods !== undefined ? acceptedPaymentMethods : undefined,
+            pixKey: pixKey !== undefined ? (pixKey || null) : undefined,
+            pixKeyType: pixKeyType !== undefined ? (pixKeyType || null) : undefined,
             developer: developer || null,
             releaseDate: releaseDate || null,
             sizeGB: sizeGB || null,
@@ -308,6 +316,9 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
                 priceBRL: true,
                 stock: true,
                 isUnlimited: true,
+                acceptedPaymentMethods: true,
+                pixKey: true,
+                pixKeyType: true,
                 developer: true,
                 releaseDate: true,
                 sizeGB: true,
@@ -612,6 +623,137 @@ export const getAllOrders = async (req: AuthRequest, res: Response) => {
 };
 
 /**
+ * Confirm a PIX Direct payment and deliver keys (Admin only)
+ */
+export const confirmPixPayment = async (req: AuthRequest, res: Response) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user?.userId;
+
+        // Verify admin
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user || user.role !== 'ADMIN') {
+            return res.status(403).json({ error: 'Acesso negado' });
+        }
+
+        // Get order
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: {
+                product: {
+                    include: {
+                        keys: {
+                            where: { isUsed: false },
+                            take: 10
+                        }
+                    }
+                },
+                buyer: {
+                    select: { id: true, email: true, displayName: true, name: true }
+                }
+            }
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: 'Pedido não encontrado' });
+        }
+
+        if (order.paymentStatus !== 'PENDING') {
+            return res.status(400).json({ error: 'Este pedido já foi processado' });
+        }
+
+        if (order.paymentMethod !== 'PIX') {
+            return res.status(400).json({ error: 'Este pedido não é do tipo PIX direto' });
+        }
+
+        const keysToDeliver = order.product.keys.slice(0, order.quantity);
+        if (!order.product.isUnlimited && keysToDeliver.length < order.quantity) {
+            return res.status(400).json({ error: 'Estoque insuficiente para entregar as keys' });
+        }
+
+        // Deliver keys
+        await prisma.$transaction(async (tx) => {
+            // Mark keys as used
+            for (const key of keysToDeliver) {
+                await tx.productKey.update({
+                    where: { id: key.id },
+                    data: {
+                        isUsed: true,
+                        usedAt: new Date(),
+                        usedById: order.buyerId,
+                        orderId: order.id
+                    }
+                });
+            }
+
+            // Update order status
+            await tx.order.update({
+                where: { id: orderId },
+                data: {
+                    paymentStatus: 'COMPLETED',
+                    deliveredKeys: {
+                        connect: keysToDeliver.map(k => ({ id: k.id }))
+                    }
+                }
+            });
+
+            // Give 10% cashback in Points
+            const cashbackPoints = Math.floor((order.totalBRL || 0) * 10);
+            if (cashbackPoints > 0) {
+                await tx.user.update({
+                    where: { id: order.buyerId },
+                    data: { zionsPoints: { increment: cashbackPoints } }
+                });
+                await tx.zionHistory.create({
+                    data: {
+                        userId: order.buyerId,
+                        amount: cashbackPoints,
+                        reason: `Cashback PIX: ${order.product.name} (10%)`
+                    }
+                });
+            }
+
+            // Award XP
+            const xpAmount = Math.floor(order.totalBRL || 0);
+            if (xpAmount > 0) {
+                await awardXP(order.buyerId, xpAmount, `Compra: ${order.product.name}`);
+            }
+        });
+
+        // Send email with keys
+        if (order.buyer.email) {
+            try {
+                await sendProductKeysEmail(
+                    order.buyer.email,
+                    order.buyer.displayName || order.buyer.name || 'Usuário',
+                    order.product.name,
+                    keysToDeliver.map(k => k.key)
+                );
+            } catch (emailError) {
+                console.error('Error sending keys email:', emailError);
+            }
+        }
+
+        // Notify buyer
+        await prisma.notification.create({
+            data: {
+                userId: order.buyerId,
+                type: 'SYSTEM',
+                content: `Pagamento PIX confirmado! Suas keys de "${order.product.name}" foram liberadas.`
+            }
+        });
+
+        res.json({ 
+            message: 'Pagamento confirmado e keys entregues',
+            deliveredKeys: keysToDeliver.map(k => k.key)
+        });
+    } catch (error) {
+        console.error('Error confirming PIX payment:', error);
+        res.status(500).json({ error: 'Erro ao confirmar pagamento' });
+    }
+};
+
+/**
  * Get admin products with full details
  */
 export const getAdminProducts = async (req: AuthRequest, res: Response) => {
@@ -654,6 +796,97 @@ export const getAdminProducts = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error getting admin products:', error);
         res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
+};
+
+// ===================== PURCHASE WITH PIX DIRECT =====================
+
+/**
+ * Create a pending order for PIX Direct payment (seller's PIX key)
+ */
+export const purchaseWithPixDirect = async (req: AuthRequest, res: Response) => {
+    try {
+        const { productId, quantity = 1 } = req.body;
+        const userId = req.user?.userId;
+
+        // Get product
+        const product = await prisma.product.findUnique({
+            where: { id: productId },
+            include: {
+                keys: {
+                    where: { isUsed: false },
+                    take: quantity
+                }
+            }
+        });
+
+        if (!product || !product.isActive) {
+            return res.status(404).json({ error: 'Produto não encontrado ou indisponível' });
+        }
+
+        if (!product.priceBRL) {
+            return res.status(400).json({ error: 'Este produto não tem preço em BRL' });
+        }
+
+        if (!product.pixKey) {
+            return res.status(400).json({ error: 'Este produto não aceita pagamento via PIX direto' });
+        }
+
+        if (!product.acceptedPaymentMethods.includes('PIX')) {
+            return res.status(400).json({ error: 'PIX direto não está habilitado para este produto' });
+        }
+
+        // Check stock
+        if (!product.isUnlimited && product.keys.length < quantity) {
+            return res.status(400).json({ error: 'Estoque insuficiente' });
+        }
+
+        // Calculate price with possible magazine discount
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, membershipType: true, email: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        let totalBRL = product.priceBRL * quantity;
+        if (product.magazineDiscount && user.membershipType === 'MAGAZINE') {
+            totalBRL = Number((totalBRL * 0.9).toFixed(2));
+        }
+
+        // Create pending order
+        const order = await prisma.order.create({
+            data: {
+                buyerId: userId!,
+                productId,
+                quantity,
+                totalBRL,
+                paymentMethod: 'PIX',
+                paymentStatus: 'PENDING'
+            }
+        });
+
+        // Create notification for admin
+        await prisma.notification.create({
+            data: {
+                userId: userId!,
+                type: 'SYSTEM',
+                content: `Pedido #${order.id.slice(0, 8)} criado via PIX Direto - R$ ${totalBRL.toFixed(2)} - Aguardando pagamento`
+            }
+        });
+
+        res.status(201).json({
+            orderId: order.id,
+            totalBRL,
+            pixKey: product.pixKey,
+            pixKeyType: product.pixKeyType,
+            message: 'Pedido criado. Realize o PIX e aguarde confirmação.'
+        });
+    } catch (error) {
+        console.error('Error creating PIX direct order:', error);
+        res.status(500).json({ error: 'Erro ao criar pedido PIX' });
     }
 };
 

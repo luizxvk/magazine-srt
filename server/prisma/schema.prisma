@@ -884,6 +884,10 @@ model Product {
   isUnlimited   Boolean         @default(false)
   isActive      Boolean         @default(true)
   magazineDiscount Boolean      @default(false) // 10% discount for MAGAZINE members
+  // Payment Options
+  acceptedPaymentMethods String[] @default([])  // ZIONS, PIX, MERCADO_PAGO
+  pixKey        String?         // Seller's PIX key for direct PIX payments
+  pixKeyType    PixKeyType?     // Type of PIX key (CPF, CNPJ, EMAIL, PHONE, RANDOM)
   // Game/Product Info
   developer     String?         // Developer/Publisher
   releaseDate   String?         // Release date

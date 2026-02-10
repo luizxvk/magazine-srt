@@ -14,7 +14,10 @@ import {
     Percent,
     QrCode,
     Receipt,
-    ExternalLink
+    ExternalLink,
+    Copy,
+    Check,
+    Clock
 } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +34,9 @@ interface Product {
     availableStock: number;
     isUnlimited: boolean;
     magazineDiscount?: boolean;
+    acceptedPaymentMethods?: string[];
+    pixKey?: string;
+    pixKeyType?: string;
 }
 
 interface PurchaseModalProps {
@@ -59,11 +65,13 @@ const categoryLabels: Record<string, string> = {
 
 export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComplete, onGoToOrders }: PurchaseModalProps) {
     const { user, accentColor, updateUserZions, showEdgeNotification } = useAuth();
-    const [paymentMethod, setPaymentMethod] = useState<'zions' | 'brl' | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<'zions' | 'brl' | 'pix_direct' | null>(null);
     const [brlPaymentType, setBrlPaymentType] = useState<'pix' | 'card' | 'boleto' | null>(null);
     const [quantity, setQuantity] = useState(1);
     const [isPurchasing, setIsPurchasing] = useState(false);
     const [purchaseComplete, setPurchaseComplete] = useState(false);
+    const [pixOrderCreated, setPixOrderCreated] = useState(false);
+    const [copiedPix, setCopiedPix] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const isMGT = user?.membershipType === 'MGT';
@@ -88,6 +96,42 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
 
     const maxQuantity = product.isUnlimited ? 10 : Math.min(product.availableStock, 10);
 
+    // Determine available payment methods
+    const acceptedMethods = product.acceptedPaymentMethods && product.acceptedPaymentMethods.length > 0
+        ? product.acceptedPaymentMethods
+        : []; // If empty, show all that have prices set
+    const showZions = product.priceZions && (acceptedMethods.length === 0 || acceptedMethods.includes('ZIONS'));
+    const showPixDirect = product.priceBRL && product.pixKey && acceptedMethods.includes('PIX');
+    const showMercadoPago = product.priceBRL && (acceptedMethods.length === 0 || acceptedMethods.includes('MERCADO_PAGO'));
+
+    const pixKeyTypeLabels: Record<string, string> = {
+        CPF: 'CPF',
+        CNPJ: 'CNPJ',
+        EMAIL: 'E-mail',
+        PHONE: 'Telefone',
+        RANDOM: 'Chave Aleatória'
+    };
+
+    const handleCopyPixKey = async () => {
+        if (product.pixKey) {
+            try {
+                await navigator.clipboard.writeText(product.pixKey);
+                setCopiedPix(true);
+                setTimeout(() => setCopiedPix(false), 2000);
+            } catch {
+                // Fallback
+                const el = document.createElement('textarea');
+                el.value = product.pixKey;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                setCopiedPix(true);
+                setTimeout(() => setCopiedPix(false), 2000);
+            }
+        }
+    };
+
     const handlePurchase = async () => {
         if (!paymentMethod) return;
 
@@ -103,6 +147,16 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                 updateUserZions(-totalZions);
                 setPurchaseComplete(true);
                 onPurchaseComplete?.();
+            } else if (paymentMethod === 'pix_direct') {
+                // Create a pending order for PIX direct payment
+                const { data } = await api.post('/products/purchase/pix-direct', {
+                    productId: product.id,
+                    quantity
+                });
+                if (data.orderId) {
+                    setPixOrderCreated(true);
+                    showEdgeNotification?.('info', 'Pedido Criado', 'Faça o PIX e aguarde confirmação do vendedor');
+                }
             } else {
                 // BRL payment via MercadoPago
                 const { data } = await api.post('/payments/product/create-preference', {
@@ -135,6 +189,8 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
     const handleClose = () => {
         if (!isPurchasing) {
             setPurchaseComplete(false);
+            setPixOrderCreated(false);
+            setCopiedPix(false);
             setPaymentMethod(null);
             setBrlPaymentType(null);
             setQuantity(1);
@@ -244,6 +300,75 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                     </button>
                                 </div>
                             </motion.div>
+                        ) : pixOrderCreated ? (
+                            /* PIX Direct - Order Created, Show PIX Key */
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="text-center py-6 space-y-4"
+                            >
+                                <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center relative bg-cyan-500/20">
+                                    <QrCode className="w-10 h-10 text-cyan-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white mb-2">Pedido Criado!</h3>
+                                    <p className="text-gray-300 text-sm">
+                                        Faça o PIX de <strong className="text-cyan-400">R$ {totalBRL.toFixed(2)}</strong> para a chave abaixo:
+                                    </p>
+                                </div>
+
+                                {/* PIX Key Display */}
+                                <div className="bg-cyan-500/5 border border-cyan-500/30 rounded-xl p-4 space-y-3">
+                                    <div className="text-xs text-cyan-400/70 uppercase tracking-wider">
+                                        {product.pixKeyType ? pixKeyTypeLabels[product.pixKeyType] || product.pixKeyType : 'Chave PIX'}
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-black/40 rounded-lg p-3">
+                                        <span className="flex-1 text-white font-mono text-sm break-all text-left">
+                                            {product.pixKey}
+                                        </span>
+                                        <button
+                                            onClick={handleCopyPixKey}
+                                            className={`flex-shrink-0 p-2 rounded-lg transition-all ${
+                                                copiedPix 
+                                                    ? 'bg-green-500/20 text-green-400' 
+                                                    : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+                                            }`}
+                                        >
+                                            {copiedPix ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    {copiedPix && (
+                                        <p className="text-xs text-green-400">Chave copiada!</p>
+                                    )}
+                                </div>
+
+                                <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-left">
+                                    <Clock className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                                    <div className="text-xs text-amber-300">
+                                        <p className="font-medium">Aguardando confirmação</p>
+                                        <p className="text-amber-400/70 mt-0.5">
+                                            Após realizar o PIX, o vendedor confirmará o pagamento e suas keys serão liberadas.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-2 flex flex-col gap-3">
+                                    {onGoToOrders && (
+                                        <button
+                                            onClick={handleGoToOrders}
+                                            className="w-full py-3 rounded-xl font-bold text-white transition-all bg-cyan-600 hover:bg-cyan-500"
+                                        >
+                                            Ver Meus Pedidos
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={handleClose}
+                                        className="w-full py-3 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                                    >
+                                        Fechar
+                                    </button>
+                                </div>
+                            </motion.div>
                         ) : (
                             <>
                                 {/* Product Preview */}
@@ -320,9 +445,9 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                         </div>
                                     )}
                                     
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className={`grid ${[showZions, showPixDirect, showMercadoPago].filter(Boolean).length >= 3 ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
                                         {/* Zions Payment */}
-                                        {product.priceZions && (
+                                        {showZions && (
                                             <button
                                                 onClick={() => setPaymentMethod('zions')}
                                                 className={`p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === 'zions'
@@ -336,35 +461,71 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                             >
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <Banknote className="w-5 h-5" style={{ color }} />
-                                                    <span className="text-white font-medium">Zions Cash</span>
+                                                    <span className="text-white font-medium text-sm">Zions Cash</span>
                                                 </div>
                                                 {hasDiscount ? (
                                                     <div>
-                                                        <p className="text-sm text-gray-500 line-through">
+                                                        <p className="text-xs text-gray-500 line-through">
                                                             R$ {originalTotalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                         </p>
-                                                        <p className="text-lg font-bold text-amber-400">
+                                                        <p className="text-base font-bold text-amber-400">
                                                             R$ {totalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                         </p>
                                                     </div>
                                                 ) : (
-                                                    <p className="text-lg font-bold" style={{ color }}>
+                                                    <p className="text-base font-bold" style={{ color }}>
                                                         R$ {totalZions.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                     </p>
                                                 )}
-                                                <p className="text-xs text-gray-500 mt-1">
+                                                <p className="text-[10px] text-gray-500 mt-1">
                                                     Saldo: R$ {user?.zionsCash?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
                                                 </p>
                                                 {!canBuyWithZions && (
-                                                    <p className="text-xs text-red-400 mt-1">
+                                                    <p className="text-[10px] text-red-400 mt-0.5">
                                                         Saldo insuficiente
                                                     </p>
                                                 )}
                                             </button>
                                         )}
 
-                                        {/* BRL Payment */}
-                                        {product.priceBRL && (
+                                        {/* PIX Direct Payment */}
+                                        {showPixDirect && (
+                                            <button
+                                                onClick={() => setPaymentMethod('pix_direct')}
+                                                className={`p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === 'pix_direct'
+                                                    ? 'border-cyan-500'
+                                                    : 'border-cyan-500/30 hover:border-cyan-500/50'
+                                                    }`}
+                                                style={{
+                                                    backgroundColor: paymentMethod === 'pix_direct' ? 'rgba(6, 182, 212, 0.15)' : 'transparent'
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <QrCode className="w-5 h-5 text-cyan-400" />
+                                                    <span className="text-white font-medium text-sm">PIX Direto</span>
+                                                </div>
+                                                {hasDiscount ? (
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 line-through">
+                                                            R$ {originalTotalBRL.toFixed(2)}
+                                                        </p>
+                                                        <p className="text-base font-bold text-amber-400">
+                                                            R$ {totalBRL.toFixed(2)}
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-base font-bold text-cyan-400">
+                                                        R$ {totalBRL.toFixed(2)}
+                                                    </p>
+                                                )}
+                                                <p className="text-[10px] text-cyan-400/60 mt-1">
+                                                    Transferência direta
+                                                </p>
+                                            </button>
+                                        )}
+
+                                        {/* BRL/MercadoPago Payment */}
+                                        {showMercadoPago && (
                                             <button
                                                 onClick={() => setPaymentMethod('brl')}
                                                 className={`p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === 'brl'
@@ -377,24 +538,24 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                             >
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <CreditCard className="w-5 h-5 text-green-400" />
-                                                    <span className="text-white font-medium">BRL</span>
+                                                    <span className="text-white font-medium text-sm">Mercado Pago</span>
                                                 </div>
                                                 {hasDiscount ? (
                                                     <div>
-                                                        <p className="text-sm text-gray-500 line-through">
+                                                        <p className="text-xs text-gray-500 line-through">
                                                             R$ {originalTotalBRL.toFixed(2)}
                                                         </p>
-                                                        <p className="text-lg font-bold text-amber-400">
+                                                        <p className="text-base font-bold text-amber-400">
                                                             R$ {totalBRL.toFixed(2)}
                                                         </p>
                                                     </div>
                                                 ) : (
-                                                    <p className="text-lg font-bold text-green-400">
+                                                    <p className="text-base font-bold text-green-400">
                                                         R$ {totalBRL.toFixed(2)}
                                                     </p>
                                                 )}
-                                                <p className="text-xs text-green-400/70 mt-1">
-                                                    MercadoPago
+                                                <p className="text-[10px] text-green-400/60 mt-1">
+                                                    PIX, Cartão ou Boleto
                                                 </p>
                                             </button>
                                         )}
@@ -495,13 +656,22 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
                                     }
                                     className="w-full py-3.5 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                                     style={{
-                                        background: paymentMethod ? `linear-gradient(135deg, ${color}, ${color}dd)` : '#374151'
+                                        background: paymentMethod 
+                                            ? paymentMethod === 'pix_direct' 
+                                                ? 'linear-gradient(135deg, #06b6d4, #0891b2)' 
+                                                : `linear-gradient(135deg, ${color}, ${color}dd)` 
+                                            : '#374151'
                                     }}
                                 >
                                     {isPurchasing ? (
                                         <>
                                             <Loader size="sm" />
                                             <span>Processando...</span>
+                                        </>
+                                    ) : paymentMethod === 'pix_direct' ? (
+                                        <>
+                                            <QrCode className="w-5 h-5" />
+                                            <span>Gerar Pedido PIX</span>
                                         </>
                                     ) : paymentMethod === 'brl' ? (
                                         <>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Plus, Edit2, Trash2, Key, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Key, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent, QrCode, Banknote, Wallet } from 'lucide-react';
 import Loader from '../../components/Loader';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -69,6 +69,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
         isUnlimited: false,
         isActive: true,
         magazineDiscount: false,
+        acceptedPaymentMethods: [] as string[],
+        pixKey: '',
+        pixKeyType: '' as string,
         developer: '',
         releaseDate: '',
         sizeGB: '',
@@ -133,6 +136,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                 isUnlimited: formData.isUnlimited,
                 isActive: formData.isActive,
                 magazineDiscount: formData.magazineDiscount,
+                acceptedPaymentMethods: formData.acceptedPaymentMethods,
+                pixKey: formData.acceptedPaymentMethods.includes('PIX') ? formData.pixKey || undefined : undefined,
+                pixKeyType: formData.acceptedPaymentMethods.includes('PIX') ? formData.pixKeyType || undefined : undefined,
                 developer: formData.developer || undefined,
                 releaseDate: formData.releaseDate || undefined,
                 sizeGB: formData.sizeGB ? parseFloat(formData.sizeGB) : undefined,
@@ -212,6 +218,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             isUnlimited: false,
             isActive: true,
             magazineDiscount: false,
+            acceptedPaymentMethods: [],
+            pixKey: '',
+            pixKeyType: '',
             developer: '',
             releaseDate: '',
             sizeGB: '',
@@ -237,6 +246,9 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
             isUnlimited: product.isUnlimited,
             isActive: product.isActive,
             magazineDiscount: product.magazineDiscount || false,
+            acceptedPaymentMethods: (product as any).acceptedPaymentMethods || [],
+            pixKey: (product as any).pixKey || '',
+            pixKeyType: (product as any).pixKeyType || '',
             developer: product.developer || '',
             releaseDate: product.releaseDate || '',
             sizeGB: product.sizeGB?.toString() || '',
@@ -672,6 +684,128 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             10% Desconto MAGAZINE
                                         </span>
                                     </label>
+                                </div>
+
+                                {/* Separator */}
+                                <div className="border-t border-white/10 pt-4">
+                                    <p className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                                        <Wallet className="w-4 h-4" /> Formas de Pagamento Aceitas
+                                    </p>
+                                </div>
+
+                                {/* Payment Methods Checkboxes */}
+                                <div className="space-y-3">
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.acceptedPaymentMethods.includes('ZIONS')}
+                                                onChange={e => {
+                                                    const methods = e.target.checked
+                                                        ? [...formData.acceptedPaymentMethods, 'ZIONS']
+                                                        : formData.acceptedPaymentMethods.filter(m => m !== 'ZIONS');
+                                                    setFormData({ ...formData, acceptedPaymentMethods: methods });
+                                                }}
+                                                className="w-4 h-4 rounded border-white/20 text-yellow-500 focus:ring-yellow-500"
+                                            />
+                                            <span className="text-sm text-yellow-400 flex items-center gap-1">
+                                                <Banknote className="w-3.5 h-3.5" />
+                                                Zions Cash
+                                            </span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.acceptedPaymentMethods.includes('PIX')}
+                                                onChange={e => {
+                                                    const methods = e.target.checked
+                                                        ? [...formData.acceptedPaymentMethods, 'PIX']
+                                                        : formData.acceptedPaymentMethods.filter(m => m !== 'PIX');
+                                                    setFormData({ ...formData, acceptedPaymentMethods: methods });
+                                                }}
+                                                className="w-4 h-4 rounded border-white/20 text-cyan-500 focus:ring-cyan-500"
+                                            />
+                                            <span className="text-sm text-cyan-400 flex items-center gap-1">
+                                                <QrCode className="w-3.5 h-3.5" />
+                                                PIX Direto
+                                            </span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.acceptedPaymentMethods.includes('MERCADO_PAGO')}
+                                                onChange={e => {
+                                                    const methods = e.target.checked
+                                                        ? [...formData.acceptedPaymentMethods, 'MERCADO_PAGO']
+                                                        : formData.acceptedPaymentMethods.filter(m => m !== 'MERCADO_PAGO');
+                                                    setFormData({ ...formData, acceptedPaymentMethods: methods });
+                                                }}
+                                                className="w-4 h-4 rounded border-white/20 text-green-500 focus:ring-green-500"
+                                            />
+                                            <span className="text-sm text-green-400 flex items-center gap-1">
+                                                <CreditCard className="w-3.5 h-3.5" />
+                                                Mercado Pago
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    {/* PIX Key fields - shown when PIX is selected */}
+                                    <AnimatePresence>
+                                        {formData.acceptedPaymentMethods.includes('PIX') && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/20 space-y-3">
+                                                    <p className="text-xs text-cyan-400 font-medium">Chave PIX do Vendedor</p>
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label className="block text-xs text-gray-400 mb-1">Tipo da Chave</label>
+                                                            <select
+                                                                value={formData.pixKeyType}
+                                                                onChange={e => setFormData({ ...formData, pixKeyType: e.target.value })}
+                                                                className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                            >
+                                                                <option value="">Selecione...</option>
+                                                                <option value="CPF">CPF</option>
+                                                                <option value="CNPJ">CNPJ</option>
+                                                                <option value="EMAIL">E-mail</option>
+                                                                <option value="PHONE">Telefone</option>
+                                                                <option value="RANDOM">Chave Aleatória</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs text-gray-400 mb-1">Chave PIX</label>
+                                                            <input
+                                                                type="text"
+                                                                value={formData.pixKey}
+                                                                onChange={e => setFormData({ ...formData, pixKey: e.target.value })}
+                                                                placeholder={
+                                                                    formData.pixKeyType === 'CPF' ? '000.000.000-00' :
+                                                                    formData.pixKeyType === 'CNPJ' ? '00.000.000/0000-00' :
+                                                                    formData.pixKeyType === 'EMAIL' ? 'email@exemplo.com' :
+                                                                    formData.pixKeyType === 'PHONE' ? '+55 11 99999-9999' :
+                                                                    'Chave aleatória'
+                                                                }
+                                                                className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-500">
+                                                        A chave PIX será exibida ao comprador para pagamento direto.
+                                                    </p>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {formData.acceptedPaymentMethods.length === 0 && (
+                                        <p className="text-xs text-amber-400/70">
+                                            ⚠ Nenhuma forma de pagamento selecionada. Todas serão habilitadas por padrão.
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Separator */}

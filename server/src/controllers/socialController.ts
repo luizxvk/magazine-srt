@@ -573,9 +573,22 @@ export const getDiscordFriends = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ message: 'Discord não conectado' });
         }
 
+        // Check if token expired, refresh if needed
+        let accessToken = connection.accessToken;
+        if (connection.expiresAt && new Date(connection.expiresAt) <= new Date()) {
+            const refreshed = await refreshDiscordToken(userId);
+            if (!refreshed) {
+                return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.', code: 'TOKEN_EXPIRED' });
+            }
+            const updated = await prisma.socialConnection.findUnique({
+                where: { userId_platform: { userId, platform: SocialPlatform.DISCORD } },
+            });
+            accessToken = updated?.accessToken || accessToken;
+        }
+
         // Buscar relacionamentos (amigos)
         const friendsResponse = await axios.get(OAUTH_URLS.discord.friends, {
-            headers: { Authorization: `Bearer ${connection.accessToken}` },
+            headers: { Authorization: `Bearer ${accessToken}` },
         });
 
         const friends = friendsResponse.data
@@ -621,25 +634,57 @@ export const getDiscordGuilds = async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ message: 'Discord não conectado' });
         }
 
+        // Check if token is expired and try refresh first
+        let accessToken = connection.accessToken;
+        if (connection.expiresAt && new Date(connection.expiresAt) <= new Date()) {
+            const refreshed = await refreshDiscordToken(userId);
+            if (!refreshed) {
+                return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.', code: 'TOKEN_EXPIRED' });
+            }
+            // Re-fetch updated token
+            const updated = await prisma.socialConnection.findUnique({
+                where: { userId_platform: { userId, platform: SocialPlatform.DISCORD } },
+            });
+            accessToken = updated?.accessToken || accessToken;
+        }
+
         // Buscar guilds do usuário
-        const guildsResponse = await axios.get('https://discord.com/api/users/@me/guilds', {
-            headers: { Authorization: `Bearer ${connection.accessToken}` },
-        });
+        try {
+            const guildsResponse = await axios.get('https://discord.com/api/users/@me/guilds', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
 
-        const guilds = guildsResponse.data.map((guild: any) => ({
-            id: guild.id,
-            name: guild.name,
-            icon: guild.icon,
-        }));
+            const guilds = guildsResponse.data.map((guild: any) => ({
+                id: guild.id,
+                name: guild.name,
+                icon: guild.icon,
+            }));
 
-        res.json({ guilds });
+            res.json({ guilds });
+        } catch (discordError: any) {
+            // If 401, try refreshing token once
+            if (discordError.response?.status === 401) {
+                const refreshed = await refreshDiscordToken(userId);
+                if (refreshed) {
+                    const updated = await prisma.socialConnection.findUnique({
+                        where: { userId_platform: { userId, platform: SocialPlatform.DISCORD } },
+                    });
+                    const retryResponse = await axios.get('https://discord.com/api/users/@me/guilds', {
+                        headers: { Authorization: `Bearer ${updated?.accessToken}` },
+                    });
+                    const guilds = retryResponse.data.map((guild: any) => ({
+                        id: guild.id,
+                        name: guild.name,
+                        icon: guild.icon,
+                    }));
+                    return res.json({ guilds });
+                }
+                return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.', code: 'TOKEN_EXPIRED' });
+            }
+            throw discordError;
+        }
     } catch (error: any) {
         console.error('Error fetching Discord guilds:', error.response?.data || error.message);
-        
-        if (error.response?.status === 401) {
-            return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.' });
-        }
-        
         res.status(500).json({ message: 'Erro ao buscar servidores do Discord' });
     }
 };
@@ -1007,6 +1052,50 @@ export const getTwitchFollowedStreams = async (req: AuthRequest, res: Response):
         res.json({ streams: [], error: 'Erro ao carregar streams' });
     }
 };
+
+// Helper: Refresh Discord OAuth token
+async function refreshDiscordToken(userId: string): Promise<boolean> {
+    try {
+        const connection = await prisma.socialConnection.findUnique({
+            where: { userId_platform: { userId, platform: SocialPlatform.DISCORD } },
+        });
+
+        if (!connection?.refreshToken) return false;
+
+        const clientId = process.env.DISCORD_CLIENT_ID;
+        const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+        if (!clientId || !clientSecret) return false;
+
+        const tokenResponse = await axios.post(
+            OAUTH_URLS.discord.token,
+            new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                grant_type: 'refresh_token',
+                refresh_token: connection.refreshToken,
+            }),
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        );
+
+        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+
+        await prisma.socialConnection.update({
+            where: { id: connection.id },
+            data: {
+                accessToken: access_token,
+                refreshToken: refresh_token || connection.refreshToken,
+                expiresAt: new Date(Date.now() + expires_in * 1000),
+                lastSynced: new Date(),
+            },
+        });
+
+        console.log('[Discord] Token refreshed successfully for user:', userId);
+        return true;
+    } catch (error) {
+        console.error('[Discord] Token refresh failed:', error);
+        return false;
+    }
+}
 
 // Helper: Refresh Twitch OAuth token
 async function refreshTwitchToken(userId: string): Promise<boolean> {

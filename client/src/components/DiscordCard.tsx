@@ -105,8 +105,13 @@ export default function DiscordCard() {
         try {
             const response = await api.get('/social/discord/guilds');
             setGuilds(response.data.guilds || []);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error loading Discord guilds:', error);
+            // If token expired, mark as disconnected so user can reconnect
+            if (error.response?.status === 401 && error.response?.data?.code === 'TOKEN_EXPIRED') {
+                setConnected(false);
+                setConnection(null);
+            }
         }
     };
 

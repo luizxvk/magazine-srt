@@ -1,4 +1,4 @@
-import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag, Info } from 'lucide-react';
+import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag, Info, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
@@ -53,6 +53,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             label: 'Grupos',
             to: '/groups',
             feature: Feature.GROUPS
+        },
+        {
+            icon: <Trophy className="w-5 h-5" />,
+            label: 'Torneios',
+            to: '/tournaments'
         },
         {
             icon: <ShoppingBag className="w-5 h-5" />,

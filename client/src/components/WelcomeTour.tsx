@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, Sparkles, Trophy, Coins, Users, Radio, ShoppingBag, Palette, MessageCircle, Crown, Zap, Gift, Target, TrendingUp } from 'lucide-react';
+import { X, ChevronRight, Sparkles, Trophy, Coins, Users, Radio, ShoppingBag, Palette, MessageCircle, Crown, Zap, Gift, Target, TrendingUp, Video, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.4';
+const TOUR_VERSION = '0.5.0-rc.6';
 
 interface WelcomeTourProps {
     isOpen?: boolean;
@@ -56,8 +56,8 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
         { icon: Trophy, label: 'Ranking', desc: 'Dispute as melhores posições' },
         { icon: Gift, label: 'Recompensas', desc: 'Troque por prêmios reais' },
         { icon: Palette, label: 'Customização', desc: 'Personalize seu perfil' },
-        { icon: MessageCircle, label: 'Chat', desc: 'Converse em tempo real' },
-        { icon: Radio, label: 'Rádio', desc: 'Lo-Fi 24/7' },
+        { icon: Video, label: 'Lives', desc: 'Transmissões ao vivo' },
+        { icon: Globe, label: 'Idiomas', desc: 'PT-BR, EN e ES' },
         { icon: ShoppingBag, label: 'Loja', desc: 'Itens exclusivos' },
     ];
 
@@ -105,9 +105,9 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
             },
             {
                 title: "Eventos & Mais",
-                description: "Acesso a eventos VIP, rádio integrada, grupos e muito mais recursos por vir!",
+                description: "Transmissões ao vivo, torneios, seletor de idiomas, rádio integrada, grupos e eventos exclusivos!",
                 emoji: "📅",
-                features: ["Eventos exclusivos", "Rádio Lo-Fi", "Grupos privados"]
+                features: ["Lives integradas", "Torneios", "Multi-idiomas"]
             }
         ] : [
             {
@@ -142,9 +142,9 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
             },
             {
                 title: "Recursos Extras",
-                description: "Rádio integrada, eventos, grupos de chat, customização de perfil e muito mais funcionalidades!",
+                description: "Transmissões ao vivo, torneios, seletor de idiomas, rádio integrada, eventos e muito mais funcionalidades!",
                 emoji: "✨",
-                features: ["Rádio Lo-Fi", "Eventos VIP", "Customização"]
+                features: ["Lives integradas", "Torneios", "Multi-idiomas"]
             }
         ])
     ];

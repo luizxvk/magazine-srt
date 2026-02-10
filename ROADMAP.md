@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.5 (Release Candidate)  
-> **Última Atualização:** 10 de Fevereiro de 2026  
+> **Versão Atual:** v0.5.0-rc.6 (Release Candidate)  
+> **Última Atualização:** 11 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
@@ -18,6 +18,77 @@
 ├─ Integração Rovex: 100% ✅
 └─ Multi-Tenant: 100% ✅
 ```
+
+---
+
+## 🆕 v0.5.0-rc.6 (Release Candidate - 11 Fevereiro 2026)
+
+### ✅ Integrações de Transmissão ao Vivo (Concluído)
+**Carrossel de lives e jogos grátis integrado ao feed**
+
+- 📺 **Carrossel de Transmissões ao Vivo**
+  - Carrossel de streams ao vivo de canais configurados
+  - Integração com API da Twitch via OAuth
+  - Visualização de streams seguidos do usuário + canais admin
+  - Cards com thumbnail, título, visualizadores e link direto
+
+- 🎁 **Jogos Grátis da Semana**
+  - Card de jogos grátis (Prime Gaming, Epic, etc.)
+  - Gerenciamento admin de jogos com link e prazo
+  - Toggle para ativar/desativar no carrossel
+
+- 🛡️ **Painel Admin de Transmissões**
+  - Toggles para Lives/Games/Drops
+  - Gerenciamento de canais monitorados
+  - Gerenciamento de jogos grátis
+
+### 🌐 Sistema de Idiomas (Em Desenvolvimento)
+**Internacionalização completa da plataforma**
+
+- 🔧 **Seletor de Idioma nas Configurações**
+  - Português (BR), English (US), Español disponíveis
+  - Seletor inline na seção Aparência
+  - Idioma persiste via i18next
+
+- 📝 **i18n Integrado**
+  - Namespaces por contexto (common, settings, gamification)
+  - Detecção automática de idioma do navegador
+  - Fallback para português BR
+
+### 🏆 Sistema de Torneios (Em Desenvolvimento)
+**Competições organizadas com brackets e premiações**
+
+- 🎮 **Página de Torneios** (`/tournaments`)
+  - Listagem de torneios abertos e encerrados
+  - Detalhes com regras, premiação e participantes
+  - Registro e desistência de torneios
+
+- 📊 **Sistema de Brackets**
+  - Chaves de eliminação simples
+  - Report de resultados por participantes
+  - Leaderboard em tempo real
+
+### 🛡️ Moderação Automática (Em Desenvolvimento)
+**Sistema de auto-moderação para conteúdo tóxico**
+
+- 🤖 **Análise de Toxicidade**
+  - Integração Perspective API (em aprovação)
+  - Filtro de spam e conteúdo ofensivo
+  - Ações automáticas (warn, hide, delete)
+
+- 📋 **Fila de Moderação**
+  - Dashboard admin para revisar conteúdo flagged
+  - Histórico de ações de moderação
+  - Sistema de appeals
+
+### 📝 Lembrete de Feedback
+**Notificação periódica solicitando feedback do usuário**
+
+- 🔔 **Notificação de Feedback**
+  - Aparece a cada 5 minutos se usuário não enviou feedback
+  - Verifica endpoint `/feedback/can-submit`
+  - Dismiss persiste por 24 horas
+  - Navega diretamente para `/feedback`
 
 ---
 
@@ -495,15 +566,19 @@
 
 ## 🔄 Em Desenvolvimento (Próximas Semanas)
 
-### 📱 App Mobile Nativo (Em Desenvolvimento)
-- 🔄 **Capacitor + Android**
+### ✅ App Mobile Nativo (Concluído)
+- ✅ **Capacitor + Android**
   - Projeto Capacitor configurado e integrado
   - Build Android gerando APK com sucesso
   - Webview otimizada para performance mobile
   - Push notifications via Firebase
+  - App publicado e funcional
+
+### 📱 Publicação nas Lojas (Planejado)
 - [ ] Publicar na Google Play Store (beta)
 - [ ] Versão iOS (Apple Developer Account)
 - [ ] Deep links e navegação nativa
+- [ ] App Store Connect + TestFlight
 
 ### Alta Prioridade
 
@@ -615,7 +690,7 @@ Criar 6 packs temáticos:
 ### Conteúdo & Mídia
 - [ ] Suporte para posts em vídeo (uploads diretos)
 - [ ] Sistema de podcasts integrado
-- [ ] Transmissões ao vivo (streaming)
+- ✅ Transmissões ao vivo (integração Twitch) - **Concluído**
 - [ ] Galeria de wallpapers/assets exclusivos
 
 ### Integrações Externas
@@ -628,7 +703,7 @@ Criar 6 packs temáticos:
 - [ ] Dashboard admin aprimorado (analytics, gráficos)
 - [ ] Sistema de moderadores com permissões
 - [ ] Logs de auditoria completos
-- [ ] Auto-moderação com IA (filtro de spam/toxicidade)
+- 🔄 Auto-moderação com IA (filtro de spam/toxicidade) - **Em Desenvolvimento**
 
 ### Acessibilidade & Performance
 - [ ] Tema de alto contraste

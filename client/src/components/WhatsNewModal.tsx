@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, MessageCircle, Palette } from 'lucide-react';
+import { X, Sparkles, Shield, Zap, Check, Heart, ShoppingBag, Star, MessageCircle, Palette, Video, Globe, Trophy, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.5';
+const CURRENT_VERSION = '0.5.0-rc.6';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,49 +43,53 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.5 - Iridescence Fix & Universal Gradients
+    // v0.5.0-rc.6 - Live Streams, Languages, Tournaments, Moderation
     const updates: UpdateItem[] = [
         {
-            icon: <Sparkles className="w-5 h-5 text-violet-400" />,
-            title: 'Tema Iridescente Corrigido',
-            description: 'O background Prisma Iridescente foi restaurado ao visual original com efeitos de shader aprimorados!',
+            icon: <Video className="w-5 h-5 text-purple-400" />,
+            title: 'Transmissões ao Vivo',
+            description: 'Acompanhe streams ao vivo diretamente no carrossel do feed! Integração completa com autenticação OAuth.',
+            isNew: true
+        },
+        {
+            icon: <ShoppingBag className="w-5 h-5 text-green-400" />,
+            title: 'Jogos Grátis da Semana',
+            description: 'Card com jogos grátis de diversas plataformas! Não perca mais nenhuma oferta.',
+            isNew: true
+        },
+        {
+            icon: <Globe className="w-5 h-5 text-blue-400" />,
+            title: 'Seletor de Idioma',
+            description: 'Agora você pode escolher o idioma da plataforma nas configurações! PT-BR, EN e ES disponíveis.',
+            isNew: true
+        },
+        {
+            icon: <Trophy className="w-5 h-5 text-yellow-400" />,
+            title: 'Sistema de Torneios',
+            description: 'Competições organizadas com brackets, prêmios e leaderboard! Inscreva-se já.',
+            isNew: true
+        },
+        {
+            icon: <Bot className="w-5 h-5 text-red-400" />,
+            title: 'Moderação Automática',
+            description: 'Sistema de IA para detectar conteúdo tóxico e spam em desenvolvimento!',
+            isNew: true
+        },
+        {
+            icon: <MessageCircle className="w-5 h-5 text-cyan-400" />,
+            title: 'Lembrete de Feedback',
+            description: 'Receba lembretes periódicos para nos ajudar a melhorar enviando seu feedback!',
             isNew: true
         },
         {
             icon: <Palette className="w-5 h-5 text-pink-400" />,
             title: 'Gradientes em Todos os Cards',
             description: 'Cards de bônus diário, amigos online, inventário e menu lateral agora usam sua cor de destaque!',
-            isNew: true
         },
         {
-            icon: <MessageCircle className="w-5 h-5 text-blue-400" />,
-            title: 'Comentários Estilo YouTube',
-            description: 'Agora você pode responder comentários e curtir! Interface completamente redesenhada.',
-        },
-        {
-            icon: <Heart className="w-5 h-5 text-red-400" />,
-            title: 'Favoritos no Mercado',
-            description: 'Salve anúncios favoritos e acompanhe itens que você quer comprar!',
-        },
-        {
-            icon: <ShoppingBag className="w-5 h-5 text-purple-400" />,
-            title: 'Sistema de Ofertas',
-            description: 'Faça propostas aos vendedores! Negocie preços e feche negócios melhores.',
-        },
-        {
-            icon: <Star className="w-5 h-5 text-yellow-400" />,
-            title: 'Anúncios em Destaque',
-            description: 'Pague 50 Zions e seu anúncio fica no topo por 24h com selo dourado!',
-        },
-        {
-            icon: <Shield className="w-5 h-5 text-emerald-400" />,
-            title: 'Vendedor Confiável',
-            description: 'Badge exclusivo para vendedores com 10+ vendas realizadas!',
-        },
-        {
-            icon: <Zap className="w-5 h-5 text-gold-400" />,
-            title: 'Elite Badge Aprimorado',
-            description: 'Assinantes que cancelaram ainda aparecem como Elite até o fim do período.',
+            icon: <Sparkles className="w-5 h-5 text-violet-400" />,
+            title: 'Tema Iridescente Corrigido',
+            description: 'O background Prisma Iridescente foi restaurado ao visual original com efeitos de shader aprimorados!',
         }
     ];
 

@@ -1313,8 +1313,10 @@ interface FreeGame {
     title: string;
     imageUrl: string;
     claimUrl: string;
-    platform: 'prime' | 'twitch' | 'epic' | 'other';
-    expiresAt?: string;
+    platform: 'prime' | 'twitch' | 'epic' | 'steam' | 'gog' | 'other';
+    expiresAt?: string | null;
+    source?: 'manual' | 'gamerpower';
+    worth?: string;
 }
 
 const DEFAULT_TWITCH_CONFIG: TwitchConfig = {
@@ -1418,20 +1420,81 @@ export const getTwitchFreeGames = async (_req: Request, res: Response): Promise<
             return;
         }
 
-        const games: FreeGame[] = gamesSetting?.value 
+        // First check admin-configured manual games
+        const manualGames: FreeGame[] = gamesSetting?.value 
             ? (gamesSetting.value as unknown as FreeGame[])
             : [];
 
-        // Filter expired games
+        // Filter expired manual games
         const now = new Date();
-        const activeGames = games.filter(g => {
+        const activeManualGames = manualGames.filter(g => {
             if (!g.expiresAt) return true;
             return new Date(g.expiresAt) > now;
         });
 
-        res.json({ games: activeGames, enabled: true });
+        // Also fetch from GamerPower API for auto games
+        let autoGames: FreeGame[] = [];
+        try {
+            const apiResponse = await axios.get('https://www.gamerpower.com/api/giveaways', {
+                params: {
+                    platform: 'pc',
+                    type: 'game',
+                    'sort-by': 'popularity'
+                },
+                timeout: 5000
+            });
+            
+            if (Array.isArray(apiResponse.data)) {
+                autoGames = apiResponse.data.slice(0, 6).map((game: any) => ({
+                    id: `gp_${game.id}`,
+                    title: game.title,
+                    imageUrl: game.thumbnail || game.image,
+                    claimUrl: game.open_giveaway_url || game.open_giveaway,
+                    platform: detectPlatform(game.platforms || ''),
+                    expiresAt: game.end_date !== 'N/A' ? game.end_date : null,
+                    source: 'gamerpower',
+                    worth: game.worth,
+                }));
+            }
+        } catch (apiError) {
+            console.debug('[FreeGames] GamerPower API unavailable:', (apiError as any)?.message);
+        }
+
+        // Combine manual and auto games, deduplicate by title
+        const seenTitles = new Set<string>();
+        const allGames: FreeGame[] = [];
+        
+        // Manual games take priority
+        for (const game of activeManualGames) {
+            const key = game.title.toLowerCase();
+            if (!seenTitles.has(key)) {
+                seenTitles.add(key);
+                allGames.push(game);
+            }
+        }
+        
+        // Then add auto games
+        for (const game of autoGames) {
+            const key = game.title.toLowerCase();
+            if (!seenTitles.has(key)) {
+                seenTitles.add(key);
+                allGames.push(game);
+            }
+        }
+
+        res.json({ games: allGames.slice(0, 10), enabled: true });
     } catch (error) {
         console.error('Error fetching free games:', error);
         res.json({ games: [], enabled: false });
     }
 };
+
+// Helper to detect platform from GamerPower string
+function detectPlatform(platforms: string): 'prime' | 'epic' | 'steam' | 'gog' | 'other' {
+    const lower = platforms.toLowerCase();
+    if (lower.includes('epic')) return 'epic';
+    if (lower.includes('steam')) return 'steam';
+    if (lower.includes('gog')) return 'gog';
+    if (lower.includes('prime') || lower.includes('amazon')) return 'prime';
+    return 'other';
+}

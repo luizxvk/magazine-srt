@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard } from 'lucide-react';
+import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
 import PushNotificationSettings from '../components/PushNotificationSettings';
+import LanguageSelector from '../components/LanguageSelector';
 import api from '../services/api';
 import Loader from '../components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -307,6 +308,15 @@ export default function SettingsPage() {
                                     showWelcomeCard ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
+                        </div>
+
+                        {/* Language Selector */}
+                        <div className="pt-4 border-t border-zinc-700/50">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Globe className={`w-4 h-4 text-${themeColor}-400`} />
+                                <p className={`font-medium ${textMain}`}>Idioma</p>
+                            </div>
+                            <LanguageSelector variant="inline" />
                         </div>
                     </div>
 

@@ -52,6 +52,7 @@ import BetaRewardPopup from './components/BetaRewardPopup';
 import BetaEndedOverlay from './components/BetaEndedOverlay';
 import SupportButton from './components/SupportButton';
 import WebGLBackgroundRenderer from './components/WebGLBackgroundRenderer';
+import FeedbackReminderNotification from './components/FeedbackReminderNotification';
 
 
 
@@ -131,6 +132,7 @@ function App() {
         <BetaRewardWrapper />
         <BetaEndedOverlay />
         <SupportButtonWrapper />
+        <FeedbackReminderWrapper />
         <WebGLBackgroundRenderer />
       </Router>
     </RadioProvider>
@@ -232,6 +234,15 @@ function SupportButtonWrapper() {
   if (!user) return null;
   
   return <SupportButton />;
+}
+
+function FeedbackReminderWrapper() {
+  const { user } = useAuth();
+  
+  // Only show for logged in users
+  if (!user) return null;
+  
+  return <FeedbackReminderNotification />;
 }
 
 export default App;

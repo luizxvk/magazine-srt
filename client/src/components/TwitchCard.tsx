@@ -234,8 +234,26 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
 
             {streams.length === 0 ? (
                 <div className={`text-center py-8 ${textSub}`}>
-                    <Tv className="w-12 h-12 mx-auto mb-2 opacity-50" style={{ color: accentColor }} />
-                    <p>Nenhuma stream ao vivo no momento</p>
+                    <Tv className="w-12 h-12 mx-auto mb-3 opacity-50" style={{ color: accentColor }} />
+                    {!connected ? (
+                        <>
+                            <p className="mb-4">Conecte sua conta para ver streams ao vivo</p>
+                            <button
+                                onClick={handleConnect}
+                                disabled={connecting}
+                                className="flex items-center gap-2 mx-auto px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:brightness-110"
+                                style={{
+                                    backgroundColor: accentColor,
+                                    color: '#000',
+                                }}
+                            >
+                                <Link className="w-4 h-4" />
+                                {connecting ? 'Conectando...' : 'Conectar Twitch'}
+                            </button>
+                        </>
+                    ) : (
+                        <p>Nenhuma stream ao vivo no momento</p>
+                    )}
                 </div>
             ) : (
                 <div className="space-y-4 max-h-[500px] overflow-y-auto">

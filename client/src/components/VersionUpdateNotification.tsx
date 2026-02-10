@@ -27,7 +27,20 @@ export default function VersionUpdateNotification() {
             });
             
             if (response.ok) {
-                const latestBuildInfo = await response.json();
+                // Check content-type to ensure it's JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    // Not JSON (probably 404 HTML page), silently ignore
+                    return;
+                }
+                
+                const text = await response.text();
+                // Extra safety check for HTML responses
+                if (text.startsWith('<!') || text.startsWith('<html')) {
+                    return;
+                }
+                
+                const latestBuildInfo = JSON.parse(text);
                 
                 // Compare build times - if different, there's a new version
                 if (latestBuildInfo.buildTime && latestBuildInfo.buildTime !== CURRENT_BUILD_TIME) {
@@ -36,7 +49,7 @@ export default function VersionUpdateNotification() {
             }
         } catch (error) {
             // Silently fail - network errors shouldn't affect UX
-            console.debug('Version check failed:', error);
+            // Don't even log in production to avoid console noise
         }
     }, [user]);
 

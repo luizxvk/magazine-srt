@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -105,6 +105,15 @@ export default function MobileCarousel({
             icon: <Calendar className="w-6 h-6" />,
             gradient: cardStyle,
             onClick: onEventsClick
+        },
+        {
+            id: 'tournaments',
+            title: 'Torneios',
+            subtitle: 'Competições e prêmios',
+            icon: <Trophy className="w-6 h-6" />,
+            gradient: cardStyle,
+            onClick: () => navigate('/tournaments'),
+            badge: '🏆'
         },
         {
             id: 'members',

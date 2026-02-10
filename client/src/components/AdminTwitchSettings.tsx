@@ -21,6 +21,8 @@ const PLATFORM_LABELS: Record<string, { label: string; color: string }> = {
     prime: { label: 'Prime Gaming', color: 'text-blue-400 bg-blue-500/20 border-blue-500/30' },
     twitch: { label: 'Twitch', color: 'text-purple-400 bg-purple-500/20 border-purple-500/30' },
     epic: { label: 'Epic Games', color: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30' },
+    steam: { label: 'Steam', color: 'text-sky-400 bg-sky-500/20 border-sky-500/30' },
+    gog: { label: 'GOG', color: 'text-violet-400 bg-violet-500/20 border-violet-500/30' },
     other: { label: 'Outro', color: 'text-gray-400 bg-gray-500/20 border-gray-500/30' },
 };
 
@@ -132,17 +134,19 @@ export default function AdminTwitchSettings() {
     const ToggleSwitch = ({ enabled, onChange, label }: { enabled: boolean; onChange: () => void; label: string }) => (
         <button
             onClick={onChange}
-            className={`flex items-center gap-3 p-3 rounded-lg border transition-all w-full ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
                 enabled 
                     ? 'bg-purple-500/20 border-purple-500/50 text-white' 
-                    : 'bg-black/20 border-white/10 text-gray-400'
+                    : 'bg-black/20 border-white/10 text-gray-400 hover:border-white/20'
             }`}
         >
-            <div className={`w-10 h-5 rounded-full relative transition-colors ${enabled ? 'bg-purple-500' : 'bg-gray-600'}`}>
-                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${enabled ? 'left-5.5' : 'left-0.5'}`} 
-                    style={{ left: enabled ? '22px' : '2px' }} />
+            <div className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-purple-500' : 'bg-gray-600'}`}>
+                <div 
+                    className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-all duration-200`}
+                    style={{ left: enabled ? '24px' : '4px' }} 
+                />
             </div>
-            <span className="text-sm font-medium">{label}</span>
+            <span className="text-sm font-medium whitespace-nowrap">{label}</span>
         </button>
     );
 

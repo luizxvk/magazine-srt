@@ -8,14 +8,18 @@ interface FreeGame {
     title: string;
     imageUrl: string;
     claimUrl: string;
-    platform: 'prime' | 'twitch' | 'epic' | 'other';
-    expiresAt?: string;
+    platform: 'prime' | 'twitch' | 'epic' | 'steam' | 'gog' | 'other';
+    expiresAt?: string | null;
+    source?: 'manual' | 'gamerpower';
+    worth?: string;
 }
 
 const PLATFORM_COLORS: Record<string, { bg: string; text: string; border: string }> = {
     prime: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' },
     twitch: { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' },
     epic: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' },
+    steam: { bg: 'bg-sky-500/20', text: 'text-sky-400', border: 'border-sky-500/30' },
+    gog: { bg: 'bg-violet-500/20', text: 'text-violet-400', border: 'border-violet-500/30' },
     other: { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/30' },
 };
 
@@ -23,6 +27,8 @@ const PLATFORM_NAMES: Record<string, string> = {
     prime: 'Prime Gaming',
     twitch: 'Twitch Drops',
     epic: 'Epic Games',
+    steam: 'Steam',
+    gog: 'GOG',
     other: 'Outro',
 };
 
@@ -115,10 +121,15 @@ export default function FreeGamesCard() {
                             {/* Game Info */}
                             <div className="flex-1 min-w-0">
                                 <p className={`font-medium ${textMain} truncate group-hover:underline`}>{game.title}</p>
-                                <div className="flex items-center gap-2 mt-1">
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
                                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${platformStyle.bg} ${platformStyle.text} border ${platformStyle.border}`}>
                                         {PLATFORM_NAMES[game.platform]}
                                     </span>
+                                    {game.worth && game.worth !== 'N/A' && (
+                                        <span className="text-xs text-green-400 font-medium">
+                                            {game.worth}
+                                        </span>
+                                    )}
                                     {daysRemaining !== null && daysRemaining <= 7 && (
                                         <span className={`text-xs flex items-center gap-1 ${daysRemaining <= 2 ? 'text-red-400' : 'text-yellow-400'}`}>
                                             <Clock className="w-3 h-3" />

@@ -1,9 +1,12 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import Ranking from '../components/Ranking';
+import GradientText from '../components/GradientText';
+import { useTranslation } from 'react-i18next';
 
 export default function RankingPage() {
     const { user } = useAuth();
+    const { t } = useTranslation('gamification');
     const isMGT = user?.membershipType === 'MGT';
 
     return (
@@ -13,11 +16,11 @@ export default function RankingPage() {
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
                 {/* Page Title */}
                 <div className="mb-8">
-                    <h1 className={`text-4xl font-serif mb-2 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                        🏆 Ranking
-                    </h1>
+                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                        🏆 {t('ranking.title')}
+                    </GradientText>
                     <p className="text-gray-400">
-                        Classificação dos membros mais ativos e engajados
+                        {t('ranking.position', { position: '#' })}
                     </p>
                 </div>
 

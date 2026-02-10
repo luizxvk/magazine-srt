@@ -18,10 +18,15 @@ import {
     steamCallback,
     getSteamActivities,
     getTwitchStreams,
+    initiateTwitchAuth,
+    twitchCallback,
+    getTwitchFollowedStreams,
+    getTwitchChannels,
+    updateTwitchChannels,
     disconnectSocial,
     getSocialConnections
 } from '../controllers/socialController';
-import { authenticateToken } from '../middleware/authMiddleware';
+import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -52,6 +57,11 @@ router.get('/steam/callback', steamCallback);
 router.get('/steam/activities', authenticateToken, getSteamActivities);
 
 // Twitch
+router.get('/twitch/auth', authenticateToken, initiateTwitchAuth);
+router.get('/twitch/callback', twitchCallback);
+router.get('/twitch/followed', authenticateToken, getTwitchFollowedStreams);
 router.get('/twitch/streams', getTwitchStreams);
+router.get('/twitch/channels', getTwitchChannels);
+router.put('/twitch/channels', authenticateToken, isAdmin, updateTwitchChannels);
 
 export default router;

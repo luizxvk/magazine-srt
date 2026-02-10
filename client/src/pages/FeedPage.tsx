@@ -13,6 +13,8 @@ import ConfirmModal from '../components/ConfirmModal';
 import ToastNotification from '../components/ToastNotification';
 import ModernLoader from '../components/ModernLoader';
 import { TimelineAnimation, feedItemVariants } from '../components/TimelineAnimation';
+import GradientText from '../components/GradientText';
+import { useTranslation } from 'react-i18next';
 
 import AnnouncementCard from '../components/AnnouncementCard';
 import StoriesBar from '../components/StoriesBar';
@@ -80,6 +82,7 @@ interface Post {
 
 export default function FeedPage() {
     const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser } = useAuth();
+    const { t } = useTranslation(['feed', 'common']);
     const isMGT = user?.membershipType === 'MGT';
 
     const [posts, setPosts] = useState<Post[]>([]);
@@ -364,14 +367,14 @@ export default function FeedPage() {
                                 <TimelineAnimation animationNum={0} className="mb-4">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h1 className={`text-2xl md:text-3xl font-serif ${isMGT ? 'text-white' : 'text-gold-400'}`}>
-                                                Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
-                                            </h1>
+                                            <GradientText as="h1" className="text-2xl md:text-3xl font-serif" fallbackClassName={isMGT ? 'text-white' : 'text-gold-400'}>
+                                                {t('feed:feed.welcome', { name: user?.name?.split(' ')[0] || t('common:nav.profile') })}
+                                            </GradientText>
                                         </div>
                                         <Link
                                             to="/settings"
                                             className="p-2 rounded-lg bg-white/10 hover:bg-white/15 text-gray-300 transition-all"
-                                            title="Configurações"
+                                            title={t('common:nav.settings')}
                                         >
                                             <Settings className="w-5 h-5" />
                                         </Link>
@@ -430,8 +433,8 @@ export default function FeedPage() {
                                     <TimelineAnimation animationNum={6}>
                                         <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
                                             <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
-                                            <p className="text-gray-400 font-serif text-xl">Nenhuma postagem no momento</p>
-                                            <p className="text-gray-600 text-sm mt-2">Seja o primeiro a compartilhar algo exclusivo.</p>
+                                            <p className="text-gray-400 font-serif text-xl">{t('feed:feed.empty')}</p>
+                                            <p className="text-gray-600 text-sm mt-2">{t('feed:createPost.placeholder')}</p>
                                         </div>
                                     </TimelineAnimation>
                                 ) : (
@@ -508,12 +511,12 @@ export default function FeedPage() {
                                                     {loadingMore ? (
                                                         <>
                                                             <Loader size="sm" />
-                                                            Carregando...
+                                                            {t('common:status.loading')}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <ChevronDown className="w-4 h-4" />
-                                                            Carregar Mais
+                                                            {t('common:actions.loadMore')}
                                                         </>
                                                     )}
                                                 </button>

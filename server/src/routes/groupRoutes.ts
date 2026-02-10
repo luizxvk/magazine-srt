@@ -55,7 +55,7 @@ router.put('/:groupId/nickname', updateNickname);
 router.post('/:groupId/mute', toggleMute);
 
 // Rotas de mensagens
-router.post('/:id/messages', postMessage);
+router.post('/:id/messages', moderateTextContent(['content']), postMessage);
 router.post('/:groupId/messages/image', postImageMessage);
 router.get('/:id/messages', getGroupMessages);
 router.delete('/:id/messages/:messageId', deleteGroupMessage);

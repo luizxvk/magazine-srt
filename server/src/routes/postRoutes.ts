@@ -2,15 +2,16 @@ import { Router } from 'express';
 import { createPost, deletePost, getComments, votePoll, getPostById, replyToComment, likeComment } from '../controllers/postController';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { commentPost } from '../controllers/feedController';
+import { moderateTextContent } from '../middleware/moderationMiddleware';
 
 const router = Router();
 
-router.post('/', authenticateToken, createPost);
+router.post('/', authenticateToken, moderateTextContent(['content', 'caption']), createPost);
 router.get('/:id', authenticateToken, getPostById); // Get single post
 router.delete('/:id', authenticateToken, deletePost);
 
 // Comments routes
-router.post('/:id/comments', authenticateToken, commentPost); // commentPost expects :id param
+router.post('/:id/comments', authenticateToken, moderateTextContent(['text', 'content']), commentPost); // commentPost expects :id param
 router.get('/:postId/comments', authenticateToken, getComments); // getComments expects :postId param
 
 // Comment reply & like routes

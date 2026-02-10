@@ -7,6 +7,8 @@ import TournamentDetail from '../components/TournamentDetail';
 import api from '../services/api';
 import { motion } from 'framer-motion';
 import { Trophy, Swords, Users } from 'lucide-react';
+import GradientText from '../components/GradientText';
+import { useTranslation } from 'react-i18next';
 
 interface Tournament {
     id: string;
@@ -27,6 +29,7 @@ interface Tournament {
 export default function TournamentsPage() {
     const { user } = useAuth();
     const { formatCurrency } = useCommunity();
+    const { t } = useTranslation('gamification');
     const isMGT = user?.membershipType === 'MGT';
 
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -74,12 +77,12 @@ export default function TournamentsPage() {
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
                 {/* Page Header */}
                 <div className="mb-8">
-                    <h1 className={`text-4xl font-serif mb-2 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
                         <Swords className="inline-block w-8 h-8 mr-2 -mt-1" />
-                        Torneios
-                    </h1>
+                        {t('tournaments.title')}
+                    </GradientText>
                     <p className="text-gray-400">
-                        Compete em torneios e ganhe prêmios em Zions
+                        {t('tournaments.prizes')} + {t('tournaments.brackets')}
                     </p>
                 </div>
 

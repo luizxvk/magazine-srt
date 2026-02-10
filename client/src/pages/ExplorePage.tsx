@@ -13,6 +13,8 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import ModernLoader from '../components/ModernLoader';
 import SearchModal from '../components/SearchModal';
+import GradientText from '../components/GradientText';
+import { useTranslation } from 'react-i18next';
 
 interface TrendingPost {
     id: string;
@@ -50,6 +52,7 @@ interface FeatureCard {
 export default function ExplorePage() {
     const { user, theme } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation('common');
     const isMGT = user?.membershipType === 'MGT';
     
     const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
@@ -61,6 +64,7 @@ export default function ExplorePage() {
 
     // Theme colors
     const themeTitle = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    // GradientText used for the page title
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT ? 'shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_20px_rgba(212,175,55,0.3)]';
     const themeButtonActive = isMGT ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-gold-500/20 text-gold-400 border-gold-500/50';
@@ -142,9 +146,9 @@ export default function ExplorePage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    <h1 className={`text-3xl md:text-4xl font-serif ${themeTitle} mb-2`}>
-                        Explorar
-                    </h1>
+                    <GradientText as="h1" className="text-3xl md:text-4xl font-serif mb-2" fallbackClassName={themeTitle}>
+                        {t('nav.explore')}
+                    </GradientText>
                     <p className={themeTextSecondary}>
                         Descubra conteúdos incríveis da comunidade
                     </p>

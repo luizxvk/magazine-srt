@@ -25,6 +25,7 @@
     },
     "feed": {
         "title": "Feed",
+        "welcome": "Bienvenido, {{name}}",
         "empty": "¡Aún no hay publicaciones. Sé el primero en publicar!",
         "refresh": "Actualizar feed"
     },

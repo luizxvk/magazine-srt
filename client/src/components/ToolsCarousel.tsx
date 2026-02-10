@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Wrench } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import RadioCard from './RadioCard';
 import DiscordCard from './DiscordCard';
 import SteamCard from './SteamCard';
 import TwitchCard from './TwitchCard';
+import api from '../services/api';
 
 // Color mapping from CustomizationShop
 const COLOR_MAP: Record<string, string> = {
@@ -50,6 +51,15 @@ export default function ToolsCarousel() {
     const isMGT = user?.membershipType === 'MGT';
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef<HTMLDivElement>(null);
+    const [twitchChannels, setTwitchChannels] = useState<string[]>(['gaules', 'alanzoka', 'loud_coringa', 'nobru']);
+
+    useEffect(() => {
+        api.get('/social/twitch/channels')
+            .then(({ data }) => {
+                if (data.channels?.length > 0) setTwitchChannels(data.channels);
+            })
+            .catch(() => {});
+    }, []);
 
     // Get the actual color hex from user's equipped color ID
     const getUserAccentColor = () => {
@@ -115,7 +125,7 @@ export default function ToolsCarousel() {
             case 'steam':
                 return <SteamCard />;
             case 'twitch':
-                return <TwitchCard usernames={['gaules', 'alanzoka', 'loud_coringa', 'nobru']} />;
+                return <TwitchCard usernames={twitchChannels} />;
             default:
                 return null;
         }

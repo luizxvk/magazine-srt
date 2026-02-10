@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Tv, Eye, ExternalLink } from 'lucide-react';
+import { Tv, Eye, ExternalLink, CheckCircle, LogOut, Link } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -16,8 +16,16 @@ interface TwitchStream {
     streamUrl: string;
 }
 
+interface TwitchConnection {
+    platformUsername: string;
+    metadata?: {
+        avatar?: string;
+        login?: string;
+    };
+}
+
 interface TwitchCardProps {
-    usernames?: string[]; // Usernames da Twitch para monitorar
+    usernames?: string[]; // Default Twitch usernames to monitor when not connected
 }
 
 // Color mapping from CustomizationShop
@@ -57,6 +65,9 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
     const isMGT = user?.membershipType === 'MGT';
     const [streams, setStreams] = useState<TwitchStream[]>([]);
     const [loading, setLoading] = useState(true);
+    const [connected, setConnected] = useState(false);
+    const [connection, setConnection] = useState<TwitchConnection | null>(null);
+    const [connecting, setConnecting] = useState(false);
 
     // Get the actual color hex from user's equipped color ID
     const getUserAccentColor = () => {
@@ -80,15 +91,38 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
     useEffect(() => {
+        checkConnection();
         loadStreams();
-        // Atualizar a cada 60 segundos
         const interval = setInterval(loadStreams, 60000);
         return () => clearInterval(interval);
     }, [usernames]);
 
+    const checkConnection = async () => {
+        try {
+            const { data } = await api.get('/social/connections');
+            const twitch = data.connections?.find((c: any) => c.platform === 'TWITCH');
+            if (twitch) {
+                setConnected(true);
+                setConnection(twitch);
+            }
+        } catch {}
+    };
+
     const loadStreams = async () => {
         try {
-            const response = await api.get('/social/twitch/streams', {
+            // Try followed streams first if connected, fallback to default
+            let response;
+            try {
+                response = await api.get('/social/twitch/followed');
+                if (response.data.streams?.length > 0) {
+                    setStreams(response.data.streams);
+                    setLoading(false);
+                    return;
+                }
+            } catch {}
+
+            // Fallback: load default streams
+            response = await api.get('/social/twitch/streams', {
                 params: { usernames: usernames.join(',') },
             });
             setStreams(response.data.streams);
@@ -96,6 +130,28 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
             console.error('Error loading Twitch streams:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleConnect = async () => {
+        try {
+            setConnecting(true);
+            const { data } = await api.get('/social/twitch/auth');
+            window.location.href = data.authUrl;
+        } catch (error) {
+            console.error('Error connecting Twitch:', error);
+            setConnecting(false);
+        }
+    };
+
+    const handleDisconnect = async () => {
+        try {
+            await api.delete('/social/disconnect/twitch');
+            setConnected(false);
+            setConnection(null);
+            loadStreams();
+        } catch (error) {
+            console.error('Error disconnecting Twitch:', error);
         }
     };
 
@@ -126,10 +182,38 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
                     <div>
                         <h3 className={`text-lg font-bold ${textMain}`}>Twitch</h3>
                         <p className={`text-sm ${textSub}`}>
-                            {streams.length} streams ao vivo
+                            {connected 
+                                ? <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-green-400" />{connection?.platformUsername}</span>
+                                : `${streams.length} streams ao vivo`}
                         </p>
                     </div>
                 </div>
+
+                {/* Connect / Disconnect button */}
+                {connected ? (
+                    <button
+                        onClick={handleDisconnect}
+                        className={`p-2 rounded-lg transition-all ${theme === 'light' ? 'hover:bg-red-50 text-red-500' : 'hover:bg-red-500/10 text-red-400'}`}
+                        title="Desconectar"
+                    >
+                        <LogOut className="w-4 h-4" />
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleConnect}
+                        disabled={connecting}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                        style={{
+                            backgroundColor: hexToRgba(accentColor, 0.15),
+                            color: accentColor,
+                            borderColor: hexToRgba(accentColor, 0.3),
+                            borderWidth: '1px',
+                        }}
+                    >
+                        <Link className="w-3.5 h-3.5" />
+                        {connecting ? 'Conectando...' : 'Conectar'}
+                    </button>
+                )}
             </div>
 
             {streams.length === 0 ? (

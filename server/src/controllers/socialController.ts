@@ -830,6 +830,289 @@ export const getSteamActivities = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// ========== TWITCH OAUTH ==========
+
+// Iniciar OAuth para Twitch
+export const initiateTwitchAuth = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ message: 'Não autenticado' });
+
+        const clientId = process.env.TWITCH_CLIENT_ID;
+        const redirectUri = process.env.TWITCH_REDIRECT_URI || `${process.env.BACKEND_URL || 'http://localhost:3000'}/api/social/twitch/callback`;
+
+        if (!clientId) {
+            return res.status(500).json({ message: 'Twitch client ID não configurado' });
+        }
+
+        const scopes = 'user:read:follows user:read:subscriptions';
+        const authUrl = `${OAUTH_URLS.twitch.authorize}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${userId}`;
+
+        res.json({ authUrl });
+    } catch (error) {
+        console.error('Error initiating Twitch auth:', error);
+        res.status(500).json({ message: 'Erro ao iniciar autenticação Twitch' });
+    }
+};
+
+// Callback OAuth Twitch
+export const twitchCallback = async (req: AuthRequest, res: Response) => {
+    try {
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const { code, state, error } = req.query;
+
+        if (error) {
+            console.error('Twitch OAuth error:', error);
+            return res.redirect(`${frontendUrl}/settings?social=twitch&status=error&message=${error}`);
+        }
+
+        const userId = state as string;
+        if (!userId || !code) {
+            return res.redirect(`${frontendUrl}/settings?social=twitch&status=error&message=missing_params`);
+        }
+
+        const clientId = process.env.TWITCH_CLIENT_ID;
+        const clientSecret = process.env.TWITCH_CLIENT_SECRET;
+        const redirectUri = process.env.TWITCH_REDIRECT_URI || `${process.env.BACKEND_URL || 'http://localhost:3000'}/api/social/twitch/callback`;
+
+        if (!clientId || !clientSecret) {
+            return res.redirect(`${frontendUrl}/settings?social=twitch&status=error&message=not_configured`);
+        }
+
+        // Exchange code for token
+        const tokenResponse = await axios.post(OAUTH_URLS.twitch.token, null, {
+            params: {
+                client_id: clientId,
+                client_secret: clientSecret,
+                code: code as string,
+                grant_type: 'authorization_code',
+                redirect_uri: redirectUri,
+            },
+        });
+
+        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+
+        // Get Twitch user info
+        const userResponse = await axios.get(OAUTH_URLS.twitch.userInfo, {
+            headers: {
+                'Client-ID': clientId,
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+
+        const twitchUser = userResponse.data.data[0];
+
+        // Save connection
+        await prisma.socialConnection.upsert({
+            where: {
+                userId_platform: { userId, platform: SocialPlatform.TWITCH },
+            },
+            update: {
+                platformId: twitchUser.id,
+                platformUsername: twitchUser.display_name || twitchUser.login,
+                accessToken: access_token,
+                refreshToken: refresh_token,
+                expiresAt: new Date(Date.now() + expires_in * 1000),
+                isActive: true,
+                lastSynced: new Date(),
+                metadata: {
+                    avatar: twitchUser.profile_image_url,
+                    login: twitchUser.login,
+                    email: twitchUser.email,
+                },
+            },
+            create: {
+                userId,
+                platform: SocialPlatform.TWITCH,
+                platformId: twitchUser.id,
+                platformUsername: twitchUser.display_name || twitchUser.login,
+                accessToken: access_token,
+                refreshToken: refresh_token,
+                expiresAt: new Date(Date.now() + expires_in * 1000),
+                isActive: true,
+                lastSynced: new Date(),
+                metadata: {
+                    avatar: twitchUser.profile_image_url,
+                    login: twitchUser.login,
+                    email: twitchUser.email,
+                },
+            },
+        });
+
+        res.redirect(`${frontendUrl}/settings?social=twitch&status=connected`);
+    } catch (error: any) {
+        console.error('Error in Twitch callback:', error.response?.data || error.message);
+        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        res.redirect(`${frontendUrl}/settings?social=twitch&status=error`);
+    }
+};
+
+// Get followed streams for connected user (live channels the user follows)
+export const getTwitchFollowedStreams = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ message: 'Não autenticado' });
+
+        const connection = await prisma.socialConnection.findUnique({
+            where: { userId_platform: { userId, platform: SocialPlatform.TWITCH } },
+        });
+
+        if (!connection || !connection.accessToken) {
+            return res.status(404).json({ message: 'Twitch não conectada', streams: [] });
+        }
+
+        const clientId = process.env.TWITCH_CLIENT_ID;
+
+        // Get live streams from followed channels
+        const streamsResponse = await axios.get('https://api.twitch.tv/helix/streams/followed', {
+            params: { user_id: connection.platformId, first: 20 },
+            headers: {
+                'Client-ID': clientId,
+                Authorization: `Bearer ${connection.accessToken}`,
+            },
+        });
+
+        const streams = streamsResponse.data.data.map((stream: any) => ({
+            userId: stream.user_id,
+            username: stream.user_login,
+            displayName: stream.user_name,
+            gameName: stream.game_name,
+            title: stream.title,
+            viewerCount: stream.viewer_count,
+            thumbnailUrl: stream.thumbnail_url.replace('{width}', '400').replace('{height}', '225'),
+            isLive: true,
+            streamUrl: `https://twitch.tv/${stream.user_login}`,
+        }));
+
+        res.json({ streams });
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            // Token expired — try refresh
+            try {
+                const refreshed = await refreshTwitchToken(req.user!.userId);
+                if (refreshed) {
+                    // Retry with new token
+                    return getTwitchFollowedStreams(req, res);
+                }
+            } catch {}
+            return res.json({ streams: [], error: 'Token expirado. Reconecte sua Twitch.' });
+        }
+        console.error('Error fetching followed streams:', error.response?.data || error.message);
+        res.json({ streams: [], error: 'Erro ao carregar streams' });
+    }
+};
+
+// Helper: Refresh Twitch OAuth token
+async function refreshTwitchToken(userId: string): Promise<boolean> {
+    try {
+        const connection = await prisma.socialConnection.findUnique({
+            where: { userId_platform: { userId, platform: SocialPlatform.TWITCH } },
+        });
+
+        if (!connection?.refreshToken) return false;
+
+        const tokenResponse = await axios.post(OAUTH_URLS.twitch.token, null, {
+            params: {
+                client_id: process.env.TWITCH_CLIENT_ID,
+                client_secret: process.env.TWITCH_CLIENT_SECRET,
+                grant_type: 'refresh_token',
+                refresh_token: connection.refreshToken,
+            },
+        });
+
+        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+
+        await prisma.socialConnection.update({
+            where: { id: connection.id },
+            data: {
+                accessToken: access_token,
+                refreshToken: refresh_token || connection.refreshToken,
+                expiresAt: new Date(Date.now() + expires_in * 1000),
+                lastSynced: new Date(),
+            },
+        });
+
+        return true;
+    } catch (error) {
+        console.error('[Twitch] Token refresh failed:', error);
+        return false;
+    }
+}
+
+// Check Twitch followed streams and create notifications when someone goes live
+export const syncTwitchNotifications = async (userId: string) => {
+    try {
+        const connection = await prisma.socialConnection.findUnique({
+            where: { userId_platform: { userId, platform: SocialPlatform.TWITCH } },
+        });
+
+        if (!connection?.accessToken) return;
+
+        const clientId = process.env.TWITCH_CLIENT_ID;
+
+        const streamsResponse = await axios.get('https://api.twitch.tv/helix/streams/followed', {
+            params: { user_id: connection.platformId, first: 10 },
+            headers: {
+                'Client-ID': clientId,
+                Authorization: `Bearer ${connection.accessToken}`,
+            },
+        });
+
+        const liveStreams = streamsResponse.data.data || [];
+        const previousLive = ((connection.metadata as any)?.lastLiveIds as string[]) || [];
+
+        // Find newly live streams
+        const newlyLive = liveStreams.filter((s: any) => !previousLive.includes(s.user_id));
+
+        for (const stream of newlyLive) {
+            await prisma.notification.create({
+                data: {
+                    userId,
+                    type: 'SYSTEM',
+                    content: JSON.stringify({
+                        text: `${stream.user_name} está ao vivo na Twitch: ${stream.title}`,
+                        actor: {
+                            id: stream.user_id,
+                            name: stream.user_name,
+                            avatarUrl: null,
+                        },
+                        metadata: {
+                            platform: 'twitch',
+                            streamUrl: `https://twitch.tv/${stream.user_login}`,
+                            gameName: stream.game_name,
+                            viewerCount: stream.viewer_count,
+                        },
+                    }),
+                },
+            });
+
+            // Also send push
+            sendPushToUser(
+                userId,
+                `🟣 ${stream.user_name} está ao vivo!`,
+                `${stream.title} — ${stream.game_name}`,
+                { url: `https://twitch.tv/${stream.user_login}`, type: 'twitch_live' }
+            ).catch(() => {});
+        }
+
+        // Update lastLiveIds in metadata
+        const currentLiveIds = liveStreams.map((s: any) => s.user_id);
+        await prisma.socialConnection.update({
+            where: { id: connection.id },
+            data: {
+                metadata: {
+                    ...((connection.metadata as any) || {}),
+                    lastLiveIds: currentLiveIds,
+                },
+                lastSynced: new Date(),
+            },
+        });
+    } catch (error) {
+        // Silent fail - don't break user flow
+        console.error('[Twitch] Notification sync error:', error);
+    }
+};
+
 // Buscar streams da Twitch
 export const getTwitchStreams = async (req: AuthRequest, res: Response) => {
     try {
@@ -947,5 +1230,53 @@ export const getSocialConnections = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error fetching social connections:', error);
         res.status(500).json({ message: 'Erro ao buscar conexões sociais' });
+    }
+};
+
+// ============ Admin Twitch Channels Config ============
+import * as fs from 'fs';
+import * as path from 'path';
+
+const TWITCH_CHANNELS_FILE = path.join(__dirname, '../config/twitchChannels.json');
+
+const readTwitchChannels = (): string[] => {
+    try {
+        const data = fs.readFileSync(TWITCH_CHANNELS_FILE, 'utf-8');
+        return JSON.parse(data).channels || [];
+    } catch {
+        return ['gaules', 'alanzoka', 'loud_coringa', 'nobru'];
+    }
+};
+
+const writeTwitchChannels = (channels: string[]) => {
+    fs.writeFileSync(TWITCH_CHANNELS_FILE, JSON.stringify({ channels }, null, 2), 'utf-8');
+};
+
+export const getTwitchChannels = async (_req: Request, res: Response) => {
+    try {
+        const channels = readTwitchChannels();
+        res.json({ channels });
+    } catch (error) {
+        console.error('Error reading twitch channels:', error);
+        res.status(500).json({ message: 'Erro ao buscar canais' });
+    }
+};
+
+export const updateTwitchChannels = async (req: AuthRequest, res: Response) => {
+    try {
+        const { channels } = req.body;
+        if (!Array.isArray(channels)) {
+            return res.status(400).json({ message: 'channels deve ser um array' });
+        }
+        const sanitized = channels
+            .filter((c: any) => typeof c === 'string')
+            .map((c: string) => c.trim().toLowerCase())
+            .filter((c: string) => c.length > 0);
+
+        writeTwitchChannels(sanitized);
+        res.json({ channels: sanitized });
+    } catch (error) {
+        console.error('Error updating twitch channels:', error);
+        res.status(500).json({ message: 'Erro ao salvar canais' });
     }
 };

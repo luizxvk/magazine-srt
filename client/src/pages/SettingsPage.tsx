@@ -8,9 +8,11 @@ import ConfirmModal from '../components/ConfirmModal';
 import PushNotificationSettings from '../components/PushNotificationSettings';
 import api from '../services/api';
 import Loader from '../components/Loader';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsPage() {
     const { user, logout, theme, toggleTheme, showToast, updateUser } = useAuth();
+    const { t } = useTranslation('settings');
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     
@@ -124,7 +126,7 @@ export default function SettingsPage() {
                         <div className={`inline-flex p-4 rounded-full bg-${themeColor}-500/10 mb-4`}>
                             <Settings className={`w-8 h-8 text-${themeColor}-400`} />
                         </div>
-                        <h1 className={`text-3xl font-bold ${textMain} mb-2`}>Configurações</h1>
+                        <h1 className={`text-3xl font-bold ${textMain} mb-2`}>{t('title')}</h1>
                         <p className={textSub}>Personalize sua experiência na plataforma</p>
                     </div>
 
@@ -135,7 +137,7 @@ export default function SettingsPage() {
                                 <User className={`w-6 h-6 text-${themeColor}-400`} />
                             </div>
                             <div>
-                                <h2 className={`text-xl font-bold ${textMain}`}>Perfil</h2>
+                                <h2 className={`text-xl font-bold ${textMain}`}>{t('sections.profile')}</h2>
                                 <p className={`text-sm ${textSub}`}>{user?.email}</p>
                             </div>
                         </div>
@@ -179,7 +181,7 @@ export default function SettingsPage() {
                     <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
                         <div className="flex items-center gap-3 mb-4">
                             <Bell className={`w-5 h-5 text-${themeColor}-400`} />
-                            <h3 className={`font-semibold ${textMain}`}>Notificações</h3>
+                            <h3 className={`font-semibold ${textMain}`}>{t('sections.notifications')}</h3>
                         </div>
 
                         {/* Sounds Toggle */}
@@ -226,7 +228,7 @@ export default function SettingsPage() {
 
                     {/* Appearance Settings */}
                     <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
-                        <h3 className={`font-semibold ${textMain} mb-4`}>Aparência</h3>
+                        <h3 className={`font-semibold ${textMain} mb-4`}>{t('sections.appearance')}</h3>
 
                         {/* Theme Toggle */}
                         <div className="flex items-center justify-between">
@@ -287,7 +289,7 @@ export default function SettingsPage() {
 
                     {/* Account Actions */}
                     <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-3`}>
-                        <h3 className={`font-semibold ${textMain} mb-4`}>Conta</h3>
+                        <h3 className={`font-semibold ${textMain} mb-4`}>{t('sections.account')}</h3>
 
                         <button
                             onClick={() => setShowLogoutConfirm(true)}

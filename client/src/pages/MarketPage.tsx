@@ -13,6 +13,8 @@ import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import VisitorBlockPopup from '../components/VisitorBlockPopup';
+import GradientText from '../components/GradientText';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -78,6 +80,7 @@ type SortType = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
 export default function MarketPage() {
   const { user, theme, updateUser, isVisitor } = useAuth();
+  const { t } = useTranslation(['shop', 'common']);
   const location = useLocation();
   const isMGT = user?.membershipType === 'MGT';
 
@@ -542,9 +545,9 @@ export default function MarketPage() {
             <Store className={`w-6 sm:w-8 h-6 sm:h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
             <div>
               <div className="flex items-center gap-3">
-                <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'} leading-none`}>
-                  Mercado
-                </h1>
+                <GradientText as="h1" className="text-2xl sm:text-3xl md:text-4xl font-bold leading-none" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                  {t('shop:market.title')}
+                </GradientText>
                 <span className={`flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse translate-y-1`}>
                   BETA
                 </span>

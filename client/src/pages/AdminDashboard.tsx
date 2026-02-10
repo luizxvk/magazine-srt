@@ -19,6 +19,7 @@ import AdminEliteReward from '../components/AdminEliteReward';
 import AdminAdsSettings from '../components/AdminAdsSettings';
 import AdminProducts from './admin/AdminProducts';
 import AdminConsumptionTracker from './admin/AdminConsumptionTracker';
+import AdminTwitchSettings from '../components/AdminTwitchSettings';
 
 interface Reward {
     id: string;
@@ -275,6 +276,7 @@ export default function AdminDashboard() {
                         <AdminCreateEvent showToast={showToast} />
                         <AdminEliteReward showToast={showToast} />
                         <AdminAdsSettings />
+                        <AdminTwitchSettings />
                         <BadgeManager />
                         <AdminFeedbackCard />
                     </div>

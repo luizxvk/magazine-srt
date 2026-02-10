@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, Sparkles, Trophy, Coins, Users, Radio, ShoppingBag, Palette, MessageCircle, Crown, Zap, Gift, Target, TrendingUp, Video, Globe } from 'lucide-react';
+import { X, ChevronRight, Sparkles, Trophy, Coins, Users, ShoppingBag, Palette, Crown, Zap, Gift, Target, TrendingUp, Video, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -1243,27 +1243,35 @@ export const getSocialConnections = async (req: AuthRequest, res: Response) => {
 };
 
 // ============ Admin Twitch Channels Config ============
-import * as fs from 'fs';
-import * as path from 'path';
+// Uses database (AppSettings) instead of file for Vercel compatibility
 
-const TWITCH_CHANNELS_FILE = path.join(__dirname, '../config/twitchChannels.json');
+const DEFAULT_TWITCH_CHANNELS = ['gaules', 'alanzoka', 'loud_coringa', 'nobru'];
 
-const readTwitchChannels = (): string[] => {
+const getTwitchChannelsFromDB = async (): Promise<string[]> => {
     try {
-        const data = fs.readFileSync(TWITCH_CHANNELS_FILE, 'utf-8');
-        return JSON.parse(data).channels || [];
+        const setting = await prisma.appSettings.findUnique({
+            where: { key: 'twitch_channels' }
+        });
+        if (setting && Array.isArray(setting.value)) {
+            return setting.value as string[];
+        }
+        return DEFAULT_TWITCH_CHANNELS;
     } catch {
-        return ['gaules', 'alanzoka', 'loud_coringa', 'nobru'];
+        return DEFAULT_TWITCH_CHANNELS;
     }
 };
 
-const writeTwitchChannels = (channels: string[]) => {
-    fs.writeFileSync(TWITCH_CHANNELS_FILE, JSON.stringify({ channels }, null, 2), 'utf-8');
+const saveTwitchChannelsToDB = async (channels: string[]): Promise<void> => {
+    await prisma.appSettings.upsert({
+        where: { key: 'twitch_channels' },
+        update: { value: channels },
+        create: { key: 'twitch_channels', value: channels }
+    });
 };
 
-export const getTwitchChannels = async (_req: Request, res: Response) => {
+export const getTwitchChannels = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const channels = readTwitchChannels();
+        const channels = await getTwitchChannelsFromDB();
         res.json({ channels });
     } catch (error) {
         console.error('Error reading twitch channels:', error);
@@ -1271,18 +1279,19 @@ export const getTwitchChannels = async (_req: Request, res: Response) => {
     }
 };
 
-export const updateTwitchChannels = async (req: AuthRequest, res: Response) => {
+export const updateTwitchChannels = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { channels } = req.body;
         if (!Array.isArray(channels)) {
-            return res.status(400).json({ message: 'channels deve ser um array' });
+            res.status(400).json({ message: 'channels deve ser um array' });
+            return;
         }
         const sanitized = channels
             .filter((c: any) => typeof c === 'string')
             .map((c: string) => c.trim().toLowerCase())
             .filter((c: string) => c.length > 0);
 
-        writeTwitchChannels(sanitized);
+        await saveTwitchChannelsToDB(sanitized);
         res.json({ channels: sanitized });
     } catch (error) {
         console.error('Error updating twitch channels:', error);

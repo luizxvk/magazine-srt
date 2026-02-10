@@ -319,6 +319,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
                 acceptedPaymentMethods: true,
                 pixKey: true,
                 pixKeyType: true,
+                pixApprovalStatus: true,
                 developer: true,
                 releaseDate: true,
                 sizeGB: true,
@@ -834,6 +835,10 @@ export const purchaseWithPixDirect = async (req: AuthRequest, res: Response) => 
 
         if (!product.acceptedPaymentMethods.includes('PIX')) {
             return res.status(400).json({ error: 'PIX direto não está habilitado para este produto' });
+        }
+
+        if (product.pixApprovalStatus !== 'APPROVED') {
+            return res.status(400).json({ error: 'PIX direto ainda não foi aprovado pela Rovex para este produto' });
         }
 
         // Check stock

@@ -79,6 +79,7 @@ model User {
   feedbacks              Feedback[]
   withdrawalRequests     WithdrawalRequest[]
   createdProducts        Product[]  @relation("ProductCreator")
+  pixSellerRequests      PixSellerRequest[] @relation("PixSellerRequester")
   themePacks             UserThemePack[]
   socialConnections      SocialConnection[]
   socialActivities       SocialActivity[]
@@ -888,6 +889,8 @@ model Product {
   acceptedPaymentMethods String[] @default([])  // ZIONS, PIX, MERCADO_PAGO
   pixKey        String?         // Seller's PIX key for direct PIX payments
   pixKeyType    PixKeyType?     // Type of PIX key (CPF, CNPJ, EMAIL, PHONE, RANDOM)
+  pixApprovalStatus PixApprovalStatus @default(NONE) // Rovex PIX approval status
+  pixSellerRequests PixSellerRequest[]
   // Game/Product Info
   developer     String?         // Developer/Publisher
   releaseDate   String?         // Release date
@@ -1316,6 +1319,48 @@ model PushSubscription {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@index([userId])
+}
+
+// ============================================
+// PIX SELLER APPROVAL (ROVEX)
+// ============================================
+
+model PixSellerRequest {
+  id            String            @id @default(uuid())
+  productId     String
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  requestedById String
+  requestedBy   User              @relation("PixSellerRequester", fields: [requestedById], references: [id])
+  // Seller Info
+  sellerName    String
+  sellerDocument String?          // CPF/CNPJ
+  sellerEmail   String
+  sellerPhone   String?
+  // PIX Details
+  pixKey        String
+  pixKeyType    PixKeyType
+  // Product Details (snapshot)
+  productName   String
+  productPrice  Float             // Price in BRL
+  productDescription String       @db.Text
+  // Request
+  justification String?           @db.Text
+  status        PixApprovalStatus @default(PENDING)
+  reviewedAt    DateTime?
+  reviewNote    String?           @db.Text
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([productId])
+  @@index([status])
+  @@index([requestedById])
+}
+
+enum PixApprovalStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 // ============================================

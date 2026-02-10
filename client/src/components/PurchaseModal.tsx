@@ -37,6 +37,7 @@ interface Product {
     acceptedPaymentMethods?: string[];
     pixKey?: string;
     pixKeyType?: string;
+    pixApprovalStatus?: string;
 }
 
 interface PurchaseModalProps {
@@ -101,7 +102,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
         ? product.acceptedPaymentMethods
         : []; // If empty, show all that have prices set
     const showZions = product.priceZions && (acceptedMethods.length === 0 || acceptedMethods.includes('ZIONS'));
-    const showPixDirect = product.priceBRL && product.pixKey && acceptedMethods.includes('PIX');
+    const showPixDirect = product.priceBRL && product.pixKey && acceptedMethods.includes('PIX') && product.pixApprovalStatus === 'APPROVED';
     const showMercadoPago = product.priceBRL && (acceptedMethods.length === 0 || acceptedMethods.includes('MERCADO_PAGO'));
 
     const pixKeyTypeLabels: Record<string, string> = {

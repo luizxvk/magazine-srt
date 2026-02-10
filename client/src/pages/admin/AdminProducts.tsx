@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Plus, Edit2, Trash2, Key, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent, QrCode, Banknote, Wallet } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Key, X, Search, Gamepad2, Gift, CreditCard, Sparkles, Eye, EyeOff, Upload, Tag, Image, HardDrive, Calendar, Monitor, User, Percent, QrCode, Banknote, Wallet, Send, Clock, CheckCircle, XCircle, Shield } from 'lucide-react';
 import Loader from '../../components/Loader';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -18,6 +18,7 @@ interface Product {
     isUnlimited: boolean;
     isActive: boolean;
     magazineDiscount?: boolean;
+    pixApprovalStatus?: string;
     developer?: string;
     releaseDate?: string;
     sizeGB?: number;
@@ -52,6 +53,13 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
     const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [newKeys, setNewKeys] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [pixRequestData, setPixRequestData] = useState({
+        sellerName: '',
+        sellerDocument: '',
+        sellerEmail: '',
+        sellerPhone: '',
+        justification: ''
+    });
 
     // Form state
     const [formData, setFormData] = useState({
@@ -146,15 +154,43 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                 tags: tagsArray.length > 0 ? tagsArray : undefined
             };
 
+            let savedProductId: string;
+
             if (editingProduct) {
                 await api.put(`/products/admin/${editingProduct.id}`, data);
+                savedProductId = editingProduct.id;
             } else {
-                await api.post('/products/admin/create', data);
+                const resp = await api.post('/products/admin/create', data);
+                savedProductId = resp.data.id;
+            }
+
+            // Submit PIX seller request to Rovex if PIX is selected and not already approved
+            if (formData.acceptedPaymentMethods.includes('PIX') && 
+                formData.pixKey && formData.pixKeyType &&
+                pixRequestData.sellerName && pixRequestData.sellerEmail &&
+                (!editingProduct?.pixApprovalStatus || editingProduct.pixApprovalStatus === 'NONE' || editingProduct.pixApprovalStatus === 'REJECTED')
+            ) {
+                try {
+                    await api.post('/products/admin/pix-request', {
+                        productId: savedProductId,
+                        sellerName: pixRequestData.sellerName,
+                        sellerDocument: pixRequestData.sellerDocument || undefined,
+                        sellerEmail: pixRequestData.sellerEmail,
+                        sellerPhone: pixRequestData.sellerPhone || undefined,
+                        pixKey: formData.pixKey,
+                        pixKeyType: formData.pixKeyType,
+                        justification: pixRequestData.justification || undefined
+                    });
+                    showToast('Produto salvo e solicitação PIX enviada à Rovex!');
+                } catch (pixError: any) {
+                    showToast(pixError.response?.data?.error || 'Produto salvo, mas erro ao enviar solicitação PIX');
+                }
             }
 
             setShowModal(false);
             setEditingProduct(null);
             resetForm();
+            setPixRequestData({ sellerName: '', sellerDocument: '', sellerEmail: '', sellerPhone: '', justification: '' });
             fetchProducts();
         } catch (error: any) {
             showToast(error.response?.data?.error || 'Erro ao salvar produto');
@@ -749,7 +785,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         </label>
                                     </div>
 
-                                    {/* PIX Key fields - shown when PIX is selected */}
+                                    {/* PIX Approval Form - shown when PIX is selected */}
                                     <AnimatePresence>
                                         {formData.acceptedPaymentMethods.includes('PIX') && (
                                             <motion.div
@@ -758,11 +794,43 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                                 exit={{ opacity: 0, height: 0 }}
                                                 className="overflow-hidden"
                                             >
+                                                {/* Show approval status if editing a product */}
+                                                {editingProduct?.pixApprovalStatus && editingProduct.pixApprovalStatus !== 'NONE' && (
+                                                    <div className={`p-3 rounded-lg mb-3 flex items-center gap-2 ${
+                                                        editingProduct.pixApprovalStatus === 'APPROVED' 
+                                                            ? 'bg-emerald-500/10 border border-emerald-500/30' 
+                                                            : editingProduct.pixApprovalStatus === 'PENDING'
+                                                                ? 'bg-amber-500/10 border border-amber-500/30'
+                                                                : 'bg-red-500/10 border border-red-500/30'
+                                                    }`}>
+                                                        {editingProduct.pixApprovalStatus === 'APPROVED' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
+                                                        {editingProduct.pixApprovalStatus === 'PENDING' && <Clock className="w-4 h-4 text-amber-400" />}
+                                                        {editingProduct.pixApprovalStatus === 'REJECTED' && <XCircle className="w-4 h-4 text-red-400" />}
+                                                        <span className={`text-xs font-medium ${
+                                                            editingProduct.pixApprovalStatus === 'APPROVED' ? 'text-emerald-400' 
+                                                            : editingProduct.pixApprovalStatus === 'PENDING' ? 'text-amber-400' 
+                                                            : 'text-red-400'
+                                                        }`}>
+                                                            {editingProduct.pixApprovalStatus === 'APPROVED' && 'PIX aprovado pela Rovex ✓'}
+                                                            {editingProduct.pixApprovalStatus === 'PENDING' && 'Aguardando aprovação da Rovex...'}
+                                                            {editingProduct.pixApprovalStatus === 'REJECTED' && 'PIX rejeitado pela Rovex'}
+                                                        </span>
+                                                    </div>
+                                                )}
+
                                                 <div className="p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/20 space-y-3">
-                                                    <p className="text-xs text-cyan-400 font-medium">Chave PIX do Vendedor</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <Shield className="w-4 h-4 text-cyan-400" />
+                                                        <p className="text-xs text-cyan-400 font-medium">Solicitação PIX para Rovex</p>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-400">
+                                                        Para vender via PIX direto, é necessário solicitar permissão à Rovex. Preencha seus dados abaixo.
+                                                    </p>
+
+                                                    {/* PIX Key */}
                                                     <div className="grid grid-cols-2 gap-3">
                                                         <div>
-                                                            <label className="block text-xs text-gray-400 mb-1">Tipo da Chave</label>
+                                                            <label className="block text-xs text-gray-400 mb-1">Tipo da Chave *</label>
                                                             <select
                                                                 value={formData.pixKeyType}
                                                                 onChange={e => setFormData({ ...formData, pixKeyType: e.target.value })}
@@ -777,7 +845,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                                             </select>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-xs text-gray-400 mb-1">Chave PIX</label>
+                                                            <label className="block text-xs text-gray-400 mb-1">Chave PIX *</label>
                                                             <input
                                                                 type="text"
                                                                 value={formData.pixKey}
@@ -793,8 +861,72 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                                             />
                                                         </div>
                                                     </div>
-                                                    <p className="text-[10px] text-gray-500">
-                                                        A chave PIX será exibida ao comprador para pagamento direto.
+
+                                                    {/* Seller Info */}
+                                                    <div className="border-t border-cyan-500/10 pt-3">
+                                                        <p className="text-[10px] text-cyan-400/70 uppercase tracking-wider mb-2">Dados do Vendedor</p>
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <div>
+                                                                <label className="block text-xs text-gray-400 mb-1">Nome Completo *</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={pixRequestData.sellerName}
+                                                                    onChange={e => setPixRequestData({ ...pixRequestData, sellerName: e.target.value })}
+                                                                    placeholder="Nome do responsável"
+                                                                    className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs text-gray-400 mb-1">CPF/CNPJ</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={pixRequestData.sellerDocument}
+                                                                    onChange={e => setPixRequestData({ ...pixRequestData, sellerDocument: e.target.value })}
+                                                                    placeholder="000.000.000-00"
+                                                                    className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-3 mt-3">
+                                                            <div>
+                                                                <label className="block text-xs text-gray-400 mb-1">Email *</label>
+                                                                <input
+                                                                    type="email"
+                                                                    value={pixRequestData.sellerEmail}
+                                                                    onChange={e => setPixRequestData({ ...pixRequestData, sellerEmail: e.target.value })}
+                                                                    placeholder="email@exemplo.com"
+                                                                    className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs text-gray-400 mb-1">Telefone</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={pixRequestData.sellerPhone}
+                                                                    onChange={e => setPixRequestData({ ...pixRequestData, sellerPhone: e.target.value })}
+                                                                    placeholder="(11) 99999-9999"
+                                                                    className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Justification */}
+                                                    <div>
+                                                        <label className="block text-xs text-gray-400 mb-1">Justificativa (opcional)</label>
+                                                        <textarea
+                                                            value={pixRequestData.justification}
+                                                            onChange={e => setPixRequestData({ ...pixRequestData, justification: e.target.value })}
+                                                            placeholder="Descreva por que deseja vender este produto via PIX..."
+                                                            rows={2}
+                                                            className={`w-full px-3 py-2 rounded-lg border border-cyan-500/30 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none`}
+                                                        />
+                                                    </div>
+
+                                                    {/* Note: request is submitted separately after product creation */}
+                                                    <p className="text-[10px] text-gray-500 flex items-center gap-1">
+                                                        <Send className="w-3 h-3" />
+                                                        A solicitação será enviada à Rovex após salvar o produto.
                                                     </p>
                                                 </div>
                                             </motion.div>

@@ -16,6 +16,11 @@ import {
     getAllOrders,
     getAdminProducts
 } from '../controllers/productController';
+import {
+    submitPixSellerRequest,
+    getPixSellerRequests,
+    getProductPixStatus
+} from '../controllers/pixSellerController';
 
 const router = Router();
 
@@ -63,5 +68,10 @@ router.post('/admin/:id/keys', authenticateToken, requireAdmin, addProductKeys);
 
 // Confirm PIX direct payment and deliver keys (admin)
 router.post('/admin/orders/:orderId/confirm-pix', authenticateToken, requireAdmin, confirmPixPayment);
+
+// PIX Seller Requests (admin)
+router.post('/admin/pix-request', authenticateToken, requireAdmin, submitPixSellerRequest);
+router.get('/admin/pix-requests', authenticateToken, requireAdmin, getPixSellerRequests);
+router.get('/admin/pix-status/:productId', authenticateToken, requireAdmin, getProductPixStatus);
 
 export default router;

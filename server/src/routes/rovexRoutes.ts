@@ -14,6 +14,11 @@ import {
   invalidateSuspensionCache,
 } from '../services/suspensionService';
 
+import {
+  getRovexPixRequests,
+  reviewPixRequest
+} from '../controllers/pixSellerController';
+
 const router = Router();
 
 // =====================================
@@ -1645,5 +1650,20 @@ router.get('/connection-test', async (req: Request, res: Response) => {
     });
   }
 });
+
+// ===================== PIX SELLER REQUESTS (Rovex reviews) =====================
+
+/**
+ * GET /api/rovex/pix-requests
+ * Get all PIX seller requests for review
+ */
+router.get('/pix-requests', getRovexPixRequests);
+
+/**
+ * POST /api/rovex/pix-requests/:requestId/review
+ * Approve or reject a PIX seller request
+ * Body: { action: 'approve' | 'reject', reviewNote?: string }
+ */
+router.post('/pix-requests/:requestId/review', reviewPixRequest);
 
 export default router;

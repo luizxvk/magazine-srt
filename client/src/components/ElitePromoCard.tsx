@@ -12,9 +12,27 @@ export default function ElitePromoCard() {
     const navigate = useNavigate();
     const { user } = useAuth();
     
-    // Don't show if user is already Elite
+    // Show congratulations card if user is already Elite
     const isElite = user?.isElite && user?.eliteUntil && new Date(user.eliteUntil) > new Date();
-    if (isElite) return null;
+    if (isElite) {
+        return (
+            <div className="relative overflow-hidden rounded-2xl p-[2px]">
+                <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(90deg, #7c3aed, #3b82f6, #6366f1)' }} />
+                <div className="relative rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg, rgba(20,20,25,0.98), rgba(15,15,20,0.99))' }}>
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ background: 'rgba(124,58,237,0.2)' }}>
+                        <Crown className="w-6 h-6 text-violet-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-1">Você é Elite!</h3>
+                    <p className="text-xs text-white/50">Aproveite seus benefícios exclusivos</p>
+                    <div className="flex flex-wrap justify-center gap-1.5 mt-3">
+                        {['2x XP', '500 Zions/mês', 'Exclusivos'].map((f, i) => (
+                            <span key={i} className="px-2 py-0.5 text-[9px] font-medium rounded-full" style={{ background: 'rgba(124,58,237,0.1)', color: 'rgba(167,139,250,0.9)', border: '1px solid rgba(124,58,237,0.15)' }}>{f}</span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <motion.div

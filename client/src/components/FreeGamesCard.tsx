@@ -59,9 +59,18 @@ export default function FreeGamesCard() {
             .catch(() => {});
     }, []);
 
-    // Don't render if disabled or no games
+    // Show placeholder if disabled or no games
     if (!enabled || games.length === 0) {
-        return null;
+        return (
+            <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-6 text-center`}>
+                <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style={{ background: `${accentColor}1a` }}>
+                    <Gamepad2 className="w-6 h-6" style={{ color: accentColor }} />
+                </div>
+                <h3 className={`text-lg font-bold ${textMain} mb-1`}>Jogos Grátis</h3>
+                <p className={`text-sm ${textSub}`}>Nenhum jogo grátis disponível no momento</p>
+                <p className={`text-xs ${textSub} mt-2`}>Volte depois para conferir novas ofertas!</p>
+            </div>
+        );
     }
 
     const getDaysRemaining = (expiresAt: string) => {

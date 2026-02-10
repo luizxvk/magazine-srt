@@ -40,8 +40,7 @@ export default function AnnouncementCard() {
 
     // Loading state removed as per user request
     if (!announcement && !loading) return <MgtLogCard />;
-    if (!announcement) return null; // Fail safe
-    if (!announcement) return <MgtLogCard />;
+    if (!announcement) return <MgtLogCard />; // Show fallback during loading too
 
     // Theme Colors
     const themeBorder = isMGT

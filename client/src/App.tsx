@@ -33,6 +33,7 @@ import DevToolsPage from './pages/admin/DevToolsPage';
 import SuspendedPage from './pages/SuspendedPage';
 import ElitePage from './pages/ElitePage';
 import SobreRovexPage from './pages/SobreRovexPage';
+import TournamentsPage from './pages/TournamentsPage';
 import { logger } from './utils/logger';
 import AchievementPopup from './components/AchievementPopup';
 import Toast from './components/Toast';
@@ -93,6 +94,7 @@ function App() {
           <Route path="/roadmap" element={<PrivateRoute><RoadmapPage /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
           <Route path="/elite" element={<PrivateRoute><ElitePage /></PrivateRoute>} />
+          <Route path="/tournaments" element={<PrivateRoute><TournamentsPage /></PrivateRoute>} />
           <Route path="/sobre-rovex" element={<SobreRovexPage />} />
           <Route path="/verify-email" element={<PrivateRoute><VerificationPage /></PrivateRoute>} />
           {/* Grupos */}

@@ -1,0 +1,66 @@
+{
+    "nav": {
+        "home": "Home",
+        "explore": "Explore",
+        "notifications": "Notifications",
+        "messages": "Messages",
+        "profile": "Profile",
+        "settings": "Settings",
+        "ranking": "Ranking",
+        "rewards": "Rewards",
+        "shop": "Shop",
+        "market": "Market",
+        "groups": "Groups",
+        "events": "Events",
+        "roadmap": "Roadmap",
+        "admin": "Admin",
+        "logout": "Logout"
+    },
+    "actions": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "confirm": "Confirm",
+        "close": "Close",
+        "send": "Send",
+        "search": "Search",
+        "filter": "Filter",
+        "loadMore": "Load more",
+        "retry": "Try again",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "copy": "Copy",
+        "share": "Share"
+    },
+    "status": {
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "empty": "Nothing found",
+        "online": "Online",
+        "offline": "Offline",
+        "away": "Away"
+    },
+    "time": {
+        "justNow": "just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "yesterday": "yesterday",
+        "today": "today"
+    },
+    "errors": {
+        "generic": "Something went wrong. Please try again.",
+        "network": "Connection error. Check your internet.",
+        "unauthorized": "Session expired. Please log in again.",
+        "forbidden": "You don't have permission for this.",
+        "notFound": "Not found."
+    },
+    "confirm": {
+        "delete": "Are you sure you want to delete?",
+        "unsavedChanges": "You have unsaved changes. Do you want to leave?"
+    }
+}

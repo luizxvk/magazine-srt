@@ -468,6 +468,7 @@ model Event {
   dropClaimUntil DateTime?     // Até quando pode resgatar
   dropClaims     EventDropClaim[]
   attendees      EventAttendee[]
+  tournament     Tournament?
 }
 
 // Registro de quem confirmou presença no evento
@@ -496,6 +497,116 @@ model EventDropClaim {
   @@unique([eventId, userId]) // Cada usuário só resgata uma vez por evento
   @@index([eventId])
   @@index([userId])
+}
+
+// ============================================
+// TOURNAMENT SYSTEM
+// ============================================
+
+model Tournament {
+  id           String           @id @default(uuid())
+  eventId      String?          @unique
+  title        String
+  description  String?
+  game         String?
+  imageUrl     String?
+  format       TournamentFormat @default(SINGLE_ELIMINATION)
+  teamSize     Int              @default(1) // 1=solo, 2=duo, 5=equipe
+  maxTeams     Int              @default(16)
+  prizePool    Int              @default(0) // Zions Cash total
+  rules        String?          @db.Text
+  status       TournamentStatus @default(REGISTRATION)
+  startDate    DateTime?
+  endDate      DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  createdBy    String
+  event        Event?           @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  teams        TournamentTeam[]
+  matches      TournamentMatch[]
+
+  @@index([status])
+  @@index([createdBy])
+  @@index([startDate])
+}
+
+model TournamentTeam {
+  id           String              @id @default(uuid())
+  tournamentId String
+  name         String
+  captainId    String
+  seed         Int?                // Posição no seed (para brackets)
+  createdAt    DateTime            @default(now())
+  tournament   Tournament          @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  members      TournamentTeamMember[]
+  matchesAsTeam1 TournamentMatch[] @relation("MatchTeam1")
+  matchesAsTeam2 TournamentMatch[] @relation("MatchTeam2")
+  matchesWon     TournamentMatch[] @relation("MatchWinner")
+
+  @@unique([tournamentId, name])
+  @@unique([tournamentId, captainId])
+  @@index([tournamentId])
+  @@index([captainId])
+}
+
+model TournamentTeamMember {
+  id        String         @id @default(uuid())
+  teamId    String
+  userId    String
+  joinedAt  DateTime       @default(now())
+  team      TournamentTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model TournamentMatch {
+  id           String       @id @default(uuid())
+  tournamentId String
+  round        Int          // Rodada (1, 2, 3 = quarter, semi, final)
+  position     Int          // Posição dentro da rodada
+  team1Id      String?
+  team2Id      String?
+  score1       Int?
+  score2       Int?
+  winnerId     String?
+  status       MatchStatus  @default(PENDING)
+  scheduledAt  DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  tournament   Tournament       @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  team1        TournamentTeam?  @relation("MatchTeam1", fields: [team1Id], references: [id], onDelete: SetNull)
+  team2        TournamentTeam?  @relation("MatchTeam2", fields: [team2Id], references: [id], onDelete: SetNull)
+  winner       TournamentTeam?  @relation("MatchWinner", fields: [winnerId], references: [id], onDelete: SetNull)
+
+  @@unique([tournamentId, round, position])
+  @@index([tournamentId])
+  @@index([status])
+  @@index([round])
+}
+
+// ============================================
+// MODERATION SYSTEM
+// ============================================
+
+model ModerationLog {
+  id        String           @id @default(uuid())
+  userId    String
+  postId    String?
+  commentId String?
+  type      ModerationType
+  reason    String
+  action    ModerationAction
+  score     Float            @default(0) // Confidence score (0-1)
+  details   Json?            // Extra metadata (categories, raw API response)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([postId])
+  @@index([type])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model Report {
@@ -1035,6 +1146,38 @@ enum InviteStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+enum TournamentFormat {
+  SINGLE_ELIMINATION
+  DOUBLE_ELIMINATION
+  ROUND_ROBIN
+  FREE_FOR_ALL
+}
+
+enum TournamentStatus {
+  REGISTRATION
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  PENDING
+  LIVE
+  COMPLETED
+}
+
+enum ModerationType {
+  IMAGE
+  TEXT
+}
+
+enum ModerationAction {
+  BLOCKED
+  FLAGGED
+  WARNED
+  ALLOWED
 }
 
 enum ThemePackRarity {

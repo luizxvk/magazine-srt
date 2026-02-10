@@ -1,0 +1,56 @@
+{
+    "customization": {
+        "title": "My Style",
+        "tabs": {
+            "backgrounds": "Backgrounds",
+            "colors": "Colors",
+            "badges": "Badges",
+            "borders": "Borders",
+            "packs": "Packs"
+        },
+        "equip": "Equip",
+        "unequip": "Unequip",
+        "buy": "Buy",
+        "equipped": "Equipped",
+        "owned": "Owned",
+        "preview": "Preview"
+    },
+    "market": {
+        "title": "Market",
+        "sell": "Sell",
+        "buy": "Buy",
+        "price": "Price",
+        "seller": "Seller",
+        "listItem": "List Item",
+        "myListings": "My Listings",
+        "setPrice": "Set price",
+        "confirmPurchase": "Confirm purchase",
+        "purchaseSuccess": "Purchase completed successfully!",
+        "fee": "{{percent}}% fee"
+    },
+    "products": {
+        "title": "Product Store",
+        "categories": {
+            "games": "Games",
+            "giftCards": "Gift Cards",
+            "keys": "Keys",
+            "other": "Other"
+        },
+        "buyNow": "Buy Now",
+        "addToCart": "Add to Cart",
+        "outOfStock": "Out of Stock",
+        "inStock": "In Stock"
+    },
+    "supplyBox": {
+        "title": "Supply Box",
+        "open": "Open Box",
+        "contains": "May contain",
+        "rarity": {
+            "common": "Common",
+            "uncommon": "Uncommon",
+            "rare": "Rare",
+            "epic": "Epic",
+            "legendary": "Legendary"
+        }
+    }
+}

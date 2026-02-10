@@ -1,0 +1,49 @@
+{
+    "createPost": {
+        "placeholder": "What's on your mind?",
+        "submit": "Post",
+        "addImage": "Add image",
+        "addPoll": "Add poll",
+        "tags": "Tags"
+    },
+    "post": {
+        "like": "Like",
+        "comment": "Comment",
+        "share": "Share",
+        "report": "Report",
+        "delete": "Delete",
+        "edit": "Edit",
+        "pin": "Pin",
+        "unpin": "Unpin",
+        "comments": "Comments",
+        "noComments": "No comments yet.",
+        "writeComment": "Write a comment...",
+        "viewMore": "View more comments",
+        "liked": "Liked",
+        "reportSuccess": "Report submitted successfully.",
+        "deleteConfirm": "Are you sure you want to delete this post?"
+    },
+    "feed": {
+        "title": "Feed",
+        "empty": "No posts yet. Be the first to publish!",
+        "refresh": "Refresh feed"
+    },
+    "stories": {
+        "addStory": "Add Story",
+        "yourStory": "Your Story",
+        "viewers": "{{count}} views"
+    },
+    "report": {
+        "title": "Report Post",
+        "reason": "Reason for reporting",
+        "reasons": {
+            "spam": "Spam or repetitive content",
+            "inappropriate": "Inappropriate content",
+            "harassment": "Harassment or bullying",
+            "violence": "Violence or threats",
+            "falseInfo": "False information",
+            "other": "Other"
+        },
+        "submit": "Submit Report"
+    }
+}

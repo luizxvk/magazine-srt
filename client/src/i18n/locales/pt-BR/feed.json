@@ -1,0 +1,49 @@
+{
+    "createPost": {
+        "placeholder": "O que está pensando?",
+        "submit": "Publicar",
+        "addImage": "Adicionar imagem",
+        "addPoll": "Adicionar enquete",
+        "tags": "Tags"
+    },
+    "post": {
+        "like": "Curtir",
+        "comment": "Comentar",
+        "share": "Compartilhar",
+        "report": "Denunciar",
+        "delete": "Excluir",
+        "edit": "Editar",
+        "pin": "Fixar",
+        "unpin": "Desafixar",
+        "comments": "Comentários",
+        "noComments": "Nenhum comentário ainda.",
+        "writeComment": "Escreva um comentário...",
+        "viewMore": "Ver mais comentários",
+        "liked": "Curtido",
+        "reportSuccess": "Denúncia enviada com sucesso.",
+        "deleteConfirm": "Tem certeza que deseja excluir este post?"
+    },
+    "feed": {
+        "title": "Feed",
+        "empty": "Nenhum post ainda. Seja o primeiro a publicar!",
+        "refresh": "Atualizar feed"
+    },
+    "stories": {
+        "addStory": "Adicionar Story",
+        "yourStory": "Seu Story",
+        "viewers": "{{count}} visualizações"
+    },
+    "report": {
+        "title": "Denunciar Post",
+        "reason": "Motivo da denúncia",
+        "reasons": {
+            "spam": "Spam ou conteúdo repetitivo",
+            "inappropriate": "Conteúdo inapropriado",
+            "harassment": "Assédio ou bullying",
+            "violence": "Violência ou ameaças",
+            "falseInfo": "Informação falsa",
+            "other": "Outro"
+        },
+        "submit": "Enviar Denúncia"
+    }
+}

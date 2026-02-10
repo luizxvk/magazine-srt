@@ -1,0 +1,68 @@
+{
+    "level": {
+        "title": "Nivel {{level}}",
+        "xpProgress": "{{current}} / {{needed}} XP",
+        "levelUp": "¡Subiste de Nivel!",
+        "newLevel": "¡Nivel {{level}} alcanzado!"
+    },
+    "badges": {
+        "title": "Logros",
+        "earned": "Obtenido",
+        "locked": "Bloqueado",
+        "total": "{{earned}} de {{total}} logros",
+        "newBadge": "¡Nuevo Logro!"
+    },
+    "ranking": {
+        "title": "Ranking",
+        "position": "{{position}}º lugar",
+        "points": "{{count}} puntos",
+        "trophies": "{{count}} trofeos",
+        "tabs": {
+            "xp": "XP",
+            "trophies": "Trofeos",
+            "zions": "Zions"
+        }
+    },
+    "dailyLogin": {
+        "title": "Bono Diario",
+        "streak": "{{count}} días seguidos",
+        "claim": "Reclamar",
+        "claimed": "Reclamado",
+        "reward": "+{{amount}} Zions"
+    },
+    "rewards": {
+        "title": "Recompensas",
+        "redeem": "Canjear",
+        "cost": "{{amount}} Zions",
+        "redeemSuccess": "¡Recompensa canjeada!"
+    },
+    "tournaments": {
+        "title": "Torneos",
+        "register": "Inscribirse",
+        "registered": "Inscrito",
+        "brackets": "Llaves",
+        "matches": "Partidas",
+        "leaderboard": "Clasificación",
+        "prizes": "Premios",
+        "rules": "Reglas",
+        "status": {
+            "registration": "Inscripciones Abiertas",
+            "inProgress": "En Curso",
+            "completed": "Finalizado"
+        },
+        "match": {
+            "pending": "Pendiente",
+            "live": "En Vivo",
+            "completed": "Finalizada",
+            "vs": "vs",
+            "winner": "Ganador",
+            "score": "Marcador"
+        },
+        "team": {
+            "create": "Crear Equipo",
+            "join": "Unirse al Equipo",
+            "name": "Nombre del Equipo",
+            "members": "Miembros"
+        }
+    }
+}

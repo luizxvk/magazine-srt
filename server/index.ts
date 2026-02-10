@@ -35,6 +35,8 @@ import featureRoutes from './src/routes/featureRoutes';
 import ogRoutes from './src/routes/ogRoutes';
 import consumptionRoutes from './src/routes/consumptionRoutes';
 import subscriptionRoutes from './src/routes/subscriptionRoutes';
+import tournamentRoutes from './src/routes/tournamentRoutes';
+import moderationRoutes from './src/routes/moderationRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -159,6 +161,8 @@ apiRouter.use('/theme-packs', themePackRoutes);
 apiRouter.use('/features', featureRoutes);
 apiRouter.use('/og', ogRoutes);
 apiRouter.use('/admin', consumptionRoutes);
+apiRouter.use('/tournaments', tournamentRoutes);
+apiRouter.use('/moderation', moderationRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

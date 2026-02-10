@@ -1,0 +1,34 @@
+{
+    "title": "Settings",
+    "sections": {
+        "profile": "Profile",
+        "appearance": "Appearance",
+        "notifications": "Notifications",
+        "privacy": "Privacy",
+        "language": "Language",
+        "account": "Account"
+    },
+    "language": {
+        "title": "Language",
+        "description": "Choose the interface language.",
+        "current": "Current language"
+    },
+    "appearance": {
+        "theme": "Theme",
+        "dark": "Dark",
+        "light": "Light",
+        "liteMode": "Lite Mode",
+        "liteModeDesc": "Disable animations for better performance."
+    },
+    "notifications": {
+        "push": "Push Notifications",
+        "pushDesc": "Receive notifications even with the app closed.",
+        "dnd": "Do Not Disturb",
+        "dndDesc": "Mute all notifications."
+    },
+    "account": {
+        "changePassword": "Change Password",
+        "deleteAccount": "Delete Account",
+        "deleteWarning": "This action is irreversible. All your data will be deleted."
+    }
+}

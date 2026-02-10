@@ -1,0 +1,66 @@
+{
+    "nav": {
+        "home": "Início",
+        "explore": "Explorar",
+        "notifications": "Notificações",
+        "messages": "Mensagens",
+        "profile": "Perfil",
+        "settings": "Configurações",
+        "ranking": "Ranking",
+        "rewards": "Recompensas",
+        "shop": "Loja",
+        "market": "Mercado",
+        "groups": "Grupos",
+        "events": "Eventos",
+        "roadmap": "Roadmap",
+        "admin": "Admin",
+        "logout": "Sair"
+    },
+    "actions": {
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "delete": "Excluir",
+        "edit": "Editar",
+        "confirm": "Confirmar",
+        "close": "Fechar",
+        "send": "Enviar",
+        "search": "Buscar",
+        "filter": "Filtrar",
+        "loadMore": "Carregar mais",
+        "retry": "Tentar novamente",
+        "back": "Voltar",
+        "next": "Próximo",
+        "previous": "Anterior",
+        "submit": "Enviar",
+        "copy": "Copiar",
+        "share": "Compartilhar"
+    },
+    "status": {
+        "loading": "Carregando...",
+        "error": "Erro",
+        "success": "Sucesso",
+        "empty": "Nada encontrado",
+        "online": "Online",
+        "offline": "Offline",
+        "away": "Ausente"
+    },
+    "time": {
+        "justNow": "agora mesmo",
+        "minutesAgo": "há {{count}} min",
+        "hoursAgo": "há {{count}}h",
+        "daysAgo": "há {{count}}d",
+        "yesterday": "ontem",
+        "today": "hoje"
+    },
+    "errors": {
+        "generic": "Algo deu errado. Tente novamente.",
+        "network": "Erro de conexão. Verifique sua internet.",
+        "unauthorized": "Sessão expirada. Faça login novamente.",
+        "forbidden": "Você não tem permissão para isso.",
+        "notFound": "Não encontrado."
+    },
+    "confirm": {
+        "delete": "Tem certeza que deseja excluir?",
+        "unsavedChanges": "Você tem alterações não salvas. Deseja sair?"
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "createPost": {
+        "placeholder": "¿Qué estás pensando?",
+        "submit": "Publicar",
+        "addImage": "Agregar imagen",
+        "addPoll": "Agregar encuesta",
+        "tags": "Etiquetas"
+    },
+    "post": {
+        "like": "Me gusta",
+        "comment": "Comentar",
+        "share": "Compartir",
+        "report": "Reportar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "pin": "Fijar",
+        "unpin": "Desfijar",
+        "comments": "Comentarios",
+        "noComments": "Aún no hay comentarios.",
+        "writeComment": "Escribe un comentario...",
+        "viewMore": "Ver más comentarios",
+        "liked": "Te gustó",
+        "reportSuccess": "Reporte enviado exitosamente.",
+        "deleteConfirm": "¿Estás seguro de que quieres eliminar esta publicación?"
+    },
+    "feed": {
+        "title": "Feed",
+        "empty": "¡Aún no hay publicaciones. Sé el primero en publicar!",
+        "refresh": "Actualizar feed"
+    },
+    "stories": {
+        "addStory": "Agregar Story",
+        "yourStory": "Tu Story",
+        "viewers": "{{count}} visualizaciones"
+    },
+    "report": {
+        "title": "Reportar Publicación",
+        "reason": "Motivo del reporte",
+        "reasons": {
+            "spam": "Spam o contenido repetitivo",
+            "inappropriate": "Contenido inapropiado",
+            "harassment": "Acoso o bullying",
+            "violence": "Violencia o amenazas",
+            "falseInfo": "Información falsa",
+            "other": "Otro"
+        },
+        "submit": "Enviar Reporte"
+    }
+}

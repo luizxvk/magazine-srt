@@ -1,0 +1,34 @@
+{
+    "title": "Configurações",
+    "sections": {
+        "profile": "Perfil",
+        "appearance": "Aparência",
+        "notifications": "Notificações",
+        "privacy": "Privacidade",
+        "language": "Idioma",
+        "account": "Conta"
+    },
+    "language": {
+        "title": "Idioma",
+        "description": "Escolha o idioma da interface.",
+        "current": "Idioma atual"
+    },
+    "appearance": {
+        "theme": "Tema",
+        "dark": "Escuro",
+        "light": "Claro",
+        "liteMode": "Modo Lite",
+        "liteModeDesc": "Desativa animações para melhor performance."
+    },
+    "notifications": {
+        "push": "Notificações Push",
+        "pushDesc": "Receba notificações mesmo com o app fechado.",
+        "dnd": "Não Perturbe",
+        "dndDesc": "Silencia todas as notificações."
+    },
+    "account": {
+        "changePassword": "Alterar Senha",
+        "deleteAccount": "Excluir Conta",
+        "deleteWarning": "Esta ação é irreversível. Todos os seus dados serão excluídos."
+    }
+}

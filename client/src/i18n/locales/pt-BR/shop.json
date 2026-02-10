@@ -1,0 +1,56 @@
+{
+    "customization": {
+        "title": "Meu Estilo",
+        "tabs": {
+            "backgrounds": "Fundos",
+            "colors": "Cores",
+            "badges": "Badges",
+            "borders": "Bordas",
+            "packs": "Packs"
+        },
+        "equip": "Equipar",
+        "unequip": "Desequipar",
+        "buy": "Comprar",
+        "equipped": "Equipado",
+        "owned": "Possuído",
+        "preview": "Visualizar"
+    },
+    "market": {
+        "title": "Mercado",
+        "sell": "Vender",
+        "buy": "Comprar",
+        "price": "Preço",
+        "seller": "Vendedor",
+        "listItem": "Listar Item",
+        "myListings": "Meus Anúncios",
+        "setPrice": "Definir preço",
+        "confirmPurchase": "Confirmar compra",
+        "purchaseSuccess": "Compra realizada com sucesso!",
+        "fee": "Taxa de {{percent}}%"
+    },
+    "products": {
+        "title": "Loja de Produtos",
+        "categories": {
+            "games": "Jogos",
+            "giftCards": "Gift Cards",
+            "keys": "Keys",
+            "other": "Outros"
+        },
+        "buyNow": "Comprar Agora",
+        "addToCart": "Adicionar ao Carrinho",
+        "outOfStock": "Esgotado",
+        "inStock": "Em estoque"
+    },
+    "supplyBox": {
+        "title": "Supply Box",
+        "open": "Abrir Caixa",
+        "contains": "Pode conter",
+        "rarity": {
+            "common": "Comum",
+            "uncommon": "Incomum",
+            "rare": "Raro",
+            "epic": "Épico",
+            "legendary": "Lendário"
+        }
+    }
+}

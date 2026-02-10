@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
 > **Versão Atual:** v0.5.0-rc.5 (Release Candidate)  
-> **Última Atualização:** 08 de Fevereiro de 2026  
+> **Última Atualização:** 10 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
@@ -22,6 +22,29 @@
 ---
 
 ## 🆕 v0.5.0-rc.5 (Release Candidate - 08 Fevereiro 2026)
+
+### ✅ Cards Animados & Loader Modernizado (Concluído)
+**Animações modernas e loader padronizado em todo o app**
+
+- 🎴 **Cards Animados (GIF)**
+  - ElitePromoCard com DottedGlowBackground animado (canvas)
+  - Login page com efeito liquid glass Apple Vision Pro
+  - Backgrounds animados com orbs flutuantes (motion.div)
+  - Efeitos de shimmer em botões de submit
+
+- ⏳ **Loader Aceternity Moderno**
+  - Substituição de todos os 44 spinners do app
+  - Loader de 3 pontos bouncing (Aceternity style)
+  - Variantes: sm (6px), md (8px), lg (12px)
+  - Temas automáticos Gold/Emerald por membership
+  - 25 arquivos atualizados para novo padrão
+
+- 📱 **Otimização Mobile do Login**
+  - CSS gradients estáticos substituem orbs animados no mobile
+  - backdrop-filter reduzido (blur 40px → 16px no mobile)
+  - Canvas DottedGlowBackground substituído por CSS dot pattern
+  - Shimmer e hover animations desabilitados em touch devices
+  - Inputs sem backdrop-filter no mobile (GPU savings)
 
 ### 🌈 Tema Iridescente Restaurado
 **Shader WebGL corrigido para o visual original**
@@ -472,6 +495,16 @@
 
 ## 🔄 Em Desenvolvimento (Próximas Semanas)
 
+### 📱 App Mobile Nativo (Em Desenvolvimento)
+- 🔄 **Capacitor + Android**
+  - Projeto Capacitor configurado e integrado
+  - Build Android gerando APK com sucesso
+  - Webview otimizada para performance mobile
+  - Push notifications via Firebase
+- [ ] Publicar na Google Play Store (beta)
+- [ ] Versão iOS (Apple Developer Account)
+- [ ] Deep links e navegação nativa
+
 ### Alta Prioridade
 
 #### 🎨 Aba "Packs de Tema" no Meu Estilo
@@ -635,7 +668,7 @@ Criar 6 packs temáticos:
 - [ ] Atingir 500 usuários ativos mensais
 - [ ] Implementar sistema de clãs
 - [ ] Lançar primeiro battle pass
-- [ ] Mobile app nativo (React Native)
+- 🔄 Mobile app nativo (Capacitor — em desenvolvimento)
 
 ---
 

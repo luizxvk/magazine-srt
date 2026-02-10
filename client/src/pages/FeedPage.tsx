@@ -107,6 +107,18 @@ export default function FeedPage() {
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [isSupplyBoxOpen, setIsSupplyBoxOpen] = useState(false);
     const [showEventDropPopup, setShowEventDropPopup] = useState(false);
+    
+    // Twitch live streams for carousel
+    const [liveStreams, setLiveStreams] = useState<Array<{
+        userId: string;
+        username: string;
+        displayName: string;
+        gameName: string;
+        title: string;
+        viewerCount: number;
+        thumbnailUrl: string;
+        streamUrl: string;
+    }>>([]);
 
     // Check URL params to auto-open events modal (from push notification)
     const [searchParams, setSearchParams] = useSearchParams();
@@ -179,9 +191,13 @@ export default function FeedPage() {
 
     useEffect(() => {
         fetchPosts(false, 1, false);
+        fetchLiveStreams();
         const interval = setInterval(() => {
             fetchPosts(true, 1, false);
         }, 30000); // Poll every 30s for real-time updates
+        
+        // Refresh Twitch streams every 60s
+        const twitchInterval = setInterval(fetchLiveStreams, 60000);
 
         // Event listener for opening radio from search
         const handleOpenRadio = () => {
@@ -200,6 +216,7 @@ export default function FeedPage() {
 
         return () => {
             clearInterval(interval);
+            clearInterval(twitchInterval);
             window.removeEventListener('openRadio', handleOpenRadio);
         };
     }, []);
@@ -226,6 +243,28 @@ export default function FeedPage() {
 
     const handlePostCreated = () => {
         fetchPosts();
+    };
+
+    const fetchLiveStreams = async () => {
+        try {
+            const { data: configData } = await api.get('/social/twitch/config');
+            if (!configData.config?.carouselEnabled) return;
+            
+            const channels = configData.config?.channels || [];
+            if (channels.length === 0) return;
+            
+            const { data } = await api.get('/social/twitch/streams', {
+                params: { usernames: channels.join(',') }
+            });
+            
+            if (data.streams?.length > 0) {
+                setLiveStreams(data.streams);
+            } else {
+                setLiveStreams([]);
+            }
+        } catch {
+            // Silent fail - Twitch streams are optional
+        }
     };
 
     const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -354,11 +393,13 @@ export default function FeedPage() {
                         {/* Welcome Card with Stories (toggleable) */}
                         {user?.showWelcomeCard !== false && (
                             <TimelineAnimation animationNum={0} className="mb-8">
-                                <WelcomeCard
-                                    viewingStoryId={viewingStoryId}
-                                    onViewStory={setViewingStoryId}
-                                    onCloseStory={() => setViewingStoryId(null)}
-                                />
+                                <div data-tutorial="stories">
+                                    <WelcomeCard
+                                        viewingStoryId={viewingStoryId}
+                                        onViewStory={setViewingStoryId}
+                                        onCloseStory={() => setViewingStoryId(null)}
+                                    />
+                                </div>
                             </TimelineAnimation>
                         )}
 
@@ -393,18 +434,22 @@ export default function FeedPage() {
 
                         {/* Create Post Card - Right after welcome */}
                         <TimelineAnimation animationNum={2}>
-                            <CreatePostCard onPostCreated={handlePostCreated} />
+                            <div data-tutorial="create-post">
+                                <CreatePostCard onPostCreated={handlePostCreated} />
+                            </div>
                         </TimelineAnimation>
 
                         {/* Mobile Carousel - Quick Access Cards */}
                         <TimelineAnimation animationNum={3} className="mb-8 lg:hidden">
-                            <MobileCarousel
-                                dailyLoginStatus={dailyLoginStatus}
-                                onDailyLoginClick={openDailyLoginModal}
-                                onNewMembersClick={() => setIsNewMembersOpen(true)}
-                                onEventsClick={() => setIsEventsOpen(true)}
-                                onSupplyBoxClick={() => setIsSupplyBoxOpen(true)}
-                            />
+                            <div data-tutorial="mobile-carousel">
+                                <MobileCarousel
+                                    dailyLoginStatus={dailyLoginStatus}
+                                    onDailyLoginClick={openDailyLoginModal}
+                                    onNewMembersClick={() => setIsNewMembersOpen(true)}
+                                    onEventsClick={() => setIsEventsOpen(true)}
+                                    onSupplyBoxClick={() => setIsSupplyBoxOpen(true)}
+                                />
+                            </div>
                         </TimelineAnimation>
 
                         {/* SRT Log Card - Mobile Only */}
@@ -417,16 +462,21 @@ export default function FeedPage() {
                             <ModernLoader />
                         ) : (
                             <>
-                                {highlightedPosts.length > 0 && (
+                                {(highlightedPosts.length > 0 || liveStreams.length > 0) && (
                                     <TimelineAnimation animationNum={5}>
-                                        <FeedCarousel posts={highlightedPosts.map(p => ({
-                                            id: p.id,
-                                            title: p.content,
-                                            image: p.image,
-                                            category: p.tags[0] || 'DESTAQUE',
-                                            author: p.author,
-                                            linkedProduct: p.linkedProduct || null
-                                        }))} />
+                                        <div data-tutorial="feed-carousel">
+                                            <FeedCarousel 
+                                                posts={highlightedPosts.map(p => ({
+                                                    id: p.id,
+                                                    title: p.content,
+                                                    image: p.image,
+                                                    category: p.tags[0] || 'DESTAQUE',
+                                                    author: p.author,
+                                                    linkedProduct: p.linkedProduct || null
+                                                }))}
+                                                liveStreams={liveStreams}
+                                            />
+                                        </div>
                                     </TimelineAnimation>
                                 )}
 

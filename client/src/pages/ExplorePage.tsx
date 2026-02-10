@@ -14,6 +14,7 @@ import Header from '../components/Header';
 import ModernLoader from '../components/ModernLoader';
 import SearchModal from '../components/SearchModal';
 import GradientText from '../components/GradientText';
+import ExploreCardsCarousel from '../components/ExploreCardsCarousel';
 import { useTranslation } from 'react-i18next';
 
 interface TrendingPost {
@@ -207,6 +208,9 @@ export default function ExplorePage() {
                             exit={{ opacity: 0, y: -20 }}
                             className="space-y-8"
                         >
+                            {/* Mobile Cards Carousel - sidebar cards */}
+                            <ExploreCardsCarousel />
+
                             {/* Features Card */}
                             <div className={`${themeCardBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-6`}>
                                 <h2 className={`text-xl font-semibold ${themeText} mb-2 flex items-center gap-2`}>

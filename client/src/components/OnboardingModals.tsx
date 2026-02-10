@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import WelcomeTour from './WelcomeTour';
 import WhatsNewModal from './WhatsNewModal';
 import EmailVerificationPopup from './EmailVerificationPopup';
+import GuidedTutorial from './GuidedTutorial';
 
 const CURRENT_VERSION = '0.5.0-rc.2';
 
@@ -20,6 +21,7 @@ export default function OnboardingModals() {
     const [showWelcome, setShowWelcome] = useState(false);
     const [showEmailVerification, setShowEmailVerification] = useState(false);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
+    const [showTutorial, setShowTutorial] = useState(false);
     const hasCheckedRef = useRef(false);
     const lastUserIdRef = useRef<string | null>(null);
 
@@ -81,6 +83,15 @@ export default function OnboardingModals() {
         checkEmailVerification();
     };
 
+    const handleStartTutorial = () => {
+        // Tutorial will start after all other modals close
+        setTimeout(() => setShowTutorial(true), 800);
+    };
+
+    const handleTutorialClose = () => {
+        setShowTutorial(false);
+    };
+
     const handleEmailVerificationClose = () => {
         setShowEmailVerification(false);
         // Marcar como dispensado para não mostrar novamente nesta sessão
@@ -98,9 +109,10 @@ export default function OnboardingModals() {
 
     return (
         <>
-            <WelcomeTour isOpen={showWelcome} onClose={handleWelcomeClose} />
+            <WelcomeTour isOpen={showWelcome} onClose={handleWelcomeClose} onStartTutorial={handleStartTutorial} />
             <EmailVerificationPopup isOpen={showEmailVerification} onClose={handleEmailVerificationClose} />
             <WhatsNewModal isOpen={showWhatsNew} onClose={handleWhatsNewClose} />
+            <GuidedTutorial isOpen={showTutorial} onClose={handleTutorialClose} />
         </>
     );
 }

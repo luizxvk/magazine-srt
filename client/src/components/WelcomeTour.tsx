@@ -8,12 +8,14 @@ const TOUR_VERSION = '0.5.0-rc.6';
 interface WelcomeTourProps {
     isOpen?: boolean;
     onClose?: () => void;
+    onStartTutorial?: () => void;
 }
 
-export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalOnClose }: WelcomeTourProps = {}) {
+export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalOnClose, onStartTutorial }: WelcomeTourProps = {}) {
     const { theme, user, accentColor: userAccentColor, accentGradient } = useAuth();
     const [step, setStep] = useState(0);
     const [internalIsVisible, setInternalIsVisible] = useState(false);
+    const [wantsTutorial, setWantsTutorial] = useState(true);
     const isMGT = user?.membershipType === 'MGT';
     const isDark = theme === 'dark';
     const hasCustomGradient = !!accentGradient;
@@ -34,6 +36,15 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
     const handleClose = () => {
         setStep(0);
         localStorage.setItem('tour_version', TOUR_VERSION);
+        
+        // Check if user wants the guided tutorial
+        if (wantsTutorial && !localStorage.getItem('tutorial_completed')) {
+            localStorage.setItem('tutorial_requested', 'true');
+            if (onStartTutorial) {
+                onStartTutorial();
+            }
+        }
+        
         if (externalOnClose) {
             externalOnClose();
         } else {
@@ -340,6 +351,40 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 transition={{ delay: 1.3 }}
                                 className="flex flex-col items-center gap-4"
                             >
+                                {/* Tutorial Checkbox */}
+                                {!localStorage.getItem('tutorial_completed') && (
+                                    <motion.label
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 1.4 }}
+                                        className={`flex items-center gap-3 cursor-pointer select-none px-4 py-2.5 rounded-xl border transition-all ${
+                                            wantsTutorial
+                                                ? (isDark 
+                                                    ? `${isMGT ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-gold-500/10 border-gold-500/30'}` 
+                                                    : `${isMGT ? 'bg-emerald-50 border-emerald-200' : 'bg-gold-50 border-gold-200'}`)
+                                                : (isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200')
+                                        }`}
+                                    >
+                                        <div
+                                            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                                                wantsTutorial
+                                                    ? `${isMGT ? 'bg-emerald-500 border-emerald-500' : 'bg-gold-500 border-gold-500'}` 
+                                                    : (isDark ? 'border-gray-600' : 'border-gray-300')
+                                            }`}
+                                            onClick={() => setWantsTutorial(!wantsTutorial)}
+                                        >
+                                            {wantsTutorial && (
+                                                <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                        <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            Quero fazer o tutorial guiado
+                                        </span>
+                                    </motion.label>
+                                )}
+
                                 <button
                                     onClick={handleNext}
                                     className={`group relative px-8 py-4 hover:brightness-110 text-black font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${!hasCustomGradient ? `${accentBg} ${isMGT ? 'shadow-emerald-500/25' : 'shadow-gold-500/25'}` : ''}`}

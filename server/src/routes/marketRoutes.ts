@@ -21,6 +21,7 @@ import {
   toggleEliteOnly,
 } from '../controllers/marketController';
 import { authenticateToken } from '../middleware/authMiddleware';
+import { moderateTextContent } from '../middleware/moderationMiddleware';
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ router.delete('/favorites/:listingId', removeFavorite);
 // Market 6.0 - Offers
 router.get('/offers/received', getOffersReceived);
 router.get('/offers/sent', getOffersSent);
-router.post('/offers/:listingId', makeOffer);
+router.post('/offers/:listingId', moderateTextContent(['message']), makeOffer);
 router.post('/offers/:offerId/accept', acceptOffer);
 router.post('/offers/:offerId/reject', rejectOffer);
 router.delete('/offers/:offerId', cancelOffer);

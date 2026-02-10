@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, ShoppingBag, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -29,11 +29,23 @@ interface CarouselPost {
     linkedProduct?: LinkedProduct | null;
 }
 
-interface FeedCarouselProps {
-    posts: CarouselPost[];
+interface LiveStream {
+    userId: string;
+    username: string;
+    displayName: string;
+    gameName: string;
+    title: string;
+    viewerCount: number;
+    thumbnailUrl: string;
+    streamUrl: string;
 }
 
-export default function FeedCarousel({ posts }: FeedCarouselProps) {
+interface FeedCarouselProps {
+    posts: CarouselPost[];
+    liveStreams?: LiveStream[];
+}
+
+export default function FeedCarousel({ posts, liveStreams = [] }: FeedCarouselProps) {
     const { user } = useAuth();
     const { config } = useCommunity();
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,22 +60,24 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                     config.adsCarouselSlot && 
                     !user?.isElite;
     
-    // Criar array de slides com anúncio inserido após o segundo post
+    // Criar array de slides com live streams primeiro, depois posts, depois anúncio
     const slides = useMemo(() => {
-        if (!showAds || posts.length < 2) {
-            return posts.map(post => ({ type: 'post' as const, data: post }));
-        }
+        const result: Array<{ type: 'post'; data: CarouselPost } | { type: 'ad' } | { type: 'live'; data: LiveStream }> = [];
         
-        const result: Array<{ type: 'post'; data: CarouselPost } | { type: 'ad' }> = [];
+        // Insert live streams first (they get priority)
+        liveStreams.forEach(stream => {
+            result.push({ type: 'live', data: stream });
+        });
+        
         posts.forEach((post, index) => {
             result.push({ type: 'post', data: post });
-            // Inserir anúncio após o segundo slide (índice 1)
-            if (index === 1) {
+            // Inserir anúncio após o segundo post (índice 1)
+            if (showAds && posts.length >= 2 && index === 1) {
                 result.push({ type: 'ad' });
             }
         });
         return result;
-    }, [posts, showAds]);
+    }, [posts, showAds, liveStreams]);
 
     const goToSlide = useCallback((newIndex: number) => {
         setCurrentIndex(newIndex);
@@ -109,6 +123,57 @@ export default function FeedCarousel({ posts }: FeedCarouselProps) {
                 {slides.map((slide, index) => (
                     slide.type === 'ad' ? (
                         <CarouselAdSlide key={`ad-${index}`} slot={config.adsCarouselSlot || ''} />
+                    ) : slide.type === 'live' ? (
+                        <div key={`live-${slide.data.userId}`} className="shrink-0 w-full h-full relative">
+                            <a 
+                                href={slide.data.streamUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block w-full h-full cursor-pointer"
+                            >
+                                {/* Thumbnail */}
+                                <img
+                                    src={slide.data.thumbnailUrl.replace('{width}', '1280').replace('{height}', '720')}
+                                    alt={slide.data.title}
+                                    className="w-full h-full object-cover select-none pointer-events-none"
+                                    draggable={false}
+                                />
+
+                                {/* Gradient Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+                                {/* Content */}
+                                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-10">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="px-3 py-1 rounded-full border bg-red-600/30 border-red-500/50 text-white text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                            AO VIVO
+                                        </span>
+                                        <span className="px-3 py-1 rounded-full border bg-purple-500/20 border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+                                            Twitch
+                                        </span>
+                                        {slide.data.gameName && (
+                                            <span className="text-xs text-gray-300 uppercase tracking-wider font-medium">
+                                                {slide.data.gameName}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif !text-white mb-4 leading-tight max-w-3xl drop-shadow-lg line-clamp-2">
+                                        {slide.data.title}
+                                    </h2>
+
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-white font-medium">{slide.data.displayName}</span>
+                                        <span className="flex items-center gap-1.5 text-red-400 text-sm font-medium">
+                                            <Eye className="w-4 h-4" />
+                                            {slide.data.viewerCount.toLocaleString('pt-BR')} assistindo
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     ) : (
                         <div key={slide.data.id} className="shrink-0 w-full h-full relative">
                             <Link 

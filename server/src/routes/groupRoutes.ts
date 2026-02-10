@@ -35,10 +35,10 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Rotas de grupo
-router.post('/', createGroup);
+router.post('/', moderateTextContent(['name', 'description']), createGroup);
 router.get('/', getMyGroups);
 router.get('/:id', getGroupById);
-router.put('/:id', updateGroup);
+router.put('/:id', moderateTextContent(['name', 'description']), updateGroup);
 router.post('/:id/join', joinGroup);
 router.post('/:id/leave', leaveGroup);
 router.delete('/:id', deleteGroup);
@@ -52,12 +52,12 @@ router.get('/invites/me', getMyInvites);
 // Rotas de membros
 router.delete('/:id/members/:memberId', removeMember);
 router.put('/:id/members/:memberId/role', updateMemberRole);
-router.put('/:groupId/nickname', updateNickname);
+router.put('/:groupId/nickname', moderateTextContent(['nickname']), updateNickname);
 router.post('/:groupId/mute', toggleMute);
 
 // Rotas de mensagens
 router.post('/:id/messages', moderateTextContent(['content']), postMessage);
-router.post('/:groupId/messages/image', postImageMessage);
+router.post('/:groupId/messages/image', moderateTextContent(['content']), postImageMessage);
 router.get('/:id/messages', getGroupMessages);
 router.delete('/:id/messages/:messageId', deleteGroupMessage);
 

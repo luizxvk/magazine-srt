@@ -186,7 +186,7 @@ export default function AdminTwitchSettings() {
             {/* Feature Toggles */}
             <div className="space-y-3">
                 <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Funcionalidades</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="flex flex-wrap gap-3">
                     <ToggleSwitch
                         enabled={config.carouselEnabled}
                         onChange={() => setConfig({ ...config, carouselEnabled: !config.carouselEnabled })}

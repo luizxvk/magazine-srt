@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Crown, Sparkles, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { DottedGlowBackground } from './ui/DottedGlowBackground';
 
 /**
  * Apple Vision Pro inspired Elite promotion card
@@ -154,6 +155,23 @@ export default function ElitePromoCard() {
                     </motion.div>
                 </div>
                 </div>
+
+                {/* Dotted glow background */}
+                <DottedGlowBackground
+                    className="pointer-events-none"
+                    style={{ maskImage: 'radial-gradient(ellipse at center, black 0%, transparent 90%)' } as React.CSSProperties}
+                    opacity={0.8}
+                    gap={10}
+                    radius={1.4}
+                    color="rgba(124, 58, 237, 0.5)"
+                    darkColor="rgba(124, 58, 237, 0.5)"
+                    glowColor="rgba(139, 92, 246, 0.9)"
+                    darkGlowColor="rgba(139, 92, 246, 0.9)"
+                    backgroundOpacity={0}
+                    speedMin={0.3}
+                    speedMax={1.2}
+                    speedScale={0.8}
+                />
 
                 {/* Shine effect on hover */}
                 <motion.div

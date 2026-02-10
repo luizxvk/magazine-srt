@@ -235,7 +235,8 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
             {streams.length === 0 ? (
                 <div className={`text-center py-8 ${textSub}`}>
                     <Tv className="w-12 h-12 mx-auto mb-3 opacity-50" style={{ color: accentColor }} />
-                    {!connected ? (
+                    {/* Show connect prompt only if no admin channels AND not connected */}
+                    {!connected && usernames.length === 0 ? (
                         <>
                             <p className="mb-4">Conecte sua conta para ver streams ao vivo</p>
                             <button
@@ -252,7 +253,26 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
                             </button>
                         </>
                     ) : (
-                        <p>Nenhuma stream ao vivo no momento</p>
+                        <>
+                            <p className="mb-2">Nenhuma stream ao vivo no momento</p>
+                            <p className="text-xs opacity-60">
+                                {usernames.length > 0 && `Monitorando: ${usernames.slice(0, 3).join(', ')}${usernames.length > 3 ? '...' : ''}`}
+                            </p>
+                            {!connected && (
+                                <button
+                                    onClick={handleConnect}
+                                    disabled={connecting}
+                                    className="mt-4 flex items-center gap-2 mx-auto px-3 py-2 rounded-lg text-xs font-medium transition-all opacity-70 hover:opacity-100"
+                                    style={{
+                                        backgroundColor: hexToRgba(accentColor, 0.15),
+                                        color: accentColor,
+                                    }}
+                                >
+                                    <Link className="w-3.5 h-3.5" />
+                                    Conectar para ver seus seguidos
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             ) : (

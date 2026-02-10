@@ -24,59 +24,96 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 // ============================================
+// MOBILE DETECTION HOOK
+// ============================================
+
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
+    return isMobile;
+}
+
+// ============================================
 // ANIMATED BACKGROUND COMPONENTS
 // ============================================
 
 /** Premium floating orbs — Magazine (gold) */
 function MagazineBackground() {
+    const isMobile = useIsMobile();
+
     return (
         <motion.div
             className="fixed inset-0 z-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
+            transition={{ duration: isMobile ? 0.6 : 1.2 }}
         >
             <div className="absolute inset-0 bg-[#050505]" />
 
-            {/* Large gold ambient orb – top right */}
-            <motion.div
-                className="absolute w-[800px] h-[800px] rounded-full"
-                style={{
-                    background: 'radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.03) 40%, transparent 70%)',
-                    filter: 'blur(80px)',
-                    top: '-15%',
-                    right: '-10%',
-                }}
-                animate={{ x: [0, 30, -20, 0], y: [0, -20, 15, 0], scale: [1, 1.05, 0.98, 1] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Medium gold orb – bottom left */}
-            <motion.div
-                className="absolute w-[600px] h-[600px] rounded-full"
-                style={{
-                    background: 'radial-gradient(circle, rgba(170,140,44,0.1) 0%, rgba(170,140,44,0.02) 50%, transparent 70%)',
-                    filter: 'blur(60px)',
-                    bottom: '-10%',
-                    left: '-5%',
-                }}
-                animate={{ x: [0, -25, 15, 0], y: [0, 20, -10, 0], scale: [1, 0.97, 1.03, 1] }}
-                transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Small accent orb – center */}
-            <motion.div
-                className="absolute w-[400px] h-[400px] rounded-full"
-                style={{
-                    background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 60%)',
-                    filter: 'blur(50px)',
-                    top: '40%',
-                    left: '30%',
-                }}
-                animate={{ x: [0, 40, -30, 0], y: [0, -30, 20, 0] }}
-                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-            />
+            {isMobile ? (
+                /* ── Mobile: Static CSS gradients, no animation ── */
+                <>
+                    <div
+                        className="absolute w-[400px] h-[400px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%)',
+                            top: '-10%',
+                            right: '-15%',
+                        }}
+                    />
+                    <div
+                        className="absolute w-[300px] h-[300px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(170,140,44,0.08) 0%, transparent 70%)',
+                            bottom: '-5%',
+                            left: '-10%',
+                        }}
+                    />
+                </>
+            ) : (
+                /* ── Desktop: Full animated orbs with blur ── */
+                <>
+                    <motion.div
+                        className="absolute w-[800px] h-[800px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.03) 40%, transparent 70%)',
+                            filter: 'blur(80px)',
+                            top: '-15%',
+                            right: '-10%',
+                        }}
+                        animate={{ x: [0, 30, -20, 0], y: [0, -20, 15, 0], scale: [1, 1.05, 0.98, 1] }}
+                        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <motion.div
+                        className="absolute w-[600px] h-[600px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(170,140,44,0.1) 0%, rgba(170,140,44,0.02) 50%, transparent 70%)',
+                            filter: 'blur(60px)',
+                            bottom: '-10%',
+                            left: '-5%',
+                        }}
+                        animate={{ x: [0, -25, 15, 0], y: [0, 20, -10, 0], scale: [1, 0.97, 1.03, 1] }}
+                        transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <motion.div
+                        className="absolute w-[400px] h-[400px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 60%)',
+                            filter: 'blur(50px)',
+                            top: '40%',
+                            left: '30%',
+                        }}
+                        animate={{ x: [0, 40, -30, 0], y: [0, -30, 20, 0] }}
+                        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                </>
+            )}
 
             {/* Noise texture overlay */}
             <div
@@ -95,70 +132,98 @@ function MagazineBackground() {
 
 /** Premium background — MGT (emerald + dotted glow) */
 function MgtBackground() {
+    const isMobile = useIsMobile();
+
     return (
         <motion.div
             className="fixed inset-0 z-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
+            transition={{ duration: isMobile ? 0.6 : 1.2 }}
         >
             <div className="absolute inset-0 bg-[#030a06]" />
 
-            {/* Emerald ambient orb – top left */}
-            <motion.div
-                className="absolute w-[700px] h-[700px] rounded-full"
-                style={{
-                    background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.02) 45%, transparent 70%)',
-                    filter: 'blur(80px)',
-                    top: '-20%',
-                    left: '-10%',
-                }}
-                animate={{ x: [0, 25, -15, 0], y: [0, -15, 25, 0], scale: [1, 1.04, 0.97, 1] }}
-                transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Teal orb – bottom right */}
-            <motion.div
-                className="absolute w-[500px] h-[500px] rounded-full"
-                style={{
-                    background: 'radial-gradient(circle, rgba(4,120,87,0.12) 0%, rgba(4,120,87,0.03) 50%, transparent 70%)',
-                    filter: 'blur(70px)',
-                    bottom: '-5%',
-                    right: '-8%',
-                }}
-                animate={{ x: [0, -20, 30, 0], y: [0, 15, -20, 0], scale: [1, 0.96, 1.05, 1] }}
-                transition={{ duration: 19, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Small accent orb – center-right */}
-            <motion.div
-                className="absolute w-[350px] h-[350px] rounded-full"
-                style={{
-                    background: 'radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 60%)',
-                    filter: 'blur(40px)',
-                    top: '50%',
-                    right: '25%',
-                }}
-                animate={{ x: [0, -35, 20, 0], y: [0, 25, -15, 0] }}
-                transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Dotted glow canvas – signature MGT effect */}
-            <DottedGlowBackground
-                className="pointer-events-none"
-                opacity={0.4}
-                gap={14}
-                radius={1.2}
-                color="rgba(16,185,129,0.3)"
-                darkColor="rgba(16,185,129,0.3)"
-                glowColor="rgba(52,211,153,0.7)"
-                darkGlowColor="rgba(52,211,153,0.7)"
-                backgroundOpacity={0}
-                speedMin={0.2}
-                speedMax={0.8}
-                speedScale={0.6}
-            />
+            {isMobile ? (
+                /* ── Mobile: Static CSS gradients, no canvas ── */
+                <>
+                    <div
+                        className="absolute w-[350px] h-[350px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)',
+                            top: '-15%',
+                            left: '-10%',
+                        }}
+                    />
+                    <div
+                        className="absolute w-[250px] h-[250px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(4,120,87,0.1) 0%, transparent 70%)',
+                            bottom: '-5%',
+                            right: '-8%',
+                        }}
+                    />
+                    {/* Static dot pattern for MGT feel on mobile */}
+                    <div
+                        className="absolute inset-0 opacity-[0.04]"
+                        style={{
+                            backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.8) 1px, transparent 1px)',
+                            backgroundSize: '20px 20px',
+                        }}
+                    />
+                </>
+            ) : (
+                /* ── Desktop: Full animated orbs + DottedGlow canvas ── */
+                <>
+                    <motion.div
+                        className="absolute w-[700px] h-[700px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.02) 45%, transparent 70%)',
+                            filter: 'blur(80px)',
+                            top: '-20%',
+                            left: '-10%',
+                        }}
+                        animate={{ x: [0, 25, -15, 0], y: [0, -15, 25, 0], scale: [1, 1.04, 0.97, 1] }}
+                        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <motion.div
+                        className="absolute w-[500px] h-[500px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(4,120,87,0.12) 0%, rgba(4,120,87,0.03) 50%, transparent 70%)',
+                            filter: 'blur(70px)',
+                            bottom: '-5%',
+                            right: '-8%',
+                        }}
+                        animate={{ x: [0, -20, 30, 0], y: [0, 15, -20, 0], scale: [1, 0.96, 1.05, 1] }}
+                        transition={{ duration: 19, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <motion.div
+                        className="absolute w-[350px] h-[350px] rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 60%)',
+                            filter: 'blur(40px)',
+                            top: '50%',
+                            right: '25%',
+                        }}
+                        animate={{ x: [0, -35, 20, 0], y: [0, 25, -15, 0] }}
+                        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <DottedGlowBackground
+                        className="pointer-events-none"
+                        opacity={0.4}
+                        gap={14}
+                        radius={1.2}
+                        color="rgba(16,185,129,0.3)"
+                        darkColor="rgba(16,185,129,0.3)"
+                        glowColor="rgba(52,211,153,0.7)"
+                        darkGlowColor="rgba(52,211,153,0.7)"
+                        backgroundOpacity={0}
+                        speedMin={0.2}
+                        speedMax={0.8}
+                        speedScale={0.6}
+                    />
+                </>
+            )}
 
             {/* Noise texture */}
             <div
@@ -180,6 +245,27 @@ function MgtBackground() {
 // ============================================
 
 function GlassCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+    const isMobile = useIsMobile();
+
+    if (isMobile) {
+        return (
+            <div className={`relative ${className}`}>
+                <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.01] pointer-events-none" />
+                <div
+                    className="relative rounded-3xl overflow-hidden border border-white/[0.06]"
+                    style={{
+                        background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+                        backdropFilter: 'blur(16px) saturate(1.2)',
+                        WebkitBackdropFilter: 'blur(16px) saturate(1.2)',
+                        boxShadow: '0 16px 40px -10px rgba(0,0,0,0.5)',
+                    }}
+                >
+                    <div className="relative z-10">{children}</div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={`relative ${className}`}>
             {/* Outer glow ring */}
@@ -239,6 +325,7 @@ function LoginForm({
 }) {
     const [capsLockOn, setCapsLockOn] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const isMobile = useIsMobile();
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         setCapsLockOn(e.getModifierState('CapsLock'));
@@ -246,21 +333,46 @@ function LoginForm({
 
     const accentRgb = isMGT ? '16,185,129' : '212,175,55';
 
-    const glassInputStyle: React.CSSProperties = {
-        background: 'rgba(255,255,255,0.04)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
-    };
+    const glassInputStyle: React.CSSProperties = isMobile
+        ? {
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+          }
+        : {
+              background: 'rgba(255,255,255,0.04)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+          };
 
     const focusInput = (e: React.FocusEvent<HTMLDivElement>) => {
         e.currentTarget.style.borderColor = `rgba(${accentRgb}, 0.4)`;
-        e.currentTarget.style.boxShadow = `inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(${accentRgb}, 0.08)`;
+        if (!isMobile) {
+            e.currentTarget.style.boxShadow = `inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(${accentRgb}, 0.08)`;
+        }
     };
 
     const blurInput = (e: React.FocusEvent<HTMLDivElement>) => {
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-        e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.05)';
+        e.currentTarget.style.borderColor = isMobile ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.06)';
+        if (!isMobile) {
+            e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.05)';
+        }
+    };
+
+    const submitButtonStyle: React.CSSProperties = isMobile ? {
+        background: isMGT
+            ? 'linear-gradient(135deg, rgba(16,185,129,0.35) 0%, rgba(4,120,87,0.45) 100%)'
+            : 'linear-gradient(135deg, rgba(212,175,55,0.35) 0%, rgba(170,140,44,0.45) 100%)',
+        border: `1px solid ${isMGT ? 'rgba(16,185,129,0.3)' : 'rgba(212,175,55,0.3)'}`,
+        color: isMGT ? 'rgba(167,243,208,0.9)' : 'rgba(253,230,138,0.9)',
+    } : {
+        background: isMGT
+            ? 'linear-gradient(135deg, rgba(16,185,129,0.3) 0%, rgba(4,120,87,0.4) 100%)'
+            : 'linear-gradient(135deg, rgba(212,175,55,0.3) 0%, rgba(170,140,44,0.4) 100%)',
+        border: `1px solid ${isMGT ? 'rgba(16,185,129,0.25)' : 'rgba(212,175,55,0.25)'}`,
+        color: isMGT ? 'rgba(167,243,208,0.9)' : 'rgba(253,230,138,0.9)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: `0 0 30px ${isMGT ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.1)'}`,
     };
 
     return (
@@ -355,25 +467,19 @@ function LoginForm({
                 type="submit"
                 disabled={isSubmitting}
                 className="relative w-full py-3.5 rounded-2xl font-medium text-xs uppercase tracking-[0.2em] overflow-hidden"
-                style={{
-                    background: isMGT
-                        ? 'linear-gradient(135deg, rgba(16,185,129,0.3) 0%, rgba(4,120,87,0.4) 100%)'
-                        : 'linear-gradient(135deg, rgba(212,175,55,0.3) 0%, rgba(170,140,44,0.4) 100%)',
-                    border: `1px solid ${isMGT ? 'rgba(16,185,129,0.25)' : 'rgba(212,175,55,0.25)'}`,
-                    color: isMGT ? 'rgba(167,243,208,0.9)' : 'rgba(253,230,138,0.9)',
-                    backdropFilter: 'blur(20px)',
-                    boxShadow: `0 0 30px ${isMGT ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.1)'}`,
-                }}
-                whileHover={{ scale: 1.01, y: -1 }}
+                style={submitButtonStyle}
+                whileHover={isMobile ? undefined : { scale: 1.01, y: -1 }}
                 whileTap={{ scale: 0.98 }}
             >
-                {/* Shimmer */}
-                <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 55%, transparent 60%)' }}
-                    animate={{ x: ['-100%', '200%'] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: 'easeInOut' }}
-                />
+                {/* Shimmer — desktop only */}
+                {!isMobile && (
+                    <motion.div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 55%, transparent 60%)' }}
+                        animate={{ x: ['-100%', '200%'] }}
+                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: 'easeInOut' }}
+                    />
+                )}
                 <span className="relative z-10 flex items-center justify-center gap-2">
                     {isSubmitting ? (
                         <>
@@ -532,7 +638,7 @@ export default function ModernLogin() {
                     transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
                 >
                     <GlassCard>
-                        <div className="p-8 md:p-10">
+                        <div className="p-6 md:p-10">
                             {/* Logo & Title */}
                             <AnimatePresence mode="wait">
                                 <motion.div
@@ -541,12 +647,12 @@ export default function ModernLogin() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.4 }}
-                                    className="text-center mb-8"
+                                    className="text-center mb-6 md:mb-8"
                                 >
                                     <motion.img
                                         src={isMGT ? logoMgt : logo}
                                         alt={isMGT ? config.tierStdName : config.tierVipName}
-                                        className={`mx-auto mb-5 ${isMGT ? 'h-14 md:h-16' : 'h-20 md:h-24'}`}
+                                        className={`mx-auto mb-4 md:mb-5 ${isMGT ? 'h-12 md:h-16' : 'h-16 md:h-24'}`}
                                         style={{
                                             filter: isMGT
                                                 ? 'drop-shadow(0 0 20px rgba(16,185,129,0.3))'
@@ -715,10 +821,9 @@ export default function ModernLogin() {
                     onClick={toggleMembership}
                     className="md:hidden w-full py-3.5 rounded-2xl text-[10px] uppercase tracking-[0.2em] font-medium flex items-center justify-center gap-2"
                     style={{
-                        background: isMGT ? 'rgba(212,175,55,0.06)' : 'rgba(16,185,129,0.06)',
+                        background: isMGT ? 'rgba(212,175,55,0.08)' : 'rgba(16,185,129,0.08)',
                         border: `1px solid ${isMGT ? 'rgba(212,175,55,0.12)' : 'rgba(16,185,129,0.12)'}`,
                         color: isMGT ? 'rgba(212,175,55,0.6)' : 'rgba(16,185,129,0.6)',
-                        backdropFilter: 'blur(20px)',
                     }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -744,7 +849,7 @@ export default function ModernLogin() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm md:backdrop-blur-xl"
                         onClick={() => setShowUserNotFoundPopup(false)}
                     >
                         <motion.div
@@ -814,7 +919,7 @@ export default function ModernLogin() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm md:backdrop-blur-xl"
                         onClick={() => setShowPermissionDeniedPopup(false)}
                     >
                         <motion.div

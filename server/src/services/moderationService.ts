@@ -7,47 +7,140 @@ import { logger } from '../utils/logger';
 // ============================================
 
 const BLACKLISTED_WORDS: string[] = [
-    // Portuguese hate speech / slurs
-    'macaco', 'viado', 'viadinho', 'traveco', 'sapatão', 'sapatona',
-    'preto de merda', 'volta pra senzala', 'lugar de negro',
-    'mulher de merda', 'piranha', 'vagabunda', 'vadia',
-    // Violence threats  
-    'vou te matar', 'vou te bater', 'vou te espancar',
-    'merece morrer', 'tem que morrer',
-    // Common offensive terms
-    'neonazi', 'nazista', 'hitler did nothing',
-    'kys', 'kill yourself', 'go die',
-    // PT-BR - insultos e xingamentos comuns
+    // ==========================================
+    // PORTUGUÊS (BR) — Xingamentos e insultos
+    // ==========================================
+    'merda', 'bosta', 'porra', 'caralho', 'cacete',
+    'fdp', 'pqp', 'vsf', 'vtnc', 'tnc', 'pnc', 'krl',
     'puta', 'filho da puta', 'filha da puta', 'filhodaputa', 'filhadaputa',
-    'filhoda puta', 'fila da puta', 'puta que pariu', 'fdp', 'pqp',
-    'merda', 'porra', 'caralho',
-    'arrombado', 'arrombada', 'cuzão', 'cuzao',
-    'desgraçado', 'desgraçada', 'otário', 'otária', 'otario',
-    'babaca', 'imbecil',
-    // Termos sexuais / vulgares
-    'rola', 'pau no cu', 'vai tomar no cu', 'tomar no cu',
-    'buceta', 'boceta', 'xereca', 'xota',
-    'punheta', 'punheteiro', 'broxa',
-    'chupar meu', 'chupa meu', 'mama aqui',
-    'putaria',
-    // English offensive
-    'fuck', 'fuck you', 'fucking', 'shit', 'asshole',
-    'nigger', 'nigga', 'faggot', 'bitch', 'whore', 'slut',
+    'filhoda puta', 'fila da puta', 'puta que pariu', 'puta merda',
+    'arrombado', 'arrombada', 'cuzao', 'cuzão', 'cu',
+    'desgraçado', 'desgraçada', 'desgraça', 'maldito', 'maldita',
+    'lazarento', 'lazarenta', 'infeliz', 'inútil', 'energúmeno',
+    'viado', 'viadinho', 'viadao', 'viadão', 'bicha', 'bichona',
+    'gay de merda', 'traveco', 'sapatão', 'sapatona',
+    'piranha', 'vagabunda', 'vadia', 'vagabundo', 'galinha', 'quenga',
+    'rapariga', 'rameira', 'meretriz',
+    'otario', 'otária', 'otário', 'trouxa', 'trouxão',
+    'babaca', 'imbecil', 'idiota', 'retardado', 'retardada',
+    'burro', 'burra', 'animal', 'jumento', 'jumenta', 'besta',
+    'corno', 'corna', 'cornudo', 'cornuda', 'chifrudo', 'chifruda',
+    'nojento', 'nojenta', 'asqueroso', 'asquerosa',
+    'lixo humano', 'escória', 'verme', 'parasita',
+    'cretino', 'cretina', 'estúpido', 'estúpida', 'tapado', 'tapada',
+    'mongol', 'mongoloide', 'débil mental', 'demente',
+    'palhaço', 'palhaça', 'ridículo', 'ridícula',
+    'sem vergonha', 'safado', 'safada', 'canalha',
+    'miserável', 'ordinário', 'ordinária',
+    'pulha', 'cafajeste', 'crápula',
+    'covarde', 'frouxo', 'frouxa',
+    'pentelho', 'pentelhão',
+    'filho de chocadeira',
+    // PT-BR — Termos sexuais / vulgares
+    'rola', 'rolão', 'pau', 'pinto', 'pica', 'piroca', 'piru',
+    'pau no cu', 'vai tomar no cu', 'tomar no cu', 'toma no cu',
+    'vai se fuder', 'vai se foder', 'foda-se', 'fodase', 'foda se',
+    'se foder', 'se fuder',
+    'buceta', 'boceta', 'xereca', 'xota', 'xoxota', 'pepeca',
+    'punheta', 'punheteiro', 'punheteira', 'broxa',
+    'chupar meu', 'chupa meu', 'mama aqui', 'me chupa', 'me mama',
+    'boquete', 'chupar pau', 'chupar rola',
+    'putaria', 'puteiro',
+    'tarado', 'tarada', 'pervertido', 'pervertida',
+    'pedófilo', 'pedofilo', 'estuprador', 'estupro',
+    // PT-BR — Racismo e preconceito
+    'macaco', 'macaca', 'preto fedido', 'preta fedida', 'negro sujo', 'negra suja',
+    'volta pra senzala', 'lugar de negro', 'preto imundo', 'preta imunda',
+    'crioulo', 'crioula',
+    'nordestino de merda', 'baiano burro',
+    // PT-BR — Ameaças e violência
+    'vou te matar', 'vou te bater', 'vou te espancar',
+    'vou te pegar', 'vou acabar contigo', 'vou acabar com você',
+    'merece morrer', 'tem que morrer', 'morra',
+    'se mata', 'se mate', 'se matar',
+    'vou te arrebentar', 'vou te destruir',
+    // ==========================================
+    // ENGLISH — Slurs, insults, hate speech
+    // ==========================================
+    'fuck', 'fuck you', 'fuck off', 'fucking', 'fucker', 'motherfucker',
+    'shit', 'bullshit', 'shitty', 'shithead', 'piece of shit',
+    'asshole', 'ass hole', 'jackass', 'dumbass',
+    'bitch', 'son of a bitch', 'bitchass',
+    'nigger', 'nigga', 'coon', 'darkie',
+    'chink', 'gook', 'slant eye',
+    'spic', 'wetback', 'beaner',
+    'kike', 'jewboy',
+    'raghead', 'towelhead', 'sand nigger',
+    'faggot', 'fag', 'dyke', 'tranny',
+    'retard', 'retarded',
+    'whore', 'slut', 'skank', 'hoe', 'thot', 'hooker',
+    'dick', 'dickhead', 'cock', 'cocksucker',
+    'cunt', 'twat', 'pussy', 'prick',
+    'wanker', 'tosser', 'bellend', 'knobhead',
+    'bastard', 'douchebag', 'scumbag',
+    'kill yourself', 'kys', 'go die', 'drink bleach',
+    'hang yourself', 'neck yourself',
+    'pedophile', 'pedo', 'child molester', 'groomer',
+    'rapist', 'rape',
+    'nazi', 'neonazi', 'neo-nazi', 'heil hitler', 'hitler did nothing',
+    'white power', 'white supremacy',
+    // ==========================================
+    // ESPAÑOL — Insultos y groserías
+    // ==========================================
+    'puto', 'puta madre', 'hijo de puta', 'hija de puta', 'hijueputa',
+    'pendejo', 'pendeja', 'pinche', 'chingada', 'chingar',
+    'chinga tu madre', 'a la verga', 'verga',
+    'culero', 'culera', 'culo', 'culiao', 'culiado',
+    'cabron', 'cabrón', 'cabrona',
+    'marica', 'maricón', 'maricon', 'joto', 'puñal',
+    'mierda', 'mierdoso',
+    'coño', 'cono', 'concha', 'conchatumadre', 'concha de tu madre',
+    'estúpido', 'estupido', 'estúpida', 'estupida',
+    'imbécil', 'imbecil', 'baboso', 'babosa', 'menso', 'mensa',
+    'mamón', 'mamon', 'mamaverga', 'mamahuevo',
+    'picha', 'pija', 'poronga',
+    'huevón', 'huevon', 'huevona',
+    'boludo', 'boluda', 'pelotudo', 'pelotuda',
+    'pajero', 'pajera',
+    'malparido', 'malparida',
+    'perra', 'zorra', 'ramera', 'golfa',
+    'cornudo', 'cornuda',
+    'te voy a matar', 'te mato', 'vas a morir',
+    'suicidate', 'matate', 'muérete', 'muerete',
+    'negro de mierda', 'negra de mierda', 'indio de mierda',
+    'sudaca', 'naco', 'naca',
 ];
 
-// Regex patterns for common evasion techniques (l33t speak, spacing, PT-BR variations)
+// Regex patterns for common evasion techniques (l33t speak, spacing, PT-BR/EN/ES variations)
 const EVASION_PATTERNS: RegExp[] = [
+    // English
     /n[i1][g6]{1,2}[e3]r/i,
     /f[a4][g6]{1,2}[o0]t/i,
     /k+\s*y+\s*s+/i,
+    /f+\s*u+\s*c+\s*k/i,
+    /s+\s*h+\s*[i1]+\s*t/i,
+    /b+\s*[i1]+\s*t+\s*c+\s*h/i,
     // PT-BR evasion patterns
-    /f[i1]lh[oa0]\s*d[ae4]\s*p[u\*]t[a4]/i,        // filha/filho da puta with spaces/chars
-    /p\s*u\s*t\s*a/i,                                 // p u t a (spaced)
-    /f\s*d\s*p/i,                                      // f d p (spaced)
-    /c\s*a\s*r\s*a\s*l\s*h\s*o/i,                     // c a r a l h o
-    /b\s*u\s*c\s*e\s*t\s*a/i,                          // b u c e t a
-    /a\s*r\s*r\s*o\s*m\s*b\s*a\s*d/i,                  // a r r o m b a d o/a
-    /v[i1][a4]d[o0]/i,                                 // v1ad0, vi4do etc
+    /f[i1]lh[oa0]\s*d[ae4]\s*p[u\*]t[a4]/i,
+    /p\s*u\s*t\s*a/i,
+    /f\s*d\s*p/i,
+    /v\s*s\s*f/i,
+    /v\s*t\s*n\s*c/i,
+    /p\s*q\s*p/i,
+    /c\s*a\s*r\s*a\s*l\s*h\s*o/i,
+    /b\s*u\s*c\s*e\s*t\s*a/i,
+    /a\s*r\s*r\s*o\s*m\s*b\s*a\s*d/i,
+    /v[i1][a4]d[o0]/i,
+    /m\s*e\s*r\s*d\s*a/i,
+    /c\s*u\s*z\s*[a\u00e3]\s*o/i,
+    /l\s*a\s*z\s*a\s*r\s*e\s*n\s*t/i,
+    /m\s*a\s*l\s*d\s*i\s*t/i,
+    // Spanish evasion patterns
+    /h[i1]j[o0u]\s*d[e3]\s*p[u\*]t[a4]/i,
+    /p[e3]nd[e3]j[o0]/i,
+    /ch[i1]ng[a4]/i,
+    /m[a4]r[i1]c[o0]n/i,
+    /c[u\*]l[e3]r[o0]/i,
 ];
 
 /**

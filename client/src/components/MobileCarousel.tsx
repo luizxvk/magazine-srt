@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info, Trophy } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info, Trophy, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,6 +23,7 @@ interface CarouselCard {
     gradient: string;
     onClick?: () => void;
     badge?: string | number;
+    premium?: boolean;
 }
 
 export default function MobileCarousel({
@@ -81,6 +82,16 @@ export default function MobileCarousel({
                 const event = new CustomEvent('openWhatsNew');
                 window.dispatchEvent(event);
             }
+        },
+        {
+            id: 'elite',
+            title: 'ELITE',
+            subtitle: user?.membershipType === 'MGT' ? 'Você é Elite ✦' : 'Eleve sua experiência',
+            icon: <Crown className="w-6 h-6" />,
+            gradient: isMGT ? 'from-emerald-400/30 to-emerald-900/60' : 'from-amber-400/25 to-yellow-900/50',
+            onClick: () => navigate('/elite'),
+            badge: '👑',
+            premium: true
         },
         {
             id: 'recommended',
@@ -286,29 +297,75 @@ export default function MobileCarousel({
                             }}
                             className="flex-shrink-0 w-32 sm:w-36 snap-start transition-opacity duration-300"
                         >
-                            <div
-                                className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/30 active:scale-95 transition-transform border border-white/10 backdrop-blur-xl`}
-                            >
-                                {/* Badge */}
-                                {card.badge && (
-                                    <div className="absolute top-1.5 right-1.5 bg-black/40 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm">
-                                        {card.badge}
-                                    </div>
+                            <div className="relative">
+                                {/* Premium glow for Elite card */}
+                                {card.premium && (
+                                    <>
+                                        <div 
+                                            className="absolute -inset-[1px] rounded-xl opacity-60 blur-[2px] animate-pulse"
+                                            style={{ 
+                                                background: isMGT 
+                                                    ? 'linear-gradient(135deg, #10b981, #059669, #34d399)' 
+                                                    : 'linear-gradient(135deg, #d4af37, #f59e0b, #fbbf24)' 
+                                            }}
+                                        />
+                                        <div 
+                                            className="absolute -inset-1 rounded-xl opacity-20 blur-md"
+                                            style={{ 
+                                                background: isMGT 
+                                                    ? 'radial-gradient(circle, #10b981 0%, transparent 70%)' 
+                                                    : 'radial-gradient(circle, #d4af37 0%, transparent 70%)' 
+                                            }}
+                                        />
+                                    </>
                                 )}
+                                <div
+                                    className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/30 active:scale-95 transition-transform backdrop-blur-xl ${
+                                        card.premium 
+                                            ? isMGT 
+                                                ? 'border border-emerald-400/40 shadow-emerald-500/20' 
+                                                : 'border border-amber-400/40 shadow-amber-500/20'
+                                            : 'border border-white/10'
+                                    }`}
+                                >
+                                    {/* Badge */}
+                                    {card.badge && (
+                                        <div className={`absolute top-1.5 right-1.5 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm ${
+                                            card.premium ? 'bg-black/50' : 'bg-black/40'
+                                        }`}>
+                                            {card.badge}
+                                        </div>
+                                    )}
 
-                                {/* Icon */}
-                                <div className="drop-shadow-md" style={{ color }}>
-                                    {card.icon}
-                                </div>
+                                    {/* Icon */}
+                                    <div className="drop-shadow-md" style={{ color: card.premium ? (isMGT ? '#34d399' : '#fbbf24') : color }}>
+                                        {card.icon}
+                                    </div>
 
-                                {/* Text */}
-                                <div className="text-left">
-                                    <p className="text-white drop-shadow-md font-bold text-[11px] sm:text-xs leading-tight truncate">
-                                        {card.title}
-                                    </p>
-                                    <p className="text-white/70 drop-shadow-md text-[9px] leading-tight truncate mt-0.5">
-                                        {card.subtitle}
-                                    </p>
+                                    {/* Text */}
+                                    <div className="text-left">
+                                        <p className={`drop-shadow-md font-bold text-[11px] sm:text-xs leading-tight truncate ${
+                                            card.premium ? 'text-white tracking-wider' : 'text-white'
+                                        }`}>
+                                            {card.title}
+                                        </p>
+                                        <p className={`drop-shadow-md text-[9px] leading-tight truncate mt-0.5 ${
+                                            card.premium ? 'text-white/80' : 'text-white/70'
+                                        }`}>
+                                            {card.subtitle}
+                                        </p>
+                                    </div>
+
+                                    {/* Subtle shimmer overlay for premium */}
+                                    {card.premium && (
+                                        <div 
+                                            className="absolute inset-0 rounded-xl opacity-[0.07] pointer-events-none"
+                                            style={{
+                                                background: `linear-gradient(105deg, transparent 40%, ${isMGT ? '#34d399' : '#fbbf24'} 50%, transparent 60%)`,
+                                                animation: 'shimmer 3s ease-in-out infinite'
+                                            }}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </button>

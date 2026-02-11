@@ -12,6 +12,7 @@ import {
     Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import ChatWindow from './ChatWindow';
 
@@ -31,11 +32,13 @@ interface AdminInfo {
 
 export default function SupportButton() {
     const { user, isMobileDrawerOpen } = useAuth();
+    const { t } = useTranslation('common');
     const isMGT = user?.membershipType === 'MGT';
     const [isOpen, setIsOpen] = useState(false);
     const [isAdminOnline, setIsAdminOnline] = useState(false);
     const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
     const [showChat, setShowChat] = useState(false);
+    const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
     // Calculate position based on window width
     const [bottomPosition, setBottomPosition] = useState('24px');
@@ -94,6 +97,16 @@ export default function SupportButton() {
             setIsOpen(false);
         }
     }, [isMobileDrawerOpen]);
+
+    // Listen for comments modal state changes
+    useEffect(() => {
+        const handleCommentsState = (e: CustomEvent<{ isOpen: boolean }>) => {
+            setIsCommentsOpen(e.detail.isOpen);
+            if (e.detail.isOpen && isOpen) setIsOpen(false);
+        };
+        window.addEventListener('commentsModalStateChange', handleCommentsState as EventListener);
+        return () => window.removeEventListener('commentsModalStateChange', handleCommentsState as EventListener);
+    }, [isOpen]);
 
     // Check if any admin is online (with error handling)
     useEffect(() => {
@@ -203,12 +216,12 @@ export default function SupportButton() {
                                         <Headphones className="w-5 h-5 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-white font-semibold">Suporte</h3>
+                                        <h3 className="text-white font-semibold">{t('support.title')}</h3>
                                         <p className="text-white/50 text-xs flex items-center gap-1">
                                             <span 
                                                 className={`w-1.5 h-1.5 rounded-full ${isAdminOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} 
                                             />
-                                            {isAdminOnline ? 'Online' : 'Offline'}
+                                            {isAdminOnline ? t('status.online') : t('status.offline')}
                                         </p>
                                     </div>
                                 </div>
@@ -236,7 +249,7 @@ export default function SupportButton() {
                                     }}
                                 >
                                     <Sparkles className="w-2.5 h-2.5" />
-                                    Recomendado
+                                    {t('support.recommended')}
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
@@ -244,7 +257,7 @@ export default function SupportButton() {
                                     </div>
                                     <div>
                                         <span className="text-white font-medium text-sm">WhatsApp</span>
-                                        <p className="text-white/40 text-xs">Resposta rápida em minutos</p>
+                                        <p className="text-white/40 text-xs">{t('support.whatsappDesc')}</p>
                                     </div>
                                     <ExternalLink className="w-4 h-4 text-white/20 ml-auto" />
                                 </div>
@@ -261,7 +274,7 @@ export default function SupportButton() {
                                     </div>
                                     <div>
                                         <span className="text-white font-medium text-sm">E-mail</span>
-                                        <p className="text-white/40 text-xs">Para assuntos detalhados</p>
+                                        <p className="text-white/40 text-xs">{t('support.emailDesc')}</p>
                                     </div>
                                     <ExternalLink className="w-4 h-4 text-white/20 ml-auto" />
                                 </div>
@@ -280,7 +293,7 @@ export default function SupportButton() {
                                     <div>
                                         <span className="text-white font-medium text-sm">Chat</span>
                                         <p className="text-white/40 text-xs">
-                                            {adminInfo ? 'Fale direto com a equipe' : 'Admin offline'}
+                                            {adminInfo ? t('support.chatDesc') : t('support.adminOffline')}
                                         </p>
                                     </div>
                                     {isAdminOnline && (
@@ -295,11 +308,11 @@ export default function SupportButton() {
                             <div className="flex items-center justify-between text-xs text-white/30">
                                 <div className="flex items-center gap-1.5">
                                     <Clock className="w-3 h-3" />
-                                    <span>Seg-Sex: 9h às 18h</span>
+                                    <span>{t('support.hours')}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <CheckCircle2 className="w-3 h-3 text-green-500/50" />
-                                    <span>~5min resposta</span>
+                                    <span>{t('support.responseTime')}</span>
                                 </div>
                             </div>
                         </div>
@@ -312,8 +325,8 @@ export default function SupportButton() {
                 onClick={() => setIsOpen(!isOpen)}
                 initial={{ y: 0, opacity: 1 }}
                 animate={{ 
-                    y: (isVisible && !isMobileDrawerOpen) ? 0 : 100, 
-                    opacity: (isVisible && !isMobileDrawerOpen) ? 1 : 0 
+                    y: (isVisible && !isMobileDrawerOpen && !isCommentsOpen) ? 0 : 100, 
+                    opacity: (isVisible && !isMobileDrawerOpen && !isCommentsOpen) ? 1 : 0 
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 style={{
@@ -334,7 +347,7 @@ export default function SupportButton() {
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                aria-label="Abrir suporte"
+                aria-label={t('support.openSupport')}
             >
                 {isOpen ? (
                     <X className="w-6 h-6 text-white" />

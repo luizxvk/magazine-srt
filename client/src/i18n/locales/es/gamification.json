@@ -64,5 +64,8 @@
             "name": "Nombre del Equipo",
             "members": "Miembros"
         }
+    },
+    "progress": {
+        "yourProgress": "Tu progreso"
     }
 }

@@ -1,10 +1,29 @@
 {
     "createPost": {
-        "placeholder": "¿Qué estás pensando?",
+        "placeholder": "¿Qué estás pensando, {{name}}?",
         "submit": "Publicar",
         "addImage": "Agregar imagen",
         "addPoll": "Agregar encuesta",
-        "tags": "Etiquetas"
+        "tags": "Etiquetas",
+        "post": "Publicación",
+        "highlight": "Destacado",
+        "photo": "Foto",
+        "video": "Video",
+        "tag": "Etiqueta",
+        "poll": "Encuesta",
+        "addOption": "+ Agregar opción",
+        "pollQuestion": "Pregunta de la encuesta (opcional)",
+        "option": "Opción {{n}}",
+        "highlightCost": "Destacar post (300 Zions)",
+        "requiresZions": "Requiere 300 Zions",
+        "success": "¡Post Publicado!",
+        "successDesc": "Tu publicación está en línea.",
+        "error": "Error al publicar",
+        "errorDesc": "Inténtalo de nuevo más tarde.",
+        "invalidPoll": "Encuesta inválida",
+        "invalidPollDesc": "Agrega al menos 2 opciones.",
+        "tagPlaceholder": "Escribe la etiqueta y presiona Enter",
+        "eventTags": "Etiquetas de eventos:"
     },
     "post": {
         "like": "Me gusta",
@@ -16,17 +35,21 @@
         "pin": "Fijar",
         "unpin": "Desfijar",
         "comments": "Comentarios",
-        "noComments": "Aún no hay comentarios.",
+        "noComments": "¡Sé el primero en comentar!",
         "writeComment": "Escribe un comentario...",
         "viewMore": "Ver más comentarios",
         "liked": "Te gustó",
         "reportSuccess": "Reporte enviado exitosamente.",
-        "deleteConfirm": "¿Estás seguro de que quieres eliminar esta publicación?"
+        "deleteConfirm": "¿Estás seguro de que quieres eliminar esta publicación?",
+        "reply": "Responder",
+        "replyCount_one": "respuesta",
+        "replyCount_other": "respuestas",
+        "replyingTo": "Respondiendo a"
     },
     "feed": {
         "title": "Feed",
-        "welcome": "Bienvenido, {{name}}",
-        "empty": "¡Aún no hay publicaciones. Sé el primero en publicar!",
+        "welcome": "Bienvenido, {{name}}",        "subtitle": "Tu feed exclusivo del Magazine",
+        "subtitleMGT": "Tu feed exclusivo del Machine Gold Team",        "empty": "¡Aún no hay publicaciones. Sé el primero en publicar!",
         "refresh": "Actualizar feed"
     },
     "stories": {

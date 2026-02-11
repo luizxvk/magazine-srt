@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import StoriesBar from './StoriesBar';
 
 interface WelcomeCardProps {
@@ -12,6 +13,7 @@ interface WelcomeCardProps {
 
 export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory }: WelcomeCardProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { t } = useTranslation(['feed', 'common']);
     const isMGT = user?.membershipType === 'MGT';
     
     // Theme-based styling
@@ -59,16 +61,16 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
                                 backgroundImage: accentGradient || `linear-gradient(to right, ${userAccent}, ${userAccent})`
                             }}
                         >
-                            Bem vindo, {user?.name?.split(' ')[0] || 'Membro'}
+                            {t('feed:feed.welcome', { name: user?.name?.split(' ')[0] || t('common:nav.profile') })}
                         </h1>
                         <p className={theme === 'light' ? 'text-gray-500 text-lg font-light tracking-wide' : 'text-gray-400 text-lg font-light tracking-wide'}>
-                            {isMGT ? 'Seu feed exclusivo do Machine Gold Team' : 'Seu feed exclusivo do Magazine'}
+                            {isMGT ? t('feed:feed.subtitleMGT') : t('feed:feed.subtitle')}
                         </p>
                     </div>
                     <Link
                         to="/settings"
                         className={`p-2.5 rounded-xl ${themeIconBg} ${themeIconColor} transition-all duration-200`}
-                        title="Configurações"
+                        title={t('common:nav.settings')}
                     >
                         <Settings className="w-5 h-5" />
                     </Link>

@@ -6,6 +6,7 @@ import DailyLoginCard from './DailyLoginCard';
 import { Feature } from '../utils/features';
 import { useFeature } from '../hooks/useFeature';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import UpgradeModal from './UpgradeModal';
 
 interface LeftSidebarProps {
@@ -25,6 +26,7 @@ interface SidebarItem {
 
 export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick, dailyLoginStatus }: LeftSidebarProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { t } = useTranslation(['common', 'gamification']);
     const isMGT = user?.membershipType === 'MGT';
 
     // Use accent color from context (with fallback)
@@ -50,45 +52,45 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
     const items: SidebarItem[] = [
         {
             icon: <Users className="w-5 h-5" />,
-            label: 'Grupos',
+            label: t('common:nav.groups'),
             to: '/groups',
             feature: Feature.GROUPS
         },
         {
             icon: <Trophy className="w-5 h-5" />,
-            label: 'Torneios',
+            label: t('common:nav.tournaments'),
             to: '/tournaments'
         },
         {
             icon: <ShoppingBag className="w-5 h-5" />,
-            label: 'Loja de Produtos',
+            label: t('common:nav.productStore'),
             to: '/store'
         },
         {
             icon: <Camera className="w-5 h-5" />,
-            label: 'Catálogo de Fotos',
+            label: t('common:nav.photoCatalog'),
             to: '/catalog',
             feature: Feature.PHOTO_CATALOG
         },
         {
             icon: <Calendar className="w-5 h-5" />,
-            label: 'Eventos Exclusivos',
+            label: t('common:nav.exclusiveEvents'),
             onClick: onEventsClick
         },
         {
             icon: <UserPlus className="w-5 h-5" />,
-            label: 'Novos Membros',
+            label: t('common:nav.newMembers'),
             onClick: onNewMembersClick
         },
         {
             icon: <Star className="w-5 h-5" />,
-            label: 'Destaques da Semana',
+            label: t('common:nav.weeklyHighlights'),
             to: '/highlights',
             feature: Feature.HIGHLIGHTS
         },
         {
             icon: <Info className="w-5 h-5" />,
-            label: 'Quem Somos',
+            label: t('common:nav.aboutUs'),
             to: '/sobre-rovex'
         }
     ];
@@ -161,7 +163,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
 
     return (
         <aside className="hidden lg:block w-56 sticky top-24 h-fit animate-fade-in-right">
-            <nav className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-3 transition-all duration-300`}>
+            <nav data-tutorial="sidebar-nav" className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-3 transition-all duration-300`}>
                 <ul className="space-y-1">
                     {items.map((item, index) => (
                         <MenuItem key={index} item={item} index={index} />
@@ -171,7 +173,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
 
             {/* Quick Stats */}
             <div className={`mt-4 ${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} p-4 transition-all duration-300`}>
-                <p className={`text-xs ${textSub} mb-2`}>Seu progresso</p>
+                <p className={`text-xs ${textSub} mb-2`}>{t('gamification:progress.yourProgress', 'Seu progresso')}</p>
                 {(() => {
                     // XP Table matching server: Level X requires XP_TABLE[X-1] total XP
                     const XP_TABLE = Array.from({ length: 30 }, (_, i) => {
@@ -193,7 +195,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
                     return (
                         <>
                             <div className="flex items-center justify-between">
-                                <span className={`text-sm ${textMain}`}>Nível {currentLevel}</span>
+                                <span className={`text-sm ${textMain}`}>{t('gamification:level.title', { level: currentLevel })}</span>
                                 <span className={`text-xs ${themeIconColor}`}>{xpInCurrentLevel} / {xpNeededForNextLevel} XP</span>
                             </div>
                             <div className={`mt-2 h-1.5 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>

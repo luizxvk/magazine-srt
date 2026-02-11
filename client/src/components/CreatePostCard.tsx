@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
+import { useTranslation } from 'react-i18next';
 import Loader from './Loader';
 
 interface EventTag {
@@ -21,6 +22,7 @@ interface CreatePostCardProps {
 
 export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const { user, showSuccess, showError, updateUser, theme, accentColor } = useAuth();
+    const { t } = useTranslation('feed');
     const [caption, setCaption] = useState('');
     const [mediaUrl, setMediaUrl] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
@@ -81,7 +83,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
         // Validar enquete se ativa
         const validPollOptions = pollOptions.filter(opt => opt.trim());
         if (showPollInput && validPollOptions.length < 2) {
-            showError('Enquete inválida', 'Adicione pelo menos 2 opções.');
+            showError(t('createPost.invalidPoll'), t('createPost.invalidPollDesc'));
             return;
         }
         
@@ -113,11 +115,11 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             const userRes = await api.get('/users/me');
             updateUser(userRes.data);
             
-            showSuccess('Post Publicado!', 'Sua publicação está no ar.');
+            showSuccess(t('createPost.success'), t('createPost.successDesc'));
             onPostCreated();
         } catch (error: any) {
             console.error('Failed to create post', error);
-            showError('Falha ao publicar', error.response?.data?.error || 'Tente novamente mais tarde.');
+            showError(t('createPost.error'), error.response?.data?.error || t('createPost.errorDesc'));
         } finally {
             setLoading(false);
         }
@@ -203,14 +205,14 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                 <div className="flex-1">
                     <p className={`font-semibold ${textColor}`}>{user?.displayName || user?.name}</p>
                     <div className="flex items-center gap-2">
-                        <span className={`text-xs ${textMuted}`}>Publicação</span>
+                        <span className={`text-xs ${textMuted}`}>{t('createPost.post')}</span>
                         {isCarouselMode && (
                             <span 
                                 className="text-[10px] px-2 py-0.5 rounded-full text-black font-bold uppercase flex items-center gap-1"
                                 style={{ backgroundColor: userAccent }}
                             >
                                 <Sparkles className="w-3 h-3" />
-                                Destaque
+                                {t('createPost.highlight')}
                             </span>
                         )}
                     </div>
@@ -223,7 +225,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     ref={textareaRef}
                     value={caption}
                     onChange={handleTextareaChange}
-                    placeholder={`No que você está pensando, ${user?.name?.split(' ')[0]}?`}
+                    placeholder={t('createPost.placeholder', { name: user?.name?.split(' ')[0] })}
                     className={`w-full ${inputBg} ${textColor} rounded-2xl px-4 py-3 resize-none focus:outline-none focus:ring-2 border ${inputBorder} backdrop-blur-sm min-h-[60px] max-h-[200px] text-base transition-all duration-300`}
                     style={{ 
                         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
@@ -299,7 +301,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         <input
                             type="text"
                             autoFocus
-                            placeholder="Digite a tag e pressione Enter"
+                            placeholder={t('createPost.tagPlaceholder')}
                             className={`w-full ${inputBg} ${textColor} rounded-xl px-3 py-2.5 text-sm focus:outline-none border ${inputBorder} backdrop-blur-sm transition-all duration-300`}
                             style={{ 
                                 boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)'
@@ -322,7 +324,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                             <div className="mt-2">
                                 <p className={`text-xs ${textMuted} mb-1.5 flex items-center gap-1`}>
                                     <Calendar className="w-3 h-3" />
-                                    Tags de eventos:
+                                    {t('createPost.eventTags')}
                                 </p>
                                 <div className="flex flex-wrap gap-1.5">
                                     {eventTags
@@ -389,7 +391,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                             type="text"
                             value={pollQuestion}
                             onChange={(e) => setPollQuestion(e.target.value)}
-                            placeholder="Pergunta da enquete (opcional)"
+                            placeholder={t('createPost.pollQuestion')}
                             className={`w-full ${inputBg} ${textColor} rounded-xl px-3 py-2.5 text-sm mb-3 focus:outline-none border ${inputBorder} backdrop-blur-sm transition-all duration-300`}
                         />
                         
@@ -419,7 +421,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                                             newOptions[index] = e.target.value;
                                             setPollOptions(newOptions);
                                         }}
-                                        placeholder={`Opção ${index + 1}`}
+                                        placeholder={t('createPost.option', { n: index + 1 })}
                                         className={`flex-1 ${inputBg} ${textColor} rounded-xl px-3 py-2 text-sm focus:outline-none border ${inputBorder} backdrop-blur-sm transition-all duration-300`}
                                     />
                                     {pollOptions.length > 2 && (
@@ -440,7 +442,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                                 className="mt-3 text-xs font-medium hover:underline transition-all duration-200"
                                 style={{ color: userAccent }}
                             >
-                                + Adicionar opção
+                                + {t('createPost.addOption').replace('+ ', '')}
                             </button>
                         )}
                     </motion.div>
@@ -476,7 +478,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         title="Adicionar foto"
                     >
                         <ImageIcon className="w-5 h-5 text-green-500" />
-                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>Foto</span>
+                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>{t('createPost.photo')}</span>
                     </motion.button>
 
                     {/* Video */}
@@ -488,7 +490,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         title="Adicionar vídeo"
                     >
                         <Video className="w-5 h-5 text-red-500" />
-                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>Vídeo</span>
+                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>{t('createPost.video')}</span>
                     </motion.button>
 
                     {/* Tag */}
@@ -504,7 +506,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         title="Adicionar tag"
                     >
                         <Hash className={`w-5 h-5 ${showTagInput ? 'text-blue-400' : 'text-blue-500'}`} />
-                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>Tag</span>
+                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>{t('createPost.tag')}</span>
                     </motion.button>
 
                     {/* Poll/Enquete */}
@@ -524,7 +526,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                         title="Criar enquete"
                     >
                         <BarChart3 className="w-5 h-5" style={{ color: showPollInput ? userAccent : '#06b6d4' }} />
-                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>Enquete</span>
+                        <span className={`text-xs ${textMuted} hidden md:inline font-medium`}>{t('createPost.poll')}</span>
                     </motion.button>
 
                     {/* Destaque/Carousel */}
@@ -542,14 +544,14 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                             backgroundColor: `${userAccent}15`,
                             borderColor: `${userAccent}40`
                         } : {}}
-                        title={canUseCarousel ? 'Destacar post (300 Zions)' : 'Requer 300 Zions'}
+                        title={canUseCarousel ? t('createPost.highlightCost') : t('createPost.requiresZions')}
                     >
                         {!canUseCarousel ? (
                             <Lock className="w-5 h-5 text-gray-500" />
                         ) : (
                             <Layers className="w-5 h-5" style={{ color: isCarouselMode ? userAccent : '#a855f7' }} />
                         )}
-                        <span className={`text-xs ${textMuted} hidden lg:inline font-medium`}>Destaque</span>
+                        <span className={`text-xs ${textMuted} hidden lg:inline font-medium`}>{t('createPost.highlight')}</span>
                     </motion.button>
                 </div>
 
@@ -573,7 +575,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     ) : (
                         <Send className="w-4 h-4" />
                     )}
-                    <span>Publicar</span>
+                    <span>{t('createPost.submit')}</span>
                 </motion.button>
             </div>
         </motion.div>

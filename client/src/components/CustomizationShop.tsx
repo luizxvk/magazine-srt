@@ -7,6 +7,7 @@ import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
 import SupplyBoxModal from './SupplyBoxModal';
 import Loader from './Loader';
+import { getItemRarity, getRarityLabel } from '../utils/raritySystem';
 
 interface ShopItem {
     id: string;
@@ -523,6 +524,22 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
     const textSub = isDarkMode ? 'text-gray-400' : 'text-gray-600';
 
+    // Rarity badge component for cosmetic items
+    const RarityBadge = ({ itemId, itemType }: { itemId: string; itemType: string }) => {
+        const rarity = getItemRarity(itemId, itemType);
+        if (rarity === 'COMMON' && itemType !== 'background') return null; // Hide common for non-backgrounds to reduce clutter
+        const label = getRarityLabel(rarity);
+        const bgClass = rarity === 'LEGENDARY' ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600'
+            : rarity === 'EPIC' ? 'bg-gradient-to-r from-purple-500 to-purple-600'
+            : rarity === 'RARE' ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+            : 'bg-gray-500/80';
+        return (
+            <div className={`absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider text-white ${bgClass} z-10`}>
+                {label}
+            </div>
+        );
+    };
+
     return createPortal(
         <AnimatePresence>
             <motion.div
@@ -733,6 +750,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         }}
                                                                     />
                                                                 )}
+                                                                <RarityBadge itemId={item.id} itemType="color" />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -813,6 +831,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         }}
                                                                     />
                                                                 )}
+                                                                <RarityBadge itemId={item.id} itemType="color" />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -886,6 +905,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     className="w-16 h-16 rounded-full shadow-lg"
                                                                     style={{ background: item.preview }}
                                                                 />
+                                                                <RarityBadge itemId={item.id} itemType="color" />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -977,6 +997,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         />
                                                                     </div>
                                                                 </div>
+                                                                <RarityBadge itemId={item.id} itemType="profileBorder" />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -1060,6 +1081,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         />
                                                                     </div>
                                                                 </div>
+                                                                <RarityBadge itemId={item.id} itemType="profileBorder" />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -1140,6 +1162,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         >
                                                             <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                                                 <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
+                                                                <RarityBadge itemId={item.id} itemType="background" />
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -1211,6 +1234,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         >
                                                             <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                                                 <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
+                                                                {!isFree && <RarityBadge itemId={item.id} itemType="background" />}
                                                                 {equipped && (
                                                                     <div className={`absolute top-2 right-2 p-1 rounded-full bg-${themeColor}-500`}>
                                                                         <Check className="w-3 h-3 text-black" />
@@ -1309,6 +1333,9 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                         />
                                                     )
                                                 )}
+
+                                                {/* Rarity badge */}
+                                                {!isFree && <RarityBadge itemId={item.id} itemType={item.type} />}
 
                                                 {/* Equipped badge */}
                                                 {equipped && (

@@ -82,7 +82,7 @@ interface Post {
 }
 
 export default function FeedPage() {
-    const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser } = useAuth();
+    const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser, theme } = useAuth();
     const { t } = useTranslation(['feed', 'common']);
     const isMGT = user?.membershipType === 'MGT';
 
@@ -412,6 +412,9 @@ export default function FeedPage() {
                                             <GradientText as="h1" className="text-2xl md:text-3xl font-serif" fallbackClassName={isMGT ? 'text-white' : 'text-gold-400'}>
                                                 {t('feed:feed.welcome', { name: user?.name?.split(' ')[0] || t('common:nav.profile') })}
                                             </GradientText>
+                                            <p className={theme === 'light' ? 'text-gray-500 text-sm font-light tracking-wide mt-1' : 'text-gray-400 text-sm font-light tracking-wide mt-1'}>
+                                                {isMGT ? t('feed:feed.subtitleMGT') : t('feed:feed.subtitle')}
+                                            </p>
                                         </div>
                                         <Link
                                             to="/settings"

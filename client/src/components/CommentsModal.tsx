@@ -3,6 +3,7 @@ import { X, Send, User, MessageCircle, Heart, Reply, ChevronDown, ChevronUp } fr
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import Loader from './Loader';
 
 interface CommentAuthor {
@@ -42,6 +43,7 @@ interface CommentsModalProps {
 
 export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded }: CommentsModalProps) {
     const { user, showAchievement, updateUserZions, theme, showEdgeNotification } = useAuth();
+    const { t } = useTranslation(['feed', 'common']);
     const isMGT = user?.membershipType === 'MGT';
     const [isMobile, setIsMobile] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -72,6 +74,16 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
     const [replyingTo, setReplyingTo] = useState<{ id: string; authorName: string } | null>(null);
     const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
     const [likingComment, setLikingComment] = useState<string | null>(null);
+
+    // Dispatch event to hide navbar/support when comments open
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('commentsModalStateChange', { detail: { isOpen } }));
+        return () => {
+            if (isOpen) {
+                window.dispatchEvent(new CustomEvent('commentsModalStateChange', { detail: { isOpen: false } }));
+            }
+        };
+    }, [isOpen]);
 
     useEffect(() => {
         if (isOpen && postId) {
@@ -276,10 +288,10 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                 </div>
                                 <div>
                                     <h3 className={`text-lg font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                        Comentários
+                                        {t('post.comments')}
                                     </h3>
                                     <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                        {getTotalComments()} {getTotalComments() === 1 ? 'comentário' : 'comentários'}
+                                        {getTotalComments()} {getTotalComments() === 1 ? t('post.comment') : t('post.comments').toLowerCase()}
                                     </p>
                                 </div>
                             </div>
@@ -303,7 +315,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                         <MessageCircle className={`w-8 h-8 ${isMGT ? 'text-emerald-500/50' : 'text-amber-500/50'}`} />
                                     </div>
                                     <p className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                        Seja o primeiro a comentar!
+                                        {t('post.noComments')}
                                     </p>
                                 </div>
                             ) : (
@@ -375,7 +387,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                                             }`}
                                                         >
                                                             <Reply className="w-4 h-4" />
-                                                            <span>Responder</span>
+                                                            <span>{t('post.reply')}</span>
                                                         </button>
 
                                                         {/* Show replies button */}
@@ -387,7 +399,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                                                 }`}
                                                             >
                                                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                                                <span>{comment.replies.length} {comment.replies.length === 1 ? 'resposta' : 'respostas'}</span>
+                                                                <span>{comment.replies.length} {comment.replies.length === 1 ? t('post.replyCount_one') : t('post.replyCount_other')}</span>
                                                             </button>
                                                         )}
                                                     </div>
@@ -483,7 +495,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                 >
                                     <div className="flex items-center justify-between">
                                         <span className={`text-sm ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`}>
-                                            Respondendo a <strong>{replyingTo.authorName}</strong>
+                                            {t('post.replyingTo')} <strong>{replyingTo.authorName}</strong>
                                         </span>
                                         <button
                                             onClick={cancelReply}
@@ -507,7 +519,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                     type="text"
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder={replyingTo ? `Responder ${replyingTo.authorName}...` : "Escreva um comentário..."}
+                                    placeholder={replyingTo ? `${t('post.reply')} ${replyingTo.authorName}...` : t('post.writeComment')}
                                     className={`flex-1 px-3 py-2 bg-transparent text-sm ${theme === 'light' ? 'text-gray-900' : 'text-white'} focus:outline-none placeholder-gray-400`}
                                 />
                                 <motion.button

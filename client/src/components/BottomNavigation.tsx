@@ -2,24 +2,26 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, ShoppingBag, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface NavItem {
     id: string;
     icon: React.ComponentType<{ className?: string }>;
-    label: string;
+    labelKey: string;
     path: string;
 }
 
 const navItems: NavItem[] = [
-    { id: 'home', icon: Home, label: 'Home', path: '/feed' },
-    { id: 'explore', icon: Search, label: 'Explorar', path: '/explore' },
-    { id: 'store', icon: ShoppingBag, label: 'Loja', path: '/loja' },
-    { id: 'profile', icon: User, label: 'Perfil', path: '/profile' },
+    { id: 'home', icon: Home, labelKey: 'common:nav.home', path: '/feed' },
+    { id: 'explore', icon: Search, labelKey: 'common:nav.explore', path: '/explore' },
+    { id: 'store', icon: ShoppingBag, labelKey: 'common:nav.shop', path: '/loja' },
+    { id: 'profile', icon: User, labelKey: 'common:nav.profile', path: '/profile' },
 ];
 
 // Memoized nav item for better performance
 const NavItemButton = memo(({ 
     item, 
+    label,
     isActive, 
     activeTextColor, 
     activeBgColor,
@@ -27,6 +29,7 @@ const NavItemButton = memo(({
     onClick 
 }: { 
     item: NavItem; 
+    label: string;
     isActive: boolean; 
     activeTextColor: string;
     activeBgColor: string;
@@ -64,7 +67,7 @@ const NavItemButton = memo(({
                     isActive ? activeTextColor : 'text-white/60'
                 }`}
             >
-                {item.label}
+                {label}
             </span>
         </button>
     );
@@ -74,14 +77,17 @@ NavItemButton.displayName = 'NavItemButton';
 
 export default function BottomNavigation() {
     const { user, isMobileDrawerOpen, activeChatUserId } = useAuth();
+    const { t } = useTranslation('common');
     const location = useLocation();
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [activeId, setActiveId] = useState('home');
     const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
+    const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
+    const liteMode = user?.liteMode ?? false;
 
     // Theme colors - simplified
     const glowColor = isMGT ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)';
@@ -98,6 +104,18 @@ export default function BottomNavigation() {
         window.addEventListener('storyViewerStateChange', handleStoryViewerState as EventListener);
         return () => {
             window.removeEventListener('storyViewerStateChange', handleStoryViewerState as EventListener);
+        };
+    }, []);
+
+    // Listen for comments modal state changes
+    useEffect(() => {
+        const handleCommentsState = (e: CustomEvent<{ isOpen: boolean }>) => {
+            setIsCommentsOpen(e.detail.isOpen);
+        };
+
+        window.addEventListener('commentsModalStateChange', handleCommentsState as EventListener);
+        return () => {
+            window.removeEventListener('commentsModalStateChange', handleCommentsState as EventListener);
         };
     }, []);
 
@@ -146,7 +164,7 @@ export default function BottomNavigation() {
 
     // Hide when drawer/modal is open, story viewer is open, or should be hidden
     // Hide navbar when chat popup is open or other conditions
-    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen || activeChatUserId) return null;
+    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen || isCommentsOpen || activeChatUserId) return null;
 
     return (
         <>
@@ -165,8 +183,10 @@ export default function BottomNavigation() {
                         className={`relative rounded-2xl overflow-hidden border ${borderGlow}`}
                         style={{
                             background: 'rgba(0, 0, 0, 0.7)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
+                            ...(liteMode ? {} : {
+                                backdropFilter: 'blur(20px)',
+                                WebkitBackdropFilter: 'blur(20px)',
+                            }),
                         }}
                     >
                         {/* Navigation items */}
@@ -175,6 +195,7 @@ export default function BottomNavigation() {
                                 <NavItemButton
                                     key={item.id}
                                     item={item}
+                                    label={t(item.labelKey)}
                                     isActive={activeId === item.id}
                                     activeTextColor={activeTextColor}
                                     activeBgColor={activeBgColor}

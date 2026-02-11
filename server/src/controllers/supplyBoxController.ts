@@ -287,6 +287,15 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                     where: { id: userId },
                     data: { zionsPoints: { increment: bonus } }
                 });
+                // Registrar crédito no histórico (fallback sem packs)
+                await prisma.zionHistory.create({
+                    data: {
+                        userId,
+                        amount: bonus,
+                        reason: `Supply Box - Bônus de ${bonus} Zions`,
+                        currency: 'POINTS'
+                    }
+                });
                 result.rewardType = 'ZIONS';
                 result.item = { id: 'zions_bonus', name: `${bonus} Zions`, value: bonus };
                 result.message = `Bônus de Zions! Você ganhou ${bonus} Pontos!`;
@@ -306,6 +315,15 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 await prisma.user.update({
                     where: { id: userId },
                     data: { zionsPoints: { increment: compensation } }
+                });
+                // Registrar compensação de duplicata no histórico
+                await prisma.zionHistory.create({
+                    data: {
+                        userId,
+                        amount: compensation,
+                        reason: `Supply Box - Duplicata: ${selectedPack.name} (+${compensation} Zions)`,
+                        currency: 'POINTS'
+                    }
                 });
                 result.type = 'DUPLICATE';
                 result.compensation = compensation;
@@ -327,6 +345,16 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 data: { zionsPoints: { increment: bonus } }
             });
 
+            // Registrar crédito no histórico
+            await prisma.zionHistory.create({
+                data: {
+                    userId,
+                    amount: bonus,
+                    reason: `Supply Box - Bônus de ${bonus} Zions`,
+                    currency: 'POINTS'
+                }
+            });
+
             result.item = { id: 'zions_bonus', name: `${bonus} Zions`, value: bonus };
             result.message = `Bônus de Zions! Você ganhou ${bonus} Pontos!`;
 
@@ -340,6 +368,15 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 await prisma.user.update({
                     where: { id: userId },
                     data: { zionsPoints: { increment: bonus } }
+                });
+                // Registrar crédito no histórico (fallback sem itens)
+                await prisma.zionHistory.create({
+                    data: {
+                        userId,
+                        amount: bonus,
+                        reason: `Supply Box - Bônus de ${bonus} Zions`,
+                        currency: 'POINTS'
+                    }
                 });
                 result.rewardType = 'ZIONS';
                 result.item = { id: 'zions_bonus', name: `${bonus} Zions`, value: bonus };
@@ -372,6 +409,15 @@ export const openDailySupplyBox = async (req: AuthRequest, res: Response) => {
                 await prisma.user.update({
                     where: { id: userId },
                     data: { zionsPoints: { increment: compensation } }
+                });
+                // Registrar compensação de duplicata no histórico
+                await prisma.zionHistory.create({
+                    data: {
+                        userId,
+                        amount: compensation,
+                        reason: `Supply Box - Duplicata: ${selectedItem.name} (+${compensation} Zions)`,
+                        currency: 'POINTS'
+                    }
                 });
                 result.type = 'DUPLICATE';
                 result.compensation = compensation;

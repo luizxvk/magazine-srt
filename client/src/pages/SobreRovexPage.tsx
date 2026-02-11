@@ -15,10 +15,13 @@ import {
     Check
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { Link } from 'react-router-dom';
+import Aurora from '../components/Aurora';
 
 export default function SobreRovexPage() {
     const { theme } = useAuth();
+    const { communityName } = useCommunity();
 
     // Rovex brand colors
     const rovexPurple = '#8B5CF6';
@@ -424,20 +427,16 @@ export default function SobreRovexPage() {
                 <section 
                     className="py-20 relative overflow-hidden"
                     style={{ 
-                        background: `linear-gradient(135deg, ${rovexPurple}, ${rovexPurpleDark})` 
+                        background: `linear-gradient(135deg, ${rovexPurple}20, ${rovexPurpleDark}40)` 
                     }}
                 >
-                    {/* Decorative elements */}
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        <motion.div 
-                            className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/10 blur-3xl"
-                            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
-                            transition={{ duration: 5, repeat: Infinity }}
-                        />
-                        <motion.div 
-                            className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-white/10 blur-3xl"
-                            animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.1, 0.15] }}
-                            transition={{ duration: 6, repeat: Infinity }}
+                    {/* Aurora Background */}
+                    <div className="absolute inset-0 pointer-events-none">
+                        <Aurora
+                            colorStops={['#7C3AED', '#A78BFA', '#5227FF']}
+                            blend={0.6}
+                            amplitude={1.2}
+                            speed={0.8}
                         />
                     </div>
 
@@ -456,7 +455,7 @@ export default function SobreRovexPage() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <motion.a
-                                    href="https://rovex.io?ref=magazine-srt"
+                                    href="https://rovex-hub.vercel.app/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 rounded-2xl font-semibold hover:bg-gray-100 transition-colors"
@@ -537,7 +536,7 @@ export default function SobreRovexPage() {
                                 to="/feed" 
                                 className={`text-sm ${theme === 'light' ? 'text-gray-500 hover:text-gray-700' : 'text-gray-500 hover:text-gray-300'} transition-colors`}
                             >
-                                ← Voltar para o Magazine SRT
+                                ← Voltar para {communityName}
                             </Link>
                         </div>
                     </div>

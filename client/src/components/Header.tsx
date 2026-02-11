@@ -18,6 +18,7 @@ import api from '../services/api';
 import logoSrtFallback from '../assets/logo-mgt.png';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 import { useDynamicHead } from '../hooks/useDynamicHead';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
     onOpenShop?: () => void;
@@ -170,25 +171,26 @@ export default function Header({ onOpenShop }: HeaderProps) {
     }, [isMobileDrawerOpen, setIsMobileDrawerOpen]);
 
     const isElite = user?.isElite && user?.eliteUntil && new Date(user.eliteUntil) > new Date();
+    const { t } = useTranslation('common');
     
     const menuItems = [
-        { icon: <Home className="w-5 h-5" />, label: 'Feed', path: '/feed' },
-        { icon: <Star className="w-5 h-5" />, label: 'Destaques', path: '/highlights' },
-        { icon: <ShoppingBag className="w-5 h-5" />, label: 'Loja de Produtos', path: '/store' },
-        { icon: <Trophy className="w-5 h-5" />, label: 'Ranking', path: '/ranking' },
+        { icon: <Home className="w-5 h-5" />, label: t('nav.home'), path: '/feed' },
+        { icon: <Star className="w-5 h-5" />, label: t('nav.rewards'), path: '/highlights' },
+        { icon: <ShoppingBag className="w-5 h-5" />, label: t('nav.shop'), path: '/store' },
+        { icon: <Trophy className="w-5 h-5" />, label: t('nav.ranking'), path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
-        { icon: <MessageCircle className="w-5 h-5" />, label: 'Grupos', path: '/groups' },
-        { icon: <Store className="w-5 h-5" />, label: 'Mercado', path: '/market' },
-        { icon: <Ticket className="w-5 h-5" />, label: 'Recompensas', path: '/rewards' },
-        { icon: <Crown className="w-5 h-5 text-amber-400" />, label: isElite ? 'Minha Assinatura' : 'ELITE ✨', path: '/elite', highlight: !isElite },
-        { icon: <Rocket className="w-5 h-5" />, label: 'Roadmap', path: '/roadmap' },
-        { icon: <Bell className="w-5 h-5" />, label: 'Notificações', path: '/notifications', badge: hasUnread },
-        { icon: <Settings className="w-5 h-5" />, label: 'Configurações', path: '/settings' },
-        ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: 'Admin', path: '/admin' }] : []),
+        { icon: <MessageCircle className="w-5 h-5" />, label: t('nav.groups'), path: '/groups' },
+        { icon: <Store className="w-5 h-5" />, label: t('nav.market'), path: '/market' },
+        { icon: <Ticket className="w-5 h-5" />, label: t('nav.rewards'), path: '/rewards' },
+        { icon: <Crown className="w-5 h-5 text-amber-400" />, label: isElite ? 'ELITE' : 'ELITE ✨', path: '/elite', highlight: !isElite },
+        { icon: <Rocket className="w-5 h-5" />, label: t('nav.roadmap'), path: '/roadmap' },
+        { icon: <Bell className="w-5 h-5" />, label: t('nav.notifications'), path: '/notifications', badge: hasUnread },
+        { icon: <Settings className="w-5 h-5" />, label: t('nav.settings'), path: '/settings' },
+        ...(user?.role === 'ADMIN' ? [{ icon: <Settings className="w-5 h-5" />, label: t('nav.admin'), path: '/admin' }] : []),
     ];
 
     return (
-        <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${headerBorder} bg-black/50 backdrop-blur-xl transition-colors duration-500`}>
+        <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${headerBorder} bg-black/50 transition-colors duration-500 ${user?.liteMode ? '' : 'backdrop-blur-xl'}`}>
             {/* Search Modal */}
             <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
             <WhatsNewModal isOpen={isWhatsNewModalOpen} onClose={() => setIsWhatsNewModalOpen(false)} />
@@ -242,7 +244,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     <Search className={`absolute left-3.5 ${theme === 'light' ? 'text-gray-700' : 'text-white/30'} group-hover:text-white/70 transition-colors w-4 h-4 z-10`} />
                     <input
                         type="text"
-                        placeholder="Buscar..."
+                        placeholder={t('actions.search') + '...'}
                         onClick={() => setIsSearchModalOpen(true)}
                         readOnly
                         className={`w-full ${theme === 'light' ? 'bg-white border-gray-300 text-black placeholder-gray-600 shadow-sm' : 'bg-white/5 border-white/10 text-white placeholder-white/20'} backdrop-blur-md border hover:border-white/20 focus:border-white/30 rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] focus:shadow-[0_0_20px_rgba(255,255,255,0.05)] relative z-0 cursor-pointer`}
@@ -262,7 +264,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <Search className={`absolute left-7 ${theme === 'light' ? 'text-gray-500' : 'text-white/50'} w-4 h-4`} />
                             <input
                                 type="text"
-                                placeholder="Buscar..."
+                                placeholder={t('actions.search') + '...'}
                                 autoFocus
                                 className={`w-full ${theme === 'light' ? 'bg-white text-gray-900 border-gray-200 placeholder-gray-500' : 'bg-white/10 text-white border-transparent placeholder-white/30'} border rounded-full py-2.5 pl-10 pr-10 text-sm focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-red-500/50' : 'focus:ring-gold-500/50'} transition-all`}
                             />
@@ -288,6 +290,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             style={{ color: accentColor }}
                             aria-label="Loja"
                             title="Loja de Personalização"
+                            data-tutorial="desktop-store"
                         >
                             <Store className="w-5 h-5" />
                         </button>
@@ -304,6 +307,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             className="relative p-2 transition-all hover:scale-110"
                             style={{ color: accentColor }}
                             aria-label="Social"
+                            data-tutorial="desktop-explore"
                         >
                             <Users className="w-5 h-5" />
                         </Link>
@@ -368,7 +372,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     </div>
 
                     {/* Profile Link - Both Mobile & Desktop */}
-                    <div className="relative">
+                    <div className="relative" data-tutorial="desktop-profile">
                         <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${headerBorder} hover:opacity-80 transition-opacity`}>
                         <div className="text-right hidden lg:block">
                             <div className="flex items-center gap-2 justify-end">
@@ -461,7 +465,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             onClick={logout}
                             className={`hidden md:block p-2 transition-all hover:scale-110 border-l ${headerBorder} pl-2 md:pl-4 ml-1 md:ml-2`}
                             style={{ color: accentColor }}
-                            title="Sair"
+                            title={t('nav.logout')}
                         >
                             <LogOut className="w-5 h-5" />
                         </button>
@@ -578,7 +582,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 }`}
                                             >
                                                 <LogOut className="w-3.5 h-3.5" />
-                                                <span>Sair</span>
+                                                <span>{t('nav.logout')}</span>
                                             </motion.button>
                                         )}
                                         <motion.button
@@ -602,8 +606,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             >
                                 <div className="grid grid-cols-3 gap-2">
                                     {[
-                                        { icon: Search, label: 'Buscar', action: () => { setIsMobileDrawerOpen(false); setIsSearchModalOpen(true); } },
-                                        { icon: Store, label: 'Loja', action: () => { setIsMobileDrawerOpen(false); onOpenShop ? onOpenShop() : setIsShopOpen(true); } },
+                                        { icon: Search, label: t('actions.search'), action: () => { setIsMobileDrawerOpen(false); setIsSearchModalOpen(true); } },
+                                        { icon: Store, label: t('nav.shop'), action: () => { setIsMobileDrawerOpen(false); onOpenShop ? onOpenShop() : setIsShopOpen(true); } },
                                         { icon: Coins, label: 'Zions', action: () => { setIsMobileDrawerOpen(false); openZionsModal(); } },
                                     ].map((item, idx) => (
                                         <motion.button

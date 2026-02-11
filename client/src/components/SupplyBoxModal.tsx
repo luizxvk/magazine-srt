@@ -134,7 +134,7 @@ const BADGE_ICONS: Record<string, string> = {
 };
 
 export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBoxModalProps) {
-    const { user, theme, accentColor } = useAuth();
+    const { user, theme, accentColor, updateUserPoints } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const defaultAccent = isMGT ? '#10b981' : '#d4af37';
     const userAccent = accentColor || defaultAccent;
@@ -173,6 +173,22 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
             // Update opens count
             setOpensToday(prev => prev + 1);
             setCost(res.data.nextCost);
+
+            // Atualizar saldo de Zions Points no contexto do usuário
+            const currentCost = cost || 0;
+            let pointsDelta = -currentCost; // Desconta o custo da abertura
+
+            if (res.data.rewardType === 'ZIONS' && res.data.item?.value) {
+                // Ganhou Zions bônus
+                pointsDelta += res.data.item.value;
+            }
+            if (res.data.type === 'DUPLICATE' && res.data.compensation) {
+                // Compensação por duplicata
+                pointsDelta += res.data.compensation;
+            }
+            if (pointsDelta !== 0) {
+                updateUserPoints(pointsDelta);
+            }
 
             // Trigger parent update independently of UI state
             if (onSuccess) onSuccess();

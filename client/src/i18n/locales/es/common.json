@@ -14,7 +14,14 @@
         "events": "Eventos",
         "roadmap": "Roadmap",
         "admin": "Admin",
-        "logout": "Salir"
+        "logout": "Salir",
+        "tournaments": "Torneos",
+        "productStore": "Tienda de Productos",
+        "photoCatalog": "Catálogo de Fotos",
+        "exclusiveEvents": "Eventos Exclusivos",
+        "newMembers": "Nuevos Miembros",
+        "weeklyHighlights": "Destacados de la Semana",
+        "aboutUs": "Quiénes Somos"
     },
     "actions": {
         "save": "Guardar",
@@ -62,5 +69,16 @@
     "confirm": {
         "delete": "¿Estás seguro de que quieres eliminar?",
         "unsavedChanges": "Tienes cambios sin guardar. ¿Quieres salir?"
+    },
+    "support": {
+        "title": "Soporte",
+        "recommended": "Recomendado",
+        "whatsappDesc": "Respuesta rápida en minutos",
+        "emailDesc": "Para asuntos detallados",
+        "chatDesc": "Habla directo con el equipo",
+        "adminOffline": "Admin offline",
+        "hours": "Lun-Vie: 9h a 18h",
+        "responseTime": "~5min respuesta",
+        "openSupport": "Abrir soporte"
     }
 }

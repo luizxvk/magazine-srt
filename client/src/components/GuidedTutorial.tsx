@@ -5,9 +5,11 @@ import { useAuth } from '../context/AuthContext';
 
 interface TutorialStep {
     targetSelector: string;
+    fallbackSelector?: string; // Fallback para desktop/mobile
     title: string;
     description: string;
     position: 'top' | 'bottom' | 'left' | 'right';
+    fallbackPosition?: 'top' | 'bottom' | 'left' | 'right';
 }
 
 const TUTORIAL_STEPS: TutorialStep[] = [
@@ -31,27 +33,35 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     },
     {
         targetSelector: '[data-tutorial="mobile-carousel"]',
+        fallbackSelector: '[data-tutorial="sidebar-nav"]',
         title: 'Acesso Rápido',
         description: 'Bônus diário, Supply Box, eventos e mais — tudo ao alcance de um toque.',
         position: 'bottom',
+        fallbackPosition: 'right',
     },
     {
         targetSelector: '[data-tutorial="nav-explore"]',
+        fallbackSelector: '[data-tutorial="desktop-explore"]',
         title: 'Explorar',
         description: 'Descubra conteúdos, membros e ferramentas da comunidade.',
         position: 'top',
+        fallbackPosition: 'bottom',
     },
     {
         targetSelector: '[data-tutorial="nav-store"]',
+        fallbackSelector: '[data-tutorial="desktop-store"]',
         title: 'Loja',
         description: 'Troque seus Zions por recompensas reais, gift cards e itens exclusivos.',
         position: 'top',
+        fallbackPosition: 'bottom',
     },
     {
         targetSelector: '[data-tutorial="nav-profile"]',
+        fallbackSelector: '[data-tutorial="desktop-profile"]',
         title: 'Seu Perfil',
         description: 'Veja suas conquistas, nível, badges e personalize seu perfil.',
         position: 'top',
+        fallbackPosition: 'left',
     },
 ];
 
@@ -67,16 +77,42 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
     const [currentStep, setCurrentStep] = useState(0);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
     const [isVisible, setIsVisible] = useState(false);
+    const [activePosition, setActivePosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
 
     const accentColor = isMGT ? '#10b981' : '#d4af37';
     const accentBorder = isMGT ? 'border-emerald-500/50' : 'border-gold-500/50';
+
+    // Check if element is actually visible in the viewport (not hidden by CSS)
+    const isElementVisible = (el: Element): boolean => {
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        // Element is hidden if: display:none, visibility:hidden, zero size, or off-screen
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        if (rect.width === 0 && rect.height === 0) return false;
+        // Check if the element or any parent has display:none (getBoundingClientRect returns 0,0,0,0)
+        if (rect.width <= 0 || rect.height <= 0) return false;
+        return true;
+    };
 
     const findAndHighlight = useCallback((stepIndex: number) => {
         const step = TUTORIAL_STEPS[stepIndex];
         if (!step) return;
 
-        const el = document.querySelector(step.targetSelector);
-        if (el) {
+        // Try primary selector first
+        let el = document.querySelector(step.targetSelector);
+        let position = step.position;
+
+        // If primary not found or not visible, try fallback
+        if ((!el || !isElementVisible(el)) && step.fallbackSelector) {
+            const fallbackEl = document.querySelector(step.fallbackSelector);
+            if (fallbackEl && isElementVisible(fallbackEl)) {
+                el = fallbackEl;
+                position = step.fallbackPosition || step.position;
+            }
+        }
+
+        if (el && isElementVisible(el)) {
+            setActivePosition(position);
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             // Small delay for scroll to complete
             setTimeout(() => {
@@ -85,7 +121,7 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
                 setIsVisible(true);
             }, 400);
         } else {
-            // Skip to next step if element not found
+            // Skip to next step if element not found or not visible
             if (stepIndex < TUTORIAL_STEPS.length - 1) {
                 setCurrentStep(stepIndex + 1);
             } else {
@@ -149,7 +185,7 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
         const padding = 16;
         const tooltipWidth = 280;
 
-        switch (step.position) {
+        switch (activePosition) {
             case 'bottom':
                 return {
                     top: targetRect.bottom + padding,
@@ -179,7 +215,7 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
     const getArrowStyle = (): React.CSSProperties & { arrowClass: string } => {
         if (!targetRect) return { arrowClass: '' };
 
-        switch (step.position) {
+        switch (activePosition) {
             case 'bottom':
                 return {
                     arrowClass: 'before:absolute before:-top-2 before:left-1/2 before:-translate-x-1/2 before:w-4 before:h-4 before:rotate-45',
@@ -254,7 +290,7 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
 
                     {/* Tooltip */}
                     <motion.div
-                        initial={{ opacity: 0, y: step.position === 'top' ? 10 : -10 }}
+                        initial={{ opacity: 0, y: activePosition === 'top' ? 10 : -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         className={`fixed z-[9999] w-[280px] ${arrowClass}`}
@@ -276,10 +312,10 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
                                 className={`absolute w-3 h-3 rotate-45 ${isDark ? 'bg-gray-900/95' : 'bg-white/95'}`}
                                 style={{
                                     borderColor: isDark ? `${accentColor}50` : '#e5e7eb',
-                                    ...(step.position === 'bottom' ? { top: -6, left: '50%', marginLeft: -6, borderTop: '1px solid', borderLeft: '1px solid' } : {}),
-                                    ...(step.position === 'top' ? { bottom: -6, left: '50%', marginLeft: -6, borderBottom: '1px solid', borderRight: '1px solid' } : {}),
-                                    ...(step.position === 'right' ? { left: -6, top: '50%', marginTop: -6, borderTop: '1px solid', borderLeft: '1px solid' } : {}),
-                                    ...(step.position === 'left' ? { right: -6, top: '50%', marginTop: -6, borderBottom: '1px solid', borderRight: '1px solid' } : {}),
+                                    ...(activePosition === 'bottom' ? { top: -6, left: '50%', marginLeft: -6, borderTop: '1px solid', borderLeft: '1px solid' } : {}),
+                                    ...(activePosition === 'top' ? { bottom: -6, left: '50%', marginLeft: -6, borderBottom: '1px solid', borderRight: '1px solid' } : {}),
+                                    ...(activePosition === 'right' ? { left: -6, top: '50%', marginTop: -6, borderTop: '1px solid', borderLeft: '1px solid' } : {}),
+                                    ...(activePosition === 'left' ? { right: -6, top: '50%', marginTop: -6, borderBottom: '1px solid', borderRight: '1px solid' } : {}),
                                 }}
                             />
 

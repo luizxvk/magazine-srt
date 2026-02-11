@@ -85,7 +85,7 @@ export default function SobreRovexPage() {
     return (
         <div className="min-h-screen relative text-white">
             {/* ColorBends animated background - full page */}
-            <div className="fixed inset-0 z-[-1] pointer-events-none">
+            <div className="fixed inset-0 z-0 pointer-events-none">
                 <ColorBends
                     colors={['#7C3AED', '#A78BFA', '#5227FF', '#8B5CF6', '#312e81']}
                     rotation={20}

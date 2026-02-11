@@ -834,6 +834,11 @@ html.rgb-dynamic .shadow-accent {
   50% { transform: translateX(100%); }
 }
 
+@keyframes eliteGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
 @keyframes rgb-cycle {
   0% {
     background-color: #ff0000 !important;

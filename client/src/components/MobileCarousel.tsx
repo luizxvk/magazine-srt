@@ -86,9 +86,9 @@ export default function MobileCarousel({
         {
             id: 'elite',
             title: 'ELITE',
-            subtitle: user?.membershipType === 'MGT' ? 'Você é Elite ✦' : 'Eleve sua experiência',
+            subtitle: user?.isElite ? 'Você é Elite ✦' : 'Eleve sua experiência',
             icon: <Crown className="w-6 h-6" />,
-            gradient: isMGT ? 'from-emerald-400/30 to-emerald-900/60' : 'from-amber-400/25 to-yellow-900/50',
+            gradient: 'from-violet-500/25 to-indigo-900/50',
             onClick: () => navigate('/elite'),
             badge: '👑',
             premium: true
@@ -302,19 +302,16 @@ export default function MobileCarousel({
                                 {card.premium && (
                                     <>
                                         <div 
-                                            className="absolute -inset-[1px] rounded-xl opacity-60 blur-[2px] animate-pulse"
+                                            className="absolute -inset-[1px] rounded-xl blur-[3px]"
                                             style={{ 
-                                                background: isMGT 
-                                                    ? 'linear-gradient(135deg, #10b981, #059669, #34d399)' 
-                                                    : 'linear-gradient(135deg, #d4af37, #f59e0b, #fbbf24)' 
+                                                background: 'linear-gradient(135deg, #7c3aed, #4f46e5, #8b5cf6, #6366f1)',
+                                                animation: 'eliteGlow 2.5s ease-in-out infinite'
                                             }}
                                         />
                                         <div 
-                                            className="absolute -inset-1 rounded-xl opacity-20 blur-md"
+                                            className="absolute -inset-1.5 rounded-xl opacity-25 blur-lg"
                                             style={{ 
-                                                background: isMGT 
-                                                    ? 'radial-gradient(circle, #10b981 0%, transparent 70%)' 
-                                                    : 'radial-gradient(circle, #d4af37 0%, transparent 70%)' 
+                                                background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)'
                                             }}
                                         />
                                     </>
@@ -322,9 +319,7 @@ export default function MobileCarousel({
                                 <div
                                     className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/30 active:scale-95 transition-transform backdrop-blur-xl ${
                                         card.premium 
-                                            ? isMGT 
-                                                ? 'border border-emerald-400/40 shadow-emerald-500/20' 
-                                                : 'border border-amber-400/40 shadow-amber-500/20'
+                                            ? 'border border-violet-400/40 shadow-violet-500/20'
                                             : 'border border-white/10'
                                     }`}
                                 >
@@ -338,7 +333,7 @@ export default function MobileCarousel({
                                     )}
 
                                     {/* Icon */}
-                                    <div className="drop-shadow-md" style={{ color: card.premium ? (isMGT ? '#34d399' : '#fbbf24') : color }}>
+                                    <div className="drop-shadow-md" style={{ color: card.premium ? '#a78bfa' : color }}>
                                         {card.icon}
                                     </div>
 
@@ -359,9 +354,9 @@ export default function MobileCarousel({
                                     {/* Subtle shimmer overlay for premium */}
                                     {card.premium && (
                                         <div 
-                                            className="absolute inset-0 rounded-xl opacity-[0.07] pointer-events-none"
+                                            className="absolute inset-0 rounded-xl opacity-[0.08] pointer-events-none"
                                             style={{
-                                                background: `linear-gradient(105deg, transparent 40%, ${isMGT ? '#34d399' : '#fbbf24'} 50%, transparent 60%)`,
+                                                background: 'linear-gradient(105deg, transparent 40%, #a78bfa 50%, transparent 60%)',
                                                 animation: 'shimmer 3s ease-in-out infinite'
                                             }}
                                         />

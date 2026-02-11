@@ -6,7 +6,7 @@ import {
     Search, TrendingUp, Users, Sparkles, 
     ChevronRight, Heart, MessageCircle, Star,
     Crown, Store, Gift, Users2, MessageSquare, 
-    ShoppingBag, Trophy, Camera, Map
+    ShoppingBag, Trophy, Camera, Map, Hash
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -50,6 +50,12 @@ interface FeatureCard {
     path: string;
 }
 
+interface TrendingTag {
+    tag: string;
+    count: number;
+    rank: number;
+}
+
 export default function ExplorePage() {
     const { user, theme } = useAuth();
     const navigate = useNavigate();
@@ -58,6 +64,7 @@ export default function ExplorePage() {
     
     const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
     const [topMembers, setTopMembers] = useState<TopMember[]>([]);
+    const [trendingTags, setTrendingTags] = useState<TrendingTag[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'discover' | 'trending' | 'members'>('discover');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -91,9 +98,10 @@ export default function ExplorePage() {
 
     const loadData = async () => {
         try {
-            const [postsRes, rankingRes] = await Promise.all([
+            const [postsRes, rankingRes, tagsRes] = await Promise.all([
                 api.get('/feed/highlights'),
-                api.get('/gamification/ranking')
+                api.get('/gamification/ranking'),
+                api.get('/feed/trending-tags').catch(() => ({ data: [] })),
             ]);
             
             // Get top 6 trending posts with images
@@ -105,6 +113,9 @@ export default function ExplorePage() {
             
             // Get top 5 members
             setTopMembers(rankingRes.data.slice(0, 5));
+            
+            // Set trending tags
+            setTrendingTags(tagsRes.data || []);
         } catch (error) {
             console.error('Failed to load explore data', error);
         } finally {
@@ -301,7 +312,48 @@ export default function ExplorePage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
+                            className="space-y-6"
                         >
+                            {/* Trending Hashtags */}
+                            {trendingTags.length > 0 && (
+                                <div className={`${themeCardBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-5`}>
+                                    <h3 className={`text-lg font-semibold ${themeText} flex items-center gap-2 mb-4`}>
+                                        <Hash className={`w-5 h-5 ${themeTitle}`} />
+                                        Hashtags em Alta
+                                    </h3>
+                                    <div className="space-y-2">
+                                        {trendingTags.map((item, index) => (
+                                            <motion.button
+                                                key={item.tag}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: index * 0.05 }}
+                                                onClick={() => {
+                                                    setIsSearchOpen(true);
+                                                }}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl ${
+                                                    theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'
+                                                } transition-colors group text-left`}
+                                            >
+                                                <span className={`text-xs font-bold w-5 text-center ${themeTextSecondary}`}>
+                                                    {item.rank}
+                                                </span>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={`font-semibold ${themeText} text-sm group-hover:${themeTitle} transition-colors`}>
+                                                        #{item.tag}
+                                                    </p>
+                                                    <p className={`text-xs ${themeTextSecondary}`}>
+                                                        {item.count} {item.count === 1 ? 'post' : 'posts'}
+                                                    </p>
+                                                </div>
+                                                <TrendingUp className={`w-4 h-4 ${themeTextSecondary} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                                            </motion.button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Trending Posts Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {trendingPosts.map((post, index) => (
                                     <motion.div

@@ -111,9 +111,7 @@ const ITEM_POOLS = {
         { id: 'color_rgb', name: 'RGB Dinâmico', rarity: 'LEGENDARY' },
     ],
     BORDER: [
-        // COMMON (0-400)
-        { id: 'border_gold', name: 'Dourado Clássico', rarity: 'COMMON' },
-        { id: 'border_emerald', name: 'Esmeralda MGT', rarity: 'COMMON' },
+        // COMMON (0-400) - Excluding default community borders (gold/emerald)
         { id: 'border_pastel_pink', name: 'Rosa Pastel', rarity: 'COMMON' },
         { id: 'border_pastel_lavender', name: 'Lavanda Pastel', rarity: 'COMMON' },
         { id: 'border_pastel_mint', name: 'Menta Pastel', rarity: 'COMMON' },

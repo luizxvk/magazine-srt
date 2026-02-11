@@ -43,7 +43,6 @@ const tools = [
     { id: 'radio', label: 'Rádio' },
     { id: 'discord', label: 'Discord' },
     { id: 'steam', label: 'Steam' },
-    { id: 'twitch', label: 'Twitch' },
 ];
 
 export default function ToolsCarousel() {
@@ -52,7 +51,7 @@ export default function ToolsCarousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef<HTMLDivElement>(null);
     const [twitchChannels, setTwitchChannels] = useState<string[]>(['gaules', 'alanzoka', 'loud_coringa', 'nobru']);
-    const [twitchEnabled, setTwitchEnabled] = useState(true);
+    const [, setTwitchEnabled] = useState(true);
 
     useEffect(() => {
         api.get('/social/twitch/config')
@@ -68,10 +67,7 @@ export default function ToolsCarousel() {
     }, []);
 
     // Filter tools based on config
-    const activeTools = tools.filter(t => {
-        if (t.id === 'twitch' && !twitchEnabled) return false;
-        return true;
-    });
+    const activeTools = tools;
 
     // Get the actual color hex from user's equipped color ID
     const getUserAccentColor = () => {

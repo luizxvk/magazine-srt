@@ -46,6 +46,9 @@ export default function SettingsPage() {
     const [doNotDisturb, setDoNotDisturb] = useState(
         localStorage.getItem('doNotDisturb') === 'true'
     );
+    const [freeGameAlerts, setFreeGameAlerts] = useState(
+        localStorage.getItem('freeGameAlerts') !== 'false'
+    );
     const [liteMode, setLiteMode] = useState(
         localStorage.getItem('liteMode') === 'true'
     );
@@ -138,6 +141,18 @@ export default function SettingsPage() {
             await api.put('/users/me/preferences', { doNotDisturb: newValue });
         } catch (error) {
             console.error('Error updating doNotDisturb:', error);
+        }
+    };
+
+    const handleToggleFreeGameAlerts = async () => {
+        const newValue = !freeGameAlerts;
+        setFreeGameAlerts(newValue);
+        localStorage.setItem('freeGameAlerts', String(newValue));
+        
+        try {
+            await api.put('/users/me/preferences', { freeGameAlerts: newValue });
+        } catch (error) {
+            console.error('Error updating freeGameAlerts:', error);
         }
     };
 
@@ -408,6 +423,24 @@ export default function SettingsPage() {
                             >
                                 <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
                                     doNotDisturb ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
+                                }`} />
+                            </button>
+                        </div>
+
+                        {/* Free Game Alerts */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0 pr-4">
+                                <p className={`font-medium ${textMain}`}>Alertas de Jogos Grátis</p>
+                                <p className={`text-sm ${textSub}`}>Receber notificação quando um jogo ficar de graça</p>
+                            </div>
+                            <button
+                                onClick={handleToggleFreeGameAlerts}
+                                className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
+                                    freeGameAlerts ? `bg-${themeColor}-500` : 'bg-gray-600'
+                                }`}
+                            >
+                                <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200 ${
+                                    freeGameAlerts ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                                 }`} />
                             </button>
                         </div>

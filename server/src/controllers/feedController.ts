@@ -953,3 +953,37 @@ export const getStoryViewers = async (req: any, res: any) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// Get trending hashtags (most used tags in recent posts)
+export const getTrendingTags = async (req: AuthRequest, res: Response) => {
+    try {
+        const days = parseInt(req.query.days as string) || 7;
+        const limit = Math.min(parseInt(req.query.limit as string) || 10, 20);
+
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+
+        const trendingTags = await prisma.postTag.groupBy({
+            by: ['tag'],
+            where: {
+                post: {
+                    createdAt: { gte: since },
+                },
+            },
+            _count: { tag: true },
+            orderBy: { _count: { tag: 'desc' } },
+            take: limit,
+        });
+
+        const tags = trendingTags.map((t, index) => ({
+            tag: t.tag,
+            count: t._count.tag,
+            rank: index + 1,
+        }));
+
+        res.json(tags);
+    } catch (error) {
+        console.error('Error fetching trending tags:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

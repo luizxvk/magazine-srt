@@ -21,6 +21,7 @@ import AdminProducts from './admin/AdminProducts';
 import AdminConsumptionTracker from './admin/AdminConsumptionTracker';
 import AdminTwitchSettings from '../components/AdminTwitchSettings';
 import AdminModerationPanel from '../components/AdminModerationPanel';
+import AdminCreateTournament from '../components/AdminCreateTournament';
 
 interface Reward {
     id: string;
@@ -268,13 +269,18 @@ export default function AdminDashboard() {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    {/* Actions */}
-                    <div className="space-y-8 h-fit xl:sticky xl:top-28">
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {/* Column 1 */}
+                    <div className="space-y-6">
                         <AdminCreatePost showToast={showToast} />
                         <AdminCreateAnnouncement showToast={showToast} />
                         <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
                         <AdminCreateEvent showToast={showToast} />
+                        <AdminCreateTournament showToast={showToast} />
+                    </div>
+
+                    {/* Column 2 */}
+                    <div className="space-y-6">
                         <AdminEliteReward showToast={showToast} />
                         <AdminAdsSettings />
                         <AdminTwitchSettings />
@@ -283,8 +289,8 @@ export default function AdminDashboard() {
                         <AdminFeedbackCard />
                     </div>
 
-                    {/* Main management column */}
-                    <div className="xl:col-span-2 space-y-8">
+                    {/* Column 3 - Main management */}
+                    <div className="lg:col-span-2 xl:col-span-1 space-y-6">
                         {/* Admin Stats Edit */}
                         <div className="glass-panel p-6 rounded-xl">
                             <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">

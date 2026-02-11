@@ -135,10 +135,13 @@ export default function FreeGamesCard() {
                                         {PLATFORM_NAMES[game.platform]}
                                     </span>
                                     {game.worth && game.worth !== 'N/A' && (
-                                        <span className="text-xs text-green-400 font-medium">
+                                        <span className="text-xs text-green-400 font-medium line-through opacity-60">
                                             {game.worth}
                                         </span>
                                     )}
+                                    <span className="text-xs text-green-400 font-bold">
+                                        Grátis
+                                    </span>
                                     {daysRemaining !== null && daysRemaining <= 7 && (
                                         <span className={`text-xs flex items-center gap-1 ${daysRemaining <= 2 ? 'text-red-400' : 'text-yellow-400'}`}>
                                             <Clock className="w-3 h-3" />

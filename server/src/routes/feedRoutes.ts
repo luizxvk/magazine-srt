@@ -10,6 +10,7 @@ const router = Router();
 router.get('/', authenticateTokenOptional, feedController.getFeed);
 router.get('/highlights', authenticateTokenOptional, feedController.getHighlights);
 router.get('/top', authenticateTokenOptional, feedController.getTopPosts);
+router.get('/trending-tags', authenticateTokenOptional, feedController.getTrendingTags);
 router.post('/', authenticateToken, postRateLimit, moderateContent(['caption']), moderateTextContent(['caption']), feedController.createPost);
 router.post('/:id/like', authenticateToken, feedController.likePost);
 router.post('/:id/comment', authenticateToken, moderateContent(['text']), moderateTextContent(['text']), feedController.commentPost);

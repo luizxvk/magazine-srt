@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, ShoppingBag, MessageCircle, Palette, Video, Globe, Trophy, Bot } from 'lucide-react';
+import { X, Sparkles, Check, ShoppingBag, Palette, Video, Globe, Trophy, Hash, Gamepad2, Layout } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.6';
+const CURRENT_VERSION = '0.5.0-rc.7';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,54 +43,55 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.6 - Live Streams, Languages, Tournaments, Moderation
+    // v0.5.0-rc.7 - Tournament Admin, Trending Hashtags, Stream Preview, Supply Box fixes
     const updates: UpdateItem[] = [
         {
+            icon: <Gamepad2 className="w-5 h-5 text-orange-400" />,
+            title: 'Criação de Torneios (Admin)',
+            description: 'Admins agora podem criar torneios completos com formato, equipes, premiação e muito mais!',
+            isNew: true
+        },
+        {
             icon: <Video className="w-5 h-5 text-purple-400" />,
-            title: 'Transmissões ao Vivo',
-            description: 'Acompanhe streams ao vivo diretamente no carrossel do feed! Integração completa com autenticação OAuth.',
+            title: 'Preview de Streams ao Vivo',
+            description: 'Passe o mouse sobre uma stream para assistir ao vivo direto no card, com controle de volume!',
+            isNew: true
+        },
+        {
+            icon: <Hash className="w-5 h-5 text-cyan-400" />,
+            title: 'Hashtags em Alta',
+            description: 'Descubra os assuntos mais falados na comunidade na aba "Em Alta" do Explorar!',
+            isNew: true
+        },
+        {
+            icon: <Layout className="w-5 h-5 text-blue-400" />,
+            title: 'Dashboard Admin Reformulado',
+            description: 'Layout masonry com cards organizados em 3 colunas para melhor visualização.',
             isNew: true
         },
         {
             icon: <ShoppingBag className="w-5 h-5 text-green-400" />,
-            title: 'Jogos Grátis da Semana',
-            description: 'Card com jogos grátis de diversas plataformas! Não perca mais nenhuma oferta.',
+            title: 'Jogos Grátis Melhorado',
+            description: 'Preço original aparece riscado com "Grátis" em destaque. Ative alertas nas configurações!',
             isNew: true
         },
         {
             icon: <Globe className="w-5 h-5 text-blue-400" />,
-            title: 'Seletor de Idioma',
-            description: 'Agora você pode escolher o idioma da plataforma nas configurações! PT-BR, EN e ES disponíveis.',
+            title: 'Explorar Mobile Aprimorado',
+            description: 'Cards do carrossel mobile agora exibem ícones e labels para melhor navegação.',
             isNew: true
         },
         {
             icon: <Trophy className="w-5 h-5 text-yellow-400" />,
-            title: 'Sistema de Torneios',
-            description: 'Competições organizadas com brackets, prêmios e leaderboard! Inscreva-se já.',
-            isNew: true
-        },
-        {
-            icon: <Bot className="w-5 h-5 text-red-400" />,
-            title: 'Moderação Automática',
-            description: 'Sistema de IA para detectar conteúdo tóxico e spam em desenvolvimento!',
-            isNew: true
-        },
-        {
-            icon: <MessageCircle className="w-5 h-5 text-cyan-400" />,
-            title: 'Lembrete de Feedback',
-            description: 'Receba lembretes periódicos para nos ajudar a melhorar enviando seu feedback!',
+            title: 'Supply Box Atualizado',
+            description: 'Bordas padrão (Magazine e Esmeralda) removidas do pool para mais chances de itens raros!',
             isNew: true
         },
         {
             icon: <Palette className="w-5 h-5 text-pink-400" />,
             title: 'Gradientes em Todos os Cards',
-            description: 'Cards de bônus diário, amigos online, inventário e menu lateral agora usam sua cor de destaque!',
+            description: 'Cards de bônus diário, amigos online, inventário e menu lateral usam sua cor de destaque!',
         },
-        {
-            icon: <Sparkles className="w-5 h-5 text-violet-400" />,
-            title: 'Tema Iridescente Corrigido',
-            description: 'O background Prisma Iridescente foi restaurado ao visual original com efeitos de shader aprimorados!',
-        }
     ];
 
     useEffect(() => {

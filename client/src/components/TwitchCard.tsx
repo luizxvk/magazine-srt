@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Tv, Eye, ExternalLink, CheckCircle, LogOut, Link } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Tv, Eye, ExternalLink, CheckCircle, LogOut, Link, Volume2, VolumeX } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -59,6 +59,107 @@ const hexToRgba = (hex: string, alpha: number) => {
     const b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
+
+// Sub-component for individual stream cards with hover preview
+function StreamCard({ stream, accentColor, textMain, textSub, theme }: {
+    stream: TwitchStream;
+    accentColor: string;
+    textMain: string;
+    textSub: string;
+    theme: string;
+}) {
+    const [showPreview, setShowPreview] = useState(false);
+    const [muted, setMuted] = useState(true);
+    const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+    const handleMouseEnter = useCallback(() => {
+        hoverTimeout.current = setTimeout(() => setShowPreview(true), 800);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        clearTimeout(hoverTimeout.current);
+        setShowPreview(false);
+        setMuted(true);
+    }, []);
+
+    const parentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+
+    return (
+        <div
+            className={`block rounded-xl overflow-hidden ${theme === 'light' ? 'bg-gray-50/80' : 'bg-white/5'} transition-all duration-300 group`}
+            style={{
+                borderColor: hexToRgba(accentColor, 0.1),
+                borderWidth: '1px'
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
+            {/* Thumbnail / Live Preview */}
+            <div className="relative aspect-video">
+                {showPreview ? (
+                    <iframe
+                        src={`https://player.twitch.tv/?channel=${stream.username}&parent=${parentHost}&muted=${muted}`}
+                        className="w-full h-full border-0"
+                        allowFullScreen
+                        allow="autoplay; encrypted-media"
+                    />
+                ) : (
+                    <img
+                        src={stream.thumbnailUrl}
+                        alt={stream.title}
+                        className="w-full h-full object-cover"
+                    />
+                )}
+                <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1 z-10">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    AO VIVO
+                </div>
+                <div className="absolute top-2 right-2 flex items-center gap-1.5 z-10">
+                    {showPreview && (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setMuted(!muted);
+                            }}
+                            className="bg-black/70 hover:bg-black/90 text-white p-1.5 rounded transition-colors"
+                            title={muted ? 'Ativar som' : 'Mutar'}
+                        >
+                            {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                        </button>
+                    )}
+                    <div className="bg-black/70 text-white text-xs font-medium px-2 py-1 rounded flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {stream.viewerCount.toLocaleString('pt-BR')}
+                    </div>
+                </div>
+                {!showPreview && (
+                    <a
+                        href={stream.streamUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center"
+                    >
+                        <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                )}
+            </div>
+
+            {/* Info */}
+            <a href={stream.streamUrl} target="_blank" rel="noopener noreferrer" className="block p-3">
+                <h4 className={`font-medium ${textMain} text-sm mb-1 line-clamp-2`}>
+                    {stream.title}
+                </h4>
+                <p className={`text-xs ${textSub} mb-0.5`}>
+                    {stream.displayName}
+                </p>
+                <p className={`text-xs ${textSub}`}>
+                    {stream.gameName}
+                </p>
+            </a>
+        </div>
+    );
+}
 
 export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_coringa'] }: TwitchCardProps) {
     const { user, theme } = useAuth();
@@ -278,50 +379,7 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
             ) : (
                 <div className="space-y-4 max-h-[500px] overflow-y-auto">
                     {streams.map((stream) => (
-                        <a
-                            key={stream.userId}
-                            href={stream.streamUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`block rounded-xl overflow-hidden ${theme === 'light' ? 'bg-gray-50/80' : 'bg-white/5'} transition-all duration-300 group`}
-                            style={{ 
-                                borderColor: hexToRgba(accentColor, 0.1),
-                                borderWidth: '1px'
-                            }}
-                        >
-                            {/* Thumbnail */}
-                            <div className="relative aspect-video">
-                                <img
-                                    src={stream.thumbnailUrl}
-                                    alt={stream.title}
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                                    AO VIVO
-                                </div>
-                                <div className="absolute top-2 right-2 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded flex items-center gap-1">
-                                    <Eye className="w-3 h-3" />
-                                    {stream.viewerCount.toLocaleString('pt-BR')}
-                                </div>
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                    <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                </div>
-                            </div>
-
-                            {/* Info */}
-                            <div className="p-3">
-                                <h4 className={`font-medium ${textMain} text-sm mb-1 line-clamp-2`}>
-                                    {stream.title}
-                                </h4>
-                                <p className={`text-xs ${textSub} mb-0.5`}>
-                                    {stream.displayName}
-                                </p>
-                                <p className={`text-xs ${textSub}`}>
-                                    {stream.gameName}
-                                </p>
-                            </div>
-                        </a>
+                        <StreamCard key={stream.userId} stream={stream} accentColor={accentColor} textMain={textMain} textSub={textSub} theme={theme} />
                     ))}
                 </div>
             )}

@@ -127,30 +127,63 @@ export const isStrongPassword = (password: string): { valid: boolean; message?: 
 
 // Check for common bad words / content moderation (basic)
 const badWords = [
-    // Portuguese offensive terms (examples - expand as needed)
-    'merda', 'porra', 'caralho', 'fdp', 'viado', 'bicha', 'piranha', 
+    // Portuguese offensive terms - insultos comuns
+    'merda', 'porra', 'caralho', 'fdp', 'pqp',
+    'puta', 'filho da puta', 'filha da puta', 'filhodaputa', 'filhadaputa',
+    'filhoda puta', 'fila da puta', 'puta que pariu',
+    'arrombado', 'arrombada', 'cuzao', 'cuzão',
+    'desgraçado', 'desgraçada', 'desgraça',
+    'viado', 'viadinho', 'bicha', 'bichona',
+    'piranha', 'vagabunda', 'vadia', 'vagabundo',
+    'otario', 'otária', 'otário',
+    'babaca', 'imbecil', 'idiota',
+    // Termos sexuais / vulgares
+    'rola', 'pau no cu', 'vai tomar no cu', 'tomar no cu',
+    'buceta', 'boceta', 'xereca', 'xota',
+    'punheta', 'punheteiro', 'broxa',
+    'chupar meu', 'chupa meu', 'mama aqui',
+    'safado', 'safada', 'putaria', 'sacanagem',
     // English offensive terms
-    'fuck', 'shit', 'nigger', 'faggot', 'retard',
-    // Racist terms
+    'fuck', 'fuck you', 'fucking', 'shit', 'ass hole', 'asshole',
+    'nigger', 'nigga', 'faggot', 'retard', 'bitch', 'whore', 'slut',
+    'dick', 'cock', 'pussy',
+    // Racist/hate terms
     'macaco', 'preto fedido', 'negro sujo',
-    // Add more as needed...
+    'volta pra senzala', 'lugar de negro',
+    // Ameaças
+    'vou te matar', 'vou te bater',
+    'merece morrer', 'tem que morrer',
+    'kys', 'kill yourself',
 ];
 
 export const containsBadContent = (text: string): boolean => {
     if (!text) return false;
-    const lowerText = text.toLowerCase();
-    return badWords.some(word => lowerText.includes(word));
+    // Normalize: lowercase, remove accents, collapse spaces
+    const lowerText = text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    return badWords.some(word => {
+        const normalizedWord = word
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+        return lowerText.includes(normalizedWord);
+    });
 };
 
-// Moderate content middleware
+// Moderate content middleware — returns 403 + CONTENT_MODERATED code for modal
 export const moderateContent = (fields: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         for (const field of fields) {
             const value = req.body[field];
             if (value && typeof value === 'string' && containsBadContent(value)) {
-                return res.status(400).json({ 
-                    error: 'Seu conteúdo contém termos inadequados. Por favor, revise.',
-                    field 
+                return res.status(403).json({ 
+                    error: 'Conteúdo bloqueado pela moderação automática.',
+                    moderationReason: 'Conteúdo contém palavras proibidas',
+                    code: 'CONTENT_MODERATED',
                 });
             }
         }

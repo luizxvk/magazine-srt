@@ -17,13 +17,37 @@ const BLACKLISTED_WORDS: string[] = [
     // Common offensive terms
     'neonazi', 'nazista', 'hitler did nothing',
     'kys', 'kill yourself', 'go die',
+    // PT-BR - insultos e xingamentos comuns
+    'puta', 'filho da puta', 'filha da puta', 'filhodaputa', 'filhadaputa',
+    'filhoda puta', 'fila da puta', 'puta que pariu', 'fdp', 'pqp',
+    'merda', 'porra', 'caralho',
+    'arrombado', 'arrombada', 'cuzão', 'cuzao',
+    'desgraçado', 'desgraçada', 'otário', 'otária', 'otario',
+    'babaca', 'imbecil',
+    // Termos sexuais / vulgares
+    'rola', 'pau no cu', 'vai tomar no cu', 'tomar no cu',
+    'buceta', 'boceta', 'xereca', 'xota',
+    'punheta', 'punheteiro', 'broxa',
+    'chupar meu', 'chupa meu', 'mama aqui',
+    'putaria',
+    // English offensive
+    'fuck', 'fuck you', 'fucking', 'shit', 'asshole',
+    'nigger', 'nigga', 'faggot', 'bitch', 'whore', 'slut',
 ];
 
-// Regex patterns for common evasion techniques (l33t speak, spacing)
+// Regex patterns for common evasion techniques (l33t speak, spacing, PT-BR variations)
 const EVASION_PATTERNS: RegExp[] = [
     /n[i1][g6]{1,2}[e3]r/i,
     /f[a4][g6]{1,2}[o0]t/i,
     /k+\s*y+\s*s+/i,
+    // PT-BR evasion patterns
+    /f[i1]lh[oa0]\s*d[ae4]\s*p[u\*]t[a4]/i,        // filha/filho da puta with spaces/chars
+    /p\s*u\s*t\s*a/i,                                 // p u t a (spaced)
+    /f\s*d\s*p/i,                                      // f d p (spaced)
+    /c\s*a\s*r\s*a\s*l\s*h\s*o/i,                     // c a r a l h o
+    /b\s*u\s*c\s*e\s*t\s*a/i,                          // b u c e t a
+    /a\s*r\s*r\s*o\s*m\s*b\s*a\s*d/i,                  // a r r o m b a d o/a
+    /v[i1][a4]d[o0]/i,                                 // v1ad0, vi4do etc
 ];
 
 /**

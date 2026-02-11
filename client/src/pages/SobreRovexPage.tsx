@@ -96,6 +96,8 @@ export default function SobreRovexPage() {
                     noise={0.04}
                     transparent={false}
                     autoRotate={1.5}
+                    mouseInfluence={0}
+                    parallax={0}
                 />
             </div>
 

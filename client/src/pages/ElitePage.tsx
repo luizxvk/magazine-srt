@@ -203,6 +203,8 @@ export default function ElitePage() {
                     noise={0.05}
                     transparent={false}
                     autoRotate={2}
+                    mouseInfluence={0}
+                    parallax={0}
                 />
             </div>
             <Header />

@@ -190,9 +190,9 @@ export default function ElitePage() {
     const isAlreadyElite = status?.isElite;
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen text-white relative">
             {/* ColorBends animated background - full page, no mouse interaction */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
+            <div className="fixed inset-0 z-[-1] pointer-events-none">
                 <ColorBends
                     colors={['#7c3aed', '#6366f1', '#4f46e5', '#8b5cf6', '#312e81']}
                     rotation={30}

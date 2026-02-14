@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info, Trophy, Crown } from 'lucide-react';
+import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info, Trophy, Crown, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -116,6 +116,15 @@ export default function MobileCarousel({
             icon: <Calendar className="w-6 h-6" />,
             gradient: cardStyle,
             onClick: onEventsClick
+        },
+        {
+            id: 'statforge',
+            title: 'StatForge',
+            subtitle: 'Rastreie suas stats de jogos',
+            icon: <BarChart3 className="w-6 h-6" />,
+            gradient: 'from-blue-500/20 to-indigo-900/40',
+            onClick: () => navigate('/statforge'),
+            badge: '📊'
         },
         {
             id: 'tournaments',

@@ -6,7 +6,7 @@ import {
     Search, TrendingUp, Users, Sparkles, 
     ChevronRight, Heart, MessageCircle, Star,
     Crown, Store, Gift, Users2, MessageSquare, 
-    ShoppingBag, Trophy, Camera, Map, Hash
+    ShoppingBag, Trophy, Camera, Map, Hash, BarChart3
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -14,7 +14,6 @@ import Header from '../components/Header';
 import ModernLoader from '../components/ModernLoader';
 import SearchModal from '../components/SearchModal';
 import GradientText from '../components/GradientText';
-import ExploreCardsCarousel from '../components/ExploreCardsCarousel';
 import { useTranslation } from 'react-i18next';
 
 interface TrendingPost {
@@ -87,6 +86,7 @@ export default function ExplorePage() {
         { id: 'groups', name: 'Grupos', description: 'Comunidades e chats', icon: <Users2 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/groups' },
         { id: 'social', name: 'Social', description: 'Amigos e conexões', icon: <MessageSquare className="w-6 h-6" />, color: 'from-pink-500 to-rose-700', path: '/social' },
         { id: 'store', name: 'Loja', description: 'Produtos físicos', icon: <ShoppingBag className="w-6 h-6" />, color: 'from-orange-500 to-red-700', path: '/store' },
+        { id: 'statforge', name: 'StatForge', description: 'Stats de jogos', icon: <BarChart3 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/statforge' },
         { id: 'catalog', name: 'Catálogo', description: 'Galeria de fotos', icon: <Camera className="w-6 h-6" />, color: 'from-cyan-500 to-blue-700', path: '/catalog' },
         { id: 'ranking', name: 'Ranking', description: 'Classificação global', icon: <Trophy className="w-6 h-6" />, color: 'from-amber-500 to-yellow-700', path: '/ranking' },
         { id: 'roadmap', name: 'Roadmap', description: 'Próximas novidades', icon: <Map className="w-6 h-6" />, color: 'from-teal-500 to-emerald-700', path: '/roadmap' },
@@ -219,8 +219,7 @@ export default function ExplorePage() {
                             exit={{ opacity: 0, y: -20 }}
                             className="space-y-8"
                         >
-                            {/* Mobile Cards Carousel - sidebar cards */}
-                            <ExploreCardsCarousel />
+
 
                             {/* Features Card */}
                             <div className={`${themeCardBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-6`}>

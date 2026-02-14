@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Coins } from 'lucide-react';
 import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
+import GradientText from '../components/GradientText';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Header from '../components/Header';
@@ -125,10 +126,12 @@ export default function ProductStore() {
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <div>
-                            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                            <div className="flex items-center gap-3">
                                 <Store className="w-8 h-8" style={{ color }} />
-                                Loja de Produtos
-                            </h1>
+                                <GradientText as="h1" className="text-3xl font-bold" fallbackClassName="text-white">
+                                    Loja de Produtos
+                                </GradientText>
+                            </div>
                             <p className="text-gray-400 mt-1">
                                 Compre keys, gift cards e muito mais com Zions
                             </p>

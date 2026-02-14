@@ -25,22 +25,20 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
         : 'bg-white/10 hover:bg-white/15';
     const themeIconColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
 
+    const themeBg = theme === 'light'
+        ? 'bg-white/80'
+        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const themeBorderClass = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeGlow = isMGT
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative rounded-3xl overflow-hidden ${accentGradient ? 'border-gradient-accent' : ''}`}
-            style={{
-                background: theme === 'light'
-                    ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,250,250,0.9) 100%)'
-                    : `linear-gradient(135deg, rgba(25,25,30,0.85) 0%, rgba(20,20,25,0.8) 100%)`,
-                backdropFilter: 'blur(40px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                boxShadow: theme === 'light'
-                    ? '0 8px 32px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.8)'
-                    : `0 8px 32px rgba(0,0,0,0.4), 0 0 80px ${userAccent}08, inset 0 0 0 1px rgba(255,255,255,0.08)`,
-            }}
+            className={`relative rounded-3xl overflow-hidden ${themeBg} backdrop-blur-xl ${themeGlow} ${accentGradient ? 'border-gradient-accent' : `border ${themeBorderClass}`}`}
         >
             {/* Accent glow gradient */}
             <div 

@@ -10,6 +10,7 @@ import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
+import GradientText from '../components/GradientText';
 
 interface GameInfo {
   id: string;
@@ -190,9 +191,9 @@ export default function StatForgePage() {
 
             {/* Info */}
             <div className="text-center sm:text-left flex-1">
-              <h1 className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+              <GradientText as="h1" className="text-3xl sm:text-4xl font-bold tracking-tight" fallbackClassName={theme === 'light' ? 'text-gray-900' : 'text-white'}>
                 StatForge
-              </h1>
+              </GradientText>
               <p className={`mt-2 text-base ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
                 Rastreie suas stats de jogos em tempo real
               </p>

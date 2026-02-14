@@ -35,6 +35,7 @@ import SupplyBoxModal from '../components/SupplyBoxModal';
 import EventDropPopup from '../components/EventDropPopup';
 import ElitePromoCard from '../components/ElitePromoCard';
 import WelcomeCard from '../components/WelcomeCard';
+import StatForgeCard from '../components/StatForgeCard';
 
 interface PollOption {
     id: string;
@@ -597,6 +598,9 @@ export default function FeedPage() {
 
                         {/* Market Card */}
                         <MarketCard />
+
+                        {/* StatForge Card */}
+                        <StatForgeCard />
 
                         {/* Inventory Card */}
                         <InventoryCard onOpenShop={() => setIsShopOpen(true)} />

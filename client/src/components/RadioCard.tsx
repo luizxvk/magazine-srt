@@ -132,8 +132,6 @@ export default function RadioCard() {
     // Use user's equipped color or fallback to station color
     const accentColor = getUserAccentColor() || currentStation.color || (isMGT ? '#10b981' : '#d4af37');
 
-    // Theme colors - consistent with other cards
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeBg = theme === 'light' 
         ? 'bg-gradient-to-br from-zinc-50 to-zinc-100' 
         : (isMGT ? 'bg-gradient-to-br from-emerald-950/50 to-black' : 'bg-gradient-to-br from-zinc-900 to-black');
@@ -148,7 +146,10 @@ export default function RadioCard() {
 
     return (
         <>
-            <div className={`group relative w-full ${themeBg} backdrop-blur-[2px] rounded-3xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} transition-all duration-300 overflow-hidden`}>
+            <div
+                className={`group relative w-full ${themeBg} backdrop-blur-[2px] rounded-3xl ${accentGradient ? 'border-gradient-accent' : 'border'} transition-all duration-300 overflow-hidden`}
+                style={!accentGradient ? { borderColor: `${accentColor}30` } : undefined}
+            >
                 {/* Liquid Glass Shadow Layer */}
                 <div className={`pointer-events-none absolute inset-0 rounded-3xl transition-all ${theme === 'light' ? GLASS_SHADOW_LIGHT : GLASS_SHADOW_DARK}`} />
                 
@@ -327,7 +328,7 @@ export default function RadioCard() {
                     </div>
 
                     {/* Station Selector - Grid Layout */}
-                    <div className={`px-4 pb-4 pt-2 border-t ${themeBorder}`}>
+                    <div className="px-4 pb-4 pt-2 border-t" style={{ borderColor: `${accentColor}30` }}>
                         <p className={`text-[10px] ${textSub} uppercase tracking-wider mb-2`}>Estações</p>
                         <div className="grid grid-cols-4 gap-1.5">
                             {RADIO_STATIONS.map((station) => (
@@ -351,7 +352,7 @@ export default function RadioCard() {
                     </div>
 
                     {/* Footer */}
-                    <div className={`px-4 py-2 border-t ${themeBorder} bg-black/10`}>
+                    <div className="px-4 py-2 border-t bg-black/10" style={{ borderColor: `${accentColor}30` }}>
                         <p className={`text-[9px] ${textSub} text-center uppercase tracking-wider flex items-center justify-center gap-1`}>
                             <Radio className="w-3 h-3" />
                             Rádio 24/7 • Waves Music

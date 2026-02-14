@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, CheckCircle, AlertTriangle, XCircle, Activity, RefreshCw, Clock } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, Activity, RefreshCw, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -81,24 +81,29 @@ export default function RovexShieldCard() {
       animate={{ opacity: 1, y: 0 }}
       className={`${cardBg} border backdrop-blur-2xl rounded-2xl p-6`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/10">
-            <Shield className="w-5 h-5 text-blue-400" />
-          </div>
-          <div>
-            <h3 className={`font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-              RovexShield
-            </h3>
-            <div className="flex items-center gap-1.5">
-              <div className={`w-1.5 h-1.5 rounded-full ${data?.status === 'online' ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
-              <span className={`text-xs ${data?.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>
-                {data?.status === 'online' ? 'Online' : 'Offline'}
-              </span>
-            </div>
-          </div>
+      {/* Hero Logo */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative mb-4">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl scale-150" />
+          <img
+            src="/assets/rovex-shield-logo.png"
+            alt="RovexShield"
+            className="relative w-28 h-28 object-contain drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+          />
         </div>
+        <h3 className={`text-lg font-bold tracking-wide ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+          RovexShield
+        </h3>
+        <div className="flex items-center gap-1.5 mt-1">
+          <div className={`w-2 h-2 rounded-full ${data?.status === 'online' ? 'bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]' : 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.6)]'}`} />
+          <span className={`text-xs font-medium ${data?.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>
+            {data?.status === 'online' ? 'Todos os Sistemas Operacionais' : 'Serviço Indisponível'}
+          </span>
+        </div>
+      </div>
+
+      {/* Refresh Button */}
+      <div className="flex justify-end -mt-2 mb-3">
         <button
           onClick={fetchStatus}
           disabled={refreshing}
@@ -175,7 +180,11 @@ export default function RovexShieldCard() {
         </>
       ) : (
         <div className="text-center py-6">
-          <Shield className="w-10 h-10 text-gray-500 mx-auto mb-2" />
+          <img
+            src="/assets/rovex-shield-logo.png"
+            alt="RovexShield"
+            className="w-16 h-16 object-contain mx-auto mb-3 opacity-40"
+          />
           <p className="text-sm text-gray-400">Erro ao carregar status</p>
         </div>
       )}

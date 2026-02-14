@@ -79,6 +79,16 @@ export enum Feature {
   ADMIN_EVENTS = 'ADMIN_EVENTS',
   ADMIN_PRODUCTS = 'ADMIN_PRODUCTS',
   
+  // === STATFORGE - GAME TRACKER (GROWTH+) ===
+  STATFORGE_BASIC = 'STATFORGE_BASIC',
+  STATFORGE_FULL = 'STATFORGE_FULL',
+  STATFORGE_NOTIFICATIONS = 'STATFORGE_NOTIFICATIONS',
+  STATFORGE_COMPARE = 'STATFORGE_COMPARE',
+  
+  // === COUPONS (GROWTH+) ===
+  COUPONS = 'COUPONS',
+  ADMIN_COUPONS = 'ADMIN_COUPONS',
+  
   // === ENTERPRISE ONLY ===
   WHITE_LABEL = 'WHITE_LABEL',
   CUSTOM_DOMAIN = 'CUSTOM_DOMAIN',
@@ -191,6 +201,12 @@ export const PLAN_FEATURES: Record<Plan, Feature[]> = {
     Feature.ADMIN_BADGES,
     Feature.ADMIN_EVENTS,
     Feature.ADMIN_PRODUCTS,
+    // StatForge (básico)
+    Feature.STATFORGE_BASIC,
+    Feature.STATFORGE_NOTIFICATIONS,
+    // Coupons
+    Feature.COUPONS,
+    Feature.ADMIN_COUPONS,
     // Extras
     Feature.CUSTOM_DOMAIN,
   ],
@@ -253,6 +269,12 @@ export const FEATURE_INFO: Record<Feature, { name: string; description: string; 
   [Feature.ADMIN_ANNOUNCEMENTS]: { name: 'Anúncios', description: 'Criar anúncios' },
   [Feature.ADMIN_EVENTS]: { name: 'Eventos', description: 'Gerenciar eventos' },
   [Feature.ADMIN_PRODUCTS]: { name: 'Gestão de Produtos', description: 'Loja admin' },
+  [Feature.STATFORGE_BASIC]: { name: 'StatForge Básico', description: 'Tracker de stats de jogos (até 5 jogos)' },
+  [Feature.STATFORGE_FULL]: { name: 'StatForge Completo', description: 'Tracker ilimitado + todos os jogos' },
+  [Feature.STATFORGE_NOTIFICATIONS]: { name: 'StatForge Notificações', description: 'Notificações de mudanças no feed' },
+  [Feature.STATFORGE_COMPARE]: { name: 'StatForge Comparação', description: 'Comparar stats entre jogadores' },
+  [Feature.COUPONS]: { name: 'Cupons', description: 'Sistema de cupons na loja' },
+  [Feature.ADMIN_COUPONS]: { name: 'Gestão de Cupons', description: 'Criar e gerenciar cupons' },
   [Feature.WHITE_LABEL]: { name: 'White Label', description: 'Sem marca Rovex' },
   [Feature.CUSTOM_DOMAIN]: { name: 'Domínio Próprio', description: 'URL personalizada' },
   [Feature.API_ACCESS]: { name: 'Acesso à API', description: 'API para integrações' },

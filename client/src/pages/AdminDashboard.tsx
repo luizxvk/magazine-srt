@@ -22,6 +22,8 @@ import AdminConsumptionTracker from './admin/AdminConsumptionTracker';
 import AdminTwitchSettings from '../components/AdminTwitchSettings';
 import AdminModerationPanel from '../components/AdminModerationPanel';
 import AdminCreateTournament from '../components/AdminCreateTournament';
+import RovexShieldCard from '../components/RovexShieldCard';
+import AdminCoupons from '../components/AdminCoupons';
 
 interface Reward {
     id: string;
@@ -285,6 +287,8 @@ export default function AdminDashboard() {
                         <AdminAdsSettings />
                         <AdminTwitchSettings />
                         <AdminModerationPanel />
+                        <RovexShieldCard />
+                        <AdminCoupons showToast={showToast} />
                         <BadgeManager />
                         <AdminFeedbackCard />
                     </div>

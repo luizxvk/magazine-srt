@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.6 (Release Candidate)  
-> **Última Atualização:** 11 de Fevereiro de 2026  
+> **Versão Atual:** v0.5.0-rc.8 (Release Candidate)  
+> **Última Atualização:** 14 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
@@ -16,8 +16,63 @@
 ├─ E-commerce: 95% ✅
 ├─ Personalização: 100% ✅
 ├─ Integração Rovex: 100% ✅
-└─ Multi-Tenant: 100% ✅
+├─ Multi-Tenant: 100% ✅
+└─ StatForge & Cupons: 100% ✅
 ```
+
+---
+
+## 🆕 v0.5.0-rc.8 (Release Candidate - 14 Fevereiro 2026)
+
+### 📊 StatForge — Rastreador de Stats de Jogos (Novo)
+**Vincule perfis e acompanhe suas stats em tempo real**
+
+- 🎮 **Vinculação de Perfis**
+  - Suporte a 17+ jogos (R6, Valorant, CS2, Apex, LoL, Fortnite e mais)
+  - Plataformas: PC, PlayStation, Xbox, Nintendo, Mobile
+  - Tela dedicada com grid de jogos e abas (Meus Jogos, Feed, Vincular)
+
+- 📈 **Snapshots & Histórico**
+  - Captura automática de stats (K/D, Win Rate, Rank)
+  - Detecção de mudanças de rank com notificação no feed social
+  - Feed de atividade mostrando eventos de amigos
+
+- 🔍 **Comparação de Players**
+  - Compare stats lado-a-lado com outros jogadores
+  - Disponível nos planos ENTERPRISE
+
+- 🔒 **Feature Gate:** GROWTH (básico, até 5 jogos) / ENTERPRISE (completo + comparação)
+
+### 🎟️ Sistema de Cupons na Loja (Novo)
+**Cupons de desconto para produtos da loja**
+
+- 🏷️ **Criação de Cupons (Admin)**
+  - Desconto fixo (R$) ou percentual (%)
+  - Limite de usos total e por usuário
+  - Valor mínimo de compra, validade configurável
+  - Toggle para cupom exclusivo Elite
+
+- ✅ **Fluxo de Aprovação Rovex**
+  - Cupons criados por admin com status PENDING
+  - Aprovação/rejeição pela plataforma Rovex
+  - Painel de revisão de cupons pendentes
+
+- 💎 **Cupom Mensal Elite**
+  - R$10 fixo de desconto gerado automaticamente
+  - Código formato ELITE-XXXX-MMYY
+  - Auto-aprovado, válido por 30 dias
+
+### 🛡️ RovexShield — Status de Moderação (Novo)
+**Card de monitoramento no painel admin**
+
+- 📡 **Status Operacional**
+  - 4 serviços monitorados (auto-mod, filtro, anti-spam, reports)
+  - Indicadores verde/amarelo/vermelho por serviço
+  - Uptime percentual e última verificação
+
+- 📊 **Quick Stats**
+  - Conteúdos bloqueados, flagged e processados em 24h
+  - Auto-refresh a cada 60 segundos
 
 ---
 

@@ -37,6 +37,8 @@ import consumptionRoutes from './src/routes/consumptionRoutes';
 import subscriptionRoutes from './src/routes/subscriptionRoutes';
 import tournamentRoutes from './src/routes/tournamentRoutes';
 import moderationRoutes from './src/routes/moderationRoutes';
+import statforgeRoutes from './src/routes/statforgeRoutes';
+import couponRoutes from './src/routes/couponRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -163,6 +165,8 @@ apiRouter.use('/og', ogRoutes);
 apiRouter.use('/admin', consumptionRoutes);
 apiRouter.use('/tournaments', tournamentRoutes);
 apiRouter.use('/moderation', moderationRoutes);
+apiRouter.use('/statforge', statforgeRoutes);
+apiRouter.use('/coupons', couponRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

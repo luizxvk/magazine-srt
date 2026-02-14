@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, ShoppingBag, Palette, Video, Globe, Trophy, Hash, Gamepad2, Layout } from 'lucide-react';
+import { X, Sparkles, Check, ShoppingBag, Palette, Video, Hash, Gamepad2, Layout, BarChart3, Shield, Ticket } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.7';
+const CURRENT_VERSION = '0.5.0-rc.8';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,49 +43,50 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.7 - Tournament Admin, Trending Hashtags, Stream Preview, Supply Box fixes
+    // v0.5.0-rc.8 - StatForge, RovexShield, Coupon System
     const updates: UpdateItem[] = [
+        {
+            icon: <BarChart3 className="w-5 h-5 text-cyan-400" />,
+            title: 'StatForge — Rastreador de Stats',
+            description: 'Vincule seus perfis de jogos (R6, Valorant, CS2 e mais) e acompanhe suas stats em tempo real!',
+            isNew: true
+        },
+        {
+            icon: <Ticket className="w-5 h-5 text-green-400" />,
+            title: 'Sistema de Cupons na Loja',
+            description: 'Admins podem criar cupons de desconto (fixo ou %). Membros Elite ganham cupom mensal de R$10!',
+            isNew: true
+        },
+        {
+            icon: <Shield className="w-5 h-5 text-emerald-400" />,
+            title: 'RovexShield — Status de Moderação',
+            description: 'Card no painel admin mostrando status operacional de todos os serviços de moderação.',
+            isNew: true
+        },
         {
             icon: <Gamepad2 className="w-5 h-5 text-orange-400" />,
             title: 'Criação de Torneios (Admin)',
             description: 'Admins agora podem criar torneios completos com formato, equipes, premiação e muito mais!',
-            isNew: true
         },
         {
             icon: <Video className="w-5 h-5 text-purple-400" />,
             title: 'Preview de Streams ao Vivo',
             description: 'Passe o mouse sobre uma stream para assistir ao vivo direto no card, com controle de volume!',
-            isNew: true
         },
         {
             icon: <Hash className="w-5 h-5 text-cyan-400" />,
             title: 'Hashtags em Alta',
             description: 'Descubra os assuntos mais falados na comunidade na aba "Em Alta" do Explorar!',
-            isNew: true
         },
         {
             icon: <Layout className="w-5 h-5 text-blue-400" />,
             title: 'Dashboard Admin Reformulado',
             description: 'Layout masonry com cards organizados em 3 colunas para melhor visualização.',
-            isNew: true
         },
         {
             icon: <ShoppingBag className="w-5 h-5 text-green-400" />,
             title: 'Jogos Grátis Melhorado',
             description: 'Preço original aparece riscado com "Grátis" em destaque. Ative alertas nas configurações!',
-            isNew: true
-        },
-        {
-            icon: <Globe className="w-5 h-5 text-blue-400" />,
-            title: 'Explorar Mobile Aprimorado',
-            description: 'Cards do carrossel mobile agora exibem ícones e labels para melhor navegação.',
-            isNew: true
-        },
-        {
-            icon: <Trophy className="w-5 h-5 text-yellow-400" />,
-            title: 'Supply Box Atualizado',
-            description: 'Bordas padrão (Magazine e Esmeralda) removidas do pool para mais chances de itens raros!',
-            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5 text-pink-400" />,

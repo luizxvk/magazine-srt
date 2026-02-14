@@ -113,6 +113,16 @@ export const Feature = {
   
   // Rovex Integration
   ROVEX_INTEGRATION: 'ROVEX_INTEGRATION',
+  
+  // StatForge - Game Tracker
+  STATFORGE_BASIC: 'STATFORGE_BASIC',
+  STATFORGE_FULL: 'STATFORGE_FULL',
+  STATFORGE_NOTIFICATIONS: 'STATFORGE_NOTIFICATIONS',
+  STATFORGE_COMPARE: 'STATFORGE_COMPARE',
+  
+  // Coupons
+  COUPONS: 'COUPONS',
+  ADMIN_COUPONS: 'ADMIN_COUPONS',
 } as const;
 
 export type Feature = typeof Feature[keyof typeof Feature];
@@ -133,6 +143,7 @@ export const FeatureCategory = {
   SOCIAL: 'Integrações',
   ADMIN: 'Administração',
   ANALYTICS: 'Analytics',
+  TRACKER: 'StatForge',
   MISC: 'Outros',
 } as const;
 
@@ -240,6 +251,16 @@ export const FEATURE_INFO: Record<Feature, FeatureInfo> = {
   
   // Rovex
   [Feature.ROVEX_INTEGRATION]: { name: 'Integração Rovex', description: 'Comunicação com Rovex Platform', category: FeatureCategory.MISC },
+  
+  // StatForge
+  [Feature.STATFORGE_BASIC]: { name: 'StatForge Básico', description: 'Tracker de stats de jogos (até 5 jogos)', category: FeatureCategory.TRACKER, icon: '📡' },
+  [Feature.STATFORGE_FULL]: { name: 'StatForge Completo', description: 'Tracker ilimitado + todos os jogos', category: FeatureCategory.TRACKER, icon: '🔥' },
+  [Feature.STATFORGE_NOTIFICATIONS]: { name: 'Notificações StatForge', description: 'Alertas de mudanças de rank/stats no feed', category: FeatureCategory.TRACKER },
+  [Feature.STATFORGE_COMPARE]: { name: 'Comparação de Players', description: 'Comparar stats entre jogadores', category: FeatureCategory.TRACKER },
+  
+  // Coupons
+  [Feature.COUPONS]: { name: 'Cupons', description: 'Sistema de cupons na loja de produtos', category: FeatureCategory.STORE, icon: '🏷️' },
+  [Feature.ADMIN_COUPONS]: { name: 'Gestão de Cupons', description: 'Criar e gerenciar cupons de desconto', category: FeatureCategory.ADMIN },
 };
 
 // ===================== PLAN DETAILS =====================
@@ -298,6 +319,8 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'Theme Packs',
       'Zions Cash + Saques',
       'Product Store (Game Keys)',
+      'StatForge (até 5 jogos)',
+      'Sistema de Cupons',
       '3 integrações sociais',
       'Analytics avançado',
     ],
@@ -312,6 +335,8 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
     features: [
       'Integrações ilimitadas',
       'White-label',
+      'StatForge Completo',
+      'Comparação de Players',
       'Pagamento via cartão',
       'API de métricas',
       'Revenue reports',

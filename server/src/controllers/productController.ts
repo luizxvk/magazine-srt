@@ -728,7 +728,8 @@ export const confirmPixPayment = async (req: AuthRequest, res: Response) => {
                     order.buyer.email,
                     order.buyer.displayName || order.buyer.name || 'Usuário',
                     order.product.name,
-                    keysToDeliver.map(k => k.key)
+                    keysToDeliver.map(k => k.key),
+                    order.id
                 );
             } catch (emailError) {
                 console.error('Error sending keys email:', emailError);

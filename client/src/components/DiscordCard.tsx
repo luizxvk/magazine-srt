@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ExternalLink, CheckCircle, LogOut } from 'lucide-react';
+import { ExternalLink, CheckCircle, LogOut, Music, Gamepad2, Twitch, Youtube, Twitter, Github, Globe, Tv } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -15,6 +15,14 @@ interface DiscordConnection {
     metadata?: {
         avatar?: string;
     };
+}
+
+interface ExternalConnection {
+    id: string;
+    type: string;
+    name: string;
+    verified: boolean;
+    visibility: number;
 }
 
 // Color mapping from CustomizationShop
@@ -49,10 +57,30 @@ const hexToRgba = (hex: string, alpha: number) => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+// Platform icons and colors for external connections
+const PLATFORM_CONFIG: Record<string, { icon: any; color: string; label: string }> = {
+    spotify: { icon: Music, color: '#1DB954', label: 'Spotify' },
+    steam: { icon: Gamepad2, color: '#1b2838', label: 'Steam' },
+    twitch: { icon: Twitch, color: '#9146FF', label: 'Twitch' },
+    youtube: { icon: Youtube, color: '#FF0000', label: 'YouTube' },
+    twitter: { icon: Twitter, color: '#1DA1F2', label: 'Twitter' },
+    github: { icon: Github, color: '#181717', label: 'GitHub' },
+    xbox: { icon: Gamepad2, color: '#107C10', label: 'Xbox' },
+    playstation: { icon: Gamepad2, color: '#003087', label: 'PlayStation' },
+    epicgames: { icon: Gamepad2, color: '#313131', label: 'Epic Games' },
+    reddit: { icon: Globe, color: '#FF4500', label: 'Reddit' },
+    facebook: { icon: Globe, color: '#1877F2', label: 'Facebook' },
+    instagram: { icon: Globe, color: '#E4405F', label: 'Instagram' },
+    tiktok: { icon: Tv, color: '#000000', label: 'TikTok' },
+    battlenet: { icon: Gamepad2, color: '#00AEFF', label: 'Battle.net' },
+    riotgames: { icon: Gamepad2, color: '#D32936', label: 'Riot Games' },
+};
+
 export default function DiscordCard() {
     const { user, theme, showToast } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
+    const [externalConnections, setExternalConnections] = useState<ExternalConnection[]>([]);
     const [connection, setConnection] = useState<DiscordConnection | null>(null);
     const [loading, setLoading] = useState(true);
     const [connected, setConnected] = useState(false);
@@ -93,6 +121,7 @@ export default function DiscordCard() {
                 setConnected(true);
                 setConnection(discordConnection);
                 await loadGuilds();
+                await loadExternalConnections();
             }
         } catch (error) {
             console.error('Error checking Discord connection:', error);
@@ -115,12 +144,22 @@ export default function DiscordCard() {
         }
     };
 
+    const loadExternalConnections = async () => {
+        try {
+            const response = await api.get('/social/discord/connections');
+            setExternalConnections(response.data.connections || []);
+        } catch (error: any) {
+            console.error('Error loading Discord connections:', error);
+        }
+    };
+
     const handleDisconnect = async () => {
         try {
             await api.delete('/social/disconnect/DISCORD');
             setConnected(false);
             setConnection(null);
             setGuilds([]);
+            setExternalConnections([]);
         } catch (error) {
             console.error('Error disconnecting Discord:', error);
         }
@@ -284,6 +323,44 @@ export default function DiscordCard() {
                                 +{guilds.length - 8} mais
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {externalConnections.length > 0 && (
+                <div className="mt-4">
+                    <p className={`text-xs ${textSub} mb-2`}>Conexões ({externalConnections.length})</p>
+                    <div className="flex flex-wrap gap-2">
+                        {externalConnections.map((conn) => {
+                            const config = PLATFORM_CONFIG[conn.type.toLowerCase()] || { 
+                                icon: Globe, 
+                                color: accentColor, 
+                                label: conn.type 
+                            };
+                            const Icon = config.icon;
+                            return (
+                                <div
+                                    key={conn.id}
+                                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl ${theme === 'light' ? 'bg-gray-100/80' : 'bg-white/5'} transition-all duration-300`}
+                                    style={{ 
+                                        borderColor: hexToRgba(config.color, 0.3),
+                                        borderWidth: '1px'
+                                    }}
+                                    title={`${config.label}: ${conn.name}${conn.verified ? ' (Verificado)' : ''}`}
+                                >
+                                    <Icon 
+                                        className="w-4 h-4" 
+                                        style={{ color: config.color }}
+                                    />
+                                    <span className={`text-xs ${textMain} truncate max-w-[80px]`}>
+                                        {conn.name}
+                                    </span>
+                                    {conn.verified && (
+                                        <CheckCircle className="w-3 h-3 text-blue-400" />
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}

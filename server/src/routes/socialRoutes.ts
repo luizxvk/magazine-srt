@@ -14,6 +14,7 @@ import {
     discordCallback,
     getDiscordFriends,
     getDiscordGuilds,
+    getDiscordConnections,
     initiateSteamAuth,
     steamCallback,
     getSteamActivities,
@@ -53,6 +54,7 @@ router.get('/discord/auth', authenticateToken, initiateDiscordAuth);
 router.get('/discord/callback', discordCallback);
 router.get('/discord/friends', authenticateToken, getDiscordFriends);
 router.get('/discord/guilds', authenticateToken, getDiscordGuilds);
+router.get('/discord/connections', authenticateToken, getDiscordConnections);
 
 // Steam
 router.get('/steam/auth', authenticateToken, initiateSteamAuth);

@@ -425,7 +425,8 @@ export const initiateDiscordAuth = async (req: AuthRequest, res: Response) => {
         }
 
         // Escopos básicos que não requerem aprovação especial
-        const scopes = 'identify guilds';
+        // connections = Mostra conexões do usuário (Spotify, Steam, Twitch, etc)
+        const scopes = 'identify guilds connections';
         const authUrl = `${OAUTH_URLS.discord.authorize}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}`;
         
         console.log('Discord auth URL generated:', authUrl);
@@ -686,6 +687,85 @@ export const getDiscordGuilds = async (req: AuthRequest, res: Response) => {
     } catch (error: any) {
         console.error('Error fetching Discord guilds:', error.response?.data || error.message);
         res.status(500).json({ message: 'Erro ao buscar servidores do Discord' });
+    }
+};
+
+// Buscar conexões externas do Discord (Spotify, Steam, Twitch, etc)
+export const getDiscordConnections = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Não autenticado' });
+        }
+
+        const connection = await prisma.socialConnection.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: SocialPlatform.DISCORD,
+                },
+            },
+        });
+
+        if (!connection || !connection.accessToken) {
+            return res.status(404).json({ message: 'Discord não conectado' });
+        }
+
+        // Check if token is expired and try refresh first
+        let accessToken = connection.accessToken;
+        if (connection.expiresAt && new Date(connection.expiresAt) <= new Date()) {
+            const refreshed = await refreshDiscordToken(userId);
+            if (!refreshed) {
+                return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.', code: 'TOKEN_EXPIRED' });
+            }
+            const updated = await prisma.socialConnection.findUnique({
+                where: { userId_platform: { userId, platform: SocialPlatform.DISCORD } },
+            });
+            accessToken = updated?.accessToken || accessToken;
+        }
+
+        // Buscar conexões externas do usuário
+        try {
+            const connectionsResponse = await axios.get('https://discord.com/api/users/@me/connections', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            const connections = connectionsResponse.data.map((conn: any) => ({
+                id: conn.id,
+                type: conn.type, // spotify, steam, twitch, youtube, twitter, github, etc
+                name: conn.name,
+                verified: conn.verified,
+                visibility: conn.visibility, // 0 = only me, 1 = everyone
+            }));
+
+            res.json({ connections });
+        } catch (discordError: any) {
+            if (discordError.response?.status === 401) {
+                const refreshed = await refreshDiscordToken(userId);
+                if (refreshed) {
+                    const updated = await prisma.socialConnection.findUnique({
+                        where: { userId_platform: { userId, platform: SocialPlatform.DISCORD } },
+                    });
+                    const retryResponse = await axios.get('https://discord.com/api/users/@me/connections', {
+                        headers: { Authorization: `Bearer ${updated?.accessToken}` },
+                    });
+                    const connections = retryResponse.data.map((conn: any) => ({
+                        id: conn.id,
+                        type: conn.type,
+                        name: conn.name,
+                        verified: conn.verified,
+                        visibility: conn.visibility,
+                    }));
+                    return res.json({ connections });
+                }
+                return res.status(401).json({ message: 'Token expirado. Reconecte sua conta Discord.', code: 'TOKEN_EXPIRED' });
+            }
+            throw discordError;
+        }
+    } catch (error: any) {
+        console.error('Error fetching Discord connections:', error.response?.data || error.message);
+        res.status(500).json({ message: 'Erro ao buscar conexões do Discord' });
     }
 };
 

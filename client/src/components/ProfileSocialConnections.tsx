@@ -84,7 +84,8 @@ export default function ProfileSocialConnections() {
     const handleConnect = async (platform: string) => {
         try {
             const response = await api.get(`/social/${platform.toLowerCase()}/auth`);
-            const authUrl = platform === 'DISCORD' && user?.id 
+            // Always append state with userId for OAuth callback
+            const authUrl = user?.id 
                 ? `${response.data.authUrl}&state=${user.id}`
                 : response.data.authUrl;
             window.location.href = authUrl;

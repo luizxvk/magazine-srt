@@ -20,6 +20,7 @@ interface GameInfo {
   iconUrl?: string | null;
   platforms: string[];
   category: string;
+  comingSoon?: boolean;
 }
 
 // Helper component for game icons with accent color filter
@@ -463,15 +464,24 @@ export default function StatForgePage() {
                       {games.filter(g => g.category === cat).map(game => (
                         <button
                           key={game.id}
-                          onClick={() => setLinkGame(game.id)}
-                          className={`p-3 rounded-xl text-left transition-all border ${linkGame === game.id
+                          onClick={() => !game.comingSoon && setLinkGame(game.id)}
+                          disabled={game.comingSoon}
+                          className={`relative p-3 rounded-xl text-left transition-all border ${linkGame === game.id
                             ? 'ring-1'
+                            : game.comingSoon
+                            ? `${theme === 'light' ? 'bg-gray-100 border-gray-200' : 'bg-white/[0.02] border-white/5'} opacity-50 cursor-not-allowed`
                             : `${theme === 'light' ? 'bg-gray-50 border-gray-200 hover:bg-gray-100' : 'bg-white/5 border-white/5 hover:bg-white/10'}`
                           }`}
                           style={linkGame === game.id ? { background: `${accentColor}15`, borderColor: `${accentColor}50`, boxShadow: `0 0 0 1px ${accentColor}30` } : {}}
                         >
+                          {/* Coming Soon Badge */}
+                          {game.comingSoon && (
+                            <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 text-[8px] font-bold text-white rounded uppercase tracking-wider shadow-lg z-10">
+                              Em breve
+                            </span>
+                          )}
                           <GameIcon iconUrl={game.iconUrl} icon={game.icon} size="sm" accentColor={linkGame === game.id ? accentColor : undefined} />
-                          <span className={`text-xs font-medium ${linkGame === game.id ? 'text-white' : theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                          <span className={`text-xs font-medium ${linkGame === game.id ? 'text-white' : game.comingSoon ? 'text-gray-500' : theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
                             {game.name}
                           </span>
                         </button>

@@ -173,32 +173,32 @@ export default function StatForgePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`${glassBg} rounded-3xl border ${theme === 'light' ? 'border-gray-200/60' : 'border-white/[0.06]'} p-8 mb-8 relative overflow-hidden`}
+          className={`${glassBg} rounded-3xl border ${theme === 'light' ? 'border-gray-200/60' : 'border-white/[0.06]'} px-6 py-5 mb-8 relative overflow-hidden`}
         >
           {/* Glow effects */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-500/10 to-transparent rounded-full blur-3xl" />
 
-          <div className="relative flex flex-col sm:flex-row items-center gap-8">
+          <div className="relative flex items-center gap-6">
             {/* Logo */}
             <div className="relative flex-shrink-0">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 to-indigo-500/15 rounded-full blur-2xl scale-125" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-full blur-3xl scale-150" />
               <img
                 src="/assets/statforge-logo.png"
                 alt="StatForge"
-                className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
+                className="relative w-40 h-40 object-contain drop-shadow-[0_0_40px_rgba(99,102,241,0.3)]"
               />
             </div>
 
             {/* Info */}
-            <div className="text-center sm:text-left flex-1">
-              <GradientText as="h1" className="text-3xl sm:text-4xl font-bold tracking-tight" fallbackClassName={theme === 'light' ? 'text-gray-900' : 'text-white'}>
+            <div className="flex-1">
+              <GradientText as="h1" className="text-2xl sm:text-3xl font-bold tracking-tight" fallbackClassName={theme === 'light' ? 'text-gray-900' : 'text-white'}>
                 StatForge
               </GradientText>
-              <p className={`mt-2 text-base ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+              <p className={`mt-1 text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
                 Rastreie suas stats de jogos em tempo real
               </p>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-4">
+              <div className="flex flex-wrap items-center gap-2 mt-3">
                 <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-blue-500/10 text-blue-400'} border ${theme === 'light' ? 'border-blue-100' : 'border-blue-500/20'}`}>
                   <Gamepad2 className="w-3.5 h-3.5" />
                   {profiles.length} jogos vinculados

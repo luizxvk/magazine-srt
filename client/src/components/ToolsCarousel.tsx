@@ -30,21 +30,13 @@ const COLOR_MAP: Record<string, string> = {
     'color_pastel_periwinkle': '#ccccff',
 };
 
-// Helper to convert hex to rgba
-const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
 const tools = [
     { id: 'radio', label: 'Rádio', icon: Radio },
     { id: 'discord', label: 'Discord', icon: MessageCircle },
 ];
 
 export default function ToolsCarousel() {
-    const { user, theme, accentColor: contextAccentColor } = useAuth();
+    const { user, accentColor: contextAccentColor } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [currentTool, setCurrentTool] = useState('radio');
     const [twitchChannels, setTwitchChannels] = useState<string[]>(['gaules', 'alanzoka', 'loud_coringa', 'nobru']);
@@ -118,7 +110,5 @@ export default function ToolsCarousel() {
                 {renderCurrentTool()}
             </div>
         </div>
-    );
-}
     );
 }

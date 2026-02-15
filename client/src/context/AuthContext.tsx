@@ -1170,7 +1170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Global heartbeat to track online presence
     useEffect(() => {
-        if (!user || isVisitor) return;
+        if (!user || user.role === 'VISITOR') return;
 
         const sendHeartbeat = async () => {
             try {
@@ -1188,7 +1188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return () => {
             clearInterval(heartbeatInterval);
         };
-    }, [user, isVisitor]);
+    }, [user]);
 
     // Achievement popup - NOW USES EDGE NOTIFICATION
     const showAchievement = useCallback((title: string, description: string) => {

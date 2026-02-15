@@ -1,13 +1,84 @@
 import { useState, useEffect } from 'react';
-import { motion, Reorder } from 'framer-motion';
+import { motion, Reorder, useMotionValue, useDragControls, animate, MotionValue, DragControls } from 'framer-motion';
 import { 
-    GripVertical, Eye, EyeOff, Radio, Gift, Crown, Shield, 
+    Eye, EyeOff, Radio, Gift, Crown, Shield, 
     ShoppingBag, BarChart3, Package, Users, MessageSquare, Megaphone, Save, RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import Loader from './Loader';
+
+// Animated shadow hook for drag feedback
+const inactiveShadow = '0px 0px 0px rgba(0,0,0,0.08)';
+function useRaisedShadow(value: MotionValue<number>) {
+    const boxShadow = useMotionValue(inactiveShadow);
+    useEffect(() => {
+        let isActive = false;
+        const unsubscribe = value.on('change', (latest) => {
+            const wasActive = isActive;
+            if (latest !== 0) {
+                isActive = true;
+                if (isActive !== wasActive) {
+                    animate(boxShadow, '5px 5px 10px rgba(0,0,0,0.15)');
+                }
+            } else {
+                isActive = false;
+                if (isActive !== wasActive) {
+                    animate(boxShadow, inactiveShadow);
+                }
+            }
+        });
+        return unsubscribe;
+    }, [value, boxShadow]);
+    return boxShadow;
+}
+
+// Drag handle icon with animated scale
+interface ReorderIconProps {
+    dragControls: DragControls;
+    isActive: boolean;
+    onPress: () => void;
+    theme: 'light' | 'dark';
+}
+
+function ReorderIcon({ dragControls, isActive, onPress, theme }: ReorderIconProps) {
+    return (
+        <motion.button
+            type="button"
+            aria-label="Reorder"
+            animate={{ scale: isActive ? 0.85 : 1 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            onPointerDown={(e) => {
+                e.preventDefault();
+                onPress();
+                dragControls.start(e);
+            }}
+            className="cursor-grab active:cursor-grabbing p-1"
+            style={{ touchAction: 'none' }}
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 39 39"
+                width="16"
+                height="16"
+                className={`fill-current transition-opacity ${
+                    theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-gray-300'
+                }`}
+            >
+                <path d="M 5 0 C 7.761 0 10 2.239 10 5 C 10 7.761 7.761 10 5 10 C 2.239 10 0 7.761 0 5 C 0 2.239 2.239 0 5 0 Z" />
+                <path d="M 19 0 C 21.761 0 24 2.239 24 5 C 24 7.761 21.761 10 19 10 C 16.239 10 14 7.761 14 5 C 14 2.239 16.239 0 19 0 Z" />
+                <path d="M 33 0 C 35.761 0 38 2.239 38 5 C 38 7.761 35.761 10 33 10 C 30.239 10 28 7.761 28 5 C 28 2.239 30.239 0 33 0 Z" />
+                <path d="M 33 14 C 35.761 14 38 16.239 38 19 C 38 21.761 35.761 24 33 24 C 30.239 24 28 21.761 28 19 C 28 16.239 30.239 14 33 14 Z" />
+                <path d="M 19 14 C 21.761 14 24 16.239 24 19 C 24 21.761 21.761 24 19 24 C 16.239 24 14 21.761 14 19 C 14 16.239 16.239 14 19 14 Z" />
+                <path d="M 5 14 C 7.761 14 10 16.239 10 19 C 10 21.761 7.761 24 5 24 C 2.239 24 0 21.761 0 19 C 0 16.239 2.239 14 5 14 Z" />
+                <path d="M 5 28 C 7.761 28 10 30.239 10 33 C 10 35.761 7.761 38 5 38 C 2.239 38 0 35.761 0 33 C 0 30.239 2.239 28 5 28 Z" />
+                <path d="M 19 28 C 21.761 28 24 30.239 24 33 C 24 35.761 21.761 38 19 38 C 16.239 38 14 35.761 14 33 C 14 30.239 16.239 28 19 28 Z" />
+                <path d="M 33 28 C 35.761 28 38 30.239 38 33 C 38 35.761 35.761 38 33 38 C 30.239 38 28 35.761 28 33 C 28 30.239 30.239 28 33 28 Z" />
+            </svg>
+        </motion.button>
+    );
+}
 
 interface FeedCard {
     id: string;
@@ -46,6 +117,89 @@ const CARD_META: Record<string, { icon: any; labelKey: string }> = {
     feedback: { icon: MessageSquare, labelKey: 'common:feedCards.cards.feedback' },
     announcements: { icon: Megaphone, labelKey: 'common:feedCards.cards.announcements' },
 };
+
+// Draggable card component with optimized drag controls
+interface DraggableCardProps {
+    card: FeedCard;
+    theme: 'light' | 'dark';
+    accentColor: string;
+    itemBg: string;
+    onToggleVisibility: () => void;
+    t: (key: string) => string;
+}
+
+function DraggableCard({ card, theme, accentColor, itemBg, onToggleVisibility, t }: DraggableCardProps) {
+    const y = useMotionValue(0);
+    const boxShadow = useRaisedShadow(y);
+    const dragControls = useDragControls();
+    const [isDragging, setIsDragging] = useState(false);
+    const [pressed, setPressed] = useState(false);
+
+    const meta = CARD_META[card.id];
+    if (!meta) return null;
+    const Icon = meta.icon;
+
+    return (
+        <Reorder.Item
+            value={card}
+            style={{ boxShadow, y }}
+            dragListener={false}
+            dragControls={dragControls}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => {
+                setIsDragging(false);
+                setPressed(false);
+            }}
+            className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${itemBg} ${
+                theme === 'light' ? 'border-gray-200' : 'border-white/[0.05]'
+            } ${!card.visible ? 'opacity-50' : ''} ${isDragging ? 'z-10' : ''}`}
+        >
+            {/* Drag handle */}
+            <ReorderIcon
+                dragControls={dragControls}
+                isActive={isDragging || pressed}
+                onPress={() => setPressed(true)}
+                theme={theme}
+            />
+
+            {/* Icon */}
+            <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: `${accentColor}20` }}
+            >
+                <Icon 
+                    className="w-4 h-4" 
+                    style={{ color: accentColor }}
+                />
+            </div>
+
+            {/* Label */}
+            <span className={`flex-1 font-medium text-sm ${
+                theme === 'light' ? 'text-gray-700' : 'text-white'
+            }`}>
+                {t(meta.labelKey)}
+            </span>
+
+            {/* Visibility toggle */}
+            <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleVisibility();
+                }}
+                className={`p-2 rounded-lg transition-colors ${
+                    card.visible 
+                        ? (theme === 'light' ? 'bg-green-100 text-green-600' : 'bg-green-500/20 text-green-400')
+                        : (theme === 'light' ? 'bg-gray-100 text-gray-400' : 'bg-white/5 text-gray-500')
+                }`}
+                title={card.visible ? t('common:feedCards.visible') : t('common:feedCards.hidden')}
+            >
+                {card.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </motion.button>
+        </Reorder.Item>
+    );
+}
 
 interface FeedCardsCustomizerProps {
     onClose?: () => void;
@@ -95,7 +249,7 @@ export default function FeedCardsCustomizer({ onClose }: FeedCardsCustomizerProp
         setSaving(true);
         try {
             const config = { cards };
-            await api.put('/users/preferences', {
+            await api.put('/users/me/preferences', {
                 feedCardsConfig: config
             });
             updateUser({ feedCardsConfig: config });
@@ -136,8 +290,13 @@ export default function FeedCardsCustomizer({ onClose }: FeedCardsCustomizerProp
             </div>
 
             {/* Drag hint */}
-            <p className={`text-xs mb-4 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
-                <GripVertical className="w-3 h-3 inline mr-1" />
+            <p className={`text-xs mb-4 flex items-center gap-1 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 39" width="12" height="12" className="fill-current opacity-60">
+                    <path d="M 5 0 C 7.761 0 10 2.239 10 5 C 10 7.761 7.761 10 5 10 C 2.239 10 0 7.761 0 5 Z" />
+                    <path d="M 19 0 C 21.761 0 24 2.239 24 5 C 24 7.761 21.761 10 19 10 C 16.239 10 14 7.761 14 5 Z" />
+                    <path d="M 5 14 C 7.761 14 10 16.239 10 19 C 10 21.761 7.761 24 5 24 C 2.239 24 0 21.761 0 19 Z" />
+                    <path d="M 19 14 C 21.761 14 24 16.239 24 19 C 24 21.761 21.761 24 19 24 C 16.239 24 14 21.761 14 19 Z" />
+                </svg>
                 {t('common:feedCards.dragToReorder')}
             </p>
 
@@ -148,62 +307,17 @@ export default function FeedCardsCustomizer({ onClose }: FeedCardsCustomizerProp
                 onReorder={handleReorder}
                 className="space-y-2"
             >
-                {cards.map((card) => {
-                    const meta = CARD_META[card.id];
-                    if (!meta) return null;
-                    const Icon = meta.icon;
-
-                    return (
-                        <Reorder.Item
-                            key={card.id}
-                            value={card}
-                            className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${itemBg} ${
-                                theme === 'light' ? 'border-gray-200' : 'border-white/[0.05]'
-                            } ${!card.visible ? 'opacity-50' : ''}`}
-                        >
-                            {/* Drag handle */}
-                            <GripVertical className={`w-4 h-4 flex-shrink-0 ${
-                                theme === 'light' ? 'text-gray-400' : 'text-gray-500'
-                            }`} />
-
-                            {/* Icon */}
-                            <div 
-                                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: `${accentColor}20` }}
-                            >
-                                <Icon 
-                                    className="w-4 h-4" 
-                                    style={{ color: accentColor }}
-                                />
-                            </div>
-
-                            {/* Label */}
-                            <span className={`flex-1 font-medium text-sm ${
-                                theme === 'light' ? 'text-gray-700' : 'text-white'
-                            }`}>
-                                {t(meta.labelKey)}
-                            </span>
-
-                            {/* Visibility toggle */}
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleVisibility(card.id);
-                                }}
-                                className={`p-2 rounded-lg transition-colors ${
-                                    card.visible 
-                                        ? (theme === 'light' ? 'bg-green-100 text-green-600' : 'bg-green-500/20 text-green-400')
-                                        : (theme === 'light' ? 'bg-gray-100 text-gray-400' : 'bg-white/5 text-gray-500')
-                                }`}
-                                title={card.visible ? t('common:feedCards.visible') : t('common:feedCards.hidden')}
-                            >
-                                {card.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                            </motion.button>
-                        </Reorder.Item>
-                    );
-                })}
+                {cards.map((card) => (
+                    <DraggableCard
+                        key={card.id}
+                        card={card}
+                        theme={theme}
+                        accentColor={accentColor}
+                        itemBg={itemBg}
+                        onToggleVisibility={() => toggleVisibility(card.id)}
+                        t={t}
+                    />
+                ))}
             </Reorder.Group>
 
             {/* Actions */}

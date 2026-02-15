@@ -5,6 +5,7 @@ import api from '../services/api';
 import { Bell, Heart, MessageCircle, Star, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import ModernLoader from '../components/ModernLoader';
 import ChatWindow from '../components/ChatWindow';
 
@@ -31,6 +32,7 @@ export default function NotificationsPage() {
     const [chatUser, setChatUser] = useState<ChatUser | null>(null);
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { t } = useTranslation();
     const isMGT = user?.membershipType === 'MGT';
 
 
@@ -138,12 +140,12 @@ export default function NotificationsPage() {
         const now = new Date();
         const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-        if (seconds < 60) return 'Agora';
+        if (seconds < 60) return t('common:notifications.now');
         const minutes = Math.floor(seconds / 60);
-        if (minutes < 60) return `${minutes} min`;
+        if (minutes < 60) return t('common:notifications.minutesAgo', { count: minutes });
         const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}h`;
-        return `${Math.floor(hours / 24)}d`;
+        if (hours < 24) return t('common:notifications.hoursAgo', { count: hours });
+        return t('common:notifications.daysAgo', { count: Math.floor(hours / 24) });
     };
 
     const parseContent = (content: string) => {
@@ -179,8 +181,8 @@ export default function NotificationsPage() {
                             <Bell className={`w-8 h-8 ${themeText}`} />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-serif font-bold text-white">Notificações</h1>
-                            <p className="text-gray-400">Suas atualizações e interações recentes.</p>
+                            <h1 className="text-3xl font-serif font-bold text-white">{t('common:notifications.title')}</h1>
+                            <p className="text-gray-400">{t('common:notifications.subtitle')}</p>
                         </div>
                     </div>
                     {notifications.some(n => !n.read) && (
@@ -188,7 +190,7 @@ export default function NotificationsPage() {
                             onClick={markAllAsRead}
                             className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border ${themeBorder} hover:bg-white/5 transition-colors ${themeText}`}
                         >
-                            Marcar todas como lidas
+                            {t('common:notifications.markAllRead')}
                         </button>
                     )}
                 </div>
@@ -198,7 +200,7 @@ export default function NotificationsPage() {
                 ) : notifications.length === 0 ? (
                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm animate-fade-in">
                         <Bell className={`w-12 h-12 ${themeEmptyIcon} mx-auto mb-4`} />
-                        <p className="text-gray-400 font-serif text-xl">Sem notificações no momento</p>
+                        <p className="text-gray-400 font-serif text-xl">{t('common:notifications.empty')}</p>
                     </div>
                 ) : (
                     <div className="space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">

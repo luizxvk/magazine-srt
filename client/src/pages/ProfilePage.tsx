@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import Header from '../components/Header';
 import Ranking from '../components/Ranking';
@@ -38,6 +39,7 @@ const BADGE_URLS: Record<string, string> = {
 
 export default function ProfilePage() {
     const { user: currentUser, theme, equippedBadge, previewTheme, accentColor, accentGradient } = useAuth();
+    const { t } = useTranslation('common');
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const paramId = searchParams.get('id');
@@ -152,7 +154,7 @@ export default function ProfilePage() {
 
     const handleShare = (postId: string | number) => {
         navigator.clipboard.writeText(`https://magazine-srt.vercel.app/api/og/post/${postId}`);
-        showToast('Link copiado para a área de transferência!', 'success');
+        showToast(t('actions.copy') + '!', 'success');
     };
 
     const handleDeletePost = async () => {
@@ -296,7 +298,7 @@ export default function ProfilePage() {
                                     onClick={() => setIsBgAdjustOpen(false)}
                                     className="px-4 py-2 rounded-full text-gray-400 border border-white/10 hover:bg-white/5 text-sm"
                                 >
-                                    Cancelar
+                                    {t('actions.cancel')}
                                 </button>
                                 <button
                                     onClick={async () => {
@@ -313,13 +315,13 @@ export default function ProfilePage() {
                                                 showToast('Imagem de fundo atualizada!', 'success');
                                             } catch (error) {
                                                 console.error('Failed to save background:', error);
-                                                showToast('Erro ao salvar imagem', 'error');
+                                                showToast(t('errors.generic'), 'error');
                                             }
                                         }
                                     }}
                                     className={`px-6 py-2 rounded-full text-black text-sm font-medium ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'}`}
                                 >
-                                    Salvar
+                                    {t('actions.save')}
                                 </button>
                             </div>
                         </div>
@@ -459,7 +461,7 @@ export default function ProfilePage() {
                                         className={`text-sm uppercase tracking-widest mb-2 font-medium text-transparent bg-clip-text ${!accentGradient && (isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold')}`}
                                         style={accentGradient ? { backgroundImage: accentGradient } : { backgroundImage: `linear-gradient(to right, ${accentColor}, ${accentColor})` }}
                                     >
-                                        {isMGT ? 'Membro MGT' : 'Membro Magazine'}
+                                        {isMGT ? t('profile.mgt') : t('profile.magazine')}
                                     </p>
                                     {profileUser.bio && <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} text-sm italic mb-4 max-w-md mx-auto md:mx-0`}>"{profileUser.bio}"</p>}
                                 </div>
@@ -519,7 +521,7 @@ export default function ProfilePage() {
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors group shrink-0 ${theme === 'light' ? 'border-gray-400 bg-gray-200 text-gray-800' : 'border-white/10 hover:bg-white/5 text-gray-400'}`}
                                             >
                                                 <Edit2 className={`w-4 h-4 transition-colors ${theme === 'light' ? 'text-gray-800' : 'text-gray-400 group-hover:text-white'}`} />
-                                                <span className={`text-xs transition-colors ${theme === 'light' ? 'text-gray-800' : 'text-gray-400 group-hover:text-white'}`}>Editar Perfil</span>
+                                                <span className={`text-xs transition-colors ${theme === 'light' ? 'text-gray-800' : 'text-gray-400 group-hover:text-white'}`}>{t('profile.editProfile')}</span>
                                             </button>
                                             {currentUser?.role === 'ADMIN' && (
                                                 <>
@@ -547,7 +549,7 @@ export default function ProfilePage() {
                                                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10"
                                                 >
                                                     <MessageCircle className="w-4 h-4" />
-                                                    <span className="text-xs font-bold uppercase tracking-wide">Mensagem</span>
+                                                    <span className="text-xs font-bold uppercase tracking-wide">{t('chat.title')}</span>
                                                 </button>
                                             )}
 
@@ -557,7 +559,7 @@ export default function ProfilePage() {
                                                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-gold-500 text-black hover:bg-gold-400 transition-colors shadow-lg shadow-gold-500/20"
                                                 >
                                                     <UserPlus className="w-4 h-4" />
-                                                    <span className="text-xs font-bold uppercase tracking-wide">Adicionar</span>
+                                                    <span className="text-xs font-bold uppercase tracking-wide">{t('profile.follow')}</span>
                                                 </button>
                                             )}
                                             {friendshipStatus === 'PENDING' && (
@@ -567,7 +569,7 @@ export default function ProfilePage() {
                                                 >
                                                     <UserCheck className="w-4 h-4" />
                                                     <span className="text-xs font-bold uppercase tracking-wide">
-                                                        {isRequester ? 'Enviado' : 'Pendente'}
+                                                        {isRequester ? t('status.loading') : t('status.loading')}
                                                     </span>
                                                 </button>
                                             )}
@@ -576,7 +578,7 @@ export default function ProfilePage() {
                                                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 text-green-400 border border-green-500/30"
                                                 >
                                                     <UserCheck className="w-4 h-4" />
-                                                    <span className="text-xs font-bold uppercase tracking-wide">Amigos</span>
+                                                    <span className="text-xs font-bold uppercase tracking-wide">{t('profile.following')}</span>
                                                 </button>
                                             )}
                                         </>
@@ -587,17 +589,17 @@ export default function ProfilePage() {
                             <div className={`grid grid-cols-${(profileUser.prestigeLevel || 0) > 0 ? '3' : '2'} gap-4 border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} pt-6 mt-4`}>
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>{profileUser.trophies || 0}</p>
-                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>Troféus</p>
+                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{t('nav.ranking')}</p>
                                 </div>
                                 {(profileUser.prestigeLevel || 0) > 0 && (
                                     <div>
                                         <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>⭐ {profileUser.prestigeLevel}</p>
-                                        <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>Prestígio</p>
+                                        <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{t('profile.rank')}</p>
                                     </div>
                                 )}
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>#{profileUser.id?.slice(0, 4) || '0000'}</p>
-                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>ID Membro</p>
+                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>ID</p>
                                 </div>
                             </div>
                         </div>
@@ -616,20 +618,20 @@ export default function ProfilePage() {
                         onClick={() => setActiveTab('posts')}
                         className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'posts' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                     >
-                        Postagens
+                        {t('profile.posts')}
                     </button>
                     <button
                         onClick={() => setActiveTab('badges')}
                         className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'badges' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                     >
-                        Conquistas
+                        {t('profile.badges')}
                     </button>
                     {isOwnProfile && (
                         <button
                             onClick={() => setActiveTab('rewards')}
                             className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'rewards' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                         >
-                            Prêmios
+                            {t('nav.rewards')}
                         </button>
                     )}
                 </div>

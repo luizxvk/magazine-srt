@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Crown, Zap, Trophy, Gift, MessageCircle, Shield, Palette, 
     Sparkles, Star, Check, X,
-    Rocket, Heart, Package, ChevronRight, Gem
+    Rocket, Heart, Package
 } from 'lucide-react';
 import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import Header from '../components/Header';
 import LiquidChrome from '../components/LiquidChrome';
+import LiquidEliteButton from '../components/LiquidEliteButton';
 import confetti from 'canvas-confetti';
 
 interface Plan {
@@ -44,6 +47,8 @@ interface SubscriptionStatus {
 
 export default function ElitePage() {
     const { user, showEdgeNotification } = useAuth();
+    const { config } = useCommunity();
+    const { t } = useTranslation('common');
     const [searchParams, setSearchParams] = useSearchParams();
     
     const [plans, setPlans] = useState<Plan[]>([]);
@@ -88,13 +93,13 @@ export default function ElitePage() {
                     origin: { y: 0.5 },
                     colors: ['#8B5CF6', '#6366F1', '#4F46E5', '#818CF8', '#A78BFA']
                 });
-                showEdgeNotification('success', 'Bem-vindo ao ELITE! 🎉', 'Seus benefícios já estão ativos');
+                showEdgeNotification('success', t('elite.welcomeElite'), t('elite.success'));
                 // Recarregar dados
                 fetchData();
             } else if (paymentStatus === 'pending') {
-                showEdgeNotification('info', 'Pagamento pendente', 'Aguardando confirmação do pagamento');
+                showEdgeNotification('info', t('payments.awaitingPayment'), t('payments.processing'));
             } else if (paymentStatus === 'failure') {
-                showEdgeNotification('error', 'Pagamento falhou', 'Tente novamente ou use outro método');
+                showEdgeNotification('error', t('payments.paymentFailed'), t('payments.tryAgain'));
             }
         }
     }, [searchParams]);
@@ -106,7 +111,7 @@ export default function ElitePage() {
     const handleSubscribe = async () => {
         if (!selectedPlan) return;
         if (!user) {
-            showEdgeNotification('error', 'Login necessário', 'Faça login para assinar o ELITE');
+            showEdgeNotification('error', t('errors.unauthorized'), t('elite.subscribe'));
             return;
         }
         
@@ -125,7 +130,7 @@ export default function ElitePage() {
                     origin: { y: 0.6 },
                     colors: ['#8B5CF6', '#6366F1', '#4F46E5', '#818CF8']
                 });
-                showEdgeNotification('success', 'Bem-vindo ao ELITE! 🎉', data.message);
+                showEdgeNotification('success', t('elite.welcomeElite'), data.message);
                 setShowConfirmModal(false);
                 fetchData();
                 return;
@@ -135,10 +140,10 @@ export default function ElitePage() {
             if (data.init_point) {
                 window.location.href = data.init_point;
             } else {
-                throw new Error('Link de pagamento não gerado');
+                throw new Error(t('errors.generic'));
             }
         } catch (error: any) {
-            showEdgeNotification('error', 'Erro', error.response?.data?.error || 'Erro ao processar assinatura');
+            showEdgeNotification('error', t('status.error'), error.response?.data?.error || t('errors.generic'));
         } finally {
             setSubscribing(false);
         }
@@ -150,11 +155,11 @@ export default function ElitePage() {
             const { data } = await api.post('/subscriptions/cancel', {
                 reason: 'Cancelado pelo usuário'
             });
-            showEdgeNotification('success', 'Assinatura cancelada', data.message);
+            showEdgeNotification('success', t('elite.cancel'), data.message);
             setShowCancelModal(false);
             fetchData();
         } catch (error: any) {
-            showEdgeNotification('error', 'Erro', error.response?.data?.error || 'Erro ao cancelar assinatura');
+            showEdgeNotification('error', t('status.error'), error.response?.data?.error || t('errors.generic'));
         } finally {
             setCancelling(false);
         }
@@ -206,37 +211,35 @@ export default function ElitePage() {
             
             <main className="relative z-10 pt-24 pb-32 px-4">
                 <div className="max-w-6xl mx-auto">
-                    {/* Hero Section - Apple Vision Pro Style */}
+                    {/* Hero Section - Compact & Professional */}
                     <motion.div 
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="text-center mb-20"
+                        className="text-center mb-16"
                     >
-                        {/* Floating Crown Icon with Glass Effect */}
+                        {/* Badge pill */}
                         <motion.div
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-                            className="relative inline-flex mb-8"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/30 to-indigo-600/30 rounded-[2rem] blur-2xl scale-150" />
-                            <div className="relative p-8 rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-                                <Gem className="w-16 h-16 text-violet-300" style={{ filter: 'drop-shadow(0 0 20px rgba(139,92,246,0.5))' }} />
-                            </div>
+                            <Crown className="w-4 h-4 text-violet-400" />
+                            <span className="text-sm font-medium text-violet-300">{t('elite.exclusiveZone')}</span>
                         </motion.div>
                         
                         {/* Title with Premium Typography */}
                         <motion.h1 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.6 }}
-                            className="text-6xl md:text-8xl font-black mb-6 tracking-tight"
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="text-5xl md:text-7xl font-black mb-4 tracking-tight"
                         >
-                            <span className="inline-block bg-gradient-to-b from-white via-violet-200 to-violet-400 bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(139,92,246,0.3)]">
-                                MGT
+                            <span className="inline-block bg-gradient-to-b from-white via-white to-violet-200 bg-clip-text text-transparent">
+                                {config.tierVipName}
                             </span>
-                            <span className="inline-block ml-4 bg-gradient-to-b from-violet-200 via-indigo-300 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(99,102,241,0.4)]">
+                            <span className="inline-block ml-3 bg-gradient-to-b from-violet-300 via-violet-400 to-indigo-500 bg-clip-text text-transparent">
                                 ELITE
                             </span>
                         </motion.h1>
@@ -244,25 +247,25 @@ export default function ElitePage() {
                         <motion.p 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ delay: 0.6 }}
-                            className="text-xl md:text-2xl text-white/60 max-w-2xl mx-auto mb-8 font-light tracking-wide"
+                            transition={{ delay: 0.5 }}
+                            className="text-lg md:text-xl text-white/50 max-w-xl mx-auto mb-8 font-light"
                         >
-                            Eleve sua experiência ao máximo. XP em dobro, benefícios exclusivos e muito mais.
+                            {t('elite.subtitle')}
                         </motion.p>
 
                         {isAlreadyElite && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.7 }}
-                                className="inline-flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-violet-500/30 shadow-[0_8px_32px_rgba(139,92,246,0.15)]"
+                                transition={{ delay: 0.6 }}
+                                className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-violet-500/30"
                             >
-                                <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600">
-                                    <Crown className="w-5 h-5 text-white" />
+                                <div className="p-1.5 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600">
+                                    <Crown className="w-4 h-4 text-white" />
                                 </div>
-                                <span className="text-white font-semibold text-lg">Você é ELITE!</span>
-                                <div className="h-6 w-px bg-white/20" />
-                                <span className="text-violet-300 font-bold">{status?.daysRemaining} dias restantes</span>
+                                <span className="text-white font-medium">{t('elite.alreadyMember')}</span>
+                                <div className="h-5 w-px bg-white/20" />
+                                <span className="text-violet-300 font-bold">{t('elite.daysRemaining', { days: status?.daysRemaining })}</span>
                             </motion.div>
                         )}
                     </motion.div>
@@ -275,9 +278,9 @@ export default function ElitePage() {
                         className="mb-20"
                     >
                         <h2 className="text-2xl font-bold text-center mb-3 text-white/90 tracking-wide">
-                            Benefícios Exclusivos
+                            {t('elite.benefits')}
                         </h2>
-                        <p className="text-center text-white/40 mb-10">Desbloqueie o máximo potencial da sua conta</p>
+                        <p className="text-center text-white/40 mb-10">{t('elite.subtitle')}</p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {benefits.map((benefit, index) => {
@@ -317,9 +320,9 @@ export default function ElitePage() {
                             transition={{ delay: 0.7, duration: 0.8 }}
                         >
                             <h2 className="text-2xl font-bold text-center mb-3 text-white/90 tracking-wide">
-                                Escolha seu Plano
+                                {t('payments.selectAmount')}
                             </h2>
-                            <p className="text-center text-white/40 mb-10">Pagamento único, sem renovação automática</p>
+                            <p className="text-center text-white/40 mb-10">{t('payments.secure')}</p>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                 {plans.map((plan, index) => (
@@ -341,7 +344,7 @@ export default function ElitePage() {
                                         {plan.popular && (
                                             <div className="absolute -top-px left-1/2 -translate-x-1/2">
                                                 <div className="px-4 py-1.5 rounded-b-xl bg-gradient-to-r from-violet-500 to-indigo-600 text-xs font-bold text-white shadow-[0_4px_20px_rgba(139,92,246,0.4)]">
-                                                    MAIS POPULAR
+                                                    {t('elite.bestValue')}
                                                 </div>
                                             </div>
                                         )}
@@ -370,7 +373,7 @@ export default function ElitePage() {
                                             {plan.savings && (
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
                                                     <Sparkles className="w-3 h-3" />
-                                                    Economize {plan.savings}
+                                                    {t('elite.annualDiscount', { percent: plan.savings })}
                                                 </span>
                                             )}
                                         </div>
@@ -396,21 +399,14 @@ export default function ElitePage() {
                                 transition={{ delay: 1 }}
                                 className="mt-12 text-center"
                             >
-                                <motion.button
+                                <LiquidEliteButton
                                     onClick={() => setShowConfirmModal(true)}
                                     disabled={!selectedPlan}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-bold text-lg bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 bg-[length:200%_100%] text-white shadow-[0_20px_50px_rgba(139,92,246,0.4)] hover:shadow-[0_25px_60px_rgba(139,92,246,0.5)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-500 hover:bg-right"
-                                >
-                                    <Crown className="w-6 h-6" />
-                                    <span>ASSINAR ELITE</span>
-                                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
+                                />
                                 
                                 <p className="text-sm text-white/30 mt-6 flex items-center justify-center gap-2">
                                     <Shield className="w-4 h-4" />
-                                    Pagamento seguro via Mercado Pago (PIX, Cartão ou Boleto)
+                                    {t('payments.secure')}
                                 </p>
                             </motion.div>
                         </motion.div>
@@ -434,14 +430,14 @@ export default function ElitePage() {
                                             <Crown className="w-8 h-8 text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="text-2xl font-bold text-white">Seu Status ELITE</h3>
-                                            <p className="text-white/50">Benefícios exclusivos ativados</p>
+                                            <h3 className="text-2xl font-bold text-white">{t('elite.eliteActive')}</h3>
+                                            <p className="text-white/50">{t('elite.benefits')}</p>
                                         </div>
                                     </div>
                                     
                                     <div className="grid grid-cols-2 gap-4 mb-6">
                                         <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                                            <p className="text-white/40 text-sm mb-1">Membro desde</p>
+                                            <p className="text-white/40 text-sm mb-1">{t('elite.memberSince')}</p>
                                             <p className="text-white font-bold text-lg">
                                                 {status.eliteSince 
                                                     ? new Date(status.eliteSince).toLocaleDateString('pt-BR')
@@ -450,7 +446,7 @@ export default function ElitePage() {
                                             </p>
                                         </div>
                                         <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                                            <p className="text-white/40 text-sm mb-1">Válido até</p>
+                                            <p className="text-white/40 text-sm mb-1">{t('elite.expiresAt')}</p>
                                             <p className="text-white font-bold text-lg">
                                                 {status.eliteUntil 
                                                     ? new Date(status.eliteUntil).toLocaleDateString('pt-BR')
@@ -459,11 +455,11 @@ export default function ElitePage() {
                                             </p>
                                         </div>
                                         <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-500/30">
-                                            <p className="text-violet-300 text-sm mb-1">Dias restantes</p>
+                                            <p className="text-violet-300 text-sm mb-1">{t('elite.daysRemaining', { days: '' })}</p>
                                             <p className="text-violet-200 font-black text-3xl">{status.daysRemaining}</p>
                                         </div>
                                         <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/30">
-                                            <p className="text-orange-300 text-sm mb-1">Streak Elite</p>
+                                            <p className="text-orange-300 text-sm mb-1">{t('profile.currentStreak')}</p>
                                             <p className="text-orange-200 font-black text-3xl">{status.eliteStreak} 🔥</p>
                                         </div>
                                     </div>
@@ -473,12 +469,12 @@ export default function ElitePage() {
                                         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
                                             <p className="text-amber-400 font-semibold flex items-center justify-center gap-2">
                                                 <Shield className="w-5 h-5" />
-                                                Assinatura cancelada
+                                                {t('elite.cancel')}
                                             </p>
                                             <p className="text-sm text-white/40 mt-1">
-                                                Benefícios ativos até {status.eliteUntil 
-                                                    ? new Date(status.eliteUntil).toLocaleDateString('pt-BR')
-                                                    : 'o fim do período'}
+                                                {t('elite.expiresAt')}: {status.eliteUntil 
+                                                    ? new Date(status.eliteUntil).toLocaleDateString()
+                                                    : '-'}
                                             </p>
                                         </div>
                                     ) : status.activeSubscription && status.activeSubscription.status === 'ACTIVE' && (
@@ -487,10 +483,10 @@ export default function ElitePage() {
                                                 onClick={() => setShowCancelModal(true)}
                                                 className="w-full py-3 rounded-xl text-sm text-white/40 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/30 transition-all duration-300"
                                             >
-                                                Cancelar assinatura
+                                                {t('elite.cancel')}
                                             </button>
                                             <p className="text-xs text-white/30 text-center mt-2">
-                                                Você mantém os benefícios até o fim do período atual
+                                                {t('elite.benefits')}
                                             </p>
                                         </div>
                                     )}
@@ -526,24 +522,24 @@ export default function ElitePage() {
                             </button>
 
                             <div className="text-center mb-8">
-                                <div className="inline-flex p-5 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-600/20 border border-violet-500/30 mb-5 shadow-[0_8px_32px_rgba(139,92,246,0.2)]">
-                                    <Gem className="w-10 h-10 text-violet-300" style={{ filter: 'drop-shadow(0 0 12px rgba(139,92,246,0.5))' }} />
+                                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-600/20 border border-violet-500/30 mb-4">
+                                    <Crown className="w-8 h-8 text-violet-300" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Confirmar Assinatura</h3>
+                                <h3 className="text-2xl font-bold text-white mb-2">{t('actions.confirm')}</h3>
                                 <p className="text-white/50">
-                                    Plano {plans.find(p => p.id === selectedPlan)?.name}
+                                    {plans.find(p => p.id === selectedPlan)?.name}
                                 </p>
                             </div>
 
                             <div className="p-5 rounded-2xl bg-white/5 border border-white/10 mb-8">
                                 <div className="flex justify-between items-center mb-3">
-                                    <span className="text-white/40">Total</span>
+                                    <span className="text-white/40">{t('payments.total')}</span>
                                     <span className="text-3xl font-black bg-gradient-to-r from-violet-300 to-indigo-300 bg-clip-text text-transparent">
                                         R$ {plans.find(p => p.id === selectedPlan)?.price.toFixed(2).replace('.', ',')}
                                     </span>
                                 </div>
                                 <p className="text-sm text-white/30">
-                                    Você será redirecionado ao Mercado Pago para concluir o pagamento.
+                                    {t('payments.processing')}
                                 </p>
                             </div>
 
@@ -557,12 +553,12 @@ export default function ElitePage() {
                                 {subscribing ? (
                                     <>
                                         <Loader size="sm" />
-                                        Redirecionando...
+                                        {t('payments.processing')}
                                     </>
                                 ) : (
                                     <>
                                         <Crown className="w-5 h-5" />
-                                        IR PARA PAGAMENTO
+                                        {t('payments.paymentMethod')}
                                     </>
                                 )}
                             </motion.button>
@@ -586,20 +582,17 @@ export default function ElitePage() {
                             className="w-full max-w-md bg-white/[0.05] backdrop-blur-2xl border border-white/[0.1] rounded-3xl p-8 shadow-[0_32px_80px_rgba(0,0,0,0.5)]"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="text-center mb-8">
-                                <div className="inline-flex p-5 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 mb-5 shadow-[0_8px_32px_rgba(239,68,68,0.2)]">
-                                    <X className="w-10 h-10 text-red-400" style={{ filter: 'drop-shadow(0 0 12px rgba(239,68,68,0.5))' }} />
+                            <div className="text-center mb-6">
+                                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 mb-4">
+                                    <X className="w-8 h-8 text-red-400" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Cancelar Assinatura?</h3>
-                                <p className="text-white/50">
-                                    Tem certeza que deseja cancelar sua assinatura ELITE?
-                                </p>
+                                <h3 className="text-xl font-bold text-white mb-2">{t('elite.cancelConfirm')}</h3>
                             </div>
 
-                            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 mb-8">
+                            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 mb-6">
                                 <p className="text-sm text-white/60 mb-3 flex items-center gap-2">
                                     <Check className="text-emerald-400 w-4 h-4" /> 
-                                    Seus benefícios continuam ativos até:
+                                    {t('elite.benefits')}
                                 </p>
                                 <p className="text-2xl font-bold bg-gradient-to-r from-violet-300 to-indigo-300 bg-clip-text text-transparent">
                                     {status?.eliteUntil 
@@ -620,7 +613,7 @@ export default function ElitePage() {
                                     whileTap={{ scale: 0.98 }}
                                     className="flex-1 py-4 rounded-2xl font-semibold bg-white/10 text-white hover:bg-white/15 transition-all border border-white/10"
                                 >
-                                    Manter
+                                    {t('actions.cancel')}
                                 </motion.button>
                                 <motion.button
                                     onClick={handleCancelSubscription}
@@ -632,7 +625,7 @@ export default function ElitePage() {
                                     {cancelling ? (
                                         <Loader size="sm" />
                                     ) : (
-                                        'Cancelar'
+                                        t('actions.confirm')
                                     )}
                                 </motion.button>
                             </div>

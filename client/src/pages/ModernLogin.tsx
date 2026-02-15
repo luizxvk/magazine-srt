@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff, Fingerprint, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -326,6 +327,7 @@ function LoginForm({
     const [capsLockOn, setCapsLockOn] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const isMobile = useIsMobile();
+    const { t } = useTranslation('common');
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         setCapsLockOn(e.getModifierState('CapsLock'));
@@ -389,7 +391,7 @@ function LoginForm({
                     <input
                         {...register('email')}
                         type="email"
-                        placeholder="Email"
+                        placeholder={t('forgotPassword.email')}
                         autoComplete="email"
                         className="bg-transparent border-none outline-none text-white/90 text-sm w-full placeholder-white/25 font-light tracking-wide"
                     />
@@ -413,7 +415,7 @@ function LoginForm({
                     <input
                         {...register('password')}
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="Senha"
+                        placeholder={t('changePassword.current')}
                         autoComplete="current-password"
                         className="bg-transparent border-none outline-none text-white/90 text-sm w-full placeholder-white/25 font-light tracking-wide"
                         onKeyDown={handleKeyDown}
@@ -451,14 +453,14 @@ function LoginForm({
                         className={`w-3.5 h-3.5 rounded-md border appearance-none cursor-pointer transition-all duration-300
                             ${isMGT ? 'border-white/10 checked:bg-emerald-500/80 checked:border-emerald-500/60' : 'border-white/10 checked:bg-gold-500/80 checked:border-gold-500/60'}`}
                     />
-                    <span className="text-[10px] text-white/30 group-hover:text-white/50 transition-colors font-light tracking-wider">Lembrar-me</span>
+                    <span className="text-[10px] text-white/30 group-hover:text-white/50 transition-colors font-light tracking-wider">{t('actions.save')}</span>
                 </label>
                 <button
                     type="button"
                     onClick={onForgotPassword}
                     className={`text-[10px] font-light tracking-wider transition-colors ${isMGT ? 'text-emerald-400/50 hover:text-emerald-400/80' : 'text-gold-400/50 hover:text-gold-400/80'}`}
                 >
-                    Esqueceu a senha?
+                    {t('forgotPassword.title')}
                 </button>
             </div>
 
@@ -488,12 +490,12 @@ function LoginForm({
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                             />
-                            Entrando...
+                            {t('status.loading')}
                         </>
                     ) : (
                         <>
                             <Fingerprint size={14} className="opacity-60" />
-                            Entrar
+                            {t('actions.submit')}
                         </>
                     )}
                 </span>
@@ -517,6 +519,7 @@ export default function ModernLogin() {
     const location = useLocation();
     const { login, loginAsVisitor } = useAuth();
     const { config } = useCommunity();
+    const { t } = useTranslation('common');
 
     // Clear stale tokens
     useEffect(() => {
@@ -592,7 +595,7 @@ export default function ModernLogin() {
 
             navigate('/feed');
         } catch (error: any) {
-            const errorMessage = error.response?.data?.error || 'Falha ao entrar. Verifique suas credenciais.';
+            const errorMessage = error.response?.data?.error || t('errors.unauthorized');
 
             if (
                 errorMessage.toLowerCase().includes('não encontrado') ||
@@ -606,7 +609,7 @@ export default function ModernLogin() {
                 errorMessage.toLowerCase().includes('invalid credentials') ||
                 errorMessage.toLowerCase().includes('credenciais inválidas')
             ) {
-                setLoginErrorMessage('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
+                setLoginErrorMessage(t('errors.unauthorized'));
                 setShowLoginErrorPopup(true);
             } else {
                 setError('root', { message: errorMessage });

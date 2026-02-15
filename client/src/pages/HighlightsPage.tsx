@@ -83,6 +83,7 @@ export default function HighlightsPage() {
             <Header />
 
             <div className="max-w-7xl mx-auto pt-28 px-4 relative z-10">
+                <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
                 {/* Header with title and controls */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 mt-4">
                     {/* Title - Styled like PhotoCatalog */}
@@ -251,6 +252,7 @@ export default function HighlightsPage() {
                         ))}
                     </div>
                 )}
+                </div>
             </div>
         </div>
     );

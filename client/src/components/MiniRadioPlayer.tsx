@@ -20,7 +20,7 @@ export default function MiniRadioPlayer() {
         showMiniPlayer, 
         setShowMiniPlayer 
     } = useRadio();
-    const { user, theme } = useAuth();
+    const { user, theme, accentColor: userAccent } = useAuth();
     const location = useLocation();
     const [isExpanded, setIsExpanded] = useState(false);
     const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,7 +59,9 @@ export default function MiniRadioPlayer() {
     // Don't show if not playing or on auth pages
     if (!showMiniPlayer || !isPlaying || isAuthPage) return null;
 
-    const accentColor = currentStation.color || (isMGT ? '#10b981' : '#d4af37');
+    // Use user's accent color, fallback to station color or default
+    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const accentColor = userAccent || currentStation.color || defaultAccent;
     
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';

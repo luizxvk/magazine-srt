@@ -434,6 +434,7 @@ export default function PhotoCatalogPage() {
             <Header />
 
             <div className="pt-32 sm:pt-36 md:pt-40 pb-20 px-3 sm:px-4 md:px-6 max-w-7xl mx-auto">
+                <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
                 <PhotoUploadModal
                     isOpen={isUploadOpen}
                     onClose={() => setIsUploadOpen(false)}
@@ -700,6 +701,7 @@ export default function PhotoCatalogPage() {
                     cancelText="Cancelar"
                     isDestructive={true}
                 />
+                </div>
 
                 {/* Expanded Photo Modal - Google Photos Style */}
                 {expandedPhoto && (

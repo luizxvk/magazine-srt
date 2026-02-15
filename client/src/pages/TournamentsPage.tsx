@@ -77,6 +77,7 @@ export default function TournamentsPage() {
             <Header />
 
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
+                <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
                 {/* Page Header */}
                 <div className="mb-8">
                     <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
@@ -156,6 +157,7 @@ export default function TournamentsPage() {
                         ))}
                     </motion.div>
                 )}
+                </div>
             </div>
         </div>
     );

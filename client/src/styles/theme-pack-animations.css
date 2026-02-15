@@ -850,6 +850,72 @@
     animation-delay: 3s;
 }
 
+/* Reactive Badge - Fixed position corner badge */
+.infinite-triangles-badge {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    opacity: 0.6;
+    transition: opacity 0.3s, transform 0.3s;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.infinite-triangles-badge:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.infinite-triangles-badge .badge-triangle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: badge-pulse 3s ease-in-out infinite;
+}
+
+.infinite-triangles-badge .badge-tri {
+    fill: none;
+    stroke: var(--accent-color, #d4af37);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px var(--accent-color, #d4af37));
+}
+
+.infinite-triangles-badge .badge-text {
+    position: relative;
+    z-index: 2;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-color, #d4af37);
+    text-shadow: 0 0 10px var(--accent-color, #d4af37);
+    animation: badge-text-pulse 3s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.05) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+@keyframes badge-text-pulse {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
 /* ========================================
    MOONLIT SKY - Night sky with moon, stars, and clouds
    Dreamy nighttime atmosphere with animated elements

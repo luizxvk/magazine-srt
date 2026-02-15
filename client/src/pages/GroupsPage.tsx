@@ -93,6 +93,7 @@ export default function GroupsPage() {
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 pt-48 pb-20 relative z-10">
+        <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
         {/* Page Title with Icon */}
         <div className="flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
@@ -198,6 +199,7 @@ export default function GroupsPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
 
       {/* Create Group Modal */}

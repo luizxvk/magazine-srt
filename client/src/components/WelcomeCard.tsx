@@ -26,8 +26,8 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
     const themeIconColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
 
     const themeBg = theme === 'light'
-        ? 'bg-white/80'
-        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+        ? 'bg-white/90'
+        : (isMGT ? 'bg-emerald-950/60' : 'bg-black/60');
     const themeBorderClass = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT
         ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]'

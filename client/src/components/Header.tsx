@@ -253,7 +253,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
                 {/* Desktop Search Bar */}
                 <div className="hidden md:flex items-center flex-1 max-w-md mx-8 relative group">
-                    <div className={`absolute inset-0 bg-gradient-to-r ${isMGT ? 'from-red-500/10 via-transparent to-red-500/10' : 'from-gold-500/10 via-transparent to-gold-500/10'} rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    <div 
+                        className="absolute inset-0 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+                        style={{ background: `linear-gradient(to right, ${accentColor}1a, transparent, ${accentColor}1a)` }}
+                    />
                     <Search className={`absolute left-3.5 ${theme === 'light' ? 'text-gray-700' : 'text-white/30'} group-hover:text-white/70 transition-colors w-4 h-4 z-10`} />
                     <input
                         type="text"
@@ -279,7 +282,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 type="text"
                                 placeholder={t('actions.search') + '...'}
                                 autoFocus
-                                className={`w-full ${theme === 'light' ? 'bg-white text-gray-900 border-gray-200 placeholder-gray-500' : 'bg-white/10 text-white border-transparent placeholder-white/30'} border rounded-full py-2.5 pl-10 pr-10 text-sm focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-red-500/50' : 'focus:ring-gold-500/50'} transition-all`}
+                                className={`w-full ${theme === 'light' ? 'bg-white text-gray-900 border-gray-200 placeholder-gray-500' : 'bg-white/10 text-white border-transparent placeholder-white/30'} border rounded-full py-2.5 pl-10 pr-10 text-sm focus:outline-none transition-all`}
+                                style={{ boxShadow: `0 0 0 2px ${accentColor}80` }}
                             />
                             <button
                                 onClick={() => setIsMobileSearchOpen(false)}
@@ -389,12 +393,12 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         <Link to={isVisitor ? "/login" : "/profile"} className={`flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l ${headerBorder} hover:opacity-80 transition-opacity`}>
                         <div className="text-right hidden lg:block">
                             <div className="flex items-center gap-2 justify-end">
-                                <p className={`text-xs ${theme === 'light' ? 'text-gray-900' : (isMGT ? 'text-white' : 'text-gold-200')} font-medium tracking-wide`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
+                                <p className={`text-xs font-medium tracking-wide ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{isVisitor ? 'Visitante' : (user?.name || 'Membro')}</p>
                                 {!isVisitor && user?.id && <BadgeDisplay userId={user.id} isElite={user.isElite} eliteUntil={user.eliteUntil} size="sm" />}
                             </div>
                             <div className="h-4 relative overflow-hidden w-32 flex justify-end">
                                 {isVisitor ? (
-                                    <p className="text-[10px] text-gold-500 uppercase tracking-[0.15em] font-bold absolute right-0">
+                                    <p className="text-[10px] uppercase tracking-[0.15em] font-bold absolute right-0" style={{ color: accentColor }}>
                                         Faça seu login
                                     </p>
                                 ) : (
@@ -406,7 +410,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: -20 }}
                                                 transition={{ duration: 0.5 }}
-                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
+                                                className={`text-[10px] uppercase tracking-[0.15em] font-bold absolute right-0 ${theme === 'light' ? 'text-gray-700' : ''}`}
+                                                style={{ color: theme === 'light' ? undefined : accentColor }}
                                             >
                                                 {user?.trophies !== undefined ? `${user.trophies} Troféus` : '0 Troféus'}
                                             </motion.p>
@@ -418,7 +423,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: -20 }}
                                                 transition={{ duration: 0.5 }}
-                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
+                                                className={`text-[10px] uppercase tracking-[0.15em] font-bold absolute right-0 ${theme === 'light' ? 'text-gray-700' : ''}`}
+                                                style={{ color: theme === 'light' ? undefined : accentColor }}
                                             >
                                                 {user?.zionsPoints ? `${user.zionsPoints.toLocaleString('pt-BR')} Points` : '0 Points'}
                                             </motion.p>
@@ -430,7 +436,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: -20 }}
                                                 transition={{ duration: 0.5 }}
-                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
+                                                className={`text-[10px] uppercase tracking-[0.15em] font-bold absolute right-0 ${theme === 'light' ? 'text-gray-700' : ''}`}
+                                                style={{ color: theme === 'light' ? undefined : accentColor }}
                                             >
                                                 {user?.zionsCash ? `Z$ ${user.zionsCash.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Z$ 0,00'}
                                             </motion.p>
@@ -442,7 +449,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: -20 }}
                                                 transition={{ duration: 0.5 }}
-                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
+                                                className={`text-[10px] uppercase tracking-[0.15em] font-bold absolute right-0 ${theme === 'light' ? 'text-gray-700' : ''}`}
+                                                style={{ color: theme === 'light' ? undefined : accentColor }}
                                             >
                                                 {isMGT ? 'Membro MGT' : 'Membro Magazine'}
                                             </motion.p>
@@ -458,13 +466,13 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     {user?.avatarUrl ? (
                                         <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <User className={`w-4 h-4 md:w-5 md:h-5 ${isMGT ? 'text-emerald-200' : 'text-gold-200'}`} />
+                                        <User className="w-4 h-4 md:w-5 md:h-5" style={{ color: accentColor }} />
                                     )}
                                 </div>
                             </div>
                             {/* Badge indicator */}
                             {getBadgeIcon() && (
-                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-black/80 rounded-full flex items-center justify-center border border-gold-500/50">
+                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-black/80 rounded-full flex items-center justify-center" style={{ borderWidth: 1, borderColor: `${accentColor}80` }}>
                                     {getBadgeIcon()}
                                 </div>
                             )}
@@ -487,7 +495,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                     {/* Mobile Hamburger Menu */}
                     <button
                         onClick={() => setIsMobileDrawerOpen(!isMobileDrawerOpen)}
-                        className={`mobile-menu-button md:hidden p-2 ${theme === 'light' ? 'text-black' : (isMGT ? 'text-emerald-500' : 'text-gold-400')} transition-colors`}
+                        className={`mobile-menu-button md:hidden p-2 transition-colors ${theme === 'light' ? 'text-black' : ''}`}
+                        style={{ color: theme === 'light' ? undefined : accentColor }}
                         aria-label="Menu"
                     >
                         {isMobileDrawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -528,7 +537,10 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         >
                             {/* Gradient Overlay */}
                             {!user?.liteMode && (
-                                <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-emerald-500/5 via-transparent to-emerald-500/5' : 'from-gold-500/5 via-transparent to-gold-500/5'} pointer-events-none`} />
+                                <div 
+                                    className="absolute inset-0 pointer-events-none" 
+                                    style={{ background: `linear-gradient(to bottom, ${accentColor}0d, transparent, ${accentColor}0d)` }}
+                                />
                             )}
 
                             {/* Header with User Info */}
@@ -556,7 +568,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     {user.avatarUrl ? (
                                                         <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <User className={`w-5 h-5 ${isMGT ? 'text-emerald-300' : 'text-gold-300'}`} />
+                                                        <User className="w-5 h-5" style={{ color: accentColor }} />
                                                     )}
                                                 </div>
                                             </div>
@@ -565,7 +577,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                     {user.displayName || user.name}
                                                 </span>
                                                 <div className="flex items-center gap-1.5">
-                                                    <span className={`text-xs font-medium ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                    <span className="text-xs font-medium" style={{ color: accentColor }}>
                                                         {user.zionsPoints || 0}
                                                     </span>
                                                     <span className={`text-[10px] ${theme === 'light' ? 'text-gray-400' : 'text-white/40'}`}>Points</span>
@@ -639,7 +651,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                         : 'bg-white/5 hover:bg-white/10 border border-white/10')
                                             }`}
                                         >
-                                            <item.icon className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                            <item.icon className="w-5 h-5" style={{ color: accentColor }} />
                                             <span className={`text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-white/70'}`}>{item.label}</span>
                                         </motion.button>
                                     ))}

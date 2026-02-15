@@ -823,6 +823,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             overlay.className = 'triangles-overlay';
             container.appendChild(overlay);
             
+            // Create reactive badge
+            const badge = document.createElement('div');
+            badge.className = 'infinite-triangles-badge';
+            badge.innerHTML = `
+                <svg viewBox="0 0 100 115" class="badge-triangle">
+                    <polygon class="badge-tri" points="50 15, 90 90, 10 90" />
+                </svg>
+                <span class="badge-text">∞</span>
+            `;
+            container.appendChild(badge);
+            
             // Create triangles container
             const trianglesContainer = document.createElement('div');
             trianglesContainer.className = 'triangles-container';

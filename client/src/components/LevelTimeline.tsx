@@ -145,7 +145,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
             {/* Prestige Section */}
             {canPrestigeNow && (
-                <div className="px-4 mt-2">
+                <div className="px-4 mt-2 relative z-10">
                     <motion.button
                         onClick={async () => {
                             try {
@@ -170,7 +170,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
             {/* Prestige stars display */}
             {(user?.prestigeLevel || 0) > 0 && (
-                <div className="px-4 mt-2 flex items-center justify-center gap-2">
+                <div className="px-4 mt-2 flex items-center justify-center gap-2 relative z-10">
                     <span className="text-xs text-gray-400 uppercase tracking-wider">Prestígio</span>
                     <span className="text-sm">{'⭐'.repeat(Math.min(user?.prestigeLevel || 0, 10))}</span>
                     {(user?.prestigeLevel || 0) > 0 && (
@@ -190,7 +190,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
             {/* Prestige info button when no prestige yet but eligible */}
             {(user?.prestigeLevel || 0) === 0 && currentLevel >= 25 && (
-                <div className="px-4 mt-2 flex items-center justify-center">
+                <div className="px-4 mt-2 flex items-center justify-center relative z-10">
                     <button
                         onClick={() => setShowPrestigeInfo(true)}
                         className={`flex items-center gap-1.5 text-xs ${

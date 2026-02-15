@@ -210,6 +210,7 @@ export default function SocialPage() {
             <Header />
 
             <div className="max-w-4xl mx-auto pt-48 pb-20 px-4 relative z-10">
+                <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
                 <div className="flex items-center gap-4 mb-8">
                     <div className={`p-3 ${themeBg} rounded-xl border ${themeBorder}`}>
                         <Users className={`w-8 h-8 ${themeColor}`} />
@@ -487,6 +488,7 @@ export default function SocialPage() {
                         )}
                     </div>
                 )}
+                </div>
             </div>
 
             {/* Popup de entrada no grupo */}

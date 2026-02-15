@@ -1137,12 +1137,13 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
 
         const searchTerm = q.trim().toLowerCase();
 
-        // Search users
+        // Search users by name, displayName, or ID
         const users = await prisma.user.findMany({
             where: {
                 OR: [
                     { name: { contains: searchTerm, mode: 'insensitive' } },
                     { displayName: { contains: searchTerm, mode: 'insensitive' } },
+                    { id: { contains: searchTerm, mode: 'insensitive' } },
                 ],
                 deletedAt: null
             },
@@ -1153,7 +1154,9 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
                 displayName: true,
                 avatarUrl: true,
                 level: true,
-                membershipType: true
+                membershipType: true,
+                trophies: true,
+                equippedProfileBorder: true
             }
         });
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield, UserCheck, X, Check, ChevronDown, UserPlus } from 'lucide-react';
+import { Users, Shield, UserCheck, X, Check, ChevronDown, UserPlus, Search } from 'lucide-react';
 import Loader from '../components/Loader';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -54,8 +54,8 @@ export default function SocialPage() {
     const { user, showToast } = useAuth();
     const [searchParams] = useSearchParams();
     const tabParam = searchParams.get('tab');
-    const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended'>(
-        tabParam === 'recommended' ? 'recommended' : tabParam === 'requests' ? 'requests' : 'friends'
+    const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended' | 'search'>(
+        tabParam === 'recommended' ? 'recommended' : tabParam === 'requests' ? 'requests' : tabParam === 'search' ? 'search' : 'friends'
     );
     const [friends, setFriends] = useState<Friend[]>([]);
     const [requests, setRequests] = useState<FriendRequest[]>([]);
@@ -68,6 +68,11 @@ export default function SocialPage() {
     const [joinedGroupPopup, setJoinedGroupPopup] = useState<{ show: boolean; groupName: string; groupId: string } | null>(null);
     const [sendingRequest, setSendingRequest] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    // Search state
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<Friend[]>([]);
+    const [searching, setSearching] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
@@ -84,6 +89,11 @@ export default function SocialPage() {
     }, [activeTab]);
 
     const fetchData = async () => {
+        // Don't fetch anything for search tab - user needs to search
+        if (activeTab === 'search') {
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         try {
             if (activeTab === 'friends') {
@@ -194,13 +204,33 @@ export default function SocialPage() {
         try {
             await api.post(`/social/request/${userId}`);
             showToast('Solicitação de amizade enviada!');
-            // Remover da lista de recomendados
+            // Remover da lista de recomendados e de resultados de busca
             setRecommended(prev => prev.filter(r => r.id !== userId));
+            setSearchResults(prev => prev.filter(r => r.id !== userId));
         } catch (error: any) {
             const message = error.response?.data?.error || 'Erro ao enviar solicitação';
             showToast(message);
         } finally {
             setSendingRequest(null);
+        }
+    };
+
+    const handleSearchUsers = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!searchQuery.trim()) return;
+        
+        setSearching(true);
+        try {
+            const response = await api.get(`/users/search?q=${encodeURIComponent(searchQuery.trim())}`);
+            const results = (response.data.users || []) as Friend[];
+            // Filter out self
+            const filtered = results.filter(u => u.id !== user?.id);
+            setSearchResults(filtered);
+        } catch (error) {
+            console.error('Failed to search users:', error);
+            showToast('Erro ao buscar usuários');
+        } finally {
+            setSearching(false);
         }
     };
 
@@ -255,6 +285,17 @@ export default function SocialPage() {
                     >
                         Recomendados
                         {activeTab === 'recommended' && (
+                            <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${themeTabBorder} ${themeShadow}`} />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('search')}
+                        className={`pb-3 px-4 text-sm font-medium tracking-wide transition-colors relative flex items-center gap-2 ${activeTab === 'search' ? themeTabActive : 'text-gray-400 hover:text-white'
+                            }`}
+                    >
+                        <Search className="w-4 h-4" />
+                        Adicionar
+                        {activeTab === 'search' && (
                             <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${themeTabBorder} ${themeShadow}`} />
                         )}
                     </button>
@@ -403,7 +444,7 @@ export default function SocialPage() {
                                 </div>
                             )}
                             </>
-                        ) : (
+                        ) : activeTab === 'recommended' ? (
                             recommended.length > 0 ? (
                                 <>
                                     {recommended.map(rec => (
@@ -485,6 +526,95 @@ export default function SocialPage() {
                                     <p className="text-gray-400">Nenhuma recomendação no momento.</p>
                                 </div>
                             )
+                        ) : (
+                            /* Search Tab */
+                            <div className="col-span-full space-y-6">
+                                {/* Search Form */}
+                                <form onSubmit={handleSearchUsers} className="flex gap-3">
+                                    <div className="flex-1 relative">
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Buscar por nome, nickname ou ID..."
+                                            className={`w-full pl-12 pr-4 py-3 bg-white/5 border ${themeBorder} rounded-xl text-white placeholder-gray-400 focus:outline-none focus:${themeBorder} transition-colors`}
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={searching || !searchQuery.trim()}
+                                        className={`px-6 py-3 rounded-xl font-medium transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        {searching ? <Loader size="sm" /> : 'Buscar'}
+                                    </button>
+                                </form>
+
+                                {/* Search Results */}
+                                {searching ? (
+                                    <div className="flex justify-center py-12">
+                                        <ModernLoader />
+                                    </div>
+                                ) : searchResults.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {searchResults.map(result => (
+                                            <div key={result.id} className={`glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4 ${themeHoverBorder} transition-colors group cursor-pointer`} onClick={() => navigate(`/profile?id=${result.id}`)}>
+                                                <div className="w-12 h-12 rounded-full p-[2px] shrink-0" style={{ background: getProfileBorderGradient(result.equippedProfileBorder, result.membershipType === 'MGT') }}>
+                                                    <div className="w-full h-full rounded-full bg-black overflow-hidden">
+                                                        {result.avatarUrl ? (
+                                                            <img src={result.avatarUrl} alt={result.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                                <Users className="w-5 h-5 text-gray-500" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className={`text-white font-medium truncate group-hover:${themeColor} transition-colors`}>
+                                                        {result.displayName || result.name}
+                                                    </h3>
+                                                    <p className="text-xs text-gray-400 flex items-center gap-2">
+                                                        <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{result.trophies} Troféus</span>
+                                                        <span className="w-1 h-1 bg-gray-600 rounded-full" />
+                                                        <span>Nível {result.level || 1}</span>
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); navigate(`/profile?id=${result.id}`); }}
+                                                        className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
+                                                    >
+                                                        Ver Perfil
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => handleSendFriendRequest(result.id, e)}
+                                                        disabled={sendingRequest === result.id}
+                                                        className={`p-1.5 rounded-lg transition-all ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50`}
+                                                        title="Enviar solicitação de amizade"
+                                                    >
+                                                        {sendingRequest === result.id ? (
+                                                            <Loader size="sm" />
+                                                        ) : (
+                                                            <UserPlus className="w-4 h-4" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : searchQuery && !searching ? (
+                                    <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+                                        <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                                        <p className="text-gray-400">Nenhum usuário encontrado.</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+                                        <Search className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                                        <p className="text-gray-400">Digite um nome, nickname ou ID para buscar usuários.</p>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 )}

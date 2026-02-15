@@ -193,6 +193,7 @@
     },
     "profile": {
         "title": "Profile",
+        "photo": "Photo",
         "bio": "Bio",
         "noBio": "No bio yet",
         "games": "Games",
@@ -248,7 +249,30 @@
         "saved": "Profile saved!",
         "saving": "Saving...",
         "maxChars": "Max {{max}} characters",
-        "invalidUrl": "Invalid URL"
+        "invalidUrl": "Invalid URL",
+        "changePhoto": "Change Photo",
+        "fullName": "Full Name",
+        "namePlaceholder": "Your name",
+        "nickname": "Nickname (Optional)",
+        "prioritizeNickname": "Prioritize Nickname",
+        "nicknameHint": "How you want to be seen",
+        "nicknameDesc": "If filled, will be displayed instead of your name.",
+        "saveChanges": "Save Changes",
+        "changePassword": "Change Password",
+        "deleteAccount": "Delete Account",
+        "maxSize": "Max: 2MB",
+        "gifsAllowed": "GIFs allowed",
+        "gifsLevelReq": "GIFs: Level 15+",
+        "deleteAccountPermanently": "Delete Account Permanently",
+        "errorUpdating": "Error updating profile",
+        "errorDeleting": "Error deleting account",
+        "fileTooLarge": "File too large",
+        "featureLocked": "Feature locked",
+        "gifLevelRequired": "Profile GIFs are allowed only for Level 15+",
+        "gifTooLarge": "GIF too large",
+        "gifMaxSize": "GIFs must be at most 2MB",
+        "deleteAccountMessage": "Are you absolutely sure you want to delete your account? All your data, trophies, and achievements will be lost forever. This action is irreversible.",
+        "deleteAccountConfirm": "Yes, Delete My Account"
     },
     "notifications": {
         "title": "Notifications",
@@ -345,12 +369,16 @@
         "termsAgree": "I agree to the terms"
     },
     "dailyLogin": {
-        "title": "Daily Login",
+        "title": "Daily Bonus",
         "streak": "Streak",
-        "days": "days",
+        "days": "{{count}} days",
+        "loginEveryDay": "Log in every day to earn more!",
+        "day": "Day {{day}}",
+        "comeBackTomorrow": "Come back tomorrow for more!",
+        "claiming": "Claiming...",
+        "claim": "Claim {{amount}} Zions",
         "reward": "Today's Reward",
         "claimed": "Claimed!",
-        "claim": "Claim Reward",
         "nextReward": "Next reward in",
         "streakBonus": "Streak Bonus!",
         "missedDay": "Don't break your streak!",
@@ -451,5 +479,152 @@
         "startConversation": "Start a conversation",
         "blocked": "User blocked",
         "deleted": "[Deleted]"
+    },
+    "social": {
+        "connections": "Connections",
+        "verified": "Verified",
+        "connected": "connected",
+        "connect": "Connect",
+        "disconnect": "Disconnect",
+        "addMore": "Add connection"
+    },
+    "register": {
+        "title": "Sign Up",
+        "subtitle": "Create your account",
+        "name": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "username": "Username",
+        "terms": "I agree to the Terms of Service",
+        "submit": "Create Account",
+        "loading": "Creating account...",
+        "success": "Account created!",
+        "error": "Error creating account",
+        "hasAccount": "Already have an account?",
+        "login": "Log in"
+    },
+    "landing": {
+        "hero": {
+            "title": "Welcome to Magazine SRT",
+            "subtitle": "The ultimate gamer community",
+            "cta": "Join the Community"
+        },
+        "features": {
+            "title": "Why choose Magazine?",
+            "gamification": "Full gamification",
+            "rewards": "Exclusive rewards",
+            "community": "Active community",
+            "events": "Weekly events"
+        },
+        "magazine": {
+            "subtitle": "Pure Elegance",
+            "cta": "Join the Club"
+        },
+        "srt": {
+            "subtitle": "Machine Gold Team",
+            "cta": "Access SRT Area"
+        }
+    },
+    "verification": {
+        "title": "Email Verification",
+        "sentTo": "We sent a 6-digit code to",
+        "enterCode": "Enter verification code",
+        "verify": "Verify Email",
+        "verifying": "Verifying...",
+        "success": "Email Verified!",
+        "redirecting": "Redirecting...",
+        "noCode": "Didn't receive the code?",
+        "resend": "Resend code",
+        "resending": "Resending...",
+        "codeSent": "Code resent! Check your email.",
+        "checkSpam": "Check your inbox and spam folder. The email may take a few minutes to arrive.",
+        "timeRemaining": {
+            "title": "Time Remaining",
+            "format": "{{days}} days and {{hours}} hours",
+            "warning": "You have {{time}} to verify your email. After that, your account will be suspended."
+        },
+        "errors": {
+            "incomplete": "Please enter the complete code",
+            "invalid": "Invalid code. Try again.",
+            "resendFailed": "Failed to resend code."
+        }
+    },
+    "groups": {
+        "title": "Groups",
+        "subtitle": "Connect with members who share your interests",
+        "create": "Create Group",
+        "join": "Join",
+        "leave": "Leave",
+        "members": "{{count}} members",
+        "empty": "No groups yet",
+        "emptyDescription": "Create the first group and start connecting members!",
+        "createFirst": "Create First Group",
+        "createNew": "Create new group",
+        "settings": "Group settings",
+        "delete": "Delete group",
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member"
+    },
+    "rewards": {
+        "title": "Rewards",
+        "subtitle": "Redeem exclusive prizes with your Trophies",
+        "available": "Available",
+        "claimed": "Claimed",
+        "points": "{{count}} points",
+        "claim": "Claim",
+        "stock": "Stock: {{count}}",
+        "outOfStock": "Out of stock",
+        "history": "History",
+        "success": "Reward claimed!",
+        "error": "Error claiming"
+    },
+    "modals": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "close": "Close",
+        "yes": "Yes",
+        "no": "No",
+        "deleteConfirm": "Are you sure you want to delete?",
+        "unsavedChanges": "Unsaved changes will be lost."
+    },
+    "errors": {
+        "generic": "Something went wrong",
+        "network": "Connection error",
+        "unauthorized": "Unauthorized",
+        "notFound": "Not found",
+        "serverError": "Server error",
+        "tryAgain": "Try again",
+        "tryAgainLater": "Please try again later"
+    },
+    "time": {
+        "now": "Now",
+        "minutesAgo": "{{count}}min ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "weeksAgo": "{{count}}w ago",
+        "monthsAgo": "{{count}}mo ago"
+    },
+    "post": {
+        "createPost": "Create Post",
+        "shareSomething": "Share something exclusive...",
+        "errorCreating": "Error creating post",
+        "removeMedia": "Remove media",
+        "options": "Options",
+        "imageUrlPrompt": "Image URL:",
+        "videoUrlPrompt": "Video URL:",
+        "addImage": "Add Image",
+        "addVideo": "Add Video",
+        "addTags": "Add Tags",
+        "mediaUrl": "Media URL...",
+        "moreTags": "More tags...",
+        "tags": "Tags",
+        "highlight": "Highlight",
+        "highlightPost": "Highlight post",
+        "post": "Post",
+        "removeTag": "Remove tag",
+        "recentEventTags": "Recent event tags:",
+        "activeEvent": "Active event"
     }
 }

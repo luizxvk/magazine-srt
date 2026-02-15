@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Mail, Clock, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 
 export default function VerificationPage() {
     const { user, showToast } = useAuth();
+    const { t } = useTranslation('common');
     const navigate = useNavigate();
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -38,7 +40,7 @@ export default function VerificationPage() {
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             
-            setTimeRemaining(`${days} dias e ${hours} horas`);
+            setTimeRemaining(t('verification.timeRemaining.format', { days, hours }));
         };
 
         calculateTimeRemaining();
@@ -87,7 +89,7 @@ export default function VerificationPage() {
         const verificationCode = code.join('');
         
         if (verificationCode.length !== 6) {
-            setError('Por favor, insira o código completo');
+            setError(t('verification.errors.incomplete'));
             return;
         }
 
@@ -111,7 +113,7 @@ export default function VerificationPage() {
                     navigate('/feed');
                 }, 1000);
             } else {
-                setError(errorMsg || 'Código inválido. Tente novamente.');
+                setError(errorMsg || t('verification.errors.invalid'));
             }
         } finally {
             setLoading(false);
@@ -124,14 +126,14 @@ export default function VerificationPage() {
 
         try {
             await api.post('/auth/resend-verification');
-            showToast('Código reenviado! Verifique seu email.');
+            showToast(t('verification.codeSent'));
         } catch (err: any) {
             const errorMsg = err.response?.data?.error;
             // Se já verificado, redireciona
             if (errorMsg === 'Email already verified') {
                 navigate('/feed');
             } else {
-                setError(errorMsg || 'Erro ao reenviar código.');
+                setError(errorMsg || t('verification.errors.resendFailed'));
             }
         } finally {
             setResending(false);
@@ -146,8 +148,8 @@ export default function VerificationPage() {
                 <LuxuriousBackground />
                 <div className="relative z-10 text-center">
                     <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-                    <h1 className="text-4xl font-bold mb-4">Email Verificado!</h1>
-                    <p className="text-gray-300">Redirecionando...</p>
+                    <h1 className="text-4xl font-bold mb-4">{t('verification.success')}</h1>
+                    <p className="text-gray-300">{t('verification.redirecting')}</p>
                 </div>
             </div>
         );
@@ -163,9 +165,9 @@ export default function VerificationPage() {
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
                         <Shield className="w-10 h-10" />
                     </div>
-                    <h1 className="text-3xl font-bold mb-2">Verificação de Email</h1>
+                    <h1 className="text-3xl font-bold mb-2">{t('verification.title')}</h1>
                     <p className="text-gray-400">
-                        Enviamos um código de 6 dígitos para <strong>{user?.email}</strong>
+                        {t('verification.sentTo')} <strong>{user?.email}</strong>
                     </p>
                 </div>
 
@@ -174,10 +176,9 @@ export default function VerificationPage() {
                     <div className="flex items-start gap-3">
                         <Clock className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                         <div>
-                            <p className="font-semibold text-red-500 mb-1">Tempo Restante</p>
+                            <p className="font-semibold text-red-500 mb-1">{t('verification.timeRemaining.title')}</p>
                             <p className="text-sm text-gray-300">
-                                Você tem <strong>{timeRemaining}</strong> para verificar seu email.
-                                Após esse período, sua conta será suspensa.
+                                {t('verification.timeRemaining.warning', { time: timeRemaining })}
                             </p>
                         </div>
                     </div>
@@ -186,7 +187,7 @@ export default function VerificationPage() {
                 {/* Code Input */}
                 <div className={`bg-gray-800/50 backdrop-blur-sm border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} rounded-xl p-8`}>
                     <label className="block text-sm font-medium mb-4 text-center">
-                        Insira o código de verificação
+                        {t('verification.enterCode')}
                     </label>
                     
                     <div className="flex gap-2 justify-center mb-6" onPaste={handlePaste}>
@@ -224,18 +225,18 @@ export default function VerificationPage() {
                                 : 'bg-gold-600 hover:bg-gold-700'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                        {loading ? 'Verificando...' : 'Verificar Email'}
+                        {loading ? t('verification.verifying') : t('verification.verify')}
                     </button>
 
                     {/* Resend Button */}
                     <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-400 mb-2">Não recebeu o código?</p>
+                        <p className="text-sm text-gray-400 mb-2">{t('verification.noCode')}</p>
                         <button
                             onClick={handleResend}
                             disabled={resending}
                             className="text-sm text-purple-400 hover:text-purple-300 transition-colors underline disabled:opacity-50"
                         >
-                            {resending ? 'Reenviando...' : 'Reenviar código'}
+                            {resending ? t('verification.resending') : t('verification.resend')}
                         </button>
                     </div>
                 </div>
@@ -245,8 +246,7 @@ export default function VerificationPage() {
                     <div className="flex items-start gap-3">
                         <Mail className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
                         <p className="text-sm text-gray-400">
-                            Verifique sua caixa de entrada e também a pasta de spam.
-                            O email pode levar alguns minutos para chegar.
+                            {t('verification.checkSpam')}
                         </p>
                     </div>
                 </div>

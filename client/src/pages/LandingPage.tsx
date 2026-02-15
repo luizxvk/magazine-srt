@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, Zap, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 
 export default function LandingPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation('common');
     const [hoveredSide, setHoveredSide] = useState<'left' | 'right' | null>(null);
 
     const handleSelect = (type: 'MAGAZINE' | 'MGT') => {
@@ -36,11 +38,11 @@ export default function LandingPage() {
                         MAGAZINE
                     </h2>
                     <p className="text-gold-400 uppercase tracking-widest text-sm md:text-base mb-8 font-medium">
-                        Elegância Pura
+                        {t('landing.magazine.subtitle')}
                     </p>
                     <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                         <button className="flex items-center gap-2 text-white border-b border-gold-500 pb-1 hover:text-gold-400 transition-colors">
-                            Entrar no Clube <ArrowRight className="w-4 h-4" />
+                            {t('landing.magazine.cta')} <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -66,11 +68,11 @@ export default function LandingPage() {
                         SRT
                     </h2>
                     <p className="text-red-500 uppercase tracking-widest text-sm md:text-base mb-8 font-medium">
-                        Machine Gold Team
+                        {t('landing.srt.subtitle')}
                     </p>
                     <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                         <button className="flex items-center gap-2 text-white border-b border-red-500 pb-1 hover:text-red-400 transition-colors">
-                            Acessar Área SRT <ArrowRight className="w-4 h-4" />
+                            {t('landing.srt.cta')} <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>

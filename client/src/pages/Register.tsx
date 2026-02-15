@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import logoMgtFallback from '../assets/logo-mgt-full.png';
 import logo from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +27,7 @@ export default function Register() {
     const location = useLocation();
     const { login } = useAuth();
     const { config } = useCommunity();
+    const { t } = useTranslation('common');
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     // Atualiza título e favicon dinamicamente
@@ -148,13 +150,13 @@ export default function Register() {
                             <div className="p-3 rounded-full mb-4 bg-red-500/20">
                                 <AlertCircle className="w-8 h-8 text-red-400" />
                             </div>
-                            <h3 className="text-lg font-bold text-white mb-2">Erro no Cadastro</h3>
+                            <h3 className="text-lg font-bold text-white mb-2">{t('register.error')}</h3>
                             <p className="text-gray-300 text-sm mb-4">{errorPopup}</p>
                             <button
                                 onClick={() => setErrorPopup(null)}
                                 className={`w-full py-2.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'}`}
                             >
-                                Entendi
+                                {t('modals.close')}
                             </button>
                         </div>
                     </div>
@@ -173,7 +175,7 @@ export default function Register() {
                 className={`absolute top-6 left-6 z-30 flex items-center gap-2 text-sm transition-colors ${isMGT ? 'text-emerald-500/70 hover:text-emerald-400' : 'text-gold-500/70 hover:text-gold-400'}`}
             >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Voltar</span>
+                <span className="hidden sm:inline">{t('actions.back')}</span>
             </button>
 
             {/* Main Card */}
@@ -192,7 +194,7 @@ export default function Register() {
                             />
                         </div>
                         <h2 className={`text-xl font-bold tracking-wide ${isMGT ? 'text-white' : 'text-gradient-gold'}`}>
-                            Criar Conta
+                            {t('register.title')}
                         </h2>
                         <p className={`text-xs mt-2 tracking-widest uppercase ${isMGT ? 'text-emerald-400/50' : 'text-gold-400/50'}`}>
                             {isMGT ? config.tierStdSlogan : config.tierVipSlogan}
@@ -223,7 +225,7 @@ export default function Register() {
                                 ) : (
                                     <div className={`w-full h-full flex flex-col items-center justify-center ${isMGT ? 'bg-emerald-500/5' : 'bg-gold-500/5'}`}>
                                         <Camera className={`w-6 h-6 mb-1 ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`} />
-                                        <span className={`text-[10px] ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`}>Foto</span>
+                                        <span className={`text-[10px] ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'}`}>{t('profile.photo')}</span>
                                     </div>
                                 )}
                                 
@@ -253,7 +255,7 @@ export default function Register() {
                                 <input
                                     {...register('name')}
                                     type="text"
-                                    placeholder="Seu nome completo"
+                                    placeholder={t('register.name')}
                                     className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
                                 />
                             </div>
@@ -289,7 +291,7 @@ export default function Register() {
                                 <input
                                     {...register('password')}
                                     type="password"
-                                    placeholder="Senha (mínimo 6 caracteres)"
+                                    placeholder={t('register.password')}
                                     className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
                                     onKeyDown={handleCapsLock}
                                     onKeyUp={handleCapsLock}
@@ -317,12 +319,12 @@ export default function Register() {
                             {isSubmitting ? (
                                 <>
                                     <Loader size="sm" />
-                                    Criando...
+                                    {t('register.loading')}
                                 </>
                             ) : (
                                 <>
                                     <Sparkles className="w-4 h-4" />
-                                    Criar Conta
+                                    {t('register.submit')}
                                 </>
                             )}
                         </button>
@@ -333,13 +335,13 @@ export default function Register() {
                     {/* Footer Link */}
                     <div className="mt-6 text-center">
                         <p className="text-gray-500 text-xs">
-                            Já tem conta?
+                            {t('register.hasAccount')}
                             <Link
                                 to="/login"
                                 state={{ membershipType }}
                                 className={`font-bold ml-1 transition-colors ${isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300'}`}
                             >
-                                Fazer Login
+                                {t('register.login')}
                             </Link>
                         </p>
                     </div>

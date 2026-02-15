@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Music, Gamepad2, Twitch, Youtube, Twitter, Github, Globe, Tv, CheckCircle, ExternalLink, Link2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 
 interface ExternalConnection {
@@ -38,6 +39,7 @@ const PLATFORM_CONFIG: Record<string, { icon: any; color: string; label: string 
 
 export default function ProfileSocialConnections() {
     const { user, theme } = useAuth();
+    const { t } = useTranslation('common');
     const isMGT = user?.membershipType === 'MGT';
     const [connections, setConnections] = useState<SocialConnection[]>([]);
     const [externalConnections, setExternalConnections] = useState<ExternalConnection[]>([]);
@@ -116,7 +118,7 @@ export default function ProfileSocialConnections() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Link2 className="w-4 h-4" style={{ color: accentColor }} />
-                        <span className={`text-sm font-medium ${textMain}`}>Conexões</span>
+                        <span className={`text-sm font-medium ${textMain}`}>{t('social.connections')}</span>
                     </div>
                     <div className="flex gap-2">
                         <button
@@ -147,7 +149,7 @@ export default function ProfileSocialConnections() {
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                     <Link2 className="w-4 h-4" style={{ color: accentColor }} />
-                    <span className={`text-sm font-medium ${textMain}`}>Conexões</span>
+                    <span className={`text-sm font-medium ${textMain}`}>{t('social.connections')}</span>
                     {totalConnections > 0 && (
                         <span className={`text-xs ${textSub}`}>({totalConnections})</span>
                     )}
@@ -172,7 +174,7 @@ export default function ProfileSocialConnections() {
                                 borderColor: `${config.color}30`,
                                 borderWidth: '1px'
                             }}
-                            title={`${config.label}: ${conn.name}${conn.verified ? ' (Verificado)' : ''}`}
+                            title={`${config.label}: ${conn.name}${conn.verified ? ` (${t('social.verified')})` : ''}`}
                         >
                             <Icon 
                                 className="w-3.5 h-3.5" 
@@ -196,7 +198,7 @@ export default function ProfileSocialConnections() {
                             borderColor: '#1b283830',
                             borderWidth: '1px'
                         }}
-                        title="Steam conectado"
+                        title={`Steam ${t('social.connected')}`}
                     >
                         <Gamepad2 className="w-3.5 h-3.5" style={{ color: '#66c0f4' }} />
                         <span className={`text-xs ${textMain}`}>Steam</span>

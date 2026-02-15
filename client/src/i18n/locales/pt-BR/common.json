@@ -225,6 +225,7 @@
     },
     "profile": {
         "title": "Perfil",
+        "photo": "Foto",
         "editProfile": "Editar Perfil",
         "admin": "Admin",
         "devTools": "DevTools",
@@ -279,7 +280,16 @@
         "maxSize": "Máximo: 2MB",
         "gifsAllowed": "GIFs permitidos",
         "gifsLevelReq": "GIFs: Nível 15+",
-        "deleteAccountPermanently": "Excluir Conta Permanentemente"
+        "deleteAccountPermanently": "Excluir Conta Permanentemente",
+        "errorUpdating": "Erro ao atualizar perfil",
+        "errorDeleting": "Erro ao excluir conta",
+        "fileTooLarge": "Arquivo muito grande",
+        "featureLocked": "Recurso bloqueado",
+        "gifLevelRequired": "GIFs de perfil são permitidos apenas para Nível 15+",
+        "gifTooLarge": "GIF muito grande",
+        "gifMaxSize": "GIFs devem ter no máximo 2MB",
+        "deleteAccountMessage": "Tem certeza absoluta que deseja excluir sua conta? Todos os seus dados, troféus e conquistas serão perdidos para sempre. Esta ação é irreversível.",
+        "deleteAccountConfirm": "Sim, Excluir Minha Conta"
     },
     "notifications": {
         "title": "Notificações",
@@ -375,10 +385,10 @@
     },
     "dailyLogin": {
         "title": "Bônus Diário",
-        "streak": "Sequência:",
-        "days": "dias",
-        "dailyTip": "Entre todos os dias para ganhar mais!",
-        "day": "Dia",
+        "streak": "Sequência",
+        "days": "{{count}} dias",
+        "loginEveryDay": "Entre todos os dias para ganhar mais!",
+        "day": "Dia {{day}}",
         "comeBackTomorrow": "Volte amanhã para mais!",
         "claiming": "Resgatando...",
         "claim": "Resgatar {{amount}} Zions"
@@ -471,5 +481,152 @@
         "memberBadge": "Membro MAGAZINE",
         "deleteMessage": "Deletar esta mensagem?",
         "deleteError": "Erro ao deletar mensagem"
+    },
+    "social": {
+        "connections": "Conexões",
+        "verified": "Verificado",
+        "connected": "conectado",
+        "connect": "Conectar",
+        "disconnect": "Desconectar",
+        "addMore": "Adicionar conexão"
+    },
+    "register": {
+        "title": "Cadastro",
+        "subtitle": "Crie sua conta",
+        "name": "Nome completo",
+        "email": "Email",
+        "password": "Senha",
+        "confirmPassword": "Confirmar senha",
+        "username": "Nome de usuário",
+        "terms": "Li e aceito os Termos de Uso",
+        "submit": "Criar Conta",
+        "loading": "Criando conta...",
+        "success": "Conta criada com sucesso!",
+        "error": "Erro ao criar conta",
+        "hasAccount": "Já tem uma conta?",
+        "login": "Fazer login"
+    },
+    "landing": {
+        "hero": {
+            "title": "Bem-vindo à Magazine SRT",
+            "subtitle": "A comunidade gamer definitiva",
+            "cta": "Entrar na Comunidade"
+        },
+        "features": {
+            "title": "Por que escolher a Magazine?",
+            "gamification": "Gamificação completa",
+            "rewards": "Recompensas exclusivas",
+            "community": "Comunidade ativa",
+            "events": "Eventos semanais"
+        },
+        "magazine": {
+            "subtitle": "Elegância Pura",
+            "cta": "Entrar no Clube"
+        },
+        "srt": {
+            "subtitle": "Machine Gold Team",
+            "cta": "Acessar Área SRT"
+        }
+    },
+    "verification": {
+        "title": "Verificação de Email",
+        "sentTo": "Enviamos um código de 6 dígitos para",
+        "enterCode": "Insira o código de verificação",
+        "verify": "Verificar Email",
+        "verifying": "Verificando...",
+        "success": "Email Verificado!",
+        "redirecting": "Redirecionando...",
+        "noCode": "Não recebeu o código?",
+        "resend": "Reenviar código",
+        "resending": "Reenviando...",
+        "codeSent": "Código reenviado! Verifique seu email.",
+        "checkSpam": "Verifique sua caixa de entrada e também a pasta de spam. O email pode levar alguns minutos para chegar.",
+        "timeRemaining": {
+            "title": "Tempo Restante",
+            "format": "{{days}} dias e {{hours}} horas",
+            "warning": "Você tem {{time}} para verificar seu email. Após esse período, sua conta será suspensa."
+        },
+        "errors": {
+            "incomplete": "Por favor, insira o código completo",
+            "invalid": "Código inválido. Tente novamente.",
+            "resendFailed": "Erro ao reenviar código."
+        }
+    },
+    "groups": {
+        "title": "Grupos",
+        "subtitle": "Conecte-se com membros de interesses similares",
+        "create": "Criar Grupo",
+        "join": "Entrar",
+        "leave": "Sair",
+        "members": "{{count}} membros",
+        "empty": "Nenhum grupo ainda",
+        "emptyDescription": "Crie o primeiro grupo e comece a conectar membros!",
+        "createFirst": "Criar Primeiro Grupo",
+        "createNew": "Criar novo grupo",
+        "settings": "Configurações do grupo",
+        "delete": "Excluir grupo",
+        "owner": "Dono",
+        "admin": "Admin",
+        "member": "Membro"
+    },
+    "rewards": {
+        "title": "Recompensas",
+        "subtitle": "Resgate prêmios exclusivos com seus Troféus",
+        "available": "Disponíveis",
+        "claimed": "Resgatadas",
+        "points": "{{count}} pontos",
+        "claim": "Resgatar",
+        "stock": "Estoque: {{count}}",
+        "outOfStock": "Esgotado",
+        "history": "Histórico",
+        "success": "Recompensa resgatada!",
+        "error": "Erro ao resgatar"
+    },
+    "modals": {
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "close": "Fechar",
+        "yes": "Sim",
+        "no": "Não",
+        "deleteConfirm": "Tem certeza que deseja excluir?",
+        "unsavedChanges": "Alterações não salvas serão perdidas."
+    },
+    "errors": {
+        "generic": "Algo deu errado",
+        "network": "Erro de conexão",
+        "unauthorized": "Não autorizado",
+        "notFound": "Não encontrado",
+        "serverError": "Erro no servidor",
+        "tryAgain": "Tente novamente",
+        "tryAgainLater": "Tente novamente mais tarde"
+    },
+    "time": {
+        "now": "Agora",
+        "minutesAgo": "{{count}}min atrás",
+        "hoursAgo": "{{count}}h atrás",
+        "daysAgo": "{{count}}d atrás",
+        "weeksAgo": "{{count}}sem atrás",
+        "monthsAgo": "{{count}}meses atrás"
+    },
+    "post": {
+        "createPost": "Criar Publicação",
+        "shareSomething": "Compartilhe algo exclusivo...",
+        "errorCreating": "Erro ao criar post",
+        "removeMedia": "Remover mídia",
+        "options": "Opções",
+        "imageUrlPrompt": "URL da Imagem:",
+        "videoUrlPrompt": "URL do Vídeo:",
+        "addImage": "Adicionar Imagem",
+        "addVideo": "Adicionar Vídeo",
+        "addTags": "Adicionar Tags",
+        "mediaUrl": "URL da mídia...",
+        "moreTags": "Mais tags...",
+        "tags": "Tags",
+        "highlight": "Destaque",
+        "highlightPost": "Destacar postagem",
+        "post": "Publicar",
+        "removeTag": "Remover tag",
+        "recentEventTags": "Tags de eventos recentes:",
+        "activeEvent": "Evento ativo"
     }
 }

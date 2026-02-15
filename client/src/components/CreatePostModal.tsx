@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Image as ImageIcon, Video, Tag, Sparkles, MoreHorizontal, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Loader from './Loader';
@@ -19,6 +20,7 @@ interface CreatePostModalProps {
 }
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostModalProps) {
+    const { t } = useTranslation();
     const { user, showToast } = useAuth();
     const [caption, setCaption] = useState('');
     const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'TEXT'>('TEXT');
@@ -89,7 +91,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
             // alert('Post created successfully!'); // Debug
         } catch (error: any) {
             console.error('Failed to create post', error);
-            showToast(`Erro ao criar post: ${error.response?.data?.error || error.message}`);
+            showToast(`${t('post.errorCreating')}: ${error.response?.data?.error || error.message}`);
         } finally {
             setLoading(false);
         }
@@ -109,12 +111,12 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-gold-200 to-gold-500">
-                                Criar Publicação
+                                {t('post.createPost')}
                             </h2>
                             <button
                                 onClick={onClose}
                                 className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
-                                title="Fechar"
+                                title={t('actions.close')}
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -126,7 +128,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 <textarea
                                     value={caption}
                                     onChange={(e) => setCaption(e.target.value)}
-                                    placeholder="Compartilhe algo exclusivo..."
+                                    placeholder={t('post.shareSomething')}
                                     className="w-full bg-transparent border-none text-white text-base md:text-lg placeholder-gray-500 focus:ring-0 resize-none min-h-[180px] md:min-h-[120px] scrollbar-hide"
                                 />
 
@@ -142,7 +144,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                             type="button"
                                             onClick={() => setMediaUrl('')}
                                             className="absolute top-2 right-2 p-2 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
-                                            title="Remover mídia"
+                                            title={t('post.removeMedia')}
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -162,7 +164,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                             className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2 border border-white/10 hover:border-gold-500/30 transition-colors"
                                         >
                                             <MoreHorizontal className="w-5 h-5 text-gold-400" />
-                                            <span className="text-sm text-gray-400">Opções</span>
+                                            <span className="text-sm text-gray-400">{t('post.options')}</span>
                                         </button>
                                         
                                         {/* Mobile Menu Dropdown */}
@@ -174,27 +176,27 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                             type="button"
                                                             onClick={() => {
                                                                 setMediaType('IMAGE');
-                                                                const url = prompt('URL da Imagem:');
+                                                                const url = prompt(t('post.imageUrlPrompt'));
                                                                 if (url) setMediaUrl(url);
                                                                 setShowMoreMenu(false);
                                                             }}
                                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-gold-400 transition-colors"
                                                         >
                                                             <ImageIcon className="w-5 h-5" />
-                                                            <span className="text-sm">Adicionar Imagem</span>
+                                                            <span className="text-sm">{t('post.addImage')}</span>
                                                         </button>
                                                         <button
                                                             type="button"
                                                             onClick={() => {
                                                                 setMediaType('VIDEO');
-                                                                const url = prompt('URL do Vídeo:');
+                                                                const url = prompt(t('post.videoUrlPrompt'));
                                                                 if (url) setMediaUrl(url);
                                                                 setShowMoreMenu(false);
                                                             }}
                                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-gold-400 transition-colors"
                                                         >
                                                             <Video className="w-5 h-5" />
-                                                            <span className="text-sm">Adicionar Vídeo</span>
+                                                            <span className="text-sm">{t('post.addVideo')}</span>
                                                         </button>
                                                     </>
                                                 )}
@@ -207,7 +209,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-gold-400 transition-colors"
                                                 >
                                                     <Tag className="w-5 h-5" />
-                                                    <span className="text-sm">Adicionar Tags</span>
+                                                    <span className="text-sm">{t('post.addTags')}</span>
                                                 </button>
                                             </div>
                                         )}
@@ -224,7 +226,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                         setMediaUrl(e.target.value);
                                                         if (e.target.value) setMediaType('IMAGE');
                                                     }}
-                                                    placeholder="URL da mídia..."
+                                                    placeholder={t('post.mediaUrl')}
                                                     className="bg-transparent border-none text-sm text-white focus:ring-0 w-32 md:w-48 placeholder-gray-600"
                                                 />
                                                 <div className="w-px h-4 bg-white/10" />
@@ -232,7 +234,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                     type="button"
                                                     onClick={() => setMediaType('IMAGE')}
                                                     className={`text-gray-400 hover:text-gold-400 transition-colors ${mediaType === 'IMAGE' ? 'text-gold-400' : ''}`}
-                                                    title="Adicionar Imagem"
+                                                    title={t('post.addImage')}
                                                 >
                                                     <ImageIcon className="w-5 h-5" />
                                                 </button>
@@ -240,7 +242,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                     type="button"
                                                     onClick={() => setMediaType('VIDEO')}
                                                     className={`text-gray-400 hover:text-gold-400 transition-colors ${mediaType === 'VIDEO' ? 'text-gold-400' : ''}`}
-                                                    title="Adicionar Vídeo"
+                                                    title={t('post.addVideo')}
                                                 >
                                                     <Video className="w-5 h-5" />
                                                 </button>
@@ -257,7 +259,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                     value={tagInput}
                                                     onChange={(e) => setTagInput(e.target.value)}
                                                     onKeyDown={handleAddTag}
-                                                    placeholder={tags.length ? "Mais tags..." : "Tags"}
+                                                    placeholder={tags.length ? t('post.moreTags') : t('post.tags')}
                                                     className="bg-transparent border-none text-sm text-white focus:ring-0 w-20 placeholder-gray-600"
                                                 />
                                             </div>
@@ -271,7 +273,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                     <div className={`flex items-center gap-3 px-4 py-2 rounded-full border transition-all ${isHighlight ? 'bg-gold-500/10 border-gold-500/50' : 'bg-white/5 border-white/10'}`}>
                                         <div className="flex flex-col items-end">
                                             <span className={`text-xs font-bold uppercase tracking-wider ${isHighlight ? 'text-gold-400' : 'text-gray-500'}`}>
-                                                Destaque
+                                                {t('post.highlight')}
                                             </span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -281,7 +283,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                 checked={isHighlight}
                                                 onChange={(e) => setIsHighlight(e.target.checked)}
                                                 disabled={!canHighlight}
-                                                aria-label="Destacar postagem"
+                                                aria-label={t('post.highlightPost')}
                                             />
                                             <div className={`w-10 h-5 rounded-full peer peer-focus:outline-none peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${!canHighlight ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700 peer-checked:bg-gold-500'}`}></div>
                                         </label>
@@ -292,7 +294,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                         type="submit"
                                         disabled={loading || (!caption && !mediaUrl)}
                                         className="bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-black font-bold p-3 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                                        title="Publicar"
+                                        title={t('post.post')}
                                     >
                                         {loading ? (
                                             <Loader size="sm" />
@@ -309,7 +311,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                     {tags.map(tag => (
                                         <span key={tag} className="bg-gold-500/10 text-gold-400 text-xs px-3 py-1 rounded-full flex items-center gap-1 border border-gold-500/20 animate-fade-in">
                                             #{tag}
-                                            <button type="button" onClick={() => removeTag(tag)} className="hover:text-white" title="Remover tag">
+                                            <button type="button" onClick={() => removeTag(tag)} className="hover:text-white" title={t('post.removeTag')}>
                                                 <X className="w-3 h-3" />
                                             </button>
                                         </span>
@@ -322,7 +324,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                 <div className="border-t border-white/10 pt-3">
                                     <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
                                         <Calendar className="w-3 h-3" />
-                                        Tags de eventos recentes:
+                                        {t('post.recentEventTags')}
                                     </p>
                                     <div className="flex flex-wrap gap-2">
                                         {eventTags
@@ -342,7 +344,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                                 <span className="text-purple-300">#</span>
                                                 {eventTag.tag}
                                                 {eventTag.isActive && (
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" title="Evento ativo" />
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" title={t('post.activeEvent')} />
                                                 )}
                                             </button>
                                         ))}

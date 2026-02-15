@@ -193,6 +193,7 @@
     },
     "profile": {
         "title": "Perfil",
+        "photo": "Foto",
         "bio": "Bio",
         "noBio": "Sin bio aún",
         "games": "Juegos",
@@ -248,7 +249,30 @@
         "saved": "¡Perfil guardado!",
         "saving": "Guardando...",
         "maxChars": "Máx {{max}} caracteres",
-        "invalidUrl": "URL inválida"
+        "invalidUrl": "URL inválida",
+        "changePhoto": "Cambiar Foto",
+        "fullName": "Nombre Completo",
+        "namePlaceholder": "Tu nombre",
+        "nickname": "Apodo (Opcional)",
+        "prioritizeNickname": "Priorizar Apodo",
+        "nicknameHint": "Cómo quieres ser visto",
+        "nicknameDesc": "Si se completa, se mostrará en lugar de tu nombre.",
+        "saveChanges": "Guardar Cambios",
+        "changePassword": "Cambiar Contraseña",
+        "deleteAccount": "Eliminar Cuenta",
+        "maxSize": "Máx: 2MB",
+        "gifsAllowed": "GIFs permitidos",
+        "gifsLevelReq": "GIFs: Nivel 15+",
+        "deleteAccountPermanently": "Eliminar Cuenta Permanentemente",
+        "errorUpdating": "Error al actualizar perfil",
+        "errorDeleting": "Error al eliminar cuenta",
+        "fileTooLarge": "Archivo muy grande",
+        "featureLocked": "Función bloqueada",
+        "gifLevelRequired": "Los GIFs de perfil solo están permitidos para Nivel 15+",
+        "gifTooLarge": "GIF muy grande",
+        "gifMaxSize": "Los GIFs deben ser como máximo 2MB",
+        "deleteAccountMessage": "¿Estás absolutamente seguro de que deseas eliminar tu cuenta? Todos tus datos, trofeos y logros se perderán para siempre. Esta acción es irreversible.",
+        "deleteAccountConfirm": "Sí, Eliminar Mi Cuenta"
     },
     "notifications": {
         "title": "Notificaciones",
@@ -345,12 +369,16 @@
         "termsAgree": "Acepto los términos"
     },
     "dailyLogin": {
-        "title": "Login Diario",
+        "title": "Bonus Diario",
         "streak": "Racha",
-        "days": "días",
+        "days": "{{count}} días",
+        "loginEveryDay": "¡Entra todos los días para ganar más!",
+        "day": "Día {{day}}",
+        "comeBackTomorrow": "¡Vuelve mañana por más!",
+        "claiming": "Reclamando...",
+        "claim": "Reclamar {{amount}} Zions",
         "reward": "Recompensa de Hoy",
         "claimed": "¡Reclamado!",
-        "claim": "Reclamar Recompensa",
         "nextReward": "Próxima recompensa en",
         "streakBonus": "¡Bonus de Racha!",
         "missedDay": "¡No pierdas tu racha!",
@@ -451,5 +479,152 @@
         "startConversation": "Inicia una conversación",
         "blocked": "Usuario bloqueado",
         "deleted": "[Eliminado]"
+    },
+    "social": {
+        "connections": "Conexiones",
+        "verified": "Verificado",
+        "connected": "conectado",
+        "connect": "Conectar",
+        "disconnect": "Desconectar",
+        "addMore": "Añadir conexión"
+    },
+    "register": {
+        "title": "Registro",
+        "subtitle": "Crea tu cuenta",
+        "name": "Nombre completo",
+        "email": "Email",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "username": "Nombre de usuario",
+        "terms": "Acepto los Términos de Servicio",
+        "submit": "Crear Cuenta",
+        "loading": "Creando cuenta...",
+        "success": "¡Cuenta creada!",
+        "error": "Error al crear cuenta",
+        "hasAccount": "¿Ya tienes una cuenta?",
+        "login": "Iniciar sesión"
+    },
+    "landing": {
+        "hero": {
+            "title": "Bienvenido a Magazine SRT",
+            "subtitle": "La comunidad gamer definitiva",
+            "cta": "Únete a la Comunidad"
+        },
+        "features": {
+            "title": "¿Por qué elegir Magazine?",
+            "gamification": "Gamificación completa",
+            "rewards": "Recompensas exclusivas",
+            "community": "Comunidad activa",
+            "events": "Eventos semanales"
+        },
+        "magazine": {
+            "subtitle": "Elegancia Pura",
+            "cta": "Entrar al Club"
+        },
+        "srt": {
+            "subtitle": "Machine Gold Team",
+            "cta": "Acceder al Área SRT"
+        }
+    },
+    "verification": {
+        "title": "Verificación de Email",
+        "sentTo": "Enviamos un código de 6 dígitos a",
+        "enterCode": "Ingresa el código de verificación",
+        "verify": "Verificar Email",
+        "verifying": "Verificando...",
+        "success": "¡Email Verificado!",
+        "redirecting": "Redirigiendo...",
+        "noCode": "¿No recibiste el código?",
+        "resend": "Reenviar código",
+        "resending": "Reenviando...",
+        "codeSent": "¡Código reenviado! Revisa tu email.",
+        "checkSpam": "Revisa tu bandeja de entrada y la carpeta de spam. El email puede tardar unos minutos en llegar.",
+        "timeRemaining": {
+            "title": "Tiempo Restante",
+            "format": "{{days}} días y {{hours}} horas",
+            "warning": "Tienes {{time}} para verificar tu email. Después, tu cuenta será suspendida."
+        },
+        "errors": {
+            "incomplete": "Por favor, ingresa el código completo",
+            "invalid": "Código inválido. Intenta de nuevo.",
+            "resendFailed": "Error al reenviar código."
+        }
+    },
+    "groups": {
+        "title": "Grupos",
+        "subtitle": "Conéctate con miembros de intereses similares",
+        "create": "Crear Grupo",
+        "join": "Unirse",
+        "leave": "Salir",
+        "members": "{{count}} miembros",
+        "empty": "Ningún grupo aún",
+        "emptyDescription": "¡Crea el primer grupo y comienza a conectar miembros!",
+        "createFirst": "Crear Primer Grupo",
+        "createNew": "Crear nuevo grupo",
+        "settings": "Configuración del grupo",
+        "delete": "Eliminar grupo",
+        "owner": "Dueño",
+        "admin": "Admin",
+        "member": "Miembro"
+    },
+    "rewards": {
+        "title": "Recompensas",
+        "subtitle": "Canjea premios exclusivos con tus Trofeos",
+        "available": "Disponibles",
+        "claimed": "Reclamadas",
+        "points": "{{count}} puntos",
+        "claim": "Reclamar",
+        "stock": "Stock: {{count}}",
+        "outOfStock": "Agotado",
+        "history": "Historial",
+        "success": "¡Recompensa reclamada!",
+        "error": "Error al reclamar"
+    },
+    "modals": {
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "close": "Cerrar",
+        "yes": "Sí",
+        "no": "No",
+        "deleteConfirm": "¿Estás seguro de que deseas eliminar?",
+        "unsavedChanges": "Los cambios no guardados se perderán."
+    },
+    "errors": {
+        "generic": "Algo salió mal",
+        "network": "Error de conexión",
+        "unauthorized": "No autorizado",
+        "notFound": "No encontrado",
+        "serverError": "Error del servidor",
+        "tryAgain": "Inténtalo de nuevo",
+        "tryAgainLater": "Inténtalo de nuevo más tarde"
+    },
+    "time": {
+        "now": "Ahora",
+        "minutesAgo": "hace {{count}}min",
+        "hoursAgo": "hace {{count}}h",
+        "daysAgo": "hace {{count}}d",
+        "weeksAgo": "hace {{count}}sem",
+        "monthsAgo": "hace {{count}}meses"
+    },
+    "post": {
+        "createPost": "Crear Publicación",
+        "shareSomething": "Comparte algo exclusivo...",
+        "errorCreating": "Error al crear publicación",
+        "removeMedia": "Eliminar media",
+        "options": "Opciones",
+        "imageUrlPrompt": "URL de Imagen:",
+        "videoUrlPrompt": "URL de Video:",
+        "addImage": "Agregar Imagen",
+        "addVideo": "Agregar Video",
+        "addTags": "Agregar Tags",
+        "mediaUrl": "URL del media...",
+        "moreTags": "Más tags...",
+        "tags": "Tags",
+        "highlight": "Destacar",
+        "highlightPost": "Destacar publicación",
+        "post": "Publicar",
+        "removeTag": "Eliminar tag",
+        "recentEventTags": "Tags de eventos recientes:",
+        "activeEvent": "Evento activo"
     }
 }

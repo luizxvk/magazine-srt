@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Plus, Lock, Globe, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import CreateGroupModal from '../components/CreateGroupModal';
@@ -33,6 +34,7 @@ interface Group {
 
 export default function GroupsPage() {
   const { user, theme, accentColor, accentGradient } = useAuth();
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const isMGT = user?.membershipType === 'MGT';
 
@@ -101,8 +103,8 @@ export default function GroupsPage() {
               <Users className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`} />
             </div>
             <div>
-              <h1 className="text-3xl font-serif font-bold"><GradientText fallbackClassName="text-white">Grupos</GradientText></h1>
-              <p className="text-gray-400">Conecte-se com membros de interesses similares</p>
+              <h1 className="text-3xl font-serif font-bold"><GradientText fallbackClassName="text-white">{t('groups.title')}</GradientText></h1>
+              <p className="text-gray-400">{t('groups.subtitle')}</p>
             </div>
           </div>
           <motion.button
@@ -113,7 +115,7 @@ export default function GroupsPage() {
             className={`${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-emerald-500/50' : ''} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-xl transition-all`}
           >
             <Plus className="w-5 h-5" />
-            Criar Grupo
+            {t('groups.create')}
           </motion.button>
         </div>
 
@@ -121,8 +123,8 @@ export default function GroupsPage() {
         {groups.length === 0 ? (
           <div className="glass-panel rounded-2xl border border-white/10 p-16 text-center">
             <Users className={`w-20 h-20 ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'} mx-auto mb-4`} />
-            <h3 className={`text-2xl font-bold ${themeText} mb-2`}>Nenhum grupo ainda</h3>
-            <p className={`${themeSecondary} mb-6`}>Crie o primeiro grupo e comece a conectar membros!</p>
+            <h3 className={`text-2xl font-bold ${themeText} mb-2`}>{t('groups.empty')}</h3>
+            <p className={`${themeSecondary} mb-6`}>{t('groups.emptyDescription')}</p>
             <motion.button
               onClick={handleCreateGroup}
               whileHover={{ scale: 1.05 }}
@@ -131,7 +133,7 @@ export default function GroupsPage() {
               className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : ''} text-white px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg transition-colors`}
             >
               <Plus className="w-5 h-5" />
-              Criar Primeiro Grupo
+              {t('groups.createFirst')}
             </motion.button>
           </div>
         ) : (

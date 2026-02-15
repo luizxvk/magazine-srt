@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Check, Gift, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import confetti from 'canvas-confetti';
 
 interface DailyLoginModalProps {
@@ -17,6 +18,7 @@ interface DailyLoginModalProps {
 
 export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: DailyLoginModalProps) {
     const { user, theme } = useAuth();
+    const { t } = useTranslation('common');
     const [claiming, setClaiming] = useState(false);
 
     if (!isOpen || !status) return null;
@@ -73,9 +75,9 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                     <div className={`inline-flex p-4 rounded-full ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} mb-4`}>
                         <Calendar className={`w-8 h-8 ${themeColor}`} />
                     </div>
-                    <h2 className={`text-2xl font-serif ${textColor} mb-2`}>Bônus Diário</h2>
+                    <h2 className={`text-2xl font-serif ${textColor} mb-2`}>{t('dailyLogin.title')}</h2>
                     <p className={`${subTextColor} text-sm`}>
-                        Sequência: <span className={themeColor}>{status.streak} dias</span> • Entre todos os dias para ganhar mais!
+                        {t('dailyLogin.streak')}: <span className={themeColor}>{t('dailyLogin.days', { count: status.streak })}</span> • {t('dailyLogin.loginEveryDay')}
                     </p>
                 </div>
 
@@ -103,7 +105,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                                     ${isBigReward ? 'col-span-2 aspect-auto' : 'aspect-square'}
                                 `}
                             >
-                                <span className="text-[10px] uppercase tracking-wider mb-1">Dia {index + 1}</span>
+                                <span className="text-[10px] uppercase tracking-wider mb-1">{t('dailyLogin.day', { day: index + 1 })}</span>
                                 {isPast ? (
                                     <Check className="w-5 h-5" />
                                 ) : (
@@ -120,7 +122,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                     {status.claimed ? (
                         <div className={`inline-flex items-center gap-2 ${subTextColor} ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} px-6 py-3 rounded-full`}>
                             <Check className="w-5 h-5" />
-                            <span>Volte amanhã para mais!</span>
+                            <span>{t('dailyLogin.comeBackTomorrow')}</span>
                         </div>
                     ) : (
                         <button
@@ -132,7 +134,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                                 ${claiming ? 'opacity-50 cursor-not-allowed' : 'shadow-lg'}
                             `}
                         >
-                            {claiming ? 'Resgatando...' : `Resgatar ${status.nextReward} Zions`}
+                            {claiming ? t('dailyLogin.claiming') : t('dailyLogin.claim', { amount: status.nextReward })}
                         </button>
                     )}
                 </div>

@@ -40,7 +40,7 @@ export default function StatForgeCard() {
                     <GradientText as="h3" className="font-bold text-lg leading-tight" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
                         StatForge
                     </GradientText>
-                    <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} truncate`}>
+                    <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} line-clamp-2`}>
                         Rastreie suas stats de jogos em tempo real
                     </p>
                 </div>

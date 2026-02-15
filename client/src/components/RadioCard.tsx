@@ -201,7 +201,7 @@ export default function RadioCard() {
                             {/* Station Info */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <h3 className={`font-semibold text-base ${textMain} truncate`}>
+                                    <h3 className={`font-semibold text-base ${textMain}`}>
                                         {currentStation.name}
                                     </h3>
                                     {isPlaying && (
@@ -211,7 +211,7 @@ export default function RadioCard() {
                                         </span>
                                     )}
                                 </div>
-                                <p className={`text-sm ${textSub} truncate mt-0.5`}>
+                                <p className={`text-sm ${textSub} mt-0.5`}>
                                     {currentStation.genre}
                                 </p>
                             </div>
@@ -331,11 +331,23 @@ export default function RadioCard() {
                     <div className="px-4 pb-4 pt-2 border-t" style={{ borderColor: `${accentColor}30` }}>
                         <p className={`text-[10px] ${textSub} uppercase tracking-wider mb-2`}>Estações</p>
                         <div className="grid grid-cols-4 gap-1.5">
-                            {RADIO_STATIONS.map((station) => (
+                            {RADIO_STATIONS.map((station) => {
+                                // Shorter display names for grid buttons
+                                const shortNames: Record<string, string> = {
+                                    'synthwave': 'Synth',
+                                    'chillwave': 'Chill',
+                                    'darksynth': 'Dark',
+                                    'spacesynth': 'Space',
+                                    'lofi': 'Lo-Fi',
+                                    'jazz': 'Jazz',
+                                    'electronic': 'EDM',
+                                    'rock': 'Rock'
+                                };
+                                return (
                                 <button
                                     key={station.id}
                                     onClick={() => changeStation(station)}
-                                    className={`px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all duration-200 truncate ${
+                                    className={`px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all duration-200 ${
                                         currentStation.id === station.id
                                             ? 'text-white shadow-md scale-105'
                                             : theme === 'light'
@@ -345,9 +357,9 @@ export default function RadioCard() {
                                     style={currentStation.id === station.id ? { backgroundColor: station.color } : {}}
                                     title={station.name}
                                 >
-                                    {station.name.split(' ')[0]}
+                                    {shortNames[station.id] || station.name.split(' ')[0]}
                                 </button>
-                            ))}
+                            )})}
                         </div>
                     </div>
 

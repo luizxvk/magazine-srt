@@ -299,8 +299,8 @@
 
 ## 🆕 v0.5.0-rc.1 (Release Candidate - 31 Janeiro 2026)
 
-### 🌐 Integração Rovex Platform
-**Conexão completa com a plataforma de gestão de comunidades**
+### 🌐 Integração Rovex Platform (Em Desenvolvimento)
+**O maior criador de comunidades do mundo!**
 
 - 🔗 **Endpoints de Integração**
   - `GET /api/rovex/health` - Health check para monitoramento
@@ -773,7 +773,7 @@ Criar 6 packs temáticos:
   
 - [ ] **Títulos e Emblemas**
   - Títulos conquistáveis (Lendário, Veterano, etc)
-  - Sistema de prestígio
+  - ✅ Sistema de prestígio - **Concluído**
   - Títulos temporários de evento
 
 - [ ] **Temporadas (Seasons)**

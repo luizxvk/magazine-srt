@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, ShoppingBag, Palette, Video, Hash, Gamepad2, Layout, BarChart3, Shield, Ticket } from 'lucide-react';
+import { X, Sparkles, Check, Palette, Video, Gamepad2, BarChart3, Shield, Ticket, Star, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.8';
+const CURRENT_VERSION = '0.5.0-rc.9';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,25 +43,41 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.8 - StatForge, RovexShield, Coupon System
+    // v0.5.0-rc.9 - Prestige Info, Glowing Cards, Gradient Icons
     const updates: UpdateItem[] = [
         {
+            icon: <Star className="w-5 h-5 text-yellow-400" />,
+            title: 'Sistema de Prestígio — Guia Completo',
+            description: 'Novo modal de informações explicando como funciona o prestígio, recompensas e tabela de bônus de XP!',
+            isNew: true
+        },
+        {
+            icon: <Zap className="w-5 h-5 text-purple-400" />,
+            title: 'Cards com Brilho Animado',
+            description: 'Cards de Market, Feedback, Jogos Grátis e Grupos agora têm bordas brilhantes sincronizadas!',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5 text-pink-400" />,
+            title: 'Ícones Gradiente no Header',
+            description: 'Ícones de notificação e configurações usam sua cor de destaque personalizada com efeito gradiente.',
+            isNew: true
+        },
+        {
             icon: <BarChart3 className="w-5 h-5 text-cyan-400" />,
-            title: 'StatForge — Rastreador de Stats',
-            description: 'Vincule seus perfis de jogos (R6, Valorant, CS2 e mais) e acompanhe suas stats em tempo real!',
+            title: 'StatForge — Melhorias',
+            description: 'Logo maior, card de notificações e correções no rastreador de stats.',
             isNew: true
         },
         {
             icon: <Ticket className="w-5 h-5 text-green-400" />,
             title: 'Sistema de Cupons na Loja',
             description: 'Admins podem criar cupons de desconto (fixo ou %). Membros Elite ganham cupom mensal de R$10!',
-            isNew: true
         },
         {
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
             title: 'RovexShield — Status de Moderação',
             description: 'Card no painel admin mostrando status operacional de todos os serviços de moderação.',
-            isNew: true
         },
         {
             icon: <Gamepad2 className="w-5 h-5 text-orange-400" />,
@@ -72,26 +88,6 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
             icon: <Video className="w-5 h-5 text-purple-400" />,
             title: 'Preview de Streams ao Vivo',
             description: 'Passe o mouse sobre uma stream para assistir ao vivo direto no card, com controle de volume!',
-        },
-        {
-            icon: <Hash className="w-5 h-5 text-cyan-400" />,
-            title: 'Hashtags em Alta',
-            description: 'Descubra os assuntos mais falados na comunidade na aba "Em Alta" do Explorar!',
-        },
-        {
-            icon: <Layout className="w-5 h-5 text-blue-400" />,
-            title: 'Dashboard Admin Reformulado',
-            description: 'Layout masonry com cards organizados em 3 colunas para melhor visualização.',
-        },
-        {
-            icon: <ShoppingBag className="w-5 h-5 text-green-400" />,
-            title: 'Jogos Grátis Melhorado',
-            description: 'Preço original aparece riscado com "Grátis" em destaque. Ative alertas nas configurações!',
-        },
-        {
-            icon: <Palette className="w-5 h-5 text-pink-400" />,
-            title: 'Gradientes em Todos os Cards',
-            description: 'Cards de bônus diário, amigos online, inventário e menu lateral usam sua cor de destaque!',
         },
     ];
 

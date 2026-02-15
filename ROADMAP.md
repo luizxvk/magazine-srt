@@ -1,6 +1,6 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.8 (Release Candidate)  
+> **Versão Atual:** v0.5.0-rc.9 (Release Candidate)  
 > **Última Atualização:** 14 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
@@ -19,6 +19,66 @@
 ├─ Multi-Tenant: 100% ✅
 └─ StatForge & Cupons: 100% ✅
 ```
+
+---
+
+## 🆕 v0.5.0-rc.9 (Release Candidate - 14 Fevereiro 2026)
+
+### ⭐ Sistema de Prestígio — Guia Completo (Novo)
+**Modal explicativo com todas as informações sobre prestígio**
+
+- 📖 **Seções do Modal**
+  - "O que é Prestígio?" — Explicação do conceito
+  - "Como Funciona?" — Passo a passo ilustrado
+  - Recompensas (Zions Cash, Bônus XP, Estrelas, Status)
+  - Tabela de bônus XP por nível de prestígio (1-10)
+  - Avisos importantes (irreversibilidade, máximo 10 prestígios)
+
+- 🔘 **Acesso ao Info**
+  - Botão de info ao lado das estrelas de prestígio
+  - Link "O que é Prestígio?" para usuários nível 25+ sem prestígio
+
+### ✨ Cards com Brilho Animado (Novo)
+**Bordas animadas sincronizadas nos principais cards**
+
+- 🌟 **Cards Atualizados**
+  - MarketCard (Loja)
+  - FeedbackFormCard (Feedback)
+  - FreeGamesCard (Jogos Grátis)
+  - GroupChatCard (Grupos/Chat)
+  - LeftSidebar Quick Stats (XP/Nível)
+
+- 🎨 **Animação**
+  - Gradiente dourado/esmeralda rotativo (3s loop)
+  - Responde ao tema (MAGAZINE vs MGT)
+  - CSS class `.glow-border-animated`
+
+### 🎨 Ícones Gradiente no Header (Novo)
+**Personalização de ícones com cor de destaque**
+
+- ⚡ **Implementação**
+  - Ícones de notificação e configurações com SVG gradient
+  - "Membro Magazine/MGT" com efeito text-shine
+  - Classe `.icon-gradient-accent` reutilizável
+
+### 📊 StatForge — Melhorias (Novo)
+**Correções e aprimoramentos no rastreador de stats**
+
+- 🔧 **Correções**
+  - Fix 500 error (user.id → user.userId em 5 endpoints)
+  - Logo aumentado ~50% (w-72/w-80/w-96)
+
+- 🔔 **Novo Card de Notificações**
+  - StatForgeNotifyCard para opt-in de alertas
+  - Integração com configurações do usuário
+
+### 📄 Documentação Rovex Atualizada
+**Sistema de cupons push atualizado**
+
+- 🔄 **Novo Modelo Push**
+  - Rovex cria cupom → Admin recebe notificação
+  - Admin ativa/desativa (não edita)
+  - Card "Cupons Rovex" no dashboard admin
 
 ---
 

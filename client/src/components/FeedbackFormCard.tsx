@@ -151,7 +151,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     
     if (loading) {
         return (
-            <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : \`border ${themeBorder}\`} ${themeGlow} ${themeBg} backdrop-blur-xl p-6`}>
+            <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl p-6`}>
                 <div className="flex items-center justify-center py-8">
                     <Loader size="sm" />
                 </div>

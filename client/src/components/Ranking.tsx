@@ -13,7 +13,7 @@ interface RankedUser {
 
 export default function Ranking() {
     const [users, setUsers] = useState<RankedUser[]>([]);
-    const { user, theme } = useAuth();
+    const { user, theme, accentGradient } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
@@ -40,7 +40,7 @@ export default function Ranking() {
 
     return (
         <>
-            <div className={`${glassPanel} rounded-xl p-6 border ${themeBorder}`}>
+            <div className={`${glassPanel} rounded-xl p-6 ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`}`}>
                 <div className="flex items-center gap-3 mb-6">
                     <Trophy className={`w-6 h-6 ${themeColor}`} />
                     <h3 className={`text-xl font-serif ${themeTitle} tracking-wider uppercase`}>Ranking Elite</h3>

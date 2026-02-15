@@ -36,11 +36,11 @@ export default function StatForgeCard() {
                         className="relative w-16 h-16 object-contain"
                     />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0 overflow-hidden">
                     <GradientText as="h3" className="font-bold text-lg leading-tight" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
                         StatForge
                     </GradientText>
-                    <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} whitespace-nowrap`}>
+                    <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} truncate`}>
                         Rastreie suas stats de jogos em tempo real
                     </p>
                 </div>

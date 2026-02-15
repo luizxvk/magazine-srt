@@ -349,7 +349,7 @@ export default function ProfilePage() {
 
             <div className="max-w-7xl mx-auto pt-40 pb-32 px-4 relative z-10">
                 {/* Profile Card */}
-                <div className={`glass-panel p-8 rounded-3xl border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} relative overflow-hidden transition-all duration-500 mb-8`}>
+                <div className={`glass-panel p-8 rounded-3xl ${accentGradient ? 'border-gradient-accent' : `border ${theme === 'light' ? 'border-gray-200' : 'border-white/10'}`} relative overflow-hidden transition-all duration-500 mb-8`}>
                     {bgImage && (
                         <div
                             className="absolute inset-0 z-0 opacity-50 blur-sm"
@@ -645,7 +645,7 @@ export default function ProfilePage() {
                                     </div>
                                 ) : (
                                     userPosts.map((post) => (
-                                        <div key={post.id} className={`glass-panel rounded-3xl p-6 border ${isMGT ? 'border-emerald-500/10 hover:border-emerald-500/30' : 'border-gold-500/10 hover:border-gold-500/30'} transition-all relative group`}>
+                                        <div key={post.id} className={`glass-panel rounded-3xl p-6 ${accentGradient ? 'border-gradient-accent' : `border ${isMGT ? 'border-emerald-500/10 hover:border-emerald-500/30' : 'border-gold-500/10 hover:border-gold-500/30'}`} transition-all relative group`}>
                                             {/* Share Button */}
                                             <button
                                                 onClick={() => handleShare(post.id)}

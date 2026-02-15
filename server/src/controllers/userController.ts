@@ -1137,12 +1137,13 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
 
         const searchTerm = q.trim().toLowerCase();
 
-        // Search users by name, displayName, or ID
+        // Search users by name, displayName, or ID (exact match for ID, contains for others)
         const users = await prisma.user.findMany({
             where: {
                 OR: [
                     { name: { contains: searchTerm, mode: 'insensitive' } },
                     { displayName: { contains: searchTerm, mode: 'insensitive' } },
+                    { id: { equals: searchTerm } },
                     { id: { contains: searchTerm, mode: 'insensitive' } },
                 ],
                 deletedAt: null

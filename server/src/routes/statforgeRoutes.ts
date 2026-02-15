@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
+import { authenticateToken } from '../middleware/authMiddleware';
 import {
   getSupportedGames,
   getUserProfiles,
@@ -41,8 +41,8 @@ router.get('/events', authenticateToken, getEventsFeed);
 // Compare two players
 router.get('/compare/:profileId1/:profileId2', authenticateToken, comparePlayers);
 
-// ===================== ADMIN =====================
-// RovexShield - Moderation system status
-router.get('/shield/status', authenticateToken, isAdmin, getShieldStatus);
+// ===================== STATUS =====================
+// RovexShield - Moderation system status (available to all authenticated users)
+router.get('/shield/status', authenticateToken, getShieldStatus);
 
 export default router;

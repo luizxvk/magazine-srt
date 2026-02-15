@@ -15,6 +15,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import ChatWindow from '../components/ChatWindow';
 import LevelTimeline from '../components/LevelTimeline';
 import BadgeDisplay from '../components/BadgeDisplay';
+import ProfileSocialConnections from '../components/ProfileSocialConnections';
 import { getProfileBorderGradient, getProfileBorderShadow } from '../utils/profileBorderUtils';
 
 // Badge URL map - using icons8 URLs
@@ -748,7 +749,8 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-8">
+                    <div className="space-y-6">
+                        {isOwnProfile && <ProfileSocialConnections />}
                         <Ranking />
                     </div>
                 </div>

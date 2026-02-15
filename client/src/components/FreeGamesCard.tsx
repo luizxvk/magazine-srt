@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gift, ExternalLink, Clock, Gamepad2 } from 'lucide-react';
+import { Gift, ExternalLink, Clock, Gamepad2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -37,6 +37,8 @@ export default function FreeGamesCard() {
     const isMGT = user?.membershipType === 'MGT';
     const [games, setGames] = useState<FreeGame[]>([]);
     const [enabled, setEnabled] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 3;
 
     // Theme styles
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
@@ -80,29 +82,60 @@ export default function FreeGamesCard() {
         return diff;
     };
 
+    const totalPages = Math.ceil(games.length / ITEMS_PER_PAGE);
+    const visibleGames = games.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE);
+
+    const nextPage = () => {
+        setCurrentPage((prev) => (prev + 1) % totalPages);
+    };
+
+    const prevPage = () => {
+        setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+    };
+
     return (
         <div className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-4 transition-all duration-300`}>
             {/* Header */}
-            <div className="flex items-center gap-2 mb-3">
-                <div 
-                    className="w-7 h-7 rounded-lg flex items-center justify-center"
-                    style={{ 
-                        backgroundColor: `${accentColor}33`,
-                        borderColor: `${accentColor}50`,
-                        borderWidth: '1px'
-                    }}
-                >
-                    <Gift className="w-3.5 h-3.5" style={{ color: accentColor }} />
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                    <div 
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ 
+                            backgroundColor: `${accentColor}33`,
+                            borderColor: `${accentColor}50`,
+                            borderWidth: '1px'
+                        }}
+                    >
+                        <Gift className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                    </div>
+                    <div>
+                        <h3 className={`text-base font-bold ${textMain}`}>Jogos Grátis</h3>
+                        <p className={`text-[10px] ${textSub}`}>{games.length} {games.length === 1 ? 'jogo disponível' : 'jogos disponíveis'}</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 className={`text-base font-bold ${textMain}`}>Jogos Grátis</h3>
-                    <p className={`text-[10px] ${textSub}`}>{games.length} {games.length === 1 ? 'jogo disponível' : 'jogos disponíveis'}</p>
-                </div>
+                {/* Navigation */}
+                {totalPages > 1 && (
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={prevPage}
+                            className={`p-1 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-gray-200' : 'hover:bg-white/10'}`}
+                        >
+                            <ChevronLeft className="w-4 h-4" style={{ color: accentColor }} />
+                        </button>
+                        <span className={`text-[10px] ${textSub}`}>{currentPage + 1}/{totalPages}</span>
+                        <button
+                            onClick={nextPage}
+                            className={`p-1 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-gray-200' : 'hover:bg-white/10'}`}
+                        >
+                            <ChevronRight className="w-4 h-4" style={{ color: accentColor }} />
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Games List */}
             <div className="space-y-2">
-                {games.map(game => {
+                {visibleGames.map(game => {
                     const platformStyle = PLATFORM_COLORS[game.platform] || PLATFORM_COLORS.other;
                     const daysRemaining = game.expiresAt ? getDaysRemaining(game.expiresAt) : null;
                     

@@ -676,5 +676,40 @@
         "profileBorder": "Borde de Perfil",
         "duplicate": "duplicado",
         "zionsCompensation": "Zions Points de compensación"
+    },
+    "auth": {
+        "login": "Iniciar Sesión"
+    },
+    "common": {
+        "backToLogin": "Volver al Login",
+        "backToHome": "Volver al Inicio",
+        "email": "Correo electrónico",
+        "yourName": "Tu nombre completo",
+        "sending": "Enviando..."
+    },
+    "invite": {
+        "requestAccess": "Solicitar Acceso",
+        "joinClub": "Únete al club exclusivo",
+        "requestSent": "¡Solicitud Enviada!",
+        "requestSentMessage": "Recibimos tu solicitud de acceso. Nuestro equipo la revisará y recibirás un email cuando tu cuenta sea aprobada.",
+        "fullName": "Nombre Completo",
+        "instagramOptional": "Instagram (Opcional)",
+        "requestInvite": "Solicitar Invitación",
+        "alreadyHaveAccount": "¿Ya tienes cuenta? Iniciar sesión",
+        "errorRequesting": "Error al solicitar invitación. Inténtalo de nuevo."
+    },
+    "resetPassword": {
+        "tokenNotFound": "Token no encontrado. Solicita un nuevo enlace.",
+        "minChars": "La contraseña debe tener al menos 6 caracteres",
+        "passwordsMismatch": "Las contraseñas no coinciden",
+        "errorResetting": "Error al restablecer contraseña. El enlace puede haber expirado.",
+        "title": "Restablecer Contraseña",
+        "subtitle": "Crea una nueva contraseña segura",
+        "success": "¡Contraseña Restablecida!",
+        "successMessage": "Tu contraseña ha sido cambiada exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña.",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar nueva contraseña",
+        "resetting": "Restableciendo...",
+        "rememberPassword": "¿Recuerdas tu contraseña?"
     }
 }

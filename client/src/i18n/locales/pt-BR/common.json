@@ -678,5 +678,40 @@
         "profileBorder": "Borda de Perfil",
         "duplicate": "duplicata",
         "zionsCompensation": "Zions Points de compensação"
+    },
+    "auth": {
+        "login": "Fazer Login"
+    },
+    "common": {
+        "backToLogin": "Voltar ao Login",
+        "backToHome": "Voltar ao Início",
+        "email": "Email",
+        "yourName": "Seu nome completo",
+        "sending": "Enviando..."
+    },
+    "invite": {
+        "requestAccess": "Solicitar Acesso",
+        "joinClub": "Faça parte do clube exclusivo",
+        "requestSent": "Solicitação Enviada!",
+        "requestSentMessage": "Recebemos seu pedido de acesso. Nossa equipe irá analisar e você receberá um email quando sua conta for aprovada.",
+        "fullName": "Nome Completo",
+        "instagramOptional": "Instagram (Opcional)",
+        "requestInvite": "Solicitar Convite",
+        "alreadyHaveAccount": "Já tem uma conta? Fazer login",
+        "errorRequesting": "Erro ao solicitar convite. Tente novamente."
+    },
+    "resetPassword": {
+        "tokenNotFound": "Token de redefinição não encontrado. Solicite um novo link.",
+        "minChars": "A senha deve ter no mínimo 6 caracteres",
+        "passwordsMismatch": "As senhas não coincidem",
+        "errorResetting": "Erro ao redefinir senha. O link pode ter expirado.",
+        "title": "Redefinir Senha",
+        "subtitle": "Crie uma nova senha segura",
+        "success": "Senha Redefinida!",
+        "successMessage": "Sua senha foi alterada com sucesso. Agora você pode fazer login com sua nova senha.",
+        "newPassword": "Nova senha",
+        "confirmPassword": "Confirmar nova senha",
+        "resetting": "Redefinindo...",
+        "rememberPassword": "Lembrou a senha?"
     }
 }

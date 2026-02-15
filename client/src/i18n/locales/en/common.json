@@ -676,5 +676,40 @@
         "profileBorder": "Profile Border",
         "duplicate": "duplicate",
         "zionsCompensation": "Zions Points compensation"
+    },
+    "auth": {
+        "login": "Log In"
+    },
+    "common": {
+        "backToLogin": "Back to Login",
+        "backToHome": "Back to Home",
+        "email": "Email",
+        "yourName": "Your full name",
+        "sending": "Sending..."
+    },
+    "invite": {
+        "requestAccess": "Request Access",
+        "joinClub": "Join the exclusive club",
+        "requestSent": "Request Sent!",
+        "requestSentMessage": "We received your access request. Our team will review it and you'll receive an email when your account is approved.",
+        "fullName": "Full Name",
+        "instagramOptional": "Instagram (Optional)",
+        "requestInvite": "Request Invite",
+        "alreadyHaveAccount": "Already have an account? Log in",
+        "errorRequesting": "Error requesting invite. Please try again."
+    },
+    "resetPassword": {
+        "tokenNotFound": "Reset token not found. Please request a new link.",
+        "minChars": "Password must be at least 6 characters",
+        "passwordsMismatch": "Passwords don't match",
+        "errorResetting": "Error resetting password. The link may have expired.",
+        "title": "Reset Password",
+        "subtitle": "Create a new secure password",
+        "success": "Password Reset!",
+        "successMessage": "Your password has been changed successfully. You can now log in with your new password.",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "resetting": "Resetting...",
+        "rememberPassword": "Remember your password?"
     }
 }

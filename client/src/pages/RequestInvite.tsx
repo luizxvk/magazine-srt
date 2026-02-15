@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -8,6 +9,7 @@ import { ArrowRight, Instagram, Mail, User } from 'lucide-react';
 
 export default function RequestInvite() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { showToast } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
@@ -25,7 +27,7 @@ export default function RequestInvite() {
             setSuccess(true);
         } catch (error: any) {
             console.error('Failed to request invite', error);
-            showToast(error.response?.data?.error || 'Erro ao solicitar convite. Tente novamente.');
+            showToast(error.response?.data?.error || t('invite.errorRequesting'));
         } finally {
             setLoading(false);
         }
@@ -42,8 +44,8 @@ export default function RequestInvite() {
                         alt="Magazine SRT"
                         className="h-24 mx-auto mb-6 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"
                     />
-                    <h1 className="text-3xl font-serif text-white mb-2">Solicitar Acesso</h1>
-                    <p className="text-gold-400/80 text-sm uppercase tracking-widest">Junte-se ao Clube Exclusivo</p>
+                    <h1 className="text-3xl font-serif text-white mb-2">{t('invite.requestAccess')}</h1>
+                    <p className="text-gold-400/80 text-sm uppercase tracking-widest">{t('invite.joinClub')}</p>
                 </div>
 
                 {success ? (
@@ -51,21 +53,21 @@ export default function RequestInvite() {
                         <div className="w-16 h-16 bg-gold-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-gold-500/20">
                             <Mail className="w-8 h-8 text-gold-400" />
                         </div>
-                        <h2 className="text-2xl font-serif text-white mb-4">Solicitação Enviada</h2>
+                        <h2 className="text-2xl font-serif text-white mb-4">{t('invite.requestSent')}</h2>
                         <p className="text-gray-300 mb-8 leading-relaxed">
-                            Sua solicitação foi recebida com sucesso. Nossa equipe analisará seu perfil e você receberá um e-mail assim que seu acesso for aprovado.
+                            {t('invite.requestSentMessage')}
                         </p>
                         <button
                             onClick={() => navigate('/')}
                             className="w-full bg-gold-500 text-black font-bold py-3.5 rounded-xl hover:bg-gold-400 transition-all duration-300 transform hover:scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                         >
-                            Voltar ao Início
+                            {t('common.backToHome')}
                         </button>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="glass-panel p-8 rounded-2xl border border-white/10 space-y-5 animate-slide-up">
                         <div className="space-y-1">
-                            <label className="text-xs text-gold-400 uppercase tracking-wider ml-1">Nome Completo</label>
+                            <label className="text-xs text-gold-400 uppercase tracking-wider ml-1">{t('invite.fullName')}</label>
                             <div className="relative group">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-gold-400 transition-colors" />
                                 <input
@@ -74,13 +76,13 @@ export default function RequestInvite() {
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     className="w-full bg-black/40 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-gray-600 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20 outline-none transition-all"
-                                    placeholder="Seu nome"
+                                    placeholder={t('common.yourName')}
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs text-gold-400 uppercase tracking-wider ml-1">E-mail</label>
+                            <label className="text-xs text-gold-400 uppercase tracking-wider ml-1">{t('common.email')}</label>
                             <div className="relative group">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-gold-400 transition-colors" />
                                 <input
@@ -95,7 +97,7 @@ export default function RequestInvite() {
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs text-gold-400 uppercase tracking-wider ml-1">Instagram (Opcional)</label>
+                            <label className="text-xs text-gold-400 uppercase tracking-wider ml-1">{t('invite.instagramOptional')}</label>
                             <div className="relative group">
                                 <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-gold-400 transition-colors" />
                                 <input
@@ -113,9 +115,9 @@ export default function RequestInvite() {
                             disabled={loading}
                             className="w-full bg-gold-500 text-black font-bold py-3.5 rounded-xl hover:bg-gold-400 transition-all duration-300 transform hover:scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Enviando...' : (
+                            {loading ? t('common.sending') : (
                                 <>
-                                    Solicitar Convite <ArrowRight className="w-5 h-5" />
+                                    {t('invite.requestInvite')} <ArrowRight className="w-5 h-5" />
                                 </>
                             )}
                         </button>
@@ -126,7 +128,7 @@ export default function RequestInvite() {
                                 onClick={() => navigate('/')}
                                 className="text-gray-500 hover:text-white text-sm transition-colors"
                             >
-                                Já tem uma conta? Fazer Login
+                                {t('invite.alreadyHaveAccount')}
                             </button>
                         </div>
                     </form>

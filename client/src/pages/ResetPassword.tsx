@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Lock, Check, AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
 import logo from '../assets/logo-mgzn.png';
 import logoMgt from '../assets/logo-mgt-full.png';
@@ -9,6 +10,7 @@ import Loader from '../components/Loader';
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const token = searchParams.get('token');
 
     const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ export default function ResetPassword() {
 
     useEffect(() => {
         if (!token) {
-            setError('Token de redefinição não encontrado. Solicite um novo link.');
+            setError(t('resetPassword.tokenNotFound'));
         }
     }, [token]);
 
@@ -29,12 +31,12 @@ export default function ResetPassword() {
         setError('');
 
         if (password.length < 6) {
-            setError('A senha deve ter no mínimo 6 caracteres');
+            setError(t('resetPassword.minChars'));
             return;
         }
 
         if (password !== confirmPassword) {
-            setError('As senhas não coincidem');
+            setError(t('resetPassword.passwordsMismatch'));
             return;
         }
 
@@ -46,7 +48,7 @@ export default function ResetPassword() {
             });
             setSuccess(true);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Erro ao redefinir senha. O link pode ter expirado.');
+            setError(err.response?.data?.error || t('resetPassword.errorResetting'));
         } finally {
             setLoading(false);
         }
@@ -66,7 +68,7 @@ export default function ResetPassword() {
                 className={`absolute top-6 left-6 z-30 flex items-center gap-2 text-sm transition-colors ${isMGT ? 'text-emerald-500/70 hover:text-emerald-400' : 'text-gold-500/70 hover:text-gold-400'}`}
             >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Voltar ao Login</span>
+                <span className="hidden sm:inline">{t('common.backToLogin')}</span>
             </Link>
 
             {/* Main Card */}
@@ -85,10 +87,10 @@ export default function ResetPassword() {
                             />
                         </div>
                         <h2 className={`text-xl font-bold tracking-wide ${isMGT ? 'text-white' : 'text-gradient-gold'}`}>
-                            Redefinir Senha
+                            {t('resetPassword.title')}
                         </h2>
                         <p className={`text-xs mt-2 tracking-widest uppercase ${isMGT ? 'text-emerald-400/50' : 'text-gold-400/50'}`}>
-                            Crie uma nova senha segura
+                            {t('resetPassword.subtitle')}
                         </p>
                     </div>
 
@@ -98,9 +100,9 @@ export default function ResetPassword() {
                             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
                                 <Check className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
                             </div>
-                            <h3 className="text-white text-lg font-bold mb-2">Senha Redefinida!</h3>
+                            <h3 className="text-white text-lg font-bold mb-2">{t('resetPassword.success')}</h3>
                             <p className="text-gray-400 text-sm mb-6">
-                                Sua senha foi alterada com sucesso. Agora você pode fazer login com sua nova senha.
+                                {t('resetPassword.successMessage')}
                             </p>
                             <button
                                 onClick={() => navigate('/login')}
@@ -111,7 +113,7 @@ export default function ResetPassword() {
                                     }`}
                             >
                                 <Sparkles className="w-4 h-4" />
-                                Fazer Login
+                                {t('auth.login')}
                             </button>
                         </div>
                     ) : (
@@ -137,7 +139,7 @@ export default function ResetPassword() {
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Nova senha"
+                                        placeholder={t('resetPassword.newPassword')}
                                         className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
                                         disabled={!token}
                                     />
@@ -156,7 +158,7 @@ export default function ResetPassword() {
                                         type="password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        placeholder="Confirmar nova senha"
+                                        placeholder={t('resetPassword.confirmPassword')}
                                         className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-600"
                                         disabled={!token}
                                     />
@@ -176,12 +178,12 @@ export default function ResetPassword() {
                                 {loading ? (
                                     <>
                                         <Loader size="sm" />
-                                        Redefinindo...
+                                        {t('resetPassword.resetting')}
                                     </>
                                 ) : (
                                     <>
                                         <Lock className="w-4 h-4" />
-                                        Redefinir Senha
+                                        {t('resetPassword.title')}
                                     </>
                                 )}
                             </button>
@@ -191,12 +193,12 @@ export default function ResetPassword() {
                     {/* Footer Link */}
                     <div className="mt-6 text-center">
                         <p className="text-gray-500 text-xs">
-                            Lembrou a senha?
+                            {t('resetPassword.rememberPassword')}
                             <Link
                                 to="/login"
                                 className={`font-bold ml-1 transition-colors ${isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-gold-400 hover:text-gold-300'}`}
                             >
-                                Fazer Login
+                                {t('auth.login')}
                             </Link>
                         </p>
                     </div>

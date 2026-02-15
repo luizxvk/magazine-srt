@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, X, Sparkles, Gift, Coins, TrendingUp, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ThemePackCard from './ThemePackCard';
@@ -134,6 +135,7 @@ const BADGE_ICONS: Record<string, string> = {
 };
 
 export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBoxModalProps) {
+    const { t } = useTranslation();
     const { user, theme, accentColor, updateUserPoints } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const defaultAccent = isMGT ? '#10b981' : '#d4af37';
@@ -194,7 +196,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
             if (onSuccess) onSuccess();
 
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Erro ao abrir Supply Box');
+            setError(err.response?.data?.error || t('supplyBox.errorOpening'));
         } finally {
             setOpening(false);
         }
@@ -269,7 +271,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 </h2>
                             </div>
                             <p className={`text-sm mb-6 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                {opensToday === 0 ? 'Primeira abertura grátis!' : `Aberturas hoje: ${opensToday}`}
+                                {opensToday === 0 ? t('supplyBox.firstFree') : t('supplyBox.opensToday', { count: opensToday })}
                             </p>
 
                             {/* Box Animation */}
@@ -303,7 +305,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 <div className="flex items-center gap-2 mb-3">
                                     <TrendingUp className={`w-4 h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`} />
                                     <span className={`text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
-                                        Chances de Drop
+                                        {t('supplyBox.dropChances')}
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-4 gap-2">
@@ -332,27 +334,27 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 <div className="flex items-center gap-2 mb-3">
                                     <Gift className={`w-4 h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`} />
                                     <span className={`text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
-                                        Prêmios Possíveis
+                                        {t('supplyBox.possiblePrizes')}
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🎨 Fundos
+                                        🎨 {t('supplyBox.backgrounds')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🏅 Badges
+                                        🏅 {t('supplyBox.badges')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🎯 Cores
+                                        🎯 {t('supplyBox.colors')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🖼️ Bordas
+                                        🖼️ {t('supplyBox.borders')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        📦 Packs
+                                        📦 {t('supplyBox.packs')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        💰 10-500 Zions
+                                        💰 {t('supplyBox.zionsRange')}
                                     </span>
                                 </div>
                             </div>
@@ -398,7 +400,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                 />
                                             ))}
                                         </div>
-                                        <span>Abrindo...</span>
+                                        <span>{t('supplyBox.opening')}</span>
                                         <style>{`
                                             @keyframes spinnerFade {
                                                 0%, 100% { opacity: 0.2; }
@@ -411,12 +413,12 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                         {cost === 0 ? (
                                             <>
                                                 <Zap className="w-5 h-5" />
-                                                Abrir Grátis!
+                                                {t('supplyBox.openFree')}
                                             </>
                                         ) : (
                                             <>
                                                 <Coins className="w-5 h-5" />
-                                                Abrir por {cost} Zions
+                                                {t('supplyBox.openFor', { cost })}
                                             </>
                                         )}
                                     </>
@@ -425,7 +427,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
 
                             {cost > 0 && (
                                 <p className={`text-xs mt-3 ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
-                                    Seu saldo: <span style={{ color: userAccent }}>{user?.zionsPoints?.toLocaleString() || 0}</span> Zions Points
+                                    {t('supplyBox.yourBalance')}: <span style={{ color: userAccent }}>{user?.zionsPoints?.toLocaleString() || 0}</span> Zions Points
                                 </p>
                             )}
                         </div>
@@ -455,7 +457,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                         WebkitTextFillColor: 'transparent'
                                     }}
                                 >
-                                    {reward.type === 'DUPLICATE' ? 'Item Duplicado!' : 'Novo Item!'}
+                                    {reward.type === 'DUPLICATE' ? t('supplyBox.duplicateItem') : t('supplyBox.newItem')}
                                 </h2>
                                 <span 
                                     className="px-3 py-1 rounded-full text-xs font-bold text-white"
@@ -495,7 +497,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                 +{reward.item.value} Zions
                                             </h3>
                                             <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
-                                                Adicionados ao seu saldo
+                                                {t('supplyBox.addedToBalance')}
                                             </p>
                                         </div>
                                     ) : reward.rewardType === 'PACK' ? (
@@ -568,16 +570,16 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                 {reward.item.name}
                                             </h3>
                                             <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
-                                                {reward.rewardType === 'BACKGROUND' && 'Fundo de Perfil'}
-                                                {reward.rewardType === 'BADGE' && 'Badge de Perfil'}
-                                                {reward.rewardType === 'COLOR' && 'Cor de Destaque'}
-                                                {reward.rewardType === 'BORDER' && 'Borda de Perfil'}
+                                                {reward.rewardType === 'BACKGROUND' && t('supplyBox.profileBackground')}
+                                                {reward.rewardType === 'BADGE' && t('supplyBox.profileBadge')}
+                                                {reward.rewardType === 'COLOR' && t('supplyBox.accentColor')}
+                                                {reward.rewardType === 'BORDER' && t('supplyBox.profileBorder')}
                                             </p>
                                             {reward.type === 'DUPLICATE' && (
                                                 <div className="mt-3 px-3 py-1.5 rounded-lg bg-amber-500/20 inline-flex items-center gap-2">
                                                     <Coins className="w-4 h-4 text-amber-400" />
                                                     <span className="text-sm text-amber-400 font-medium">
-                                                        +{reward.compensation} Zions (duplicata)
+                                                        +{reward.compensation} Zions ({t('supplyBox.duplicate')})
                                                     </span>
                                                 </div>
                                             )}
@@ -594,7 +596,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                     <div className="flex items-center justify-center gap-2 mt-2">
                                         <Coins className="w-4 h-4" style={{ color: userAccent }} />
                                         <span className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-                                            +{reward.compensation} Zions Points de compensação
+                                            +{reward.compensation} {t('supplyBox.zionsCompensation')}
                                         </span>
                                     </div>
                                 )}
@@ -610,7 +612,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                         : 'bg-white/10 hover:bg-white/15 text-white'
                                 }`}
                             >
-                                Fechar
+                                {t('actions.close')}
                             </motion.button>
                         </motion.div>
                     )}

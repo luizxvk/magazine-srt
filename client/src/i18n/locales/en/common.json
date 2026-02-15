@@ -650,5 +650,31 @@
         "voteError": "Error voting",
         "vote": "vote",
         "votes": "votes"
+    },
+    "supplyBox": {
+        "errorOpening": "Error opening Supply Box",
+        "firstFree": "First opening free!",
+        "opensToday": "Opens today: {{count}}",
+        "dropChances": "Drop Chances",
+        "possiblePrizes": "Possible Prizes",
+        "backgrounds": "Backgrounds",
+        "badges": "Badges",
+        "colors": "Colors",
+        "borders": "Borders",
+        "packs": "Packs",
+        "zionsRange": "10-500 Zions",
+        "opening": "Opening...",
+        "openFree": "Open Free!",
+        "openFor": "Open for {{cost}} Zions",
+        "yourBalance": "Your balance",
+        "duplicateItem": "Duplicate Item!",
+        "newItem": "New Item!",
+        "addedToBalance": "Added to your balance",
+        "profileBackground": "Profile Background",
+        "profileBadge": "Profile Badge",
+        "accentColor": "Accent Color",
+        "profileBorder": "Profile Border",
+        "duplicate": "duplicate",
+        "zionsCompensation": "Zions Points compensation"
     }
 }

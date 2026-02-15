@@ -652,5 +652,31 @@
         "voteError": "Erro ao votar",
         "vote": "voto",
         "votes": "votos"
+    },
+    "supplyBox": {
+        "errorOpening": "Erro ao abrir Supply Box",
+        "firstFree": "Primeira abertura grátis!",
+        "opensToday": "Aberturas hoje: {{count}}",
+        "dropChances": "Chances de Drop",
+        "possiblePrizes": "Prêmios Possíveis",
+        "backgrounds": "Fundos",
+        "badges": "Badges",
+        "colors": "Cores",
+        "borders": "Bordas",
+        "packs": "Packs",
+        "zionsRange": "10-500 Zions",
+        "opening": "Abrindo...",
+        "openFree": "Abrir Grátis!",
+        "openFor": "Abrir por {{cost}} Zions",
+        "yourBalance": "Seu saldo",
+        "duplicateItem": "Item Duplicado!",
+        "newItem": "Novo Item!",
+        "addedToBalance": "Adicionados ao seu saldo",
+        "profileBackground": "Fundo de Perfil",
+        "profileBadge": "Badge de Perfil",
+        "accentColor": "Cor de Destaque",
+        "profileBorder": "Borda de Perfil",
+        "duplicate": "duplicata",
+        "zionsCompensation": "Zions Points de compensação"
     }
 }

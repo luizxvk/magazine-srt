@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, User, FileText, Hash, Clock, TrendingUp, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -246,7 +247,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <AnimatePresence>
             <motion.div
                 initial={{ opacity: 0 }}
@@ -407,5 +408,5 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 </motion.div>
             </motion.div>
         </AnimatePresence>
-    );
+    , document.body);
 }

@@ -23,6 +23,8 @@ const SUPPORTED_GAMES = [
   { id: 'steam', name: 'Steam', icon: '🎮', platforms: ['pc'], category: 'Platform' },
   { id: 'xbox', name: 'Xbox', icon: '🟢', platforms: ['xbox'], category: 'Platform' },
   { id: 'psn', name: 'PlayStation', icon: '🔵', platforms: ['playstation'], category: 'Platform' },
+  { id: 'nintendo', name: 'Nintendo', icon: '🔴', platforms: ['nintendo'], category: 'Platform' },
+  { id: 'epicgames', name: 'Epic Games', icon: '🟣', platforms: ['pc'], category: 'Platform' },
   // Others
   { id: 'rocketleague', name: 'Rocket League', icon: '🚗', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
   { id: 'minecraft', name: 'Minecraft', icon: '⛏️', platforms: ['pc', 'xbox', 'playstation'], category: 'Sandbox' },

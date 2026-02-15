@@ -67,7 +67,7 @@ interface GameEvent {
 type Tab = 'profiles' | 'feed' | 'link';
 
 export default function StatForgePage() {
-  const { theme } = useAuth();
+  const { theme, accentColor, accentGradient } = useAuth();
 
   const [tab, setTab] = useState<Tab>('profiles');
   const [profiles, setProfiles] = useState<GameProfile[]>([]);
@@ -185,7 +185,7 @@ export default function StatForgePage() {
               <img
                 src="/assets/statforge-logo.png"
                 alt="StatForge"
-                className="relative w-32 h-32 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
+                className="relative w-44 h-44 sm:w-52 sm:h-52 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
               />
             </div>
 
@@ -222,9 +222,10 @@ export default function StatForgePage() {
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${tab === t.key
-                  ? `bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/20`
+                  ? `border text-white`
                   : `${theme === 'light' ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-400 hover:bg-white/5'}`
                 }`}
+              style={tab === t.key ? { background: `${accentColor}20`, borderColor: `${accentColor}30`, color: accentColor } : {}}
             >
               <t.icon className="w-4 h-4" />
               {t.label}
@@ -248,7 +249,8 @@ export default function StatForgePage() {
                 <p className="text-gray-400 mb-6">Vincule seus jogos para começar a rastrear suas stats</p>
                 <button
                   onClick={() => setTab('link')}
-                  className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-orange-500/20 transition-all"
+                  className="px-6 py-3 text-white rounded-xl font-medium hover:shadow-lg transition-all"
+                  style={{ background: accentGradient || accentColor }}
                 >
                   <Plus className="w-4 h-4 inline mr-2" />
                   Vincular Primeiro Jogo
@@ -403,26 +405,48 @@ export default function StatForgePage() {
               Vincular Novo Jogo
             </h3>
 
-            {/* Game selection */}
-            <div className="mb-6">
-              <label className="text-sm text-gray-400 mb-3 block">Selecione o Jogo</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {games.map(game => (
-                  <button
-                    key={game.id}
-                    onClick={() => setLinkGame(game.id)}
-                    className={`p-3 rounded-xl text-left transition-all border ${linkGame === game.id
-                        ? 'bg-orange-500/10 border-orange-500/30 ring-1 ring-orange-500/20'
-                        : `${theme === 'light' ? 'bg-gray-50 border-gray-200 hover:bg-gray-100' : 'bg-white/5 border-white/5 hover:bg-white/10'}`
-                      }`}
-                  >
-                    <span className="text-xl block mb-1">{game.icon}</span>
-                    <span className={`text-xs font-medium ${linkGame === game.id ? 'text-orange-400' : theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
-                      {game.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
+            {/* Game selection - grouped by category */}
+            <div className="mb-6 space-y-5">
+              <label className="text-sm text-gray-400 block">Selecione o Jogo</label>
+              {(() => {
+                const categoryLabels: Record<string, string> = {
+                  'FPS': '🎯 FPS / Tactical',
+                  'Battle Royale': '🏆 Battle Royale',
+                  'MOBA': '⚔️ MOBA',
+                  'Strategy': '♟️ Estratégia',
+                  'Platform': '🏪 Lojas & Plataformas',
+                  'Sports': '⚽ Esportes',
+                  'Sandbox': '🧱 Sandbox',
+                };
+                const categories = [...new Set(games.map(g => g.category))];
+                // Sort: Platform last
+                const sorted = categories.sort((a, b) => a === 'Platform' ? 1 : b === 'Platform' ? -1 : 0);
+                return sorted.map(cat => (
+                  <div key={cat}>
+                    <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
+                      {categoryLabels[cat] || cat}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                      {games.filter(g => g.category === cat).map(game => (
+                        <button
+                          key={game.id}
+                          onClick={() => setLinkGame(game.id)}
+                          className={`p-3 rounded-xl text-left transition-all border ${linkGame === game.id
+                            ? 'ring-1'
+                            : `${theme === 'light' ? 'bg-gray-50 border-gray-200 hover:bg-gray-100' : 'bg-white/5 border-white/5 hover:bg-white/10'}`
+                          }`}
+                          style={linkGame === game.id ? { background: `${accentColor}15`, borderColor: `${accentColor}50`, boxShadow: `0 0 0 1px ${accentColor}30` } : {}}
+                        >
+                          <span className="text-xl block mb-1">{game.icon}</span>
+                          <span className={`text-xs font-medium ${linkGame === game.id ? 'text-white' : theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                            {game.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
 
             {linkGame && (
@@ -440,9 +464,10 @@ export default function StatForgePage() {
                         key={p}
                         onClick={() => setLinkPlatform(p)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${linkPlatform === p
-                            ? 'bg-orange-500/10 border-orange-500/30 text-orange-400'
+                          ? ''
                             : `${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-white/5 border-white/5 text-gray-400'}`
                           }`}
+                        style={linkPlatform === p ? { background: `${accentColor}15`, borderColor: `${accentColor}50`, color: accentColor } : {}}
                       >
                         {p === 'pc' ? '🖥️ PC' : p === 'xbox' ? '🟢 Xbox' : '🔵 PlayStation'}
                       </button>
@@ -461,7 +486,8 @@ export default function StatForgePage() {
                     className={`w-full px-4 py-3 rounded-xl border ${theme === 'light'
                         ? 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'
                         : 'bg-white/5 border-white/10 text-white placeholder-gray-500'
-                      } focus:outline-none focus:ring-2 focus:ring-orange-500/30`}
+                      } focus:outline-none focus:ring-2`}
+                  style={{ '--tw-ring-color': `${accentColor}50` } as React.CSSProperties}
                   />
                 </div>
 
@@ -469,7 +495,8 @@ export default function StatForgePage() {
                 <button
                   onClick={handleLink}
                   disabled={!linkGamertag || linking}
-                  className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-orange-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{ background: accentGradient || accentColor }}
                 >
                   {linking ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -560,7 +587,7 @@ function StatCard({ label, value, icon, theme }: { label: string; value: string;
   return (
     <div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}>
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-orange-400">{icon}</span>
+        <span style={{ color: 'var(--accent-color, #d4af37)' }}>{icon}</span>
         <span className="text-xs text-gray-400">{label}</span>
       </div>
       <p className={`text-lg font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{value}</p>

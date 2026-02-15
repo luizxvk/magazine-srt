@@ -8,6 +8,7 @@ import CreateGroupModal from '../components/CreateGroupModal';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
+import GradientText from '../components/GradientText';
 
 interface Group {
   id: string;
@@ -99,7 +100,7 @@ export default function GroupsPage() {
               <Users className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`} />
             </div>
             <div>
-              <h1 className="text-3xl font-serif font-bold text-white">Grupos</h1>
+              <h1 className="text-3xl font-serif font-bold"><GradientText fallbackClassName="text-white">Grupos</GradientText></h1>
               <p className="text-gray-400">Conecte-se com membros de interesses similares</p>
             </div>
           </div>

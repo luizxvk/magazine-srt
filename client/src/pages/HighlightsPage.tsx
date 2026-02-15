@@ -6,6 +6,7 @@ import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter, Star } from 'lucid
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import Loader from '../components/Loader';
+import GradientText from '../components/GradientText';
 
 interface HighlightPost {
     id: string;
@@ -97,8 +98,8 @@ export default function HighlightsPage() {
                             <Star className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                         </div>
                         <div>
-                            <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                Destaques da Semana
+                            <h2 className={`text-xl font-bold`}>
+                                <GradientText fallbackClassName={theme === 'light' ? 'text-gray-900' : 'text-white'}>Destaques da Semana</GradientText>
                             </h2>
                             <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
                                 Os melhores posts da comunidade.

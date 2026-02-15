@@ -353,7 +353,7 @@ const roadmapItems: RoadmapItem[] = [
         id: '36',
         title: 'Torneios Competitivos',
         description: 'Brackets automáticos, rankings ao vivo, premiação em Zions e matchmaking. Solo, duo e equipes.',
-        status: 'planned',
+        status: 'completed',
         icon: <Swords className="w-5 h-5" />,
         category: 'community'
     },
@@ -361,7 +361,7 @@ const roadmapItems: RoadmapItem[] = [
         id: '37',
         title: 'Sistema de Idiomas (i18n)',
         description: 'Suporte a múltiplos idiomas: Português, English e Español. Detecção automática do navegador.',
-        status: 'planned',
+        status: 'completed',
         icon: <Globe className="w-5 h-5" />,
         category: 'improvement'
     },
@@ -369,7 +369,7 @@ const roadmapItems: RoadmapItem[] = [
         id: '38',
         title: 'Auto-Moderação com IA',
         description: 'Filtro automático de conteúdo impróprio (NSFW) e discurso de ódio usando Google Vision e Perspective API.',
-        status: 'planned',
+        status: 'completed',
         icon: <Bot className="w-5 h-5" />,
         category: 'security'
     }

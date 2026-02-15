@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, Gift, Sparkles, Gamepad2, Trash2, UserCheck, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -46,7 +47,7 @@ interface Event {
 }
 
 export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
-    const { user, theme, showSuccess, showError } = useAuth();
+    const { user, theme, showSuccess, showError, accentColor } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const isAdmin = user?.role === 'ADMIN';
     const [events, setEvents] = useState<Event[]>([]);
@@ -129,19 +130,47 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
 
     if (!isOpen) return null;
 
-    const themeColor = isMGT ? 'emerald' : 'gold';
-    const borderColor = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
-    const themeBg = theme === 'light' ? 'bg-white' : 'bg-gray-900/95';
+    const userAccent = accentColor || (isMGT ? '#10b981' : '#d4af37');
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className={`relative w-full max-w-lg ${themeBg} rounded-3xl border ${borderColor} shadow-2xl overflow-hidden backdrop-blur-xl`}>
-                {/* Header - Apple Vision Pro style */}
-                <div className={`p-6 border-b ${borderColor} ${theme === 'light' ? 'bg-gray-50/80' : 'bg-black/40'}`}>
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+                    onClick={onClose}
+                >
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative w-full max-w-lg overflow-hidden rounded-3xl"
+                        style={{
+                            background: theme === 'light'
+                                ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)'
+                                : 'linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(20,20,20,0.9) 100%)',
+                            boxShadow: `0 25px 50px -12px rgba(0,0,0,0.5), inset 0 0 0 1px ${theme === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.1)'}`
+                        }}
+                    >
+                        {/* Accent glow */}
+                        <div
+                            className="absolute inset-0 opacity-30 pointer-events-none"
+                            style={{ background: `radial-gradient(ellipse at top, ${userAccent}30, transparent 60%)` }}
+                        />
+
+                {/* Header */}
+                <div className="relative p-6 border-b" style={{ borderColor: theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className={`p-3 rounded-2xl bg-gradient-to-br from-${themeColor}-500/20 to-${themeColor}-600/10 text-${themeColor}-500 backdrop-blur-sm border border-${themeColor}-500/20`}>
-                                <Calendar className="w-5 h-5" />
+                            <div
+                                className="p-3 rounded-2xl backdrop-blur-sm"
+                                style={{ background: `${userAccent}20`, border: `1px solid ${userAccent}30` }}
+                            >
+                                <Calendar className="w-5 h-5" style={{ color: userAccent }} />
                             </div>
                             <div>
                                 <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Eventos Exclusivos</h2>
@@ -166,8 +195,8 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                         </div>
                     ) : events.length === 0 ? (
                         <div className="text-center py-12">
-                            <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-${themeColor}-500/10 flex items-center justify-center`}>
-                                <Calendar className={`w-8 h-8 text-${themeColor}-500/50`} />
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: `${userAccent}15` }}>
+                                <Calendar className="w-8 h-8" style={{ color: `${userAccent}80` }} />
                             </div>
                             <p className={`font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Nenhum evento agendado</p>
                             <p className={`text-sm mt-1 ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>Fique atento para novidades!</p>
@@ -184,19 +213,23 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                 return (
                                     <div 
                                         key={event.id} 
-                                        className={`group relative overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-gray-50 border border-gray-200/50' : isMGT ? 'bg-emerald-950/30 border border-emerald-500/10' : 'bg-amber-950/20 border border-amber-500/10'} hover:border-${themeColor}-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-${themeColor}-500/5`}
+                                        className={`group relative overflow-hidden rounded-2xl border transition-all duration-300`}
+                                        style={{ 
+                                            background: theme === 'light' ? 'rgba(245,245,245,0.5)' : `${userAccent}08`,
+                                            borderColor: `${userAccent}15`
+                                        }}
                                     >
                                         {/* Background glow effect */}
-                                        <div className={`absolute inset-0 bg-gradient-to-r from-${themeColor}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `linear-gradient(to right, ${userAccent}08, transparent)` }} />
                                         
                                         <div className="relative flex">
                                             {/* Date Column - Apple style pill */}
                                             <div className={`flex flex-col items-center justify-center w-20 py-4 ${theme === 'light' ? 'bg-gray-100/50' : 'bg-white/[0.02]'} border-r ${theme === 'light' ? 'border-gray-200/50' : 'border-white/[0.06]'}`}>
-                                                <span className={`text-3xl font-bold text-${themeColor}-500`}>{day}</span>
+                                                <span className="text-3xl font-bold" style={{ color: userAccent }}>{day}</span>
                                                 <span className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'} tracking-wider`}>{month}</span>
                                                 {isUpcoming && (
-                                                    <div className={`mt-2 px-2 py-0.5 rounded-full bg-${themeColor}-500/10 border border-${themeColor}-500/20`}>
-                                                        <span className={`text-[9px] font-bold text-${themeColor}-500 uppercase tracking-wider`}>Em breve</span>
+                                                    <div className="mt-2 px-2 py-0.5 rounded-full" style={{ background: `${userAccent}15`, border: `1px solid ${userAccent}30` }}>
+                                                        <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: userAccent }}>Em breve</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -204,7 +237,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                             {/* Info Column */}
                                             <div className="flex-1 p-4">
                                                 <div className="flex items-start justify-between gap-2">
-                                                    <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'} group-hover:text-${themeColor}-500 transition-colors`}>
+                                                    <h3 className={`font-bold mb-1 ${theme === 'light' ? 'text-gray-900' : 'text-white'} transition-colors`}>
                                                         {event.title}
                                                     </h3>
                                                     {isAdmin && (
@@ -290,11 +323,11 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                                         <button
                                                             onClick={() => handleToggleAttend(event.id, event.isAttending || false)}
                                                             disabled={attending === event.id}
-                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                                                event.isAttending 
-                                                                    ? `bg-${themeColor}-500/20 text-${themeColor}-500 border border-${themeColor}-500/30` 
-                                                                    : `bg-${themeColor}-500 text-black hover:bg-${themeColor}-400`
-                                                            }`}
+                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all`}
+                                                            style={event.isAttending 
+                                                                ? { background: `${userAccent}20`, color: userAccent, border: `1px solid ${userAccent}50` }
+                                                                : { background: userAccent, color: '#000' }
+                                                            }
                                                         >
                                                             {attending === event.id ? (
                                                                 <Loader size="sm" />
@@ -353,8 +386,10 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                         </div>
                     )}
                 </div>
-            </div>
-        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 
     return createPortal(modalContent, document.body);

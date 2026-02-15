@@ -6,6 +6,7 @@ import api from '../services/api';
 import { Camera, Filter, Globe, Star, Trash2, User, Grid, LayoutList, LayoutGrid, Image, ChevronDown, X } from 'lucide-react';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ConfirmModal from '../components/ConfirmModal';
+import GradientText from '../components/GradientText';
 
 interface CatalogPhoto {
     id: string;
@@ -451,8 +452,8 @@ export default function PhotoCatalogPage() {
                             <Image className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
                         </div>
                         <div>
-                            <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
-                                Catálogo de Fotos
+                            <h2 className={`text-xl font-bold`}>
+                                <GradientText fallbackClassName={theme === 'light' ? 'text-gray-900' : 'text-white'}>Catálogo de Fotos</GradientText>
                             </h2>
                             <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
                                 Explore e compartilhe momentos exclusivos.

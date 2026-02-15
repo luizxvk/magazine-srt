@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
+import LuxuriousBackground from '../components/LuxuriousBackground';
 import TournamentCard from '../components/TournamentCard';
 import TournamentDetail from '../components/TournamentDetail';
 import api from '../services/api';
@@ -71,7 +72,8 @@ export default function TournamentsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-off-black">
+        <div className="min-h-screen">
+            <LuxuriousBackground />
             <Header />
 
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">

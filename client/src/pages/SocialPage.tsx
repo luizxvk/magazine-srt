@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ModernLoader from '../components/ModernLoader';
 import { motion, AnimatePresence } from 'framer-motion';
+import GradientText from '../components/GradientText';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface Friend {
@@ -214,7 +215,7 @@ export default function SocialPage() {
                         <Users className={`w-8 h-8 ${themeColor}`} />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-serif font-bold text-white">Social</h1>
+                        <h1 className="text-3xl font-serif font-bold"><GradientText fallbackClassName="text-white">Social</GradientText></h1>
                         <p className="text-gray-400">Conecte-se com outros membros da elite.</p>
                     </div>
                 </div>

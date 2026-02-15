@@ -271,305 +271,256 @@ export default function AdminDashboard() {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {/* Column 1 */}
-                    <div className="space-y-6">
-                        <AdminCreatePost showToast={showToast} />
-                        <AdminCreateAnnouncement showToast={showToast} />
-                        <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
-                        <AdminCreateEvent showToast={showToast} />
-                        <AdminCreateTournament showToast={showToast} />
-                    </div>
-
-                    {/* Column 2 */}
-                    <div className="space-y-6">
-                        <AdminEliteReward showToast={showToast} />
-                        <AdminAdsSettings />
-                        <AdminTwitchSettings />
-                        <AdminModerationPanel />
-                        <RovexShieldCard />
-                        <AdminCoupons showToast={showToast} />
-                        <BadgeManager />
-                        <AdminFeedbackCard />
-                    </div>
-
-                    {/* Column 3 - Main management */}
-                    <div className="lg:col-span-2 xl:col-span-1 space-y-6">
-                        {/* Admin Stats Edit */}
-                        <div className="glass-panel p-6 rounded-xl">
-                            <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                                <Edit2 className="w-5 h-5 text-gold-400" /> Editar Meus Status
-                            </h2>
-                            <div className="flex items-end gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-xs text-gray-400 mb-1">Meus Troféus</label>
-                                    <input
-                                        type="number"
-                                        defaultValue={user?.trophies || 0}
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        aria-label="Editar meus troféus"
-                                        onBlur={async (e) => {
-                                            const newTrophies = parseInt(e.target.value);
-                                            if (!isNaN(newTrophies)) {
-                                                try {
-                                                    await api.put('/users/me', { trophies: newTrophies });
-                                                    showToast('Troféus atualizados!', 'success');
-                                                    window.location.reload();
-                                                } catch (error) {
-                                                    console.error('Failed to update trophies', error);
-                                                    showToast('Erro ao atualizar troféus. Verifique se você tem permissão.', 'error');
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-xs text-gray-400 mb-1">Meu Nível (1-30)</label>
-                                    <input
-                                        type="number"
-                                        defaultValue={user?.level || 1}
-                                        min="1"
-                                        max="30"
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        aria-label="Editar meu nível"
-                                        onBlur={async (e) => {
-                                            const newLevel = parseInt(e.target.value);
-                                            if (!isNaN(newLevel) && newLevel >= 1 && newLevel <= 30) {
-                                                try {
-                                                    await api.put('/users/me', { level: newLevel });
-                                                    showToast('Nível atualizado!', 'success');
-                                                    window.location.reload();
-                                                } catch (error) {
-                                                    console.error('Failed to update level', error);
-                                                    showToast('Erro ao atualizar nível.', 'error');
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-xs text-gray-400 mb-1">Meus Zions Points</label>
-                                    <input
-                                        type="number"
-                                        defaultValue={user?.zionsPoints || 0}
-                                        min="0"
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        aria-label="Editar meus zions points"
-                                        onBlur={async (e) => {
-                                            const newPoints = parseInt(e.target.value);
-                                            if (!isNaN(newPoints) && newPoints >= 0) {
-                                                try {
-                                                    await api.put('/users/me', { zionsPoints: newPoints });
-                                                    showToast('Zions Points atualizados!', 'success');
-                                                    window.location.reload();
-                                                } catch (error) {
-                                                    console.error('Failed to update zions points', error);
-                                                    showToast('Erro ao atualizar zions points.', 'error');
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-xs text-gray-400 mb-1">Meus Zions Cash</label>
-                                    <input
-                                        type="number"
-                                        defaultValue={user?.zionsCash || 0}
-                                        min="0"
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-gold-500/50 outline-none"
-                                        aria-label="Editar meus zions cash"
-                                        onBlur={async (e) => {
-                                            const newCash = parseInt(e.target.value);
-                                            if (!isNaN(newCash) && newCash >= 0) {
-                                                try {
-                                                    await api.put('/users/me', { zionsCash: newCash });
-                                                    showToast('Zions Cash atualizados!', 'success');
-                                                    window.location.reload();
-                                                } catch (error) {
-                                                    console.error('Failed to update zions cash', error);
-                                                    showToast('Erro ao atualizar zions cash.', 'error');
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div className="text-xs text-gray-500 pb-3 flex items-end">
-                                    *Edição em tempo real (Admin)
-                                </div>
+                {/* Admin Cards - Horizontal Full Width Layout */}
+                <div className="space-y-4">
+                    <AdminCreatePost showToast={showToast} />
+                    <AdminEliteReward showToast={showToast} />
+                    
+                    {/* Admin Stats Edit */}
+                    <div className="admin-card">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2.5 rounded-xl bg-gold-500/10">
+                                <Edit2 className="w-5 h-5 text-gold-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-white">Editar Meus Status</h3>
+                                <p className="text-xs text-gray-400">Edição em tempo real (Admin)</p>
                             </div>
                         </div>
-
-                        {/* Member Requests */}
-                        <div className="glass-panel p-6 rounded-xl">
-                            <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                                <UserIcon className="w-5 h-5 text-gold-400" /> Solicitações de Membros
-                            </h2>
-                            {requests.length === 0 ? (
-                                <p className="text-gray-500 text-sm">Nenhuma solicitação pendente.</p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {requests.map(req => (
-                                        <div key={req.id} className="p-4 bg-white/5 rounded-lg border border-white/5">
-                                            <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
-                                                <div>
-                                                    <h3 className="font-bold text-white">{req.name}</h3>
-                                                    {req.instagram && <p className="text-xs text-gold-400 mt-1">@{req.instagram}</p>}
-                                                </div>
-                                                <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full shrink-0">
-                                                    Pendente
-                                                </span>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => handleApproveRequest(req.id)}
-                                                    className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
-                                                >
-                                                    <Check className="w-3 h-3" /> Aprovar
-                                                </button>
-                                                <button
-                                                    onClick={() => handleRejectRequest(req.id)}
-                                                    className="flex-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1"
-                                                >
-                                                    <X className="w-3 h-3" /> Rejeitar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="glass-panel p-6 rounded-xl">
-                            <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                                <Gift className="w-5 h-5 text-gold-400" /> Recompensas Ativas
-                            </h2>
-
-                            {loading ? (
-                                <div className="flex justify-center py-10">
-                                    <Loader size="md" />
-                                </div>
-                            ) : rewards.length === 0 ? (
-                                <div className="text-center py-10 text-gray-500">Nenhuma recompensa cadastrada.</div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {rewards.map(reward => (
-                                        <div key={reward.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/5 hover:border-gold-500/20 transition-colors">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-400">
-                                                    <Gift className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-medium text-white">{reward.title}</h3>
-                                                    <p className="text-xs text-gray-400">
-                                                        {reward.costZions} Zions • {reward.stock} em estoque • {reward.type}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => setEditModal({ isOpen: true, reward })}
-                                                    className="p-2 text-gray-400 hover:text-gold-400 transition-colors"
-                                                    aria-label={`Editar recompensa ${reward.title}`}
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => setDeleteModal({ isOpen: true, rewardId: reward.id })}
-                                                    className="p-2 text-gray-400 hover:text-red-400 transition-colors"
-                                                    aria-label={`Remover recompensa ${reward.title}`}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                        <div className="flex flex-wrap gap-4">
+                            <div className="flex-1 min-w-[140px]">
+                                <label className="block text-xs text-gray-400 mb-1">Troféus</label>
+                                <input
+                                    type="number"
+                                    defaultValue={user?.trophies || 0}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-gold-500/50 outline-none text-sm"
+                                    onBlur={async (e) => {
+                                        const newTrophies = parseInt(e.target.value);
+                                        if (!isNaN(newTrophies)) {
+                                            try {
+                                                await api.put('/users/me', { trophies: newTrophies });
+                                                showToast('Troféus atualizados!', 'success');
+                                                window.location.reload();
+                                            } catch { showToast('Erro ao atualizar troféus.', 'error'); }
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="flex-1 min-w-[140px]">
+                                <label className="block text-xs text-gray-400 mb-1">Nível (1-30)</label>
+                                <input
+                                    type="number"
+                                    defaultValue={user?.level || 1}
+                                    min="1"
+                                    max="30"
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-gold-500/50 outline-none text-sm"
+                                    onBlur={async (e) => {
+                                        const newLevel = parseInt(e.target.value);
+                                        if (!isNaN(newLevel) && newLevel >= 1 && newLevel <= 30) {
+                                            try {
+                                                await api.put('/users/me', { level: newLevel });
+                                                showToast('Nível atualizado!', 'success');
+                                                window.location.reload();
+                                            } catch { showToast('Erro ao atualizar nível.', 'error'); }
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="flex-1 min-w-[140px]">
+                                <label className="block text-xs text-gray-400 mb-1">Zions Points</label>
+                                <input
+                                    type="number"
+                                    defaultValue={user?.zionsPoints || 0}
+                                    min="0"
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-gold-500/50 outline-none text-sm"
+                                    onBlur={async (e) => {
+                                        const newPoints = parseInt(e.target.value);
+                                        if (!isNaN(newPoints) && newPoints >= 0) {
+                                            try {
+                                                await api.put('/users/me', { zionsPoints: newPoints });
+                                                showToast('Zions Points atualizados!', 'success');
+                                                window.location.reload();
+                                            } catch { showToast('Erro ao atualizar zions points.', 'error'); }
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="flex-1 min-w-[140px]">
+                                <label className="block text-xs text-gray-400 mb-1">Zions Cash</label>
+                                <input
+                                    type="number"
+                                    defaultValue={user?.zionsCash || 0}
+                                    min="0"
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-gold-500/50 outline-none text-sm"
+                                    onBlur={async (e) => {
+                                        const newCash = parseInt(e.target.value);
+                                        if (!isNaN(newCash) && newCash >= 0) {
+                                            try {
+                                                await api.put('/users/me', { zionsCash: newCash });
+                                                showToast('Zions Cash atualizados!', 'success');
+                                                window.location.reload();
+                                            } catch { showToast('Erro ao atualizar zions cash.', 'error'); }
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Users Management */}
-                <div className="lg:col-span-3 glass-panel p-6 rounded-xl mt-8">
-                    <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                        <UserIcon className="w-5 h-5 text-gold-400" /> Gerenciar Usuários
-                    </h2>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="text-xs text-gray-400 border-b border-white/10">
-                                    <th className="p-3 font-medium uppercase tracking-wider">Nome</th>
-                                    <th className="p-3 font-medium uppercase tracking-wider">Email</th>
-                                    <th className="p-3 font-medium uppercase tracking-wider">Membro</th>
-                                    <th className="p-3 font-medium uppercase tracking-wider">Nível</th>
-                                    <th className="p-3 font-medium uppercase tracking-wider">Troféus</th>
-                                    <th className="p-3 font-medium uppercase tracking-wider text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-sm divide-y divide-white/5">
-                                {usersList.slice(0, usersToShow).map(u => (
-                                    <tr key={u.id} className="hover:bg-white/5 transition-colors group">
-                                        <td className="p-3 text-white font-medium">{u.name}</td>
-                                        <td className="p-3 text-gray-400">{u.email}</td>
-                                        <td className="p-3">
-                                            <button
-                                                onClick={() => handleToggleMembership(u.id, u.membershipType)}
-                                                className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${u.membershipType === 'MGT'
-                                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30'
-                                                    : 'bg-gold-500/20 text-gold-400 border-gold-500/30 hover:bg-gold-500/30'
-                                                    }`}
-                                            >
-                                                {u.membershipType || 'MAGAZINE'}
-                                            </button>
-                                        </td>
-                                        <td className="p-3">
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="30"
-                                                defaultValue={u.level || 1}
-                                                aria-label={`Editar nível de ${u.name}`}
-                                                className="w-16 bg-black/40 border border-white/10 rounded px-2 py-1 text-white text-xs focus:border-gold-500/50 outline-none"
-                                                onBlur={async (e) => {
-                                                    const newLevel = parseInt(e.target.value);
-                                                    if (!isNaN(newLevel) && newLevel >= 1 && newLevel <= 30) {
-                                                        try {
-                                                            await api.put(`/users/${u.id}/level`, { level: newLevel });
-                                                            showToast(`Nível de ${u.name} atualizado para ${newLevel}`, 'success');
-                                                        } catch (error) {
-                                                            console.error('Failed to update level', error);
-                                                            showToast('Erro ao atualizar nível', 'error');
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                        </td>
-                                        <td className="p-3 text-gray-400">{u.trophies}</td>
-                                        <td className="p-3 text-right">
-                                            <button
-                                                onClick={() => handleResetPassword(u.id, u.name)}
-                                                className="text-gray-500 hover:text-white transition-colors p-1"
-                                                title="Enviar Nova Senha por Email"
-                                            >
-                                                Enviar Nova Senha
-                                            </button>
-                                        </td>
-                                    </tr>
+                    {/* Member Requests */}
+                    <div className="admin-card">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2.5 rounded-xl bg-gold-500/10">
+                                <UserIcon className="w-5 h-5 text-gold-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-white">Solicitações de Membros</h3>
+                                <p className="text-xs text-gray-400">{requests.length} pendente{requests.length !== 1 ? 's' : ''}</p>
+                            </div>
+                        </div>
+                        {requests.length === 0 ? (
+                            <p className="text-gray-500 text-sm">Nenhuma solicitação pendente.</p>
+                        ) : (
+                            <div className="flex flex-wrap gap-3">
+                                {requests.map(req => (
+                                    <div key={req.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 min-w-[250px]">
+                                        <div className="flex-1">
+                                            <h4 className="font-medium text-white text-sm">{req.name}</h4>
+                                            {req.instagram && <p className="text-xs text-gold-400">@{req.instagram}</p>}
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button onClick={() => handleApproveRequest(req.id)} className="p-1.5 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"><Check className="w-4 h-4" /></button>
+                                            <button onClick={() => handleRejectRequest(req.id)} className="p-1.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"><X className="w-4 h-4" /></button>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
-                        
-                        {/* Load More Button */}
-                        {usersToShow < usersList.length && (
-                            <div className="mt-4 flex justify-center">
-                                <button
-                                    onClick={() => setUsersToShow(prev => prev + 10)}
-                                    className="px-6 py-2 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 rounded-lg border border-gold-500/30 transition-colors text-sm font-medium"
-                                >
-                                    Carregar Mais ({usersList.length - usersToShow} restantes)
-                                </button>
                             </div>
                         )}
+                    </div>
+
+                    {/* Active Rewards */}
+                    <div className="admin-card">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2.5 rounded-xl bg-gold-500/10">
+                                <Gift className="w-5 h-5 text-gold-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-white">Recompensas Ativas</h3>
+                                <p className="text-xs text-gray-400">{rewards.length} cadastrada{rewards.length !== 1 ? 's' : ''}</p>
+                            </div>
+                        </div>
+                        {loading ? (
+                            <Loader size="sm" />
+                        ) : rewards.length === 0 ? (
+                            <p className="text-gray-500 text-sm">Nenhuma recompensa cadastrada.</p>
+                        ) : (
+                            <div className="flex flex-wrap gap-3">
+                                {rewards.map(reward => (
+                                    <div key={reward.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 min-w-[280px]">
+                                        <div className="w-9 h-9 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-400 shrink-0">
+                                            <Gift className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-medium text-white text-sm truncate">{reward.title}</h4>
+                                            <p className="text-xs text-gray-400">{reward.costZions} Z$ • {reward.stock} estoque</p>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button onClick={() => setEditModal({ isOpen: true, reward })} className="p-1.5 text-gray-400 hover:text-gold-400"><Edit2 className="w-4 h-4" /></button>
+                                            <button onClick={() => setDeleteModal({ isOpen: true, rewardId: reward.id })} className="p-1.5 text-gray-400 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <AdminCreateAnnouncement showToast={showToast} />
+                    <AdminAdsSettings />
+                    <AdminCreateReward showToast={showToast} onRewardCreated={fetchData} />
+                    <AdminTwitchSettings />
+                    <AdminModerationPanel />
+                    <AdminCreateEvent showToast={showToast} />
+                    <AdminCreateTournament showToast={showToast} />
+                    <RovexShieldCard />
+                    <AdminCoupons showToast={showToast} />
+                    <BadgeManager />
+                    <AdminFeedbackCard />
+
+                    {/* Users Management */}
+                    <div className="admin-card">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2.5 rounded-xl bg-gold-500/10">
+                                <UserIcon className="w-5 h-5 text-gold-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-white">Gerenciar Usuários</h3>
+                                <p className="text-xs text-gray-400">{usersList.length} usuário{usersList.length !== 1 ? 's' : ''}</p>
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr className="text-xs text-gray-400 border-b border-white/10">
+                                        <th className="p-2 font-medium">Nome</th>
+                                        <th className="p-2 font-medium">Email</th>
+                                        <th className="p-2 font-medium">Membro</th>
+                                        <th className="p-2 font-medium">Nível</th>
+                                        <th className="p-2 font-medium">Troféus</th>
+                                        <th className="p-2 font-medium text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {usersList.slice(0, usersToShow).map(u => (
+                                        <tr key={u.id} className="hover:bg-white/5">
+                                            <td className="p-2 text-white">{u.name}</td>
+                                            <td className="p-2 text-gray-400">{u.email}</td>
+                                            <td className="p-2">
+                                                <button
+                                                    onClick={() => handleToggleMembership(u.id, u.membershipType)}
+                                                    className={`px-2 py-0.5 rounded text-[10px] font-bold border ${u.membershipType === 'MGT' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}`}
+                                                >
+                                                    {u.membershipType || 'MAGAZINE'}
+                                                </button>
+                                            </td>
+                                            <td className="p-2">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="30"
+                                                    defaultValue={u.level || 1}
+                                                    className="w-14 bg-black/40 border border-white/10 rounded px-2 py-1 text-white text-xs"
+                                                    onBlur={async (e) => {
+                                                        const newLevel = parseInt(e.target.value);
+                                                        if (!isNaN(newLevel) && newLevel >= 1 && newLevel <= 30) {
+                                                            try {
+                                                                await api.put(`/users/${u.id}/level`, { level: newLevel });
+                                                                showToast(`Nível de ${u.name} atualizado`, 'success');
+                                                            } catch { showToast('Erro ao atualizar nível', 'error'); }
+                                                        }
+                                                    }}
+                                                />
+                                            </td>
+                                            <td className="p-2 text-gray-400">{u.trophies}</td>
+                                            <td className="p-2 text-right">
+                                                <button onClick={() => handleResetPassword(u.id, u.name)} className="text-xs text-gray-500 hover:text-white">
+                                                    Nova Senha
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {usersToShow < usersList.length && (
+                                <div className="mt-3 flex justify-center">
+                                    <button
+                                        onClick={() => setUsersToShow(prev => prev + 10)}
+                                        className="px-4 py-1.5 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 rounded-lg border border-gold-500/30 text-xs font-medium"
+                                    >
+                                        Carregar Mais ({usersList.length - usersToShow} restantes)
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

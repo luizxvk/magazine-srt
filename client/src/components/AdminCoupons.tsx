@@ -51,10 +51,6 @@ export default function AdminCoupons({ showToast }: AdminCouponsProps) {
   const [expiresAt, setExpiresAt] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const cardBg = theme === 'light'
-    ? 'bg-white/80 border-gray-200/60'
-    : 'bg-white/[0.03] border-white/[0.08]';
-
   useEffect(() => {
     fetchCoupons();
   }, [filter]);
@@ -146,7 +142,7 @@ export default function AdminCoupons({ showToast }: AdminCouponsProps) {
     : 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:ring-purple-500/30';
 
   return (
-    <div className={`${cardBg} border backdrop-blur-2xl rounded-2xl p-6`}>
+    <div className="admin-card">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

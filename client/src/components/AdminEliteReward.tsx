@@ -28,8 +28,6 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
         showInHighlights: false
     });
 
-    const cardBg = theme === 'light' ? 'bg-white' : 'bg-zinc-900/80';
-    const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
     const inputBg = theme === 'light' ? 'bg-gray-50' : 'bg-black/40';
@@ -79,7 +77,7 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
 
     if (loading) {
         return (
-            <div className={`${cardBg} ${cardBorder} border rounded-2xl p-6`}>
+            <div className="admin-card">
                 <div className="flex items-center justify-center py-8">
                     <Loader size="md" />
                 </div>
@@ -88,7 +86,7 @@ export default function AdminEliteReward({ showToast }: AdminEliteRewardProps) {
     }
 
     return (
-        <div className={`${cardBg} ${cardBorder} border rounded-2xl p-6`}>
+        <div className="admin-card">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 rounded-xl bg-gold-500/10">

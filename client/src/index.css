@@ -592,6 +592,15 @@ html.rgb-dynamic .shadow-accent {
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 
+  /* Standardized Admin Card Style */
+  .admin-card {
+    @apply bg-zinc-900/80 border border-white/10 rounded-2xl p-5 backdrop-blur-xl;
+  }
+
+  .light .admin-card {
+    @apply bg-white border-gray-200 shadow-lg;
+  }
+
   .text-gradient-gold {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-gold-300 via-gold-100 to-gold-400;
     text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);

@@ -53,7 +53,6 @@ export default function AdminCreateTournament({ showToast, onTournamentCreated }
     const accentBg = isMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10';
     const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-amber-500/30';
     const accentText = isMGT ? 'text-emerald-400' : 'text-amber-400';
-    const cardBg = isDark ? 'bg-black/40' : 'bg-white/80';
     const inputBg = isDark ? 'bg-white/5' : 'bg-gray-100/80';
     const inputBorder = isDark ? 'border-white/10' : 'border-gray-200';
     const textMain = isDark ? 'text-white' : 'text-gray-900';
@@ -129,7 +128,7 @@ export default function AdminCreateTournament({ showToast, onTournamentCreated }
     };
 
     return (
-        <div className={`${cardBg} backdrop-blur-xl rounded-2xl border ${accentBorder} p-5 transition-all duration-300`}>
+        <div className="admin-card transition-all duration-300">
             {/* Header Toggle */}
             <button
                 onClick={() => setIsOpen(!isOpen)}

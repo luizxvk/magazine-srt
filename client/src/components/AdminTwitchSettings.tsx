@@ -152,7 +152,7 @@ export default function AdminTwitchSettings() {
 
     if (loading) {
         return (
-            <div className="glass-panel p-6 rounded-xl">
+            <div className="admin-card">
                 <div className="flex justify-center py-12">
                     <RefreshCw className="w-6 h-6 text-purple-400 animate-spin" />
                 </div>
@@ -161,7 +161,7 @@ export default function AdminTwitchSettings() {
     }
 
     return (
-        <div className="glass-panel p-6 rounded-xl space-y-6">
+        <div className="admin-card space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-serif text-white flex items-center gap-2">

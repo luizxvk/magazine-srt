@@ -64,7 +64,6 @@ export default function AdminFeedbackCard() {
     const activeColor = accentColor || defaultColor;
     
     const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-    const themeBg = theme === 'light' ? 'bg-white/90' : 'bg-black/40';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
     
@@ -160,7 +159,7 @@ export default function AdminFeedbackCard() {
     
     if (loading) {
         return (
-            <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6`}>
+            <div className="admin-card">
                 <div className="flex items-center justify-center py-8">
                     <Loader size="sm" />
                 </div>
@@ -169,7 +168,7 @@ export default function AdminFeedbackCard() {
     }
     
     return (
-        <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl overflow-hidden`}>
+        <div className="admin-card !p-0 overflow-hidden">
             {/* Header */}
             <div className="p-4 border-b border-white/10">
                 <div className="flex items-center justify-between mb-3">

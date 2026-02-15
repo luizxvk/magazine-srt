@@ -99,7 +99,7 @@ export default function AdminModerationPanel() {
     };
 
     return (
-        <div className="glass-panel p-6 rounded-xl space-y-6">
+        <div className="admin-card space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-serif text-white flex items-center gap-2">

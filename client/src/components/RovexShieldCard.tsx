@@ -67,10 +67,6 @@ export default function RovexShieldCard() {
     }
   };
 
-  const cardBg = theme === 'light'
-    ? 'bg-white/80 border-gray-200/60'
-    : 'bg-white/[0.03] border-white/[0.08]';
-
   const serviceRowBg = theme === 'light'
     ? 'bg-gray-50/80'
     : 'bg-white/[0.03]';
@@ -79,7 +75,7 @@ export default function RovexShieldCard() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`${cardBg} border backdrop-blur-2xl rounded-2xl p-6`}
+      className="admin-card"
     >
       {/* Hero Logo */}
       <div className="flex flex-col items-center mb-6">

@@ -126,7 +126,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
     };
 
     return (
-        <div className="glass-panel p-6 rounded-xl relative overflow-hidden group">
+        <div className="admin-card relative overflow-hidden group">
             {/* Liquid Glass Effect Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 to-transparent opacity-50 pointer-events-none" />
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-gold-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-gold-500/20 transition-colors duration-700" />

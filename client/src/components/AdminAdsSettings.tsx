@@ -24,7 +24,6 @@ export default function AdminAdsSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    const themeCard = isDarkMode ? 'bg-neutral-900/80' : 'bg-white';
     const themeBorder = isDarkMode ? 'border-white/10' : 'border-gray-200';
     const themeText = isDarkMode ? 'text-white' : 'text-gray-900';
     const themeSecondary = isDarkMode ? 'text-gray-400' : 'text-gray-600';
@@ -78,7 +77,7 @@ export default function AdminAdsSettings() {
 
     if (loading) {
         return (
-            <div className={`${themeCard} rounded-2xl p-6 border ${themeBorder}`}>
+            <div className="admin-card">
                 <div className="flex items-center justify-center py-8">
                     <Loader size="sm" />
                 </div>
@@ -90,7 +89,7 @@ export default function AdminAdsSettings() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`${themeCard} rounded-2xl p-6 border ${themeBorder}`}
+            className="admin-card"
         >
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">

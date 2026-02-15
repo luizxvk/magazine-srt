@@ -49,7 +49,6 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
     const [dropClaimHours, setDropClaimHours] = useState(24); // Horas após evento para resgatar
 
     const themeColor = isMGT ? 'emerald' : 'gold';
-    const borderColor = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
     const focusColor = isMGT ? 'focus:border-emerald-500/50' : 'focus:border-gold-500/50';
     const buttonBg = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500';
     const iconColor = isMGT ? 'text-emerald-400' : 'text-gold-400';
@@ -177,7 +176,7 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
     };
 
     return (
-        <div className={`glass-panel p-6 rounded-xl border ${borderColor}`}>
+        <div className="admin-card">
             <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-xl font-serif text-${themeColor}-400 flex items-center gap-2`}>
                     <Calendar className={`w-5 h-5 ${iconColor}`} />

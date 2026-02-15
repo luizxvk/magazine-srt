@@ -182,7 +182,7 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
     };
 
     return (
-        <div className="glass-panel p-6 rounded-xl relative overflow-hidden group">
+        <div className="admin-card relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-50 pointer-events-none" />
 
             <div className="flex items-center justify-between mb-6 relative z-10">

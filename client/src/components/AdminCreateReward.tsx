@@ -133,7 +133,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
     };
 
     return (
-        <div className="glass-panel p-6 rounded-xl h-fit">
+        <div className="admin-card h-fit">
             <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
                 <Plus className="w-5 h-5 text-gold-400" /> Nova Recompensa
             </h2>

@@ -128,7 +128,7 @@ const BadgeManager: React.FC = () => {
 
     if (loading) {
         return (
-            <div className={`p-6 rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="admin-card">
                 <div className="flex items-center gap-3 mb-6">
                     <Tag className="w-6 h-6 text-purple-500" />
                     <h2 className="text-xl font-bold">Gerenciar Selos</h2>
@@ -139,7 +139,7 @@ const BadgeManager: React.FC = () => {
     }
 
     return (
-        <div className={`p-6 rounded-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className="admin-card">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">

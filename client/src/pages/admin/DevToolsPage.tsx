@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Terminal, RefreshCw, Pause, Play, Trash2, AlertTriangle, Coins } from 'lucide-react';
+import { Terminal, RefreshCw, Pause, Play, Trash2, AlertTriangle, Coins, Send, CheckCircle, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import Header from '../../components/Header';
 import LuxuriousBackground from '../../components/LuxuriousBackground';
@@ -20,25 +21,36 @@ export default function DevToolsPage() {
     const [loading, setLoading] = useState(true);
     const [autoRefresh, setAutoRefresh] = useState(true);
     const [filterSource, setFilterSource] = useState<'ALL' | 'FRONTEND' | 'BACKEND'>('ALL');
-    const [resettingZions, setResettingZions] = useState(false);
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [requestReason, setRequestReason] = useState('');
+    const [submittingRequest, setSubmittingRequest] = useState(false);
+    const [requestSent, setRequestSent] = useState(false);
     const logsEndRef = useRef<HTMLDivElement>(null);
-    const { showSuccess, showError } = useAuth();
+    const { showSuccess, showError, user } = useAuth();
 
-    const handleResetZions = async () => {
-        if (!confirm('⚠️ ATENÇÃO: Isso irá ZERAR todos os Zions de TODOS os usuários (exceto admins).\n\nEssa ação é IRREVERSÍVEL!\n\nDeseja continuar?')) {
+    const handleSubmitRequest = async () => {
+        if (!requestReason.trim()) {
+            showError('Por favor, informe o motivo da solicitação');
             return;
         }
-        
-        setResettingZions(true);
+        setSubmittingRequest(true);
         try {
-            const response = await api.post('/devtools/reset-zions');
-            showSuccess(`✅ ${response.data.message}`);
-            console.log('[DevTools] Reset Zions result:', response.data);
-        } catch (error) {
-            console.error('[DevTools] Failed to reset zions:', error);
-            showError('Erro ao resetar Zions');
+            await api.post('/rovex/action-request', {
+                action: 'RESET_ZIONS',
+                reason: requestReason,
+                requestedBy: user?.name || user?.email
+            });
+            setRequestSent(true);
+            showSuccess('Solicitação enviada para aprovação da Rovex!');
+            setTimeout(() => {
+                setShowRequestModal(false);
+                setRequestSent(false);
+                setRequestReason('');
+            }, 2000);
+        } catch (error: any) {
+            showError(error?.response?.data?.error || 'Erro ao enviar solicitação');
         } finally {
-            setResettingZions(false);
+            setSubmittingRequest(false);
         }
     };
 
@@ -135,24 +147,26 @@ export default function DevToolsPage() {
                         </div>
                     </div>
 
-                    {/* Danger Zone - Admin Actions */}
-                    <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-6">
+                    {/* Danger Zone - Admin Actions - Requires Rovex Approval */}
+                    <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6">
                         <div className="flex items-center gap-3 mb-4">
-                            <AlertTriangle className="w-5 h-5 text-red-400" />
-                            <h2 className="text-lg font-bold text-red-400">Zona de Perigo</h2>
+                            <AlertTriangle className="w-5 h-5 text-amber-400" />
+                            <h2 className="text-lg font-bold text-amber-400">Ações Administrativas</h2>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                REQUER APROVAÇÃO ROVEX
+                            </span>
                         </div>
                         <div className="flex flex-wrap gap-4">
                             <button
-                                onClick={handleResetZions}
-                                disabled={resettingZions}
-                                className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/40 rounded-lg text-red-400 hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => setShowRequestModal(true)}
+                                className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/40 rounded-lg text-amber-400 hover:bg-amber-500/30 transition-all"
                             >
                                 <Coins className="w-4 h-4" />
-                                {resettingZions ? 'Resetando...' : 'Reset Zions (Exceto Admins)'}
+                                Solicitar Reset de Zions
                             </button>
                         </div>
-                        <p className="text-red-400/60 text-xs mt-3">
-                            ⚠️ Essas ações são irreversíveis. Use com cuidado.
+                        <p className="text-amber-400/60 text-xs mt-3">
+                            ⚠️ Ações críticas requerem aprovação da equipe Rovex por segurança.
                         </p>
                     </div>
 
@@ -219,6 +233,100 @@ export default function DevToolsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Rovex Request Modal */}
+            <AnimatePresence>
+                {showRequestModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => !submittingRequest && setShowRequestModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                            className="w-full max-w-md rounded-2xl p-6 bg-[#1c1c1e]/95 backdrop-blur-xl border border-white/10"
+                        >
+                            {requestSent ? (
+                                <div className="text-center py-8">
+                                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                                        <CheckCircle className="w-8 h-8 text-green-400" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-white mb-2">Solicitação Enviada!</h3>
+                                    <p className="text-gray-400 text-sm">A equipe Rovex analisará sua solicitação.</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                                            <Send className="w-6 h-6 text-amber-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white">Solicitar Reset de Zions</h3>
+                                            <p className="text-xs text-gray-400">Requer aprovação da Rovex</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6">
+                                        <div className="flex items-start gap-3">
+                                            <Clock className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                                            <div>
+                                                <p className="text-sm text-blue-400 font-medium">Como funciona?</p>
+                                                <p className="text-xs text-gray-400 mt-1">
+                                                    Sua solicitação será enviada para a equipe Rovex. Após análise, você receberá uma notificação com o status da aprovação.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-6">
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                            Motivo da solicitação *
+                                        </label>
+                                        <textarea
+                                            value={requestReason}
+                                            onChange={e => setRequestReason(e.target.value)}
+                                            placeholder="Explique por que precisa resetar os Zions de todos os usuários..."
+                                            className="w-full h-24 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-amber-500/50 resize-none"
+                                        />
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowRequestModal(false)}
+                                            disabled={submittingRequest}
+                                            className="flex-1 py-3 rounded-xl text-sm font-medium border border-white/10 text-gray-400 hover:bg-white/5 transition-colors disabled:opacity-50"
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            onClick={handleSubmitRequest}
+                                            disabled={submittingRequest || !requestReason.trim()}
+                                            className="flex-1 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-amber-400 text-black hover:from-amber-400 hover:to-amber-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            {submittingRequest ? (
+                                                <>
+                                                    <Loader size="sm" />
+                                                    Enviando...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Send className="w-4 h-4" />
+                                                    Enviar Solicitação
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
 
     );

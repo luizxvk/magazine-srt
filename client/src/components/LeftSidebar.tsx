@@ -22,6 +22,7 @@ interface SidebarItem {
     onClick?: () => void;
     to?: string;
     feature?: Feature; // Feature gate opcional
+    badge?: string; // NEW badge, etc.
 }
 
 export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick, dailyLoginStatus }: LeftSidebarProps) {
@@ -59,12 +60,14 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
         {
             icon: <Trophy className="w-5 h-5" />,
             label: t('common:nav.tournaments'),
-            to: '/tournaments'
+            to: '/tournaments',
+            badge: 'NEW'
         },
         {
             icon: <BarChart3 className="w-5 h-5" />,
             label: 'StatForge',
-            to: '/statforge'
+            to: '/statforge',
+            badge: 'NEW'
         },
         {
             icon: <ShoppingBag className="w-5 h-5" />,
@@ -135,6 +138,11 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
                 <span className={`flex-1 text-sm font-medium ${textMain} group-hover:${isMGT ? 'text-emerald-400' : 'text-gold-400'} transition-colors`}>
                     {item.label}
                 </span>
+                {item.badge && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm">
+                        {item.badge}
+                    </span>
+                )}
                 {isLocked && (
                     <Lock size={12} className="text-amber-500" />
                 )}

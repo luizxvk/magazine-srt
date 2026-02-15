@@ -131,7 +131,8 @@ export default function MobileCarousel({
             subtitle: 'Competições e prêmios',
             icon: <Trophy className="w-6 h-6" />,
             gradient: cardStyle,
-            onClick: () => navigate('/tournaments')
+            onClick: () => navigate('/tournaments'),
+            badge: 'NEW'
         },
         {
             id: 'members',
@@ -167,6 +168,13 @@ export default function MobileCarousel({
         }
     ];
 
+    // Sort cards: NEW badges first, then others
+    const sortedCards = [...cards].sort((a, b) => {
+        const aIsNew = a.badge === 'NEW' ? 1 : 0;
+        const bIsNew = b.badge === 'NEW' ? 1 : 0;
+        return bIsNew - aIsNew; // NEW items come first
+    });
+
     // Handle scroll snap
     useEffect(() => {
         const carousel = carouselRef.current;
@@ -176,8 +184,8 @@ export default function MobileCarousel({
             const cardWidth = 160 + 12; // card width + gap
             const scrollPosition = carousel.scrollLeft;
             const newIndex = Math.round(scrollPosition / cardWidth);
-            // Clamp between 0 and cards.length - 1
-            const clampedIndex = Math.max(0, Math.min(newIndex, cards.length - 1));
+            // Clamp between 0 and sortedCards.length - 1
+            const clampedIndex = Math.max(0, Math.min(newIndex, sortedCards.length - 1));
             if (clampedIndex !== currentIndex) {
                 setCurrentIndex(clampedIndex);
             }
@@ -187,7 +195,7 @@ export default function MobileCarousel({
         // Call once to set initial index
         handleScroll();
         return () => carousel.removeEventListener('scroll', handleScroll);
-    }, [cards.length, currentIndex]);
+    }, [sortedCards.length, currentIndex]);
 
     // Mouse/Touch drag handlers
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -228,7 +236,7 @@ export default function MobileCarousel({
     };
 
     const handleNext = () => {
-        const newIndex = Math.min(cards.length - 1, currentIndex + 1);
+        const newIndex = Math.min(sortedCards.length - 1, currentIndex + 1);
         scrollToIndex(newIndex);
     };
 
@@ -277,10 +285,10 @@ export default function MobileCarousel({
             </div>
 
             {/* Carousel Container */}
-            <div className="relative w-full overflow-visible">
+            <div className="relative w-full overflow-visible pt-2">
                 <div
                     ref={carouselRef}
-                    className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing -mx-1 px-1"
+                    className="flex gap-3 overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing -mx-1 px-1"
                     style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -291,7 +299,7 @@ export default function MobileCarousel({
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
                 >
-                    {cards.map((card) => (
+                    {sortedCards.map((card) => (
                         <button
                             key={card.id}
                             onClick={(e) => {
@@ -381,7 +389,7 @@ export default function MobileCarousel({
 
             {/* Dots Indicator */}
             <div className="flex justify-center gap-1.5 mt-[-8px]">
-                {cards.map((_, idx) => (
+                {sortedCards.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => scrollToIndex(idx)}

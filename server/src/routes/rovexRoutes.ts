@@ -1666,4 +1666,106 @@ router.get('/pix-requests', getRovexPixRequests);
  */
 router.post('/pix-requests/:requestId/review', reviewPixRequest);
 
+// ===================== ADMIN ACTION REQUESTS (Requires Rovex approval) =====================
+
+/**
+ * POST /api/rovex/action-request
+ * Submit a critical action request for Rovex approval
+ * Body: { action: 'RESET_ZIONS' | string, reason: string, requestedBy?: string }
+ */
+router.post('/action-request', authenticateToken, isAdmin, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId;
+    const { action, reason, requestedBy } = req.body;
+
+    if (!action || !reason) {
+      return res.status(400).json({ error: 'action and reason are required' });
+    }
+
+    // Get user info
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true, email: true }
+    });
+
+    // Create the action request record
+    const actionRequest = await prisma.systemConfig.create({
+      data: {
+        key: `action_request_${Date.now()}`,
+        value: JSON.stringify({
+          action,
+          reason,
+          requestedBy: requestedBy || user?.username || user?.email,
+          userId,
+          status: 'PENDING',
+          createdAt: new Date().toISOString(),
+        })
+      }
+    });
+
+    // Report to Rovex platform (if configured)
+    try {
+      await reportEvent('ADMIN_ACTION_REQUEST', {
+        requestId: actionRequest.id,
+        action,
+        reason,
+        requestedBy: requestedBy || user?.username || user?.email,
+        userId,
+      });
+    } catch (e) {
+      console.debug('[Rovex] Could not report action request event');
+    }
+
+    // Create notification for admins
+    await prisma.notification.create({
+      data: {
+        userId,
+        type: 'CUSTOM',
+        content: JSON.stringify({
+          title: '📋 Solicitação Enviada',
+          text: `Sua solicitação de "${action}" foi enviada para aprovação da Rovex.`,
+          action,
+        })
+      }
+    });
+
+    console.log(`[Rovex] 📋 Admin action request submitted: ${action} by ${requestedBy || user?.username}`);
+
+    res.json({
+      success: true,
+      message: 'Solicitação enviada para aprovação da Rovex',
+      requestId: actionRequest.id,
+    });
+  } catch (error) {
+    console.error('[Rovex] Action request error:', error);
+    res.status(500).json({ error: 'Failed to submit action request' });
+  }
+});
+
+/**
+ * GET /api/rovex/action-requests
+ * Get all pending action requests (for Rovex dashboard)
+ */
+router.get('/action-requests', async (req: Request, res: Response) => {
+  try {
+    const requests = await prisma.systemConfig.findMany({
+      where: {
+        key: { startsWith: 'action_request_' }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const parsedRequests = requests.map(r => ({
+      id: r.id,
+      key: r.key,
+      ...JSON.parse(r.value),
+    }));
+
+    res.json(parsedRequests);
+  } catch (error) {
+    console.error('[Rovex] Get action requests error:', error);
+    res.status(500).json({ error: 'Failed to get action requests' });
+  }
+});
+
 export default router;

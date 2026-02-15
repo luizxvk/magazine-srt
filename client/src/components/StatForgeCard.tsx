@@ -33,7 +33,7 @@ export default function StatForgeCard() {
                     <img
                         src="/assets/statforge-logo.png"
                         alt="StatForge"
-                        className="relative w-24 h-24 object-contain"
+                        className="relative w-36 h-36 object-contain"
                     />
                 </div>
                 <div className="flex-1 min-w-0">

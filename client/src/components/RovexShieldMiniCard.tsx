@@ -11,9 +11,14 @@ interface ShieldData {
 }
 
 export default function RovexShieldMiniCard() {
-  const { theme, accentColor } = useAuth();
+  const { user, theme, accentColor } = useAuth();
   const [data, setData] = useState<ShieldData | null>(null);
   const [loading, setLoading] = useState(true);
+  const isMGT = user?.membershipType === 'MGT';
+  const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+  const themeGlow = isMGT
+    ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+    : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -38,14 +43,14 @@ export default function RovexShieldMiniCard() {
     : 0;
 
   const cardBg = theme === 'light' 
-    ? 'bg-white/90 border-gray-200/50' 
-    : 'bg-[#1c1c1e]/90 border-white/10';
+    ? 'bg-white/90' 
+    : 'bg-[#1c1c1e]/90';
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl ${cardBg} p-4`}
+      className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl ${cardBg} ${themeBorder} ${themeGlow} p-4 transition-all duration-300`}
     >
       {/* Subtle gradient overlay */}
       <div 

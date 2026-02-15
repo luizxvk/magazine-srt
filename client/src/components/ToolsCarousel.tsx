@@ -74,8 +74,13 @@ export default function ToolsCarousel() {
         }
     };
 
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeGlow = isMGT
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
+
     return (
-        <div className="rounded-2xl bg-[#1c1c1e]/80 backdrop-blur-xl border border-white/10 overflow-hidden">
+        <div className={`rounded-2xl bg-[#1c1c1e]/80 backdrop-blur-xl border ${themeBorder} ${themeGlow} overflow-hidden transition-all duration-300`}>
             {/* Minimal Tab Header */}
             <div className="flex border-b border-white/5">
                 {tools.map((tool) => {
@@ -106,7 +111,7 @@ export default function ToolsCarousel() {
             </div>
 
             {/* Tool Content */}
-            <div className="p-4 max-h-[320px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <div className="p-4">
                 {renderCurrentTool()}
             </div>
         </div>

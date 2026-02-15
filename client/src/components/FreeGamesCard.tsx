@@ -101,7 +101,7 @@ export default function FreeGamesCard() {
             </div>
 
             {/* Games List */}
-            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+            <div className="space-y-3">
                 {games.map(game => {
                     const platformStyle = PLATFORM_COLORS[game.platform] || PLATFORM_COLORS.other;
                     const daysRemaining = game.expiresAt ? getDaysRemaining(game.expiresAt) : null;

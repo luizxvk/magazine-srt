@@ -324,17 +324,17 @@ export default function MobileCarousel({
                                     </>
                                 )}
                                 <div
-                                    className={`relative h-20 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/30 active:scale-95 transition-transform backdrop-blur-xl ${
+                                    className={`relative h-20 sm:h-24 rounded-xl bg-gradient-to-br ${card.gradient} p-2.5 flex flex-col justify-between shadow-lg shadow-black/30 active:scale-95 transition-transform backdrop-blur-xl ${
                                         card.premium 
                                             ? 'border border-violet-400/40 shadow-violet-500/20'
                                             : 'border border-white/10'
                                     }`}
                                 >
-                                    {/* Badge */}
+                                    {/* Badge - positioned outside overflow */}
                                     {card.badge && (
-                                        <div className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-lg ${
+                                        <div className={`absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-lg z-20 ${
                                             card.badge === 'NEW' 
-                                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse' 
+                                                ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white' 
                                                 : 'backdrop-blur-sm bg-black/40 text-white'
                                         }`}>
                                             {card.badge}

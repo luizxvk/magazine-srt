@@ -36,6 +36,7 @@ import EventDropPopup from '../components/EventDropPopup';
 import ElitePromoCard from '../components/ElitePromoCard';
 import WelcomeCard from '../components/WelcomeCard';
 import StatForgeCard from '../components/StatForgeCard';
+import RovexShieldMiniCard from '../components/RovexShieldMiniCard';
 
 interface PollOption {
     id: string;
@@ -595,6 +596,9 @@ export default function FeedPage() {
 
                         {/* Elite Promo Card - Apple Vision Pro style */}
                         <ElitePromoCard />
+
+                        {/* RovexShield Status Mini Card */}
+                        <RovexShieldMiniCard />
 
                         {/* Market Card */}
                         <MarketCard />

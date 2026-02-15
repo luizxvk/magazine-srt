@@ -47,25 +47,23 @@ const NavItemButton = memo(({
             {/* Active background */}
             {isActive && (
                 <div 
-                    className={`absolute inset-0 ${activeBgColor} rounded-xl`}
-                    style={{ boxShadow: `0 0 15px ${glowColor}` }}
+                    className="absolute inset-0 rounded-xl"
+                    style={{ backgroundColor: activeBgColor, boxShadow: `0 0 15px ${glowColor}` }}
                 />
             )}
 
             {/* Icon */}
-            <div className={`relative z-10 transition-transform ${isActive ? 'scale-110 -translate-y-0.5' : ''}`}>
-                <Icon 
-                    className={`w-6 h-6 transition-colors ${
-                        isActive ? activeTextColor : 'text-white/60'
-                    }`} 
-                />
+            <div 
+                className={`relative z-10 transition-transform ${isActive ? 'scale-110 -translate-y-0.5' : ''}`}
+                style={{ color: isActive ? activeTextColor : 'rgba(255,255,255,0.6)' }}
+            >
+                <Icon className="w-6 h-6 transition-colors" />
             </div>
 
             {/* Label */}
             <span
-                className={`relative z-10 text-[10px] font-medium mt-1 transition-colors ${
-                    isActive ? activeTextColor : 'text-white/60'
-                }`}
+                className="relative z-10 text-[10px] font-medium mt-1 transition-colors"
+                style={{ color: isActive ? activeTextColor : 'rgba(255,255,255,0.6)' }}
             >
                 {label}
             </span>
@@ -75,8 +73,16 @@ const NavItemButton = memo(({
 
 NavItemButton.displayName = 'NavItemButton';
 
+// Helper to convert hex to rgba
+const hexToRgba = (hex: string, alpha: number): string => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export default function BottomNavigation() {
-    const { user, isMobileDrawerOpen, activeChatUserId } = useAuth();
+    const { user, isMobileDrawerOpen, activeChatUserId, accentColor } = useAuth();
     const { t } = useTranslation('common');
     const location = useLocation();
     const navigate = useNavigate();
@@ -88,12 +94,15 @@ export default function BottomNavigation() {
 
     const isMGT = user?.membershipType === 'MGT';
     const liteMode = user?.liteMode ?? false;
+    
+    // Use user's accent color for navbar
+    const userColor = accentColor || (isMGT ? '#10b981' : '#d4af37');
 
-    // Theme colors - simplified
-    const glowColor = isMGT ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)';
-    const activeTextColor = isMGT ? 'text-emerald-400' : 'text-amber-400';
-    const activeBgColor = isMGT ? 'bg-emerald-500/20' : 'bg-amber-500/20';
-    const borderGlow = isMGT ? 'border-emerald-500/20' : 'border-amber-500/20';
+    // Theme colors - use accent color
+    const glowColor = hexToRgba(userColor, 0.3);
+    const activeTextColor = userColor; // Pass as hex for inline styles
+    const activeBgColor = hexToRgba(userColor, 0.2);
+    const borderGlow = 'border-white/10';
 
     // Listen for story viewer state changes
     useEffect(() => {

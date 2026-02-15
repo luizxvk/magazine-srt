@@ -695,7 +695,7 @@ export const getZionsHistory = async (req: Request, res: Response) => {
 
 export const getPrestigeStatus = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).userId;
+        const userId = (req as any).user?.userId;
         const status = await canPrestige(userId);
         res.json(status);
     } catch (error) {
@@ -706,7 +706,7 @@ export const getPrestigeStatus = async (req: Request, res: Response) => {
 
 export const doPrestige = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).userId;
+        const userId = (req as any).user?.userId;
         const result = await performPrestige(userId);
         res.json(result);
     } catch (error: any) {

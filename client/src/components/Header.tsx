@@ -216,7 +216,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <img 
                                 src={logoUrl} 
                                 alt={config.tierStdName || "MGT"} 
-                                className={`h-24 sm:h-28 md:h-32 object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
+                                className={`h-10 w-auto object-contain ${theme === 'light' ? 'brightness-0' : ''}`} 
                             />
                         ) : (
                             <span 

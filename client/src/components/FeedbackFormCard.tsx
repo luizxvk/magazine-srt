@@ -226,7 +226,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     }
     
     return (
-        <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl overflow-hidden`}>
+        <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl`}>
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">

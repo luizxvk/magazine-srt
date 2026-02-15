@@ -190,7 +190,8 @@ export default function GroupChatCard() {
   }
 
   return (
-    <div className={`glass-panel rounded-xl ${accentGradient ? 'border-gradient-accent' : `border ${accentBorder}`} ${themeGlow} overflow-hidden transition-all duration-300`}>
+    <div className={`backdrop-blur-xl rounded-xl ${accentGradient ? 'border-gradient-accent' : `border ${accentBorder}`} ${themeGlow} transition-all duration-300`}
+    style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
       {/* Header - Group Selector */}
       <div 
         className="p-4 cursor-pointer hover:bg-white/5 transition-colors"

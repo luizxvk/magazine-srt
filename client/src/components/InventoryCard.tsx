@@ -187,7 +187,7 @@ export default function InventoryCard({ onOpenShop }: InventoryCardProps) {
     }
 
     return (
-        <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${bgColor} backdrop-blur-xl ${themeGlow} overflow-hidden transition-all duration-300`}>
+        <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${bgColor} backdrop-blur-xl ${themeGlow} transition-all duration-300`}>
             {/* Header */}
             <div className="p-4 flex justify-between items-center border-b border-white/10">
                 <div className="flex items-center gap-2">

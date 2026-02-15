@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import Header from './Header';
+import LuxuriousBackground from './LuxuriousBackground';
 import BracketViewer from './BracketViewer';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -177,7 +178,8 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
 
     if (loading || !tournament) {
         return (
-            <div className="min-h-screen bg-off-black">
+            <div className="min-h-screen">
+                <LuxuriousBackground />
                 <Header />
                 <div className="flex justify-center items-center h-[60vh]">
                     <div className="flex gap-1">
@@ -196,7 +198,8 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
     }
 
     return (
-        <div className="min-h-screen bg-off-black">
+        <div className="min-h-screen">
+            <LuxuriousBackground />
             <Header />
 
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">

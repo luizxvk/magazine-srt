@@ -44,7 +44,7 @@ export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps)
     return (
         <button
             onClick={onClick}
-            className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder} ${themeHover}`} ${themeGlow} transition-all duration-300 group text-left relative overflow-hidden`}
+            className={`w-full ${themeBg} backdrop-blur-xl p-4 rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder} ${themeHover}`} ${themeGlow} transition-all duration-300 group text-left relative`}
         >
             {/* Background Icon */}
             <div className="absolute -top-4 -right-4 opacity-20 group-hover:opacity-30 transition-opacity">

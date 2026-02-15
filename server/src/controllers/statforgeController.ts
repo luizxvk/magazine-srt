@@ -9,7 +9,7 @@ const SUPPORTED_GAMES = [
   { id: 'r6siege', name: 'Rainbow Six Siege', icon: '🛡️', iconUrl: 'https://img.icons8.com/?size=100&id=59676&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
   { id: 'cs2', name: 'Counter-Strike 2', icon: '🔫', iconUrl: 'https://img.icons8.com/?size=100&id=fKi1D913kbYA&format=png&color=000000', platforms: ['pc'], category: 'FPS' },
   { id: 'valorant', name: 'Valorant', icon: '⚡', iconUrl: 'https://img.icons8.com/?size=100&id=GSHWFnD9x56D&format=png&color=000000', platforms: ['pc'], category: 'FPS' },
-  { id: 'apex', name: 'Apex Legends', icon: '🏆', iconUrl: null, platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
+  { id: 'apex', name: 'Apex Legends', icon: '🏆', iconUrl: 'https://img.icons8.com/?size=100&id=rF1FlO7j89ts&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
   { id: 'overwatch2', name: 'Overwatch 2', icon: '🦸', iconUrl: 'https://img.icons8.com/?size=100&id=63667&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
   { id: 'cod', name: 'Call of Duty', icon: '💣', iconUrl: 'https://img.icons8.com/?size=100&id=BFTj9toBTo31&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
   // Battle Royale
@@ -17,7 +17,7 @@ const SUPPORTED_GAMES = [
   { id: 'pubg', name: 'PUBG', icon: '🪖', iconUrl: 'https://img.icons8.com/?size=100&id=usqeMxUzF8Jz&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
   // MOBA
   { id: 'lol', name: 'League of Legends', icon: '⚔️', iconUrl: 'https://img.icons8.com/?size=100&id=IH9qqSdkPkox&format=png&color=000000', platforms: ['pc'], category: 'MOBA' },
-  { id: 'dota2', name: 'Dota 2', icon: '🧙', iconUrl: null, platforms: ['pc'], category: 'MOBA' },
+  { id: 'dota2', name: 'Dota 2', icon: '🧙', iconUrl: 'https://img.icons8.com/?size=100&id=Yfv5WYFsIzfD&format=png&color=000000', platforms: ['pc'], category: 'MOBA' },
   { id: 'tft', name: 'Teamfight Tactics', icon: '♟️', iconUrl: 'https://img.icons8.com/?size=100&id=xvOD5btf9fjF&format=png&color=000000', platforms: ['pc'], category: 'Strategy' },
   // Platform-wide
   { id: 'steam', name: 'Steam', icon: '🎮', iconUrl: 'https://img.icons8.com/?size=100&id=zNqjI8XKkCv0&format=png&color=000000', platforms: ['pc'], category: 'Platform' },
@@ -27,7 +27,7 @@ const SUPPORTED_GAMES = [
   { id: 'epicgames', name: 'Epic Games', icon: '🟣', iconUrl: 'https://img.icons8.com/?size=100&id=R47Qp4SiyIGP&format=png&color=000000', platforms: ['pc'], category: 'Platform' },
   // Others
   { id: 'rocketleague', name: 'Rocket League', icon: '🚗', iconUrl: 'https://img.icons8.com/?size=100&id=Vg63URCXiYXv&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
-  { id: 'minecraft', name: 'Minecraft', icon: '⛏️', iconUrl: null, platforms: ['pc', 'xbox', 'playstation'], category: 'Sandbox' },
+  { id: 'minecraft', name: 'Minecraft', icon: '⛏️', iconUrl: 'https://img.icons8.com/?size=100&id=TqPdCjmGuqPc&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Sandbox' },
   { id: 'eafc', name: 'EA FC', icon: '⚽', iconUrl: 'https://img.icons8.com/?size=100&id=9793&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
 ];
 

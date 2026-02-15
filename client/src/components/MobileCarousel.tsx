@@ -61,7 +61,7 @@ export default function MobileCarousel({
             icon: <Gift className="w-6 h-6" />,
             gradient: cardStyle,
             onClick: onDailyLoginClick,
-            badge: dailyLoginStatus?.claimed ? '✓' : dailyLoginStatus?.nextReward
+            badge: dailyLoginStatus?.claimed ? '✓' : undefined
         },
         {
             id: 'supplybox',
@@ -69,8 +69,7 @@ export default function MobileCarousel({
             subtitle: 'Abra e ganhe prêmios!',
             icon: <Package className="w-6 h-6" />,
             gradient: cardStyle,
-            onClick: onSupplyBoxClick,
-            badge: '🎁'
+            onClick: onSupplyBoxClick
         },
         {
             id: 'whatsnew',
@@ -81,7 +80,8 @@ export default function MobileCarousel({
             onClick: () => {
                 const event = new CustomEvent('openWhatsNew');
                 window.dispatchEvent(event);
-            }
+            },
+            badge: 'NEW'
         },
         {
             id: 'elite',
@@ -90,7 +90,6 @@ export default function MobileCarousel({
             icon: <Crown className="w-6 h-6" />,
             gradient: 'from-violet-500/25 to-indigo-900/50',
             onClick: () => navigate('/elite'),
-            badge: '👑',
             premium: true
         },
         {
@@ -124,7 +123,7 @@ export default function MobileCarousel({
             icon: <BarChart3 className="w-6 h-6" />,
             gradient: 'from-blue-500/20 to-indigo-900/40',
             onClick: () => navigate('/statforge'),
-            badge: '📊'
+            badge: 'NEW'
         },
         {
             id: 'tournaments',
@@ -132,8 +131,7 @@ export default function MobileCarousel({
             subtitle: 'Competições e prêmios',
             icon: <Trophy className="w-6 h-6" />,
             gradient: cardStyle,
-            onClick: () => navigate('/tournaments'),
-            badge: '🏆'
+            onClick: () => navigate('/tournaments')
         },
         {
             id: 'members',
@@ -334,8 +332,10 @@ export default function MobileCarousel({
                                 >
                                     {/* Badge */}
                                     {card.badge && (
-                                        <div className={`absolute top-1.5 right-1.5 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm ${
-                                            card.premium ? 'bg-black/50' : 'bg-black/40'
+                                        <div className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-lg ${
+                                            card.badge === 'NEW' 
+                                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse' 
+                                                : 'backdrop-blur-sm bg-black/40 text-white'
                                         }`}>
                                             {card.badge}
                                         </div>

@@ -645,7 +645,7 @@ export const checkGroupCreatorBadge = async (userId: string) => {
 // ============================================
 const MAX_LEVEL = 30;
 const MAX_PRESTIGE = 10;
-const PRESTIGE_ZIONS_REWARD = [500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500]; // Cash per prestige level
+const PRESTIGE_POINTS_REWARD = [500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500]; // Points per prestige level
 
 export const canPrestige = async (userId: string) => {
     const user = await prisma.user.findUnique({
@@ -657,7 +657,7 @@ export const canPrestige = async (userId: string) => {
     if (user.prestigeLevel >= MAX_PRESTIGE) return { canPrestige: false, reason: 'Você atingiu o prestígio máximo!' };
     
     const nextPrestige = user.prestigeLevel + 1;
-    const reward = PRESTIGE_ZIONS_REWARD[user.prestigeLevel] || 500;
+    const reward = PRESTIGE_POINTS_REWARD[user.prestigeLevel] || 500;
     return {
         canPrestige: true,
         currentPrestige: user.prestigeLevel,
@@ -679,9 +679,9 @@ export const performPrestige = async (userId: string) => {
 
     const newPrestige = user.prestigeLevel + 1;
     const newStars = user.prestigeStars + 1;
-    const cashReward = PRESTIGE_ZIONS_REWARD[user.prestigeLevel] || 500;
+    const pointsReward = PRESTIGE_POINTS_REWARD[user.prestigeLevel] || 500;
 
-    // Reset level/XP, increment prestige, award Zions Cash
+    // Reset level/XP, increment prestige, award Zions Points (not Cash)
     const updatedUser = await prisma.user.update({
         where: { id: userId },
         data: {
@@ -690,7 +690,7 @@ export const performPrestige = async (userId: string) => {
             prestigeLevel: newPrestige,
             prestigeStars: newStars,
             lastPrestigedAt: new Date(),
-            zionsCash: { increment: cashReward },
+            zionsPoints: { increment: pointsReward },
         }
     });
 
@@ -700,7 +700,7 @@ export const performPrestige = async (userId: string) => {
             userId,
             type: 'ACHIEVEMENT',
             content: JSON.stringify({
-                text: `Prestígio ${newPrestige}! Você ganhou Z$${cashReward} e +${newPrestige * 5}% bônus de XP!`,
+                text: `Prestígio ${newPrestige}! Você ganhou ${pointsReward} Zions Points e +${newPrestige * 5}% bônus de XP!`,
                 title: `⭐ Prestígio ${newPrestige}`,
                 prestige: newPrestige,
             })
@@ -720,7 +720,7 @@ export const performPrestige = async (userId: string) => {
     return {
         prestige: newPrestige,
         stars: newStars,
-        cashReward,
+        pointsReward,
         xpBonus: newPrestige * 5,
         user: updatedUser,
     };

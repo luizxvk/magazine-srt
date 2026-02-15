@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Wrench } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Radio, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import RadioCard from './RadioCard';
 import DiscordCard from './DiscordCard';
@@ -39,36 +39,29 @@ const hexToRgba = (hex: string, alpha: number) => {
 };
 
 const tools = [
-    { id: 'radio', label: 'Rádio' },
-    { id: 'discord', label: 'Discord' },
+    { id: 'radio', label: 'Rádio', icon: Radio },
+    { id: 'discord', label: 'Discord', icon: MessageCircle },
 ];
 
 export default function ToolsCarousel() {
-    const { user, theme, accentGradient } = useAuth();
+    const { user, theme, accentColor: contextAccentColor } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const carouselRef = useRef<HTMLDivElement>(null);
+    const [currentTool, setCurrentTool] = useState('radio');
     const [twitchChannels, setTwitchChannels] = useState<string[]>(['gaules', 'alanzoka', 'loud_coringa', 'nobru']);
-    const [, setTwitchEnabled] = useState(true);
 
     useEffect(() => {
         api.get('/social/twitch/config')
             .then(({ data }) => {
-                if (data.config) {
-                    setTwitchEnabled(data.config.carouselEnabled !== false);
-                    if (data.config.channels?.length > 0) {
-                        setTwitchChannels(data.config.channels);
-                    }
+                if (data.config?.channels?.length > 0) {
+                    setTwitchChannels(data.config.channels);
                 }
             })
             .catch(() => {});
     }, []);
 
-    // Filter tools based on config
-    const activeTools = tools;
-
     // Get the actual color hex from user's equipped color ID
     const getUserAccentColor = () => {
+        if (contextAccentColor) return contextAccentColor;
         if (!user?.equippedColor) return null;
         if (user.equippedColor.startsWith('#')) return user.equippedColor;
         return COLOR_MAP[user.equippedColor] || null;
@@ -76,56 +69,8 @@ export default function ToolsCarousel() {
 
     const accentColor = getUserAccentColor() || (isMGT ? '#10b981' : '#d4af37');
 
-    // Theme styles
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeGlow = isMGT 
-        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.25)]' 
-        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_20px_rgba(212,175,55,0.25)]';
-    const themeBg = theme === 'light' 
-        ? 'bg-white/80' 
-        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
-    const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-
-    const goToSlide = (index: number) => {
-        setCurrentIndex(index);
-    };
-
-    const goToPrevious = () => {
-        setCurrentIndex(prev => (prev === 0 ? activeTools.length - 1 : prev - 1));
-    };
-
-    const goToNext = () => {
-        setCurrentIndex(prev => (prev === activeTools.length - 1 ? 0 : prev + 1));
-    };
-
-    // Handle swipe gestures
-    const touchStartX = useRef(0);
-    const touchEndX = useRef(0);
-
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        touchEndX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = () => {
-        const diff = touchStartX.current - touchEndX.current;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0) {
-                goToNext();
-            } else {
-                goToPrevious();
-            }
-        }
-    };
-
     const renderCurrentTool = () => {
-        const currentTool = activeTools[currentIndex];
-        if (!currentTool) return null;
-        switch (currentTool.id) {
+        switch (currentTool) {
             case 'radio':
                 return <RadioCard />;
             case 'discord':
@@ -138,93 +83,42 @@ export default function ToolsCarousel() {
     };
 
     return (
-        <div className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-4 transition-all duration-300`}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                    <div 
-                        className="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={{ 
-                            backgroundColor: hexToRgba(accentColor, 0.2),
-                            borderColor: hexToRgba(accentColor, 0.3),
-                            borderWidth: '1px'
-                        }}
-                    >
-                        <Wrench className="w-4 h-4" style={{ color: accentColor }} />
-                    </div>
-                    <h3 className={`text-lg font-bold ${textMain}`}>Ferramentas</h3>
-                </div>
-
-                {/* Navigation Arrows */}
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={goToPrevious}
-                        className={`p-1.5 rounded-lg transition-all duration-200 ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}
-                        style={{ color: accentColor }}
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                        onClick={goToNext}
-                        className={`p-1.5 rounded-lg transition-all duration-200 ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}
-                        style={{ color: accentColor }}
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
+        <div className="rounded-2xl bg-[#1c1c1e]/80 backdrop-blur-xl border border-white/10 overflow-hidden">
+            {/* Minimal Tab Header */}
+            <div className="flex border-b border-white/5">
+                {tools.map((tool) => {
+                    const Icon = tool.icon;
+                    const isActive = currentTool === tool.id;
+                    return (
+                        <button
+                            key={tool.id}
+                            onClick={() => setCurrentTool(tool.id)}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-all relative ${
+                                isActive ? 'text-white' : 'text-gray-500 hover:text-gray-300'
+                            }`}
+                        >
+                            <Icon 
+                                className="w-4 h-4" 
+                                style={{ color: isActive ? accentColor : undefined }} 
+                            />
+                            <span>{tool.label}</span>
+                            {isActive && (
+                                <div 
+                                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 rounded-full"
+                                    style={{ backgroundColor: accentColor }}
+                                />
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
-            {/* Tab Indicator */}
-            <div className="flex items-center gap-2 mb-4">
-                {activeTools.map((tool, index) => (
-                    <button
-                        key={tool.id}
-                        onClick={() => goToSlide(index)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                            currentIndex === index
-                                ? ''
-                                : `${textSub} ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'}`
-                        }`}
-                        style={currentIndex === index ? {
-                            backgroundColor: hexToRgba(accentColor, 0.2),
-                            color: accentColor,
-                            borderColor: hexToRgba(accentColor, 0.3),
-                            borderWidth: '1px'
-                        } : undefined}
-                    >
-                        {tool.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* Carousel Content */}
-            <div
-                ref={carouselRef}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                className="relative overflow-hidden"
-            >
-                <div className="max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                    {renderCurrentTool()}
-                </div>
-            </div>
-
-            {/* Dots Indicator */}
-            <div className="flex items-center justify-center gap-2 mt-4">
-                {activeTools.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => goToSlide(index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                            currentIndex === index 
-                                ? 'w-6' 
-                                : `${theme === 'light' ? 'bg-gray-300' : 'bg-white/20'}`
-                        }`}
-                        style={currentIndex === index ? { backgroundColor: accentColor } : undefined}
-                    />
-                ))}
+            {/* Tool Content */}
+            <div className="p-4 max-h-[320px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                {renderCurrentTool()}
             </div>
         </div>
+    );
+}
     );
 }

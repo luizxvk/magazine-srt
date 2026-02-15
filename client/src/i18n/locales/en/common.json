@@ -40,7 +40,8 @@
         "previous": "Previous",
         "submit": "Submit",
         "copy": "Copy",
-        "share": "Share"
+        "share": "Share",
+        "expand": "Expand"
     },
     "status": {
         "loading": "Loading...",
@@ -626,5 +627,28 @@
         "removeTag": "Remove tag",
         "recentEventTags": "Recent event tags:",
         "activeEvent": "Active event"
+    },
+    "feed": {
+        "highlight": "Highlight",
+        "delete": "Delete",
+        "removeAdmin": "Remove (Admin)",
+        "report": "Report",
+        "linkCopied": "Link copied!",
+        "reportPost": "Report Post",
+        "reportReason": "Why are you reporting this post?",
+        "reportReasons": {
+            "inappropriate": "Inappropriate content",
+            "spam": "Spam",
+            "hate": "Hate speech",
+            "violence": "Violence",
+            "harassment": "Harassment",
+            "other": "Other"
+        },
+        "sending": "Sending...",
+        "reportSuccess": "Report submitted successfully. Our team will review it.",
+        "reportError": "Error submitting report",
+        "voteError": "Error voting",
+        "vote": "vote",
+        "votes": "votes"
     }
 }

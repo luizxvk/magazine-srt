@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles, BarChart3 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,10 +58,11 @@ interface MediaContentProps {
     isMGT: boolean;
     isExpanded: boolean;
     isHighlight?: boolean;
+    t: (key: string) => string;
 }
 
 // Extracted outside to avoid re-creation on each render
-function MediaContent({ video, image, title, category, theme, isMGT, isExpanded, isHighlight }: MediaContentProps) {
+function MediaContent({ video, image, title, category, theme, isMGT, isExpanded, isHighlight, t }: MediaContentProps) {
     return (
         <>
             {video ? (
@@ -97,7 +99,7 @@ function MediaContent({ video, image, title, category, theme, isMGT, isExpanded,
                 {isHighlight && (
                     <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium flex items-center gap-1 ${isMGT ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
                         <Sparkles className="w-3 h-3" />
-                        Destaque
+                        {t('feed.highlight')}
                     </span>
                 )}
                 <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/30 text-white'} ${isMGT && theme !== 'light' ? 'border-white/30 text-white' : ''} ${!isMGT && theme !== 'light' ? 'border-gold-500/30 text-gold-300' : ''}`}>
@@ -110,7 +112,7 @@ function MediaContent({ video, image, title, category, theme, isMGT, isExpanded,
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div
                         className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-black/80 transition-colors block cursor-pointer"
-                        title="Expandir"
+                        title={t('actions.expand')}
                     >
                         <Maximize2 className="w-4 h-4" />
                     </div>
@@ -145,6 +147,7 @@ export default function FeedItem({
     onPollVote,
     isExpanded = false
 }: FeedItemProps) {
+    const { t } = useTranslation();
     const { user, theme, isVisitor, showToast, accentColor, accentGradient } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
@@ -202,7 +205,7 @@ export default function FeedItem({
                 onPollVote(id, optionId);
             }
         } catch (error: any) {
-            showToast(error.response?.data?.error || 'Erro ao votar');
+            showToast(error.response?.data?.error || t('feed.voteError'));
         } finally {
             setVotingOptionId(null);
         }
@@ -214,11 +217,11 @@ export default function FeedItem({
         setIsReporting(true);
         try {
             await api.post(`/reports/post/${id}`, { reason: reportReason });
-            showToast('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
+            showToast(t('feed.reportSuccess'));
             setShowReportModal(false);
             setReportReason('');
         } catch (error: any) {
-            showToast(error.response?.data?.error || 'Erro ao enviar denúncia');
+            showToast(error.response?.data?.error || t('feed.reportError'));
         } finally {
             setIsReporting(false);
         }
@@ -253,11 +256,11 @@ export default function FeedItem({
                 <div className={`relative ${isExpanded ? 'w-full' : 'aspect-square md:aspect-[4/3]'} overflow-hidden bg-black rounded-t-xl`}>
                     {!isExpanded ? (
                         <Link to={`/post/${id}`} className="block w-full h-full">
-                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} isHighlight={isHighlight} />
+                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} isHighlight={isHighlight} t={t} />
                         </Link>
                     ) : (
                         <div className="w-full h-full">
-                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} isHighlight={isHighlight} />
+                            <MediaContent video={video} image={image} title={title} category={category} theme={theme} isMGT={isMGT} isExpanded={isExpanded} isHighlight={isHighlight} t={t} />
                         </div>
                     )}
                 </div>
@@ -311,7 +314,7 @@ export default function FeedItem({
                                             }}
                                             className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
                                         >
-                                            <Trash2 className="w-4 h-4" /> {isAdmin && !isOwner ? 'Remover (Admin)' : 'Deletar'}
+                                            <Trash2 className="w-4 h-4" /> {isAdmin && !isOwner ? t('feed.removeAdmin') : t('feed.delete')}
                                         </button>
                                     )}
                                     <button
@@ -323,7 +326,7 @@ export default function FeedItem({
                                         }}
                                         className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2 transition-colors"
                                     >
-                                        <Share2 className="w-4 h-4" /> Compartilhar
+                                        <Share2 className="w-4 h-4" /> {t('actions.share')}
                                     </button>
                                     <button
                                         onClick={(e) => {
@@ -334,7 +337,7 @@ export default function FeedItem({
                                         }}
                                         className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2 transition-colors"
                                     >
-                                        <Flag className="w-4 h-4" /> Denunciar
+                                        <Flag className="w-4 h-4" /> {t('feed.report')}
                                     </button>
                                 </motion.div>
                             )}
@@ -349,7 +352,7 @@ export default function FeedItem({
                                     exit={{ opacity: 0, y: -10 }}
                                     className="absolute right-0 top-full mt-2 px-3 py-2 bg-green-500 text-white text-xs rounded-lg flex items-center gap-1 shadow-lg z-50"
                                 >
-                                    <Check className="w-3 h-3" /> Link copiado!
+                                    <Check className="w-3 h-3" /> {t('feed.linkCopied')}
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -360,10 +363,10 @@ export default function FeedItem({
                 {showReportModal && (
                     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowReportModal(false)}>
                         <div className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
-                            <h3 className="text-white font-serif text-lg mb-4">Denunciar Postagem</h3>
-                            <p className="text-gray-400 text-sm mb-4">Por que você está denunciando esta postagem?</p>
+                            <h3 className="text-white font-serif text-lg mb-4">{t('feed.reportPost')}</h3>
+                            <p className="text-gray-400 text-sm mb-4">{t('feed.reportReason')}</p>
                             <div className="space-y-2 mb-4">
-                                {['Conteúdo impróprio', 'Spam', 'Discurso de ódio', 'Violência', 'Assédio', 'Outro'].map((reason) => (
+                                {[t('feed.reportReasons.inappropriate'), t('feed.reportReasons.spam'), t('feed.reportReasons.hate'), t('feed.reportReasons.violence'), t('feed.reportReasons.harassment'), t('feed.reportReasons.other')].map((reason) => (
                                     <button
                                         key={reason}
                                         onClick={() => setReportReason(reason)}
@@ -382,7 +385,7 @@ export default function FeedItem({
                                     onClick={() => setShowReportModal(false)}
                                     className="flex-1 py-2 rounded-lg border border-white/10 text-gray-400 hover:bg-white/5"
                                 >
-                                    Cancelar
+                                    {t('actions.cancel')}
                                 </button>
                                 <button
                                     onClick={handleReport}
@@ -393,7 +396,7 @@ export default function FeedItem({
                                             : 'bg-gold-500 text-black hover:bg-gold-400'
                                     }`}
                                 >
-                                    {isReporting ? 'Enviando...' : 'Denunciar'}
+                                    {isReporting ? t('feed.sending') : t('feed.report')}
                                 </button>
                             </div>
                         </div>
@@ -425,7 +428,7 @@ export default function FeedItem({
                         <div className="flex items-center gap-2 mb-3">
                             <BarChart3 className="w-4 h-4" style={{ color: userAccent }} />
                             <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
-                                {poll.totalVotes} {poll.totalVotes === 1 ? 'voto' : 'votos'}
+                                {poll.totalVotes} {poll.totalVotes === 1 ? t('feed.vote') : t('feed.votes')}
                             </span>
                         </div>
                         <div className="space-y-2">

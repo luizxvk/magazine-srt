@@ -40,7 +40,8 @@
         "previous": "Anterior",
         "submit": "Enviar",
         "copy": "Copiar",
-        "share": "Compartilhar"
+        "share": "Compartilhar",
+        "expand": "Expandir"
     },
     "status": {
         "loading": "Carregando...",
@@ -628,5 +629,28 @@
         "removeTag": "Remover tag",
         "recentEventTags": "Tags de eventos recentes:",
         "activeEvent": "Evento ativo"
+    },
+    "feed": {
+        "highlight": "Destaque",
+        "delete": "Deletar",
+        "removeAdmin": "Remover (Admin)",
+        "report": "Denunciar",
+        "linkCopied": "Link copiado!",
+        "reportPost": "Denunciar Postagem",
+        "reportReason": "Por que você está denunciando esta postagem?",
+        "reportReasons": {
+            "inappropriate": "Conteúdo impróprio",
+            "spam": "Spam",
+            "hate": "Discurso de ódio",
+            "violence": "Violência",
+            "harassment": "Assédio",
+            "other": "Outro"
+        },
+        "sending": "Enviando...",
+        "reportSuccess": "Denúncia enviada com sucesso. Nossa equipe irá analisar.",
+        "reportError": "Erro ao enviar denúncia",
+        "voteError": "Erro ao votar",
+        "vote": "voto",
+        "votes": "votos"
     }
 }

@@ -40,7 +40,8 @@
         "previous": "Anterior",
         "submit": "Enviar",
         "copy": "Copiar",
-        "share": "Compartir"
+        "share": "Compartir",
+        "expand": "Expandir"
     },
     "status": {
         "loading": "Cargando...",
@@ -626,5 +627,28 @@
         "removeTag": "Eliminar tag",
         "recentEventTags": "Tags de eventos recientes:",
         "activeEvent": "Evento activo"
+    },
+    "feed": {
+        "highlight": "Destacar",
+        "delete": "Eliminar",
+        "removeAdmin": "Eliminar (Admin)",
+        "report": "Reportar",
+        "linkCopied": "¡Enlace copiado!",
+        "reportPost": "Reportar Publicación",
+        "reportReason": "¿Por qué estás reportando esta publicación?",
+        "reportReasons": {
+            "inappropriate": "Contenido inapropiado",
+            "spam": "Spam",
+            "hate": "Discurso de odio",
+            "violence": "Violencia",
+            "harassment": "Acoso",
+            "other": "Otro"
+        },
+        "sending": "Enviando...",
+        "reportSuccess": "Reporte enviado exitosamente. Nuestro equipo lo revisará.",
+        "reportError": "Error al enviar reporte",
+        "voteError": "Error al votar",
+        "vote": "voto",
+        "votes": "votos"
     }
 }

@@ -24,16 +24,16 @@ export default function StatForgeCard() {
             onClick={() => navigate('/statforge')}
             className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} px-5 py-4 transition-all duration-300 cursor-pointer group hover:scale-[1.02]`}
         >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
                 <div className="relative flex-shrink-0">
                     <div
-                        className="absolute inset-0 rounded-full blur-xl opacity-40"
+                        className="absolute inset-0 rounded-full blur-2xl opacity-50 scale-125"
                         style={{ background: color }}
                     />
                     <img
                         src="/assets/statforge-logo.png"
                         alt="StatForge"
-                        className="relative w-16 h-16 object-contain"
+                        className="relative w-24 h-24 object-contain"
                     />
                 </div>
                 <div className="flex-1 min-w-0">

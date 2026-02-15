@@ -48,7 +48,7 @@ export async function getSupportedGames(req: Request, res: Response) {
 // ============================================
 export async function getUserProfiles(req: Request, res: Response) {
   try {
-    const userId = (req as any).user?.id || req.params.userId;
+    const userId = (req as any).user?.userId || req.params.userId;
 
     const profiles = await prisma.gameProfile.findMany({
       where: { userId, isActive: true },
@@ -85,7 +85,7 @@ export async function getUserProfiles(req: Request, res: Response) {
 // ============================================
 export async function linkGameProfile(req: Request, res: Response) {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user.userId;
     const { game, platform, gamertag, platformId } = req.body;
 
     if (!game || !platform || !gamertag) {
@@ -144,7 +144,7 @@ export async function linkGameProfile(req: Request, res: Response) {
 // ============================================
 export async function unlinkGameProfile(req: Request, res: Response) {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user.userId;
     const { profileId } = req.params;
 
     const profile = await prisma.gameProfile.findFirst({
@@ -210,7 +210,7 @@ export async function getProfileStats(req: Request, res: Response) {
 // ============================================
 export async function addSnapshot(req: Request, res: Response) {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user.userId;
     const { profileId } = req.params;
     const { rank, rankTier, level, kd, winRate, totalMatches, totalWins, totalKills, totalDeaths, hoursPlayed, score, stats } = req.body;
 
@@ -291,7 +291,7 @@ async function getPreviousSnapshot(profileId: string) {
 // ============================================
 export async function getEventsFeed(req: Request, res: Response) {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user.userId;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const game = req.query.game as string | undefined;

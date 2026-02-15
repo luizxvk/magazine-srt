@@ -307,6 +307,17 @@ body::-webkit-scrollbar-thumb:hover {
 .text-accent-500 { color: var(--accent-500) !important; }
 .text-accent-600 { color: var(--accent-600) !important; }
 
+/* Gradient icon - applies accent gradient to SVG icon strokes */
+.icon-gradient-accent {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-gradient-accent svg {
+  stroke: url(#accentIconGradient);
+}
+
 .bg-accent { background-color: var(--accent-color) !important; }
 .bg-accent-500 { background-color: var(--accent-500) !important; }
 .bg-accent\/10 { background-color: rgba(var(--accent-color-rgb), 0.1) !important; }

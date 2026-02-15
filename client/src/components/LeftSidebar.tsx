@@ -177,7 +177,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
             </nav>
 
             {/* Quick Stats */}
-            <div className={`mt-4 ${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} p-4 transition-all duration-300`}>
+            <div className={`mt-4 ${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-4 transition-all duration-300`}>
                 <p className={`text-xs ${textSub} mb-2`}>{t('gamification:progress.yourProgress', 'Seu progresso')}</p>
                 {(() => {
                     // XP Table matching server: Level X requires XP_TABLE[X-1] total XP

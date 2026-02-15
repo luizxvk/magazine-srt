@@ -68,32 +68,30 @@ function SortableWidget({ widget, cardBg, cardBorder, theme }: SortableWidgetPro
         <div
             ref={setNodeRef}
             style={style}
-            className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all ${isDragging ? 'scale-105 shadow-2xl ring-2 ring-gold-500/50' : 'hover:scale-[1.02]'}`}
+            className={`${cardBg} ${cardBorder} border backdrop-blur-xl rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all ${isDragging ? 'scale-105 shadow-2xl ring-2 ring-gold-500/50' : 'hover:scale-[1.02]'}`}
         >
-            <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-xl bg-${widget.color}-500/10`}>
-                        {widget.icon}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-400" />
-                        <button
-                            {...attributes}
-                            {...listeners}
-                            className="p-1.5 rounded-lg hover:bg-white/10 cursor-grab active:cursor-grabbing transition-colors"
-                            title="Arrastar para reorganizar"
-                        >
-                            <GripVertical className="w-4 h-4 text-gray-500" />
-                        </button>
-                    </div>
+            <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-xl bg-${widget.color}-500/10 flex-shrink-0`}>
+                    {widget.icon}
                 </div>
-                <div className="flex-1">
-                    <h3 className="text-gray-400 text-sm mb-2">{widget.title}</h3>
-                    <p className={`text-3xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-gray-400 text-xs mb-0.5">{widget.title}</h3>
+                    <p className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'} leading-tight`}>
                         {widget.value.toLocaleString()}
                     </p>
+                    <p className="text-gray-500 text-[10px] mt-0.5">{widget.subtitle}</p>
                 </div>
-                <p className="text-gray-500 text-xs mt-2">{widget.subtitle}</p>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                    <TrendingUp className="w-3.5 h-3.5 text-green-400" />
+                    <button
+                        {...attributes}
+                        {...listeners}
+                        className="p-1.5 rounded-lg hover:bg-white/10 cursor-grab active:cursor-grabbing transition-colors"
+                        title="Arrastar para reorganizar"
+                    >
+                        <GripVertical className="w-4 h-4 text-gray-500" />
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -269,7 +267,7 @@ export default function AdminGridDashboard() {
                 onDragEnd={handleDragEnd}
             >
                 <SortableContext items={widgetOrder} strategy={rectSortingStrategy}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {widgets.map((widget) => (
                             <SortableWidget
                                 key={widget.id}

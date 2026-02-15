@@ -11,6 +11,10 @@ export default function MarketCard() {
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const backgroundAccent = accentColor || defaultColor;
     const themeBg = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeGlow = isMGT
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
     
     const handleTabNavigation = (tab: string) => {
         navigate('/market', { state: { activeTab: tab } });
@@ -18,12 +22,7 @@ export default function MarketCard() {
 
     return (
         <div 
-            className={`${themeBg} backdrop-blur-xl rounded-xl p-5 ${accentGradient ? 'border-gradient-accent' : 'border'} transition-all duration-300 group cursor-pointer relative overflow-hidden`}
-            style={{ 
-                borderColor: accentGradient ? undefined : `${backgroundAccent}33`,
-            }}
-            onMouseEnter={(e) => !accentGradient && (e.currentTarget.style.borderColor = `${backgroundAccent}80`)}
-            onMouseLeave={(e) => !accentGradient && (e.currentTarget.style.borderColor = `${backgroundAccent}33`)}
+            className={`${themeBg} backdrop-blur-xl rounded-xl p-5 ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} transition-all duration-300 group cursor-pointer relative overflow-hidden`}
         >
             <div 
                 className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"

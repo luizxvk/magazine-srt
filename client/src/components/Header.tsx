@@ -43,7 +43,7 @@ const BADGE_URLS: Record<string, string> = {
 };
 
 export default function Header({ onOpenShop }: HeaderProps) {
-    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor, previewTheme } = useAuth();
+    const { user, isVisitor, logout, showAchievement, theme, openZionsModal, equippedBadge, dailyLoginStatus, openDailyLoginModal, isMobileDrawerOpen, setIsMobileDrawerOpen, accentColor, accentGradient, accentGradientColors, previewTheme } = useAuth();
     const { config } = useCommunity();
     
     // Atualiza título e favicon dinamicamente
@@ -172,6 +172,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
     const isElite = user?.isElite && user?.eliteUntil && new Date(user.eliteUntil) > new Date();
     const { t } = useTranslation('common');
+    const iconClass = accentGradient ? 'icon-gradient-accent' : '';
     
     const menuItems = [
         { icon: <Home className="w-5 h-5" />, label: t('nav.home'), path: '/feed' },
@@ -191,6 +192,18 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-panel border-b ${headerBorder} bg-black/50 transition-colors duration-500 ${user?.liteMode ? '' : 'backdrop-blur-xl'}`}>
+            {/* SVG gradient definition for icons */}
+            {accentGradientColors && accentGradientColors.length >= 2 && (
+                <svg width="0" height="0" style={{ position: 'absolute' }}>
+                    <defs>
+                        <linearGradient id="accentIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            {accentGradientColors.filter((_, i) => i < Math.ceil(accentGradientColors.length / (accentGradientColors[0] === accentGradientColors[accentGradientColors.length - 1] ? 2 : 1))).map((color, i, arr) => (
+                                <stop key={i} offset={`${(i / Math.max(arr.length - 1, 1)) * 100}%`} stopColor={color} />
+                            ))}
+                        </linearGradient>
+                    </defs>
+                </svg>
+            )}
             {/* Search Modal */}
             <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
             <WhatsNewModal isOpen={isWhatsNewModalOpen} onClose={() => setIsWhatsNewModalOpen(false)} />
@@ -286,7 +299,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         {/* Shop Button - Always visible */}
                         <button
                             onClick={() => onOpenShop ? onOpenShop() : setIsShopOpen(true)}
-                            className="p-2 transition-all hover:scale-110"
+                            className={`p-2 transition-all hover:scale-110 ${iconClass}`}
                             style={{ color: accentColor }}
                             aria-label="Loja"
                             title="Loja de Personalização"
@@ -304,7 +317,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     setShowVisitorBlock(true);
                                 }
                             }}
-                            className="relative p-2 transition-all hover:scale-110"
+                            className={`relative p-2 transition-all hover:scale-110 ${iconClass}`}
                             style={{ color: accentColor }}
                             aria-label="Social"
                             data-tutorial="desktop-explore"
@@ -312,14 +325,14 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <Users className="w-5 h-5" />
                         </Link>
 
-                        <Link to="/groups" className="relative p-2 transition-all hover:scale-110" style={{ color: accentColor }} aria-label="Grupos" title="Grupos">
+                        <Link to="/groups" className={`relative p-2 transition-all hover:scale-110 ${iconClass}`} style={{ color: accentColor }} aria-label="Grupos" title="Grupos">
                             <MessageCircle className="w-5 h-5" />
                             {(hasGroupInvites || hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}
                         </Link>
 
-                        <Link to="/roadmap" className="p-2 transition-all hover:scale-110" style={{ color: accentColor }} aria-label="Roadmap" title="Roadmap">
+                        <Link to="/roadmap" className={`p-2 transition-all hover:scale-110 ${iconClass}`} style={{ color: accentColor }} aria-label="Roadmap" title="Roadmap">
                             <Rocket className="w-5 h-5" />
                         </Link>
 
@@ -333,7 +346,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                         setShowNotifications(!showNotifications);
                                     }
                                 }}
-                                className="p-2 transition-all hover:scale-110 relative"
+                                className={`p-2 transition-all hover:scale-110 relative ${iconClass}`}
                                 style={{ color: accentColor }}
                                 aria-label="Notifications"
                             >
@@ -354,7 +367,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     openZionsModal();
                                 }
                             }}
-                            className="p-2 transition-all hover:scale-110"
+                            className={`p-2 transition-all hover:scale-110 ${iconClass}`}
                             style={{ color: accentColor }}
                             title="Adquirir Zions"
                         >
@@ -363,7 +376,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
 
                         <button
                             onClick={() => setIsWhatsNewModalOpen(true)}
-                            className="p-2 transition-all hover:scale-110"
+                            className={`p-2 transition-all hover:scale-110 ${iconClass}`}
                             style={{ color: accentColor }}
                             title="O que há de novo"
                         >
@@ -429,7 +442,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: -20 }}
                                                 transition={{ duration: 0.5 }}
-                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white' : 'text-gold-500')} uppercase tracking-[0.15em] font-bold absolute right-0`}
+                                                className={`text-[10px] ${theme === 'light' ? 'text-gray-700' : (isMGT ? 'text-white text-shine-white' : 'text-gold-500 text-shine-gold')} uppercase tracking-[0.15em] font-bold absolute right-0`}
                                             >
                                                 {isMGT ? 'Membro MGT' : 'Membro Magazine'}
                                             </motion.p>

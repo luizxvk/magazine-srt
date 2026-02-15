@@ -1,174 +1,215 @@
-# Rovex AI — Fluxo de Aprovação de Cupons
+# Rovex Platform — Sistema de Cupons Push
 
 ## Visão Geral
 
-O sistema de cupons da Magazine SRT utiliza um fluxo de aprovação mediado pela **Rovex AI** para garantir que todos os cupons criados por administradores de comunidades estejam em conformidade com as políticas da plataforma antes de serem disponibilizados aos usuários.
+O sistema de cupons da Magazine SRT utiliza um modelo **push-based** onde a **Rovex Platform** cria e distribui cupons para as comunidades. Os administradores de comunidade recebem notificações quando novos cupons são disponibilizados.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     FLUXO DE APROVAÇÃO                          │
+│                     FLUXO DE CUPONS (PUSH)                      │
 │                                                                 │
-│  Admin Comunidade     Rovex Platform        Usuário Final       │
-│  ────────────────     ──────────────        ──────────────      │
+│  Rovex Platform       Admin Comunidade      Usuário Final       │
+│  ──────────────       ────────────────      ──────────────      │
 │                                                                 │
-│  Cria Cupom ──────►  Status: PENDING                            │
-│  (POST /create)       │                                         │
-│                       │                                         │
-│                  Rovex AI Analisa                                │
-│                       │                                         │
-│               ┌───────┴────────┐                                │
-│               ▼                ▼                                │
-│          APPROVED          REJECTED                             │
-│               │                │                                │
-│               ▼                ▼                                │
-│          Cupom Ativo      Cupom Bloqueado                       │
-│               │                                                 │
-│               ▼                                                 │
-│          Valida no Checkout ◄────── Usuário aplica código       │
+│  Cria Cupom ──────►  Notificação                                │
+│  (Estratégia/        "Um novo cupom                             │
+│   Promocional)        foi postado!" 🔔                          │
+│        │                   │                                    │
+│        │                   ▼                                    │
+│        │             Admin visualiza                            │
+│        │             no Dashboard                               │
+│        │                   │                                    │
+│        ▼                   ▼                                    │
+│  Cupom já nasce      Admin pode                                 │
+│  APPROVED            ativar/desativar                           │
+│        │                   │                                    │
+│        │                   ▼                                    │
+│        └──────────►  Valida no Checkout ◄─── Usuário aplica     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Modelo Push vs Pull
+
+| Aspecto | Modelo Antigo (Pull) | Modelo Atual (Push) |
+|---------|---------------------|---------------------|
+| Criador | Admin da comunidade | Rovex Platform |
+| Aprovação | Rovex AI revisava | N/A - já vem aprovado |
+| Controle | Admin define desconto | Rovex define, admin ativa |
+| Timing | Admin quando quiser | Rovex em campanhas estratégicas |
+| Notificação | Admin esperava aprovação | Admin recebe "novo cupom postado" |
+
+---
+
 ## Endpoints da API
 
-### 1. Criação de Cupom (Comunidade → Rovex)
+### 1. Rovex Cria e Distribui Cupom
 
 ```
-POST /api/coupons/admin/create
+POST /api/rovex/coupons/distribute
+Authorization: Bearer <rovex_service_jwt>
+X-Rovex-Signature: <hmac_sha256>
+```
+
+**Request Body:**
+```json
+{
+  "communityId": "uuid-da-comunidade",
+  "code": "ROVEX2025",
+  "discountValue": 15,
+  "description": "🎉 Promoção Rovex - 15% de desconto exclusivo!",
+  "discountType": "PERCENTAGE",
+  "minPurchase": 50.00,
+  "maxDiscount": 30.00,
+  "maxUses": 200,
+  "maxUsesPerUser": 1,
+  "applicableCategories": ["all"],
+  "expiresAt": "2025-12-31T23:59:59.000Z",
+  "campaignId": "campanha-verao-2025",
+  "notifyAdmins": true
+}
+```
+
+**Response (201):**
+```json
+{
+  "id": "uuid-do-cupom",
+  "code": "ROVEX2025",
+  "discountType": "PERCENTAGE",
+  "discountValue": 15,
+  "rovexApproval": "APPROVED",
+  "isRovexManaged": true,
+  "createdAt": "2025-01-15T10:00:00.000Z",
+  "notificationSent": true
+}
+```
+
+> **IMPORTANTE:** Cupons distribuídos pela Rovex já nascem com `rovexApproval: "APPROVED"` e `isRovexManaged: true`.
+
+---
+
+### 2. Admin Visualiza Cupons Disponíveis
+
+```
+GET /api/coupons/admin/available
+Authorization: Bearer <admin_jwt>
+```
+
+**Response:**
+```json
+{
+  "coupons": [
+    {
+      "id": "uuid",
+      "code": "ROVEX2025",
+      "description": "🎉 Promoção Rovex - 15% de desconto exclusivo!",
+      "discountType": "PERCENTAGE",
+      "discountValue": 15,
+      "minPurchase": 50.00,
+      "maxDiscount": 30.00,
+      "maxUses": 200,
+      "usedCount": 0,
+      "isActive": true,
+      "isRovexManaged": true,
+      "expiresAt": "2025-12-31T23:59:59.000Z",
+      "campaignId": "campanha-verao-2025",
+      "receivedAt": "2025-01-15T10:00:00.000Z"
+    }
+  ],
+  "unreadCount": 1
+}
+```
+
+---
+
+### 3. Admin Ativa/Desativa Cupom
+
+Admins podem desativar temporariamente um cupom Rovex sem excluí-lo:
+
+```
+PATCH /api/coupons/admin/:id/toggle
 Authorization: Bearer <admin_jwt>
 ```
 
 **Request Body:**
 ```json
 {
-  "code": "VERAO2025",
-  "discountValue": 15,
-  "description": "Promoção de Verão - 15% off",
-  "discountType": "PERCENTAGE",
-  "minPurchase": 50.00,
-  "maxDiscount": 30.00,
-  "maxUses": 200,
-  "maxUsesPerUser": 1,
-  "isEliteOnly": false,
-  "expiresAt": "2025-12-31T23:59:59.000Z"
+  "isActive": false
 }
 ```
 
-**Validações na Criação:**
-| Campo | Regra |
-|-------|-------|
-| `code` | Obrigatório, único, auto-uppercase, sem espaços |
-| `discountValue` | Obrigatório, > 0 |
-| `discountType` | `"FIXED"` (R$) ou `"PERCENTAGE"` (%) |
-| `PERCENTAGE` | Deve ser entre 1% e 50% |
-| `maxDiscount` | Teto para cupons percentuais |
-
-**Response (201):**
-```json
-{
-  "id": "uuid-do-cupom",
-  "code": "VERAO2025",
-  "discountType": "PERCENTAGE",
-  "discountValue": 15,
-  "rovexApproval": "PENDING",
-  "createdAt": "2025-01-15T10:00:00.000Z"
-}
-```
-
-> **IMPORTANTE:** Todo cupom criado por admins inicia com `rovexApproval: "PENDING"` e **NÃO pode ser usado** até aprovação.
-
----
-
-### 2. Listar Cupons Pendentes (Rovex AI → Consulta)
-
-```
-GET /api/coupons/admin/approvals
-Authorization: Bearer <rovex_service_jwt>
-```
-
-**Response:**
-```json
-[
-  {
-    "id": "uuid",
-    "code": "VERAO2025",
-    "description": "Promoção de Verão - 15% off",
-    "discountType": "PERCENTAGE",
-    "discountValue": 15,
-    "minPurchase": 50.00,
-    "maxDiscount": 30.00,
-    "maxUses": 200,
-    "maxUsesPerUser": 1,
-    "isEliteOnly": false,
-    "expiresAt": "2025-12-31T23:59:59.000Z",
-    "rovexApproval": "PENDING",
-    "createdAt": "2025-01-15T10:00:00.000Z"
-  }
-]
-```
-
----
-
-### 3. Revisar Cupom (Rovex AI → Aprovação/Rejeição)
-
-```
-POST /api/coupons/admin/approvals/:id/review
-Authorization: Bearer <rovex_service_jwt>
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "approved": true,
-  "reviewNote": "Cupom dentro das políticas. Desconto percentual válido com teto definido."
-}
-```
-
-**Parâmetros:**
-| Campo | Tipo | Obrigatório | Descrição |
-|-------|------|-------------|-----------|
-| `approved` | `boolean` | Sim | `true` = APPROVED, `false` = REJECTED |
-| `reviewNote` | `string` | Não | Justificativa da decisão (exibida ao admin) |
-
-**Response (200) — Aprovado:**
+**Response (200):**
 ```json
 {
   "id": "uuid",
-  "code": "VERAO2025",
-  "rovexApproval": "APPROVED",
-  "rovexReviewedAt": "2025-01-15T10:05:00.000Z",
-  "rovexReviewNote": "Cupom dentro das políticas."
-}
-```
-
-**Response (200) — Rejeitado:**
-```json
-{
-  "id": "uuid",
-  "code": "VERAO2025",
-  "rovexApproval": "REJECTED",
-  "rovexReviewedAt": "2025-01-15T10:05:00.000Z",
-  "rovexReviewNote": "Desconto acima do limite permitido para o plano STARTER."
+  "code": "ROVEX2025",
+  "isActive": false,
+  "message": "Cupom desativado. Membros não poderão utilizá-lo temporariamente."
 }
 ```
 
 ---
 
-## Critérios de Análise da Rovex AI
+### 4. Admin Marca Notificação como Lida
 
-A Rovex AI deve validar os seguintes critérios antes de aprovar um cupom:
+```
+POST /api/coupons/admin/:id/mark-read
+Authorization: Bearer <admin_jwt>
+```
 
-### Regras de Negócio
-| Regra | Descrição |
-|-------|-----------|
-| **Limite de Desconto** | PERCENTAGE: máx 50%. FIXED: proporcional ao plano da comunidade |
-| **Frequência** | Máx 5 cupons ativos simultâneos por comunidade (plano STARTER) |
-| **Nomenclatura** | Código não pode conter palavras ofensivas ou enganosas |
-| **Validade** | `expiresAt` deve ser no futuro (mín 1h, máx 1 ano) |
-| **Uso Único** | `maxUsesPerUser` deve ser ≥ 1 |
-| **Teto Obrigatório** | Cupons PERCENTAGE devem ter `maxDiscount` definido |
+**Response (200):**
+```json
+{
+  "success": true
+}
+```
 
-### Limites por Plano
+---
+
+## Notificações no Dashboard
+
+Quando a Rovex distribui um cupom, o sistema cria uma notificação para o admin:
+
+```typescript
+// Tipo de notificação
+{
+  type: "COUPON_DISTRIBUTED",
+  title: "Novo cupom disponível!",
+  message: "A Rovex liberou o cupom ROVEX2025 (15% off) para sua comunidade.",
+  data: {
+    couponId: "uuid",
+    code: "ROVEX2025",
+    discountValue: 15,
+    discountType: "PERCENTAGE"
+  },
+  isRead: false,
+  createdAt: "2025-01-15T10:00:00.000Z"
+}
+```
+
+### Card no Dashboard Admin
+
+O dashboard do admin exibe um card de "Cupons Rovex" que mostra:
+- Badge com contagem de cupons não lidos
+- Lista de cupons recentes com status (ativo/inativo)
+- Botão para ver detalhes/ativar
+
+```tsx
+// Exemplo visual do card
+┌────────────────────────────────────────┐
+│  🎫 Cupons Rovex              🔴 1 novo │
+├────────────────────────────────────────┤
+│  ROVEX2025 - 15% off                   │
+│  📅 Expira em 31/12/2025               │
+│  ⚡ 0/200 usos                          │
+│  [Ativo ✓]  [Ver detalhes]             │
+└────────────────────────────────────────┘
+```
+
+---
+
+## Limites por Plano da Comunidade
+
+Cupons distribuídos pela Rovex respeitam os limites do plano da comunidade:
 
 | Plano | % Máximo | R$ Máximo | Cupons Ativos | Elite-Only |
 |-------|----------|-----------|---------------|------------|
@@ -178,7 +219,33 @@ A Rovex AI deve validar os seguintes critérios antes de aprovar um cupom:
 
 ---
 
-## Modelo de Dados
+## Campanhas da Rovex
+
+A Rovex pode distribuir cupons como parte de campanhas promocionais:
+
+| Tipo de Campanha | Exemplo | Descrição |
+|-----------------|---------|-----------|
+| **Sazonal** | VERAO2025 | Black Friday, Natal, etc. |
+| **Onboarding** | BEMVINDO10 | Para novas comunidades |
+| **Retenção** | VOLTAPRA15 | Para reativar comunidades |
+| **Parceria** | PATROCINIO20 | Cupons de parceiros |
+
+```json
+// Exemplo de campanha push
+{
+  "campaignId": "blackfriday-2025",
+  "campaignName": "Black Friday 2025",
+  "targetPlans": ["GROWTH", "ENTERPRISE"],
+  "coupons": [
+    {
+      "code": "BLACK25",
+      "discountValue": 25,
+      "discountType": "PERCENTAGE"
+    }
+  ],
+  "distributionDate": "2025-11-28T00:00:00.000Z"
+}
+```
 
 ```prisma
 model Coupon {
@@ -195,10 +262,11 @@ model Coupon {
   isActive          Boolean              @default(true)
   isEliteOnly       Boolean              @default(false)
   isAutoGenerated   Boolean              @default(false)
+  isRovexManaged    Boolean              @default(false)  // Cupom criado/gerenciado pela Rovex
+  campaignId        String?                               // ID da campanha Rovex
   expiresAt         DateTime?
-  rovexApproval     CouponApprovalStatus @default(PENDING)
-  rovexReviewedAt   DateTime?
-  rovexReviewNote   String?              @db.Text
+  rovexApproval     CouponApprovalStatus @default(APPROVED)  // Cupons Rovex já vêm aprovados
+  rovexDistributedAt DateTime?                            // Quando foi distribuído
   createdById       String?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
@@ -206,9 +274,27 @@ model Coupon {
 }
 
 enum CouponApprovalStatus {
-  PENDING    // Aguardando análise da Rovex AI
-  APPROVED   // Aprovado — cupom utilizável
-  REJECTED   // Rejeitado — cupom bloqueado
+  APPROVED   // Cupom utilizável (padrão para cupons Rovex)
+  REJECTED   // Cupom bloqueado (removido pela Rovex ou admin)
+}
+```
+
+---
+
+## Modelo de Dados - Notificação Admin
+
+```prisma
+model AdminNotification {
+  id          String   @id @default(uuid())
+  adminId     String
+  type        String   // "COUPON_DISTRIBUTED", "COUPON_EXPIRING", etc.
+  title       String
+  message     String
+  data        Json?    // { couponId, code, discountValue, ... }
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  admin       User     @relation(fields: [adminId], references: [id])
 }
 ```
 
@@ -217,12 +303,12 @@ enum CouponApprovalStatus {
 ## Exceções ao Fluxo
 
 ### Cupons Auto-Gerados (Elite)
-Cupons gerados automaticamente para membros Elite via `POST /api/coupons/elite/claim` são criados com `rovexApproval: "APPROVED"` e **não passam pelo fluxo de aprovação**.
+Cupons gerados automaticamente para membros Elite via `POST /api/coupons/elite/claim` são criados com `rovexApproval: "APPROVED"` e **não passam pelo fluxo de distribuição**.
 
 ### Validação no Checkout
 Quando um usuário aplica um cupom no checkout (`POST /api/coupons/validate`), o sistema verifica:
 
-1. `rovexApproval === "APPROVED"` — caso contrário, retorna erro "Cupom aguardando aprovação"
+1. `rovexApproval === "APPROVED"`
 2. `isActive === true`
 3. `expiresAt` não expirado
 4. `usedCount < maxUses` (se definido)
@@ -232,35 +318,51 @@ Quando um usuário aplica um cupom no checkout (`POST /api/coupons/validate`), o
 
 ---
 
-## Fluxo de Integração Rovex AI
+## Fluxo de Integração Resumido
 
 ```
-1. Comunidade cria cupom → POST /api/coupons/admin/create
-2. Rovex AI consulta pendentes periodicamente → GET /api/coupons/admin/approvals
-3. Rovex AI analisa contra critérios do plano da comunidade
-4. Rovex AI aprova/rejeita → POST /api/coupons/admin/approvals/:id/review
-5. Admin da comunidade vê status atualizado no painel (sem botões de aprovação)
-6. Se APPROVED → cupom fica disponível para uso dos membros
-7. Se REJECTED → admin pode ver a reviewNote e criar novo cupom corrigido
+1. Rovex Platform decide criar campanha promocional
+2. Rovex distribui cupom para comunidades elegíveis → POST /api/rovex/coupons/distribute
+3. Sistema cria cupom com rovexApproval: "APPROVED" e isRovexManaged: true
+4. Sistema cria notificação para admins: "Um novo cupom foi postado!"
+5. Admin visualiza notificação no dashboard → card "Cupons Rovex"
+6. Admin pode ativar/desativar cupom conforme necessidade
+7. Membros aplicam cupom no checkout
+8. Rovex monitora métricas de uso via analytics
 ```
 
 ---
 
-## Webhooks (Futuro)
+## Webhooks de Notificação
 
-> **Status:** Não implementado. Planejado para v0.6.0.
-
-Quando implementado, a Rovex Platform enviará webhooks para notificar a comunidade sobre mudanças de status:
+A Rovex envia webhook para confirmar distribuição:
 
 ```json
-// POST <community_webhook_url>/coupons/status-change
+// POST <community_webhook_url>/rovex/coupon-distributed
 {
-  "event": "coupon.approval_changed",
+  "event": "coupon.distributed",
   "couponId": "uuid",
-  "code": "VERAO2025",
-  "newStatus": "APPROVED",
-  "reviewNote": "...",
-  "timestamp": "2025-01-15T10:05:00.000Z"
+  "code": "ROVEX2025",
+  "discountType": "PERCENTAGE",
+  "discountValue": 15,
+  "campaignId": "campanha-verao-2025",
+  "expiresAt": "2025-12-31T23:59:59.000Z",
+  "timestamp": "2025-01-15T10:00:00.000Z"
+}
+```
+
+A comunidade pode enviar eventos de uso de volta:
+
+```json
+// POST <rovex_api>/webhooks/coupon-usage
+{
+  "event": "coupon.used",
+  "couponId": "uuid",
+  "code": "ROVEX2025",
+  "userId": "uuid-usuario",
+  "discountApplied": 15.00,
+  "orderTotal": 100.00,
+  "timestamp": "2025-01-16T14:30:00.000Z"
 }
 ```
 
@@ -268,12 +370,37 @@ Quando implementado, a Rovex Platform enviará webhooks para notificar a comunid
 
 ## Autenticação
 
-Todos os endpoints requerem autenticação JWT via header `Authorization: Bearer <token>`.
+### Endpoints Comunidade
+Requerem JWT de admin da comunidade:
+```
+Authorization: Bearer <admin_jwt>
+```
 
-Para integração Rovex AI, usar um **Service Token** com role `ADMIN` gerado especificamente para o serviço de revisão automática.
-
+### Endpoints Rovex
+Requerem Service Token + assinatura HMAC:
 ```
 Authorization: Bearer <rovex_service_jwt>
+X-Rovex-Signature: <hmac_sha256_of_body>
 ```
 
-O token deve ser rotacionado a cada 90 dias via endpoint `POST /api/rovex/rotate-token`.
+O token é rotacionado a cada 90 dias via `POST /api/rovex/rotate-token`.
+
+---
+
+## FAQ
+
+### O admin pode criar cupons próprios?
+**Sim**, mas cupons criados pelo admin local funcionam independentemente do sistema Rovex. Eles não aparecem no card "Cupons Rovex" e são gerenciados normalmente.
+
+### O admin pode editar cupons Rovex?
+**Não**. Cupons `isRovexManaged: true` só podem ser ativados/desativados. Os valores de desconto, código e limites são definidos pela Rovex.
+
+### E se o admin desativar um cupom Rovex?
+O cupom fica temporariamente indisponível na comunidade. A Rovex recebe analytics sobre cupons desativados para ajustar campanhas futuras.
+
+### Como a Rovex escolhe quais comunidades recebem cupons?
+Baseado em:
+- Plano da comunidade (STARTER, GROWTH, ENTERPRISE)
+- Métricas de engajamento
+- Participação em campanhas anteriores
+- Configurações de opt-in da comunidade

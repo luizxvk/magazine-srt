@@ -33,7 +33,7 @@ const PLATFORM_NAMES: Record<string, string> = {
 };
 
 export default function FreeGamesCard() {
-    const { user, theme } = useAuth();
+    const { user, theme, accentGradient } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const [games, setGames] = useState<FreeGame[]>([]);
     const [enabled, setEnabled] = useState(false);
@@ -62,7 +62,7 @@ export default function FreeGamesCard() {
     // Show placeholder if disabled or no games
     if (!enabled || games.length === 0) {
         return (
-            <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} p-6 text-center`}>
+            <div className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-6 text-center`}>
                 <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style={{ background: `${accentColor}1a` }}>
                     <Gamepad2 className="w-6 h-6" style={{ color: accentColor }} />
                 </div>
@@ -81,7 +81,7 @@ export default function FreeGamesCard() {
     };
 
     return (
-        <div className={`${themeBg} backdrop-blur-xl rounded-2xl border ${themeBorder} ${themeGlow} p-4 transition-all duration-300`}>
+        <div className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-4 transition-all duration-300`}>
             {/* Header */}
             <div className="flex items-center gap-2 mb-4">
                 <div 

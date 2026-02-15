@@ -10,7 +10,7 @@ interface FeedbackFormCardProps {
 }
 
 export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
-    const { user, theme, accentColor, isVisitor, showError, showWarning } = useAuth();
+    const { user, theme, accentColor, accentGradient, isVisitor, showError, showWarning } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     
     const [canSubmit, setCanSubmit] = useState(true);
@@ -45,8 +45,11 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const activeColor = accentColor || defaultColor;
     
-    const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-    const themeBg = theme === 'light' ? 'bg-white/90' : 'bg-black/40';
+    const themeBorder = theme === 'light' ? 'border-gray-200' : (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30');
+    const themeBg = theme === 'light' ? 'bg-white/90' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const themeGlow = isMGT
+        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
     
@@ -148,7 +151,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     
     if (loading) {
         return (
-            <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6`}>
+            <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : \`border ${themeBorder}\`} ${themeGlow} ${themeBg} backdrop-blur-xl p-6`}>
                 <div className="flex items-center justify-center py-8">
                     <Loader size="sm" />
                 </div>
@@ -162,7 +165,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
             <>
                 <button
                     onClick={() => setShowVisitorBlock(true)}
-                    className={`w-full rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6 text-center hover:border-opacity-50 transition-all`}
+                    className={`w-full rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl p-6 text-center hover:border-opacity-50 transition-all`}
                 >
                     <MessageSquare className="w-12 h-12 mx-auto mb-3" style={{ color: activeColor }} />
                     <h3 className={`text-lg font-bold ${themeText} mb-2`}>Enviar Feedback</h3>
@@ -181,7 +184,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     
     if (submitted) {
         return (
-            <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6 text-center`}>
+            <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl p-6 text-center`}>
                 <CheckCircle className="w-16 h-16 mx-auto mb-4" style={{ color: activeColor }} />
                 <h3 className={`text-xl font-bold ${themeText} mb-2`}>Obrigado pelo seu feedback!</h3>
                 <p className={`${themeSecondary} mb-4`}>
@@ -202,7 +205,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     
     if (!canSubmit && nextAllowedDate) {
         return (
-            <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl p-6`}>
+            <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl p-6`}>
                 <div className="flex items-center gap-3 mb-4">
                     <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${activeColor}20` }}>
                         <Clock className="w-6 h-6" style={{ color: activeColor }} />
@@ -223,7 +226,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     }
     
     return (
-        <div className={`rounded-2xl border ${themeBorder} ${themeBg} backdrop-blur-xl overflow-hidden`}>
+        <div className={`rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} ${themeBg} backdrop-blur-xl overflow-hidden`}>
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">

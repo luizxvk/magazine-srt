@@ -44,7 +44,7 @@ interface TypingUser {
 }
 
 export default function GroupChatCard() {
-  const { user } = useAuth();
+  const { user, accentGradient } = useAuth();
   const isMGT = user?.membershipType === 'MGT';
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -63,6 +63,9 @@ export default function GroupChatCard() {
   const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
   const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
   const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+  const themeGlow = isMGT
+      ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+      : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
 
   // Fetch user's groups
   useEffect(() => {
@@ -187,7 +190,7 @@ export default function GroupChatCard() {
   }
 
   return (
-    <div className={`glass-panel rounded-xl border ${accentBorder} overflow-hidden transition-all duration-300`}>
+    <div className={`glass-panel rounded-xl ${accentGradient ? 'border-gradient-accent' : `border ${accentBorder}`} ${themeGlow} overflow-hidden transition-all duration-300`}>
       {/* Header - Group Selector */}
       <div 
         className="p-4 cursor-pointer hover:bg-white/5 transition-colors"

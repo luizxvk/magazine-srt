@@ -11,6 +11,7 @@ import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
+import StatForgeNotifyCard from '../components/StatForgeNotifyCard';
 
 interface GameInfo {
   id: string;
@@ -178,14 +179,14 @@ export default function StatForgePage() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-500/10 to-transparent rounded-full blur-3xl" />
 
-          <div className="relative flex flex-col sm:flex-row items-center gap-6">
+          <div className="relative flex flex-col sm:flex-row items-center gap-8">
             {/* Logo */}
             <div className="relative flex-shrink-0">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 to-indigo-500/15 rounded-full blur-2xl scale-125" />
               <img
                 src="/assets/statforge-logo.png"
                 alt="StatForge"
-                className="relative w-56 h-56 sm:w-64 sm:h-64 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
+                className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
               />
             </div>
 
@@ -210,6 +211,11 @@ export default function StatForgePage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Notification Opt-in */}
+        <div className="mb-4">
+          <StatForgeNotifyCard />
+        </div>
 
         {/* Tabs */}
         <div className={`${glassBg} rounded-2xl border ${theme === 'light' ? 'border-gray-200/60' : 'border-white/[0.06]'} p-1.5 flex gap-1 mb-8`}>

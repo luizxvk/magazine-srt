@@ -17,8 +17,29 @@ interface GameInfo {
   id: string;
   name: string;
   icon: string;
+  iconUrl?: string | null;
   platforms: string[];
   category: string;
+}
+
+// Helper component for game icons with accent color filter
+function GameIcon({ iconUrl, icon, size = 'md', accentColor }: { iconUrl?: string | null; icon: string; size?: 'sm' | 'md' | 'lg'; accentColor?: string }) {
+  const sizeClasses = { sm: 'w-5 h-5', md: 'w-8 h-8', lg: 'w-10 h-10' };
+  const textSizes = { sm: 'text-lg', md: 'text-3xl', lg: 'text-4xl' };
+  
+  if (iconUrl) {
+    return (
+      <img 
+        src={iconUrl} 
+        alt="" 
+        className={`${sizeClasses[size]} object-contain`}
+        style={{ 
+          filter: accentColor ? `drop-shadow(0 0 6px ${accentColor}80)` : undefined 
+        }}
+      />
+    );
+  }
+  return <span className={textSizes[size]}>{icon}</span>;
 }
 
 interface GameProfile {
@@ -31,6 +52,7 @@ interface GameProfile {
   lastSyncedAt?: string;
   gameName: string;
   gameIcon: string;
+  gameIconUrl?: string | null;
   gameCategory: string;
   latestStats?: GameSnapshot;
 }
@@ -273,7 +295,7 @@ export default function StatForgePage() {
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="text-3xl">{profile.gameIcon}</span>
+                      <GameIcon iconUrl={profile.gameIconUrl} icon={profile.gameIcon} size="md" accentColor={accentColor} />
                       <div>
                         <h3 className={`font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                           {profile.gameName}
@@ -382,8 +404,13 @@ export default function StatForgePage() {
                       <span className="text-sm font-medium text-gray-300">
                         {event.user?.displayName || event.user?.name || 'Jogador'}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {event.gameInfo?.icon} {event.gameInfo?.name}
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        {event.gameInfo?.iconUrl ? (
+                          <img src={event.gameInfo.iconUrl} alt="" className="w-4 h-4 object-contain" />
+                        ) : (
+                          event.gameInfo?.icon
+                        )}
+                        {event.gameInfo?.name}
                       </span>
                     </div>
                     <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
@@ -443,7 +470,7 @@ export default function StatForgePage() {
                           }`}
                           style={linkGame === game.id ? { background: `${accentColor}15`, borderColor: `${accentColor}50`, boxShadow: `0 0 0 1px ${accentColor}30` } : {}}
                         >
-                          <span className="text-xl block mb-1">{game.icon}</span>
+                          <GameIcon iconUrl={game.iconUrl} icon={game.icon} size="sm" accentColor={linkGame === game.id ? accentColor : undefined} />
                           <span className={`text-xs font-medium ${linkGame === game.id ? 'text-white' : theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
                             {game.name}
                           </span>
@@ -536,7 +563,7 @@ export default function StatForgePage() {
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl">{selectedProfile.gameIcon}</span>
+                  <GameIcon iconUrl={selectedProfile.gameIconUrl} icon={selectedProfile.gameIcon} size="lg" accentColor={accentColor} />
                   <div>
                     <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                       {selectedProfile.gameName}

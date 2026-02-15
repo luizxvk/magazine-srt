@@ -6,29 +6,29 @@ import prisma from '../utils/prisma';
 // ============================================
 const SUPPORTED_GAMES = [
   // FPS/Tactical
-  { id: 'r6siege', name: 'Rainbow Six Siege', icon: '🛡️', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
-  { id: 'cs2', name: 'Counter-Strike 2', icon: '🔫', platforms: ['pc'], category: 'FPS' },
-  { id: 'valorant', name: 'Valorant', icon: '⚡', platforms: ['pc'], category: 'FPS' },
-  { id: 'apex', name: 'Apex Legends', icon: '🏆', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
-  { id: 'overwatch2', name: 'Overwatch 2', icon: '🦸', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
-  { id: 'cod', name: 'Call of Duty', icon: '💣', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
+  { id: 'r6siege', name: 'Rainbow Six Siege', icon: '🛡️', iconUrl: 'https://img.icons8.com/?size=100&id=59676&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
+  { id: 'cs2', name: 'Counter-Strike 2', icon: '🔫', iconUrl: 'https://img.icons8.com/?size=100&id=fKi1D913kbYA&format=png&color=000000', platforms: ['pc'], category: 'FPS' },
+  { id: 'valorant', name: 'Valorant', icon: '⚡', iconUrl: 'https://img.icons8.com/?size=100&id=GSHWFnD9x56D&format=png&color=000000', platforms: ['pc'], category: 'FPS' },
+  { id: 'apex', name: 'Apex Legends', icon: '🏆', iconUrl: null, platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
+  { id: 'overwatch2', name: 'Overwatch 2', icon: '🦸', iconUrl: 'https://img.icons8.com/?size=100&id=63667&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
+  { id: 'cod', name: 'Call of Duty', icon: '💣', iconUrl: 'https://img.icons8.com/?size=100&id=BFTj9toBTo31&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS' },
   // Battle Royale
-  { id: 'fortnite', name: 'Fortnite', icon: '🏗️', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
-  { id: 'pubg', name: 'PUBG', icon: '🪖', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
+  { id: 'fortnite', name: 'Fortnite', icon: '🏗️', iconUrl: 'https://img.icons8.com/?size=100&id=84531&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
+  { id: 'pubg', name: 'PUBG', icon: '🪖', iconUrl: 'https://img.icons8.com/?size=100&id=usqeMxUzF8Jz&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale' },
   // MOBA
-  { id: 'lol', name: 'League of Legends', icon: '⚔️', platforms: ['pc'], category: 'MOBA' },
-  { id: 'dota2', name: 'Dota 2', icon: '🧙', platforms: ['pc'], category: 'MOBA' },
-  { id: 'tft', name: 'Teamfight Tactics', icon: '♟️', platforms: ['pc'], category: 'Strategy' },
+  { id: 'lol', name: 'League of Legends', icon: '⚔️', iconUrl: 'https://img.icons8.com/?size=100&id=IH9qqSdkPkox&format=png&color=000000', platforms: ['pc'], category: 'MOBA' },
+  { id: 'dota2', name: 'Dota 2', icon: '🧙', iconUrl: null, platforms: ['pc'], category: 'MOBA' },
+  { id: 'tft', name: 'Teamfight Tactics', icon: '♟️', iconUrl: 'https://img.icons8.com/?size=100&id=xvOD5btf9fjF&format=png&color=000000', platforms: ['pc'], category: 'Strategy' },
   // Platform-wide
-  { id: 'steam', name: 'Steam', icon: '🎮', platforms: ['pc'], category: 'Platform' },
-  { id: 'xbox', name: 'Xbox', icon: '🟢', platforms: ['xbox'], category: 'Platform' },
-  { id: 'psn', name: 'PlayStation', icon: '🔵', platforms: ['playstation'], category: 'Platform' },
-  { id: 'nintendo', name: 'Nintendo', icon: '🔴', platforms: ['nintendo'], category: 'Platform' },
-  { id: 'epicgames', name: 'Epic Games', icon: '🟣', platforms: ['pc'], category: 'Platform' },
+  { id: 'steam', name: 'Steam', icon: '🎮', iconUrl: 'https://img.icons8.com/?size=100&id=zNqjI8XKkCv0&format=png&color=000000', platforms: ['pc'], category: 'Platform' },
+  { id: 'xbox', name: 'Xbox', icon: '🟢', iconUrl: 'https://img.icons8.com/?size=100&id=84939&format=png&color=000000', platforms: ['xbox'], category: 'Platform' },
+  { id: 'psn', name: 'PlayStation', icon: '🔵', iconUrl: 'https://img.icons8.com/?size=100&id=12519&format=png&color=000000', platforms: ['playstation'], category: 'Platform' },
+  { id: 'nintendo', name: 'Nintendo', icon: '🔴', iconUrl: 'https://img.icons8.com/?size=100&id=19598&format=png&color=000000', platforms: ['nintendo'], category: 'Platform' },
+  { id: 'epicgames', name: 'Epic Games', icon: '🟣', iconUrl: 'https://img.icons8.com/?size=100&id=R47Qp4SiyIGP&format=png&color=000000', platforms: ['pc'], category: 'Platform' },
   // Others
-  { id: 'rocketleague', name: 'Rocket League', icon: '🚗', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
-  { id: 'minecraft', name: 'Minecraft', icon: '⛏️', platforms: ['pc', 'xbox', 'playstation'], category: 'Sandbox' },
-  { id: 'eafc', name: 'EA FC', icon: '⚽', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
+  { id: 'rocketleague', name: 'Rocket League', icon: '🚗', iconUrl: 'https://img.icons8.com/?size=100&id=Vg63URCXiYXv&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
+  { id: 'minecraft', name: 'Minecraft', icon: '⛏️', iconUrl: null, platforms: ['pc', 'xbox', 'playstation'], category: 'Sandbox' },
+  { id: 'eafc', name: 'EA FC', icon: '⚽', iconUrl: 'https://img.icons8.com/?size=100&id=9793&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Sports' },
 ];
 
 // ============================================
@@ -68,6 +68,7 @@ export async function getUserProfiles(req: Request, res: Response) {
         ...profile,
         gameName: gameInfo?.name || profile.game,
         gameIcon: gameInfo?.icon || '🎮',
+        gameIconUrl: gameInfo?.iconUrl || null,
         gameCategory: gameInfo?.category || 'Other',
         latestStats: latestSnapshot,
       };
@@ -196,6 +197,7 @@ export async function getProfileStats(req: Request, res: Response) {
         ...profile,
         gameName: gameInfo?.name || profile.game,
         gameIcon: gameInfo?.icon || '🎮',
+        gameIconUrl: gameInfo?.iconUrl || null,
       },
       snapshots: profile.snapshots,
     });

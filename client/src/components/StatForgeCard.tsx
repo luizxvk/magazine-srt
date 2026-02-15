@@ -24,7 +24,7 @@ export default function StatForgeCard() {
             onClick={() => navigate('/statforge')}
             className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} px-5 py-4 transition-all duration-300 cursor-pointer group hover:scale-[1.02]`}
         >
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-4">
                 <div className="relative flex-shrink-0">
                     <div
                         className="absolute inset-0 rounded-full blur-2xl opacity-50 scale-125"
@@ -33,14 +33,14 @@ export default function StatForgeCard() {
                     <img
                         src="/assets/statforge-logo.png"
                         alt="StatForge"
-                        className="relative w-36 h-36 object-contain"
+                        className="relative w-16 h-16 object-contain"
                     />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1">
                     <GradientText as="h3" className="font-bold text-lg leading-tight" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
                         StatForge
                     </GradientText>
-                    <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} whitespace-nowrap`}>
                         Rastreie suas stats de jogos em tempo real
                     </p>
                 </div>

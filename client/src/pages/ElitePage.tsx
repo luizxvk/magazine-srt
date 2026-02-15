@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Header from '../components/Header';
+import LuxuriousBackground from '../components/LuxuriousBackground';
 import ColorBends from '../components/ColorBends';
 import { LiquidButton } from '../components/LiquidGradient';
 import confetti from 'canvas-confetti';
@@ -191,6 +192,7 @@ export default function ElitePage() {
 
     return (
         <div className="min-h-screen text-white relative">
+            <LuxuriousBackground />
             {/* ColorBends animated background - full page, no mouse interaction */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <ColorBends

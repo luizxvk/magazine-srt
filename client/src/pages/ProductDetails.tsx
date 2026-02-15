@@ -66,13 +66,16 @@ export default function ProductDetails() {
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
 
-    // Discount calculation for MAGAZINE members
-    const hasDiscount = product?.magazineDiscount && isMagazine;
+    // Discount calculation for MAGAZINE/Elite members
+    const isElite = user?.isElite || user?.membershipType === 'MGT';
+    const hasDiscount = product?.magazineDiscount && (isMagazine || isElite);
+    const discountPercent = isElite ? 0.15 : 0.10; // Elite 15%, Magazine 10%
+    const discountMultiplier = 1 - discountPercent;
     const discountedZions = hasDiscount && product?.priceZions 
-        ? Math.floor(product.priceZions * 0.9) 
+        ? Math.floor(product.priceZions * discountMultiplier) 
         : null;
     const discountedBRL = hasDiscount && product?.priceBRL 
-        ? (product.priceBRL * 0.9).toFixed(2) 
+        ? (product.priceBRL * discountMultiplier).toFixed(2) 
         : null;
 
     useEffect(() => {

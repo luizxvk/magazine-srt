@@ -111,16 +111,6 @@ export default function AdminCoupons({ showToast }: AdminCouponsProps) {
     }
   };
 
-  const handleReview = async (id: string, approved: boolean) => {
-    try {
-      await api.post(`/coupons/admin/approvals/${id}/review`, { approved });
-      showToast(approved ? 'Cupom aprovado!' : 'Cupom rejeitado', approved ? 'success' : 'info');
-      fetchCoupons();
-    } catch (error) {
-      showToast('Erro ao revisar cupom', 'error');
-    }
-  };
-
   const resetForm = () => {
     setCode('');
     setDescription('');
@@ -371,22 +361,7 @@ export default function AdminCoupons({ showToast }: AdminCouponsProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   {coupon.rovexApproval === 'PENDING' && (
-                    <>
-                      <button
-                        onClick={() => handleReview(coupon.id, true)}
-                        className="p-1.5 rounded-lg hover:bg-green-500/10 text-green-400 transition-colors"
-                        title="Aprovar"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleReview(coupon.id, false)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"
-                        title="Rejeitar"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                    </>
+                    <span className="text-[10px] text-amber-400/70 italic">Aguardando Rovex...</span>
                   )}
                   <button
                     onClick={() => handleDelete(coupon.id)}

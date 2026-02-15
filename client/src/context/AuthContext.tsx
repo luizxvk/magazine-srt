@@ -45,6 +45,10 @@ interface User {
     profileBgScale?: number | null;
     profileBgPosX?: number | null;
     profileBgPosY?: number | null;
+    // Prestige system
+    prestigeLevel?: number;
+    prestigeStars?: number;
+    lastPrestigedAt?: string;
     // Beta reward
     betaRewardClaimed?: boolean;
     // UI preferences

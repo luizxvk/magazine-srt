@@ -185,7 +185,7 @@ export default function StatForgePage() {
               <img
                 src="/assets/statforge-logo.png"
                 alt="StatForge"
-                className="relative w-44 h-44 sm:w-52 sm:h-52 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
+                className="relative w-56 h-56 sm:w-64 sm:h-64 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.25)]"
               />
             </div>
 

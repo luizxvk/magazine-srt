@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getRanking, getBadges, getRewards, redeemReward, createReward, updateReward, deleteReward, dailyLogin, getMyRedemptions, getDailyLoginStatus, getZionsHistory } from '../controllers/gamificationController';
+import { getRanking, getBadges, getRewards, redeemReward, createReward, updateReward, deleteReward, dailyLogin, getMyRedemptions, getDailyLoginStatus, getZionsHistory, getPrestigeStatus, doPrestige } from '../controllers/gamificationController';
 import { authenticateToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -15,5 +15,9 @@ router.delete('/rewards/:id', authenticateToken, isAdmin, deleteReward);
 router.post('/daily-login', authenticateToken, dailyLogin);
 router.get('/daily-login/status', authenticateToken, getDailyLoginStatus);
 router.get('/zions-history', authenticateToken, getZionsHistory);
+
+// Prestige system
+router.get('/prestige/status', authenticateToken, getPrestigeStatus);
+router.post('/prestige', authenticateToken, doPrestige);
 
 export default router;

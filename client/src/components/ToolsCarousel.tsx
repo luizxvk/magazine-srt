@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, Wrench } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import RadioCard from './RadioCard';
 import DiscordCard from './DiscordCard';
-import SteamCard from './SteamCard';
 import TwitchCard from './TwitchCard';
 import api from '../services/api';
 
@@ -42,7 +41,6 @@ const hexToRgba = (hex: string, alpha: number) => {
 const tools = [
     { id: 'radio', label: 'Rádio' },
     { id: 'discord', label: 'Discord' },
-    { id: 'steam', label: 'Steam' },
 ];
 
 export default function ToolsCarousel() {
@@ -132,8 +130,6 @@ export default function ToolsCarousel() {
                 return <RadioCard />;
             case 'discord':
                 return <DiscordCard />;
-            case 'steam':
-                return <SteamCard />;
             case 'twitch':
                 return <TwitchCard usernames={twitchChannels} />;
             default:

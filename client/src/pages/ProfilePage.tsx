@@ -420,7 +420,12 @@ export default function ProfilePage() {
                                 );
                             })()}
 
-                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
+                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 ${isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
+                                {(profileUser.prestigeLevel || 0) > 0 && (
+                                    <span className="flex items-center gap-0.5 mr-0.5">
+                                        {'⭐'.repeat(Math.min(profileUser.prestigeLevel, 5))}
+                                    </span>
+                                )}
                                 Lvl {profileUser.level || 1}
                             </div>
                         </div>
@@ -578,11 +583,17 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            <div className={`grid grid-cols-2 gap-4 border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} pt-6 mt-4`}>
+                            <div className={`grid grid-cols-${(profileUser.prestigeLevel || 0) > 0 ? '3' : '2'} gap-4 border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} pt-6 mt-4`}>
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>{profileUser.trophies || 0}</p>
                                     <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>Troféus</p>
                                 </div>
+                                {(profileUser.prestigeLevel || 0) > 0 && (
+                                    <div>
+                                        <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>⭐ {profileUser.prestigeLevel}</p>
+                                        <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>Prestígio</p>
+                                    </div>
+                                )}
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>#{profileUser.id?.slice(0, 4) || '0000'}</p>
                                     <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>ID Membro</p>

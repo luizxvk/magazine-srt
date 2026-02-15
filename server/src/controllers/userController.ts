@@ -471,6 +471,10 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 eliteUntil: true,
                 eliteSince: true,
                 eliteStreak: true,
+                // Prestige system
+                prestigeLevel: true,
+                prestigeStars: true,
+                lastPrestigedAt: true,
                 _count: {
                     select: {
                         posts: true

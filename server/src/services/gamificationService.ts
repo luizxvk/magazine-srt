@@ -639,3 +639,89 @@ export const checkGroupCreatorBadge = async (userId: string) => {
         console.error('Error checking group creator badge:', error);
     }
 };
+
+// ============================================
+// PRESTIGE SYSTEM
+// ============================================
+const MAX_LEVEL = 30;
+const MAX_PRESTIGE = 10;
+const PRESTIGE_ZIONS_REWARD = [500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500]; // Cash per prestige level
+
+export const canPrestige = async (userId: string) => {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { level: true, prestigeLevel: true, prestigeStars: true }
+    });
+    if (!user) return { canPrestige: false, reason: 'User not found' };
+    if (user.level < MAX_LEVEL) return { canPrestige: false, reason: `Você precisa atingir o nível ${MAX_LEVEL} para prestigiar`, currentLevel: user.level, maxLevel: MAX_LEVEL };
+    if (user.prestigeLevel >= MAX_PRESTIGE) return { canPrestige: false, reason: 'Você atingiu o prestígio máximo!' };
+    
+    const nextPrestige = user.prestigeLevel + 1;
+    const reward = PRESTIGE_ZIONS_REWARD[user.prestigeLevel] || 500;
+    return {
+        canPrestige: true,
+        currentPrestige: user.prestigeLevel,
+        nextPrestige,
+        reward,
+        xpBonus: nextPrestige * 5, // +5% per prestige
+    };
+};
+
+export const performPrestige = async (userId: string) => {
+    const check = await canPrestige(userId);
+    if (!check.canPrestige) throw new Error(check.reason || 'Cannot prestige');
+    
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { prestigeLevel: true, prestigeStars: true }
+    });
+    if (!user) throw new Error('User not found');
+
+    const newPrestige = user.prestigeLevel + 1;
+    const newStars = user.prestigeStars + 1;
+    const cashReward = PRESTIGE_ZIONS_REWARD[user.prestigeLevel] || 500;
+
+    // Reset level/XP, increment prestige, award Zions Cash
+    const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            level: 1,
+            xp: 0,
+            prestigeLevel: newPrestige,
+            prestigeStars: newStars,
+            lastPrestigedAt: new Date(),
+            zionsCash: { increment: cashReward },
+        }
+    });
+
+    // Create notification
+    await prisma.notification.create({
+        data: {
+            userId,
+            type: 'ACHIEVEMENT',
+            content: JSON.stringify({
+                text: `Prestígio ${newPrestige}! Você ganhou Z$${cashReward} e +${newPrestige * 5}% bônus de XP!`,
+                title: `⭐ Prestígio ${newPrestige}`,
+                prestige: newPrestige,
+            })
+        }
+    });
+
+    // Award prestige badge if exists
+    const badgeName = `Prestígio ${newPrestige}`;
+    const badge = await prisma.badge.findFirst({ where: { name: badgeName } });
+    if (badge) {
+        const exists = await prisma.userBadge.findFirst({ where: { userId, badgeId: badge.id } });
+        if (!exists) {
+            await prisma.userBadge.create({ data: { userId, badgeId: badge.id } });
+        }
+    }
+
+    return {
+        prestige: newPrestige,
+        stars: newStars,
+        cashReward,
+        xpBonus: newPrestige * 5,
+        user: updatedUser,
+    };
+};

@@ -418,13 +418,24 @@ export const purchaseWithZions = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ error: 'Estoque insuficiente' });
         }
 
-        const totalCost = product.priceZions * quantity;
-
         // Get user
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, zionsCash: true, email: true, displayName: true, name: true }
+            select: { id: true, zionsCash: true, email: true, displayName: true, name: true, membershipType: true, isElite: true }
         });
+
+        // Calculate price with membership discount
+        let totalCost = product.priceZions * quantity;
+        let discountApplied = 0;
+        if (product.magazineDiscount) {
+            if (user?.isElite || user?.membershipType === 'MGT') {
+                discountApplied = 15;
+                totalCost = Math.floor(totalCost * 0.85); // 15% Elite discount
+            } else if (user?.membershipType === 'MAGAZINE') {
+                discountApplied = 10;
+                totalCost = Math.floor(totalCost * 0.90); // 10% Magazine discount
+            }
+        }
 
         if (!user || user.zionsCash < totalCost) {
             return res.status(400).json({ error: 'Zions Cash insuficiente' });
@@ -847,10 +858,10 @@ export const purchaseWithPixDirect = async (req: AuthRequest, res: Response) => 
             return res.status(400).json({ error: 'Estoque insuficiente' });
         }
 
-        // Calculate price with possible magazine discount
+        // Calculate price with possible membership discount
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, membershipType: true, email: true }
+            select: { id: true, membershipType: true, isElite: true, email: true }
         });
 
         if (!user) {
@@ -858,8 +869,12 @@ export const purchaseWithPixDirect = async (req: AuthRequest, res: Response) => 
         }
 
         let totalBRL = product.priceBRL * quantity;
-        if (product.magazineDiscount && user.membershipType === 'MAGAZINE') {
-            totalBRL = Number((totalBRL * 0.9).toFixed(2));
+        if (product.magazineDiscount) {
+            if (user.isElite || user.membershipType === 'MGT') {
+                totalBRL = Number((totalBRL * 0.85).toFixed(2)); // 15% Elite discount
+            } else if (user.membershipType === 'MAGAZINE') {
+                totalBRL = Number((totalBRL * 0.9).toFixed(2)); // 10% Magazine discount
+            }
         }
 
         // Create pending order
@@ -938,17 +953,21 @@ export const purchaseWithBRL = async (req: AuthRequest, res: Response) => {
         // Get user
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, email: true, displayName: true, name: true, membershipType: true }
+            select: { id: true, email: true, displayName: true, name: true, membershipType: true, isElite: true }
         });
 
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
-        // Calculate price with discount for MAGAZINE members
+        // Calculate price with membership discount
         let totalPrice = product.priceBRL * quantity;
-        if (product.magazineDiscount && user.membershipType === 'MAGAZINE') {
-            totalPrice = totalPrice * 0.9; // 10% discount
+        if (product.magazineDiscount) {
+            if (user.isElite || user.membershipType === 'MGT') {
+                totalPrice = totalPrice * 0.85; // 15% Elite discount
+            } else if (user.membershipType === 'MAGAZINE') {
+                totalPrice = totalPrice * 0.90; // 10% Magazine discount
+            }
         }
 
         // Create order with PENDING status

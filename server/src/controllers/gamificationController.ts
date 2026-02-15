@@ -3,7 +3,7 @@ import prisma from '../utils/prisma';
 import { sendRewardRedemptionEmail } from '../services/emailVerificationService';
 import { sendPushToUser } from './notificationController';
 import { z } from 'zod';
-import { checkLoginStreakBadges, checkRewardBadges } from '../services/gamificationService';
+import { checkLoginStreakBadges, checkRewardBadges, canPrestige, performPrestige } from '../services/gamificationService';
 
 // Validation schemas
 const createRewardSchema = z.object({
@@ -686,6 +686,36 @@ export const getZionsHistory = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Failed to fetch zion history:', error);
         res.status(500).json({ error: 'Failed to fetch zion history' });
+    }
+};
+
+// ============================================
+// PRESTIGE SYSTEM
+// ============================================
+
+export const getPrestigeStatus = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).userId;
+        const status = await canPrestige(userId);
+        res.json(status);
+    } catch (error) {
+        console.error('Failed to get prestige status:', error);
+        res.status(500).json({ error: 'Failed to get prestige status' });
+    }
+};
+
+export const doPrestige = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).userId;
+        const result = await performPrestige(userId);
+        res.json(result);
+    } catch (error: any) {
+        console.error('Failed to prestige:', error);
+        if (error.message) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(500).json({ error: 'Failed to prestige' });
+        }
     }
 };
 

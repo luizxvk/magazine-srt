@@ -105,6 +105,10 @@ model User {
   eventAttendance        EventAttendee[]
   // StatForge - Game Tracker
   gameProfiles           GameProfile[]
+  // Prestige System
+  prestigeLevel          Int            @default(0)  // Current prestige tier (0-10)
+  prestigeStars          Int            @default(0)  // Visual stars count
+  lastPrestigedAt        DateTime?                   // When last prestiged
 
   @@index([membershipType])
   @@index([isElite])

@@ -1168,6 +1168,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
     }, [user, showEdgeNotification]);
 
+    // Global heartbeat to track online presence
+    useEffect(() => {
+        if (!user || isVisitor) return;
+
+        const sendHeartbeat = async () => {
+            try {
+                await api.post('/social/heartbeat');
+            } catch (error) {
+                console.debug('Heartbeat failed:', error);
+            }
+        };
+
+        // Send initial heartbeat
+        sendHeartbeat();
+        // Send heartbeat every 2 minutes
+        const heartbeatInterval = setInterval(sendHeartbeat, 2 * 60 * 1000);
+
+        return () => {
+            clearInterval(heartbeatInterval);
+        };
+    }, [user, isVisitor]);
+
     // Achievement popup - NOW USES EDGE NOTIFICATION
     const showAchievement = useCallback((title: string, description: string) => {
         showEdgeNotification('achievement', title, description, { duration: 6000 });

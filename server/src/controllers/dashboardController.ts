@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../utils/prisma';
 
 export const getDashboardStats = async (req: Request, res: Response) => {
     try {
         const now = new Date();
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
 
         // Total users
         const totalUsers = await prisma.user.count({
@@ -29,10 +28,11 @@ export const getDashboardStats = async (req: Request, res: Response) => {
             }
         });
 
-        // Online now
+        // Online now (users with heartbeat in last 5 minutes)
         const onlineNow = await prisma.user.count({
             where: {
                 isOnline: true,
+                lastSeenAt: { gte: fiveMinutesAgo },
                 deletedAt: null
             }
         });

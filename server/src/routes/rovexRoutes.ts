@@ -1685,7 +1685,7 @@ router.post('/action-request', authenticateToken, isAdmin, async (req: Request, 
     // Get user info
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, username: true, email: true }
+      select: { id: true, name: true, email: true }
     });
 
     // Create the action request record
@@ -1695,7 +1695,7 @@ router.post('/action-request', authenticateToken, isAdmin, async (req: Request, 
         value: JSON.stringify({
           action,
           reason,
-          requestedBy: requestedBy || user?.username || user?.email,
+          requestedBy: requestedBy || user?.name || user?.email,
           userId,
           status: 'PENDING',
           createdAt: new Date().toISOString(),
@@ -1706,10 +1706,10 @@ router.post('/action-request', authenticateToken, isAdmin, async (req: Request, 
     // Report to Rovex platform (if configured)
     try {
       await reportEvent('ADMIN_ACTION_REQUEST', {
-        requestId: actionRequest.id,
+        requestId: actionRequest.key,
         action,
         reason,
-        requestedBy: requestedBy || user?.username || user?.email,
+        requestedBy: requestedBy || user?.name || user?.email,
         userId,
       });
     } catch (e) {
@@ -1720,7 +1720,7 @@ router.post('/action-request', authenticateToken, isAdmin, async (req: Request, 
     await prisma.notification.create({
       data: {
         userId,
-        type: 'CUSTOM',
+        type: 'SYSTEM',
         content: JSON.stringify({
           title: '📋 Solicitação Enviada',
           text: `Sua solicitação de "${action}" foi enviada para aprovação da Rovex.`,
@@ -1729,12 +1729,12 @@ router.post('/action-request', authenticateToken, isAdmin, async (req: Request, 
       }
     });
 
-    console.log(`[Rovex] 📋 Admin action request submitted: ${action} by ${requestedBy || user?.username}`);
+    console.log(`[Rovex] 📋 Admin action request submitted: ${action} by ${requestedBy || user?.name}`);
 
     res.json({
       success: true,
       message: 'Solicitação enviada para aprovação da Rovex',
-      requestId: actionRequest.id,
+      requestId: actionRequest.key,
     });
   } catch (error) {
     console.error('[Rovex] Action request error:', error);
@@ -1752,11 +1752,11 @@ router.get('/action-requests', async (req: Request, res: Response) => {
       where: {
         key: { startsWith: 'action_request_' }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { updatedAt: 'desc' }
     });
 
     const parsedRequests = requests.map(r => ({
-      id: r.id,
+      id: r.key,
       key: r.key,
       ...JSON.parse(r.value),
     }));

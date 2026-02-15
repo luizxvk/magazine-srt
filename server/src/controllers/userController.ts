@@ -475,6 +475,8 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 prestigeLevel: true,
                 prestigeStars: true,
                 lastPrestigedAt: true,
+                // Feed Cards Customization
+                feedCardsConfig: true,
                 _count: {
                     select: {
                         posts: true
@@ -1190,18 +1192,19 @@ export const searchAll = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// Update user preferences (doNotDisturb, liteMode, showWelcomeCard)
+// Update user preferences (doNotDisturb, liteMode, showWelcomeCard, feedCardsConfig)
 export const updatePreferences = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        const { doNotDisturb, liteMode, showWelcomeCard } = req.body;
+        const { doNotDisturb, liteMode, showWelcomeCard, feedCardsConfig } = req.body;
 
         const updateData: any = {};
         if (typeof doNotDisturb === 'boolean') updateData.doNotDisturb = doNotDisturb;
         if (typeof liteMode === 'boolean') updateData.liteMode = liteMode;
         if (typeof showWelcomeCard === 'boolean') updateData.showWelcomeCard = showWelcomeCard;
+        if (feedCardsConfig !== undefined) updateData.feedCardsConfig = feedCardsConfig;
 
         const user = await prisma.user.update({
             where: { id: userId },
@@ -1211,6 +1214,7 @@ export const updatePreferences = async (req: AuthRequest, res: Response) => {
                 doNotDisturb: true,
                 liteMode: true,
                 showWelcomeCard: true,
+                feedCardsConfig: true,
                 isOnline: true
             }
         });

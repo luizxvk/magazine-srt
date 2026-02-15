@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard, Globe, Link2 } from 'lucide-react';
+import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard, Globe, Link2, PanelRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
 import PushNotificationSettings from '../components/PushNotificationSettings';
 import LanguageSelector from '../components/LanguageSelector';
+import FeedCardsCustomizer from '../components/FeedCardsCustomizer';
 import api from '../services/api';
 import Loader from '../components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -519,6 +520,18 @@ export default function SettingsPage() {
                             </div>
                             <LanguageSelector variant="inline" />
                         </div>
+                    </div>
+
+                    {/* Feed Cards Customization */}
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
+                        <div className="flex items-center gap-2 mb-4">
+                            <PanelRight className={`w-5 h-5 text-${themeColor}-400`} />
+                            <h3 className={`font-semibold ${textMain}`}>Cards do Feed</h3>
+                        </div>
+                        <p className={`text-sm ${textSub} mb-4`}>
+                            Escolha quais cards exibir na lateral direita do feed e reorganize a ordem
+                        </p>
+                        <FeedCardsCustomizer />
                     </div>
 
                     {/* Account Actions */}

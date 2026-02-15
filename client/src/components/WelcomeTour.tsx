@@ -3,7 +3,7 @@ import { X, ChevronRight, Sparkles, Trophy, Coins, Users, ShoppingBag, Palette, 
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.9';
+const TOUR_VERSION = '0.5.0-rc.10';
 
 interface WelcomeTourProps {
     isOpen?: boolean;

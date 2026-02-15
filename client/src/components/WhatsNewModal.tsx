@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Palette, Video, Gamepad2, BarChart3, Shield, Ticket, Star, Zap } from 'lucide-react';
+import { X, Sparkles, Check, Palette, BarChart3, Shield, Ticket, Star, Zap, PanelRight, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.9';
+const CURRENT_VERSION = '0.5.0-rc.10';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,51 +43,50 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.9 - Prestige Info, Glowing Cards, Gradient Icons
+    // v0.5.0-rc.10 - Feed Cards Customization, StatForge Accent Icons, i18n
     const updates: UpdateItem[] = [
         {
-            icon: <Star className="w-5 h-5 text-yellow-400" />,
-            title: 'Sistema de Prestígio — Guia Completo',
-            description: 'Novo modal de informações explicando como funciona o prestígio, recompensas e tabela de bônus de XP!',
-            isNew: true
-        },
-        {
-            icon: <Zap className="w-5 h-5 text-purple-400" />,
-            title: 'Cards com Brilho Animado',
-            description: 'Cards de Market, Feedback, Jogos Grátis e Grupos agora têm bordas brilhantes sincronizadas!',
+            icon: <PanelRight className="w-5 h-5 text-blue-400" />,
+            title: 'Personalização dos Cards do Feed',
+            description: 'Agora você pode mostrar/ocultar e reordenar os cards da sidebar do feed nas configurações!',
             isNew: true
         },
         {
             icon: <Palette className="w-5 h-5 text-pink-400" />,
-            title: 'Ícones Gradiente no Header',
-            description: 'Ícones de notificação e configurações usam sua cor de destaque personalizada com efeito gradiente.',
+            title: 'StatForge — Ícones Coloridos',
+            description: 'Ícones dos jogos no StatForge agora seguem sua cor de destaque personalizada com efeito glow!',
             isNew: true
+        },
+        {
+            icon: <Globe className="w-5 h-5 text-cyan-400" />,
+            title: 'Traduções Expandidas',
+            description: 'Novas traduções para StatForge, moderação e cards do feed em português, inglês e espanhol.',
+            isNew: true
+        },
+        {
+            icon: <Star className="w-5 h-5 text-yellow-400" />,
+            title: 'Sistema de Prestígio — Guia Completo',
+            description: 'Modal explicando como funciona o prestígio, recompensas e tabela de bônus de XP!',
+        },
+        {
+            icon: <Zap className="w-5 h-5 text-purple-400" />,
+            title: 'Cards com Brilho Animado',
+            description: 'Cards de Market, Feedback, Jogos Grátis e Grupos com bordas brilhantes sincronizadas!',
         },
         {
             icon: <BarChart3 className="w-5 h-5 text-cyan-400" />,
             title: 'StatForge — Melhorias',
             description: 'Logo maior, card de notificações e correções no rastreador de stats.',
-            isNew: true
         },
         {
             icon: <Ticket className="w-5 h-5 text-green-400" />,
             title: 'Sistema de Cupons na Loja',
-            description: 'Admins podem criar cupons de desconto (fixo ou %). Membros Elite ganham cupom mensal de R$10!',
+            description: 'Cupons de desconto (fixo ou %). Membros Elite ganham cupom mensal de R$10!',
         },
         {
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
-            title: 'RovexShield — Status de Moderação',
-            description: 'Card no painel admin mostrando status operacional de todos os serviços de moderação.',
-        },
-        {
-            icon: <Gamepad2 className="w-5 h-5 text-orange-400" />,
-            title: 'Criação de Torneios (Admin)',
-            description: 'Admins agora podem criar torneios completos com formato, equipes, premiação e muito mais!',
-        },
-        {
-            icon: <Video className="w-5 h-5 text-purple-400" />,
-            title: 'Preview de Streams ao Vivo',
-            description: 'Passe o mouse sobre uma stream para assistir ao vivo direto no card, com controle de volume!',
+            title: 'RovexShield — Moderação Automática',
+            description: 'Sistema de moderação com IA (Perspective API + NSFWJS) + blacklist customizada.',
         },
     ];
 

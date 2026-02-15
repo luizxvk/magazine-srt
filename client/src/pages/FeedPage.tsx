@@ -37,6 +37,7 @@ import ElitePromoCard from '../components/ElitePromoCard';
 import WelcomeCard from '../components/WelcomeCard';
 import StatForgeCard from '../components/StatForgeCard';
 import RovexShieldMiniCard from '../components/RovexShieldMiniCard';
+import { getOrderedVisibleCards } from '../components/FeedCardsCustomizer';
 
 interface PollOption {
     id: string;
@@ -586,39 +587,44 @@ export default function FeedPage() {
 
                     {/* Right Sidebar (Desktop Only - hidden below xl/1280px) */}
                     <aside className="hidden xl:block w-72 space-y-4 sticky top-24 h-fit animate-fade-in-left">
-                        {/* Tools Carousel - Radio, Discord, Steam, Twitch */}
-                        <div id="radio-card" className="transition-all duration-300 rounded-2xl">
-                            <ToolsCarousel />
-                        </div>
-
-                        {/* Free Games Card */}
-                        <FreeGamesCard />
-
-                        {/* Elite Promo Card - Apple Vision Pro style */}
-                        <ElitePromoCard />
-
-                        {/* RovexShield Status Mini Card */}
-                        <RovexShieldMiniCard />
-
-                        {/* Market Card */}
-                        <MarketCard />
-
-                        {/* StatForge Card */}
-                        <StatForgeCard />
-
-                        {/* Inventory Card */}
-                        <InventoryCard onOpenShop={() => setIsShopOpen(true)} />
-
-                        {/* Group Chat Card */}
-                        <GroupChatCard />
-
-                        {/* Feedback Form Card */}
-                        <FeedbackFormCard />
-
-                        {/* SRT LOG Promotion Card */}
-                        <div className="transform hover:scale-105 transition-transform duration-500">
-                            <AnnouncementCard />
-                        </div>
+                        {/* Render cards based on user's feedCardsConfig */}
+                        {(() => {
+                            const visibleCards = getOrderedVisibleCards(user?.feedCardsConfig as any);
+                            return visibleCards.map((cardId) => {
+                                switch (cardId) {
+                                    case 'tools':
+                                        return (
+                                            <div key="tools" id="radio-card" className="transition-all duration-300 rounded-2xl">
+                                                <ToolsCarousel />
+                                            </div>
+                                        );
+                                    case 'freeGames':
+                                        return <FreeGamesCard key="freeGames" />;
+                                    case 'elite':
+                                        return <ElitePromoCard key="elite" />;
+                                    case 'shield':
+                                        return <RovexShieldMiniCard key="shield" />;
+                                    case 'market':
+                                        return <MarketCard key="market" />;
+                                    case 'statforge':
+                                        return <StatForgeCard key="statforge" />;
+                                    case 'inventory':
+                                        return <InventoryCard key="inventory" onOpenShop={() => setIsShopOpen(true)} />;
+                                    case 'groups':
+                                        return <GroupChatCard key="groups" />;
+                                    case 'feedback':
+                                        return <FeedbackFormCard key="feedback" />;
+                                    case 'announcements':
+                                        return (
+                                            <div key="announcements" className="transform hover:scale-105 transition-transform duration-500">
+                                                <AnnouncementCard />
+                                            </div>
+                                        );
+                                    default:
+                                        return null;
+                                }
+                            });
+                        })()}
                     </aside>
                 </div>
             </div>

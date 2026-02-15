@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.9 (Release Candidate)  
-> **Última Atualização:** 14 de Fevereiro de 2026  
+> **Versão Atual:** v0.5.0-rc.10 (Release Candidate)  
+> **Última Atualização:** 15 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
@@ -22,9 +22,50 @@
 
 ---
 
-## 🆕 v0.5.0-rc.9 (Release Candidate - 14 Fevereiro 2026)
+## 🆕 v0.5.0-rc.10 (Release Candidate - 15 Fevereiro 2026)
 
-### ⭐ Sistema de Prestígio — Guia Completo (Novo)
+### 📱 Personalização dos Cards do Feed (Novo)
+**Controle total sobre quais cards aparecem na sidebar do feed**
+
+- ⚙️ **Funcionalidades**
+  - Mostrar/ocultar cards individualmente
+  - Arrastar e soltar para reordenar (Framer Motion Reorder)
+  - Persistência no perfil do usuário (feedCardsConfig)
+  - 10 cards configuráveis (Tools, Jogos Grátis, Elite, etc.)
+
+- 🎨 **Interface**
+  - Seção dedicada em Configurações com ícone PanelRight
+  - Ícone Eye/EyeOff para toggle de visibilidade
+  - Animações suaves de reordenação
+  - Resposta ao tema do usuário
+
+### 🎮 StatForge — Ícones Coloridos (Novo)
+**Ícones dos jogos seguem a cor de destaque personalizada**
+
+- ✨ **Efeitos Visuais**
+  - Background com transparência da cor de destaque
+  - Drop-shadow com glow colorido
+  - Overlay blur para efeito holográfico
+  - Aplicado a todos os ícones (sm, md, lg)
+
+### 🌍 Traduções i18n Expandidas (Novo)
+**Novas chaves de tradução para features recentes**
+
+- 📝 **Namespaces Atualizados**
+  - `statforge`: títulos, descrições, botões do StatForge
+  - `moderation`: avisos, status, ações de moderação
+  - `feedCards`: nomes dos cards e configurações
+
+- 🗣️ **Idiomas**
+  - Português (pt-BR) ✅
+  - Inglês (en) ✅
+  - Espanhol (es) ✅
+
+---
+
+## 📋 v0.5.0-rc.9 (Release Candidate - 14 Fevereiro 2026)
+
+### ⭐ Sistema de Prestígio — Guia Completo
 **Modal explicativo com todas as informações sobre prestígio**
 
 - 📖 **Seções do Modal**
@@ -38,7 +79,7 @@
   - Botão de info ao lado das estrelas de prestígio
   - Link "O que é Prestígio?" para usuários nível 25+ sem prestígio
 
-### ✨ Cards com Brilho Animado (Novo)
+### ✨ Cards com Brilho Animado
 **Bordas animadas sincronizadas nos principais cards**
 
 - 🌟 **Cards Atualizados**
@@ -53,7 +94,7 @@
   - Responde ao tema (MAGAZINE vs MGT)
   - CSS class `.glow-border-animated`
 
-### 🎨 Ícones Gradiente no Header (Novo)
+### 🎨 Ícones Gradiente no Header
 **Personalização de ícones com cor de destaque**
 
 - ⚡ **Implementação**
@@ -61,7 +102,7 @@
   - "Membro Magazine/MGT" com efeito text-shine
   - Classe `.icon-gradient-accent` reutilizável
 
-### 📊 StatForge — Melhorias (Novo)
+### 📊 StatForge — Melhorias
 **Correções e aprimoramentos no rastreador de stats**
 
 - 🔧 **Correções**
@@ -82,7 +123,7 @@
 
 ---
 
-## 🆕 v0.5.0-rc.8 (Release Candidate - 14 Fevereiro 2026)
+## 📋 v0.5.0-rc.8 (Release Candidate - 14 Fevereiro 2026)
 
 ### 📊 StatForge — Rastreador de Stats de Jogos (Novo)
 **Vincule perfis e acompanhe suas stats em tempo real**

@@ -109,6 +109,8 @@ model User {
   prestigeLevel          Int            @default(0)  // Current prestige tier (0-10)
   prestigeStars          Int            @default(0)  // Visual stars count
   lastPrestigedAt        DateTime?                   // When last prestiged
+  // Feed Cards Customization
+  feedCardsConfig        Json?          // { cards: [{id: 'tools', visible: true, order: 0}, ...] }
 
   @@index([membershipType])
   @@index([isElite])

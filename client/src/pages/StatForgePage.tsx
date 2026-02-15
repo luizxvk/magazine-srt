@@ -26,18 +26,35 @@ interface GameInfo {
 // Helper component for game icons with accent color filter
 function GameIcon({ iconUrl, icon, size = 'md', accentColor }: { iconUrl?: string | null; icon: string; size?: 'sm' | 'md' | 'lg'; accentColor?: string }) {
   const sizeClasses = { sm: 'w-5 h-5', md: 'w-8 h-8', lg: 'w-10 h-10' };
+  const containerSizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-14 h-14' };
   const textSizes = { sm: 'text-lg', md: 'text-3xl', lg: 'text-4xl' };
   
   if (iconUrl) {
     return (
-      <img 
-        src={iconUrl} 
-        alt="" 
-        className={`${sizeClasses[size]} object-contain`}
+      <div 
+        className={`relative ${containerSizes[size]} rounded-lg flex items-center justify-center shrink-0`}
         style={{ 
-          filter: accentColor ? `drop-shadow(0 0 6px ${accentColor}80)` : undefined 
+          backgroundColor: accentColor ? `${accentColor}15` : 'transparent',
         }}
-      />
+      >
+        <img 
+          src={iconUrl} 
+          alt="" 
+          className={`${sizeClasses[size]} object-contain relative z-10`}
+          style={{ 
+            filter: accentColor 
+              ? `drop-shadow(0 0 8px ${accentColor}90) drop-shadow(0 0 3px ${accentColor}60)` 
+              : undefined 
+          }}
+        />
+        {/* Glow effect overlay */}
+        {accentColor && (
+          <div 
+            className="absolute inset-0 rounded-lg opacity-30 blur-sm"
+            style={{ backgroundColor: accentColor }}
+          />
+        )}
+      </div>
     );
   }
   return <span className={textSizes[size]}>{icon}</span>;
@@ -480,7 +497,7 @@ export default function StatForgePage() {
                               Em breve
                             </span>
                           )}
-                          <GameIcon iconUrl={game.iconUrl} icon={game.icon} size="sm" accentColor={linkGame === game.id ? accentColor : undefined} />
+                          <GameIcon iconUrl={game.iconUrl} icon={game.icon} size="sm" accentColor={accentColor} />
                           <span className={`text-xs font-medium ${linkGame === game.id ? 'text-white' : game.comingSoon ? 'text-gray-500' : theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
                             {game.name}
                           </span>

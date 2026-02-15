@@ -53,6 +53,8 @@ interface User {
     betaRewardClaimed?: boolean;
     // UI preferences
     showWelcomeCard?: boolean;
+    // Feed customization
+    feedCardsConfig?: Record<string, unknown> | null;
 }
 
 export interface DailyLoginStatus {

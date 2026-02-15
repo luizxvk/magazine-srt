@@ -83,25 +83,25 @@ export default function FreeGamesCard() {
     return (
         <div className={`${themeBg} backdrop-blur-xl rounded-2xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} p-4 transition-all duration-300`}>
             {/* Header */}
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-3">
                 <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center"
                     style={{ 
                         backgroundColor: `${accentColor}33`,
                         borderColor: `${accentColor}50`,
                         borderWidth: '1px'
                     }}
                 >
-                    <Gift className="w-4 h-4" style={{ color: accentColor }} />
+                    <Gift className="w-3.5 h-3.5" style={{ color: accentColor }} />
                 </div>
                 <div>
-                    <h3 className={`text-lg font-bold ${textMain}`}>Jogos Grátis</h3>
-                    <p className={`text-xs ${textSub}`}>{games.length} {games.length === 1 ? 'jogo disponível' : 'jogos disponíveis'}</p>
+                    <h3 className={`text-base font-bold ${textMain}`}>Jogos Grátis</h3>
+                    <p className={`text-[10px] ${textSub}`}>{games.length} {games.length === 1 ? 'jogo disponível' : 'jogos disponíveis'}</p>
                 </div>
             </div>
 
             {/* Games List */}
-            <div className="space-y-3">
+            <div className="space-y-2">
                 {games.map(game => {
                     const platformStyle = PLATFORM_COLORS[game.platform] || PLATFORM_COLORS.other;
                     const daysRemaining = game.expiresAt ? getDaysRemaining(game.expiresAt) : null;
@@ -112,39 +112,39 @@ export default function FreeGamesCard() {
                             href={game.claimUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`flex items-center gap-3 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-50/80 hover:bg-gray-100/80' : 'bg-white/5 hover:bg-white/10'} transition-all duration-200 group`}
+                            className={`flex items-center gap-2.5 p-2 rounded-xl ${theme === 'light' ? 'bg-gray-50/80 hover:bg-gray-100/80' : 'bg-white/5 hover:bg-white/10'} transition-all duration-200 group`}
                         >
                             {/* Game Image */}
                             {game.imageUrl ? (
                                 <img 
                                     src={game.imageUrl} 
                                     alt={game.title} 
-                                    className="w-14 h-14 rounded-lg object-cover"
+                                    className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                                 />
                             ) : (
-                                <div className={`w-14 h-14 rounded-lg flex items-center justify-center ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
-                                    <Gamepad2 className={`w-6 h-6 ${textSub}`} />
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
+                                    <Gamepad2 className={`w-5 h-5 ${textSub}`} />
                                 </div>
                             )}
 
                             {/* Game Info */}
                             <div className="flex-1 min-w-0">
-                                <p className={`font-medium ${textMain} truncate group-hover:underline`}>{game.title}</p>
-                                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${platformStyle.bg} ${platformStyle.text} border ${platformStyle.border}`}>
+                                <p className={`font-medium text-sm ${textMain} truncate group-hover:underline`}>{game.title}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${platformStyle.bg} ${platformStyle.text} border ${platformStyle.border}`}>
                                         {PLATFORM_NAMES[game.platform]}
                                     </span>
                                     {game.worth && game.worth !== 'N/A' && (
-                                        <span className="text-xs text-green-400 font-medium line-through opacity-60">
+                                        <span className="text-[10px] text-green-400 font-medium line-through opacity-60">
                                             {game.worth}
                                         </span>
                                     )}
-                                    <span className="text-xs text-green-400 font-bold">
+                                    <span className="text-[10px] text-green-400 font-bold">
                                         Grátis
                                     </span>
                                     {daysRemaining !== null && daysRemaining <= 7 && (
-                                        <span className={`text-xs flex items-center gap-1 ${daysRemaining <= 2 ? 'text-red-400' : 'text-yellow-400'}`}>
-                                            <Clock className="w-3 h-3" />
+                                        <span className={`text-[10px] flex items-center gap-0.5 ${daysRemaining <= 2 ? 'text-red-400' : 'text-yellow-400'}`}>
+                                            <Clock className="w-2.5 h-2.5" />
                                             {daysRemaining <= 0 ? 'Último dia!' : `${daysRemaining}d restantes`}
                                         </span>
                                     )}

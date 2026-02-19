@@ -181,6 +181,24 @@ export default function StatForgePage() {
     }
   };
 
+  const [syncing, setSyncing] = useState<string | null>(null);
+  
+  const handleSync = async (profileId: string) => {
+    try {
+      setSyncing(profileId);
+      const res = await api.post(`/statforge/profiles/${profileId}/sync`);
+      // Atualizar o perfil com os novos dados
+      if (res.data.success) {
+        fetchData(); // Recarrega todos os perfis
+      }
+    } catch (error: any) {
+      console.error('Error syncing:', error);
+      alert(error.response?.data?.error || 'Erro ao sincronizar');
+    } finally {
+      setSyncing(null);
+    }
+  };
+
   useEffect(() => {
     if (tab === 'feed') fetchEvents();
   }, [tab]);
@@ -321,12 +339,23 @@ export default function StatForgePage() {
                         <p className="text-sm text-gray-400">{profile.gamertag} • {profile.platform.toUpperCase()}</p>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleUnlink(profile.id); }}
-                      className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-red-400 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleSync(profile.id); }}
+                        disabled={syncing === profile.id}
+                        className={`p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${syncing === profile.id ? 'opacity-100' : ''}`}
+                        style={{ color: accentColor }}
+                        title="Sincronizar stats"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${syncing === profile.id ? 'animate-spin' : ''}`} />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleUnlink(profile.id); }}
+                        className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-red-400 transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {profile.latestStats ? (
@@ -632,7 +661,19 @@ export default function StatForgePage() {
                 </div>
               ) : (
                 <div className={`p-8 rounded-xl ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} text-center`}>
-                  <p className="text-gray-400">Nenhum dado sincronizado ainda</p>
+                  <p className="text-gray-400 mb-4">Nenhum dado sincronizado ainda</p>
+                  <button
+                    onClick={() => handleSync(selectedProfile.id)}
+                    disabled={syncing === selectedProfile.id}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
+                    style={{ 
+                      backgroundColor: `${accentColor}20`,
+                      color: accentColor 
+                    }}
+                  >
+                    <RefreshCw className={`w-4 h-4 ${syncing === selectedProfile.id ? 'animate-spin' : ''}`} />
+                    {syncing === selectedProfile.id ? 'Sincronizando...' : 'Sincronizar Agora'}
+                  </button>
                 </div>
               )}
             </motion.div>

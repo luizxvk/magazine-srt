@@ -16,7 +16,7 @@
             ]
         },
         {
-            "source": "/(.*)",
+            "source": "/:path((?!ads\\.txt|sw\\.js|assets|packs|sounds|manifest\\.json|favicon\\.ico).*)",
             "destination": "/index.html"
         }
     ]

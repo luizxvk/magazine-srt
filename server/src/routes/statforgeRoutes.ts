@@ -7,6 +7,7 @@ import {
   unlinkGameProfile,
   getProfileStats,
   addSnapshot,
+  fetchGameStats,
   getEventsFeed,
   comparePlayers,
   getShieldStatus,
@@ -34,6 +35,9 @@ router.get('/profiles/:profileId/stats', authenticateToken, getProfileStats);
 
 // Manually add/update stats snapshot
 router.post('/profiles/:profileId/snapshot', authenticateToken, addSnapshot);
+
+// Fetch stats from external API (auto-sync)
+router.post('/profiles/:profileId/sync', authenticateToken, fetchGameStats);
 
 // Get events feed (rank changes, achievements, etc.)
 router.get('/events', authenticateToken, getEventsFeed);

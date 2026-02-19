@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
+import { fetchGameStats as fetchExternalStats } from '../services/statforgeService';
 
 // ============================================
 // SUPPORTED GAMES CATALOG
@@ -454,5 +455,97 @@ export async function getShieldStatus(req: Request, res: Response) {
   } catch (error) {
     console.error('[RovexShield] Error getting status:', error);
     res.status(500).json({ error: 'Failed to get shield status' });
+  }
+}
+
+// ============================================
+// FETCH GAME STATS FROM EXTERNAL API
+// ============================================
+export async function fetchGameStats(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.userId;
+    const { profileId } = req.params;
+
+    // Get the profile
+    const profile = await prisma.gameProfile.findFirst({
+      where: { id: profileId, userId },
+    });
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    // Check if game supports automatic sync
+    const gameInfo = SUPPORTED_GAMES.find((g) => g.id === profile.game);
+    if (!gameInfo || gameInfo.comingSoon) {
+      return res.status(400).json({ error: 'This game does not support automatic sync yet' });
+    }
+
+    // Fetch stats from external API
+    const result = await fetchExternalStats(profile.game, profile.gamertag, profile.platform);
+
+    if (!result.success) {
+      return res.status(400).json({ error: result.error || 'Failed to fetch stats' });
+    }
+
+    const stats = result.data!;
+
+    // Get previous snapshot to detect changes
+    const previousSnapshot = await getPreviousSnapshot(profileId);
+
+    // Create snapshot with fetched data
+    const snapshot = await prisma.gameSnapshot.create({
+      data: {
+        profileId,
+        rank: stats.rank,
+        rankTier: stats.rankTier,
+        level: stats.level,
+        kd: stats.kd,
+        winRate: stats.winRate,
+        totalMatches: stats.totalMatches,
+        totalWins: stats.totalWins,
+        totalKills: stats.totalKills,
+        totalDeaths: stats.totalDeaths,
+        hoursPlayed: stats.hoursPlayed,
+        score: stats.score,
+        stats: stats.stats || {},
+      },
+    });
+
+    // Detect rank changes and create events
+    if (previousSnapshot && stats.rank && previousSnapshot.rank !== stats.rank) {
+      const isRankUp = (stats.rankTier || 0) > (previousSnapshot.rankTier || 0);
+
+      await prisma.gameEvent.create({
+        data: {
+          profileId,
+          userId,
+          game: profile.game,
+          eventType: isRankUp ? 'rank_up' : 'rank_down',
+          title: isRankUp
+            ? `Subiu para ${stats.rank} no ${gameInfo?.name || profile.game}!`
+            : `Desceu para ${stats.rank} no ${gameInfo?.name || profile.game}`,
+          description: `${previousSnapshot.rank} → ${stats.rank}`,
+          oldValue: previousSnapshot.rank || undefined,
+          newValue: stats.rank,
+          iconUrl: gameInfo?.icon,
+        },
+      });
+    }
+
+    // Update lastSyncedAt
+    await prisma.gameProfile.update({
+      where: { id: profileId },
+      data: { lastSyncedAt: new Date() },
+    });
+
+    res.json({
+      success: true,
+      snapshot,
+      message: 'Stats synced successfully',
+    });
+  } catch (error) {
+    console.error('[StatForge] Error fetching game stats:', error);
+    res.status(500).json({ error: 'Failed to fetch game stats' });
   }
 }

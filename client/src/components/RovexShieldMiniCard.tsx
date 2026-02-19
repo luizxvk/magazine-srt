@@ -15,10 +15,16 @@ export default function RovexShieldMiniCard() {
   const [data, setData] = useState<ShieldData | null>(null);
   const [loading, setLoading] = useState(true);
   const isMGT = user?.membershipType === 'MGT';
+  const isLight = theme === 'light';
   const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
   const themeGlow = isMGT
     ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
     : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
+  const themeBg = isLight
+    ? 'bg-white/90'
+    : isMGT 
+      ? 'bg-emerald-950/40' 
+      : 'bg-amber-950/40';
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -42,15 +48,11 @@ export default function RovexShieldMiniCard() {
     ? Object.values(data.services).filter(s => s.status === 'operational').length 
     : 0;
 
-  const cardBg = theme === 'light' 
-    ? 'bg-white/90' 
-    : 'bg-[#1c1c1e]/90';
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl ${cardBg} ${themeBorder} ${themeGlow} p-4 transition-all duration-300`}
+      className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl ${themeBg} ${themeBorder} ${themeGlow} p-4 transition-all duration-300`}
     >
       {/* Subtle gradient overlay */}
       <div 
@@ -75,7 +77,7 @@ export default function RovexShieldMiniCard() {
           {/* Live indicator */}
           <div 
             className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 ${
-              theme === 'light' ? 'border-white' : 'border-[#1c1c1e]'
+              isLight ? 'border-white' : 'border-[#1c1c1e]'
             } ${
               isOnline 
                 ? 'bg-green-400 animate-pulse shadow-[0_0_6px_rgba(74,222,128,0.6)]' 
@@ -87,7 +89,7 @@ export default function RovexShieldMiniCard() {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+            <h4 className={`text-sm font-semibold ${isLight ? 'text-gray-900' : 'text-white'}`}>
               RovexShield
             </h4>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
@@ -108,13 +110,13 @@ export default function RovexShieldMiniCard() {
             <div className="flex items-center gap-3 mt-1">
               <div className="flex items-center gap-1">
                 <CheckCircle className="w-3 h-3 text-green-400" />
-                <span className={`text-xs ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                <span className={`text-xs ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
                   {operationalCount}/{servicesCount} serviços
                 </span>
               </div>
               {data?.uptime && (
                 <div className="flex items-center gap-1">
-                  <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
+                <span className={`text-xs ${isLight ? 'text-gray-500' : 'text-gray-500'}`}>
                     {data.uptime.toFixed(1)}% uptime
                   </span>
                 </div>
@@ -127,8 +129,8 @@ export default function RovexShieldMiniCard() {
         {!loading && (
           <div className={`p-1.5 rounded-lg ${
             isOnline 
-              ? theme === 'light' ? 'bg-green-100' : 'bg-green-500/10' 
-              : theme === 'light' ? 'bg-red-100' : 'bg-red-500/10'
+              ? isLight ? 'bg-green-100' : 'bg-green-500/10' 
+              : isLight ? 'bg-red-100' : 'bg-red-500/10'
           }`}>
             {isOnline ? (
               <CheckCircle className="w-4 h-4 text-green-500" />
@@ -140,7 +142,7 @@ export default function RovexShieldMiniCard() {
       </div>
 
       {/* Marketing tagline */}
-      <p className={`text-[10px] mt-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'}`}>
+      <p className={`text-[10px] mt-2 ${isLight ? 'text-gray-500' : 'text-gray-500'}`}>
         Segurança e infraestrutura sob controle. Hospedagem otimizada pela Rovex.
       </p>
     </motion.div>

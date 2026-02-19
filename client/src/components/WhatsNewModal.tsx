@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Palette, Shield, Ticket, Star, PanelRight, Swords, Trophy, Coins } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Sparkles, Check, Swords, Trophy, Coins, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, TrendingUp, PanelRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -19,88 +20,89 @@ interface WhatsNewModalProps {
 }
 
 export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externalOnClose }: WhatsNewModalProps = {}) {
-    const { user, accentColor: userAccentColor, accentGradient } = useAuth();
+    const { user, accentColor: userAccentColor, accentGradient, theme } = useAuth();
     const location = useLocation();
     const [internalIsOpen, setInternalIsOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
     const isMGT = user?.membershipType === 'MGT';
 
-    // Use external state if provided, otherwise use internal state
     const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
 
-    // Theme-aware styling with user's custom accent gradient
-    const hasCustomGradient = !!accentGradient;
-    const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
-    const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
-    const accentTextColor = isMGT ? 'text-emerald-400' : 'text-yellow-400';
-    const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
-    const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
+    // Apple Vision Pro styling
+    const isLight = theme === 'light';
+    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const accentColor = userAccentColor || defaultAccent;
+    const cardBg = isLight ? 'bg-white/95' : 'bg-[#1c1c1e]/95';
+    const textMain = isLight ? 'text-gray-900' : 'text-white';
+    const textSub = isLight ? 'text-gray-600' : 'text-gray-400';
+    const borderColor = isLight ? 'border-gray-200' : 'border-white/10';
+    const itemBg = isLight ? 'bg-gray-50' : 'bg-white/[0.03]';
+    const itemBorder = isLight ? 'border-gray-100' : 'border-white/5';
 
-    // Compute dynamic gradient styles for buttons and icons
-    const gradientStyle = hasCustomGradient 
-        ? { background: accentGradient } 
-        : undefined;
-    const iconStyle = hasCustomGradient 
-        ? { color: userAccentColor } 
-        : undefined;
-
-    // v0.5.0-rc.11 - Battle Pass, Desafios 1v1, Roadmap de Features
-    const updates: UpdateItem[] = [
+    // Page 1 - Main Features
+    const page1Updates: UpdateItem[] = [
         {
-            icon: <Trophy className="w-5 h-5 text-amber-400" />,
+            icon: <Trophy className="w-5 h-5" />,
             title: 'Battle Pass Comunitário',
-            description: 'Novo sistema de temporada com missões diárias/semanais, rewards exclusivos e 50 níveis para progredir!',
+            description: 'Sistema de temporada com missões diárias/semanais e 50 níveis de rewards!',
             isNew: true
         },
         {
-            icon: <Swords className="w-5 h-5 text-red-400" />,
+            icon: <Swords className="w-5 h-5" />,
             title: 'Desafios 1v1',
-            description: 'Desafie amigos no StatForge! Aposte Zions, compete em partidas e o melhor leva tudo!',
+            description: 'Desafie amigos, aposte Zions e compete por kills, wins e K/D!',
             isNew: true
         },
         {
-            icon: <Coins className="w-5 h-5 text-yellow-400" />,
+            icon: <Coins className="w-5 h-5" />,
             title: 'Apostas Sociais',
-            description: 'Aposte Zions em previsões: ranking semanal, resultados de partidas e mais!',
+            description: 'Aposte em previsões: ranking semanal, resultados e mais!',
             isNew: true
         },
         {
-            icon: <PanelRight className="w-5 h-5 text-blue-400" />,
-            title: 'Personalização dos Cards do Feed',
-            description: 'Mostrar/ocultar e reordenar os cards da sidebar nas configurações!',
-        },
-        {
-            icon: <Palette className="w-5 h-5 text-pink-400" />,
-            title: 'StatForge — Ícones Coloridos',
-            description: 'Ícones dos jogos seguem sua cor de destaque com efeito glow!',
-        },
-        {
-            icon: <Star className="w-5 h-5 text-yellow-400" />,
-            title: 'Sistema de Prestígio',
-            description: 'Reset de nível para ganhar estrelas, Zions Cash e bônus permanente de XP!',
-        },
-        {
-            icon: <Ticket className="w-5 h-5 text-green-400" />,
-            title: 'Cupons na Loja',
-            description: 'Cupons de desconto! Membros Elite ganham R$10/mês automaticamente.',
-        },
-        {
-            icon: <Shield className="w-5 h-5 text-emerald-400" />,
-            title: 'RovexShield',
-            description: 'Moderação automática com IA + filtros customizados.',
+            icon: <PanelRight className="w-5 h-5" />,
+            title: 'Cards do Feed Personalizáveis',
+            description: 'Mostrar/ocultar e reordenar cards nas configurações!',
         },
     ];
 
+    // Page 2 - Coming Soon Features
+    const page2Updates: UpdateItem[] = [
+        {
+            icon: <Video className="w-5 h-5" />,
+            title: 'Watch Parties',
+            description: 'Assista streams e vídeos juntos com amigos em tempo real!',
+            isNew: true
+        },
+        {
+            icon: <Film className="w-5 h-5" />,
+            title: 'Clips & Highlights',
+            description: 'Crie e compartilhe clipes de 15-60s dos seus melhores momentos!',
+            isNew: true
+        },
+        {
+            icon: <LayoutDashboard className="w-5 h-5" />,
+            title: 'Creator Dashboard',
+            description: 'Painel avançado: analytics, monetização e crescimento!',
+            isNew: true
+        },
+        {
+            icon: <TrendingUp className="w-5 h-5" />,
+            title: 'Sistema de Apostas Social',
+            description: 'Pools de apostas em partidas ao vivo com odds dinâmicas!',
+            isNew: true
+        },
+    ];
+
+    const pages = [page1Updates, page2Updates];
+    const pageTitles = ['Novidades', 'Em Breve'];
+
     useEffect(() => {
-        // Only auto-show if using internal state (no external control)
         if (externalIsOpen !== undefined) return;
-
-        // Só mostrar se: usuário logado E NÃO está na tela de login/register
         const isAuthPage = ['/', '/login', '/register', '/request-invite'].includes(location.pathname);
-
         if (user && !isAuthPage) {
             const lastSeenVersion = localStorage.getItem('whatsNewVersion');
             if (lastSeenVersion !== CURRENT_VERSION) {
-                // Delay para não conflitar com outros modais
                 const timer = setTimeout(() => setInternalIsOpen(true), 2000);
                 return () => clearTimeout(timer);
             }
@@ -114,6 +116,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         } else {
             setInternalIsOpen(false);
         }
+        setCurrentPage(0);
     };
 
     if (!isOpen) return null;
@@ -121,81 +124,173 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const modalContent = (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/60 backdrop-blur-xl"
                 onClick={handleClose}
             />
 
-            {/* Modal */}
-            <div className="relative w-full max-w-lg bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-800 overflow-hidden animate-in fade-in zoom-in duration-300">
-                {/* Header com gradiente - usa gradient customizado se disponível */}
+            {/* Modal - Apple Vision Pro Style */}
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className={`relative w-full max-w-md ${cardBg} rounded-3xl shadow-2xl border ${borderColor} overflow-hidden backdrop-blur-2xl`}
+                style={{
+                    boxShadow: isLight 
+                        ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' 
+                        : `0 0 80px -20px ${accentColor}30`
+                }}
+            >
+                {/* Ambient glow */}
                 <div 
-                    className={`relative p-6 pb-12 ${!hasCustomGradient ? `bg-gradient-to-r ${gradientFrom} ${gradientTo}` : ''}`}
-                    style={hasCustomGradient ? { background: accentGradient } : undefined}
-                >
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 blur-3xl opacity-20 pointer-events-none"
+                    style={{ background: accentGradient || accentColor }}
+                />
+
+                {/* Header */}
+                <div className="relative p-6 pb-4">
                     <button
                         onClick={handleClose}
-                        className="absolute top-4 right-4 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+                        className={`absolute top-4 right-4 p-2 rounded-full ${isLight ? 'hover:bg-gray-100' : 'hover:bg-white/10'} transition-colors`}
                     >
-                        <X className="w-5 h-5 text-white" />
+                        <X className={`w-5 h-5 ${textSub}`} />
                     </button>
 
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-white/20 rounded-xl">
-                            <Sparkles className="w-8 h-8 text-white" />
+                        <div 
+                            className="p-3 rounded-2xl"
+                            style={{ 
+                                background: `linear-gradient(135deg, ${accentColor}30, ${accentColor}10)`,
+                                boxShadow: `0 0 20px ${accentColor}20`
+                            }}
+                        >
+                            <Sparkles className="w-7 h-7" style={{ color: accentColor }} />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="text-2xl font-bold text-white">Novidades v{CURRENT_VERSION}</h2>
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-red-500 text-white font-bold uppercase">BETA</span>
+                                <h2 className={`text-xl font-bold ${textMain}`}>
+                                    {pageTitles[currentPage]} v{CURRENT_VERSION}
+                                </h2>
+                                <span 
+                                    className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase"
+                                    style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
+                                >
+                                    BETA
+                                </span>
                             </div>
-                            <p className="text-white/80 text-sm">Confira o que há de novo!</p>
+                            <p className={`text-sm ${textSub}`}>
+                                {currentPage === 0 ? 'Confira o que há de novo!' : 'O que está por vir!'}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Conteúdo */}
-                <div className="p-6 -mt-6">
-                    <div className="bg-zinc-800/50 rounded-xl p-4 space-y-2 max-h-[50vh] overflow-y-auto custom-scrollbar">
-                        {updates.map((update, index) => (
-                            <div
-                                key={index}
-                                className={`flex items-center gap-3 p-3 rounded-xl ${bgAccent} border ${borderAccent}`}
-                            >
-                                <div 
-                                className={`p-2 rounded-lg bg-zinc-800 shrink-0 ${!hasCustomGradient ? accentTextColor : ''}`}
-                                style={iconStyle}
-                            >
-                                    {update.icon}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="font-medium text-white text-sm">{update.title}</h3>
-                                        {update.isNew && (
-                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-medium">
-                                                NOVO
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-zinc-400 text-xs">{update.description}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                {/* Page indicator */}
+                <div className="flex justify-center gap-2 px-6 pb-3">
+                    {pages.map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setCurrentPage(idx)}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                                idx === currentPage ? 'w-6' : 'w-1.5'
+                            }`}
+                            style={{ 
+                                backgroundColor: idx === currentPage ? accentColor : (isLight ? '#d1d5db' : '#3f3f46')
+                            }}
+                        />
+                    ))}
                 </div>
 
-                {/* Footer - botão com gradient customizado */}
-                <div className="p-6 pt-0">
-                    <button
+                {/* Content with slide animation */}
+                <div className="relative px-6 pb-4 overflow-hidden">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentPage}
+                            initial={{ opacity: 0, x: currentPage === 0 ? -20 : 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: currentPage === 0 ? 20 : -20 }}
+                            transition={{ duration: 0.2 }}
+                            className="space-y-2"
+                        >
+                            {pages[currentPage].map((update, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className={`flex items-start gap-3 p-3 rounded-xl ${itemBg} border ${itemBorder} transition-all hover:scale-[1.01]`}
+                                >
+                                    <div 
+                                        className="p-2 rounded-lg shrink-0"
+                                        style={{ backgroundColor: `${accentColor}15` }}
+                                    >
+                                        <span style={{ color: accentColor }}>{update.icon}</span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className={`font-medium text-sm ${textMain}`}>{update.title}</h3>
+                                            {update.isNew && (
+                                                <span 
+                                                    className="text-[9px] px-1.5 py-0.5 rounded-full font-bold"
+                                                    style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
+                                                >
+                                                    NOVO
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className={`text-xs ${textSub} mt-0.5`}>{update.description}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+
+                {/* Footer with navigation */}
+                <div className="p-6 pt-3 flex items-center gap-3">
+                    {/* Navigation buttons */}
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                            disabled={currentPage === 0}
+                            className={`p-2 rounded-xl transition-all ${
+                                currentPage === 0 
+                                    ? 'opacity-30 cursor-not-allowed' 
+                                    : isLight ? 'hover:bg-gray-100' : 'hover:bg-white/10'
+                            }`}
+                        >
+                            <ChevronLeft className={`w-5 h-5 ${textSub}`} />
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(p => Math.min(pages.length - 1, p + 1))}
+                            disabled={currentPage === pages.length - 1}
+                            className={`p-2 rounded-xl transition-all ${
+                                currentPage === pages.length - 1 
+                                    ? 'opacity-30 cursor-not-allowed' 
+                                    : isLight ? 'hover:bg-gray-100' : 'hover:bg-white/10'
+                            }`}
+                        >
+                            <ChevronRight className={`w-5 h-5 ${textSub}`} />
+                        </button>
+                    </div>
+
+                    {/* Confirm button */}
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={handleClose}
-                        className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity ${!hasCustomGradient ? `bg-gradient-to-r ${gradientFrom} ${gradientTo}` : ''}`}
-                        style={gradientStyle}
+                        className="flex-1 py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2"
+                        style={{ background: accentGradient || accentColor }}
                     >
                         <Check className="w-5 h-5" />
                         Vamos lá!
-                    </button>
+                    </motion.button>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 

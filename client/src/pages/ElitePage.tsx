@@ -278,7 +278,7 @@ export default function ElitePage() {
                         className="mb-20"
                     >
                         <h2 className="text-2xl font-bold text-center mb-3 text-white/90 tracking-wide">
-                            {t('elite.benefits')}
+                            {t('elite.benefitsTitle')}
                         </h2>
                         <p className="text-center text-white/40 mb-10">{t('elite.subtitle')}</p>
                         
@@ -431,7 +431,7 @@ export default function ElitePage() {
                                         </div>
                                         <div>
                                             <h3 className="text-2xl font-bold text-white">{t('elite.eliteActive')}</h3>
-                                            <p className="text-white/50">{t('elite.benefits')}</p>
+                                            <p className="text-white/50">{t('elite.benefitsSubtitle')}</p>
                                         </div>
                                     </div>
                                     
@@ -486,7 +486,7 @@ export default function ElitePage() {
                                                 {t('elite.cancel')}
                                             </button>
                                             <p className="text-xs text-white/30 text-center mt-2">
-                                                {t('elite.benefits')}
+                                                {t('elite.benefitsContinue')}
                                             </p>
                                         </div>
                                     )}
@@ -592,7 +592,7 @@ export default function ElitePage() {
                             <div className="p-5 rounded-2xl bg-white/5 border border-white/10 mb-6">
                                 <p className="text-sm text-white/60 mb-3 flex items-center gap-2">
                                     <Check className="text-emerald-400 w-4 h-4" /> 
-                                    {t('elite.benefits')}
+                                    {t('elite.benefitsContinue')}
                                 </p>
                                 <p className="text-2xl font-bold bg-gradient-to-r from-violet-300 to-indigo-300 bg-clip-text text-transparent">
                                     {status?.eliteUntil 

@@ -9,6 +9,8 @@ import {
   getUserChallenges,
   getChallengeById,
   getChallengeLeaderboard,
+  getWeeklyChallengeLeaderboard,
+  getUserChallengeStats,
   processExpiredChallenges
 } from '../services/challengeService';
 import { ChallengeMetric, ChallengeStatus } from '@prisma/client';
@@ -197,5 +199,39 @@ export async function processExpiredHandler(req: Request, res: Response) {
   } catch (error: any) {
     console.error('[Challenge] Error processing expired:', error);
     res.status(500).json({ error: 'Erro ao processar desafios expirados' });
+  }
+}
+
+// ============================================
+// GET WEEKLY LEADERBOARD
+// ============================================
+export async function getWeeklyLeaderboardHandler(req: Request, res: Response) {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const data = await getWeeklyChallengeLeaderboard(limit);
+    res.json(data);
+  } catch (error: any) {
+    console.error('[Challenge] Error getting weekly leaderboard:', error);
+    res.status(500).json({ error: 'Erro ao buscar ranking semanal' });
+  }
+}
+
+// ============================================
+// GET MY CHALLENGE STATS
+// ============================================
+export async function getMyChallengeStatsHandler(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Não autenticado' });
+    }
+
+    const stats = await getUserChallengeStats(userId);
+    res.json(stats);
+  } catch (error: any) {
+    console.error('[Challenge] Error getting stats:', error);
+    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
   }
 }

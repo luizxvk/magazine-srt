@@ -8,6 +8,8 @@ import {
   getMyChallengesHandler,
   getChallengeHandler,
   getLeaderboardHandler,
+  getWeeklyLeaderboardHandler,
+  getMyChallengeStatsHandler,
   forceCompleteHandler,
   processExpiredHandler
 } from '../controllers/challengeController';
@@ -18,11 +20,17 @@ const router = Router();
 // Get my challenges (sent + received)
 router.get('/', authenticateToken, getMyChallengesHandler);
 
-// Get challenge details
-router.get('/:challengeId', authenticateToken, getChallengeHandler);
+// Get my challenge stats
+router.get('/my-stats', authenticateToken, getMyChallengeStatsHandler);
 
-// Get challenge leaderboard
+// Get challenge leaderboard (all time)
 router.get('/leaderboard/top', authenticateToken, getLeaderboardHandler);
+
+// Get weekly challenge leaderboard
+router.get('/leaderboard/weekly', authenticateToken, getWeeklyLeaderboardHandler);
+
+// Get challenge details (must be after specific routes)
+router.get('/:challengeId', authenticateToken, getChallengeHandler);
 
 // Create a new challenge
 router.post('/', authenticateToken, createChallengeHandler);

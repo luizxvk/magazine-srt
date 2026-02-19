@@ -712,3 +712,129 @@ export const processExpiredChallenges = async () => {
 
   return { completed: expiredChallenges.length, expired: expiredPending.length };
 };
+
+// =============================================
+// GET WEEKLY CHALLENGE LEADERBOARD
+// =============================================
+export const getWeeklyChallengeLeaderboard = async (limit: number = 10) => {
+  // Get start of current week (Monday)
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Monday = 0
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - diff);
+  weekStart.setHours(0, 0, 0, 0);
+
+  // Get completed challenges from this week
+  const completedChallenges = await prisma.challenge.findMany({
+    where: {
+      status: 'COMPLETED',
+      winnerId: { not: null },
+      completedAt: { gte: weekStart }
+    },
+    select: { winnerId: true, betAmount: true }
+  });
+
+  // Count wins and earnings per user
+  const userStats: Record<string, { wins: number; earnings: number }> = {};
+  completedChallenges.forEach(c => {
+    if (c.winnerId) {
+      if (!userStats[c.winnerId]) {
+        userStats[c.winnerId] = { wins: 0, earnings: 0 };
+      }
+      userStats[c.winnerId].wins += 1;
+      userStats[c.winnerId].earnings += Math.floor(c.betAmount * 2 * 0.95); // Prize after 5% fee
+    }
+  });
+
+  // Sort by wins, then by earnings
+  const topUserIds = Object.entries(userStats)
+    .sort((a, b) => {
+      if (b[1].wins !== a[1].wins) return b[1].wins - a[1].wins;
+      return b[1].earnings - a[1].earnings;
+    })
+    .slice(0, limit)
+    .map(([userId]) => userId);
+
+  const users = await prisma.user.findMany({
+    where: { id: { in: topUserIds } },
+    select: { id: true, name: true, displayName: true, avatarUrl: true }
+  });
+
+  return {
+    weekStart: weekStart.toISOString(),
+    leaderboard: topUserIds.map(userId => ({
+      user: users.find(u => u.id === userId),
+      wins: userStats[userId].wins,
+      earnings: userStats[userId].earnings
+    }))
+  };
+};
+
+// =============================================
+// GET USER CHALLENGE STATS
+// =============================================
+export const getUserChallengeStats = async (userId: string) => {
+  const [totalWins, totalLosses, totalDraws, weeklyWins, totalEarnings] = await Promise.all([
+    // Total wins
+    prisma.challenge.count({
+      where: { winnerId: userId, status: 'COMPLETED' }
+    }),
+    // Total losses
+    prisma.challenge.count({
+      where: {
+        status: 'COMPLETED',
+        AND: [
+          { winnerId: { not: null } },
+          { winnerId: { not: userId } }
+        ],
+        OR: [{ challengerId: userId }, { opponentId: userId }]
+      }
+    }),
+    // Total draws
+    prisma.challenge.count({
+      where: {
+        status: 'COMPLETED',
+        winnerId: null,
+        OR: [{ challengerId: userId }, { opponentId: userId }]
+      }
+    }),
+    // Weekly wins
+    prisma.challenge.count({
+      where: {
+        winnerId: userId,
+        status: 'COMPLETED',
+        completedAt: {
+          gte: (() => {
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - diff);
+            weekStart.setHours(0, 0, 0, 0);
+            return weekStart;
+          })()
+        }
+      }
+    }),
+    // Total earnings from challenges
+    prisma.zionHistory.aggregate({
+      where: {
+        userId,
+        reason: { contains: 'Vitória no desafio 1v1' }
+      },
+      _sum: { amount: true }
+    })
+  ]);
+
+  return {
+    totalWins,
+    totalLosses,
+    totalDraws,
+    weeklyWins,
+    winRate: totalWins + totalLosses > 0 
+      ? Math.round((totalWins / (totalWins + totalLosses)) * 100) 
+      : 0,
+    totalEarnings: totalEarnings._sum.amount || 0
+  };
+};

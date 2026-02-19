@@ -12,7 +12,8 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import StatForgeNotifyCard from '../components/StatForgeNotifyCard';
-import Toast, { ToastType } from '../components/Toast';
+import Toast from '../components/Toast';
+import type { ToastType } from '../components/Toast';
 
 interface GameInfo {
   id: string;

@@ -105,6 +105,9 @@ model User {
   eventAttendance        EventAttendee[]
   // StatForge - Game Tracker
   gameProfiles           GameProfile[]
+  // Challenge System - 1v1 Duels
+  challengesSent         Challenge[]    @relation("ChallengeSent")
+  challengesReceived     Challenge[]    @relation("ChallengeReceived")
   // Prestige System
   prestigeLevel          Int            @default(0)  // Current prestige tier (0-10)
   prestigeStars          Int            @default(0)  // Visual stars count
@@ -1128,6 +1131,7 @@ enum NotificationType {
   GROUP_INVITE
   GROUP_MENTION
   EVENT_REMINDER
+  CHALLENGE
 }
 
 enum MediaType {
@@ -1504,6 +1508,72 @@ enum CouponApprovalStatus {
   PENDING    // Aguardando aprovação da Rovex
   APPROVED   // Aprovado
   REJECTED   // Rejeitado
+}
+
+// ============================================
+// CHALLENGE SYSTEM - 1v1 DUELS
+// ============================================
+
+model Challenge {
+  id                String          @id @default(uuid())
+  challengerId      String          // Quem criou o desafio
+  opponentId        String          // Quem foi desafiado
+  gameProfileId     String          // Perfil do challenger (para saber o jogo)
+  opponentProfileId String?         // Perfil do oponente (preenchido ao aceitar)
+  game              String          // Nome do jogo ("valorant", "cs2", etc.)
+  metric            ChallengeMetric // Métrica do desafio (kills, wins, kd)
+  targetValue       Int?            // (Opcional) Valor alvo a atingir
+  betAmount         Int             // Quantidade de Zions apostada (cada lado)
+  duration          Int             @default(3) // Prazo em dias
+  status            ChallengeStatus @default(PENDING)
+  winnerId          String?         // ID do vencedor
+  
+  // Snapshots - Stats no início e fim do desafio
+  challengerStartStats  Json?       // Snapshot inicial do challenger
+  opponentStartStats    Json?       // Snapshot inicial do opponent
+  challengerEndStats    Json?       // Snapshot final do challenger
+  opponentEndStats      Json?       // Snapshot final do opponent
+  
+  // Resultados calculados
+  challengerDelta   Float?          // Diferença de performance do challenger
+  opponentDelta     Float?          // Diferença de performance do opponent
+  
+  expiresAt         DateTime?       // Quando o desafio expira (para aceitar)
+  startsAt          DateTime?       // Quando o desafio começou
+  endsAt            DateTime?       // Quando termina (startsAt + duration)
+  completedAt       DateTime?       // Quando foi finalizado
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  challenger        User            @relation("ChallengeSent", fields: [challengerId], references: [id])
+  opponent          User            @relation("ChallengeReceived", fields: [opponentId], references: [id])
+  
+  @@index([challengerId])
+  @@index([opponentId])
+  @@index([game])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ChallengeStatus {
+  PENDING      // Aguardando aceite do oponente
+  ACCEPTED     // Aceito, aguardando início
+  IN_PROGRESS  // Em andamento
+  COMPLETED    // Finalizado
+  CANCELLED    // Cancelado pelo challenger
+  DECLINED     // Recusado pelo opponent
+  EXPIRED      // Expirou sem resposta
+}
+
+enum ChallengeMetric {
+  KILLS        // Total de eliminações
+  WINS         // Total de vitórias
+  KD           // Melhor K/D ratio
+  WIN_RATE     // Melhor % de vitória
+  SCORE        // Maior score/ELO ganho
+  HOURS        // Mais horas jogadas
 }
 
 // ============================================

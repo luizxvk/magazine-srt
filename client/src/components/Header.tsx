@@ -1,4 +1,4 @@
-import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown } from 'lucide-react';
+import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -177,6 +177,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
     const menuItems = [
         { icon: <Home className="w-5 h-5" />, label: t('nav.home'), path: '/feed' },
         { icon: <Star className="w-5 h-5" />, label: t('nav.rewards'), path: '/highlights' },
+        { icon: <Gamepad2 className="w-5 h-5" />, label: 'StatForge', path: '/statforge' },
+        { icon: <Swords className="w-5 h-5" />, label: 'Desafios 1v1', path: '/challenges', highlight: true },
         { icon: <ShoppingBag className="w-5 h-5" />, label: t('nav.shop'), path: '/store' },
         { icon: <Trophy className="w-5 h-5" />, label: t('nav.ranking'), path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },

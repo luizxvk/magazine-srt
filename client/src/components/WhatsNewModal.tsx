@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check, Palette, BarChart3, Shield, Ticket, Star, Zap, PanelRight, Globe } from 'lucide-react';
+import { X, Sparkles, Check, Palette, Shield, Ticket, Star, PanelRight, Swords, Trophy, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.10';
+const CURRENT_VERSION = '0.5.0-rc.11';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -43,50 +43,50 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
         ? { color: userAccentColor } 
         : undefined;
 
-    // v0.5.0-rc.10 - Feed Cards Customization, StatForge Accent Icons, i18n
+    // v0.5.0-rc.11 - Battle Pass, Desafios 1v1, Roadmap de Features
     const updates: UpdateItem[] = [
+        {
+            icon: <Trophy className="w-5 h-5 text-amber-400" />,
+            title: 'Battle Pass Comunitário',
+            description: 'Novo sistema de temporada com missões diárias/semanais, rewards exclusivos e 50 níveis para progredir!',
+            isNew: true
+        },
+        {
+            icon: <Swords className="w-5 h-5 text-red-400" />,
+            title: 'Desafios 1v1',
+            description: 'Desafie amigos no StatForge! Aposte Zions, compete em partidas e o melhor leva tudo!',
+            isNew: true
+        },
+        {
+            icon: <Coins className="w-5 h-5 text-yellow-400" />,
+            title: 'Apostas Sociais',
+            description: 'Aposte Zions em previsões: ranking semanal, resultados de partidas e mais!',
+            isNew: true
+        },
         {
             icon: <PanelRight className="w-5 h-5 text-blue-400" />,
             title: 'Personalização dos Cards do Feed',
-            description: 'Agora você pode mostrar/ocultar e reordenar os cards da sidebar do feed nas configurações!',
-            isNew: true
+            description: 'Mostrar/ocultar e reordenar os cards da sidebar nas configurações!',
         },
         {
             icon: <Palette className="w-5 h-5 text-pink-400" />,
             title: 'StatForge — Ícones Coloridos',
-            description: 'Ícones dos jogos no StatForge agora seguem sua cor de destaque personalizada com efeito glow!',
-            isNew: true
-        },
-        {
-            icon: <Globe className="w-5 h-5 text-cyan-400" />,
-            title: 'Traduções Expandidas',
-            description: 'Novas traduções para StatForge, moderação e cards do feed em português, inglês e espanhol.',
-            isNew: true
+            description: 'Ícones dos jogos seguem sua cor de destaque com efeito glow!',
         },
         {
             icon: <Star className="w-5 h-5 text-yellow-400" />,
-            title: 'Sistema de Prestígio — Guia Completo',
-            description: 'Modal explicando como funciona o prestígio, recompensas e tabela de bônus de XP!',
-        },
-        {
-            icon: <Zap className="w-5 h-5 text-purple-400" />,
-            title: 'Cards com Brilho Animado',
-            description: 'Cards de Market, Feedback, Jogos Grátis e Grupos com bordas brilhantes sincronizadas!',
-        },
-        {
-            icon: <BarChart3 className="w-5 h-5 text-cyan-400" />,
-            title: 'StatForge — Melhorias',
-            description: 'Logo maior, card de notificações e correções no rastreador de stats.',
+            title: 'Sistema de Prestígio',
+            description: 'Reset de nível para ganhar estrelas, Zions Cash e bônus permanente de XP!',
         },
         {
             icon: <Ticket className="w-5 h-5 text-green-400" />,
-            title: 'Sistema de Cupons na Loja',
-            description: 'Cupons de desconto (fixo ou %). Membros Elite ganham cupom mensal de R$10!',
+            title: 'Cupons na Loja',
+            description: 'Cupons de desconto! Membros Elite ganham R$10/mês automaticamente.',
         },
         {
             icon: <Shield className="w-5 h-5 text-emerald-400" />,
-            title: 'RovexShield — Moderação Automática',
-            description: 'Sistema de moderação com IA (Perspective API + NSFWJS) + blacklist customizada.',
+            title: 'RovexShield',
+            description: 'Moderação automática com IA + filtros customizados.',
         },
     ];
 

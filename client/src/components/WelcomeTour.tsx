@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, Sparkles, Trophy, Coins, Users, ShoppingBag, Palette, Crown, Zap, Gift, Target, TrendingUp, Video, Globe } from 'lucide-react';
+import { X, ChevronRight, Sparkles, Trophy, Coins, Users, ShoppingBag, Palette, Crown, Zap, Gift, Target, TrendingUp, Video, Swords } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.10';
+const TOUR_VERSION = '0.5.0-rc.11';
 
 interface WelcomeTourProps {
     isOpen?: boolean;
@@ -64,11 +64,11 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
     const welcomeFeatures = [
         { icon: Users, label: 'Comunidade', desc: 'Conecte-se com outros membros' },
         { icon: Coins, label: 'Zions', desc: 'Ganhe moedas virtuais' },
-        { icon: Trophy, label: 'Ranking', desc: 'Dispute as melhores posições' },
+        { icon: Trophy, label: 'Battle Pass', desc: 'Missões e recompensas' },
         { icon: Gift, label: 'Recompensas', desc: 'Troque por prêmios reais' },
-        { icon: Palette, label: 'Customização', desc: 'Personalize seu perfil' },
+        { icon: Swords, label: 'Desafios 1v1', desc: 'Aposte e vença amigos' },
         { icon: Video, label: 'Lives', desc: 'Transmissões ao vivo' },
-        { icon: Globe, label: 'Idiomas', desc: 'PT-BR, EN e ES' },
+        { icon: Palette, label: 'Customização', desc: 'Personalize seu perfil' },
         { icon: ShoppingBag, label: 'Loja', desc: 'Itens exclusivos' },
     ];
 

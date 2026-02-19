@@ -1,7 +1,7 @@
 # 🗺️ ROADMAP - Magazine SRT
 
-> **Versão Atual:** v0.5.0-rc.10 (Release Candidate)  
-> **Última Atualização:** 15 de Fevereiro de 2026  
+> **Versão Atual:** v0.5.0-rc.11 (Release Candidate)  
+> **Última Atualização:** 19 de Fevereiro de 2026  
 > **Lançamento v0.5.0:** 05 de Fevereiro de 2026 às 13:00 BRT
 
 ---
@@ -17,12 +17,97 @@
 ├─ Personalização: 100% ✅
 ├─ Integração Rovex: 100% ✅
 ├─ Multi-Tenant: 100% ✅
-└─ StatForge & Cupons: 100% ✅
+├─ StatForge & Cupons: 100% ✅
+└─ Battle Pass & Desafios: 0% 🚧
 ```
 
 ---
 
-## 🆕 v0.5.0-rc.10 (Release Candidate - 15 Fevereiro 2026)
+## 🔮 Próximas Features (Planejado)
+
+### 🏆 Battle Pass Comunitário
+**Sistema de temporada com missões e recompensas exclusivas**
+
+- 📋 **Estrutura**
+  - 50 níveis por temporada (30 dias)
+  - Trilha gratuita e trilha premium
+  - Missões diárias (3) e semanais (5)
+  - XP de temporada separado do XP geral
+
+- 🎁 **Recompensas**
+  - Zions Points e Cash
+  - Badges exclusivos de temporada
+  - Theme Packs limitados
+  - Bordas e cores únicas
+  - Título de temporada
+
+- ⚙️ **Missões Exemplo**
+  - "Faça 5 posts hoje" (diária)
+  - "Ganhe 3 partidas no StatForge" (diária)
+  - "Alcance top 10 no ranking semanal" (semanal)
+  - "Complete 7 dias de login streak" (semanal)
+
+### ⚔️ Sistema de Desafios 1v1
+**Desafie amigos e aposte Zions em partidas**
+
+- 🎮 **Mecânica**
+  - Criar desafio com jogo (StatForge)
+  - Definir métrica (kills, wins, K/D)
+  - Definir prazo (1-7 dias)
+  - Ambos apostam Zions (mínimo 100)
+
+- 📊 **Tracking**
+  - Integração com StatForge
+  - Verificação automática de resultados
+  - Snapshot antes/depois do desafio
+  - Histórico de duelos
+
+- 🏅 **Recompensas**
+  - Vencedor leva pot (95%, 5% taxa)
+  - Badge "Duelista" (10 vitórias)
+  - Ranking de duelistas
+
+### 🎲 Apostas Sociais com Zions
+**Previsões e apostas na comunidade**
+
+- 🔮 **Tipos de Apostas**
+  - Ranking: "Quem será top 1 essa semana?"
+  - Partidas: "Jogador X vai ganhar contra Y?"
+  - Eventos: "Quantos participantes no evento?"
+  - Personalizadas (admin cria)
+
+- 💰 **Pool System**
+  - Usuários apostam em outcomes
+  - Odds dinâmicas baseadas em pool
+  - Pagamento proporcional aos vencedores
+  - Taxa da casa: 5%
+
+- 🛡️ **Segurança**
+  - Limite diário de apostas
+  - Apenas Zions Points (não é dinheiro real)
+  - Bloqueio para menores de idade
+  - Sistema anti-manipulação
+
+---
+
+## 🆕 v0.5.0-rc.11 (Release Candidate - 19 Fevereiro 2026)
+
+### 🗺️ Roadmap de Novas Features
+**Planejamento público das próximas grandes features**
+
+- 🆕 **Features Anunciadas**
+  - Battle Pass Comunitário (temporadas com missões)
+  - Desafios 1v1 (apostas em partidas)
+  - Apostas Sociais (previsões com Zions)
+
+- 📋 **Documentação**
+  - ROADMAP.md atualizado
+  - WhatsNewModal com prévia das features
+  - Seção "Em Breve" no site
+
+---
+
+## 📋 v0.5.0-rc.10 (Release Candidate - 15 Fevereiro 2026)
 
 ### 📱 Personalização dos Cards do Feed (Novo)
 **Controle total sobre quais cards aparecem na sidebar do feed**

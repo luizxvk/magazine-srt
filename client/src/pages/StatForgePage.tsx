@@ -12,6 +12,7 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import StatForgeNotifyCard from '../components/StatForgeNotifyCard';
+import Toast, { ToastType } from '../components/Toast';
 
 interface GameInfo {
   id: string;
@@ -122,6 +123,7 @@ export default function StatForgePage() {
   const [linkPlatform, setLinkPlatform] = useState('pc');
   const [linkGamertag, setLinkGamertag] = useState('');
   const [linking, setLinking] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -193,7 +195,7 @@ export default function StatForgePage() {
       }
     } catch (error: any) {
       console.error('Error syncing:', error);
-      alert(error.response?.data?.error || 'Erro ao sincronizar');
+      setToast({ message: error.response?.data?.error || 'Erro ao sincronizar', type: 'error' });
     } finally {
       setSyncing(null);
     }
@@ -700,6 +702,19 @@ export default function StatForgePage() {
               )}
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <div className="fixed top-4 right-4 z-[100]">
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          </div>
         )}
       </AnimatePresence>
     </div>

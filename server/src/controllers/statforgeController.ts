@@ -18,11 +18,13 @@ const SUPPORTED_GAMES = [
   // Steam (Steam Web API)
   { id: 'steam', name: 'Steam', icon: '🎮', iconUrl: 'https://img.icons8.com/?size=100&id=zNqjI8XKkCv0&format=png&color=000000', platforms: ['pc'], category: 'Platform', comingSoon: false },
   
+  // Tracker.gg APIs (R6 Siege, Apex)
+  { id: 'r6siege', name: 'Rainbow Six Siege', icon: '🛡️', iconUrl: 'https://img.icons8.com/?size=100&id=59676&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS', comingSoon: false },
+  { id: 'apex', name: 'Apex Legends', icon: '🏆', iconUrl: 'https://img.icons8.com/?size=100&id=rF1FlO7j89ts&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale', comingSoon: false },
+  
   // === EM BREVE - APIs em Integração ===
   // FPS/Tactical
-  { id: 'r6siege', name: 'Rainbow Six Siege', icon: '🛡️', iconUrl: 'https://img.icons8.com/?size=100&id=59676&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS', comingSoon: true },
   { id: 'cs2', name: 'Counter-Strike 2', icon: '🔫', iconUrl: 'https://img.icons8.com/?size=100&id=fKi1D913kbYA&format=png&color=000000', platforms: ['pc'], category: 'FPS', comingSoon: true },
-  { id: 'apex', name: 'Apex Legends', icon: '🏆', iconUrl: 'https://img.icons8.com/?size=100&id=rF1FlO7j89ts&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'Battle Royale', comingSoon: true },
   { id: 'overwatch2', name: 'Overwatch 2', icon: '🦸', iconUrl: 'https://img.icons8.com/?size=100&id=63667&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS', comingSoon: true },
   { id: 'cod', name: 'Call of Duty', icon: '💣', iconUrl: 'https://img.icons8.com/?size=100&id=BFTj9toBTo31&format=png&color=000000', platforms: ['pc', 'xbox', 'playstation'], category: 'FPS', comingSoon: true },
   // Battle Royale

@@ -17,6 +17,7 @@ import axios from 'axios';
 const RIOT_API_KEY = process.env.RIOT_API_KEY || '';
 const PUBG_API_KEY = process.env.PUBG_API_KEY || '';
 const STEAM_API_KEY = process.env.STEAM_API_KEY || '';
+const TRACKER_GG_API_KEY = process.env.TRACKER_GG_API_KEY || '';
 
 // Riot Americas router for accounts API
 const RIOT_AMERICAS = 'https://americas.api.riotgames.com';
@@ -31,6 +32,9 @@ const OPENDOTA_API = 'https://api.opendota.com/api';
 
 // Steam API
 const STEAM_API = 'https://api.steampowered.com';
+
+// Tracker.gg API (R6, Apex, etc.)
+const TRACKER_GG_API = 'https://public-api.tracker.gg/v2';
 
 // ============================================
 // TYPES
@@ -446,6 +450,133 @@ export async function fetchSteamStats(gamertag: string, platform: string): Promi
 }
 
 // ============================================
+// TRACKER.GG (R6 Siege, Apex Legends, etc.)
+// ============================================
+
+/**
+ * Fetch R6 Siege stats via Tracker.gg
+ */
+export async function fetchR6SiegeStats(gamertag: string, platform: string): Promise<FetchResult> {
+  try {
+    if (!TRACKER_GG_API_KEY) {
+      return { success: false, error: 'TRACKER_GG_API_KEY not configured' };
+    }
+
+    // Map platform to Tracker.gg format
+    const platformMap: Record<string, string> = {
+      'pc': 'uplay',
+      'xbox': 'xbl',
+      'playstation': 'psn',
+    };
+    const trnPlatform = platformMap[platform] || 'uplay';
+
+    const response = await axios.get(
+      `${TRACKER_GG_API}/r6siege/standard/profile/${trnPlatform}/${encodeURIComponent(gamertag)}`,
+      {
+        headers: {
+          'TRN-Api-Key': TRACKER_GG_API_KEY,
+        },
+      }
+    );
+
+    const data = response.data.data;
+    const overview = data.segments?.find((s: any) => s.type === 'overview');
+
+    if (!overview) {
+      return { success: false, error: 'No overview data found' };
+    }
+
+    const stats: GameStats = {
+      level: overview.stats?.level?.value || 0,
+      kd: overview.stats?.kd?.value || 0,
+      winRate: overview.stats?.wlPercentage?.value || 0,
+      totalMatches: overview.stats?.matchesPlayed?.value || 0,
+      totalWins: overview.stats?.wins?.value || 0,
+      totalKills: overview.stats?.kills?.value || 0,
+      totalDeaths: overview.stats?.deaths?.value || 0,
+      hoursPlayed: Math.round((overview.stats?.timePlayed?.value || 0) / 3600),
+      rank: overview.stats?.rankName?.value || 'Unranked',
+      rankTier: overview.stats?.maxRank?.value || 0,
+      stats: {
+        headshots: overview.stats?.headshots?.value || 0,
+        headshotPercentage: overview.stats?.headshotPercentage?.value || 0,
+        assists: overview.stats?.assists?.value || 0,
+        revives: overview.stats?.revives?.value || 0,
+        melee: overview.stats?.meleeKills?.value || 0,
+      },
+    };
+
+    return { success: true, data: stats };
+  } catch (error: any) {
+    console.error('[StatForge] R6 Siege fetch error:', error.response?.data || error.message);
+    if (error.response?.status === 404) {
+      return { success: false, error: 'Player not found on R6 Siege' };
+    }
+    return { success: false, error: 'Failed to fetch R6 Siege stats' };
+  }
+}
+
+/**
+ * Fetch Apex Legends stats via Tracker.gg
+ */
+export async function fetchApexStats(gamertag: string, platform: string): Promise<FetchResult> {
+  try {
+    if (!TRACKER_GG_API_KEY) {
+      return { success: false, error: 'TRACKER_GG_API_KEY not configured' };
+    }
+
+    // Map platform to Tracker.gg format
+    const platformMap: Record<string, string> = {
+      'pc': 'origin',
+      'xbox': 'xbl',
+      'playstation': 'psn',
+    };
+    const trnPlatform = platformMap[platform] || 'origin';
+
+    const response = await axios.get(
+      `${TRACKER_GG_API}/apex/standard/profile/${trnPlatform}/${encodeURIComponent(gamertag)}`,
+      {
+        headers: {
+          'TRN-Api-Key': TRACKER_GG_API_KEY,
+        },
+      }
+    );
+
+    const data = response.data.data;
+    const overview = data.segments?.find((s: any) => s.type === 'overview');
+
+    if (!overview) {
+      return { success: false, error: 'No overview data found' };
+    }
+
+    const stats: GameStats = {
+      level: overview.stats?.level?.value || 0,
+      totalKills: overview.stats?.kills?.value || 0,
+      totalMatches: overview.stats?.matchesPlayed?.value || 0,
+      rank: overview.stats?.rankName?.value || data.metadata?.activeLegendName || 'Unknown',
+      rankTier: overview.stats?.rankScore?.value || 0,
+      stats: {
+        activeLegend: data.metadata?.activeLegendName,
+        damage: overview.stats?.damage?.value || 0,
+        headshots: overview.stats?.headshots?.value || 0,
+        arenas: {
+          kills: overview.stats?.arenasKills?.value || 0,
+          damage: overview.stats?.arenasDamage?.value || 0,
+        },
+      },
+    };
+
+    return { success: true, data: stats };
+  } catch (error: any) {
+    console.error('[StatForge] Apex fetch error:', error.response?.data || error.message);
+    if (error.response?.status === 404) {
+      return { success: false, error: 'Player not found on Apex Legends' };
+    }
+    return { success: false, error: 'Failed to fetch Apex stats' };
+  }
+}
+
+// ============================================
 // MAIN DISPATCHER
 // ============================================
 
@@ -466,6 +597,10 @@ export async function fetchGameStats(game: string, gamertag: string, platform: s
       return fetchDota2Stats(gamertag, platform);
     case 'steam':
       return fetchSteamStats(gamertag, platform);
+    case 'r6siege':
+      return fetchR6SiegeStats(gamertag, platform);
+    case 'apex':
+      return fetchApexStats(gamertag, platform);
     default:
       return { success: false, error: `Game "${game}" is not yet supported for automatic sync` };
   }

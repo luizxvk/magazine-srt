@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Trash2, TrendingUp, TrendingDown, Clock, Gamepad2,
-  RefreshCw, BarChart3, Shield, Target, Trophy,
+  RefreshCw, BarChart3, Shield, Target, Trophy, Users, Flame, Skull,
   Crosshair, Activity, Zap, X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -657,6 +657,28 @@ export default function StatForgePage() {
                   )}
                   {selectedProfile.latestStats.score != null && (
                     <StatCard label="Score/MMR" value={selectedProfile.latestStats.score.toLocaleString()} icon={<BarChart3 className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {/* Extra stats from APIs */}
+                  {selectedProfile.latestStats.totalDeaths != null && (
+                    <StatCard label="Mortes" value={selectedProfile.latestStats.totalDeaths.toLocaleString()} icon={<Skull className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {selectedProfile.latestStats.totalWins != null && (
+                    <StatCard label="Vitórias" value={selectedProfile.latestStats.totalWins.toLocaleString()} icon={<Trophy className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {selectedProfile.latestStats.stats?.headshots != null && (
+                    <StatCard label="Headshots" value={selectedProfile.latestStats.stats.headshots.toLocaleString()} icon={<Crosshair className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {selectedProfile.latestStats.stats?.headshotPercentage != null && (
+                    <StatCard label="HS %" value={`${selectedProfile.latestStats.stats.headshotPercentage.toFixed(1)}%`} icon={<Target className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {selectedProfile.latestStats.stats?.assists != null && (
+                    <StatCard label="Assists" value={selectedProfile.latestStats.stats.assists.toLocaleString()} icon={<Users className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {selectedProfile.latestStats.stats?.damage != null && (
+                    <StatCard label="Dano" value={selectedProfile.latestStats.stats.damage.toLocaleString()} icon={<Flame className="w-4 h-4" />} theme={theme} />
+                  )}
+                  {selectedProfile.latestStats.stats?.activeLegend && (
+                    <StatCard label="Lenda Ativa" value={selectedProfile.latestStats.stats.activeLegend} icon={<Gamepad2 className="w-4 h-4" />} theme={theme} />
                   )}
                 </div>
               ) : (

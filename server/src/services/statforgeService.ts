@@ -576,6 +576,191 @@ export async function fetchApexStats(gamertag: string, platform: string): Promis
   }
 }
 
+/**
+ * Fetch Counter-Strike 2 stats via Tracker.gg
+ */
+export async function fetchCS2Stats(gamertag: string, platform: string): Promise<FetchResult> {
+  try {
+    if (!TRACKER_GG_API_KEY) {
+      return { success: false, error: 'TRACKER_GG_API_KEY not configured' };
+    }
+
+    // CS2 uses Steam platform identifier
+    const response = await axios.get(
+      `${TRACKER_GG_API}/cs2/standard/profile/steam/${encodeURIComponent(gamertag)}`,
+      {
+        headers: {
+          'TRN-Api-Key': TRACKER_GG_API_KEY,
+        },
+      }
+    );
+
+    const data = response.data.data;
+    const overview = data.segments?.find((s: any) => s.type === 'overview');
+
+    if (!overview) {
+      return { success: false, error: 'No overview data found' };
+    }
+
+    const stats: GameStats = {
+      kd: overview.stats?.kd?.value || 0,
+      winRate: overview.stats?.winPercentage?.value || 0,
+      totalMatches: overview.stats?.matchesPlayed?.value || 0,
+      totalWins: overview.stats?.wins?.value || 0,
+      totalKills: overview.stats?.kills?.value || 0,
+      totalDeaths: overview.stats?.deaths?.value || 0,
+      hoursPlayed: Math.round((overview.stats?.timePlayed?.value || 0) / 3600),
+      rank: overview.stats?.rank?.metadata?.name || 'Unranked',
+      rankTier: overview.stats?.rank?.value || 0,
+      stats: {
+        headshots: overview.stats?.headshots?.value || 0,
+        headshotPercentage: overview.stats?.headshotPct?.value || 0,
+        damage: overview.stats?.damage?.value || 0,
+        damagePerRound: overview.stats?.damagePerRound?.value || 0,
+        roundsPlayed: overview.stats?.roundsPlayed?.value || 0,
+        mvps: overview.stats?.mvps?.value || 0,
+        adr: overview.stats?.adr?.value || 0,
+      },
+    };
+
+    return { success: true, data: stats };
+  } catch (error: any) {
+    console.error('[StatForge] CS2 fetch error:', error.response?.data || error.message);
+    if (error.response?.status === 404) {
+      return { success: false, error: 'Player not found on CS2' };
+    }
+    return { success: false, error: 'Failed to fetch CS2 stats' };
+  }
+}
+
+/**
+ * Fetch Fortnite stats via Tracker.gg
+ */
+export async function fetchFortniteStats(gamertag: string, platform: string): Promise<FetchResult> {
+  try {
+    if (!TRACKER_GG_API_KEY) {
+      return { success: false, error: 'TRACKER_GG_API_KEY not configured' };
+    }
+
+    // Map platform to Tracker.gg format
+    const platformMap: Record<string, string> = {
+      'pc': 'epic',
+      'xbox': 'xbl',
+      'playstation': 'psn',
+    };
+    const trnPlatform = platformMap[platform] || 'epic';
+
+    const response = await axios.get(
+      `${TRACKER_GG_API}/fortnite/standard/profile/${trnPlatform}/${encodeURIComponent(gamertag)}`,
+      {
+        headers: {
+          'TRN-Api-Key': TRACKER_GG_API_KEY,
+        },
+      }
+    );
+
+    const data = response.data.data;
+    const overview = data.segments?.find((s: any) => s.type === 'overview');
+
+    if (!overview) {
+      return { success: false, error: 'No overview data found' };
+    }
+
+    const stats: GameStats = {
+      level: overview.stats?.level?.value || 0,
+      kd: overview.stats?.kd?.value || 0,
+      winRate: overview.stats?.winRate?.value || 0,
+      totalMatches: overview.stats?.matchesPlayed?.value || 0,
+      totalWins: overview.stats?.wins?.value || 0,
+      totalKills: overview.stats?.kills?.value || 0,
+      totalDeaths: overview.stats?.deaths?.value || 0,
+      score: overview.stats?.score?.value || 0,
+      stats: {
+        top3: overview.stats?.top3?.value || 0,
+        top5: overview.stats?.top5?.value || 0,
+        top10: overview.stats?.top10?.value || 0,
+        top25: overview.stats?.top25?.value || 0,
+        minutesPlayed: overview.stats?.minutesPlayed?.value || 0,
+        killsPerMatch: overview.stats?.killsPerMatch?.value || 0,
+        killsPerMin: overview.stats?.killsPerMin?.value || 0,
+      },
+    };
+
+    return { success: true, data: stats };
+  } catch (error: any) {
+    console.error('[StatForge] Fortnite fetch error:', error.response?.data || error.message);
+    if (error.response?.status === 404) {
+      return { success: false, error: 'Player not found on Fortnite' };
+    }
+    return { success: false, error: 'Failed to fetch Fortnite stats' };
+  }
+}
+
+/**
+ * Fetch Rocket League stats via Tracker.gg
+ */
+export async function fetchRocketLeagueStats(gamertag: string, platform: string): Promise<FetchResult> {
+  try {
+    if (!TRACKER_GG_API_KEY) {
+      return { success: false, error: 'TRACKER_GG_API_KEY not configured' };
+    }
+
+    // Map platform to Tracker.gg format
+    const platformMap: Record<string, string> = {
+      'pc': 'steam',
+      'xbox': 'xbl',
+      'playstation': 'psn',
+      'epic': 'epic',
+    };
+    const trnPlatform = platformMap[platform] || 'steam';
+
+    const response = await axios.get(
+      `${TRACKER_GG_API}/rocket-league/standard/profile/${trnPlatform}/${encodeURIComponent(gamertag)}`,
+      {
+        headers: {
+          'TRN-Api-Key': TRACKER_GG_API_KEY,
+        },
+      }
+    );
+
+    const data = response.data.data;
+    const overview = data.segments?.find((s: any) => s.type === 'overview');
+
+    if (!overview) {
+      return { success: false, error: 'No overview data found' };
+    }
+
+    // Find ranked 3v3 or 2v2 for rank
+    const ranked3v3 = data.segments?.find((s: any) => s.metadata?.name === 'Ranked Standard 3v3');
+    const ranked2v2 = data.segments?.find((s: any) => s.metadata?.name === 'Ranked Doubles 2v2');
+    const rankedPlaylist = ranked3v3 || ranked2v2;
+
+    const stats: GameStats = {
+      totalWins: overview.stats?.wins?.value || 0,
+      totalMatches: overview.stats?.matches?.value || 0,
+      rank: rankedPlaylist?.stats?.tier?.metadata?.name || 'Unranked',
+      rankTier: rankedPlaylist?.stats?.rating?.value || 0,
+      score: rankedPlaylist?.stats?.rating?.value || overview.stats?.seasonRewardLevel?.value || 0,
+      stats: {
+        goals: overview.stats?.goals?.value || 0,
+        assists: overview.stats?.assists?.value || 0,
+        mvps: overview.stats?.mVPs?.value || 0,
+        saves: overview.stats?.saves?.value || 0,
+        shots: overview.stats?.shots?.value || 0,
+        goalShotRatio: overview.stats?.goalShotRatio?.value || 0,
+      },
+    };
+
+    return { success: true, data: stats };
+  } catch (error: any) {
+    console.error('[StatForge] Rocket League fetch error:', error.response?.data || error.message);
+    if (error.response?.status === 404) {
+      return { success: false, error: 'Player not found on Rocket League' };
+    }
+    return { success: false, error: 'Failed to fetch Rocket League stats' };
+  }
+}
+
 // ============================================
 // MAIN DISPATCHER
 // ============================================
@@ -601,6 +786,12 @@ export async function fetchGameStats(game: string, gamertag: string, platform: s
       return fetchR6SiegeStats(gamertag, platform);
     case 'apex':
       return fetchApexStats(gamertag, platform);
+    case 'cs2':
+      return fetchCS2Stats(gamertag, platform);
+    case 'fortnite':
+      return fetchFortniteStats(gamertag, platform);
+    case 'rocketleague':
+      return fetchRocketLeagueStats(gamertag, platform);
     default:
       return { success: false, error: `Game "${game}" is not yet supported for automatic sync` };
   }

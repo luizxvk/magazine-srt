@@ -47,6 +47,22 @@ interface LeaderboardEntry {
   wins: number;
 }
 
+interface WeeklyLeaderboardEntry {
+  userId: string;
+  user: User;
+  wins: number;
+  totalEarnings: number;
+}
+
+interface ChallengeStats {
+  totalWins: number;
+  totalLosses: number;
+  totalDraws: number;
+  weeklyWins: number;
+  winRate: string;
+  totalEarnings: number;
+}
+
 const METRIC_LABELS: Record<string, string> = {
   KILLS: 'Eliminações',
   WINS: 'Vitórias',
@@ -75,8 +91,11 @@ export default function ChallengesPage() {
   const userAccent = accentColor || defaultAccent;
 
   const [tab, setTab] = useState<Tab>('active');
+  const [leaderboardTab, setLeaderboardTab] = useState<'allTime' | 'weekly'>('weekly');
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [weeklyLeaderboard, setWeeklyLeaderboard] = useState<WeeklyLeaderboardEntry[]>([]);
+  const [myStats, setMyStats] = useState<ChallengeStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -85,6 +104,8 @@ export default function ChallengesPage() {
   useEffect(() => {
     fetchChallenges();
     fetchLeaderboard();
+    fetchWeeklyLeaderboard();
+    fetchMyStats();
   }, []);
 
   const fetchChallenges = async () => {
@@ -105,6 +126,24 @@ export default function ChallengesPage() {
       setLeaderboard(res.data);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
+    }
+  };
+
+  const fetchWeeklyLeaderboard = async () => {
+    try {
+      const res = await api.get('/challenges/leaderboard/weekly');
+      setWeeklyLeaderboard(res.data);
+    } catch (error) {
+      console.error('Error fetching weekly leaderboard:', error);
+    }
+  };
+
+  const fetchMyStats = async () => {
+    try {
+      const res = await api.get('/challenges/my-stats');
+      setMyStats(res.data);
+    } catch (error) {
+      console.error('Error fetching my stats:', error);
     }
   };
 
@@ -449,46 +488,143 @@ export default function ChallengesPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
+                className="space-y-4"
               >
+                {/* My Stats Card */}
+                {myStats && (
+                  <div className={`${cardBg} border ${cardBorder} rounded-2xl p-4`}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Target className="w-5 h-5" style={{ color: userAccent }} />
+                      <h3 className={`font-semibold ${textMain}`}>Suas Estatísticas</h3>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className={`text-center p-3 rounded-xl ${isLight ? 'bg-emerald-50' : 'bg-emerald-500/10'}`}>
+                        <p className="text-2xl font-bold text-emerald-500">{myStats.totalWins}</p>
+                        <p className={`text-xs ${textMuted}`}>Vitórias</p>
+                      </div>
+                      <div className={`text-center p-3 rounded-xl ${isLight ? 'bg-red-50' : 'bg-red-500/10'}`}>
+                        <p className="text-2xl font-bold text-red-500">{myStats.totalLosses}</p>
+                        <p className={`text-xs ${textMuted}`}>Derrotas</p>
+                      </div>
+                      <div className={`text-center p-3 rounded-xl ${isLight ? 'bg-blue-50' : 'bg-blue-500/10'}`}>
+                        <p className="text-2xl font-bold text-blue-500">{myStats.winRate}%</p>
+                        <p className={`text-xs ${textMuted}`}>Win Rate</p>
+                      </div>
+                      <div className={`text-center p-3 rounded-xl`} style={{ backgroundColor: `${userAccent}15` }}>
+                        <p className="text-2xl font-bold" style={{ color: userAccent }}>Z${myStats.totalEarnings}</p>
+                        <p className={`text-xs ${textMuted}`}>Ganhos</p>
+                      </div>
+                    </div>
+                    {myStats.weeklyWins > 0 && (
+                      <div className="mt-3 flex items-center justify-center gap-2 text-sm">
+                        <Trophy className="w-4 h-4 text-yellow-400" />
+                        <span className={textMuted}>{myStats.weeklyWins} vitórias esta semana!</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Leaderboard Sub-tabs */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setLeaderboardTab('weekly')}
+                    className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all ${
+                      leaderboardTab === 'weekly'
+                        ? isLight ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+                        : `${cardBg} border ${cardBorder} ${textMuted}`
+                    }`}
+                  >
+                    Semanal
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardTab('allTime')}
+                    className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all ${
+                      leaderboardTab === 'allTime'
+                        ? isLight ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+                        : `${cardBg} border ${cardBorder} ${textMuted}`
+                    }`}
+                  >
+                    Geral
+                  </button>
+                </div>
+
+                {/* Leaderboard List */}
                 <div className={`${cardBg} border ${cardBorder} rounded-2xl overflow-hidden`}>
                   <div className="p-4 border-b border-white/10">
                     <div className="flex items-center gap-2">
                       <Trophy className="w-5 h-5" style={{ color: userAccent }} />
-                      <h3 className={`font-semibold ${textMain}`}>Top Duelistas</h3>
+                      <h3 className={`font-semibold ${textMain}`}>
+                        {leaderboardTab === 'weekly' ? 'Top Duelistas da Semana' : 'Top Duelistas'}
+                      </h3>
                     </div>
                   </div>
                   <div className="divide-y divide-white/5">
-                    {leaderboard.length === 0 ? (
-                      <div className="text-center py-8">
-                        <p className={textMuted}>Nenhum duelista ainda</p>
-                      </div>
-                    ) : (
-                      leaderboard.map((entry, index) => (
-                        <div key={entry.user?.id || index} className="flex items-center gap-4 p-4">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                            index === 0 ? 'bg-yellow-500/20 text-yellow-400' :
-                            index === 1 ? 'bg-gray-400/20 text-gray-400' :
-                            index === 2 ? 'bg-amber-600/20 text-amber-600' :
-                            `${isLight ? 'bg-gray-100' : 'bg-white/5'} ${textMuted}`
-                          }`}>
-                            {index + 1}
-                          </div>
-                          <img
-                            src={entry.user?.avatarUrl || `https://ui-avatars.com/api/?name=${entry.user?.name}&background=random`}
-                            alt={entry.user?.name}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                          <div className="flex-1">
-                            <p className={`font-medium ${textMain}`}>
-                              {entry.user?.displayName || entry.user?.name}
-                            </p>
-                            <p className={`text-sm ${textMuted}`}>
-                              {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'}
-                            </p>
-                          </div>
-                          {index === 0 && <Crown className="w-5 h-5 text-yellow-400" />}
+                    {leaderboardTab === 'weekly' ? (
+                      weeklyLeaderboard.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className={textMuted}>Nenhum duelista esta semana</p>
                         </div>
-                      ))
+                      ) : (
+                        weeklyLeaderboard.map((entry, index) => (
+                          <div key={entry.userId || index} className="flex items-center gap-4 p-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                              index === 0 ? 'bg-yellow-500/20 text-yellow-400' :
+                              index === 1 ? 'bg-gray-400/20 text-gray-400' :
+                              index === 2 ? 'bg-amber-600/20 text-amber-600' :
+                              `${isLight ? 'bg-gray-100' : 'bg-white/5'} ${textMuted}`
+                            }`}>
+                              {index + 1}
+                            </div>
+                            <img
+                              src={entry.user?.avatarUrl || `https://ui-avatars.com/api/?name=${entry.user?.name}&background=random`}
+                              alt={entry.user?.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                            <div className="flex-1">
+                              <p className={`font-medium ${textMain}`}>
+                                {entry.user?.displayName || entry.user?.name}
+                              </p>
+                              <p className={`text-sm ${textMuted}`}>
+                                {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'} · Z${entry.totalEarnings}
+                              </p>
+                            </div>
+                            {index === 0 && <Crown className="w-5 h-5 text-yellow-400" />}
+                          </div>
+                        ))
+                      )
+                    ) : (
+                      leaderboard.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className={textMuted}>Nenhum duelista ainda</p>
+                        </div>
+                      ) : (
+                        leaderboard.map((entry, index) => (
+                          <div key={entry.user?.id || index} className="flex items-center gap-4 p-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                              index === 0 ? 'bg-yellow-500/20 text-yellow-400' :
+                              index === 1 ? 'bg-gray-400/20 text-gray-400' :
+                              index === 2 ? 'bg-amber-600/20 text-amber-600' :
+                              `${isLight ? 'bg-gray-100' : 'bg-white/5'} ${textMuted}`
+                            }`}>
+                              {index + 1}
+                            </div>
+                            <img
+                              src={entry.user?.avatarUrl || `https://ui-avatars.com/api/?name=${entry.user?.name}&background=random`}
+                              alt={entry.user?.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                            <div className="flex-1">
+                              <p className={`font-medium ${textMain}`}>
+                                {entry.user?.displayName || entry.user?.name}
+                              </p>
+                              <p className={`text-sm ${textMuted}`}>
+                                {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'}
+                              </p>
+                            </div>
+                            {index === 0 && <Crown className="w-5 h-5 text-yellow-400" />}
+                          </div>
+                        ))
+                      )
                     )}
                   </div>
                 </div>

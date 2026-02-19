@@ -461,6 +461,12 @@ export default function SettingsPage() {
                             <div>
                                 <p className={`font-medium ${textMain}`}>Tema {theme === 'light' ? 'Claro' : 'Escuro'}</p>
                                 <p className={`text-sm ${textSub}`}>Alternar entre modo claro e escuro</p>
+                                {theme === 'light' && (
+                                    <p className="text-xs text-amber-500 mt-1 flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                        Cores de destaque usam o padrão no modo claro
+                                    </p>
+                                )}
                             </div>
                             <button
                                 onClick={toggleTheme}

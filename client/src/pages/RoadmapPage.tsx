@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Smartphone, Globe, Bot, Swords } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Smartphone, Globe, Bot, Swords, Trophy, Video, Film, LayoutDashboard, TrendingUp } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -331,6 +331,14 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Smartphone className="w-5 h-5" />,
         category: 'feature'
     },
+    {
+        id: '40',
+        title: 'Desafios 1v1',
+        description: 'Desafie amigos para competições 1v1, aposte Zions e compita por kills, wins e K/D. Integração StatForge.',
+        status: 'in-progress',
+        icon: <Swords className="w-5 h-5" />,
+        category: 'feature'
+    },
     
     // ===== PLANNED =====
     {
@@ -347,6 +355,46 @@ const roadmapItems: RoadmapItem[] = [
         description: 'Ao atingir nível 30, faça prestígio: recomece do zero com badge exclusiva e bônus permanente de XP. 10 níveis de prestígio!',
         status: 'planned',
         icon: <Crown className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '41',
+        title: 'Battle Pass Sazonal',
+        description: 'Battle Pass com 100 níveis de recompensas exclusivas. Track gratuito + premium com cosméticos raros e Zions.',
+        status: 'planned',
+        icon: <Trophy className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '42',
+        title: 'Watch Parties',
+        description: 'Assista streams da Twitch/YouTube e videos juntos com amigos. Chat sincronizado e reações em tempo real.',
+        status: 'planned',
+        icon: <Video className="w-5 h-5" />,
+        category: 'community'
+    },
+    {
+        id: '43',
+        title: 'Clips e Highlights',
+        description: 'Crie e compartilhe clipes de 15-60s dos seus melhores momentos. Competições de clipes com premiação.',
+        status: 'planned',
+        icon: <Film className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '44',
+        title: 'Creator Dashboard',
+        description: 'Painel avançado para criadores: analytics detalhado, monetização e crescimento de seguidores.',
+        status: 'planned',
+        icon: <LayoutDashboard className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '45',
+        title: 'Apostas Sociais',
+        description: 'Aposte em partidas ao vivo de e-sports e jogos. Pools de apostas entre amigos com odds dinâmicas.',
+        status: 'planned',
+        icon: <TrendingUp className="w-5 h-5" />,
         category: 'feature'
     },
     {

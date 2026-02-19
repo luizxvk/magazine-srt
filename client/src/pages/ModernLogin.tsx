@@ -415,7 +415,7 @@ function LoginForm({
                     <input
                         {...register('password')}
                         type={showPassword ? 'text' : 'password'}
-                        placeholder={t('changePassword.current')}
+                        placeholder={t('auth:login.password')}
                         autoComplete="current-password"
                         className="bg-transparent border-none outline-none text-white/90 text-sm w-full placeholder-white/25 font-light tracking-wide"
                         onKeyDown={handleKeyDown}

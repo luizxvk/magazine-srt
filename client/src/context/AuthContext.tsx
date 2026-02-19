@@ -248,6 +248,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Compute accent color from user's equipped customization (or preview)
     const accentColor = React.useMemo(() => {
+        // In light mode, always use default theme color for better visibility
+        if (theme === 'light') {
+            return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
+        }
         // If preview is active, use preview color
         if (previewTheme?.color) {
             return previewTheme.color;
@@ -269,15 +273,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         // Default colors based on membership
         return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
-    }, [user?.equippedColor, user?.membershipType, previewTheme?.color]);
+    }, [user?.equippedColor, user?.membershipType, previewTheme?.color, theme]);
 
     // Compute accent gradient (for background usage)
     const accentGradient = React.useMemo(() => {
+        // In light mode, do not use custom gradients
+        if (theme === 'light') {
+            return null;
+        }
         if (user?.equippedColor && ACCENT_GRADIENTS[user.equippedColor]) {
             return ACCENT_GRADIENTS[user.equippedColor];
         }
         return null; // No gradient, use solid color
-    }, [user?.equippedColor]);
+    }, [user?.equippedColor, theme]);
 
     // Compute accent gradient colors array (for animated GradientText)
     const accentGradientColors = React.useMemo(() => {

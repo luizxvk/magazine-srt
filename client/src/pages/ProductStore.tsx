@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, ChevronDown, ArrowLeft, ShoppingBag, History, Key, Coins } from 'lucide-react';
 import Loader from '../components/Loader';
+import PremiumLoader from '../components/PremiumLoader';
 import { useAuth } from '../context/AuthContext';
 import GradientText from '../components/GradientText';
 import { useNavigate } from 'react-router-dom';
@@ -54,11 +55,12 @@ const categoryOptions = [
 ];
 
 export default function ProductStore() {
-    const { user, accentColor } = useAuth();
+    const { user, accentColor, theme } = useAuth();
     const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
+    const [initialLoad, setInitialLoad] = useState(true);
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState<Category>('ALL');
     const [sortBy, setSortBy] = useState<SortBy>('createdAt');
@@ -69,6 +71,9 @@ export default function ProductStore() {
     const isMGT = user?.membershipType === 'MGT';
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
+    const isLight = theme === 'light';
+    const cardBg = isLight ? 'bg-white/80' : 'bg-black/40';
+    const borderColor = isLight ? 'border-gray-200' : 'border-white/10';
 
     useEffect(() => {
         if (activeTab === 'store') {
@@ -94,6 +99,7 @@ export default function ProductStore() {
             console.error('Error fetching products:', error);
         } finally {
             setLoading(false);
+            setInitialLoad(false);
         }
     };
 
@@ -106,6 +112,7 @@ export default function ProductStore() {
             console.error('Error fetching orders:', error);
         } finally {
             setLoading(false);
+            setInitialLoad(false);
         }
     };
 
@@ -114,7 +121,18 @@ export default function ProductStore() {
             <LuxuriousBackground />
             <Header />
 
+            {/* Premium Loading Screen */}
+            <AnimatePresence>
+                {initialLoad && (
+                    <PremiumLoader 
+                        title="Loja de Produtos" 
+                        subtitle="Carregando catálogo..." 
+                    />
+                )}
+            </AnimatePresence>
+
             <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24 pb-24">
+              <div className={`${cardBg} backdrop-blur-xl rounded-3xl p-6 md:p-8 border ${borderColor} shadow-xl`}>
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div className="flex items-center gap-4">
@@ -447,6 +465,7 @@ export default function ProductStore() {
                         </motion.div>
                     )}
                 </AnimatePresence>
+              </div>
             </main>
 
             <Footer />

@@ -6,6 +6,31 @@ const isCapacitor = typeof (window as any).Capacitor !== 'undefined';
 // Default backend URL for the main magazine template
 const DEFAULT_BACKEND_URL = 'https://magazine-srt.vercel.app';
 
+// Detectar subdomain do hostname atual
+const getCommunitySubdomain = (): string | null => {
+    // Se tem variável de ambiente definida, usa ela
+    if (import.meta.env.VITE_COMMUNITY_SUBDOMAIN) {
+        return import.meta.env.VITE_COMMUNITY_SUBDOMAIN;
+    }
+    
+    // Extrair do hostname (ex: teste-e2e-065129.vercel.app => teste-e2e-065129)
+    const host = window.location.hostname;
+    
+    // Padrão: {subdomain}.comunidades.rovex.app
+    const communityMatch = host.match(/^([^.]+)\.comunidades\.rovex\.app$/);
+    if (communityMatch) {
+        return communityMatch[1];
+    }
+    
+    // Padrão alternativo: {subdomain}.vercel.app (deploys temporários)
+    const vercelMatch = host.match(/^([^.]+)\.vercel\.app$/);
+    if (vercelMatch && vercelMatch[1] !== 'magazine-srt') {
+        return vercelMatch[1];
+    }
+    
+    return null;
+};
+
 // Em produção web usa VITE_API_URL ou fallback para o backend padrão
 // No Capacitor app usa URL completa da API
 const getBaseURL = () => {
@@ -40,6 +65,13 @@ api.interceptors.request.use((config) => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Enviar subdomain para multi-tenant detection
+    const subdomain = getCommunitySubdomain();
+    if (subdomain) {
+        config.headers['X-Community-Subdomain'] = subdomain;
+    }
+    
     return config;
 });
 

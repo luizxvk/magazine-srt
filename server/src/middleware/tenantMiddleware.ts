@@ -13,7 +13,7 @@ const configCache = new Map<string, { config: CommunityConfig; cachedAt: number 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
 
 /**
- * Middleware que detecta a comunidade pelo subdomain e carrega config
+ * Middleware que detecta a comunidade pelo subdomain/header e carrega config
  */
 export async function tenantDetection(req: Request, res: Response, next: NextFunction) {
   try {
@@ -23,9 +23,25 @@ export async function tenantDetection(req: Request, res: Response, next: NextFun
       return next();
     }
     
-    // Extrair subdomain do host
-    const host = req.headers.host || '';
-    const subdomain = extractSubdomain(host);
+    // 1. Primeiro tenta header explícito (para frontends clonados)
+    let subdomain = req.headers['x-community-subdomain'] as string || null;
+    
+    // 2. Se não tiver header, extrai do Host
+    if (!subdomain) {
+      const host = req.headers.host || '';
+      subdomain = extractSubdomain(host);
+    }
+    
+    // 3. Também pode vir do Origin (CORS)
+    if (!subdomain && req.headers.origin) {
+      const originHost = new URL(req.headers.origin as string).host;
+      subdomain = extractSubdomain(originHost);
+    }
+    
+    // 4. Fallback: variável de ambiente (para backends específicos)
+    if (!subdomain) {
+      subdomain = process.env.ROVEX_COMMUNITY_SLUG || null;
+    }
     
     if (!subdomain) {
       // Sem subdomain = Magazine SRT default
@@ -37,6 +53,17 @@ export async function tenantDetection(req: Request, res: Response, next: NextFun
     const config = await getCommunityConfigBySubdomain(subdomain);
     
     if (!config) {
+      // Se não encontrou mas temos env var, pode ser config local
+      if (process.env.ROVEX_COMMUNITY_SLUG === subdomain) {
+        // Usar defaults com subdomain específico
+        setCommunityConfig({
+          ...DEFAULT_COMMUNITY_CONFIG,
+          id: process.env.ROVEX_COMMUNITY_ID || subdomain,
+          subdomain: subdomain,
+        });
+        return next();
+      }
+      
       return res.status(404).json({
         error: 'Community not found',
         message: `A comunidade "${subdomain}" não foi encontrada.`,

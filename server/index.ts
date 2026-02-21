@@ -78,6 +78,7 @@ const allowedVercelPatterns = [
     /^https:\/\/magazine-.*\.vercel\.app$/,           // magazine-* subdomains
     /^https:\/\/teste-e2e-.*\.vercel\.app$/,          // Test communities
     /^https:\/\/.*-streetrunnerteam\.vercel\.app$/,   // Team preview deploys
+    /^https:\/\/.*\.comunidades\.rovex\.app$/,        // Provisioned communities
 ];
 
 const corsOptions = {
@@ -110,7 +111,7 @@ const corsOptions = {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'x-rovex-secret'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'x-rovex-secret', 'X-Community-Subdomain'],
     preflightContinue: false,
     optionsSuccessStatus: 200
 };

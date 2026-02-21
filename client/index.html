@@ -13,7 +13,6 @@
   
   <!-- Security Headers -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
   <!-- Content Security Policy -->
@@ -23,9 +22,9 @@
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob: https: http:;
-    connect-src 'self' https://magazine-frontend.vercel.app https://*.vercel.app https://pagead2.googlesyndication.com wss:;
+    media-src 'self' https: blob:;
+    connect-src 'self' https://magazine-srt.vercel.app https://*.vercel.app https://*.rovex.app https://rovex-platform-production.up.railway.app https://pagead2.googlesyndication.com wss: ws:;
     frame-src 'self' https://googleads.g.doubleclick.net https://www.google.com;
-    frame-ancestors 'none';
     base-uri 'self';
     form-action 'self';
   ">

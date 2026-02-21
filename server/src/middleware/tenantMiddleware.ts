@@ -53,21 +53,20 @@ export async function tenantDetection(req: Request, res: Response, next: NextFun
     const config = await getCommunityConfigBySubdomain(subdomain);
     
     if (!config) {
-      // Se não encontrou mas temos env var, pode ser config local
-      if (process.env.ROVEX_COMMUNITY_SLUG === subdomain) {
-        // Usar defaults com subdomain específico
-        setCommunityConfig({
-          ...DEFAULT_COMMUNITY_CONFIG,
-          id: process.env.ROVEX_COMMUNITY_ID || subdomain,
-          subdomain: subdomain,
-        });
-        return next();
-      }
+      // Comunidade não encontrada no Rovex - criar config básico com defaults
+      // Isso permite que novas comunidades funcionem mesmo sem registro completo
+      console.log(`[TenantDetection] Community "${subdomain}" not found in Rovex, using generated defaults`);
       
-      return res.status(404).json({
-        error: 'Community not found',
-        message: `A comunidade "${subdomain}" não foi encontrada.`,
-      });
+      const generatedConfig: CommunityConfig = {
+        ...DEFAULT_COMMUNITY_CONFIG,
+        id: subdomain,
+        subdomain: subdomain,
+        name: subdomain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), // "teste-mt-001" -> "Teste Mt 001"
+      };
+      
+      setCommunityConfig(generatedConfig);
+      (req as any).community = generatedConfig;
+      return next();
     }
     
     // Aplicar config para este request

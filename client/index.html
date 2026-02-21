@@ -1,6 +1,6 @@
 <!doctype html>
-<!-- Deployment trigger: 2026-01-05T16:47 -->
-<html lang="en">
+<!-- Deployment trigger: 2026-02-21T10:30 -->
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8" />
@@ -10,6 +10,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://adservice.google.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob: https: http:;
+    connect-src 'self' https://magazine-frontend.vercel.app https://*.vercel.app https://pagead2.googlesyndication.com wss:;
+    frame-src 'self' https://googleads.g.doubleclick.net https://www.google.com;
+    frame-ancestors 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+  
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5337827655553735" crossorigin="anonymous"></script>
   <title>Magazine MGT</title>

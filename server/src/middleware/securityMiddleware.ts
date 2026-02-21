@@ -4,13 +4,30 @@ import { Request, Response, NextFunction } from 'express';
 const sanitizeString = (str: string): string => {
     if (typeof str !== 'string') return str;
     
-    // Remove dangerous HTML/script tags
+    // Remove dangerous HTML/script tags - comprehensive list
     return str
+        // Remove all script tags and content
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<\s*\/?\s*(script|iframe|object|embed|form|input|button|meta|link|style)\b[^>]*>/gi, '')
-        .replace(/javascript:/gi, '')
-        .replace(/on\w+\s*=/gi, '')
-        .replace(/data:\s*text\/html/gi, '')
+        // Remove dangerous HTML tags (including svg which can execute JS)
+        .replace(/<\s*\/?\s*(script|iframe|object|embed|form|input|button|meta|link|style|svg|math|base|applet)\b[^>]*>/gi, '')
+        // Remove event handlers (onclick, onerror, onload, etc)
+        .replace(/\bon\w+\s*=\s*(["'])[^"']*\1/gi, '')
+        .replace(/\bon\w+\s*=\s*[^\s>]+/gi, '')
+        // Remove javascript: protocol
+        .replace(/javascript\s*:/gi, '')
+        // Remove vbscript: protocol
+        .replace(/vbscript\s*:/gi, '')
+        // Remove data: URLs that could execute code
+        .replace(/data\s*:\s*text\/html/gi, '')
+        .replace(/data\s*:\s*text\/javascript/gi, '')
+        .replace(/data\s*:\s*application\/javascript/gi, '')
+        // Remove expression() CSS hack
+        .replace(/expression\s*\(/gi, '')
+        // Remove eval() calls
+        .replace(/eval\s*\(/gi, '')
+        // Encode remaining < and > to prevent tag injection
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
         .trim();
 };
 
@@ -84,14 +101,21 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
     // Enable XSS filter
     res.setHeader('X-XSS-Protection', '1; mode=block');
     
-    // Content Security Policy - relaxed for API
-    // res.setHeader('Content-Security-Policy', "default-src 'self'; img-src * data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';");
+    // HTTP Strict Transport Security - force HTTPS for 1 year
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     
-    // Referrer Policy
+    // Content Security Policy - API responses
+    res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+    
+    // Referrer Policy - strict
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     
-    // Permissions Policy
-    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    // Permissions Policy - disable sensitive features
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=(), usb=()');
+    
+    // Prevent caching of sensitive API responses
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
     
     next();
 };

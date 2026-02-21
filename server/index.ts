@@ -59,7 +59,7 @@ const PORT = process.env.PORT || 3000;
 // Enable gzip compression for all responses
 app.use(compression());
 
-// Permissive CORS Configuration - MUST be before security headers
+// CORS Configuration - Restrict to known origins only
 const allowedOrigins = [
     'https://magazine-frontend.vercel.app',
     'https://magazine-srt.vercel.app',
@@ -73,9 +73,16 @@ const allowedOrigins = [
     'https://localhost'
 ];
 
+// Known subdomain patterns for Vercel previews (restrict to our projects)
+const allowedVercelPatterns = [
+    /^https:\/\/magazine-.*\.vercel\.app$/,           // magazine-* subdomains
+    /^https:\/\/teste-e2e-.*\.vercel\.app$/,          // Test communities
+    /^https:\/\/.*-streetrunnerteam\.vercel\.app$/,   // Team preview deploys
+];
+
 const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
+        // Allow requests with no origin (like mobile apps or curl requests from same server)
         if (!origin) return callback(null, true);
 
         // Allow Capacitor/Ionic apps
@@ -88,16 +95,22 @@ const corsOptions = {
             return callback(null, true);
         }
 
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
-            callback(null, true);
-        } else {
-            console.log('Blocked by CORS:', origin);
-            callback(new Error('Not allowed by CORS'));
+        // Check exact match
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
         }
+        
+        // Check Vercel patterns (our subdomains only)
+        if (allowedVercelPatterns.some(pattern => pattern.test(origin))) {
+            return callback(null, true);
+        }
+
+        console.warn('[CORS] Blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'x-rovex-secret'],
     preflightContinue: false,
     optionsSuccessStatus: 200
 };

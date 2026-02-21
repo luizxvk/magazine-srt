@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Send, Settings, Crown, Shield, VolumeX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -61,9 +62,10 @@ interface Group {
 export default function GroupDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user, theme } = useAuth();
+  const { isStdTier } = useCommunity();
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isMGT = user?.membershipType === 'MGT';
+  const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
   const [group, setGroup] = useState<Group | null>(null);
   const [messages, setMessages] = useState<GroupMessage[]>([]);

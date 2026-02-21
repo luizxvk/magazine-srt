@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard, Globe, Link2, PanelRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import ConfirmModal from '../components/ConfirmModal';
 import PushNotificationSettings from '../components/PushNotificationSettings';
@@ -14,10 +15,11 @@ import { useTranslation } from 'react-i18next';
 
 export default function SettingsPage() {
     const { user, logout, theme, toggleTheme, showToast, updateUser } = useAuth();
+    const { isStdTier } = useCommunity();
     const { t } = useTranslation('settings');
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     // Handle OAuth callback success messages
     useEffect(() => {

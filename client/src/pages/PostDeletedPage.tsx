@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 
 export default function PostDeletedPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
     const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';

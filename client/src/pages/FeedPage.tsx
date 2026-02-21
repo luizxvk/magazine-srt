@@ -7,6 +7,7 @@ import FeedCarousel from '../components/FeedCarousel';
 import CommentsModal from '../components/CommentsModal';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { Sparkles, ChevronDown, Settings } from 'lucide-react';
 import Loader from '../components/Loader';
 import ConfirmModal from '../components/ConfirmModal';
@@ -86,8 +87,9 @@ interface Post {
 
 export default function FeedPage() {
     const { user, dailyLoginStatus, openDailyLoginModal, showAchievement, updateUserZions, updateUser, theme } = useAuth();
+    const { isStdTier } = useCommunity();
     const { t } = useTranslation(['feed', 'common']);
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);

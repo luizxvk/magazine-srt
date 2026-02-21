@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Plus, Lock, Globe, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -34,9 +35,10 @@ interface Group {
 
 export default function GroupsPage() {
   const { user, theme, accentColor, accentGradient } = useAuth();
+  const { isStdTier } = useCommunity();
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const isMGT = user?.membershipType === 'MGT';
+  const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);

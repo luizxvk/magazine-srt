@@ -1,12 +1,14 @@
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Rewards from '../components/Rewards';
 
 export default function RewardsPage() {
     const { user, theme } = useAuth();
+    const { isStdTier } = useCommunity();
     const { t } = useTranslation('common');
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     const themeBg = theme === 'light' ? 'bg-gray-50' : 'bg-off-black';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';

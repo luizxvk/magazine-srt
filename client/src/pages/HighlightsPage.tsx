@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import { ArrowLeft, Heart, MessageCircle, Grid, List, Filter, Star } from 'lucide-react';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -26,7 +27,8 @@ interface HighlightPost {
 
 export default function HighlightsPage() {
     const { user, theme } = useAuth();
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const [posts, setPosts] = useState<HighlightPost[]>([]);
     const [filteredPosts, setFilteredPosts] = useState<HighlightPost[]>([]);
     const [loading, setLoading] = useState(true);

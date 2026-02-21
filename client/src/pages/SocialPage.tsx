@@ -6,6 +6,7 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Header from '../components/Header';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import ModernLoader from '../components/ModernLoader';
 import { motion, AnimatePresence } from 'framer-motion';
 import GradientText from '../components/GradientText';
@@ -74,7 +75,8 @@ export default function SocialPage() {
     const [searchResults, setSearchResults] = useState<Friend[]>([]);
     const [searching, setSearching] = useState(false);
 
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
     const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
     const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';

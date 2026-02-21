@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import { Check, Star, Shield, Zap, Edit2 } from 'lucide-react';
@@ -75,8 +76,9 @@ const defaultPlans: Plan[] = [
 
 export default function MgtLogPage() {
     const { user, showError } = useAuth();
+    const { isStdTier } = useCommunity();
     const navigate = useNavigate();
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const isAdmin = user?.role === 'ADMIN';
     const [loading, setLoading] = useState<string | null>(null);
 

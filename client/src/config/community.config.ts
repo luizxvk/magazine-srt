@@ -153,8 +153,16 @@ export function getTierName(membershipType: string, config: CommunityConfig): st
 }
 
 /**
- * Verifica se é o tier VIP
+ * Verifica se é o tier VIP (MAGAZINE ou equivalente)
  */
 export function isVipTier(membershipType: string, config: CommunityConfig): boolean {
   return membershipType === config.tierVipName || membershipType === 'MAGAZINE';
+}
+
+/**
+ * Verifica se é o tier Standard (MGT ou equivalente)
+ * Usa fallback para 'MGT' para retrocompatibilidade
+ */
+export function isStdTier(membershipType: string, config: CommunityConfig): boolean {
+  return membershipType === config.tierStdName || membershipType === 'MGT';
 }

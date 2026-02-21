@@ -18,6 +18,7 @@ import {
   getTierColor,
   getTierName,
   isVipTier,
+  isStdTier,
 } from '../config/community.config';
 import { Plan, type Feature } from '../utils/features';
 import { isFeatureAvailable, getRequiredPlan } from '../hooks/useFeature';
@@ -56,6 +57,7 @@ interface CommunityContextValue {
   getTierColor: (membershipType: string) => string;
   getTierName: (membershipType: string) => string;
   isVipTier: (membershipType: string) => boolean;
+  isStdTier: (membershipType: string) => boolean;
   
   // Estado
   isLoading: boolean;
@@ -160,6 +162,10 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
     return isVipTier(membershipType, config);
   };
 
+  const isStdTierValue = (membershipType: string): boolean => {
+    return isStdTier(membershipType, config);
+  };
+
   // Valor do contexto
   const value: CommunityContextValue = {
     config,
@@ -181,6 +187,7 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
     getTierColor: getTierColorValue,
     getTierName: getTierNameValue,
     isVipTier: isVipTierValue,
+    isStdTier: isStdTierValue,
     
     // Estado
     isLoading,

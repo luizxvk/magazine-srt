@@ -4,6 +4,7 @@ import { Store, Search, Filter, Gamepad2, Gift, CreditCard, Package, Sparkles, C
 import Loader from '../components/Loader';
 import PremiumLoader from '../components/PremiumLoader';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import GradientText from '../components/GradientText';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -68,7 +69,8 @@ export default function ProductStore() {
     const [showFilters, setShowFilters] = useState(false);
     const [activeTab, setActiveTab] = useState<Tab>('store');
 
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
     const isLight = theme === 'light';

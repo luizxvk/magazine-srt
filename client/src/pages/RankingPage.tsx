@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import Ranking from '../components/Ranking';
 import GradientText from '../components/GradientText';
@@ -6,8 +7,9 @@ import { useTranslation } from 'react-i18next';
 
 export default function RankingPage() {
     const { user } = useAuth();
+    const { isStdTier } = useCommunity();
     const { t } = useTranslation('gamification');
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     return (
         <div className="min-h-screen bg-off-black">

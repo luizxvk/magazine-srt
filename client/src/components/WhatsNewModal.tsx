@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Swords, Trophy, Coins, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, TrendingUp, PanelRight } from 'lucide-react';
+import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, TrendingUp, PanelRight, Palette, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.11';
+const CURRENT_VERSION = '0.5.0-rc.12';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -42,22 +42,21 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Page 1 - Main Features
     const page1Updates: UpdateItem[] = [
         {
-            icon: <Trophy className="w-5 h-5" />,
-            title: 'Battle Pass Comunitário',
-            description: 'Sistema de temporada com missões diárias/semanais e 50 níveis de rewards!',
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Branding Dinâmico por Comunidade',
+            description: 'Cores e nomes de tiers totalmente personalizáveis via config da comunidade!',
+            isNew: true
+        },
+        {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Multi-Tenant Rovex Ready',
+            description: 'Integração completa com Rovex Platform para provisionamento automático!',
             isNew: true
         },
         {
             icon: <Swords className="w-5 h-5" />,
             title: 'Desafios 1v1',
             description: 'Desafie amigos, aposte Zions e compete por kills, wins e K/D!',
-            isNew: true
-        },
-        {
-            icon: <Coins className="w-5 h-5" />,
-            title: 'Apostas Sociais',
-            description: 'Aposte em previsões: ranking semanal, resultados e mais!',
-            isNew: true
         },
         {
             icon: <PanelRight className="w-5 h-5" />,

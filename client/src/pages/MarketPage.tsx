@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -80,9 +81,10 @@ type SortType = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
 export default function MarketPage() {
   const { user, theme, updateUser, isVisitor } = useAuth();
+  const { isStdTier } = useCommunity();
   const { t } = useTranslation(['shop', 'common']);
   const location = useLocation();
-  const isMGT = user?.membershipType === 'MGT';
+  const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
   const [activeTab, setActiveTab] = useState<TabType>('browse');
 

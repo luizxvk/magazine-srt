@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -9,8 +10,9 @@ import FeedbackFormCard from '../components/FeedbackFormCard';
 export default function FeedbackPage() {
     const navigate = useNavigate();
     const { user, accentColor } = useAuth();
+    const { isStdTier } = useCommunity();
 
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;
 

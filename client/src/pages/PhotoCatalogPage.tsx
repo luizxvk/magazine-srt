@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import api from '../services/api';
@@ -329,7 +330,8 @@ function ListPhotoCard({
 
 export default function PhotoCatalogPage() {
     const { user, theme } = useAuth();
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     // Theme setup
     const themeColors = isMGT ? 'text-emerald-500' : 'text-gold-500';

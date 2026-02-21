@@ -7,6 +7,7 @@ import {
     ChevronLeft, ChevronRight, X, Shield, Percent
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -61,7 +62,8 @@ export default function ProductDetails() {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [showGallery, setShowGallery] = useState(false);
 
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const isMagazine = user?.membershipType === 'MAGAZINE';
     const defaultColor = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultColor;

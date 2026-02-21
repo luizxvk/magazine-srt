@@ -5,6 +5,7 @@ import api from '../services/api';
 import { Bell, Heart, MessageCircle, Star, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { useTranslation } from 'react-i18next';
 import ModernLoader from '../components/ModernLoader';
 import ChatWindow from '../components/ChatWindow';
@@ -32,8 +33,9 @@ export default function NotificationsPage() {
     const [chatUser, setChatUser] = useState<ChatUser | null>(null);
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { isStdTier } = useCommunity();
     const { t } = useTranslation();
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
 
     const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';

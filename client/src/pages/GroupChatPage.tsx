@@ -7,6 +7,7 @@ import {
   Reply, Smile
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
 import Header from '../components/Header';
@@ -94,7 +95,8 @@ export default function GroupChatPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, theme, showToast, showError } = useAuth();
-  const isMGT = user?.membershipType === 'MGT';
+  const { isStdTier } = useCommunity();
+  const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [group, setGroup] = useState<Group | null>(null);

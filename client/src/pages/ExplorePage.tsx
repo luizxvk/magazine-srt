@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import { 
     Search, TrendingUp, Users, Sparkles, 
@@ -57,9 +58,10 @@ interface TrendingTag {
 
 export default function ExplorePage() {
     const { user, theme } = useAuth();
+    const { isStdTier } = useCommunity();
     const navigate = useNavigate();
     const { t } = useTranslation('common');
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     
     const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
     const [topMembers, setTopMembers] = useState<TopMember[]>([]);

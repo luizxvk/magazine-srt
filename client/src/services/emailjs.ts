@@ -1,4 +1,5 @@
 import emailjs from '@emailjs/browser';
+import { DEFAULT_COMMUNITY_CONFIG } from '../config/community.config';
 
 // EmailJS Configuration - Get these from https://dashboard.emailjs.com
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
@@ -32,7 +33,7 @@ export const sendPasswordResetEmail = async (params: PasswordResetEmailParams): 
                 to_email: params.to_email,
                 to_name: params.to_name,
                 reset_link: params.reset_link,
-                app_name: 'Magazine/MGT',
+                app_name: DEFAULT_COMMUNITY_CONFIG.name,
                 current_year: new Date().getFullYear(),
             }
         );
@@ -69,7 +70,7 @@ export const sendWelcomeEmail = async (params: WelcomeEmailParams): Promise<bool
                 to_name: params.to_name,
                 temp_password: params.temp_password,
                 login_link: `${window.location.origin}/login`,
-                app_name: 'Magazine/MGT',
+                app_name: DEFAULT_COMMUNITY_CONFIG.name,
                 current_year: new Date().getFullYear(),
             }
         );

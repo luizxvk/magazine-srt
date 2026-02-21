@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Smartphone, Globe, Bot, Swords, Trophy, Video, Film, LayoutDashboard, TrendingUp } from 'lucide-react';
@@ -305,6 +306,24 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Zap className="w-5 h-5" />,
         category: 'improvement'
     },
+    {
+        id: '29i',
+        title: 'Branding Dinâmico Multi-Tenant',
+        description: 'Cores de tier (MGT/Magazine) totalmente configuráveis via Rovex. Nomes, cores e logos personalizados por comunidade.',
+        status: 'completed',
+        version: 'v0.5.0-rc.12',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29j',
+        title: 'Integração Rovex Platform',
+        description: 'Provisioning automático: Neon DB, Vercel deploy, config sync, email com credenciais admin e Feature Gates por plano.',
+        status: 'completed',
+        version: 'v0.5.0-rc.12',
+        icon: <Gamepad2 className="w-5 h-5" />,
+        category: 'feature'
+    },
     
     // ===== IN PROGRESS =====
     {
@@ -459,7 +478,8 @@ const categoryConfig = {
 
 export default function RoadmapPage() {
     const { user, theme } = useAuth();
-    const isMGT = user?.membershipType === 'MGT';
+    const { isStdTier } = useCommunity();
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
     const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';

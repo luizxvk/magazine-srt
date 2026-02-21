@@ -718,6 +718,64 @@ router.post('/admin/ads', authenticateToken, isAdmin, async (req: Request, res: 
   }
 });
 
+/**
+ * POST /api/rovex/admin/reset-config
+ * Reset community configuration to defaults (Magazine MGT template)
+ * ADMIN only - use this to restore template after testing
+ */
+router.post('/admin/reset-config', authenticateToken, isAdmin, async (req: Request, res: Response) => {
+  try {
+    console.log('[Admin] Resetting community config to defaults...');
+    
+    // Delete the community_config to restore defaults
+    await prisma.systemConfig.deleteMany({
+      where: { key: 'community_config' },
+    });
+    
+    console.log('[Admin] ✅ Community config reset to defaults');
+    
+    res.json({
+      success: true,
+      message: 'Community configuration reset to defaults (Magazine MGT)',
+      instructions: 'Refresh the page to see the changes',
+    });
+  } catch (error) {
+    console.error('❌ Reset config error:', error);
+    res.status(500).json({ success: false, error: 'Failed to reset config' });
+  }
+});
+
+/**
+ * GET /api/rovex/admin/community-config
+ * Get current community configuration for admin panel
+ */
+router.get('/admin/community-config', authenticateToken, isAdmin, async (req: Request, res: Response) => {
+  try {
+    const configRecord = await prisma.systemConfig.findUnique({
+      where: { key: 'community_config' },
+    });
+    
+    const savedConfig = configRecord?.value ? JSON.parse(configRecord.value) : null;
+    
+    res.json({
+      success: true,
+      hasCustomConfig: !!savedConfig,
+      config: savedConfig,
+      defaults: {
+        id: 'magazine-srt',
+        subdomain: 'magazine-srt',
+        name: 'Magazine MGT',
+        tierVipName: 'MAGAZINE',
+        tierStdName: 'MGT',
+        currencyName: 'Zions',
+      },
+    });
+  } catch (error) {
+    console.error('❌ Get community config error:', error);
+    res.status(500).json({ success: false, error: 'Failed to get config' });
+  }
+});
+
 // =====================================
 // ROTAS PROTEGIDAS (requerem ROVEX_API_SECRET)
 // =====================================

@@ -26,10 +26,6 @@
     ],
     "rewrites": [
         {
-            "source": "/api/:path*",
-            "destination": "https://magazine-srt.vercel.app/api/:path*"
-        },
-        {
             "source": "/post/:id",
             "destination": "https://magazine-srt.vercel.app/api/og/post/:id",
             "has": [
@@ -41,7 +37,7 @@
             ]
         },
         {
-            "source": "/:path((?!ads\\.txt|sw\\.js|assets|packs|sounds|manifest\\.json|favicon\\.ico).*)",
+            "source": "/:path((?!ads\\.txt|sw\\.js|assets|packs|sounds|manifest\\.json|favicon\\.ico|api).*)",
             "destination": "/index.html"
         }
     ]

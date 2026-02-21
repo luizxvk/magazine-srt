@@ -3,22 +3,27 @@ import axios from 'axios';
 // Detectar se está rodando no Capacitor (app nativo)
 const isCapacitor = typeof (window as any).Capacitor !== 'undefined';
 
-// Em produção web usa /api (mesmo domínio)
+// Default backend URL for the main magazine template
+const DEFAULT_BACKEND_URL = 'https://magazine-srt.vercel.app';
+
+// Em produção web usa VITE_API_URL ou fallback para o backend padrão
 // No Capacitor app usa URL completa da API
 const getBaseURL = () => {
-    // Se tem variável de ambiente definida, usa ela
+    // Se tem variável de ambiente definida, usa ela (comunidades provisionadas)
     if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL;
+        const url = import.meta.env.VITE_API_URL;
+        // Garantir que termina sem /api se já tiver
+        return url.endsWith('/api') ? url : `${url}/api`;
     }
     
     // Se é Capacitor (app nativo), precisa URL completa
     if (isCapacitor) {
-        return 'https://magazine-srt.vercel.app/api';
+        return `${DEFAULT_BACKEND_URL}/api`;
     }
     
-    // Em produção web, usa path relativo
+    // Em produção web sem VITE_API_URL, usa o backend padrão
     if (import.meta.env.PROD) {
-        return '/api';
+        return `${DEFAULT_BACKEND_URL}/api`;
     }
     
     // Em desenvolvimento local

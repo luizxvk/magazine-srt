@@ -376,6 +376,46 @@ body::-webkit-scrollbar-thumb:hover {
 .shadow-accent { box-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4) !important; }
 
 /* ==============================================
+   TIER STANDARD (MGT) COLOR UTILITY CLASSES
+   Dynamic colors based on community config
+   Use these instead of hardcoded emerald-* classes
+   ============================================== */
+
+/* Text Colors */
+.text-tier-std { color: var(--tier-std-color) !important; }
+.text-tier-std\/30 { color: rgba(var(--tier-std-color-rgb), 0.3) !important; }
+.text-tier-std\/50 { color: rgba(var(--tier-std-color-rgb), 0.5) !important; }
+.text-tier-std\/70 { color: rgba(var(--tier-std-color-rgb), 0.7) !important; }
+
+/* Background Colors */
+.bg-tier-std { background-color: var(--tier-std-color) !important; }
+.bg-tier-std\/10 { background-color: rgba(var(--tier-std-color-rgb), 0.1) !important; }
+.bg-tier-std\/20 { background-color: rgba(var(--tier-std-color-rgb), 0.2) !important; }
+.bg-tier-std\/30 { background-color: rgba(var(--tier-std-color-rgb), 0.3) !important; }
+
+/* Border Colors */
+.border-tier-std { border-color: var(--tier-std-color) !important; }
+.border-tier-std\/20 { border-color: rgba(var(--tier-std-color-rgb), 0.2) !important; }
+.border-tier-std\/30 { border-color: rgba(var(--tier-std-color-rgb), 0.3) !important; }
+.border-tier-std\/50 { border-color: rgba(var(--tier-std-color-rgb), 0.5) !important; }
+
+/* Ring Colors */
+.ring-tier-std { --tw-ring-color: var(--tier-std-color) !important; }
+
+/* Hover variants */
+.hover\:bg-tier-std\/20:hover { background-color: rgba(var(--tier-std-color-rgb), 0.2) !important; }
+.hover\:bg-tier-std\/30:hover { background-color: rgba(var(--tier-std-color-rgb), 0.3) !important; }
+.hover\:text-tier-std:hover { color: var(--tier-std-color) !important; }
+
+/* Focus variants */
+.focus\:ring-tier-std:focus { --tw-ring-color: var(--tier-std-color) !important; }
+.focus\:border-tier-std:focus { border-color: var(--tier-std-color) !important; }
+
+/* Gradient utility - use with from-tier-std to-tier-std */
+.from-tier-std { --tw-gradient-from: var(--tier-std-color); }
+.to-tier-std { --tw-gradient-to: var(--tier-std-color); }
+
+/* ==============================================
    GLOBAL ACCENT COLOR OVERRIDE SYSTEM
    When user has a custom color equipped (.custom-accent),
    all gold and emerald colors are replaced with the accent color

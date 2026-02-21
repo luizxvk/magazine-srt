@@ -71,19 +71,19 @@ export default function ExplorePage() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
 
-    // Theme colors
-    const themeTitle = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    // Theme colors - usando classes tier-std para cor dinâmica
+    const themeTitle = isMGT ? 'text-tier-std' : 'text-gold-400';
     // GradientText used for the page title
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeGlow = isMGT ? 'shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_20px_rgba(212,175,55,0.3)]';
-    const themeButtonActive = isMGT ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-gold-500/20 text-gold-400 border-gold-500/50';
-    const themeCardBg = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const themeBorder = isMGT ? 'border-tier-std/30' : 'border-gold-500/30';
+    const themeGlow = isMGT ? 'shadow-[0_0_20px_rgba(var(--tier-std-color-rgb),0.3)]' : 'shadow-[0_0_20px_rgba(212,175,55,0.3)]';
+    const themeButtonActive = isMGT ? 'bg-tier-std/20 text-tier-std border-tier-std/50' : 'bg-gold-500/20 text-gold-400 border-gold-500/50';
+    const themeCardBg = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-tier-std/10' : 'bg-black/30');
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeTextSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
     // Features disponíveis na plataforma
     const features: FeatureCard[] = [
-        { id: 'market', name: 'Mercado', description: 'Compre e venda itens', icon: <Store className="w-6 h-6" />, color: isMGT ? 'from-emerald-500 to-emerald-700' : 'from-gold-500 to-amber-700', path: '/market' },
+        { id: 'market', name: 'Mercado', description: 'Compre e venda itens', icon: <Store className="w-6 h-6" />, color: isMGT ? 'from-tier-std to-tier-std' : 'from-gold-500 to-amber-700', path: '/market' },
         { id: 'rewards', name: 'Recompensas', description: 'Resgate prêmios exclusivos', icon: <Gift className="w-6 h-6" />, color: 'from-purple-500 to-violet-700', path: '/rewards' },
         { id: 'groups', name: 'Grupos', description: 'Comunidades e chats', icon: <Users2 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/groups' },
         { id: 'social', name: 'Social', description: 'Amigos e conexões', icon: <MessageSquare className="w-6 h-6" />, color: 'from-pink-500 to-rose-700', path: '/social' },
@@ -91,7 +91,7 @@ export default function ExplorePage() {
         { id: 'statforge', name: 'StatForge', description: 'Stats de jogos', icon: <BarChart3 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/statforge' },
         { id: 'catalog', name: 'Catálogo', description: 'Galeria de fotos', icon: <Camera className="w-6 h-6" />, color: 'from-cyan-500 to-blue-700', path: '/catalog' },
         { id: 'ranking', name: 'Ranking', description: 'Classificação global', icon: <Trophy className="w-6 h-6" />, color: 'from-amber-500 to-yellow-700', path: '/ranking' },
-        { id: 'roadmap', name: 'Roadmap', description: 'Próximas novidades', icon: <Map className="w-6 h-6" />, color: 'from-teal-500 to-emerald-700', path: '/roadmap' },
+        { id: 'roadmap', name: 'Roadmap', description: 'Próximas novidades', icon: <Map className="w-6 h-6" />, color: 'from-teal-500 to-teal-700', path: '/roadmap' },
     ];
 
     useEffect(() => {

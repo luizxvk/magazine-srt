@@ -491,7 +491,7 @@ export default function FeedPage() {
                                 {posts.length === 0 ? (
                                     <TimelineAnimation animationNum={6}>
                                         <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                                            <Sparkles className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'} mx-auto mb-4`} />
+                                            <Sparkles className={`w-12 h-12 ${isMGT ? 'text-tier-std/30' : 'text-gold-500/30'} mx-auto mb-4`} />
                                             <p className="text-gray-400 font-serif text-xl">{t('feed:feed.empty')}</p>
                                             <p className="text-gray-600 text-sm mt-2">{t('feed:createPost.placeholder')}</p>
                                         </div>
@@ -563,7 +563,7 @@ export default function FeedPage() {
                                                     disabled={loadingMore}
                                                     className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                                                         isMGT
-                                                            ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20'
+                                                            ? 'bg-tier-std/10 hover:bg-tier-std/20 text-tier-std border border-tier-std/20'
                                                             : 'bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 border border-gold-500/20'
                                                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                                                 >

@@ -99,9 +99,27 @@ function extractSubdomain(host: string): string | null {
   // Padrão Rovex: {subdomain}.comunidades.rovex.app
   const rovexPattern = /^([a-z0-9-]+)\.comunidades\.rovex\.app$/;
   const match = hostWithoutPort.match(rovexPattern);
-  
   if (match) {
     return match[1];
+  }
+  
+  // Padrão Vercel provisioning: magazine-{subdomain}-frontend.vercel.app
+  const vercelProvisionPattern = /^magazine-([a-z0-9-]+)-frontend\.vercel\.app$/;
+  const vercelMatch = hostWithoutPort.match(vercelProvisionPattern);
+  if (vercelMatch) {
+    return vercelMatch[1];
+  }
+  
+  // Padrão Vercel direto: {subdomain}.vercel.app (exceto magazine-srt, magazine-frontend)
+  const vercelDirectPattern = /^([a-z0-9-]+)\.vercel\.app$/;
+  const directMatch = hostWithoutPort.match(vercelDirectPattern);
+  if (directMatch) {
+    const subdomain = directMatch[1];
+    // Ignorar os projetos principais (magazine-srt, magazine-frontend, rovex-hub)
+    const ignoredProjects = ['magazine-srt', 'magazine-frontend', 'rovex-hub', 'rovex-platform'];
+    if (!ignoredProjects.includes(subdomain)) {
+      return subdomain;
+    }
   }
   
   // Localhost ou domínio custom = null (usar default ou buscar por domínio)
@@ -185,8 +203,8 @@ function mapRovexResponseToConfig(data: any): CommunityConfig {
     plan: data.plan || 'FREE',
     
     logoUrl: data.logoUrl || DEFAULT_COMMUNITY_CONFIG.logoUrl,
-    logoIconUrl: data.logoIconUrl,
-    faviconUrl: data.faviconUrl,
+    logoIconUrl: data.logoIconUrl || data.logoUrl || DEFAULT_COMMUNITY_CONFIG.logoIconUrl,
+    faviconUrl: data.faviconUrl || data.logoUrl,
     ogImageUrl: data.ogImageUrl,
     loginBackgroundUrl: data.loginBackgroundUrl,
     

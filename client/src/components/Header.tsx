@@ -49,8 +49,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
     // Atualiza título e favicon dinamicamente
     useDynamicHead();
     
-    // Logo dinâmica: usa config ou fallback para asset local
-    const logoUrl = config.logoIconUrl || logoSrtFallback;
+    // Logo dinâmica: usa logoIconUrl, fallback para logoUrl, ou asset local
+    const logoUrl = config.logoIconUrl || config.logoUrl || logoSrtFallback;
     
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);

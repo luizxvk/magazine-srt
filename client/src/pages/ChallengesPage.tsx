@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -88,8 +89,9 @@ type Tab = 'active' | 'history' | 'leaderboard';
 export default function ChallengesPage() {
   const { user, theme, accentColor, accentGradient } = useAuth();
   const { isStdTier } = useCommunity();
+  const { getAccentColor } = useTierColors();
   const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
-  const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+  const defaultAccent = getAccentColor(isMGT);
   const userAccent = accentColor || defaultAccent;
 
   const [tab, setTab] = useState<Tab>('active');

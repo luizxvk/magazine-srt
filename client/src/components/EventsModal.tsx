@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, Gift, Sparkles, Gamepad2, Trash2, UserCheck, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 import Loader from './Loader';
 
@@ -47,8 +48,8 @@ interface Event {
 }
 
 export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
-    const { user, theme, showSuccess, showError, accentColor } = useAuth();
-    const isMGT = user?.membershipType === 'MGT';
+    const { user, theme, showSuccess, showError } = useAuth();
+    const { getUserAccent } = useTierColors();
     const isAdmin = user?.role === 'ADMIN';
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
 
     if (!isOpen) return null;
 
-    const userAccent = accentColor || (isMGT ? '#10b981' : '#d4af37');
+    const userAccent = getUserAccent();
 
     const modalContent = (
         <AnimatePresence>

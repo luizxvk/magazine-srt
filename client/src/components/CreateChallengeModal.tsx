@@ -4,6 +4,7 @@ import {
   X, Swords, Search, Coins, Clock, Target, Loader2, AlertCircle, Check, Users
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface CreateChallengeModalProps {
@@ -46,8 +47,9 @@ const BET_PRESETS = [100, 250, 500, 1000];
 
 export default function CreateChallengeModal({ isOpen, onClose, onSuccess }: CreateChallengeModalProps) {
   const { user, theme, accentColor, accentGradient } = useAuth();
+  const { getAccentColor } = useTierColors();
   const isMGT = user?.membershipType === 'MGT';
-  const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+  const defaultAccent = getAccentColor(isMGT);
   const userAccent = accentColor || defaultAccent;
 
   const [step, setStep] = useState(1);

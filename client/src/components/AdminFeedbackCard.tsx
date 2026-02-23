@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, Star, User, ChevronDown, ChevronUp, Check, Trash2, Filter, BarChart3, ThumbsUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 import Loader from './Loader';
 
@@ -50,6 +51,7 @@ interface FeedbackStats {
 
 export default function AdminFeedbackCard() {
     const { user, theme, accentColor } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -60,7 +62,7 @@ export default function AdminFeedbackCard() {
     const [showUnreadOnly, setShowUnreadOnly] = useState(false);
     const [showStats, setShowStats] = useState(false);
     
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const activeColor = accentColor || defaultColor;
     
     const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';

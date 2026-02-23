@@ -3,6 +3,7 @@ import { X, Users, Sparkles, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface NewMembersModalProps {
@@ -21,12 +22,13 @@ interface User {
 
 export default function NewMembersModal({ isOpen, onClose }: NewMembersModalProps) {
     const { user, theme, accentColor } = useAuth();
+    const { getAccentColor } = useTierColors();
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     const [recentUsers, setRecentUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const defaultAccent = getAccentColor(isMGT);
     const userAccent = accentColor || defaultAccent;
 
     useEffect(() => {

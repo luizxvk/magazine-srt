@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Type, Send, Palette, ChevronDown, ChevronUp, Smile, Move, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 
 interface StoryEditorProps {
     imageUrl: string;
@@ -12,6 +13,7 @@ interface StoryEditorProps {
 
 export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEditorProps) {
     const { user } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const [text, setText] = useState('');
     const [textColor, setTextColor] = useState('#FFFFFF');
@@ -60,7 +62,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
     const colors = [
         '#FFFFFF', // White
         '#000000', // Black
-        isMGT ? '#10b981' : '#d4af37', // Accent color
+        getAccentColor(isMGT), // Accent color
         '#ef4444', // Red
         '#3b82f6', // Blue
         '#a855f7', // Purple
@@ -404,7 +406,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                     onChange={(e) => setBgOpacity(parseFloat(e.target.value))}
                                     className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer slider-thumb"
                                     style={{
-                                        background: `linear-gradient(to right, ${isMGT ? '#10b981' : '#d4af37'} 0%, ${isMGT ? '#10b981' : '#d4af37'} ${bgOpacity * 100}%, rgba(255,255,255,0.2) ${bgOpacity * 100}%, rgba(255,255,255,0.2) 100%)`
+                                        background: `linear-gradient(to right, ${getAccentColor(isMGT)} 0%, ${getAccentColor(isMGT)} ${bgOpacity * 100}%, rgba(255,255,255,0.2) ${bgOpacity * 100}%, rgba(255,255,255,0.2) 100%)`
                                     }}
                                 />
                             </div>

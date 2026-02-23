@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, X, Radio, ChevronLeft, ChevronRight, Users, Headphones } from 'lucide-react';
 import { useRadio, RADIO_STATIONS } from '../context/RadioContext';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Loader from './Loader';
@@ -22,6 +23,7 @@ export default function MiniRadioPlayer() {
         setShowMiniPlayer 
     } = useRadio();
     const { user, theme, accentColor: userAccent } = useAuth();
+    const { getAccentColor } = useTierColors();
     const location = useLocation();
     const [isExpanded, setIsExpanded] = useState(false);
     const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,7 +86,7 @@ export default function MiniRadioPlayer() {
     if (!showMiniPlayer || !isPlaying || isAuthPage) return null;
 
     // Use user's accent color, fallback to station color or default
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const defaultAccent = getAccentColor(isMGT);
     const accentColor = userAccent || currentStation.color || defaultAccent;
     
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -269,7 +271,7 @@ export default function MiniRadioPlayer() {
                                         // Use accent color for selected, otherwise use project theme colors
                                         const isSelected = currentStation.id === station.id;
                                         const buttonBg = isSelected 
-                                            ? (isMGT ? '#10b981' : '#d4af37') 
+                                            ? defaultAccent 
                                             : undefined;
                                         
                                         return (

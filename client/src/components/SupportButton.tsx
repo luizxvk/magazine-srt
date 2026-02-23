@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useTierColors } from '../hooks/useTierColors';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import ChatWindow from './ChatWindow';
@@ -34,6 +35,7 @@ interface AdminInfo {
 export default function SupportButton() {
     const { user, isMobileDrawerOpen } = useAuth();
     const { communityName } = useCommunity();
+    const { getAccentColor } = useTierColors();
     const { t } = useTranslation('common');
     const isMGT = user?.membershipType === 'MGT';
     const [isOpen, setIsOpen] = useState(false);
@@ -141,8 +143,8 @@ export default function SupportButton() {
     }, []);
 
     // Theme colors
-    const accentColorHex = isMGT ? '#10b981' : '#D4AF37';
-    const gradientFrom = isMGT ? '#10b981' : '#f59e0b';
+    const accentColorHex = getAccentColor(isMGT);
+    const gradientFrom = getAccentColor(isMGT);
     const gradientTo = isMGT ? '#0d9488' : '#ca8a04';
 
     // Support options

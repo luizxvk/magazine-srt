@@ -5,6 +5,7 @@ import Loader from '../components/Loader';
 import PremiumLoader from '../components/PremiumLoader';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useTierColors } from '../hooks/useTierColors';
 import GradientText from '../components/GradientText';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -70,8 +71,9 @@ export default function ProductStore() {
     const [activeTab, setActiveTab] = useState<Tab>('store');
 
     const { isStdTier } = useCommunity();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const color = accentColor || defaultColor;
     const isLight = theme === 'light';
     const cardBg = isLight ? 'bg-white/80' : 'bg-black/40';

@@ -30,6 +30,7 @@ import Loader from '../../components/Loader';
 // Tipo de moeda
 type CurrencyFilter = 'ALL' | 'POINTS' | 'CASH';
 import { useAuth } from '../../context/AuthContext';
+import { useTierColors } from '../../hooks/useTierColors';
 import api from '../../services/api';
 
 // Tipos de transação
@@ -104,10 +105,11 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
     
     const isDarkMode = theme === 'dark';
     const isMGT = user?.membershipType === 'MGT';
+    const { getAccentColor } = useTierColors();
     
     // Cores do tema
     const accentColor = isMGT ? 'tier-std' : 'amber';
-    const accentHex = isMGT ? '#10b981' : '#d4af37';
+    const accentHex = getAccentColor(isMGT);
 
     useEffect(() => {
         fetchTransactions();

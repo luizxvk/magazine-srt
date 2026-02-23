@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Gift, Camera, Calendar, Users, Star, MessageSquare, ChevronLeft, ChevronRight, UserPlus, Hand, Package, Info, Trophy, Crown, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 
 interface MobileCarouselProps {
     dailyLoginStatus: {
@@ -34,6 +35,7 @@ export default function MobileCarousel({
     onSupplyBoxClick
 }: MobileCarouselProps) {
     const { user, accentColor } = useAuth();
+    const { getAccentColor } = useTierColors();
     const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef<HTMLDivElement>(null);
@@ -43,7 +45,7 @@ export default function MobileCarousel({
     const [hasMoved, setHasMoved] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const color = accentColor || defaultColor;
 
     // Estilo padrão Apple Vision Pro - escuro com accent color do usuário

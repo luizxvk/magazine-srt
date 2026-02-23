@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -63,9 +64,10 @@ export default function ProductDetails() {
     const [showGallery, setShowGallery] = useState(false);
 
     const { isStdTier } = useCommunity();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     const isMagazine = user?.membershipType === 'MAGAZINE';
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const color = accentColor || defaultColor;
 
     // Discount calculation for MAGAZINE/Elite members

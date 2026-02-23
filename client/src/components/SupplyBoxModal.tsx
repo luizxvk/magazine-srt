@@ -4,6 +4,7 @@ import { Package, X, Sparkles, Gift, Coins, TrendingUp, Zap } from 'lucide-react
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import ThemePackCard from './ThemePackCard';
 import { RARITY_CONFIG, getRarityColor, getRarityLabel } from '../utils/raritySystem';
 
@@ -137,8 +138,9 @@ const BADGE_ICONS: Record<string, string> = {
 export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBoxModalProps) {
     const { t } = useTranslation();
     const { user, theme, accentColor, updateUserPoints } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const defaultAccent = getAccentColor(isMGT);
     const userAccent = accentColor || defaultAccent;
 
     const [opening, setOpening] = useState(false);
@@ -176,16 +178,16 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
             setOpensToday(prev => prev + 1);
             setCost(res.data.nextCost);
 
-            // Atualizar saldo de Zions Points no contexto do usuário
+            // Atualizar saldo de Zions Points no contexto do usuï¿½rio
             const currentCost = cost || 0;
             let pointsDelta = -currentCost; // Desconta o custo da abertura
 
             if (res.data.rewardType === 'ZIONS' && res.data.item?.value) {
-                // Ganhou Zions bônus
+                // Ganhou Zions bï¿½nus
                 pointsDelta += res.data.item.value;
             }
             if (res.data.type === 'DUPLICATE' && res.data.compensation) {
-                // Compensação por duplicata
+                // Compensaï¿½ï¿½o por duplicata
                 pointsDelta += res.data.compensation;
             }
             if (pointsDelta !== 0) {

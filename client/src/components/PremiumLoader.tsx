@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useTierColors } from '../hooks/useTierColors';
 import logoFallback from '../assets/logo-mgzn.png';
 import logoMgtFallback from '../assets/logo-mgt.png';
 
@@ -10,11 +11,11 @@ interface PremiumLoaderProps {
 }
 
 export default function PremiumLoader({ title, subtitle }: PremiumLoaderProps) {
-  const { user, accentColor, accentGradient, theme } = useAuth();
+  const { user, accentGradient, theme } = useAuth();
   const { config } = useCommunity();
+  const { getUserAccent } = useTierColors();
   const isMGT = user?.membershipType === 'MGT';
-  const defaultAccent = isMGT ? '#10b981' : '#d4af37';
-  const userAccent = accentColor || defaultAccent;
+  const userAccent = getUserAccent();
   const isLight = theme === 'light';
 
   return (

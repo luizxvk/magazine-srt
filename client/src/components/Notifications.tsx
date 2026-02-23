@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import ChatWindow from './ChatWindow';
 
 interface Notification {
@@ -32,9 +33,10 @@ export default function Notifications({ onClose }: NotificationsProps) {
     const [chatUser, setChatUser] = useState<ChatUser | null>(null);
     const navigate = useNavigate();
     const { user, theme, accentColor } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
 
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const defaultAccent = getAccentColor(isMGT);
     const userAccent = accentColor || defaultAccent;
 
     useEffect(() => {

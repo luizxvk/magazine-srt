@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useTierColors } from '../hooks/useTierColors';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
@@ -41,6 +42,7 @@ const BADGE_URLS: Record<string, string> = {
 export default function ProfilePage() {
     const { user: currentUser, theme, equippedBadge, previewTheme, accentColor, accentGradient } = useAuth();
     const { tierStdName, tierVipName, isStdTier } = useCommunity();
+    const { getAccentColor } = useTierColors();
     const { t } = useTranslation('common');
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -449,7 +451,7 @@ export default function ProfilePage() {
                                                 <BadgeCheck 
                                                     className={`w-5 h-5 ${isMGT ? 'text-tier-std-500' : 'text-blue-500'} drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]`}
                                                     strokeWidth={2.5}
-                                                    fill={isMGT ? '#10b981' : '#3b82f6'}
+                                                    fill={getAccentColor(isMGT)}
                                                     stroke="white"
                                                 />
                                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">

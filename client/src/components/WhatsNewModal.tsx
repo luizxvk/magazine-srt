@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, TrendingUp, PanelRight, Palette, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
 const CURRENT_VERSION = '0.5.0-rc.14';
@@ -21,6 +22,7 @@ interface WhatsNewModalProps {
 
 export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externalOnClose }: WhatsNewModalProps = {}) {
     const { user, accentColor: userAccentColor, accentGradient, theme } = useAuth();
+    const { getAccentColor } = useTierColors();
     const location = useLocation();
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
@@ -30,7 +32,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
 
     // Apple Vision Pro styling
     const isLight = theme === 'light';
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    const defaultAccent = getAccentColor(isMGT);
     const accentColor = userAccentColor || defaultAccent;
     const cardBg = isLight ? 'bg-white/95' : 'bg-[#1c1c1e]/95';
     const textMain = isLight ? 'text-gray-900' : 'text-white';

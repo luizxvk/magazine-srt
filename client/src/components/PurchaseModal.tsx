@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface Product {
@@ -66,6 +67,7 @@ const categoryLabels: Record<string, string> = {
 
 export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComplete, onGoToOrders }: PurchaseModalProps) {
     const { user, accentColor, updateUserZions, showEdgeNotification } = useAuth();
+    const { getAccentColor } = useTierColors();
     const [paymentMethod, setPaymentMethod] = useState<'zions' | 'brl' | 'pix_direct' | null>(null);
     const [brlPaymentType, setBrlPaymentType] = useState<'pix' | 'card' | 'boleto' | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -77,7 +79,7 @@ export default function PurchaseModal({ product, isOpen, onClose, onPurchaseComp
 
     const isMGT = user?.membershipType === 'MGT';
     const isMagazine = user?.membershipType === 'MAGAZINE';
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const color = accentColor || defaultColor;
 
     // Discount calculation for MAGAZINE/Elite members

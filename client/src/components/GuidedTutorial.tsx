@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 
 interface TutorialStep {
     targetSelector: string;
@@ -72,6 +73,7 @@ interface GuidedTutorialProps {
 
 export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps) {
     const { user, theme } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const isDark = theme === 'dark';
     const [currentStep, setCurrentStep] = useState(0);
@@ -79,7 +81,7 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
     const [isVisible, setIsVisible] = useState(false);
     const [activePosition, setActivePosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
 
-    const accentColor = isMGT ? '#10b981' : '#d4af37';
+    const accentColor = getAccentColor(isMGT);
     const accentBorder = isMGT ? 'border-tier-std-500/50' : 'border-gold-500/50';
 
     // Check if element is actually visible in the viewport (not hidden by CSS)

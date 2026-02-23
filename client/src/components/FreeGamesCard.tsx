@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Gift, ExternalLink, Clock, Gamepad2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface FreeGame {
@@ -34,6 +35,7 @@ const PLATFORM_NAMES: Record<string, string> = {
 
 export default function FreeGamesCard() {
     const { user, theme, accentGradient } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const [games, setGames] = useState<FreeGame[]>([]);
     const [enabled, setEnabled] = useState(false);
@@ -50,7 +52,7 @@ export default function FreeGamesCard() {
         : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const accentColor = isMGT ? '#10b981' : '#d4af37';
+    const accentColor = getAccentColor(isMGT);
 
     useEffect(() => {
         api.get('/social/twitch/free-games')

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 const REMINDER_INTERVAL = 5 * 60 * 1000; // 5 minutes
@@ -11,13 +12,14 @@ const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 export default function FeedbackReminderNotification() {
     const { user, isVisitor, accentColor } = useAuth();
+    const { getAccentColor } = useTierColors();
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
     
     const [show, setShow] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
     
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const activeColor = accentColor || defaultColor;
     
     const checkFeedbackStatus = useCallback(async () => {

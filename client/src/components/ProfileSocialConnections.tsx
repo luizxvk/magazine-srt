@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Music, Gamepad2, Twitch, Youtube, Twitter, Github, Globe, Tv, CheckCircle, ExternalLink, Link2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 
@@ -39,6 +40,7 @@ const PLATFORM_CONFIG: Record<string, { icon: any; color: string; label: string 
 
 export default function ProfileSocialConnections() {
     const { user, theme } = useAuth();
+    const { getAccentColor } = useTierColors();
     const { t } = useTranslation('common');
     const isMGT = user?.membershipType === 'MGT';
     const [connections, setConnections] = useState<SocialConnection[]>([]);
@@ -54,7 +56,7 @@ export default function ProfileSocialConnections() {
         : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const accentColor = isMGT ? '#10b981' : '#d4af37';
+    const accentColor = getAccentColor(isMGT);
 
     useEffect(() => {
         loadConnections();

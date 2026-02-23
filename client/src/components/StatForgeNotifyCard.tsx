@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Bell, BellOff, Gamepad2, TrendingUp, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 
 export default function StatForgeNotifyCard() {
     const { theme, accentColor, accentGradient, user } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
 
     const [enabled, setEnabled] = useState(() => {
@@ -12,7 +14,7 @@ export default function StatForgeNotifyCard() {
     });
     const [justToggled, setJustToggled] = useState(false);
 
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const color = accentColor || defaultColor;
 
     const cardBg = theme === 'light'

@@ -3,6 +3,7 @@ import { ShoppingBag, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
 import Loader from './Loader';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface Product {
@@ -16,14 +17,13 @@ interface Product {
 
 export default function ProductStoreCard() {
     const navigate = useNavigate();
-    const { user, accentColor } = useAuth();
+    useAuth(); // Required for user context
+    const { getUserAccent } = useTierColors();
     const [products, setProducts] = useState<Product[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     
-    const isMGT = user?.membershipType === 'MGT';
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
-    const color = accentColor || defaultColor;
+    const color = getUserAccent();
 
     useEffect(() => {
         fetchProducts();

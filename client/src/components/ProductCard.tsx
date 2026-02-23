@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Package, Gamepad2, Gift, CreditCard, Sparkles, Coins, Percent } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 
 interface Product {
     id: string;
@@ -37,13 +38,12 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
-    const { user, theme, accentColor } = useAuth();
+    const { user, theme } = useAuth();
+    const { getUserAccent } = useTierColors();
     const navigate = useNavigate();
 
-    const isMGT = user?.membershipType === 'MGT';
     const isMagazine = user?.membershipType === 'MAGAZINE';
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
-    const color = accentColor || defaultColor;
+    const color = getUserAccent();
 
     const isOutOfStock = !product.isUnlimited && product.availableStock <= 0;
     

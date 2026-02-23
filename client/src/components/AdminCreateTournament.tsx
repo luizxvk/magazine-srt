@@ -3,6 +3,7 @@ import { Swords, Trophy, Users, Clock, Gamepad2, Image, FileText, ChevronDown, X
 import { motion, AnimatePresence } from 'framer-motion';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface AdminCreateTournamentProps {
@@ -27,6 +28,7 @@ const TEAM_SIZES = [
 
 export default function AdminCreateTournament({ showToast, onTournamentCreated }: AdminCreateTournamentProps) {
     const { user, theme } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
 
     const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +51,7 @@ export default function AdminCreateTournament({ showToast, onTournamentCreated }
     });
 
     const isDark = theme !== 'light';
-    const accent = isMGT ? '#10b981' : '#d4af37';
+    const accent = getAccentColor(isMGT);
     const accentBg = isMGT ? 'bg-tier-std-500/10' : 'bg-amber-500/10';
     const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-amber-500/30';
     const accentText = isMGT ? 'text-tier-std-400' : 'text-amber-400';

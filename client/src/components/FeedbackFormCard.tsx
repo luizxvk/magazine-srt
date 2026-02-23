@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, Star, Send, CheckCircle, Clock, Bug, Heart, Lightbulb, Users, Palette, HelpCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import Loader from './Loader';
@@ -11,6 +12,7 @@ interface FeedbackFormCardProps {
 
 export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     const { user, theme, accentColor, accentGradient, isVisitor, showError, showWarning } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     
     const [canSubmit, setCanSubmit] = useState(true);
@@ -42,7 +44,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
         suggestions: ''
     });
     
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    const defaultColor = getAccentColor(isMGT);
     const activeColor = accentColor || defaultColor;
     
     const themeBorder = theme === 'light' ? 'border-gray-200' : (isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30');

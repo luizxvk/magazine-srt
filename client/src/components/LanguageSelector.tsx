@@ -45,7 +45,7 @@ export default function LanguageSelector({ variant = 'dropdown', className = '' 
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                             i18n.language === lang.code
                                 ? isMGT
-                                    ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                                    ? 'bg-tier-std-500/10 border border-tier-std-500/30 text-tier-std-400'
                                     : 'bg-gold-500/10 border border-gold-500/30 text-gold-400'
                                 : 'bg-white/[0.03] border border-white/[0.06] text-white/60 hover:bg-white/[0.06] hover:text-white/80'
                         }`}
@@ -53,7 +53,7 @@ export default function LanguageSelector({ variant = 'dropdown', className = '' 
                         <span className="text-lg">{lang.flag}</span>
                         <span className="text-sm font-medium flex-1 text-left">{lang.label}</span>
                         {i18n.language === lang.code && (
-                            <Check size={16} className={isMGT ? 'text-emerald-400' : 'text-gold-400'} />
+                            <Check size={16} className={isMGT ? 'text-tier-std-400' : 'text-gold-400'} />
                         )}
                     </button>
                 ))}
@@ -87,7 +87,7 @@ export default function LanguageSelector({ variant = 'dropdown', className = '' 
                                 onClick={() => changeLanguage(lang.code)}
                                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                                     i18n.language === lang.code
-                                        ? isMGT ? 'text-emerald-400 bg-emerald-500/10' : 'text-gold-400 bg-gold-500/10'
+                                        ? isMGT ? 'text-tier-std-400 bg-tier-std-500/10' : 'text-gold-400 bg-gold-500/10'
                                         : 'text-white/60 hover:text-white/90 hover:bg-white/[0.04]'
                                 }`}
                             >

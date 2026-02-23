@@ -207,7 +207,7 @@ export default function AdminWithdrawals({ onClose }: AdminWithdrawalsProps) {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Buscar por nome, email ou chave PIX..."
-                    className={`w-full pl-12 pr-4 py-3 rounded-xl border border-white/10 ${theme === 'light' ? 'bg-white' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                    className={`w-full pl-12 pr-4 py-3 rounded-xl border border-white/10 ${theme === 'light' ? 'bg-white' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                 />
             </div>
 

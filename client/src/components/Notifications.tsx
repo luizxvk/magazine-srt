@@ -257,7 +257,7 @@ export default function Notifications({ onClose }: NotificationsProps) {
                                     switch (notification.type) {
                                         case 'LIKE': return <Heart className="w-3 h-3 text-red-400 fill-current" />;
                                         case 'COMMENT': return <MessageCircle className="w-3 h-3 text-blue-400 fill-current" />;
-                                        case 'MESSAGE': return <MessageCircle className="w-3 h-3 text-emerald-400 fill-current" />;
+                                        case 'MESSAGE': return <MessageCircle className="w-3 h-3 text-tier-std-400 fill-current" />;
                                         case 'FRIEND_REQUEST': return <UserPlus className="w-3 h-3 text-purple-400" />;
                                         case 'BADGE': return <Star className="w-3 h-3" style={{ color: userAccent }} />;
                                         default: return <Bell className="w-3 h-3 text-gray-400" />;

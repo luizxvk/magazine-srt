@@ -20,13 +20,13 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
     
     // Theme colors
     const themeColor = isMGT ? 'emerald' : 'gold';
-    const gradientFrom = isMGT ? 'from-emerald-500' : 'from-gold-500';
-    const gradientTo = isMGT ? 'to-emerald-600' : 'to-amber-600';
-    const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
-    const accentBorder = isMGT ? 'border-emerald-500' : 'border-gold-500';
-    const accentRing = isMGT ? 'ring-emerald-500/20' : 'ring-gold-500/20';
-    const cardBg = isMGT ? 'from-emerald-950/90 to-gray-950' : 'from-gray-900 to-gray-950';
-    const borderColor = isMGT ? 'border-emerald-500/20' : 'border-white/10';
+    const gradientFrom = isMGT ? 'from-tier-std-500' : 'from-gold-500';
+    const gradientTo = isMGT ? 'to-tier-std-600' : 'to-amber-600';
+    const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
+    const accentBorder = isMGT ? 'border-tier-std-500' : 'border-gold-500';
+    const accentRing = isMGT ? 'ring-tier-std-500/20' : 'ring-gold-500/20';
+    const cardBg = isMGT ? 'from-tier-std-950/90 to-gray-950' : 'from-gray-900 to-gray-950';
+    const borderColor = isMGT ? 'border-tier-std-500/20' : 'border-white/10';
 
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -198,7 +198,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
                                 animate={{ scale: 1 }}
                                 className="flex flex-col items-center gap-4"
                             >
-                                <div className={`w-20 h-20 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                                <div className={`w-20 h-20 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
                                     <ShieldCheck className={`w-10 h-10 ${accentText}`} />
                                 </div>
                                 <p className="text-gray-300 text-center">
@@ -319,8 +319,8 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
 
                     {/* Warning Banner */}
                     {!success && (
-                        <div className={`${isMGT ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'} border-t px-6 py-4`}>
-                            <p className={`${isMGT ? 'text-emerald-400/80' : 'text-amber-400/80'} text-xs text-center`}>
+                        <div className={`${isMGT ? 'bg-tier-std-500/10 border-tier-std-500/20' : 'bg-amber-500/10 border-amber-500/20'} border-t px-6 py-4`}>
+                            <p className={`${isMGT ? 'text-tier-std-400/80' : 'text-amber-400/80'} text-xs text-center`}>
                                 ⚠️ Verifique seu email para manter sua conta ativa e ter acesso a todas as funcionalidades.
                             </p>
                         </div>

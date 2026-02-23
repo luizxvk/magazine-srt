@@ -80,7 +80,7 @@ export default function TournamentsPage() {
                 <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
                 {/* Page Header */}
                 <div className="mb-8">
-                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>
                         <Swords className="inline-block w-8 h-8 mr-2 -mt-1" />
                         {t('tournaments.title')}
                     </GradientText>
@@ -101,7 +101,7 @@ export default function TournamentsPage() {
                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                                     active
                                         ? isMGT
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                            ? 'bg-tier-std-500/20 text-tier-std-400 border border-tier-std-500/30'
                                             : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
                                         : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
                                 }`}
@@ -120,7 +120,7 @@ export default function TournamentsPage() {
                             {[0, 1, 2].map(i => (
                                 <motion.div
                                     key={i}
-                                    className={`w-3 h-3 rounded-full ${isMGT ? 'bg-emerald-400' : 'bg-gold-400'}`}
+                                    className={`w-3 h-3 rounded-full ${isMGT ? 'bg-tier-std-400' : 'bg-gold-400'}`}
                                     animate={{ y: [0, -10, 0] }}
                                     transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
                                 />

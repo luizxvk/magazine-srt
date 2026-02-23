@@ -72,10 +72,10 @@ export default function TournamentCard({ tournament, onClick, formatCurrency }: 
                 ) : (
                     <div className={`h-32 flex items-center justify-center relative ${
                         isMGT
-                            ? 'bg-gradient-to-br from-emerald-900/30 to-emerald-800/10'
+                            ? 'bg-gradient-to-br from-tier-std-900/30 to-tier-std-800/10'
                             : 'bg-gradient-to-br from-gold-900/30 to-gold-800/10'
                     }`}>
-                        <Swords className={`w-12 h-12 ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'}`} />
+                        <Swords className={`w-12 h-12 ${isMGT ? 'text-tier-std-500/30' : 'text-gold-500/30'}`} />
                         <div className="absolute bottom-3 left-3">
                             <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${badge.color}`}>
                                 {badge.label}
@@ -119,10 +119,10 @@ export default function TournamentCard({ tournament, onClick, formatCurrency }: 
                     {/* Prize Pool */}
                     {tournament.prizePool > 0 && (
                         <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${
-                            isMGT ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-gold-500/10 border border-gold-500/20'
+                            isMGT ? 'bg-tier-std-500/10 border border-tier-std-500/20' : 'bg-gold-500/10 border border-gold-500/20'
                         }`}>
-                            <Coins className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
-                            <span className={`text-sm font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                            <Coins className={`w-4 h-4 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
+                            <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                 {formatCurrency(tournament.prizePool)}
                             </span>
                             <span className="text-xs text-gray-500 ml-auto">Premiação</span>

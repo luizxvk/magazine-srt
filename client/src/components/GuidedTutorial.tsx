@@ -80,7 +80,7 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
     const [activePosition, setActivePosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
 
     const accentColor = isMGT ? '#10b981' : '#d4af37';
-    const accentBorder = isMGT ? 'border-emerald-500/50' : 'border-gold-500/50';
+    const accentBorder = isMGT ? 'border-tier-std-500/50' : 'border-gold-500/50';
 
     // Check if element is actually visible in the viewport (not hidden by CSS)
     const isElementVisible = (el: Element): boolean => {

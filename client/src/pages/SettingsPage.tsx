@@ -233,7 +233,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Profile Section */}
-                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
                         <div className="flex items-center gap-4 mb-4">
                             <div className={`p-3 rounded-full bg-${themeColor}-500/10`}>
                                 <User className={`w-6 h-6 text-${themeColor}-400`} />
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Social Connections */}
-                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
                         <div className="flex items-center gap-3 mb-2">
                             <Link2 className={`w-5 h-5 text-${themeColor}-400`} />
                             <h3 className={`font-semibold ${textMain}`}>Conectar Serviços</h3>
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Notifications Settings */}
-                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
                         <div className="flex items-center gap-3 mb-4">
                             <Bell className={`w-5 h-5 text-${themeColor}-400`} />
                             <h3 className={`font-semibold ${textMain}`}>{t('sections.notifications')}</h3>
@@ -455,7 +455,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Appearance Settings */}
-                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-4`}>
                         <h3 className={`font-semibold ${textMain} mb-4`}>{t('sections.appearance')}</h3>
 
                         {/* Theme Toggle */}
@@ -531,7 +531,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Feed Cards Customization */}
-                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
                         <div className="flex items-center gap-2 mb-4">
                             <PanelRight className={`w-5 h-5 text-${themeColor}-400`} />
                             <h3 className={`font-semibold ${textMain}`}>Cards do Feed</h3>
@@ -543,7 +543,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Account Actions */}
-                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-3`}>
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6 space-y-3`}>
                         <h3 className={`font-semibold ${textMain} mb-4`}>{t('sections.account')}</h3>
 
                         <button

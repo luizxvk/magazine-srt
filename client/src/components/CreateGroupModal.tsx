@@ -28,9 +28,9 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
   const themeInput = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
   
   // Use CSS variables for custom accent colors
-  const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
-  const accentText = isMGT ? 'text-emerald-500' : 'text-gold-500';
-  const accentBorder = isMGT ? 'border-emerald-500' : 'border-gold-500';
+  const accentBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
+  const accentText = isMGT ? 'text-tier-std-500' : 'text-gold-500';
+  const accentBorder = isMGT ? 'border-tier-std-500' : 'border-gold-500';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +84,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
               {/* Header */}
               <div className={`flex items-center justify-between p-6 border-b ${themeBorder}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} rounded-lg`}>
+                  <div className={`p-2 ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} rounded-lg`}>
                     <Users className={`w-6 h-6 ${accentText}`} />
                   </div>
                   <h2 className={`text-xl font-serif ${themeText}`}>Criar Novo Grupo</h2>
@@ -110,7 +110,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     onChange={(e) => setName(e.target.value)}
                     maxLength={50}
                     placeholder="Ex: Carros Esportivos"
-                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all`}
+                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all`}
                   />
                 </div>
 
@@ -125,7 +125,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     maxLength={200}
                     rows={3}
                     placeholder="Descreva o propósito do grupo..."
-                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all resize-none`}
+                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all resize-none`}
                   />
                   <p className={`text-xs ${themeSecondary} mt-1`}>
                     {description.length}/200 caracteres
@@ -143,7 +143,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                       onClick={() => setIsPrivate(false)}
                       className={`flex-1 p-4 rounded-lg border-2 transition-all ${
                         !isPrivate
-                          ? `${accentBorder} ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`
+                          ? `${accentBorder} ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}`
                           : `${themeBorder} ${themeInput}`
                       }`}
                     >
@@ -157,7 +157,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                       onClick={() => setIsPrivate(true)}
                       className={`flex-1 p-4 rounded-lg border-2 transition-all ${
                         isPrivate
-                          ? `${accentBorder} ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`
+                          ? `${accentBorder} ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}`
                           : `${themeBorder} ${themeInput}`
                       }`}
                     >
@@ -179,7 +179,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     onChange={(e) => setMaxMembers(Number(e.target.value))}
                     min={2}
                     max={500}
-                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all`}
+                    className={`w-full px-4 py-3 rounded-lg ${themeInput} ${themeText} border ${themeBorder} focus:ring-2 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-gold-500'} focus:border-transparent transition-all`}
                   />
                 </div>
 

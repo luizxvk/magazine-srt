@@ -536,7 +536,7 @@ export default function MarketPage() {
   const sellableItems = [...standardSellableItems, ...themePackItems];
 
   return (
-    <div className={`min-h-screen font-sans selection:${isMGT ? 'bg-emerald-500/30' : 'bg-gold-500/30'} relative`}>
+    <div className={`min-h-screen font-sans selection:${isMGT ? 'bg-tier-std-500/30' : 'bg-gold-500/30'} relative`}>
       <LuxuriousBackground />
       <Header />
 
@@ -544,13 +544,13 @@ export default function MarketPage() {
         {/* Page Title */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Store className={`w-6 sm:w-8 h-6 sm:h-8 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+            <Store className={`w-6 sm:w-8 h-6 sm:h-8 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
             <div>
               <div className="flex items-center gap-3">
-                <GradientText as="h1" className="text-2xl sm:text-3xl md:text-4xl font-bold leading-none" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                <GradientText as="h1" className="text-2xl sm:text-3xl md:text-4xl font-bold leading-none" fallbackClassName={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>
                   {t('shop:market.title')}
                 </GradientText>
-                <span className={`flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse translate-y-1`}>
+                <span className={`flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400 border border-tier-std-500/40' : 'bg-gold-500/20 text-gold-400 border border-gold-500/40'} animate-pulse translate-y-1`}>
                   BETA
                 </span>
               </div>

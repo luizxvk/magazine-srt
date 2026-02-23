@@ -2,7 +2,7 @@
  * useThemeColors
  * 
  * Hook que retorna cores dinâmicas baseadas na configuração da comunidade.
- * Use este hook ao invés de classes Tailwind hardcoded como "emerald-500".
+ * Use este hook ao invés de classes Tailwind hardcoded como "tier-std-500".
  * 
  * Uso:
  * ```tsx

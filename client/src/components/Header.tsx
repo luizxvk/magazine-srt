@@ -535,7 +535,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 user?.liteMode 
                                     ? (theme === 'light' ? 'bg-gray-100' : 'bg-zinc-950') 
                                     : (theme === 'light' ? 'bg-white/90 backdrop-blur-2xl' : 'bg-black/80 backdrop-blur-2xl')
-                            } border-l ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')} shadow-[-20px_0_60px_rgba(0,0,0,0.5)]`}
+                            } border-l ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-tier-std-500/20' : 'border-white/10')} shadow-[-20px_0_60px_rgba(0,0,0,0.5)]`}
                         >
                             {/* Gradient Overlay */}
                             {!user?.liteMode && (
@@ -550,7 +550,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                                className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-tier-std-500/20' : 'border-white/10')}`}
                             >
                                 {/* Top Bar with User + Actions */}
                                 <div className="flex items-center gap-3">
@@ -629,7 +629,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.15 }}
-                                className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                                className={`relative z-10 p-4 border-b ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-tier-std-500/20' : 'border-white/10')}`}
                             >
                                 <div className="grid grid-cols-3 gap-2">
                                     {[
@@ -649,7 +649,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 theme === 'light'
                                                     ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200/50'
                                                     : (isMGT 
-                                                        ? 'bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20' 
+                                                        ? 'bg-tier-std-500/10 hover:bg-tier-std-500/20 border border-tier-std-500/20' 
                                                         : 'bg-white/5 hover:bg-white/10 border border-white/10')
                                             }`}
                                         >
@@ -719,7 +719,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.4 }}
-                                className={`relative z-10 p-4 border-t ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-emerald-500/20' : 'border-white/10')}`}
+                                className={`relative z-10 p-4 border-t ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-tier-std-500/20' : 'border-white/10')}`}
                             >
                                 <p className={`text-[10px] text-center ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>
                                     Powered by <span className="font-medium">Rovex</span>

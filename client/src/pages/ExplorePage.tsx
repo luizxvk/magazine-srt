@@ -456,7 +456,7 @@ export default function ExplorePage() {
                                                 className="w-14 h-14 rounded-full object-cover border-2 border-white/20 group-hover:border-white/40 transition-colors"
                                             />
                                             {member.isVerified && (
-                                                <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'} flex items-center justify-center`}>
+                                                <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${isMGT ? 'bg-tier-std-500' : 'bg-gold-500'} flex items-center justify-center`}>
                                                     <Star className="w-3 h-3 text-black" />
                                                 </div>
                                             )}

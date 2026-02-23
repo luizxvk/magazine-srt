@@ -38,14 +38,14 @@ export default function NotificationsPage() {
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
 
-    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
-    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
+    const themeBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
+    const themeBorder = isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20';
     const themeHoverBorder = isMGT ? 'hover:border-red-500/30' : 'hover:border-gold-500/30';
     const themeShadow = isMGT ? 'shadow-[0_0_15px_rgba(220,20,60,0.1)]' : 'shadow-[0_0_15px_rgba(212,175,55,0.1)]';
-    const themeIconBg = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
-    const themeDot = isMGT ? 'bg-emerald-500 shadow-[0_0_10px_#DC143C]' : 'bg-gold-500 shadow-[0_0_10px_#D4AF37]';
-    const themeEmptyIcon = isMGT ? 'text-emerald-500/30' : 'text-gold-500/30';
+    const themeIconBg = isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20';
+    const themeDot = isMGT ? 'bg-tier-std-500 shadow-[0_0_10px_#DC143C]' : 'bg-gold-500 shadow-[0_0_10px_#D4AF37]';
+    const themeEmptyIcon = isMGT ? 'text-tier-std-500/30' : 'text-gold-500/30';
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -231,7 +231,7 @@ export default function NotificationsPage() {
                                                 <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-1 border border-black">
                                                     {notification.type === 'LIKE' && <Heart className="w-3 h-3 text-red-400 fill-current" />}
                                                     {notification.type === 'COMMENT' && <MessageCircle className="w-3 h-3 text-blue-400 fill-current" />}
-                                                    {notification.type === 'MESSAGE' && <MessageCircle className="w-3 h-3 text-emerald-400 fill-current" />}
+                                                    {notification.type === 'MESSAGE' && <MessageCircle className="w-3 h-3 text-tier-std-400 fill-current" />}
                                                     {notification.type === 'FRIEND_REQUEST' && <UserPlus className="w-3 h-3 text-blue-400" />}
                                                 </div>
                                             </div>

@@ -34,7 +34,7 @@ export default function EventDropPopup({ onClose }: EventDropPopupProps) {
     const isMGT = user?.membershipType === 'MGT';
     const accentColor = isMGT ? 'emerald' : 'purple';
     const bgGradient = isMGT 
-        ? 'from-emerald-500/20 to-teal-500/20' 
+        ? 'from-tier-std-500/20 to-teal-500/20' 
         : 'from-purple-500/20 to-pink-500/20';
 
     useEffect(() => {
@@ -278,7 +278,7 @@ export default function EventDropPopup({ onClose }: EventDropPopupProps) {
                                     disabled={isSubmitting || !keyword.trim()}
                                     className={`w-full py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-all flex items-center justify-center gap-2 ${
                                         isMGT
-                                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600'
+                                            ? 'bg-gradient-to-r from-tier-std-500 to-teal-500 hover:from-tier-std-600 hover:to-teal-600'
                                             : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
                                     } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >

@@ -61,10 +61,10 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
         ? 'bg-white/80 backdrop-blur-2xl border-white/50' 
         : 'bg-black/40 backdrop-blur-2xl border-white/10';
     const commentBubble = theme === 'light'
-        ? (isMGT ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100')
-        : (isMGT ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/10');
+        ? (isMGT ? 'bg-tier-std-50 border-tier-std-100' : 'bg-amber-50 border-amber-100')
+        : (isMGT ? 'bg-tier-std-500/10 border-tier-std-500/20' : 'bg-white/5 border-white/10');
     const accentGradient = isMGT 
-        ? 'from-emerald-500 to-teal-400' 
+        ? 'from-tier-std-500 to-teal-400' 
         : 'from-amber-500 to-yellow-400';
 
     const [comments, setComments] = useState<Comment[]>([]);
@@ -312,7 +312,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                             ) : comments.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 gap-3">
                                     <div className={`p-4 rounded-2xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
-                                        <MessageCircle className={`w-8 h-8 ${isMGT ? 'text-emerald-500/50' : 'text-amber-500/50'}`} />
+                                        <MessageCircle className={`w-8 h-8 ${isMGT ? 'text-tier-std-500/50' : 'text-amber-500/50'}`} />
                                     </div>
                                     <p className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
                                         {t('post.noComments')}
@@ -335,12 +335,12 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                         >
                                             {/* Main Comment */}
                                             <div className="flex gap-3">
-                                                <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ${authorMGT ? 'ring-emerald-500/30' : 'ring-amber-500/30'}`}>
+                                                <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ${authorMGT ? 'ring-tier-std-500/30' : 'ring-amber-500/30'}`}>
                                                     {comment.user?.avatarUrl ? (
                                                         <img src={comment.user.avatarUrl} alt={authorName} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <div className={`w-full h-full flex items-center justify-center ${authorMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
-                                                            <User className={`w-5 h-5 ${authorMGT ? 'text-emerald-500' : 'text-amber-500'}`} />
+                                                        <div className={`w-full h-full flex items-center justify-center ${authorMGT ? 'bg-tier-std-500/10' : 'bg-amber-500/10'}`}>
+                                                            <User className={`w-5 h-5 ${authorMGT ? 'text-tier-std-500' : 'text-amber-500'}`} />
                                                         </div>
                                                     )}
                                                 </div>
@@ -395,7 +395,7 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                                             <button
                                                                 onClick={() => toggleReplies(comment.id)}
                                                                 className={`flex items-center gap-1 text-xs font-medium transition-all ${
-                                                                    isMGT ? 'text-emerald-500 hover:text-emerald-400' : 'text-amber-500 hover:text-amber-400'
+                                                                    isMGT ? 'text-tier-std-500 hover:text-tier-std-400' : 'text-amber-500 hover:text-amber-400'
                                                                 }`}
                                                             >
                                                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -428,12 +428,12 @@ export default function CommentsModal({ isOpen, onClose, postId, onCommentAdded 
                                                                     transition={{ delay: replyIndex * 0.05 }}
                                                                     className="flex gap-2"
                                                                 >
-                                                                    <div className={`w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ${replyAuthorMGT ? 'ring-emerald-500/20' : 'ring-amber-500/20'}`}>
+                                                                    <div className={`w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ${replyAuthorMGT ? 'ring-tier-std-500/20' : 'ring-amber-500/20'}`}>
                                                                         {reply.user?.avatarUrl ? (
                                                                             <img src={reply.user.avatarUrl} alt={replyAuthorName} className="w-full h-full object-cover" />
                                                                         ) : (
-                                                                            <div className={`w-full h-full flex items-center justify-center ${replyAuthorMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
-                                                                                <User className={`w-4 h-4 ${replyAuthorMGT ? 'text-emerald-500' : 'text-amber-500'}`} />
+                                                                            <div className={`w-full h-full flex items-center justify-center ${replyAuthorMGT ? 'bg-tier-std-500/10' : 'bg-amber-500/10'}`}>
+                                                                                <User className={`w-4 h-4 ${replyAuthorMGT ? 'text-tier-std-500' : 'text-amber-500'}`} />
                                                                             </div>
                                                                         )}
                                                                     </div>

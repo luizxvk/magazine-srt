@@ -477,7 +477,7 @@ export default function AdminDashboard() {
                                             <td className="p-2">
                                                 <button
                                                     onClick={() => handleToggleMembership(u.id, u.membershipType)}
-                                                    className={`px-2 py-0.5 rounded text-[10px] font-bold border ${u.membershipType === 'MGT' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}`}
+                                                    className={`px-2 py-0.5 rounded text-[10px] font-bold border ${u.membershipType === 'MGT' ? 'bg-tier-std-500/20 text-tier-std-400 border-tier-std-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}`}
                                                 >
                                                     {u.membershipType || 'MAGAZINE'}
                                                 </button>

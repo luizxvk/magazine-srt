@@ -11,10 +11,10 @@ export default function StatForgeCard() {
     const defaultAccent = isMGT ? '#10b981' : '#d4af37';
     const color = accentColor || defaultAccent;
 
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const themeBg = theme === 'light'
         ? 'bg-white/80'
-        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+        : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const themeGlow = isMGT
         ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
         : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
@@ -37,7 +37,7 @@ export default function StatForgeCard() {
                     />
                 </div>
                 <div className="flex-1 min-w-0 overflow-hidden">
-                    <GradientText as="h3" className="font-bold text-lg leading-tight" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                    <GradientText as="h3" className="font-bold text-lg leading-tight" fallbackClassName={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>
                         StatForge
                     </GradientText>
                     <p className={`text-sm mt-0.5 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} line-clamp-2`}>

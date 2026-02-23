@@ -101,9 +101,9 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-black';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeTitleColor = isMGT ? 'text-white' : 'text-gold-400';
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
-    const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
-    const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeBorder = isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20';
+    const themeIconBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
+    const themeIconColor = isMGT ? 'text-tier-std-500' : 'text-gold-400';
     const themeTextHover = isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300';
 
     return (
@@ -146,7 +146,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             <DailyLoginCard status={dailyLoginStatus} onClick={openDailyLoginModal} />
 
                             {/* Progress Card */}
-                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                         <TrendingUp className={`w-5 h-5 ${themeIconColor}`} />
@@ -155,7 +155,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                         <p className="text-xs text-gray-400">Seu progresso</p>
                                         <div className="flex items-center gap-2">
                                             <span className={`font-bold ${themeText}`}>Nível {progressData.currentLevel}</span>
-                                            <span className={`text-sm ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                            <span className={`text-sm ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                                 {progressData.xpInCurrentLevel} / {progressData.xpNeededForNextLevel} XP
                                             </span>
                                         </div>
@@ -163,7 +163,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                 </div>
                                 <div className={`h-2 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`}>
                                     <div 
-                                        className={`h-full rounded-full transition-all duration-500 ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}
+                                        className={`h-full rounded-full transition-all duration-500 ${isMGT ? 'bg-tier-std-500' : 'bg-gold-500'}`}
                                         style={{ width: `${progressData.progressPercent}%` }}
                                     />
                                 </div>
@@ -178,7 +178,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             {/* O que há de novo - card separado */}
                             <div 
                                 onClick={() => setShowWhatsNew(true)}
-                                className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
+                                className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-tier-std-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}
                             >
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
@@ -201,9 +201,9 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
 
                             {/* Navigation Cards - Quick Access */}
                             <div className="space-y-3">
-                                <h4 className={`text-sm font-medium ${isMGT ? 'text-emerald-400' : 'text-gold-400'} uppercase tracking-wider`}>Navegação Rápida</h4>
+                                <h4 className={`text-sm font-medium ${isMGT ? 'text-tier-std-400' : 'text-gold-400'} uppercase tracking-wider`}>Navegação Rápida</h4>
                                 
-                                <Link to="/groups" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
+                                <Link to="/groups" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
                                     <div className="flex items-center gap-3">
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <MessageCircle className={`w-4 h-4 ${themeIconColor}`} />
@@ -213,7 +213,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                     <ChevronRight className={`w-4 h-4 ${themeIconColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
                                 </Link>
 
-                                <Link to="/catalog" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
+                                <Link to="/catalog" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
                                     <div className="flex items-center gap-3">
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <Camera className={`w-4 h-4 ${themeIconColor}`} />
@@ -223,7 +223,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                     <ChevronRight className={`w-4 h-4 ${themeIconColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
                                 </Link>
 
-                                <Link to="/highlights" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
+                                <Link to="/highlights" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
                                     <div className="flex items-center gap-3">
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <Star className={`w-4 h-4 ${themeIconColor}`} />
@@ -236,7 +236,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
 
                             {/* Radio & Tools */}
                             <div className="space-y-3">
-                                <h4 className={`text-sm font-medium ${isMGT ? 'text-emerald-400' : 'text-gold-400'} uppercase tracking-wider`}>Ferramentas</h4>
+                                <h4 className={`text-sm font-medium ${isMGT ? 'text-tier-std-400' : 'text-gold-400'} uppercase tracking-wider`}>Ferramentas</h4>
                                 
                                 {/* Radio Card */}
                                 <RadioCard />
@@ -247,7 +247,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                         href="https://discord.gg/magazine" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 flex flex-col items-center gap-2`}
+                                        className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 flex flex-col items-center gap-2`}
                                     >
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <svg className={`w-4 h-4 ${themeIconColor}`} viewBox="0 0 24 24" fill="currentColor">
@@ -261,7 +261,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                         href="https://store.steampowered.com" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 flex flex-col items-center gap-2`}
+                                        className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 flex flex-col items-center gap-2`}
                                     >
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <Gamepad2 className={`w-4 h-4 ${themeIconColor}`} />
@@ -273,7 +273,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                         href="https://twitch.tv" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-emerald-500/20 hover:border-emerald-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 flex flex-col items-center gap-2`}
+                                        className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 flex flex-col items-center gap-2`}
                                     >
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <Tv className={`w-4 h-4 ${themeIconColor}`} />
@@ -284,7 +284,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             </div>
 
                             {/* Events Card */}
-                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-tier-std-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                         <Calendar className="w-5 h-5" />
@@ -297,7 +297,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             </div>
 
                             {/* New Members Card */}
-                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-emerald-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
+                            <div className={`glass-panel rounded-xl p-4 border ${isMGT ? 'border-tier-std-500/20 active:border-white/40' : 'border-gold-500/20 active:border-gold-500/40'} transition-all duration-300 group cursor-pointer`}>
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className={`p-2 ${themeIconBg} rounded-lg ${themeIconColor} ${themeTextHover} transition-colors`}>
                                         <Users className="w-5 h-5" />

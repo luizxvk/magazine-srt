@@ -47,7 +47,7 @@ export default function LoadingScreen() {
             {/* Logo container with glow effect */}
             <div className="relative z-10 flex flex-col items-center">
                 {/* Pulsing glow behind logo */}
-                <div className={`absolute inset-0 blur-3xl opacity-30 animate-pulse ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`} style={{ borderRadius: '50%', transform: 'scale(1.5)' }} />
+                <div className={`absolute inset-0 blur-3xl opacity-30 animate-pulse ${isMGT ? 'bg-tier-std-500' : 'bg-gold-500'}`} style={{ borderRadius: '50%', transform: 'scale(1.5)' }} />
 
                 {/* Logo */}
                 <img
@@ -60,10 +60,10 @@ export default function LoadingScreen() {
                 {/* Progress bar container - Apple style */}
                 <div className="mt-12 w-48 md:w-64 relative">
                     {/* Background track */}
-                    <div className={`h-1 rounded-full ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} overflow-hidden backdrop-blur-sm`}>
+                    <div className={`h-1 rounded-full ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'} overflow-hidden backdrop-blur-sm`}>
                         {/* Progress fill */}
                         <div
-                            className={`h-full rounded-full transition-all duration-300 ease-out ${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-gradient-to-r from-gold-600 to-gold-400'}`}
+                            className={`h-full rounded-full transition-all duration-300 ease-out ${isMGT ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-400' : 'bg-gradient-to-r from-gold-600 to-gold-400'}`}
                             style={{
                                 width: `${progress}%`,
                                 boxShadow: isMGT
@@ -79,14 +79,14 @@ export default function LoadingScreen() {
                         style={{ opacity: progress < 100 ? 1 : 0 }}
                     >
                         <div
-                            className={`absolute inset-y-0 w-20 ${isMGT ? 'bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent' : 'bg-gradient-to-r from-transparent via-gold-400/30 to-transparent'} animate-shimmer`}
+                            className={`absolute inset-y-0 w-20 ${isMGT ? 'bg-gradient-to-r from-transparent via-tier-std-400/30 to-transparent' : 'bg-gradient-to-r from-transparent via-gold-400/30 to-transparent'} animate-shimmer`}
                         />
                     </div>
                 </div>
 
                 {/* Status text */}
                 <div className="mt-6 h-6 flex items-center justify-center">
-                    <p className={`text-xs uppercase tracking-[0.3em] font-light transition-opacity duration-500 ${isMGT ? 'text-emerald-400/60' : 'text-gold-400/60'}`}>
+                    <p className={`text-xs uppercase tracking-[0.3em] font-light transition-opacity duration-500 ${isMGT ? 'text-tier-std-400/60' : 'text-gold-400/60'}`}>
                         {phase === 0 && 'Carregando'}
                         {phase === 1 && 'Preparando ambiente'}
                         {phase === 2 && 'Quase lá'}
@@ -101,7 +101,7 @@ export default function LoadingScreen() {
 
             {/* Bottom branding */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
-                <p className={`text-[10px] uppercase tracking-[0.4em] font-light ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'}`}>
+                <p className={`text-[10px] uppercase tracking-[0.4em] font-light ${isMGT ? 'text-tier-std-500/30' : 'text-gold-500/30'}`}>
                     {config.name || (isMGT ? 'Machine Gold Team' : 'Magazine')}
                 </p>
             </div>

@@ -194,9 +194,9 @@ export default function ProfilePage() {
             {isBgAdjustOpen && tempBgImage && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsBgAdjustOpen(false)} />
-                    <div className={`relative w-full max-w-lg bg-[#0a0a0a] border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up`}>
+                    <div className={`relative w-full max-w-lg bg-[#0a0a0a] border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up`}>
                         {/* Header */}
-                        <div className={`p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r ${isMGT ? 'from-emerald-900/10' : 'from-gold-900/10'} to-transparent`}>
+                        <div className={`p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r ${isMGT ? 'from-tier-std-900/10' : 'from-gold-900/10'} to-transparent`}>
                             <h3 className="text-lg font-serif text-white">Ajustar Imagem de Fundo</h3>
                             <button onClick={() => setIsBgAdjustOpen(false)} className="text-gray-400 hover:text-white">✕</button>
                         </div>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
                                     backgroundRepeat: 'no-repeat'
                                 }}
                             >
-                                <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-emerald-900/20' : 'from-gold-500/10'} to-black/80`} />
+                                <div className={`absolute inset-0 bg-gradient-to-b ${isMGT ? 'from-tier-std-900/20' : 'from-gold-500/10'} to-black/80`} />
                                 <div className="absolute bottom-2 left-2 text-xs text-white/50 flex items-center gap-1">
                                     <Move className="w-3 h-3" />
                                     Preview
@@ -321,7 +321,7 @@ export default function ProfilePage() {
                                             }
                                         }
                                     }}
-                                    className={`px-6 py-2 rounded-full text-black text-sm font-medium ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400'}`}
+                                    className={`px-6 py-2 rounded-full text-black text-sm font-medium ${isMGT ? 'bg-tier-std-500 hover:bg-tier-std-400' : 'bg-gold-500 hover:bg-gold-400'}`}
                                 >
                                     {t('actions.save')}
                                 </button>
@@ -425,7 +425,7 @@ export default function ProfilePage() {
                                 );
                             })()}
 
-                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 ${isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
+                            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 ${isMGT ? 'bg-tier-std-600 text-white' : 'bg-gold-500 text-black'} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg whitespace-nowrap z-20`}>
                                 {(profileUser.prestigeLevel || 0) > 0 && (
                                     <span className="flex items-center gap-0.5 mr-0.5">
                                         {'⭐'.repeat(Math.min(profileUser.prestigeLevel, 5))}
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                                                 title="Email Verificado"
                                             >
                                                 <BadgeCheck 
-                                                    className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-blue-500'} drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]`}
+                                                    className={`w-5 h-5 ${isMGT ? 'text-tier-std-500' : 'text-blue-500'} drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]`}
                                                     strokeWidth={2.5}
                                                     fill={isMGT ? '#10b981' : '#3b82f6'}
                                                     stroke="white"
@@ -460,7 +460,7 @@ export default function ProfilePage() {
                                         <BadgeDisplay userId={profileUser.id} isElite={profileUser.isElite} eliteUntil={profileUser.eliteUntil} />
                                     </div>
                                     <p 
-                                        className={`text-sm uppercase tracking-widest mb-2 font-medium text-transparent bg-clip-text ${!accentGradient && (isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold')}`}
+                                        className={`text-sm uppercase tracking-widest mb-2 font-medium text-transparent bg-clip-text ${!accentGradient && (isMGT ? 'text-tier-std-500 text-shine-emerald' : 'text-gold-400 text-shine-gold')}`}
                                         style={accentGradient ? { backgroundImage: accentGradient } : { backgroundImage: `linear-gradient(to right, ${accentColor}, ${accentColor})` }}
                                     >
                                         {isMGT ? tierStdName : tierVipName}
@@ -591,17 +591,17 @@ export default function ProfilePage() {
                             <div className={`grid grid-cols-${(profileUser.prestigeLevel || 0) > 0 ? '3' : '2'} gap-4 border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} pt-6 mt-4`}>
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>{profileUser.trophies || 0}</p>
-                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{t('nav.ranking')}</p>
+                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>{t('nav.ranking')}</p>
                                 </div>
                                 {(profileUser.prestigeLevel || 0) > 0 && (
                                     <div>
                                         <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>⭐ {profileUser.prestigeLevel}</p>
-                                        <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{t('profile.rank')}</p>
+                                        <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>{t('profile.rank')}</p>
                                     </div>
                                 )}
                                 <div>
                                     <p className={`text-2xl md:text-3xl font-light ${theme === 'light' ? 'text-gray-900' : 'text-white'} mb-1`}>#{profileUser.id?.slice(0, 4) || '0000'}</p>
-                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>ID</p>
+                                    <p className={`text-[10px] md:text-xs uppercase tracking-wider ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>ID</p>
                                 </div>
                             </div>
                         </div>
@@ -618,20 +618,20 @@ export default function ProfilePage() {
                 <div className="flex gap-8 border-b border-white/10 mb-8 px-4 overflow-x-auto scrollbar-hide">
                     <button
                         onClick={() => setActiveTab('posts')}
-                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'posts' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
+                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'posts' ? (isMGT ? 'text-tier-std-500 border-b-2 border-tier-std-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                     >
                         {t('profile.posts')}
                     </button>
                     <button
                         onClick={() => setActiveTab('badges')}
-                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'badges' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
+                        className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'badges' ? (isMGT ? 'text-tier-std-500 border-b-2 border-tier-std-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                     >
                         {t('profile.badges')}
                     </button>
                     {isOwnProfile && (
                         <button
                             onClick={() => setActiveTab('rewards')}
-                            className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'rewards' ? (isMGT ? 'text-emerald-500 border-b-2 border-emerald-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
+                            className={`pb-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'rewards' ? (isMGT ? 'text-tier-std-500 border-b-2 border-tier-std-500' : 'text-gold-400 border-b-2 border-gold-400') : 'text-gray-500 hover:text-white'}`}
                         >
                             {t('nav.rewards')}
                         </button>
@@ -649,7 +649,7 @@ export default function ProfilePage() {
                                     </div>
                                 ) : (
                                     userPosts.map((post) => (
-                                        <div key={post.id} className={`glass-panel rounded-3xl p-6 ${accentGradient ? 'border-gradient-accent' : `border ${isMGT ? 'border-emerald-500/10 hover:border-emerald-500/30' : 'border-gold-500/10 hover:border-gold-500/30'}`} transition-all relative group`}>
+                                        <div key={post.id} className={`glass-panel rounded-3xl p-6 ${accentGradient ? 'border-gradient-accent' : `border ${isMGT ? 'border-tier-std-500/10 hover:border-tier-std-500/30' : 'border-gold-500/10 hover:border-gold-500/30'}`} transition-all relative group`}>
                                             {/* Share Button */}
                                             <button
                                                 onClick={() => handleShare(post.id)}
@@ -685,7 +685,7 @@ export default function ProfilePage() {
                                             {post.pollOptions && post.pollOptions.length > 0 && (
                                                 <div className="mb-4 p-4 rounded-2xl bg-white/5 border border-white/10">
                                                     <div className="flex items-center gap-2 mb-3">
-                                                        <BarChart3 className={`w-4 h-4 ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`} />
+                                                        <BarChart3 className={`w-4 h-4 ${isMGT ? 'text-tier-std-500' : 'text-gold-400'}`} />
                                                         <span className="text-sm font-medium text-gray-300">
                                                             {post.pollOptions.reduce((acc: number, opt: any) => acc + (opt.votes?.length || opt._count?.votes || 0), 0)} votos
                                                         </span>
@@ -717,7 +717,7 @@ export default function ProfilePage() {
                                                                     />
                                                                     <div className="relative flex items-center justify-between">
                                                                         <span className="text-sm text-white">{option.text}</span>
-                                                                        <span className={`text-sm font-semibold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                                        <span className={`text-sm font-semibold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                                                             {percentage}%
                                                                         </span>
                                                                     </div>

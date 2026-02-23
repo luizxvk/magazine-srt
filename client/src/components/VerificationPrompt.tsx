@@ -14,10 +14,10 @@ export default function VerificationPrompt() {
     
     // Theme-based colors
     const bgGradient = isMGT 
-        ? 'from-emerald-900/95 to-emerald-800/95' 
+        ? 'from-tier-std-900/95 to-tier-std-800/95' 
         : 'from-gold-900/95 to-gold-800/95';
     const buttonBg = isMGT 
-        ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+        ? 'bg-tier-std-600 hover:bg-tier-std-500 text-white' 
         : 'bg-gold-500 hover:bg-gold-400 text-black';
 
     useEffect(() => {
@@ -69,7 +69,7 @@ export default function VerificationPrompt() {
                 exit={{ opacity: 0, y: 50 }}
                 className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)]"
             >
-                <div className={`bg-gradient-to-br ${bgGradient} backdrop-blur-xl rounded-xl shadow-2xl border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} p-6`}>
+                <div className={`bg-gradient-to-br ${bgGradient} backdrop-blur-xl rounded-xl shadow-2xl border ${isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30'} p-6`}>
                     <button
                         onClick={handleDismiss}
                         className="absolute top-3 right-3 p-1 hover:bg-white/20 rounded-lg transition-colors text-white"
@@ -78,8 +78,8 @@ export default function VerificationPrompt() {
                     </button>
 
                     <div className="flex items-start gap-4">
-                        <div className={`w-12 h-12 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} flex items-center justify-center flex-shrink-0`}>
-                            <Shield className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                        <div className={`w-12 h-12 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center flex-shrink-0`}>
+                            <Shield className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                         </div>
                         <div className="flex-1">
                             <h3 className="font-serif text-lg mb-1 text-white font-bold">Verifique seu Email</h3>

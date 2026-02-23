@@ -102,7 +102,7 @@ export default function GroupDetailPage() {
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const themeInput = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
-  const accentColor = isMGT ? 'emerald-500' : 'gold-500';
+  const accentColor = isMGT ? 'tier-std-500' : 'gold-500';
 
   useEffect(() => {
     if (id) {

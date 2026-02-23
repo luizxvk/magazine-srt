@@ -76,8 +76,8 @@ export default function HighlightsPage() {
     }, [selectedTag, posts]);
 
     // Explicit theme classes for Tailwind JIT
-    const themeTagActive = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
-    const themeBadge = isMGT ? 'bg-emerald-500 text-black' : 'bg-gold-500 text-black';
+    const themeTagActive = isMGT ? 'bg-tier-std-500 text-black' : 'bg-gold-500 text-black';
+    const themeBadge = isMGT ? 'bg-tier-std-500 text-black' : 'bg-gold-500 text-black';
 
     return (
         <div className="min-h-screen text-white font-sans relative">
@@ -91,14 +91,14 @@ export default function HighlightsPage() {
                     {/* Title - Styled like PhotoCatalog */}
                     <div className={`flex items-center gap-4 p-4 rounded-xl ${
                         theme === 'light' 
-                            ? (isMGT ? 'bg-emerald-100' : 'bg-amber-100') 
-                            : (isMGT ? 'bg-emerald-950/30' : 'bg-gold-950/30')
-                    } border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-                        <Link to="/feed" className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20 hover:bg-emerald-500/30' : 'bg-gold-500/20 hover:bg-gold-500/30'} transition-colors`} title="Voltar ao Feed">
-                            <ArrowLeft className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                            ? (isMGT ? 'bg-tier-std-100' : 'bg-amber-100') 
+                            : (isMGT ? 'bg-tier-std-950/30' : 'bg-gold-950/30')
+                    } border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
+                        <Link to="/feed" className={`p-3 rounded-xl ${isMGT ? 'bg-tier-std-500/20 hover:bg-tier-std-500/30' : 'bg-gold-500/20 hover:bg-gold-500/30'} transition-colors`} title="Voltar ao Feed">
+                            <ArrowLeft className={`w-5 h-5 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                         </Link>
-                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
-                            <Star className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}`}>
+                            <Star className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                         </div>
                         <div>
                             <h2 className={`text-xl font-bold`}>
@@ -113,12 +113,12 @@ export default function HighlightsPage() {
                     {/* Controls */}
                     <div className="flex items-center gap-3">
                         {/* View Mode Toggle */}
-                        <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}>
+                        <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}`}>
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`p-2 rounded-md transition-all ${viewMode === 'grid' 
-                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                    ? (isMGT ? 'bg-tier-std-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-tier-std-400 hover:bg-tier-std-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                 title="Visualização em grade"
                             >
                                 <Grid className="w-4 h-4" />
@@ -126,8 +126,8 @@ export default function HighlightsPage() {
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`p-2 rounded-md transition-all ${viewMode === 'list' 
-                                    ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                    : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                    ? (isMGT ? 'bg-tier-std-500 text-white' : 'bg-gold-500 text-black') 
+                                    : (isMGT ? 'text-tier-std-400 hover:bg-tier-std-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                 title="Visualização em lista"
                             >
                                 <List className="w-4 h-4" />

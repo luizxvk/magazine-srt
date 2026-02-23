@@ -338,7 +338,7 @@ export default function FeedCardsCustomizer({ onClose }: FeedCardsCustomizerProp
                     disabled={!hasChanges || saving}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                         isMGT
-                            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:brightness-110'
+                            ? 'bg-gradient-to-r from-tier-std-500 to-tier-std-600 hover:brightness-110'
                             : 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:brightness-110'
                     }`}
                     style={accentColor && !isMGT ? { background: `linear-gradient(135deg, ${accentColor}, ${accentColor}dd)` } : undefined}

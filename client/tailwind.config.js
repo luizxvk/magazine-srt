@@ -26,6 +26,27 @@ export default {
                 'off-black': '#0b0b0b',
                 'glass-white': 'rgba(255, 255, 255, 0.06)',
                 'glass-border': 'rgba(212, 175, 55, 0.3)',
+                // Dynamic tier colors using CSS variables from CommunityContext
+                'tier-std': {
+                    DEFAULT: 'var(--tier-std-500)',
+                    50: 'color-mix(in srgb, var(--tier-std-500) 10%, white)',
+                    100: 'color-mix(in srgb, var(--tier-std-500) 20%, white)',
+                    200: 'color-mix(in srgb, var(--tier-std-500) 40%, white)',
+                    300: 'color-mix(in srgb, var(--tier-std-500) 60%, white)',
+                    400: 'var(--tier-std-400)',
+                    500: 'var(--tier-std-500)',
+                    600: 'var(--tier-std-600)',
+                    700: 'var(--tier-std-700)',
+                    800: 'color-mix(in srgb, var(--tier-std-500) 30%, black)',
+                    900: 'color-mix(in srgb, var(--tier-std-500) 20%, black)',
+                    950: 'var(--tier-std-950)',
+                },
+                'tier-vip': {
+                    DEFAULT: 'var(--tier-vip-500)',
+                    400: 'var(--tier-vip-400)',
+                    500: 'var(--tier-vip-500)',
+                    600: 'var(--tier-vip-600)',
+                },
             },
             fontFamily: {
                 serif: ['Forum', 'serif'],

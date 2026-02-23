@@ -89,9 +89,9 @@ export default function ForgotPasswordModal({ isOpen, onClose, isMGT }: ForgotPa
 
     if (!isOpen) return null;
 
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400';
-    const themeInputFocus = isMGT ? 'focus:border-emerald-500/50' : 'focus:border-gold-500/50';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const themeButton = isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeInputFocus = isMGT ? 'focus:border-tier-std-500/50' : 'focus:border-gold-500/50';
 
     return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">

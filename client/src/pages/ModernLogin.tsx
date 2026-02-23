@@ -507,14 +507,14 @@ function LoginForm({
                         defaultChecked={localStorage.getItem('rememberMe') === 'true'}
                         onChange={(e) => localStorage.setItem('rememberMe', e.target.checked.toString())}
                         className={`w-3.5 h-3.5 rounded-md border appearance-none cursor-pointer transition-all duration-300
-                            ${isMGT ? 'border-white/10 checked:bg-emerald-500/80 checked:border-emerald-500/60' : 'border-white/10 checked:bg-gold-500/80 checked:border-gold-500/60'}`}
+                            ${isMGT ? 'border-white/10 checked:bg-tier-std-500/80 checked:border-tier-std-500/60' : 'border-white/10 checked:bg-gold-500/80 checked:border-gold-500/60'}`}
                     />
                     <span className="text-[10px] text-white/30 group-hover:text-white/50 transition-colors font-light tracking-wider">{t('actions.save')}</span>
                 </label>
                 <button
                     type="button"
                     onClick={onForgotPassword}
-                    className={`text-[10px] font-light tracking-wider transition-colors ${isMGT ? 'text-emerald-400/50 hover:text-emerald-400/80' : 'text-gold-400/50 hover:text-gold-400/80'}`}
+                    className={`text-[10px] font-light tracking-wider transition-colors ${isMGT ? 'text-tier-std-400/50 hover:text-tier-std-400/80' : 'text-gold-400/50 hover:text-gold-400/80'}`}
                 >
                     {t('forgotPassword.title')}
                 </button>
@@ -542,7 +542,7 @@ function LoginForm({
                     {isSubmitting ? (
                         <>
                             <motion.div
-                                className={`w-4 h-4 border-2 rounded-full ${isMGT ? 'border-emerald-400/30 border-t-emerald-400' : 'border-gold-400/30 border-t-gold-400'}`}
+                                className={`w-4 h-4 border-2 rounded-full ${isMGT ? 'border-tier-std-400/30 border-t-tier-std-400' : 'border-gold-400/30 border-t-gold-400'}`}
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                             />
@@ -792,7 +792,7 @@ export default function ModernLogin() {
                                     {isMGT ? (
                                         <p className="text-white/25 text-xs font-light">
                                             Ainda não é membro?{' '}
-                                            <Link to="/register" state={{ membershipType: 'MGT' }} className="text-emerald-400/70 hover:text-emerald-400 transition-colors font-normal">
+                                            <Link to="/register" state={{ membershipType: 'MGT' }} className="text-tier-std-400/70 hover:text-tier-std-400 transition-colors font-normal">
                                                 Criar Conta
                                             </Link>
                                         </p>
@@ -932,21 +932,21 @@ export default function ModernLogin() {
 
                                     <div className="text-center">
                                         <div
-                                            className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}
+                                            className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}`}
                                             style={{ border: `1px solid ${isMGT ? 'rgba(16,185,129,0.15)' : 'rgba(212,175,55,0.15)'}` }}
                                         >
-                                            <AlertCircle className={`w-6 h-6 ${isMGT ? 'text-emerald-400/70' : 'text-gold-400/70'}`} />
+                                            <AlertCircle className={`w-6 h-6 ${isMGT ? 'text-tier-std-400/70' : 'text-gold-400/70'}`} />
                                         </div>
 
                                         <h3 className="text-lg font-semibold text-white/90 mb-2">Usuário não encontrado</h3>
                                         <p className="text-white/30 text-sm font-light mb-1">Não encontramos uma conta com o email</p>
-                                        <p className={`text-sm font-medium mb-4 ${isMGT ? 'text-emerald-400/70' : 'text-gold-400/70'}`}>{notFoundEmail}</p>
+                                        <p className={`text-sm font-medium mb-4 ${isMGT ? 'text-tier-std-400/70' : 'text-gold-400/70'}`}>{notFoundEmail}</p>
                                         <p className="text-white/20 text-xs font-light mb-6">Verifique o email digitado ou crie uma nova conta.</p>
 
                                         <div className="flex flex-col gap-2.5">
                                             <motion.button
                                                 onClick={() => setShowUserNotFoundPopup(false)}
-                                                className={`w-full py-3 rounded-xl font-medium text-xs uppercase tracking-[0.15em] ${isMGT ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20' : 'bg-gold-500/20 text-gold-300 border border-gold-500/20'}`}
+                                                className={`w-full py-3 rounded-xl font-medium text-xs uppercase tracking-[0.15em] ${isMGT ? 'bg-tier-std-500/20 text-tier-std-300 border border-tier-std-500/20' : 'bg-gold-500/20 text-gold-300 border border-gold-500/20'}`}
                                                 whileTap={{ scale: 0.98 }}
                                             >
                                                 Tentar Novamente
@@ -1002,10 +1002,10 @@ export default function ModernLogin() {
 
                                     <div className="text-center">
                                         <div
-                                            className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${deniedMembershipType === 'MAGAZINE' ? 'bg-gold-500/10' : 'bg-emerald-500/10'}`}
+                                            className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${deniedMembershipType === 'MAGAZINE' ? 'bg-gold-500/10' : 'bg-tier-std-500/10'}`}
                                             style={{ border: `1px solid ${deniedMembershipType === 'MAGAZINE' ? 'rgba(212,175,55,0.15)' : 'rgba(16,185,129,0.15)'}` }}
                                         >
-                                            <AlertCircle className={`w-6 h-6 ${deniedMembershipType === 'MAGAZINE' ? 'text-gold-400/70' : 'text-emerald-400/70'}`} />
+                                            <AlertCircle className={`w-6 h-6 ${deniedMembershipType === 'MAGAZINE' ? 'text-gold-400/70' : 'text-tier-std-400/70'}`} />
                                         </div>
 
                                         <h3 className="text-lg font-semibold text-white/90 mb-2">Acesso Negado</h3>
@@ -1031,13 +1031,13 @@ export default function ModernLogin() {
                                                     </div>
                                                 </div>
                                                 <p className="text-white/20 text-xs font-light mb-5">
-                                                    Sua conta atual é <span className="text-emerald-400/60 font-medium">{config.tierStdName}</span>.
+                                                    Sua conta atual é <span className="text-tier-std-400/60 font-medium">{config.tierStdName}</span>.
                                                 </p>
                                             </>
                                         ) : (
                                             <>
                                                 <p className="text-white/30 text-sm font-light mb-3">
-                                                    Você não tem permissão para acessar o <span className="text-emerald-400/70 font-medium">{config.tierStdName}</span>.
+                                                    Você não tem permissão para acessar o <span className="text-tier-std-400/70 font-medium">{config.tierStdName}</span>.
                                                 </p>
                                                 <p className="text-white/20 text-xs font-light mb-5">
                                                     Sua conta atual é <span className="text-gold-400/60 font-medium">{config.tierVipName}</span>. Cada conta tem acesso a apenas um tipo.
@@ -1051,7 +1051,7 @@ export default function ModernLogin() {
                                                     setShowPermissionDeniedPopup(false);
                                                     navigate(deniedMembershipType === 'MGT' ? '/login/mgt' : '/login');
                                                 }}
-                                                className={`w-full py-3 rounded-xl font-medium text-xs uppercase tracking-[0.15em] ${deniedMembershipType === 'MAGAZINE' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20' : 'bg-gold-500/20 text-gold-300 border border-gold-500/20'}`}
+                                                className={`w-full py-3 rounded-xl font-medium text-xs uppercase tracking-[0.15em] ${deniedMembershipType === 'MAGAZINE' ? 'bg-tier-std-500/20 text-tier-std-300 border border-tier-std-500/20' : 'bg-gold-500/20 text-gold-300 border border-gold-500/20'}`}
                                                 whileTap={{ scale: 0.98 }}
                                             >
                                                 Acessar {deniedMembershipType === 'MAGAZINE' ? config.tierStdName : config.tierVipName}

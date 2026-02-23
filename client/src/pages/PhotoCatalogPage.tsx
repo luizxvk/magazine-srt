@@ -248,7 +248,7 @@ function ListPhotoCard({
     isMGT?: boolean;
     onClick?: () => void;
 }) {
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     
     return (
         <div onClick={onClick} className={`flex gap-4 p-4 rounded-2xl bg-white/5 border ${themeBorder} backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group`}>
@@ -334,7 +334,7 @@ export default function PhotoCatalogPage() {
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
     // Theme setup
-    const themeColors = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const themeColors = isMGT ? 'text-tier-std-500' : 'text-gold-500';
 
 
     const [activeTab] = useState<'my' | 'explore'>('my');
@@ -448,11 +448,11 @@ export default function PhotoCatalogPage() {
                     {/* Title - Padronizado como Social */}
                     <div className={`flex items-center gap-4 p-4 rounded-xl ${
                         theme === 'light' 
-                            ? (isMGT ? 'bg-emerald-100' : 'bg-amber-100') 
-                            : (isMGT ? 'bg-emerald-950/30' : 'bg-gold-950/30')
-                    } border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
-                            <Image className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                            ? (isMGT ? 'bg-tier-std-100' : 'bg-amber-100') 
+                            : (isMGT ? 'bg-tier-std-950/30' : 'bg-gold-950/30')
+                    } border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
+                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}`}>
+                            <Image className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                         </div>
                         <div>
                             <h2 className={`text-xl font-bold`}>
@@ -468,12 +468,12 @@ export default function PhotoCatalogPage() {
                     <div className="flex flex-wrap gap-3 items-center justify-between">
                         <div className="flex gap-3 items-center">
                             {/* View Mode Toggle */}
-                            <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}`}>
+                            <div className={`flex rounded-lg p-1 ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}`}>
                                 <button
                                     onClick={() => setViewMode('masonry')}
                                     className={`p-2 rounded-md transition-all ${viewMode === 'masonry' 
-                                        ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                        : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                        ? (isMGT ? 'bg-tier-std-500 text-white' : 'bg-gold-500 text-black') 
+                                        : (isMGT ? 'text-tier-std-400 hover:bg-tier-std-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                     title="Visualização Masonry"
                                 >
                                     <LayoutGrid className="w-4 h-4" />
@@ -481,8 +481,8 @@ export default function PhotoCatalogPage() {
                                 <button
                                     onClick={() => setViewMode('grid')}
                                     className={`p-2 rounded-md transition-all ${viewMode === 'grid' 
-                                        ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                        : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                        ? (isMGT ? 'bg-tier-std-500 text-white' : 'bg-gold-500 text-black') 
+                                        : (isMGT ? 'text-tier-std-400 hover:bg-tier-std-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                     title="Visualização em Grade"
                                 >
                                     <Grid className="w-4 h-4" />
@@ -490,8 +490,8 @@ export default function PhotoCatalogPage() {
                                 <button
                                     onClick={() => setViewMode('list')}
                                     className={`p-2 rounded-md transition-all ${viewMode === 'list' 
-                                        ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black') 
-                                        : (isMGT ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
+                                        ? (isMGT ? 'bg-tier-std-500 text-white' : 'bg-gold-500 text-black') 
+                                        : (isMGT ? 'text-tier-std-400 hover:bg-tier-std-500/20' : 'text-gold-400 hover:bg-gold-500/20')}`}
                                     title="Visualização em Lista"
                                 >
                                     <LayoutList className="w-4 h-4" />
@@ -504,8 +504,8 @@ export default function PhotoCatalogPage() {
                                     onClick={() => setShowFilters(!showFilters)}
                                     className={`flex items-center gap-2 p-2 px-3 rounded-lg transition-colors ${
                                         showFilters || selectedCategory || selectedBrand || onlyFavorites
-                                            ? (isMGT ? 'bg-emerald-500 text-white' : 'bg-gold-500 text-black')
-                                            : (isMGT ? 'bg-gray-800 text-emerald-500 hover:bg-gray-700' : 'bg-gray-800 text-gold-500 hover:bg-gray-700')
+                                            ? (isMGT ? 'bg-tier-std-500 text-white' : 'bg-gold-500 text-black')
+                                            : (isMGT ? 'bg-gray-800 text-tier-std-500 hover:bg-gray-700' : 'bg-gray-800 text-gold-500 hover:bg-gray-700')
                                     }`}
                                 >
                                     <Filter className="w-4 h-4" />
@@ -561,7 +561,7 @@ export default function PhotoCatalogPage() {
                                                 </label>
                                                 <button
                                                     onClick={() => setOnlyFavorites(!onlyFavorites)}
-                                                    className={`w-12 h-6 rounded-full transition-colors ${onlyFavorites ? (isMGT ? 'bg-emerald-500' : 'bg-gold-500') : 'bg-gray-600'}`}
+                                                    className={`w-12 h-6 rounded-full transition-colors ${onlyFavorites ? (isMGT ? 'bg-tier-std-500' : 'bg-gold-500') : 'bg-gray-600'}`}
                                                 >
                                                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${onlyFavorites ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                                 </button>
@@ -590,7 +590,7 @@ export default function PhotoCatalogPage() {
                         {/* Add Photo Button */}
                         <button
                             onClick={() => setIsUploadOpen(true)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400'}`}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-white transition-all ${isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : 'bg-gold-500 hover:bg-gold-400'}`}
                         >
                             <Camera className="w-4 h-4" />
                             <span className="hidden sm:inline">Adicionar Foto</span>
@@ -601,13 +601,13 @@ export default function PhotoCatalogPage() {
                     {(selectedCategory || selectedBrand || onlyFavorites) && (
                         <div className="flex flex-wrap gap-2">
                             {selectedCategory && (
-                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                     {selectedCategory}
                                     <button onClick={() => setSelectedCategory('')}><X className="w-3 h-3" /></button>
                                 </span>
                             )}
                             {selectedBrand && (
-                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                     {selectedBrand}
                                     <button onClick={() => setSelectedBrand('')}><X className="w-3 h-3" /></button>
                                 </span>
@@ -681,7 +681,7 @@ export default function PhotoCatalogPage() {
                         {activeTab === 'my' && (
                             <button
                                 onClick={() => setIsUploadOpen(true)}
-                                className={`px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-widest text-white ${isMGT ? 'bg-emerald-600' : 'bg-gold-500'}`}
+                                className={`px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-widest text-white ${isMGT ? 'bg-tier-std-600' : 'bg-gold-500'}`}
                             >
                                 Adicionar Foto
                             </button>
@@ -750,12 +750,12 @@ export default function PhotoCatalogPage() {
                         {/* Tags - Bottom Left */}
                         <div className="absolute bottom-4 left-4 z-10 flex flex-wrap gap-2">
                             {expandedPhoto.category && (
-                                <span className={`text-xs uppercase tracking-wider px-3 py-1 rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                <span className={`text-xs uppercase tracking-wider px-3 py-1 rounded-full ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                     {expandedPhoto.category}
                                 </span>
                             )}
                             {expandedPhoto.carBrand && (
-                                <span className={`text-xs uppercase tracking-wider px-3 py-1 rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                <span className={`text-xs uppercase tracking-wider px-3 py-1 rounded-full ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                     {expandedPhoto.carBrand}
                                 </span>
                             )}

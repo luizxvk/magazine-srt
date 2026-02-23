@@ -40,13 +40,13 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
     const userAccent = accentColor || defaultAccent;
     const hasCustomGradient = !!accentGradient;
     
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
-    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';
+    const themeBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
     const themeGlow = isMGT
         ? 'shadow-[0_0_20px_rgba(16,185,129,0.15)]'
         : 'shadow-[0_0_20px_rgba(212,175,55,0.15)]';
-    const bgColor = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+    const bgColor = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
 
     useEffect(() => {
         const fetchOnlineFriends = async () => {
@@ -182,7 +182,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                         <BadgeDisplay userId={friend.id} isElite={friend.isElite} eliteUntil={friend.eliteUntil} size="sm" />
                                                     </div>
                                                 </div>
-                                                <p className={`text-[10px] uppercase tracking-wider ${friendMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                                <p className={`text-[10px] uppercase tracking-wider ${friendMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                                     {friendMGT ? tierStdName : tierVipName} • {friend.isOnline ? 'online' : getTimeAgo(friend.lastSeenAt)}
                                                 </p>
                                             </div>
@@ -192,7 +192,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                 e.stopPropagation();
                                                 setChatOpen(friend);
                                             }}
-                                            className={`p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all ${friendMGT ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-gold-500/20 text-gold-400 hover:bg-gold-500/30'}`}
+                                            className={`p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all ${friendMGT ? 'bg-tier-std-500/20 text-tier-std-400 hover:bg-tier-std-500/30' : 'bg-gold-500/20 text-gold-400 hover:bg-gold-500/30'}`}
                                             title="Enviar mensagem"
                                         >
                                             <MessageCircle className="w-4 h-4" />

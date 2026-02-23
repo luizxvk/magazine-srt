@@ -225,7 +225,7 @@ export default function AdminCreatePost({ showToast }: AdminCreatePostProps) {
                                 onClick={() => setShowProductDropdown(!showProductDropdown)}
                                 className={`p-2 rounded-lg transition-colors border flex items-center gap-2 ${
                                     selectedProduct 
-                                        ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' 
+                                        ? 'bg-tier-std-500/20 border-tier-std-500/30 text-tier-std-400' 
                                         : 'bg-white/5 border-white/5 text-gray-400 hover:text-gold-400'
                                 }`}
                                 title="Vincular Produto"

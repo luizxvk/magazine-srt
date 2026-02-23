@@ -64,7 +64,7 @@ export default function AdminAdsSettings() {
         <button
             onClick={() => onChange(!enabled)}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                enabled ? 'bg-emerald-500' : 'bg-gray-600'
+                enabled ? 'bg-tier-std-500' : 'bg-gray-600'
             }`}
         >
             <span

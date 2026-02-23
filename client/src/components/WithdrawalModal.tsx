@@ -60,11 +60,11 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
     const [pixKeyType, setPixKeyType] = useState('CPF');
 
     const isMGT = user?.membershipType === 'MGT';
-    const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
-    const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
-    const textAccent = isMGT ? 'text-emerald-400' : 'text-yellow-400';
-    const borderAccent = isMGT ? 'border-emerald-500/30' : 'border-yellow-500/30';
-    const bgAccent = isMGT ? 'bg-emerald-500/10' : 'bg-yellow-500/10';
+    const gradientFrom = isMGT ? 'from-tier-std-500' : 'from-yellow-500';
+    const gradientTo = isMGT ? 'to-tier-std-600' : 'to-yellow-600';
+    const textAccent = isMGT ? 'text-tier-std-400' : 'text-yellow-400';
+    const borderAccent = isMGT ? 'border-tier-std-500/30' : 'border-yellow-500/30';
+    const bgAccent = isMGT ? 'bg-tier-std-500/10' : 'bg-yellow-500/10';
 
     useEffect(() => {
         if (isOpen) {
@@ -181,7 +181,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
                             onClick={() => setActiveTab('new')}
                             className={`flex-1 py-3 font-medium transition-colors ${
                                 activeTab === 'new' 
-                                    ? `${textAccent} border-b-2 ${isMGT ? 'border-emerald-500' : 'border-yellow-500'}` 
+                                    ? `${textAccent} border-b-2 ${isMGT ? 'border-tier-std-500' : 'border-yellow-500'}` 
                                     : 'text-gray-400 hover:text-gray-300'
                             }`}
                         >
@@ -191,7 +191,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
                             onClick={() => setActiveTab('history')}
                             className={`flex-1 py-3 font-medium transition-colors ${
                                 activeTab === 'history' 
-                                    ? `${textAccent} border-b-2 ${isMGT ? 'border-emerald-500' : 'border-yellow-500'}` 
+                                    ? `${textAccent} border-b-2 ${isMGT ? 'border-tier-std-500' : 'border-yellow-500'}` 
                                     : 'text-gray-400 hover:text-gray-300'
                             }`}
                         >
@@ -266,7 +266,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
                                                     placeholder="1000"
                                                     min={rate?.minZions}
                                                     max={Math.min(rate?.maxZions || 0, user?.zions || 0)}
-                                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/5 text-white'} focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-yellow-500'}`}
+                                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/5 text-white'} focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-yellow-500'}`}
                                                 />
                                             </div>
                                             {amountZions > 0 && (
@@ -316,7 +316,7 @@ export default function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProp
                                                     pixKeyType === 'PHONE' ? '+55 11 99999-9999' :
                                                     'Chave aleatória'
                                                 }
-                                                className={`w-full px-4 py-3 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/5 text-white'} focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-yellow-500'}`}
+                                                className={`w-full px-4 py-3 rounded-xl border ${borderAccent} ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-white/5 text-white'} focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-yellow-500'}`}
                                             />
                                         </div>
 

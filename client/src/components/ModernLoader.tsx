@@ -39,10 +39,10 @@ export default function ModernLoader({ text, size = 'md', className = '', fullSc
     const { dot, gap, bounce } = sizeMap[size];
 
     const gradientClass = isMGT
-        ? 'border-emerald-400/50 bg-gradient-to-b from-emerald-400 to-emerald-500'
+        ? 'border-tier-std-400/50 bg-gradient-to-b from-tier-std-400 to-tier-std-500'
         : 'border-gold-400/50 bg-gradient-to-b from-gold-400 to-gold-500';
 
-    const textColor = isMGT ? 'text-emerald-400/60' : 'text-gold-400/60';
+    const textColor = isMGT ? 'text-tier-std-400/60' : 'text-gold-400/60';
 
     const transition = (delay: number) => ({
         duration: 1,
@@ -94,7 +94,7 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
     const { user } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
     const shimmerBg = isMGT
-        ? 'from-emerald-500/5 via-emerald-500/10 to-emerald-500/5'
+        ? 'from-tier-std-500/5 via-tier-std-500/10 to-tier-std-500/5'
         : 'from-yellow-500/5 via-yellow-500/10 to-yellow-500/5';
 
     return (
@@ -133,7 +133,7 @@ export function DotsLoader({ className = '' }: { className?: string }) {
     const isMGT = user?.membershipType === 'MGT';
 
     const gradientClass = isMGT
-        ? 'border-emerald-400/50 bg-gradient-to-b from-emerald-400 to-emerald-500'
+        ? 'border-tier-std-400/50 bg-gradient-to-b from-tier-std-400 to-tier-std-500'
         : 'border-gold-400/50 bg-gradient-to-b from-gold-400 to-gold-500';
 
     const transition = (delay: number) => ({

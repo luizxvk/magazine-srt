@@ -180,7 +180,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                                     </span>
                                 )}
                             </div>
-                            <span className={`text-[10px] font-bold tracking-widest uppercase ${isOtherMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                            <span className={`text-[10px] font-bold tracking-widest uppercase ${isOtherMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                 Membro {isOtherMGT ? 'MGT' : 'MAGAZINE'}
                             </span>
                         </div>
@@ -223,14 +223,14 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             
                             // My messages use my membership color, their messages use their membership color
                             const myBubbleClass = isMeMGT 
-                                ? 'bg-emerald-500/10 text-white border-emerald-500/20 rounded-tr-sm'
+                                ? 'bg-tier-std-500/10 text-white border-tier-std-500/20 rounded-tr-sm'
                                 : 'bg-gold-500/10 text-white border-gold-500/20 rounded-tr-sm';
                             const theirBubbleClass = isOtherMGT
-                                ? 'bg-emerald-500/5 text-white border-emerald-500/10 rounded-tl-sm'
+                                ? 'bg-tier-std-500/5 text-white border-tier-std-500/10 rounded-tl-sm'
                                 : (theme === 'light' ? 'bg-gray-100 text-gray-900 border-gray-200 rounded-tl-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-tl-sm');
                             const bubbleClass = isMe ? myBubbleClass : theirBubbleClass;
                             const timeClass = isMe 
-                                ? (isMeMGT ? 'text-emerald-200' : 'text-gold-200')
+                                ? (isMeMGT ? 'text-tier-std-200' : 'text-gold-200')
                                 : (theme === 'light' ? 'text-gray-600' : 'text-gray-400');
 
                             return (
@@ -284,7 +284,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
 
                 {/* Input Area */}
                 <div className="p-4 bg-black/40 backdrop-blur-md border-t border-white/5">
-                    <div className={`relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-2 py-2 transition-all duration-300 shadow-lg ${isMeMGT ? 'focus-within:border-emerald-500/30 focus-within:bg-emerald-500/5' : 'focus-within:border-gold-500/30 focus-within:bg-gold-500/5'}`}>
+                    <div className={`relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-2 py-2 transition-all duration-300 shadow-lg ${isMeMGT ? 'focus-within:border-tier-std-500/30 focus-within:bg-tier-std-500/5' : 'focus-within:border-gold-500/30 focus-within:bg-gold-500/5'}`}>
                         <input
                             type="text"
                             value={newMessage}
@@ -299,7 +299,7 @@ export default function ChatWindow({ otherUserId, otherUserName, otherUserAvatar
                             onClick={handleSendMessage}
                             disabled={!newMessage.trim() || sending || cooldown > 0}
                             aria-label="Enviar mensagem"
-                            className={`p-2.5 text-white rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg relative ${isMeMGT ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/30' : 'bg-gold-600 hover:bg-gold-500 shadow-gold-500/30'}`}
+                            className={`p-2.5 text-white rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg relative ${isMeMGT ? 'bg-tier-std-600 hover:bg-tier-std-500 shadow-tier-std-500/30' : 'bg-gold-600 hover:bg-gold-500 shadow-gold-500/30'}`}
                         >
                             {cooldown > 0 ? (
                                 <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold">{cooldown}</span>

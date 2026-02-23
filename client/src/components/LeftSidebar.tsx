@@ -36,18 +36,18 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
     const hasCustomAccent = !!accentColor;
 
     // Theme styles - consistent with project pattern
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT 
         ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
         : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
     const themeBg = theme === 'light' 
         ? 'bg-white/80' 
-        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+        : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const themeIconColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
+    const themeIconColor = isMGT ? 'text-tier-std-500' : 'text-gold-400';
     const themeHoverBg = isMGT 
-        ? 'hover:bg-emerald-500/10' 
+        ? 'hover:bg-tier-std-500/10' 
         : 'hover:bg-gold-500/10';
 
     const items: SidebarItem[] = [
@@ -135,7 +135,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
                 >
                     {item.icon}
                 </span>
-                <span className={`flex-1 text-sm font-medium ${textMain} group-hover:${isMGT ? 'text-emerald-400' : 'text-gold-400'} transition-colors`}>
+                <span className={`flex-1 text-sm font-medium ${textMain} group-hover:${isMGT ? 'text-tier-std-400' : 'text-gold-400'} transition-colors`}>
                     {item.label}
                 </span>
                 {item.badge && (

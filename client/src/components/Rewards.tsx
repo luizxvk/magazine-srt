@@ -47,12 +47,12 @@ export default function Rewards() {
     const [historyLimit, setHistoryLimit] = useState(10);
 
     const isMGT = user?.membershipType === 'MGT';
-    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
-    const themeText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeColor = isMGT ? 'text-tier-std-500' : 'text-gold-500';
+    const themeText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
     const themeCardText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const themeTabActive = isMGT ? 'text-emerald-500' : 'text-gold-400';
-    const themeTabBorder = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeTabActive = isMGT ? 'text-tier-std-500' : 'text-gold-400';
+    const themeTabBorder = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
     const themeShadow = isMGT ? 'shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
 
     useEffect(() => {
@@ -461,7 +461,7 @@ export default function Rewards() {
                                 {zionHistory.length > historyLimit && (
                                     <button
                                         onClick={() => setHistoryLimit(prev => prev + 10)}
-                                        className={`w-full py-3 rounded-lg text-sm font-medium transition-all ${isMGT ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-gold-500/10 text-gold-400 hover:bg-gold-500/20'}`}
+                                        className={`w-full py-3 rounded-lg text-sm font-medium transition-all ${isMGT ? 'bg-tier-std-500/10 text-tier-std-400 hover:bg-tier-std-500/20' : 'bg-gold-500/10 text-gold-400 hover:bg-gold-500/20'}`}
                                     >
                                         Mostrar Mais ({zionHistory.length - historyLimit} restantes)
                                     </button>

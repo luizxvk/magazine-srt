@@ -115,7 +115,7 @@ export default function BetaRewardPopup() {
                     {/* Animated background glow - centered pulse */}
                     <motion.div 
                         className={`absolute inset-0 ${
-                            isMGT ? 'bg-emerald-500' : 'bg-gold-500'
+                            isMGT ? 'bg-tier-std-500' : 'bg-gold-500'
                         }`}
                         style={{
                             background: isMGT 
@@ -138,7 +138,7 @@ export default function BetaRewardPopup() {
                         {[...Array(8)].map((_, i) => (
                             <motion.div
                                 key={i}
-                                className={`absolute w-2 h-2 rounded-full ${isMGT ? 'bg-emerald-400' : 'bg-gold-400'}`}
+                                className={`absolute w-2 h-2 rounded-full ${isMGT ? 'bg-tier-std-400' : 'bg-gold-400'}`}
                                 initial={{ opacity: 0, scale: 0 }}
                                 animate={{ 
                                     opacity: [0, 0.8, 0],
@@ -169,8 +169,8 @@ export default function BetaRewardPopup() {
                             transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
                         >
                             <div className={`p-5 rounded-2xl bg-gradient-to-br ${
-                                isMGT ? 'from-emerald-500 to-emerald-600' : 'from-gold-500 to-amber-600'
-                            } shadow-2xl ${isMGT ? 'shadow-emerald-500/30' : 'shadow-gold-500/30'}`}>
+                                isMGT ? 'from-tier-std-500 to-tier-std-600' : 'from-gold-500 to-amber-600'
+                            } shadow-2xl ${isMGT ? 'shadow-tier-std-500/30' : 'shadow-gold-500/30'}`}>
                                 <Gift className="w-10 h-10 text-white" />
                             </div>
                         </motion.div>
@@ -189,10 +189,10 @@ export default function BetaRewardPopup() {
                         {/* Reward Card */}
                         <div className={`p-4 rounded-2xl mb-6 ${
                             theme === 'light' ? 'bg-gray-50' : 'bg-white/5'
-                        } border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'}`}>
+                        } border ${isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30'}`}>
                             <div className="flex items-center justify-center gap-3">
-                                <Sparkles className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
-                                <span className={`text-3xl font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                <Sparkles className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
+                                <span className={`text-3xl font-bold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                     +{BETA_REWARD_POINTS}
                                 </span>
                                 <span className={`text-lg ${theme === 'light' ? 'text-gray-500' : 'text-white/60'}`}>
@@ -211,7 +211,7 @@ export default function BetaRewardPopup() {
                                 claimed
                                     ? 'bg-green-500 cursor-default'
                                     : isMGT 
-                                        ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 shadow-emerald-500/30' 
+                                        ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 hover:from-tier-std-500 hover:to-tier-std-400 shadow-tier-std-500/30' 
                                         : 'bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 shadow-gold-500/30'
                             } disabled:opacity-80`}
                         >

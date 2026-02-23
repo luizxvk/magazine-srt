@@ -290,7 +290,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                 {/* Controles - EMBAIXO CENTRALIZADO */}
                 <div className="w-full max-w-md mx-auto pb-6">
                     <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                        <h2 className={`text-2xl font-bold mb-6 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                        <h2 className={`text-2xl font-bold mb-6 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                             Editar Story
                         </h2>
 
@@ -430,7 +430,7 @@ export default function StoryEditor({ imageUrl, onClose, onPublish }: StoryEdito
                                 isPublishing 
                                     ? 'bg-gray-600 cursor-not-allowed opacity-50' 
                                     : isMGT 
-                                        ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 hover:shadow-emerald-500/50 hover:scale-[1.02]' 
+                                        ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-400 hover:shadow-tier-std-500/50 hover:scale-[1.02]' 
                                         : 'bg-gradient-to-r from-gold-600 to-gold-400 hover:shadow-gold-500/50 hover:scale-[1.02]'
                             }`}
                         >

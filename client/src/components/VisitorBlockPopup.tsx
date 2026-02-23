@@ -14,8 +14,8 @@ export default function VisitorBlockPopup({ isOpen, onClose, featureName = 'este
     const { user, theme } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
-    const gradientFrom = isMGT ? 'from-emerald-500' : 'from-yellow-500';
-    const gradientTo = isMGT ? 'to-emerald-600' : 'to-yellow-600';
+    const gradientFrom = isMGT ? 'from-tier-std-500' : 'from-yellow-500';
+    const gradientTo = isMGT ? 'to-tier-std-600' : 'to-yellow-600';
     const bgColor = theme === 'light' ? 'bg-white' : 'bg-zinc-900';
     const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
     const subTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
@@ -67,7 +67,7 @@ export default function VisitorBlockPopup({ isOpen, onClose, featureName = 'este
                         {/* Content */}
                         <div className="p-6">
                             <div className="flex items-start gap-3 mb-6">
-                                <Sparkles className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-yellow-400'} mt-1 flex-shrink-0`} />
+                                <Sparkles className={`w-5 h-5 ${isMGT ? 'text-tier-std-400' : 'text-yellow-400'} mt-1 flex-shrink-0`} />
                                 <div>
                                     <p className={`${textColor} font-medium mb-2`}>
                                         Para acessar {featureName}, você precisa criar uma conta!

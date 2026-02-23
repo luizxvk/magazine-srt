@@ -47,8 +47,8 @@ function EdgeNotificationItem({ notification, onClose }: EdgeNotificationProps) 
     const typeConfig = {
         success: {
             icon: CheckCircle,
-            iconColor: isMGT ? 'text-emerald-400' : 'text-green-400',
-            progressColor: isMGT ? 'bg-emerald-500' : 'bg-green-500',
+            iconColor: isMGT ? 'text-tier-std-400' : 'text-green-400',
+            progressColor: isMGT ? 'bg-tier-std-500' : 'bg-green-500',
         },
         error: {
             icon: XCircle,
@@ -67,8 +67,8 @@ function EdgeNotificationItem({ notification, onClose }: EdgeNotificationProps) 
         },
         message: {
             icon: MessageCircle,
-            iconColor: isMGT ? 'text-emerald-400' : 'text-amber-400',
-            progressColor: isMGT ? 'bg-emerald-500' : 'bg-amber-500',
+            iconColor: isMGT ? 'text-tier-std-400' : 'text-amber-400',
+            progressColor: isMGT ? 'bg-tier-std-500' : 'bg-amber-500',
         },
         friend: {
             icon: UserPlus,
@@ -77,13 +77,13 @@ function EdgeNotificationItem({ notification, onClose }: EdgeNotificationProps) 
         },
         reward: {
             icon: Coins,
-            iconColor: isMGT ? 'text-emerald-400' : 'text-amber-400',
-            progressColor: isMGT ? 'bg-emerald-500' : 'bg-amber-500',
+            iconColor: isMGT ? 'text-tier-std-400' : 'text-amber-400',
+            progressColor: isMGT ? 'bg-tier-std-500' : 'bg-amber-500',
         },
         achievement: {
             icon: Trophy,
-            iconColor: isMGT ? 'text-emerald-400' : 'text-amber-400',
-            progressColor: isMGT ? 'bg-emerald-500' : 'bg-amber-500',
+            iconColor: isMGT ? 'text-tier-std-400' : 'text-amber-400',
+            progressColor: isMGT ? 'bg-tier-std-500' : 'bg-amber-500',
         },
         system: {
             icon: Bell,

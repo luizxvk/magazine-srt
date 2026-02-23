@@ -378,7 +378,7 @@ export default function ProductDetails() {
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className="text-2xl font-bold text-emerald-400">
+                                            <span className="text-2xl font-bold text-tier-std-400">
                                                 R$ {product.priceBRL.toFixed(2)}
                                             </span>
                                         )
@@ -397,7 +397,7 @@ export default function ProductDetails() {
                             <div className="flex items-center gap-2 mb-4">
                                 <Shield className="w-4 h-4 text-gray-400" />
                                 {product.isUnlimited ? (
-                                    <span className="text-emerald-400 text-sm">Estoque ilimitado</span>
+                                    <span className="text-tier-std-400 text-sm">Estoque ilimitado</span>
                                 ) : isOutOfStock ? (
                                     <span className="text-red-400 text-sm">Esgotado</span>
                                 ) : (

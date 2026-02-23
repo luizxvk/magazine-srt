@@ -25,7 +25,7 @@ const Loader: React.FC<LoaderProps> = ({ size = 'md', className = '' }) => {
     const { dot, gap, bounce } = sizeMap[size];
 
     const gradientClass = isMGT
-        ? 'border-emerald-400/60 bg-gradient-to-b from-emerald-400 to-emerald-500'
+        ? 'border-tier-std-400/60 bg-gradient-to-b from-tier-std-400 to-tier-std-500'
         : 'border-gold-400/60 bg-gradient-to-b from-gold-400 to-gold-500';
 
     const transition = (delay: number) => ({

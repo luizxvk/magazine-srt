@@ -60,9 +60,9 @@ export default function GroupChatCard() {
   const [loading, setLoading] = useState(true);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
-  const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-  const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+  const accentBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
+  const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+  const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
   const themeGlow = isMGT
       ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
       : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
@@ -199,7 +199,7 @@ export default function GroupChatCard() {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} rounded-lg`}>
+            <div className={`p-2 ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} rounded-lg`}>
               <MessageCircle className={`w-5 h-5 ${accentText}`} />
             </div>
             <div>
@@ -368,7 +368,7 @@ export default function GroupChatCard() {
                 value={messageText}
                 onChange={handleMessageChange}
                 placeholder="Mensagem..."
-                className={`flex-1 px-3 py-1.5 rounded-full bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-1 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-500`}
+                className={`flex-1 px-3 py-1.5 rounded-full bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-1 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-gold-500'} placeholder-gray-500`}
               />
               <button
                 type="submit"

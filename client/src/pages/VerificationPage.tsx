@@ -185,7 +185,7 @@ export default function VerificationPage() {
                 </div>
 
                 {/* Code Input */}
-                <div className={`bg-gray-800/50 backdrop-blur-sm border ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} rounded-xl p-8`}>
+                <div className={`bg-gray-800/50 backdrop-blur-sm border ${isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30'} rounded-xl p-8`}>
                     <label className="block text-sm font-medium mb-4 text-center">
                         {t('verification.enterCode')}
                     </label>
@@ -203,7 +203,7 @@ export default function VerificationPage() {
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 className={`w-12 h-14 text-center text-2xl font-bold rounded-lg border-2 ${
                                     isMGT 
-                                        ? 'bg-gray-700 border-emerald-500/50 focus:border-emerald-500' 
+                                        ? 'bg-gray-700 border-tier-std-500/50 focus:border-tier-std-500' 
                                         : 'bg-gray-700 border-gold-500/50 focus:border-gold-500'
                                 } focus:outline-none transition-colors`}
                             />
@@ -221,7 +221,7 @@ export default function VerificationPage() {
                         disabled={loading || code.some(d => !d)}
                         className={`w-full py-3 rounded-lg font-semibold transition-all ${
                             isMGT
-                                ? 'bg-emerald-600 hover:bg-emerald-700'
+                                ? 'bg-tier-std-600 hover:bg-tier-std-700'
                                 : 'bg-gold-600 hover:bg-gold-700'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >

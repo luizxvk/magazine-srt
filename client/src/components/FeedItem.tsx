@@ -97,7 +97,7 @@ function MediaContent({ video, image, title, category, theme, isMGT, isExpanded,
             {/* Category Badge */}
             <div className="absolute top-4 left-4 pointer-events-none flex gap-2">
                 {isHighlight && (
-                    <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium flex items-center gap-1 ${isMGT ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
+                    <span className={`px-3 py-1 rounded-sm backdrop-blur-md border text-[10px] uppercase tracking-[0.2em] font-medium flex items-center gap-1 ${isMGT ? 'bg-tier-std-500/20 border-tier-std-500/30 text-tier-std-300' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
                         <Sparkles className="w-3 h-3" />
                         {t('feed.highlight')}
                     </span>
@@ -234,7 +234,7 @@ export default function FeedItem({
     const cardBorder = theme === 'light' 
         ? 'border-gray-200' 
         : 'border-white/10';
-    const cardHoverBorder = isMGT ? 'hover:border-emerald-500/30' : 'hover:border-gold-500/30';
+    const cardHoverBorder = isMGT ? 'hover:border-tier-std-500/30' : 'hover:border-gold-500/30';
     const cardShadow = theme === 'light'
         ? 'shadow-lg'
         : 'shadow-[0_8px_32px_rgba(0,0,0,0.3)]';
@@ -372,7 +372,7 @@ export default function FeedItem({
                                         onClick={() => setReportReason(reason)}
                                         className={`w-full p-3 rounded-lg text-left text-sm transition-colors ${
                                             reportReason === reason 
-                                                ? (isMGT ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-gold-500/20 border-gold-500/50 text-gold-400')
+                                                ? (isMGT ? 'bg-tier-std-500/20 border-tier-std-500/50 text-tier-std-400' : 'bg-gold-500/20 border-gold-500/50 text-gold-400')
                                                 : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'
                                         } border`}
                                     >
@@ -392,7 +392,7 @@ export default function FeedItem({
                                     disabled={!reportReason || isReporting}
                                     className={`flex-1 py-2 rounded-lg font-medium disabled:opacity-50 ${
                                         isMGT 
-                                            ? 'bg-emerald-500 text-black hover:bg-emerald-400' 
+                                            ? 'bg-tier-std-500 text-black hover:bg-tier-std-400' 
                                             : 'bg-gold-500 text-black hover:bg-gold-400'
                                     }`}
                                 >
@@ -519,9 +519,9 @@ export default function FeedItem({
                         <motion.button
                             whileTap={{ scale: 0.8 }}
                             onClick={(e) => { e.stopPropagation(); onLike && onLike(id); }}
-                            className={`flex items-center gap-2 transition-colors group/like ${isLiked ? 'text-red-500' : (isMGT ? 'text-gray-500 hover:text-emerald-500' : 'text-gray-500 hover:text-red-500')}`}
+                            className={`flex items-center gap-2 transition-colors group/like ${isLiked ? 'text-red-500' : (isMGT ? 'text-gray-500 hover:text-tier-std-500' : 'text-gray-500 hover:text-red-500')}`}
                         >
-                            <Heart className={`w-4 h-4 transition-colors ${isLiked ? 'fill-red-500' : (isMGT ? 'group-hover/like:fill-emerald-500' : 'group-hover/like:fill-red-500')}`} />
+                            <Heart className={`w-4 h-4 transition-colors ${isLiked ? 'fill-red-500' : (isMGT ? 'group-hover/like:fill-tier-std-500' : 'group-hover/like:fill-red-500')}`} />
                             <span className="text-xs tracking-wider font-medium">{likes}</span>
                         </motion.button>
                         <motion.button

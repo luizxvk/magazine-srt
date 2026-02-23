@@ -69,7 +69,7 @@ export default function ExploreCardsCarousel() {
     };
 
     const accentColor = isMGT ? '#10b981' : '#d4af37';
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeBorder = isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20';
     const cardBg = theme === 'light' ? 'bg-white/60' : 'bg-black/20';
 
     return (

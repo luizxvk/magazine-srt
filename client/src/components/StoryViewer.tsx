@@ -288,7 +288,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
             <div className="relative w-full h-full md:max-w-md md:h-full bg-black shadow-2xl">
                 {/* Header */}
                 <div className="absolute top-6 left-0 right-0 z-20 p-4 flex items-center gap-3 mt-2">
-                    <div className={`w-10 h-10 rounded-full p-[1px] ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}>
+                    <div className={`w-10 h-10 rounded-full p-[1px] ${isMGT ? 'bg-tier-std-500' : 'bg-gold-500'}`}>
                         <img
                             src={currentStoryGroup.user.avatarUrl}
                             alt={currentStoryGroup.user.name}
@@ -296,7 +296,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                         />
                     </div>
                     <div>
-                        <p className={`font-medium text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${isMGT ? 'text-emerald-400' : 'text-white'}`}>{currentStoryGroup.user.name}</p>
+                        <p className={`font-medium text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${isMGT ? 'text-tier-std-400' : 'text-white'}`}>{currentStoryGroup.user.name}</p>
                         <p className="text-white/90 text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                             {currentItem.timestamp ? (currentItem.timestamp.includes('T') ? new Date(currentItem.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : currentItem.timestamp) : currentStoryGroup.timestamp}
                         </p>
@@ -342,7 +342,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                                 transition={{ duration: 0.3 }}
                                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
                             >
-                                <Heart className={`w-32 h-32 ${isMGT ? 'text-emerald-500' : 'text-gold-500'} fill-current drop-shadow-2xl`} />
+                                <Heart className={`w-32 h-32 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'} fill-current drop-shadow-2xl`} />
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -357,10 +357,10 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
                             >
                                 <div className="relative">
-                                    <Heart className={`w-40 h-40 ${isMGT ? 'text-emerald-500' : 'text-gold-500'} fill-current drop-shadow-2xl animate-pulse`} />
-                                    <Sparkles className={`absolute -top-4 -right-4 w-12 h-12 ${isMGT ? 'text-emerald-400' : 'text-gold-400'} animate-spin`} />
-                                    <Sparkles className={`absolute -bottom-4 -left-4 w-10 h-10 ${isMGT ? 'text-emerald-400' : 'text-gold-400'} animate-bounce`} />
-                                    <span className={`absolute -bottom-8 left-1/2 -translate-x-1/2 text-lg font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'} drop-shadow-lg`}>
+                                    <Heart className={`w-40 h-40 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'} fill-current drop-shadow-2xl animate-pulse`} />
+                                    <Sparkles className={`absolute -top-4 -right-4 w-12 h-12 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'} animate-spin`} />
+                                    <Sparkles className={`absolute -bottom-4 -left-4 w-10 h-10 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'} animate-bounce`} />
+                                    <span className={`absolute -bottom-8 left-1/2 -translate-x-1/2 text-lg font-bold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'} drop-shadow-lg`}>
                                         Super Like!
                                     </span>
                                 </div>
@@ -445,7 +445,7 @@ export default function StoryViewer({ stories, initialStoryIndex, onClose, onSto
                     {/* Like Button with Super Like on hold */}
                     {user?.role !== 'VISITOR' && (
                         <button
-                            className={`p-2 hover:scale-110 transition-all ${isLiked ? (isMGT ? 'text-emerald-500' : 'text-gold-500') : 'text-white'}`}
+                            className={`p-2 hover:scale-110 transition-all ${isLiked ? (isMGT ? 'text-tier-std-500' : 'text-gold-500') : 'text-white'}`}
                             onClick={handleLike}
                             onMouseDown={handleLikeHoldStart}
                             onMouseUp={handleLikeHoldEnd}

@@ -90,7 +90,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
     const isMyStory = currentStory?.user.id === user?.id;
     const isAdmin = user?.role === 'ADMIN';
     const canDelete = isMyStory || isAdmin;
-    const accentColor = isMGT ? 'emerald-500' : 'gold-500';
+    const accentColor = isMGT ? 'tier-std-500' : 'gold-500';
 
     // Emit event to hide/show bottom navigation when story viewer opens/closes
     useEffect(() => {
@@ -275,7 +275,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                 {currentNavigation.currentUserStories.map((_, index) => (
                     <div key={index} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
                         <motion.div
-                            className={`h-full ${isMGT ? 'bg-emerald-500' : 'bg-gold-500'}`}
+                            className={`h-full ${isMGT ? 'bg-tier-std-500' : 'bg-gold-500'}`}
                             initial={{ width: '0%' }}
                             animate={{
                                 width: index < currentNavigation.storyIndexInUser 
@@ -469,20 +469,20 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                             animate={{ y: 0 }}
                             exit={{ y: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={`relative w-full max-w-lg max-h-[70vh] bg-gradient-to-b ${isMGT ? 'from-zinc-900 to-black' : 'from-zinc-900 to-black'} rounded-t-3xl overflow-hidden border-t ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'}`}
+                            className={`relative w-full max-w-lg max-h-[70vh] bg-gradient-to-b ${isMGT ? 'from-zinc-900 to-black' : 'from-zinc-900 to-black'} rounded-t-3xl overflow-hidden border-t ${isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30'}`}
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Handle bar */}
                             <div className="flex justify-center pt-3 pb-2">
-                                <div className={`w-12 h-1 rounded-full ${isMGT ? 'bg-emerald-500/50' : 'bg-gold-500/50'}`} />
+                                <div className={`w-12 h-1 rounded-full ${isMGT ? 'bg-tier-std-500/50' : 'bg-gold-500/50'}`} />
                             </div>
                             
                             {/* Header */}
                             <div className="px-6 pb-4 border-b border-white/10">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
-                                            <Eye className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                        <div className={`p-2 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}`}>
+                                            <Eye className={`w-5 h-5 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                                         </div>
                                         <div>
                                             <h2 className="text-lg font-bold text-white">Visualizações</h2>
@@ -518,7 +518,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                                                     <img
                                                         src={viewer.viewer.avatarUrl || '/default-avatar.png'}
                                                         alt={viewer.viewer.name}
-                                                        className={`w-11 h-11 rounded-full object-cover ring-2 ${isMGT ? 'ring-emerald-500/30' : 'ring-gold-500/30'}`}
+                                                        className={`w-11 h-11 rounded-full object-cover ring-2 ${isMGT ? 'ring-tier-std-500/30' : 'ring-gold-500/30'}`}
                                                     />
                                                     <div>
                                                         <p className="font-medium text-white">
@@ -528,9 +528,9 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                                                     </div>
                                                 </div>
                                                 <button 
-                                                    className={`p-2 rounded-full ${isMGT ? 'bg-emerald-500/10 hover:bg-emerald-500/20' : 'bg-gold-500/10 hover:bg-gold-500/20'} transition-colors`}
+                                                    className={`p-2 rounded-full ${isMGT ? 'bg-tier-std-500/10 hover:bg-tier-std-500/20' : 'bg-gold-500/10 hover:bg-gold-500/20'} transition-colors`}
                                                 >
-                                                    <Send className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                                    <Send className={`w-4 h-4 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                                                 </button>
                                             </motion.div>
                                         ))}

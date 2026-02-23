@@ -82,7 +82,7 @@ const transactionTypeConfig: Record<TransactionType, {
     MARKET_SALE: { label: 'Venda no Mercado', icon: Store, color: 'text-green-400', bgColor: 'bg-green-500/20' },
     SUPPLY_BOX: { label: 'Supply Box', icon: Gift, color: 'text-amber-400', bgColor: 'bg-amber-500/20' },
     STORE_PURCHASE: { label: 'Loja de Produtos', icon: Package, color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
-    DAILY_LOGIN: { label: 'Bônus Diário', icon: Calendar, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' },
+    DAILY_LOGIN: { label: 'Bônus Diário', icon: Calendar, color: 'text-tier-std-400', bgColor: 'bg-tier-std-500/20' },
     BADGE_REWARD: { label: 'Conquista', icon: Sparkles, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
     OTHER: { label: 'Outro', icon: TrendingDown, color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
 };
@@ -237,7 +237,7 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
             <div className="relative">
                 <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${
                     isMGT 
-                        ? 'from-emerald-500/10 via-transparent to-cyan-500/10' 
+                        ? 'from-tier-std-500/10 via-transparent to-cyan-500/10' 
                         : 'from-amber-500/10 via-transparent to-orange-500/10'
                 } blur-xl`} />
                 
@@ -250,10 +250,10 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
                         <div className="flex items-center gap-4">
                             <div className={`p-3 rounded-2xl bg-gradient-to-br ${
                                 isMGT 
-                                    ? 'from-emerald-500/20 to-cyan-500/20' 
+                                    ? 'from-tier-std-500/20 to-cyan-500/20' 
                                     : 'from-amber-500/20 to-orange-500/20'
                             }`}>
-                                <ShoppingBag className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                <ShoppingBag className={`w-8 h-8 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                             </div>
                             <div>
                                 <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>

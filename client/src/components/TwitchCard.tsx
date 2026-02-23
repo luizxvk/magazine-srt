@@ -181,13 +181,13 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
     const accentColor = getUserAccentColor() || (isMGT ? '#10b981' : '#d4af37');
 
     // Theme styles - consistent with RadioCard pattern
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT 
         ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.25)]' 
         : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_20px_rgba(212,175,55,0.25)]';
     const themeBg = theme === 'light' 
         ? 'bg-white/80' 
-        : (isMGT ? 'bg-emerald-950/30' : 'bg-black/30');
+        : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 

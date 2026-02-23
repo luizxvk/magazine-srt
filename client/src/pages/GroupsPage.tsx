@@ -92,7 +92,7 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className={`min-h-screen font-sans selection:${isMGT ? 'bg-emerald-500/30' : 'bg-gold-500/30'} relative`}>
+    <div className={`min-h-screen font-sans selection:${isMGT ? 'bg-tier-std-500/30' : 'bg-gold-500/30'} relative`}>
       <LuxuriousBackground />
       <Header />
       
@@ -101,8 +101,8 @@ export default function GroupsPage() {
         {/* Page Title with Icon */}
         <div className="flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <div className={`p-3 ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded-xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
-              <Users className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-400'}`} />
+            <div className={`p-3 ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'} rounded-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
+              <Users className={`w-8 h-8 ${isMGT ? 'text-tier-std-500' : 'text-gold-400'}`} />
             </div>
             <div>
               <h1 className="text-3xl font-serif font-bold"><GradientText fallbackClassName="text-white">{t('groups.title')}</GradientText></h1>
@@ -114,7 +114,7 @@ export default function GroupsPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             style={buttonStyle}
-            className={`${isMGT ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-emerald-500/50' : ''} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-xl transition-all`}
+            className={`${isMGT ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 hover:shadow-tier-std-500/50' : ''} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-xl transition-all`}
           >
             <Plus className="w-5 h-5" />
             {t('groups.create')}
@@ -124,7 +124,7 @@ export default function GroupsPage() {
         {/* Groups Grid */}
         {groups.length === 0 ? (
           <div className="glass-panel rounded-2xl border border-white/10 p-16 text-center">
-            <Users className={`w-20 h-20 ${isMGT ? 'text-emerald-500/50' : 'text-gold-500/50'} mx-auto mb-4`} />
+            <Users className={`w-20 h-20 ${isMGT ? 'text-tier-std-500/50' : 'text-gold-500/50'} mx-auto mb-4`} />
             <h3 className={`text-2xl font-bold ${themeText} mb-2`}>{t('groups.empty')}</h3>
             <p className={`${themeSecondary} mb-6`}>{t('groups.emptyDescription')}</p>
             <motion.button
@@ -132,7 +132,7 @@ export default function GroupsPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               style={buttonStyle}
-              className={`${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : ''} text-white px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg transition-colors`}
+              className={`${isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : ''} text-white px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg transition-colors`}
             >
               <Plus className="w-5 h-5" />
               {t('groups.createFirst')}
@@ -150,7 +150,7 @@ export default function GroupsPage() {
                 className={`glass-panel rounded-2xl overflow-hidden border ${themeBorder} cursor-pointer transition-all duration-300 hover:border-${isMGT ? 'emerald' : 'gold'}-500/50 hover:shadow-xl`}
               >
                 {/* Avatar */}
-                <div className={`relative h-32 ${isMGT ? 'bg-gradient-to-br from-emerald-600/20 to-emerald-500/5' : 'bg-gradient-to-br from-gold-600/20 to-gold-500/5'} flex items-center justify-center`}>
+                <div className={`relative h-32 ${isMGT ? 'bg-gradient-to-br from-tier-std-600/20 to-tier-std-500/5' : 'bg-gradient-to-br from-gold-600/20 to-gold-500/5'} flex items-center justify-center`}>
                   {group.avatarUrl ? (
                     <img
                       src={group.avatarUrl}
@@ -158,8 +158,8 @@ export default function GroupsPage() {
                       className="w-20 h-20 rounded-full border-4 border-white/20 object-cover"
                     />
                   ) : (
-                    <div className={`w-20 h-20 rounded-full ${isMGT ? 'bg-emerald-600/30' : 'bg-gold-600/30'} flex items-center justify-center`}>
-                      <Users className={`w-10 h-10 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                    <div className={`w-20 h-20 rounded-full ${isMGT ? 'bg-tier-std-600/30' : 'bg-gold-600/30'} flex items-center justify-center`}>
+                      <Users className={`w-10 h-10 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                     </div>
                   )}
                   {!group.isPrivate && (
@@ -196,7 +196,7 @@ export default function GroupsPage() {
                         {group._count.messages}
                       </span>
                     </div>
-                    <ChevronRight className={`w-5 h-5 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
+                    <ChevronRight className={`w-5 h-5 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`} />
                   </div>
                 </div>
               </motion.div>

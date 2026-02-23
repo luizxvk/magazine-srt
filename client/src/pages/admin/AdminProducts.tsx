@@ -320,12 +320,12 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Buscar..."
-                            className={`pl-9 pr-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-white' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                            className={`pl-9 pr-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-white' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                         />
                     </div>
                     <button
                         onClick={() => { resetForm(); setEditingProduct(null); setShowModal(true); }}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-tier-std-500 text-white hover:bg-tier-std-600 transition-colors"
                     >
                         <Plus className="w-4 h-4" />
                         Novo Produto
@@ -402,7 +402,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         {product.isUnlimited ? (
                                             <span className="text-sm text-blue-400">∞ Ilimitado</span>
                                         ) : (
-                                            <span className={`text-sm ${product.availableKeys === 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                            <span className={`text-sm ${product.availableKeys === 0 ? 'text-red-400' : 'text-tier-std-400'}`}>
                                                 {product.availableKeys} / {product.totalKeys}
                                             </span>
                                         )}
@@ -415,7 +415,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             onClick={() => handleToggleActive(product)}
                                             className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
                                                 product.isActive 
-                                                    ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' 
+                                                    ? 'bg-tier-std-500/20 text-tier-std-400 hover:bg-tier-std-500/30' 
                                                     : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                                             }`}
                                         >
@@ -497,7 +497,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         required
-                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                     />
                                 </div>
 
@@ -509,7 +509,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         required
                                         rows={3}
-                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none`}
+                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-tier-std-500 resize-none`}
                                     />
                                 </div>
 
@@ -536,8 +536,8 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         )}
                                         
                                         {/* Upload Button */}
-                                        <label className={`flex items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-white/20 hover:border-emerald-500/50 cursor-pointer transition-colors ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
-                                            <Upload className="w-5 h-5 text-emerald-500" />
+                                        <label className={`flex items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-white/20 hover:border-tier-std-500/50 cursor-pointer transition-colors ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
+                                            <Upload className="w-5 h-5 text-tier-std-500" />
                                             <span className="text-sm text-gray-400">
                                                 {formData.imageFile ? formData.imageFile.name : 'Clique para selecionar imagem'}
                                             </span>
@@ -599,7 +599,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         {formData.screenshotPreviews.length > 0 && (
                                             <div className="flex flex-wrap gap-2">
                                                 {formData.screenshotPreviews.map((preview, idx) => (
-                                                    <div key={idx} className="relative w-20 h-12 rounded-lg overflow-hidden bg-white/5 border-2 border-emerald-500/50">
+                                                    <div key={idx} className="relative w-20 h-12 rounded-lg overflow-hidden bg-white/5 border-2 border-tier-std-500/50">
                                                         <img src={preview} alt="" className="w-full h-full object-cover" />
                                                         <button
                                                             type="button"
@@ -620,8 +620,8 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         )}
                                         
                                         {/* Upload Button for Screenshots */}
-                                        <label className={`flex items-center gap-3 px-4 py-2 rounded-lg border border-dashed border-white/20 hover:border-emerald-500/50 cursor-pointer transition-colors ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
-                                            <Upload className="w-4 h-4 text-emerald-500" />
+                                        <label className={`flex items-center gap-3 px-4 py-2 rounded-lg border border-dashed border-white/20 hover:border-tier-std-500/50 cursor-pointer transition-colors ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}>
+                                            <Upload className="w-4 h-4 text-tier-std-500" />
                                             <span className="text-xs text-gray-400">Adicionar screenshots</span>
                                             <input
                                                 type="file"
@@ -653,7 +653,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                     <select
                                         value={formData.category}
                                         onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                     >
                                         {categoryOptions.map(cat => (
                                             <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -671,7 +671,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             onChange={e => setFormData({ ...formData, priceZions: e.target.value })}
                                             placeholder="1000"
                                             min="0"
-                                            className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                            className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                         />
                                     </div>
                                     <div>
@@ -683,7 +683,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             placeholder="10.00"
                                             min="0"
                                             step="0.01"
-                                            className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                            className={`w-full px-4 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                         />
                                     </div>
                                 </div>
@@ -695,7 +695,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             type="checkbox"
                                             checked={formData.isUnlimited}
                                             onChange={e => setFormData({ ...formData, isUnlimited: e.target.checked })}
-                                            className="w-4 h-4 rounded border-white/20 text-emerald-500 focus:ring-emerald-500"
+                                            className="w-4 h-4 rounded border-white/20 text-tier-std-500 focus:ring-tier-std-500"
                                         />
                                         <span className="text-sm text-gray-400">Estoque Ilimitado</span>
                                     </label>
@@ -704,7 +704,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             type="checkbox"
                                             checked={formData.isActive}
                                             onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
-                                            className="w-4 h-4 rounded border-white/20 text-emerald-500 focus:ring-emerald-500"
+                                            className="w-4 h-4 rounded border-white/20 text-tier-std-500 focus:ring-tier-std-500"
                                         />
                                         <span className="text-sm text-gray-400">Ativo</span>
                                     </label>
@@ -798,16 +798,16 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                                 {editingProduct?.pixApprovalStatus && editingProduct.pixApprovalStatus !== 'NONE' && (
                                                     <div className={`p-3 rounded-lg mb-3 flex items-center gap-2 ${
                                                         editingProduct.pixApprovalStatus === 'APPROVED' 
-                                                            ? 'bg-emerald-500/10 border border-emerald-500/30' 
+                                                            ? 'bg-tier-std-500/10 border border-tier-std-500/30' 
                                                             : editingProduct.pixApprovalStatus === 'PENDING'
                                                                 ? 'bg-amber-500/10 border border-amber-500/30'
                                                                 : 'bg-red-500/10 border border-red-500/30'
                                                     }`}>
-                                                        {editingProduct.pixApprovalStatus === 'APPROVED' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
+                                                        {editingProduct.pixApprovalStatus === 'APPROVED' && <CheckCircle className="w-4 h-4 text-tier-std-400" />}
                                                         {editingProduct.pixApprovalStatus === 'PENDING' && <Clock className="w-4 h-4 text-amber-400" />}
                                                         {editingProduct.pixApprovalStatus === 'REJECTED' && <XCircle className="w-4 h-4 text-red-400" />}
                                                         <span className={`text-xs font-medium ${
-                                                            editingProduct.pixApprovalStatus === 'APPROVED' ? 'text-emerald-400' 
+                                                            editingProduct.pixApprovalStatus === 'APPROVED' ? 'text-tier-std-400' 
                                                             : editingProduct.pixApprovalStatus === 'PENDING' ? 'text-amber-400' 
                                                             : 'text-red-400'
                                                         }`}>
@@ -958,7 +958,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             value={formData.developer}
                                             onChange={e => setFormData({ ...formData, developer: e.target.value })}
                                             placeholder="Activision"
-                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                         />
                                     </div>
                                     <div>
@@ -970,7 +970,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             value={formData.platform}
                                             onChange={e => setFormData({ ...formData, platform: e.target.value })}
                                             placeholder="PC, Xbox, PS5"
-                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                         />
                                     </div>
                                 </div>
@@ -988,7 +988,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             placeholder="120"
                                             min="0"
                                             step="0.1"
-                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                         />
                                     </div>
                                     <div>
@@ -1000,7 +1000,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                             value={formData.releaseDate}
                                             onChange={e => setFormData({ ...formData, releaseDate: e.target.value })}
                                             placeholder="25 Out, 2025"
-                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                            className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                         />
                                     </div>
                                 </div>
@@ -1015,7 +1015,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                         value={formData.tags}
                                         onChange={e => setFormData({ ...formData, tags: e.target.value })}
                                         placeholder="FPS, Multiplayer, Action, CallOfDuty"
-                                        className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                        className={`w-full px-3 py-2 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500`}
                                     />
                                     <p className="text-xs text-gray-500 mt-1">Ex: FPS, Multiplayer, Action</p>
                                 </div>
@@ -1024,7 +1024,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-full py-3 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="w-full py-3 rounded-lg bg-tier-std-500 text-white font-medium hover:bg-tier-std-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {submitting ? (
                                         <Loader size="sm" />
@@ -1077,7 +1077,7 @@ export default function AdminProducts({ onClose }: AdminProductsProps) {
                                     onChange={e => setNewKeys(e.target.value)}
                                     placeholder="XXXXX-XXXXX-XXXXX&#10;YYYYY-YYYYY-YYYYY&#10;ZZZZZ-ZZZZZ-ZZZZZ"
                                     rows={8}
-                                    className={`w-full px-4 py-3 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none`}
+                                    className={`w-full px-4 py-3 rounded-lg border border-white/10 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} font-mono text-sm focus:outline-none focus:ring-2 focus:ring-tier-std-500 resize-none`}
                                 />
 
                                 <p className="text-xs text-gray-500">

@@ -139,7 +139,7 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     {isSubscribed ? (
-                        <BellRing className="w-5 h-5 text-emerald-400" />
+                        <BellRing className="w-5 h-5 text-tier-std-400" />
                     ) : (
                         <Bell className="w-5 h-5 text-zinc-400" />
                     )}
@@ -153,7 +153,7 @@ export default function PushNotificationSettings({ onClose, compact = false }: P
                     disabled={actionLoading || permission === 'denied'}
                     className={`relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 ${
                         isSubscribed 
-                            ? 'bg-emerald-500' 
+                            ? 'bg-tier-std-500' 
                             : 'bg-gray-600'
                     } ${actionLoading || permission === 'denied' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >

@@ -50,9 +50,9 @@ export default function AdminCreateTournament({ showToast, onTournamentCreated }
 
     const isDark = theme !== 'light';
     const accent = isMGT ? '#10b981' : '#d4af37';
-    const accentBg = isMGT ? 'bg-emerald-500/10' : 'bg-amber-500/10';
-    const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-amber-500/30';
-    const accentText = isMGT ? 'text-emerald-400' : 'text-amber-400';
+    const accentBg = isMGT ? 'bg-tier-std-500/10' : 'bg-amber-500/10';
+    const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-amber-500/30';
+    const accentText = isMGT ? 'text-tier-std-400' : 'text-amber-400';
     const inputBg = isDark ? 'bg-white/5' : 'bg-gray-100/80';
     const inputBorder = isDark ? 'border-white/10' : 'border-gray-200';
     const textMain = isDark ? 'text-white' : 'text-gray-900';

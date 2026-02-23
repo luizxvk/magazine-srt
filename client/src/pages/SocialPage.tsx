@@ -77,14 +77,14 @@ export default function SocialPage() {
 
     const { isStdTier } = useCommunity();
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
-    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-400';
-    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeColor = isMGT ? 'text-tier-std-500' : 'text-gold-400';
+    const themeBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
+    const themeBorder = isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20';
     const themeHoverBorder = isMGT ? 'hover:border-red-500/30' : 'hover:border-gold-500/30';
-    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeButton = isMGT ? 'bg-tier-std-600 hover:bg-red-500' : 'bg-gold-500 hover:bg-gold-400';
     const themeShadow = isMGT ? 'shadow-[0_0_10px_rgba(255,0,0,0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
-    const themeTabActive = isMGT ? 'text-emerald-500' : 'text-gold-400';
-    const themeTabBorder = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeTabActive = isMGT ? 'text-tier-std-500' : 'text-gold-400';
+    const themeTabBorder = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
 
     useEffect(() => {
         fetchData();
@@ -328,7 +328,7 @@ export default function SocialPage() {
                                                 {friend.displayName || friend.name}
                                             </h3>
                                             <p className="text-xs text-gray-400 flex items-center gap-2">
-                                                <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{friend.trophies} Troféus</span>
+                                                <span className={`${isMGT ? 'text-tier-std-500/80' : 'text-gold-500/80'}`}>{friend.trophies} Troféus</span>
                                                 <span className="w-1 h-1 bg-gray-600 rounded-full" />
                                                 <span>Nível {friend.level}</span>
                                             </p>
@@ -467,7 +467,7 @@ export default function SocialPage() {
                                                     {rec.displayName || rec.name}
                                                 </h3>
                                                 <p className="text-xs text-gray-400 flex items-center gap-2">
-                                                    <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{rec.trophies} Troféus</span>
+                                                    <span className={`${isMGT ? 'text-tier-std-500/80' : 'text-gold-500/80'}`}>{rec.trophies} Troféus</span>
                                                     <span className="w-1 h-1 bg-gray-600 rounded-full" />
                                                     <span>Nível {rec.level || 1}</span>
                                                 </p>
@@ -475,14 +475,14 @@ export default function SocialPage() {
                                             <div className="flex items-center gap-2">
                                                 <button 
                                                     onClick={() => navigate(`/profile?id=${rec.id}`)}
-                                                    className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
+                                                    className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-tier-std-500 text-tier-std-500 hover:bg-tier-std-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
                                                 >
                                                     Ver Perfil
                                                 </button>
                                                 <button
                                                     onClick={(e) => handleSendFriendRequest(rec.id, e)}
                                                     disabled={sendingRequest === rec.id}
-                                                    className={`p-1.5 rounded-lg transition-all ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50`}
+                                                    className={`p-1.5 rounded-lg transition-all ${isMGT ? 'bg-tier-std-500 hover:bg-tier-std-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50`}
                                                     title="Enviar solicitação de amizade"
                                                 >
                                                     {sendingRequest === rec.id ? (
@@ -503,7 +503,7 @@ export default function SocialPage() {
                                                 disabled={loadingMore}
                                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                                                     isMGT
-                                                        ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20'
+                                                        ? 'bg-tier-std-500/10 hover:bg-tier-std-500/20 text-tier-std-400 border border-tier-std-500/20'
                                                         : 'bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 border border-gold-500/20'
                                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                                             >
@@ -546,7 +546,7 @@ export default function SocialPage() {
                                     <button
                                         type="submit"
                                         disabled={searching || !searchQuery.trim()}
-                                        className={`px-6 py-3 rounded-xl font-medium transition-all ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                                        className={`px-6 py-3 rounded-xl font-medium transition-all ${isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50 disabled:cursor-not-allowed`}
                                     >
                                         {searching ? <Loader size="sm" /> : 'Buscar'}
                                     </button>
@@ -577,7 +577,7 @@ export default function SocialPage() {
                                                         {result.displayName || result.name}
                                                     </h3>
                                                     <p className="text-xs text-gray-400 flex items-center gap-2">
-                                                        <span className={`${isMGT ? 'text-emerald-500/80' : 'text-gold-500/80'}`}>{result.trophies} Troféus</span>
+                                                        <span className={`${isMGT ? 'text-tier-std-500/80' : 'text-gold-500/80'}`}>{result.trophies} Troféus</span>
                                                         <span className="w-1 h-1 bg-gray-600 rounded-full" />
                                                         <span>Nível {result.level || 1}</span>
                                                     </p>
@@ -585,14 +585,14 @@ export default function SocialPage() {
                                                 <div className="flex items-center gap-2">
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); navigate(`/profile?id=${result.id}`); }}
-                                                        className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
+                                                        className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg border ${isMGT ? 'border-tier-std-500 text-tier-std-500 hover:bg-tier-std-500 hover:text-white' : 'border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black'} transition-all`}
                                                     >
                                                         Ver Perfil
                                                     </button>
                                                     <button
                                                         onClick={(e) => handleSendFriendRequest(result.id, e)}
                                                         disabled={sendingRequest === result.id}
-                                                        className={`p-1.5 rounded-lg transition-all ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50`}
+                                                        className={`p-1.5 rounded-lg transition-all ${isMGT ? 'bg-tier-std-500 hover:bg-tier-std-400 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black'} disabled:opacity-50`}
                                                         title="Enviar solicitação de amizade"
                                                     >
                                                         {sendingRequest === result.id ? (
@@ -640,18 +640,18 @@ export default function SocialPage() {
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.8, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className={`${isMGT ? 'bg-gray-900 border-emerald-500/30' : 'bg-gray-900 border-gold-500/30'} border rounded-2xl p-8 max-w-md w-full text-center`}
+                            className={`${isMGT ? 'bg-gray-900 border-tier-std-500/30' : 'bg-gray-900 border-gold-500/30'} border rounded-2xl p-8 max-w-md w-full text-center`}
                         >
-                            <div className={`w-16 h-16 rounded-full ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'} flex items-center justify-center mx-auto mb-4`}>
-                                <Check className={`w-8 h-8 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
+                            <div className={`w-16 h-16 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center mx-auto mb-4`}>
+                                <Check className={`w-8 h-8 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`} />
                             </div>
                             <h2 className="text-xl font-bold text-white mb-2">Bem-vindo ao grupo!</h2>
                             <p className="text-gray-400 mb-6">
-                                Você entrou no grupo <span className={`font-semibold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>"{joinedGroupPopup.groupName}"</span>
+                                Você entrou no grupo <span className={`font-semibold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>"{joinedGroupPopup.groupName}"</span>
                             </p>
                             <button
                                 onClick={() => navigate(`/groups/${joinedGroupPopup.groupId}`)}
-                                className={`w-full py-3 rounded-xl font-semibold text-white ${isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500'} transition-colors`}
+                                className={`w-full py-3 rounded-xl font-semibold text-white ${isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : 'bg-gold-600 hover:bg-gold-500'} transition-colors`}
                             >
                                 Ir para o grupo
                             </button>

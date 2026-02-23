@@ -250,7 +250,7 @@ export default function StoriesBar({ viewingStoryId, onViewStory, onCloseStory, 
                                         className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
                                     />
                                     <div className={`absolute inset-0 flex items-center justify-center bg-black/30`}>
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isMGT ? 'bg-emerald-600' : 'bg-gold-500'} text-white shadow-lg`}>
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isMGT ? 'bg-tier-std-600' : 'bg-gold-500'} text-white shadow-lg`}>
                                             <Plus className="w-4 h-4" />
                                         </div>
                                     </div>

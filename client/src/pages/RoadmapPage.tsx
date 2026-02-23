@@ -482,7 +482,7 @@ const categoryConfig = {
     feature: { label: 'Funcionalidade', color: 'text-purple-400 bg-purple-500/10' },
     improvement: { label: 'Melhoria', color: 'text-cyan-400 bg-cyan-500/10' },
     security: { label: 'Segurança', color: 'text-red-400 bg-red-500/10' },
-    community: { label: 'Comunidade', color: 'text-emerald-400 bg-emerald-500/10' }
+    community: { label: 'Comunidade', color: 'text-tier-std-400 bg-tier-std-500/10' }
 };
 
 export default function RoadmapPage() {
@@ -490,9 +490,9 @@ export default function RoadmapPage() {
     const { isStdTier } = useCommunity();
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
-    const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
+    const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const themeBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
 
     const completedItems = roadmapItems.filter(item => item.status === 'completed');
     const inProgressItems = roadmapItems.filter(item => item.status === 'in-progress');

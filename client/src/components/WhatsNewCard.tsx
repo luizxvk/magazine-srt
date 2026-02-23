@@ -10,12 +10,12 @@ export default function WhatsNewCard() {
     const [showModal, setShowModal] = useState(false);
 
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-neutral-900/50';
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeBorder = isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
-    const themeIconBg = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
-    const themeIconColor = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const themeIconBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
+    const themeIconColor = isMGT ? 'text-tier-std-400' : 'text-gold-400';
     const themeGradient = isMGT 
-        ? 'from-emerald-500/10 to-transparent' 
+        ? 'from-tier-std-500/10 to-transparent' 
         : 'from-gold-500/10 to-transparent';
 
     return (

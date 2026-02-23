@@ -76,7 +76,7 @@ const METRIC_LABELS: Record<string, string> = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
   PENDING: { label: 'Aguardando', color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
   ACCEPTED: { label: 'Aceito', color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
-  IN_PROGRESS: { label: 'Em Andamento', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' },
+  IN_PROGRESS: { label: 'Em Andamento', color: 'text-tier-std-400', bgColor: 'bg-tier-std-500/20' },
   COMPLETED: { label: 'Finalizado', color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
   CANCELLED: { label: 'Cancelado', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
   DECLINED: { label: 'Recusado', color: 'text-red-400', bgColor: 'bg-red-500/20' },
@@ -279,7 +279,7 @@ export default function ChallengesPage() {
         {/* Result */}
         {isCompleted && (
           <div className={`flex items-center justify-center gap-2 p-3 rounded-xl mb-3 ${
-            didWin ? 'bg-emerald-500/20 text-emerald-400' : 
+            didWin ? 'bg-tier-std-500/20 text-tier-std-400' : 
             wasDraw ? 'bg-yellow-500/20 text-yellow-400' : 
             'bg-red-500/20 text-red-400'
           }`}>
@@ -500,8 +500,8 @@ export default function ChallengesPage() {
                       <h3 className={`font-semibold ${textMain}`}>Suas Estatísticas</h3>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className={`text-center p-3 rounded-xl ${isLight ? 'bg-emerald-50' : 'bg-emerald-500/10'}`}>
-                        <p className="text-2xl font-bold text-emerald-500">{myStats.totalWins}</p>
+                      <div className={`text-center p-3 rounded-xl ${isLight ? 'bg-tier-std-50' : 'bg-tier-std-500/10'}`}>
+                        <p className="text-2xl font-bold text-tier-std-500">{myStats.totalWins}</p>
                         <p className={`text-xs ${textMuted}`}>Vitórias</p>
                       </div>
                       <div className={`text-center p-3 rounded-xl ${isLight ? 'bg-red-50' : 'bg-red-500/10'}`}>

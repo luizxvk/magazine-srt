@@ -135,8 +135,8 @@ export default function GroupChatPage() {
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-  const accentColor = isMGT ? 'emerald-500' : 'gold-500';
-  const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+  const accentColor = isMGT ? 'tier-std-500' : 'gold-500';
+  const accentBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
 
   const myMember = group?.members.find(m => m.userId === user?.id);
   const isAdmin = myMember?.role === 'ADMIN';
@@ -561,7 +561,7 @@ export default function GroupChatPage() {
 
       {/* Centralized Chat Container */}
       <div className="max-w-5xl mx-auto px-4 pt-48 pb-6 relative z-10">
-        <div className={`h-[calc(100vh-180px)] flex flex-col glass-panel rounded-xl overflow-hidden border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+        <div className={`h-[calc(100vh-180px)] flex flex-col glass-panel rounded-xl overflow-hidden border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
           {/* Header */}
           <div className="border-b border-white/10 p-4 flex items-center justify-between bg-black/20">
             <div className="flex items-center gap-3">
@@ -676,7 +676,7 @@ export default function GroupChatPage() {
 
                       {/* Reply preview */}
                       {msg.replyTo && (
-                        <div className={`text-xs ${themeSecondary} mb-1 px-3 py-1 rounded-lg bg-white/5 border-l-2 ${isMGT ? 'border-emerald-500' : 'border-gold-500'} ${isMe ? 'mr-2' : 'ml-2'}`}>
+                        <div className={`text-xs ${themeSecondary} mb-1 px-3 py-1 rounded-lg bg-white/5 border-l-2 ${isMGT ? 'border-tier-std-500' : 'border-gold-500'} ${isMe ? 'mr-2' : 'ml-2'}`}>
                           <span className="font-medium">{msg.replyTo.sender.displayName || msg.replyTo.sender.name}</span>
                           <p className="truncate max-w-[200px]">{msg.replyTo.content}</p>
                         </div>
@@ -759,7 +759,7 @@ export default function GroupChatPage() {
                               onClick={() => handleAddReaction(msg.id, emoji)}
                               className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs ${
                                 data.userReacted 
-                                  ? `${isMGT ? 'bg-emerald-500/30 border-emerald-500' : 'bg-gold-500/30 border-gold-500'} border` 
+                                  ? `${isMGT ? 'bg-tier-std-500/30 border-tier-std-500' : 'bg-gold-500/30 border-gold-500'} border` 
                                   : 'bg-gray-700/50 hover:bg-gray-600/50'
                               } transition-colors`}
                               title={data.users.join(', ')}
@@ -854,14 +854,14 @@ export default function GroupChatPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className={`px-4 pt-3 pb-1 border-l-4 ${isMGT ? 'border-emerald-500' : 'border-gold-500'} bg-white/5`}
+                  className={`px-4 pt-3 pb-1 border-l-4 ${isMGT ? 'border-tier-std-500' : 'border-gold-500'} bg-white/5`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Reply className="w-4 h-4 text-gray-400" />
                       <span className="text-sm">
                         <span className="text-gray-400">Respondendo a </span>
-                        <span className={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                        <span className={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>
                           {replyingTo.sender.displayName || replyingTo.sender.name}
                         </span>
                       </span>
@@ -938,7 +938,7 @@ export default function GroupChatPage() {
                 value={messageText}
                 onChange={handleMessageChange}
                 placeholder="Digite uma mensagem... Use @ para mencionar"
-                className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-emerald-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
+                className={`flex-1 px-4 py-2 rounded-full bg-white/5 text-white border border-white/10 focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-tier-std-500' : 'focus:ring-gold-500'} placeholder-gray-400`}
               />
 
               <button
@@ -1332,7 +1332,7 @@ export default function GroupChatPage() {
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Enviar Imagem</h3>
               <p className="text-gray-400 mb-6">
-                Enviar esta imagem custará <span className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>10 Zions</span>. Deseja continuar?
+                Enviar esta imagem custará <span className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>10 Zions</span>. Deseja continuar?
               </p>
               <div className="flex gap-3">
                 <button

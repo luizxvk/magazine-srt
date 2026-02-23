@@ -17,15 +17,15 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
     const { user, updateUser, showError, showWarning } = useAuth();
     const isMGT = user?.membershipType === 'MGT';
 
-    const themeBorder = isMGT ? 'border-emerald-500/20' : 'border-gold-500/20';
+    const themeBorder = isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20';
     const themeHeaderBg = isMGT ? 'from-red-900/10' : 'from-gold-900/10';
-    const themeText = isMGT ? 'text-emerald-100' : 'text-gold-100';
-    const themeAvatarBorder = isMGT ? 'border-emerald-500/30 group-hover:border-red-500' : 'border-gold-500/30 group-hover:border-gold-500';
-    const themeIcon = isMGT ? 'text-emerald-500/50' : 'text-gold-500/50';
-    const themeLabel = isMGT ? 'text-emerald-500/70' : 'text-gold-500/70';
+    const themeText = isMGT ? 'text-tier-std-100' : 'text-gold-100';
+    const themeAvatarBorder = isMGT ? 'border-tier-std-500/30 group-hover:border-red-500' : 'border-gold-500/30 group-hover:border-gold-500';
+    const themeIcon = isMGT ? 'text-tier-std-500/50' : 'text-gold-500/50';
+    const themeLabel = isMGT ? 'text-tier-std-500/70' : 'text-gold-500/70';
     const themeFocus = isMGT ? 'focus:border-red-500/50' : 'focus:border-gold-500/50';
-    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
-    const themeToggle = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeButton = isMGT ? 'bg-tier-std-600 hover:bg-red-500 text-white' : 'bg-gold-500 hover:bg-gold-400 text-black';
+    const themeToggle = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
 
     const [name, setName] = useState(user?.name || '');
     const [displayName, setDisplayName] = useState(user?.displayName || ''); // Nickname

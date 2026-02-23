@@ -395,7 +395,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             )}
                                         </div>
                                         <span className={`text-xs px-2 py-1 rounded-full ${result.type === 'page'
-                                                ? (isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400')
+                                                ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400')
                                                 : (theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/5 text-gray-400')
                                             }`}>
                                             {getResultTypeLabel(result.type)}

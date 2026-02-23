@@ -134,7 +134,7 @@ export default function RadioCard() {
 
     const themeBg = theme === 'light' 
         ? 'bg-gradient-to-br from-zinc-50 to-zinc-100' 
-        : (isMGT ? 'bg-gradient-to-br from-emerald-950/50 to-black' : 'bg-gradient-to-br from-zinc-900 to-black');
+        : (isMGT ? 'bg-gradient-to-br from-tier-std-950/50 to-black' : 'bg-gradient-to-br from-zinc-900 to-black');
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textSub = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 

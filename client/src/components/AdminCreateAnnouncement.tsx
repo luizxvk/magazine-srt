@@ -513,7 +513,7 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
                         <button
                             onClick={handlePageContentUpdate}
                             disabled={loading}
-                            className="flex-[2] bg-emerald-600 text-white font-medium py-3 rounded-lg hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 shadow-xl"
+                            className="flex-[2] bg-tier-std-600 text-white font-medium py-3 rounded-lg hover:bg-tier-std-500 transition-colors flex items-center justify-center gap-2 shadow-xl"
                         >
                             {loading ? 'Salvando...' : 'Salvar Alterações'}
                             <Save className="w-4 h-4" />

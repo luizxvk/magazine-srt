@@ -222,7 +222,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gold-500/50 text-xs font-bold">Z</span>
                             </div>
                             {costZions === 0 && (
-                                <p className="mt-1 text-xs text-emerald-400 flex items-center gap-1">
+                                <p className="mt-1 text-xs text-tier-std-400 flex items-center gap-1">
                                     <Gift className="w-3 h-3" />
                                     Recompensa gratuita
                                 </p>
@@ -248,7 +248,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 onClick={() => setIsUnlimited(true)}
                                 className={`p-4 rounded-xl text-sm font-bold border transition-all ${
                                     isUnlimited
-                                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                                        ? 'bg-tier-std-500/20 border-tier-std-500 text-tier-std-400'
                                         : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5 hover:border-white/30'
                                 }`}
                             >
@@ -276,8 +276,8 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                     </div>
 
                     {/* Zions Reward Field */}
-                    <div className="p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/20">
-                        <label className="block text-xs text-emerald-400 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
+                    <div className="p-4 bg-tier-std-500/5 rounded-xl border border-tier-std-500/20">
+                        <label className="block text-xs text-tier-std-400 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
                             <Coins className="w-4 h-4" />
                             Zions de Recompensa (Opcional)
                         </label>
@@ -287,10 +287,10 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 min="0"
                                 value={zionsReward}
                                 onChange={e => setZionsReward(parseInt(e.target.value) || 0)}
-                                className="w-full bg-black/40 border border-emerald-500/30 rounded-xl px-4 py-3 text-white focus:border-emerald-500/50 outline-none transition-all font-mono text-lg"
+                                className="w-full bg-black/40 border border-tier-std-500/30 rounded-xl px-4 py-3 text-white focus:border-tier-std-500/50 outline-none transition-all font-mono text-lg"
                                 placeholder="0"
                             />
-                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/50 text-xs font-bold">Z</span>
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-tier-std-500/50 text-xs font-bold">Z</span>
                         </div>
                         <p className="mt-2 text-xs text-gray-400">
                             {zionsReward > 0 
@@ -441,7 +441,7 @@ export default function AdminCreateReward({ showToast, onRewardCreated }: AdminC
                                 {/* Cost Badge */}
                                 <div className="absolute top-3 right-3 bg-black/80 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-bold border shadow-lg">
                                     {costZions === 0 ? (
-                                        <span className="text-emerald-400 border-emerald-500/20">Gratuito</span>
+                                        <span className="text-tier-std-400 border-tier-std-500/20">Gratuito</span>
                                     ) : (
                                         <span className="text-gold-400 border-gold-500/20">{costZions} Z</span>
                                     )}

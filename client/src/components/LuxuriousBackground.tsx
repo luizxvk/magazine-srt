@@ -13,20 +13,20 @@ export default function LuxuriousBackground() {
 
     // Theme Colors
     const orb1Color = isLight
-        ? (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10')
-        : (isMGT ? 'bg-emerald-600/20' : 'bg-gold-500/20');
+        ? (isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10')
+        : (isMGT ? 'bg-tier-std-600/20' : 'bg-gold-500/20');
 
     const orb2Color = isLight
-        ? (isMGT ? 'bg-emerald-600/5' : 'bg-gold-600/5')
-        : (isMGT ? 'bg-emerald-800/10' : 'bg-gold-600/10');
+        ? (isMGT ? 'bg-tier-std-600/5' : 'bg-gold-600/5')
+        : (isMGT ? 'bg-tier-std-800/10' : 'bg-gold-600/10');
 
     const orb3Color = isLight
-        ? (isMGT ? 'bg-emerald-400/5' : 'bg-gold-400/5')
-        : (isMGT ? 'bg-emerald-500/10' : 'bg-gold-400/10');
+        ? (isMGT ? 'bg-tier-std-400/5' : 'bg-gold-400/5')
+        : (isMGT ? 'bg-tier-std-500/10' : 'bg-gold-400/10');
 
     const particleColor = isLight
-        ? (isMGT ? 'bg-emerald-600' : 'bg-gold-600')
-        : (isMGT ? 'bg-emerald-400' : 'bg-gold-300');
+        ? (isMGT ? 'bg-tier-std-600' : 'bg-gold-600')
+        : (isMGT ? 'bg-tier-std-400' : 'bg-gold-300');
 
     const bgGradient = isLight
         ? 'bg-[radial-gradient(circle_at_50%_50%,_#ffffff_0%,_#f3f4f6_100%)]'

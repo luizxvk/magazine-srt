@@ -18,7 +18,7 @@ export default function RankingPage() {
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
                 {/* Page Title */}
                 <div className="mb-8">
-                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-emerald-400' : 'text-gold-400'}>
+                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>
                         🏆 {t('ranking.title')}
                     </GradientText>
                     <p className="text-gray-400">

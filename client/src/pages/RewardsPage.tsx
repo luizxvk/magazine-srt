@@ -20,7 +20,7 @@ export default function RewardsPage() {
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
                 {/* Page Title */}
                 <div className="mb-8">
-                    <h1 className={`text-4xl font-serif mb-2 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                    <h1 className={`text-4xl font-serif mb-2 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                         🎁 {t('rewards.title')}
                     </h1>
                     <p className={themeSecondary}>

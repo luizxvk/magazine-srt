@@ -48,7 +48,7 @@ export default function MobileCarousel({
 
     // Estilo padrão Apple Vision Pro - escuro com accent color do usuário
     const cardStyle = isMGT 
-        ? 'from-emerald-500/20 to-emerald-900/40' 
+        ? 'from-tier-std-500/20 to-tier-std-900/40' 
         : 'from-[#2c2c2e] to-[#1c1c1e]';
 
     const cards: CarouselCard[] = [

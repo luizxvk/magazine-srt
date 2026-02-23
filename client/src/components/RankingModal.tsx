@@ -220,18 +220,18 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
 
     if (!isOpen) return null;
 
-    const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
-    const accentBgLight = isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10';
-    const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const accentBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
+    const accentBgLight = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
+    const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className={`w-full max-w-2xl glass-panel rounded-3xl border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'} overflow-hidden flex flex-col max-h-[85vh]`}>
+            <div className={`w-full max-w-2xl glass-panel rounded-3xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} overflow-hidden flex flex-col max-h-[85vh]`}>
                 {/* Header */}
-                <div className={`p-6 border-b ${isMGT ? 'border-emerald-500/10' : 'border-gold-500/10'} flex justify-between items-center bg-black/40 flex-shrink-0`}>
+                <div className={`p-6 border-b ${isMGT ? 'border-tier-std-500/10' : 'border-gold-500/10'} flex justify-between items-center bg-black/40 flex-shrink-0`}>
                     <div className="flex items-center gap-3">
-                        <Crown className={`w-6 h-6 ${isMGT ? 'text-emerald-500' : 'text-gold-500'}`} />
+                        <Crown className={`w-6 h-6 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`} />
                         <h2 className={`text-xl font-serif ${isMGT ? 'text-white' : 'text-gold-400'}`}>Elite Ranking</h2>
                     </div>
                     <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Fechar">
@@ -249,7 +249,7 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-gradient-to-r from-emerald-500/90 to-teal-500/90 flex items-center justify-center z-10"
+                                    className="absolute inset-0 bg-gradient-to-r from-tier-std-500/90 to-teal-500/90 flex items-center justify-center z-10"
                                 >
                                     <motion.div
                                         initial={{ scale: 0 }}
@@ -316,7 +316,7 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                                             whileTap={{ scale: 0.95 }}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
                                                 isMGT 
-                                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-white shadow-lg shadow-emerald-500/30' 
+                                                    ? 'bg-gradient-to-r from-tier-std-500 to-teal-400 text-white shadow-lg shadow-tier-std-500/30' 
                                                     : 'bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-lg shadow-amber-500/30'
                                             } ${claiming ? 'opacity-50' : ''}`}
                                         >
@@ -359,13 +359,13 @@ export default function RankingModal({ isOpen, onClose, isMGT }: RankingModalPro
                 <div className="p-4 flex gap-4 border-b border-white/5 bg-white/5 flex-shrink-0">
                     <button
                         onClick={() => setSortBy('trophies')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'trophies' ? (isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'trophies' ? (isMGT ? 'bg-tier-std-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
                     >
                         <Trophy className="w-3 h-3" /> Por Troféus
                     </button>
                     <button
                         onClick={() => setSortBy('level')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'level' ? (isMGT ? 'bg-emerald-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${sortBy === 'level' ? (isMGT ? 'bg-tier-std-600 text-white' : 'bg-gold-500 text-black') : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
                     >
                         <Star className="w-3 h-3" /> Por Nível
                     </button>

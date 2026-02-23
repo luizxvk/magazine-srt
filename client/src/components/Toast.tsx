@@ -26,10 +26,10 @@ export default function Toast({ message, description, type, onClose, duration = 
     // Type-specific styles
     const typeStyles = {
         success: {
-            iconBg: isMGT ? 'bg-emerald-500/20' : 'bg-green-500/20',
-            iconColor: isMGT ? 'text-emerald-500' : 'text-green-500',
-            borderAccent: isMGT ? 'border-l-emerald-500' : 'border-l-green-500',
-            shadow: isMGT ? 'shadow-emerald-500/10' : 'shadow-green-500/10',
+            iconBg: isMGT ? 'bg-tier-std-500/20' : 'bg-green-500/20',
+            iconColor: isMGT ? 'text-tier-std-500' : 'text-green-500',
+            borderAccent: isMGT ? 'border-l-tier-std-500' : 'border-l-green-500',
+            shadow: isMGT ? 'shadow-tier-std-500/10' : 'shadow-green-500/10',
             Icon: CheckCircle
         },
         error: {

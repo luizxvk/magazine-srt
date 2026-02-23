@@ -45,38 +45,38 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
 
     // Theme Colors
     // Theme Colors
-    const themeBorder = isMGT ? 'border-emerald-500/40' : 'border-gold-500/20';
-    const themeText = isMGT ? (theme === 'light' ? 'text-emerald-900' : 'text-emerald-100') : (theme === 'light' ? 'text-gray-900' : 'text-gold-200');
-    const themeTextMuted = isMGT ? (theme === 'light' ? 'text-emerald-700' : 'text-emerald-100') : (theme === 'light' ? 'text-gray-600' : 'text-gold-200/80');
-    const themeTextHover = isMGT ? 'hover:text-emerald-100' : 'hover:text-gold-100';
-    const themeBgHover = isMGT ? 'hover:bg-emerald-200/10' : 'hover:bg-gold-200/10';
-    const themeBgActive = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
-    const themeTextActive = isMGT ? 'text-emerald-300' : 'text-gold-300';
-    const themeButton = isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-400 hover:bg-gold-300';
+    const themeBorder = isMGT ? 'border-tier-std-500/40' : 'border-gold-500/20';
+    const themeText = isMGT ? (theme === 'light' ? 'text-tier-std-900' : 'text-tier-std-100') : (theme === 'light' ? 'text-gray-900' : 'text-gold-200');
+    const themeTextMuted = isMGT ? (theme === 'light' ? 'text-tier-std-700' : 'text-tier-std-100') : (theme === 'light' ? 'text-gray-600' : 'text-gold-200/80');
+    const themeTextHover = isMGT ? 'hover:text-tier-std-100' : 'hover:text-gold-100';
+    const themeBgHover = isMGT ? 'hover:bg-tier-std-200/10' : 'hover:bg-gold-200/10';
+    const themeBgActive = isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20';
+    const themeTextActive = isMGT ? 'text-tier-std-300' : 'text-gold-300';
+    const themeButton = isMGT ? 'bg-tier-std-500 hover:bg-tier-std-400' : 'bg-gold-400 hover:bg-gold-300';
 
     const themePillBg = isMGT
-        ? (theme === 'light' ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-900/20')
+        ? (theme === 'light' ? 'bg-tier-std-50 border-tier-std-200' : 'bg-tier-std-900/20')
         : (theme === 'light' ? 'bg-white border-gray-200' : 'bg-gold-300/10');
 
-    const themePillBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-200/30';
+    const themePillBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-200/30';
     const themePillShadow = isMGT ? 'shadow-[0_8px_32px_0_rgba(16,185,129,0.1)]' : 'shadow-[0_8px_32px_0_rgba(252,246,186,0.1)]';
     const themePillHoverShadow = isMGT ? 'hover:shadow-[0_8px_40px_0_rgba(16,185,129,0.2)]' : 'hover:shadow-[0_8px_40px_0_rgba(252,246,186,0.2)]';
-    const themePillHoverBorder = isMGT ? 'hover:border-emerald-500/40' : 'hover:border-gold-200/40';
-    const themePillExpandedBg = isMGT ? 'bg-emerald-900/30' : 'bg-gold-300/15';
-    const themeGlow = isMGT ? 'from-transparent via-emerald-500/10' : 'from-transparent via-gold-200/10';
+    const themePillHoverBorder = isMGT ? 'hover:border-tier-std-500/40' : 'hover:border-gold-200/40';
+    const themePillExpandedBg = isMGT ? 'bg-tier-std-900/30' : 'bg-gold-300/15';
+    const themeGlow = isMGT ? 'from-transparent via-tier-std-500/10' : 'from-transparent via-gold-200/10';
 
     const themeInputText = isMGT
-        ? (theme === 'light' ? 'text-emerald-900' : 'text-emerald-100')
+        ? (theme === 'light' ? 'text-tier-std-900' : 'text-tier-std-100')
         : (theme === 'light' ? 'text-gray-800' : 'text-gold-100');
 
     const themeInputPlaceholder = isMGT
-        ? (theme === 'light' ? 'placeholder-emerald-900/50' : 'placeholder-emerald-200/60')
+        ? (theme === 'light' ? 'placeholder-tier-std-900/50' : 'placeholder-tier-std-200/60')
         : (theme === 'light' ? 'placeholder-gray-400' : 'placeholder-gold-200/60');
 
-    const themeSelection = isMGT ? 'selection:bg-emerald-500/30' : 'selection:bg-gold-200/30';
-    const themeTagBg = isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20';
-    const themeTagBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeTagText = isMGT ? 'text-emerald-300' : 'text-gold-300';
+    const themeSelection = isMGT ? 'selection:bg-tier-std-500/30' : 'selection:bg-gold-200/30';
+    const themeTagBg = isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20';
+    const themeTagBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const themeTagText = isMGT ? 'text-tier-std-300' : 'text-gold-300';
 
     // Load users for mention suggestions
     useEffect(() => {
@@ -379,7 +379,7 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
             {/* Tag Input Popup */}
             {showTagInput && (
                 <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl border ${themeBorder} rounded-2xl p-4 shadow-2xl w-64 animate-fade-in-up z-50`}>
-                    <h3 className={`${isMGT ? 'text-emerald-400' : 'text-gold-400'} text-xs uppercase tracking-widest mb-2 text-center`}>Adicionar Tag</h3>
+                    <h3 className={`${isMGT ? 'text-tier-std-400' : 'text-gold-400'} text-xs uppercase tracking-widest mb-2 text-center`}>Adicionar Tag</h3>
                     <input
                         autoFocus
                         type="text"

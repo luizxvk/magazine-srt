@@ -97,13 +97,13 @@ export default function VersionUpdateNotification() {
                         : 'bg-zinc-900 border border-white/10 shadow-2xl'
                 }`}>
                     {/* Gradient accent */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-tier-std-500 via-blue-500 to-purple-500" />
                     
                     <div className="p-4">
                         <div className="flex items-start gap-4">
                             {/* Icon */}
-                            <div className="shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 border border-emerald-500/30">
-                                <Sparkles className="w-5 h-5 text-emerald-400" />
+                            <div className="shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-tier-std-500/20 to-blue-500/20 border border-tier-std-500/30">
+                                <Sparkles className="w-5 h-5 text-tier-std-400" />
                             </div>
                             
                             {/* Content */}
@@ -119,7 +119,7 @@ export default function VersionUpdateNotification() {
                                 <div className="flex items-center gap-2 mt-3">
                                     <button
                                         onClick={handleUpdate}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-xs font-medium transition-all hover:scale-105 shadow-lg shadow-emerald-500/25"
+                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-tier-std-600 to-tier-std-500 hover:from-tier-std-500 hover:to-tier-std-400 text-white text-xs font-medium transition-all hover:scale-105 shadow-lg shadow-tier-std-500/25"
                                     >
                                         <RefreshCw className="w-3.5 h-3.5" />
                                         Atualizar Agora

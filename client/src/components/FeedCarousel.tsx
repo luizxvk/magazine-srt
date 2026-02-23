@@ -194,12 +194,12 @@ export default function FeedCarousel({ posts, liveStreams = [] }: FeedCarouselPr
                                 {/* Content */}
                                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-10">
                                     <div className="flex items-center gap-2 mb-4">
-                                        <span className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isMGT ? 'bg-emerald-500/20 border-red-500/30 text-white' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
+                                        <span className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isMGT ? 'bg-tier-std-500/20 border-red-500/30 text-white' : 'bg-gold-500/20 border-gold-500/30 text-gold-300'}`}>
                                             <Sparkles className="w-3 h-3" />
                                             Destaque
                                         </span>
                                         {slide.data.linkedProduct && (
-                                            <span className="px-3 py-1 rounded-full border bg-emerald-500/20 border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                            <span className="px-3 py-1 rounded-full border bg-tier-std-500/20 border-tier-std-500/30 text-tier-std-300 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                                                 <ShoppingBag className="w-3 h-3" />
                                                 Produto
                                             </span>
@@ -241,7 +241,7 @@ export default function FeedCarousel({ posts, liveStreams = [] }: FeedCarouselPr
                                             />
                                         </div>
                                         <span className="text-sm text-gray-300 font-medium">
-                                            Por <span className={`${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>{slide.data.author.name}</span>
+                                            Por <span className={`${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>{slide.data.author.name}</span>
                                         </span>
                                     </div>
                                 </div>

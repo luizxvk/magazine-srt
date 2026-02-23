@@ -55,7 +55,7 @@ export default function BracketViewer({ matches, onReportScore }: BracketViewerP
                         <div key={round} className="flex flex-col">
                             {/* Round Header */}
                             <div className={`text-center mb-4 px-4 py-1.5 rounded-lg text-sm font-bold ${
-                                isMGT ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gold-500/10 text-gold-400'
+                                isMGT ? 'bg-tier-std-500/10 text-tier-std-400' : 'bg-gold-500/10 text-gold-400'
                             }`}>
                                 {roundLabels(round)}
                             </div>
@@ -104,7 +104,7 @@ function MatchCard({
             className={`w-56 rounded-xl border transition-all ${
                 isFinal
                     ? isMGT
-                        ? 'border-emerald-500/30 bg-emerald-500/5 shadow-lg shadow-emerald-500/10'
+                        ? 'border-tier-std-500/30 bg-tier-std-500/5 shadow-lg shadow-tier-std-500/10'
                         : 'border-gold-500/30 bg-gold-500/5 shadow-lg shadow-gold-500/10'
                     : 'border-white/10 bg-white/5'
             } ${isLive ? 'ring-2 ring-red-500/50 animate-pulse' : ''}`}
@@ -142,7 +142,7 @@ function MatchCard({
                     onClick={(e) => { e.stopPropagation(); onReport(match.id); }}
                     className={`w-full text-xs py-1.5 rounded-b-xl font-medium transition-colors ${
                         isMGT
-                            ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                            ? 'bg-tier-std-500/10 text-tier-std-400 hover:bg-tier-std-500/20'
                             : 'bg-gold-500/10 text-gold-400 hover:bg-gold-500/20'
                     }`}
                 >
@@ -181,7 +181,7 @@ function TeamSlot({
             } ${
                 isWinner && isCompleted
                     ? isMGT
-                        ? 'bg-emerald-500/10'
+                        ? 'bg-tier-std-500/10'
                         : 'bg-gold-500/10'
                     : ''
             }`}
@@ -197,7 +197,7 @@ function TeamSlot({
                         !team
                             ? 'text-gray-600 italic'
                             : isWinner && isCompleted
-                                ? isMGT ? 'text-emerald-400 font-bold' : 'text-gold-400 font-bold'
+                                ? isMGT ? 'text-tier-std-400 font-bold' : 'text-gold-400 font-bold'
                                 : isCompleted && !isWinner
                                     ? 'text-gray-600 line-through'
                                     : 'text-gray-300'
@@ -211,7 +211,7 @@ function TeamSlot({
                 <span
                     className={`text-sm font-mono font-bold ml-2 ${
                         isWinner && isCompleted
-                            ? isMGT ? 'text-emerald-400' : 'text-gold-400'
+                            ? isMGT ? 'text-tier-std-400' : 'text-gold-400'
                             : 'text-gray-500'
                     }`}
                 >

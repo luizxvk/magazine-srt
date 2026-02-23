@@ -83,10 +83,10 @@ export default function MgtLogPage() {
     const [loading, setLoading] = useState<string | null>(null);
 
     // Theme Colors (emerald for MGT, gold for Magazine)
-    const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
-    const themeButton = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-500 hover:bg-gold-400';
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeGlow = isMGT ? 'shadow-emerald-500/20' : 'shadow-gold-500/20';
+    const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';
+    const themeButton = isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : 'bg-gold-500 hover:bg-gold-400';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const themeGlow = isMGT ? 'shadow-tier-std-500/20' : 'shadow-gold-500/20';
 
     const [pageContent, setPageContent] = useState<PageContent>({
         tag: 'Nova Assinatura Premium',
@@ -157,7 +157,7 @@ export default function MgtLogPage() {
             {isAdmin && (
                 <button
                     onClick={() => navigate('/admin/edit-mgt-log')}
-                    className="fixed bottom-6 right-6 z-50 p-4 bg-emerald-600 rounded-full shadow-lg hover:bg-emerald-500 transition-all hover:scale-110"
+                    className="fixed bottom-6 right-6 z-50 p-4 bg-tier-std-600 rounded-full shadow-lg hover:bg-tier-std-500 transition-all hover:scale-110"
                     title="Editar Página"
                 >
                     <Edit2 className="w-6 h-6 text-white" />
@@ -177,7 +177,7 @@ export default function MgtLogPage() {
                     <h1 className="text-5xl md:text-7xl font-serif mb-6 leading-tight flex flex-col items-center">
                         {pageContent.heroTitle} <br />
                         <div className="relative mt-0 group">
-                            <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-600' : 'bg-gold-500'} blur-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 rounded-full`} />
+                            <div className={`absolute inset-0 ${isMGT ? 'bg-tier-std-600' : 'bg-gold-500'} blur-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 rounded-full`} />
                             <img
                                 src={pageContent.logoUrl}
                                 alt="MGT LOG"

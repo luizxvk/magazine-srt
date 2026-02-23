@@ -371,7 +371,7 @@ export default function ElitePage() {
                                             <p className="text-sm text-white/50 mb-4">{plan.duration}</p>
                                             
                                             {plan.savings && (
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tier-std-500/20 text-tier-std-400 text-xs font-bold border border-tier-std-500/30">
                                                     <Sparkles className="w-3 h-3" />
                                                     {t('elite.annualDiscount', { percent: plan.savings })}
                                                 </span>
@@ -591,7 +591,7 @@ export default function ElitePage() {
 
                             <div className="p-5 rounded-2xl bg-white/5 border border-white/10 mb-6">
                                 <p className="text-sm text-white/60 mb-3 flex items-center gap-2">
-                                    <Check className="text-emerald-400 w-4 h-4" /> 
+                                    <Check className="text-tier-std-400 w-4 h-4" /> 
                                     {t('elite.benefitsContinue')}
                                 </p>
                                 <p className="text-2xl font-bold bg-gradient-to-r from-violet-300 to-indigo-300 bg-clip-text text-transparent">

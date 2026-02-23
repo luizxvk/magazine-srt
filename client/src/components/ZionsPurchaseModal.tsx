@@ -48,16 +48,16 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
     // Apple Vision Pro style - glass morphism with dark backgrounds
     const themeColors = isMGT ? {
         accent: 'emerald',
-        gradient: 'from-emerald-500/10 to-transparent',
-        border: 'border-emerald-500/30',
-        text: 'text-emerald-400',
-        button: 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400',
+        gradient: 'from-tier-std-500/10 to-transparent',
+        border: 'border-tier-std-500/30',
+        text: 'text-tier-std-400',
+        button: 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 hover:from-tier-std-500 hover:to-tier-std-400',
         glow: 'shadow-[0_0_60px_rgba(16,185,129,0.15)]',
         cardBg: isDark ? 'bg-black/60' : 'bg-white/90',
         bg: isDark ? 'bg-zinc-950/95 backdrop-blur-2xl' : 'bg-white/95 backdrop-blur-2xl',
-        cardBorder: 'border-emerald-500/20',
+        cardBorder: 'border-tier-std-500/20',
         itemBg: isDark ? 'bg-black/40' : 'bg-gray-50',
-        itemBorder: isDark ? 'border-emerald-500/20' : 'border-emerald-200',
+        itemBorder: isDark ? 'border-tier-std-500/20' : 'border-tier-std-200',
     } : {
         accent: 'gold',
         gradient: 'from-gold-500/10 to-transparent',
@@ -210,7 +210,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                 
                 {/* Centered radial glow behind card */}
                 <div 
-                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} opacity-20 blur-[120px]`}
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full ${isMGT ? 'bg-tier-std-500' : 'bg-amber-500'} opacity-20 blur-[120px]`}
                     style={{ animation: 'pulse-glow 3s ease-in-out infinite' }}
                 />
                 
@@ -220,8 +220,8 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                         <div
                             key={i}
                             className={`absolute w-2 h-2 rounded-full ${
-                                i % 3 === 0 ? (isMGT ? 'bg-emerald-400' : 'bg-amber-400') :
-                                i % 3 === 1 ? (isMGT ? 'bg-emerald-300' : 'bg-amber-300') :
+                                i % 3 === 0 ? (isMGT ? 'bg-tier-std-400' : 'bg-amber-400') :
+                                i % 3 === 1 ? (isMGT ? 'bg-tier-std-300' : 'bg-amber-300') :
                                 'bg-white'
                             }`}
                             style={{
@@ -240,10 +240,10 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                     className="relative z-10 w-full max-w-[340px]"
                     style={{ animation: 'card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
                 >
-                    <div className={`relative overflow-hidden rounded-[32px] ${isDark ? 'bg-zinc-900/80' : 'bg-white/90'} backdrop-blur-3xl border ${isMGT ? 'border-emerald-500/20' : 'border-amber-500/20'} shadow-2xl`}>
+                    <div className={`relative overflow-hidden rounded-[32px] ${isDark ? 'bg-zinc-900/80' : 'bg-white/90'} backdrop-blur-3xl border ${isMGT ? 'border-tier-std-500/20' : 'border-amber-500/20'} shadow-2xl`}>
                         
                         {/* Inner glow at top */}
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} opacity-10 blur-3xl rounded-full`} />
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 ${isMGT ? 'bg-tier-std-500' : 'bg-amber-500'} opacity-10 blur-3xl rounded-full`} />
                         
                         <div className="relative p-8 pt-10">
                             {/* Animated Checkmark - Apple Pay style */}
@@ -251,7 +251,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                 <div className="relative">
                                     {/* Outer ring */}
                                     <div 
-                                        className={`w-24 h-24 rounded-full ${isMGT ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' : 'bg-gradient-to-br from-amber-500 to-amber-600'}`}
+                                        className={`w-24 h-24 rounded-full ${isMGT ? 'bg-gradient-to-br from-tier-std-500 to-tier-std-600' : 'bg-gradient-to-br from-amber-500 to-amber-600'}`}
                                         style={{ animation: 'scale-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
                                     >
                                         {/* Inner checkmark with SVG animation */}
@@ -278,15 +278,15 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                     
                                     {/* Sparkle effects */}
                                     <div 
-                                        className={`absolute -top-1 -right-1 w-4 h-4 ${isMGT ? 'bg-emerald-300' : 'bg-amber-300'} rounded-full`}
+                                        className={`absolute -top-1 -right-1 w-4 h-4 ${isMGT ? 'bg-tier-std-300' : 'bg-amber-300'} rounded-full`}
                                         style={{ animation: 'sparkle 1s ease-out 0.5s forwards', opacity: 0 }}
                                     />
                                     <div 
-                                        className={`absolute -bottom-1 -left-1 w-3 h-3 ${isMGT ? 'bg-emerald-400' : 'bg-amber-400'} rounded-full`}
+                                        className={`absolute -bottom-1 -left-1 w-3 h-3 ${isMGT ? 'bg-tier-std-400' : 'bg-amber-400'} rounded-full`}
                                         style={{ animation: 'sparkle 1s ease-out 0.7s forwards', opacity: 0 }}
                                     />
                                     <div 
-                                        className={`absolute top-1/2 -right-3 w-2 h-2 ${isMGT ? 'bg-emerald-200' : 'bg-amber-200'} rounded-full`}
+                                        className={`absolute top-1/2 -right-3 w-2 h-2 ${isMGT ? 'bg-tier-std-200' : 'bg-amber-200'} rounded-full`}
                                         style={{ animation: 'sparkle 1s ease-out 0.6s forwards', opacity: 0 }}
                                     />
                                 </div>
@@ -305,18 +305,18 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                                 className="my-6"
                                 style={{ animation: 'fade-up 0.5s ease-out 0.3s forwards', opacity: 0 }}
                             >
-                                <div className={`relative mx-auto max-w-[200px] py-4 px-6 rounded-2xl ${isDark ? 'bg-black/40' : 'bg-gray-100'} border ${isMGT ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
+                                <div className={`relative mx-auto max-w-[200px] py-4 px-6 rounded-2xl ${isDark ? 'bg-black/40' : 'bg-gray-100'} border ${isMGT ? 'border-tier-std-500/30' : 'border-amber-500/30'}`}>
                                     {/* Decorative dots */}
                                     <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${isDark ? 'bg-zinc-900' : 'bg-white'}`} />
                                     <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${isDark ? 'bg-zinc-900' : 'bg-white'}`} />
                                     
                                     <div className="flex items-center justify-center gap-2">
                                         {showSuccess.type === 'cash' ? (
-                                            <Wallet className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                            <Wallet className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                                         ) : (
-                                            <Coins className={`w-6 h-6 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                            <Coins className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                                         )}
-                                        <span className={`text-3xl font-bold tracking-tight ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <span className={`text-3xl font-bold tracking-tight ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>
                                             {showSuccess.type === 'cash' ? `Z$ ${showSuccess.amount}` : `+${showSuccess.amount}`}
                                         </span>
                                     </div>
@@ -337,7 +337,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
                             {/* Continue Button */}
                             <button
                                 onClick={handleSuccessClose}
-                                className={`w-full py-4 rounded-2xl font-semibold text-white text-lg ${isMGT ? 'bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-400 active:bg-amber-600'} transition-all duration-200 active:scale-[0.98]`}
+                                className={`w-full py-4 rounded-2xl font-semibold text-white text-lg ${isMGT ? 'bg-tier-std-500 hover:bg-tier-std-400 active:bg-tier-std-600' : 'bg-amber-500 hover:bg-amber-400 active:bg-amber-600'} transition-all duration-200 active:scale-[0.98]`}
                                 style={{ animation: 'fade-up 0.5s ease-out 0.5s forwards', opacity: 0 }}
                             >
                                 Continuar
@@ -540,7 +540,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
 
                                 {/* Coin Image with Glow */}
                                 <div className="relative mb-3 group-hover:scale-110 transition-transform duration-300">
-                                    <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} blur-[30px] opacity-30 rounded-full`} />
+                                    <div className={`absolute inset-0 ${isMGT ? 'bg-tier-std-500' : 'bg-amber-500'} blur-[30px] opacity-30 rounded-full`} />
                                     <img
                                         src={pkg.image}
                                         alt={`${pkg.zions} Zions`}
@@ -596,7 +596,7 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
 
                                     {/* Coin Image with Glow */}
                                     <div className="relative mb-3 group-hover:scale-110 transition-transform duration-300">
-                                        <div className={`absolute inset-0 ${isMGT ? 'bg-emerald-500' : 'bg-amber-500'} blur-[30px] opacity-30 rounded-full`} />
+                                        <div className={`absolute inset-0 ${isMGT ? 'bg-tier-std-500' : 'bg-amber-500'} blur-[30px] opacity-30 rounded-full`} />
                                         <img
                                             src={pkg.image}
                                             alt={`Z$ ${pkg.amount}`}

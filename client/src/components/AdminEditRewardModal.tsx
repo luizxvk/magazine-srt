@@ -178,8 +178,8 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                             </div>
 
                             {/* Zions Reward Field */}
-                            <div className="p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/20">
-                                <label className="block text-xs text-emerald-400 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
+                            <div className="p-4 bg-tier-std-500/5 rounded-xl border border-tier-std-500/20">
+                                <label className="block text-xs text-tier-std-400 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
                                     <Coins className="w-4 h-4" />
                                     Zions de Recompensa
                                 </label>
@@ -188,7 +188,7 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                                     min="0"
                                     value={zionsReward}
                                     onChange={e => setZionsReward(parseInt(e.target.value) || 0)}
-                                    className="w-full bg-black/40 border border-emerald-500/30 rounded-xl px-4 py-3 text-white focus:border-emerald-500/50 outline-none font-mono text-lg"
+                                    className="w-full bg-black/40 border border-tier-std-500/30 rounded-xl px-4 py-3 text-white focus:border-tier-std-500/50 outline-none font-mono text-lg"
                                 />
                                 <p className="mt-2 text-xs text-gray-400">
                                     {zionsReward > 0 
@@ -207,7 +207,7 @@ export default function AdminEditRewardModal({ isOpen, onClose, reward, onUpdate
                                         onClick={() => setIsUnlimited(true)}
                                         className={`p-3 rounded-xl text-sm font-bold border transition-all ${
                                             isUnlimited
-                                                ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                                                ? 'bg-tier-std-500/20 border-tier-std-500 text-tier-std-400'
                                                 : 'bg-black/40 border-white/10 text-gray-400 hover:bg-white/5'
                                         }`}
                                     >

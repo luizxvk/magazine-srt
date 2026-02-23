@@ -28,7 +28,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
     // Theme Colors
     const themeProgressGradient = isMGT
-        ? 'from-emerald-600 via-emerald-500 to-emerald-400'
+        ? 'from-tier-std-600 via-tier-std-500 to-tier-std-400'
         : 'from-yellow-600 via-yellow-400 to-yellow-200';
 
     const themeShadow = isMGT
@@ -36,7 +36,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
         : 'shadow-[0_0_15px_rgba(234,179,8,0.3)]';
 
     const themeNodeReached = isMGT
-        ? 'bg-gradient-to-br from-emerald-500 to-emerald-700 border-emerald-400 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+        ? 'bg-gradient-to-br from-tier-std-500 to-tier-std-700 border-tier-std-400 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]'
         : 'bg-gradient-to-br from-yellow-400 to-yellow-600 border-yellow-300 text-black shadow-[0_0_10px_rgba(234,179,8,0.3)]';
 
     const themeNodeUnreached = theme === 'light'
@@ -44,14 +44,14 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
         : 'bg-gray-900 border-gray-700 text-gray-500';
 
     const themeRewardIconReached = isMGT
-        ? 'bg-emerald-500/20 text-emerald-500'
+        ? 'bg-tier-std-500/20 text-tier-std-500'
         : 'bg-yellow-500/20 text-yellow-400';
 
     const themeRewardIconUnreached = theme === 'light'
         ? 'bg-gray-200 text-gray-400'
         : 'bg-gray-800/50 text-gray-600';
 
-    const themeTextReached = isMGT ? 'text-emerald-500' : 'text-yellow-400';
+    const themeTextReached = isMGT ? 'text-tier-std-500' : 'text-yellow-400';
     const themeTextUnreached = theme === 'light' ? 'text-gray-400' : 'text-gray-600';
 
     const getLevelReward = (level: number) => {
@@ -69,7 +69,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
             {/* XP Progress Bar */}
             <div className="mb-4 px-4">
                 <div className="flex justify-between items-center mb-2">
-                    <span className={`text-xs font-medium ${isMGT ? 'text-emerald-400' : 'text-yellow-400'}`}>
+                    <span className={`text-xs font-medium ${isMGT ? 'text-tier-std-400' : 'text-yellow-400'}`}>
                         Nível {currentLevel}
                     </span>
                     <span className="text-xs text-gray-400">
@@ -131,7 +131,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                             key={level}
                                             className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                                                 isReached ? themeNodeReached : themeNodeUnreached
-                                            } ${isCurrent ? `scale-110 ring-2 ${isMGT ? 'ring-emerald-500/40' : 'ring-yellow-500/40'} z-30` : 'z-20'}`}
+                                            } ${isCurrent ? `scale-110 ring-2 ${isMGT ? 'ring-tier-std-500/40' : 'ring-yellow-500/40'} z-30` : 'z-20'}`}
                                             whileHover={{ scale: 1.15 }}
                                         >
                                             <span className="text-[10px] font-bold">{level}</span>
@@ -157,7 +157,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                         }}
                         className={`w-full py-3 rounded-xl font-bold text-sm uppercase tracking-widest border transition-all ${
                             isMGT
-                                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 border-emerald-400/30 text-white hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
+                                ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 border-tier-std-400/30 text-white hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
                                 : 'bg-gradient-to-r from-yellow-500 to-amber-500 border-yellow-400/30 text-black hover:shadow-[0_0_25px_rgba(234,179,8,0.4)]'
                         }`}
                         whileHover={{ scale: 1.02 }}
@@ -175,13 +175,13 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                     <span className="text-xs text-gray-400 uppercase tracking-wider">Prestígio</span>
                     <span className="text-sm">{'⭐'.repeat(Math.min(user?.prestigeLevel || 0, 10))}</span>
                     {(user?.prestigeLevel || 0) > 0 && (
-                        <span className={`text-[10px] ${isMGT ? 'text-emerald-400' : 'text-yellow-400'}`}>
+                        <span className={`text-[10px] ${isMGT ? 'text-tier-std-400' : 'text-yellow-400'}`}>
                             +{(user?.prestigeLevel || 0) * 5}% XP
                         </span>
                     )}
                     <button
                         onClick={() => setShowPrestigeInfo(true)}
-                        className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isMGT ? 'text-emerald-400 hover:text-emerald-300' : 'text-yellow-400 hover:text-yellow-300'}`}
+                        className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isMGT ? 'text-tier-std-400 hover:text-tier-std-300' : 'text-yellow-400 hover:text-yellow-300'}`}
                         title="Como funciona o Prestígio?"
                     >
                         <Info size={14} />
@@ -195,7 +195,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                     <button
                         onClick={() => setShowPrestigeInfo(true)}
                         className={`flex items-center gap-1.5 text-xs ${
-                            isMGT ? 'text-emerald-400 hover:text-emerald-300' : 'text-yellow-400 hover:text-yellow-300'
+                            isMGT ? 'text-tier-std-400 hover:text-tier-std-300' : 'text-yellow-400 hover:text-yellow-300'
                         } transition-colors`}
                     >
                         <Info size={14} />
@@ -230,7 +230,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                             className="p-3 rounded-2xl"
                                             style={{ backgroundColor: isMGT ? 'rgba(16, 185, 129, 0.2)' : 'rgba(212, 175, 55, 0.2)' }}
                                         >
-                                            <Sparkles className={isMGT ? 'text-emerald-400' : 'text-amber-400'} size={28} />
+                                            <Sparkles className={isMGT ? 'text-tier-std-400' : 'text-amber-400'} size={28} />
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-bold text-white">Sistema de Prestígio</h3>
@@ -248,7 +248,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                 <div className="space-y-4">
                                     {/* What is Prestige */}
                                     <div className="rounded-2xl p-4 bg-white/5 border border-white/5">
-                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>
                                             O que é Prestígio?
                                         </h4>
                                         <p className="text-sm text-gray-300 leading-relaxed">
@@ -259,20 +259,20 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
                                     {/* How it works */}
                                     <div className="rounded-2xl p-4 bg-white/5 border border-white/5">
-                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>
                                             Como Funciona?
                                         </h4>
                                         <ul className="text-sm space-y-3 text-gray-300">
                                             <li className="flex items-center gap-3">
-                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>1</span>
+                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-amber-500/20 text-amber-400'}`}>1</span>
                                                 <span>Alcance o <strong className="text-white">Nível 30</strong> (nível máximo)</span>
                                             </li>
                                             <li className="flex items-center gap-3">
-                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>2</span>
+                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-amber-500/20 text-amber-400'}`}>2</span>
                                                 <span>Clique em <strong className="text-white">"Prestigiar"</strong> para ativar</span>
                                             </li>
                                             <li className="flex items-center gap-3">
-                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>3</span>
+                                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-amber-500/20 text-amber-400'}`}>3</span>
                                                 <span>Seu nível volta ao <strong className="text-white">1</strong>, mas você ganha:</span>
                                             </li>
                                         </ul>
@@ -280,28 +280,28 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
                                     {/* Rewards */}
                                     <div className="rounded-2xl p-4 bg-white/5 border border-white/5">
-                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>
                                             Recompensas por Prestígio
                                         </h4>
                                         <div className="grid grid-cols-2 gap-3 text-sm">
                                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                                                <Coins className={`w-6 h-6 mb-2 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
-                                                <div className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>Zions Points</div>
+                                                <Coins className={`w-6 h-6 mb-2 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
+                                                <div className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>Zions Points</div>
                                                 <div className="text-gray-400 text-xs mt-1">+500 por prestígio</div>
                                             </div>
                                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                                                <Zap className={`w-6 h-6 mb-2 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
-                                                <div className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>Bônus de XP</div>
+                                                <Zap className={`w-6 h-6 mb-2 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
+                                                <div className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>Bônus de XP</div>
                                                 <div className="text-gray-400 text-xs mt-1">+5% permanente</div>
                                             </div>
                                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                                                <Star className={`w-6 h-6 mb-2 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
-                                                <div className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>Estrela</div>
+                                                <Star className={`w-6 h-6 mb-2 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
+                                                <div className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>Estrela</div>
                                                 <div className="text-gray-400 text-xs mt-1">Exibida no perfil</div>
                                             </div>
                                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                                                <Award className={`w-6 h-6 mb-2 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
-                                                <div className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>Status</div>
+                                                <Award className={`w-6 h-6 mb-2 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
+                                                <div className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>Status</div>
                                                 <div className="text-gray-400 text-xs mt-1">Reconhecimento</div>
                                             </div>
                                         </div>
@@ -309,26 +309,26 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
 
                                     {/* XP Bonus table */}
                                     <div className="rounded-2xl p-4 bg-white/5 border border-white/5">
-                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>
                                             Tabela de Bônus
                                         </h4>
                                         <div className="grid grid-cols-5 gap-2 text-center text-xs">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((p) => (
                                                 <div key={p} className={`p-2 rounded-xl transition-colors ${
                                                     (user?.prestigeLevel || 0) >= p 
-                                                        ? (isMGT ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-amber-500/20 border border-amber-500/30')
+                                                        ? (isMGT ? 'bg-tier-std-500/20 border border-tier-std-500/30' : 'bg-amber-500/20 border border-amber-500/30')
                                                         : 'bg-white/5 border border-white/5'
                                                 }`}>
                                                     <div className={`text-base font-bold ${
                                                         (user?.prestigeLevel || 0) >= p
-                                                            ? (isMGT ? 'text-emerald-400' : 'text-amber-400')
+                                                            ? (isMGT ? 'text-tier-std-400' : 'text-amber-400')
                                                             : 'text-gray-500'
                                                     }`}>
                                                         ⭐{p}
                                                     </div>
                                                     <div className={`font-medium ${
                                                         (user?.prestigeLevel || 0) >= p
-                                                            ? (isMGT ? 'text-emerald-400' : 'text-amber-400')
+                                                            ? (isMGT ? 'text-tier-std-400' : 'text-amber-400')
                                                             : 'text-gray-500'
                                                     }`}>
                                                         +{p * 5}%
@@ -368,7 +368,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                     onClick={() => setShowPrestigeInfo(false)}
                                     className={`w-full mt-6 py-3 rounded-xl text-sm font-semibold transition-all ${
                                         isMGT 
-                                            ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30' 
+                                            ? 'bg-tier-std-500/20 text-tier-std-400 hover:bg-tier-std-500/30 border border-tier-std-500/30' 
                                             : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30'
                                     }`}
                                 >
@@ -401,8 +401,8 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                 className="w-full max-w-md rounded-3xl p-6 bg-[#1c1c1e]/95 backdrop-blur-2xl border border-white/10 shadow-2xl"
                             >
                                 <div className="text-center mb-6">
-                                    <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-emerald-500/20' : 'bg-amber-500/20'}`}>
-                                        <Star className={`w-8 h-8 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                    <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-tier-std-500/20' : 'bg-amber-500/20'}`}>
+                                        <Star className={`w-8 h-8 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                                     </div>
                                     <h3 className="text-xl font-bold text-white">
                                         Prestigiar para Nível {(user?.prestigeLevel || 0) + 1}
@@ -413,30 +413,30 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                 </div>
 
                                 <div className="rounded-2xl p-4 mb-6 bg-white/5 border border-white/5">
-                                    <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                    <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>
                                         Recompensas
                                     </h4>
                                     <ul className="space-y-3 text-sm">
                                         <li className="flex justify-between items-center text-gray-300">
                                             <span className="flex items-center gap-2">
-                                                <Coins className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                                <Coins className={`w-4 h-4 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                                                 Zions Points
                                             </span>
-                                            <span className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>+{prestigeInfo?.reward || 500}</span>
+                                            <span className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>+{prestigeInfo?.reward || 500}</span>
                                         </li>
                                         <li className="flex justify-between items-center text-gray-300">
                                             <span className="flex items-center gap-2">
-                                                <Zap className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                                <Zap className={`w-4 h-4 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                                                 Bônus de XP
                                             </span>
-                                            <span className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>+{prestigeInfo?.xpBonus || ((user?.prestigeLevel || 0) + 1) * 5}%</span>
+                                            <span className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>+{prestigeInfo?.xpBonus || ((user?.prestigeLevel || 0) + 1) * 5}%</span>
                                         </li>
                                         <li className="flex justify-between items-center text-gray-300">
                                             <span className="flex items-center gap-2">
-                                                <Star className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`} />
+                                                <Star className={`w-4 h-4 ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`} />
                                                 Estrela de Prestígio
                                             </span>
-                                            <span className={`font-bold ${isMGT ? 'text-emerald-400' : 'text-amber-400'}`}>⭐ ×{(user?.prestigeStars || 0) + 1}</span>
+                                            <span className={`font-bold ${isMGT ? 'text-tier-std-400' : 'text-amber-400'}`}>⭐ ×{(user?.prestigeStars || 0) + 1}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -471,7 +471,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                                     disabled={prestigeLoading}
                                     className={`flex-1 py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all ${
                                         isMGT
-                                            ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-400'
+                                            ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 text-white hover:from-tier-std-500 hover:to-tier-std-400'
                                             : 'bg-gradient-to-r from-amber-500 to-amber-400 text-black hover:from-amber-400 hover:to-amber-300'
                                     } disabled:opacity-50`}
                                     whileHover={{ scale: 1.02 }}

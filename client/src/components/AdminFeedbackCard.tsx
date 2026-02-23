@@ -283,7 +283,7 @@ export default function AdminFeedbackCard() {
                                             )}
                                             <span className={`text-xs px-2 py-0.5 rounded ${
                                                 feedback.user.membershipType === 'MGT' 
-                                                    ? 'bg-emerald-500/20 text-emerald-400' 
+                                                    ? 'bg-tier-std-500/20 text-tier-std-400' 
                                                     : 'bg-gold-500/20 text-gold-400'
                                             }`}>
                                                 {feedback.user.membershipType}

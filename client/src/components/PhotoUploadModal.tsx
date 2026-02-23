@@ -28,9 +28,9 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
     const themeColors = isMGT
         ? {
             bg: theme === 'light' ? 'bg-white' : 'bg-gray-900',
-            border: 'border-emerald-500/30',
-            text: 'text-emerald-500',
-            button: 'bg-emerald-600 hover:bg-emerald-500',
+            border: 'border-tier-std-500/30',
+            text: 'text-tier-std-500',
+            button: 'bg-tier-std-600 hover:bg-tier-std-500',
             inputBg: theme === 'light' ? 'bg-gray-50' : 'bg-black/40',
         }
         : {
@@ -151,7 +151,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
                             <label className="text-sm font-medium text-gray-400">Imagem do Veículo</label>
                             <div
                                 {...getRootProps()}
-                                className={`flex-1 relative rounded-xl overflow-hidden aspect-video ${themeColors.inputBg} border-2 border-dashed ${isDragActive ? 'border-emerald-500 bg-emerald-500/10' : 'border-gray-600'} flex items-center justify-center group cursor-pointer transition-all hover:border-gray-400`}
+                                className={`flex-1 relative rounded-xl overflow-hidden aspect-video ${themeColors.inputBg} border-2 border-dashed ${isDragActive ? 'border-tier-std-500 bg-tier-std-500/10' : 'border-gray-600'} flex items-center justify-center group cursor-pointer transition-all hover:border-gray-400`}
                             >
                                 <input {...getInputProps()} />
                                 {isCompressing ? (
@@ -170,7 +170,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
                                     </div>
                                 ) : (
                                     <div className="text-center p-8">
-                                        <Upload className={`w-12 h-12 mx-auto mb-2 ${isDragActive ? 'text-emerald-500' : 'text-gray-500'}`} />
+                                        <Upload className={`w-12 h-12 mx-auto mb-2 ${isDragActive ? 'text-tier-std-500' : 'text-gray-500'}`} />
                                         <p className="text-sm text-gray-400 font-medium">
                                             {isDragActive ? 'Solte a imagem aqui' : 'Arraste e solte uma imagem aqui'}
                                         </p>
@@ -243,11 +243,11 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
 
                         {/* Visibility Toggle */}
                         <div
-                            className={`p-4 rounded-xl border ${isPublic ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-red-500/30 bg-red-500/5'} cursor-pointer transition-all flex items-center justify-between`}
+                            className={`p-4 rounded-xl border ${isPublic ? 'border-tier-std-500/30 bg-tier-std-500/5' : 'border-red-500/30 bg-red-500/5'} cursor-pointer transition-all flex items-center justify-between`}
                             onClick={() => setIsPublic(!isPublic)}
                         >
                             <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-full ${isPublic ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'}`}>
+                                <div className={`p-2 rounded-full ${isPublic ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-red-500/20 text-red-500'}`}>
                                     {isPublic ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                 </div>
                                 <div>
@@ -259,7 +259,7 @@ export default function PhotoUploadModal({ isOpen, onClose, onSuccess }: PhotoUp
                                     </p>
                                 </div>
                             </div>
-                            <div className={`w-12 h-6 rounded-full relative transition-colors ${isPublic ? 'bg-emerald-500' : 'bg-gray-600'}`}>
+                            <div className={`w-12 h-6 rounded-full relative transition-colors ${isPublic ? 'bg-tier-std-500' : 'bg-gray-600'}`}>
                                 <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${isPublic ? 'translate-x-6' : ''}`} />
                             </div>
                         </div>

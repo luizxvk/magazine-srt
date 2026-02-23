@@ -296,7 +296,7 @@ export default function EventsModal({ isOpen, onClose }: EventsModalProps) {
                                                                             {attendee.avatarUrl ? (
                                                                                 <img src={attendee.avatarUrl} alt="" className="w-full h-full object-cover" />
                                                                             ) : (
-                                                                                <div className={`w-full h-full flex items-center justify-center text-[10px] font-bold ${attendee.membershipType === 'MGT' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                                                                <div className={`w-full h-full flex items-center justify-center text-[10px] font-bold ${attendee.membershipType === 'MGT' ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                                                                     {(attendee.displayName || attendee.name).charAt(0).toUpperCase()}
                                                                                 </div>
                                                                             )}

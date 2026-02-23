@@ -49,9 +49,9 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
     const [dropClaimHours, setDropClaimHours] = useState(24); // Horas após evento para resgatar
 
     const themeColor = isMGT ? 'emerald' : 'gold';
-    const focusColor = isMGT ? 'focus:border-emerald-500/50' : 'focus:border-gold-500/50';
-    const buttonBg = isMGT ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gold-600 hover:bg-gold-500';
-    const iconColor = isMGT ? 'text-emerald-400' : 'text-gold-400';
+    const focusColor = isMGT ? 'focus:border-tier-std-500/50' : 'focus:border-gold-500/50';
+    const buttonBg = isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : 'bg-gold-600 hover:bg-gold-500';
+    const iconColor = isMGT ? 'text-tier-std-400' : 'text-gold-400';
 
     // Buscar recompensas disponíveis quando abre o form
     useEffect(() => {

@@ -216,7 +216,7 @@ export default function AdminGridDashboard() {
         comments: {
             title: 'Comentários',
             value: stats.totalComments,
-            icon: <Shield className="w-6 h-6 text-emerald-400" />,
+            icon: <Shield className="w-6 h-6 text-tier-std-400" />,
             subtitle: 'Total de interações',
             color: 'emerald'
         }

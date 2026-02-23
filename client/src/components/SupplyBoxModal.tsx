@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, X, Sparkles, Gift, Coins, TrendingUp, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -122,16 +122,16 @@ const BORDER_PREVIEWS: Record<string, string> = {
 };
 
 const BADGE_ICONS: Record<string, string> = {
-    'badge_crown': '👑',
-    'badge_fire': '🔥',
-    'badge_heart': '❤️',
-    'badge_pony': '🦄',
-    'badge_skull': '💀',
-    'badge_star': '⭐',
-    'badge_moon': '🌙',
-    'badge_sun': '☀️',
-    'badge_lightning': '⚡',
-    'badge_diamond': '💎',
+    'badge_crown': '??',
+    'badge_fire': '??',
+    'badge_heart': '??',
+    'badge_pony': '??',
+    'badge_skull': '??',
+    'badge_star': '?',
+    'badge_moon': '??',
+    'badge_sun': '??',
+    'badge_lightning': '?',
+    'badge_diamond': '??',
 };
 
 export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBoxModalProps) {
@@ -176,16 +176,16 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
             setOpensToday(prev => prev + 1);
             setCost(res.data.nextCost);
 
-            // Atualizar saldo de Zions Points no contexto do usuário
+            // Atualizar saldo de Zions Points no contexto do usu�rio
             const currentCost = cost || 0;
             let pointsDelta = -currentCost; // Desconta o custo da abertura
 
             if (res.data.rewardType === 'ZIONS' && res.data.item?.value) {
-                // Ganhou Zions bônus
+                // Ganhou Zions b�nus
                 pointsDelta += res.data.item.value;
             }
             if (res.data.type === 'DUPLICATE' && res.data.compensation) {
-                // Compensação por duplicata
+                // Compensa��o por duplicata
                 pointsDelta += res.data.compensation;
             }
             if (pointsDelta !== 0) {
@@ -339,22 +339,22 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🎨 {t('supplyBox.backgrounds')}
+                                        ?? {t('supplyBox.backgrounds')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🏅 {t('supplyBox.badges')}
+                                        ?? {t('supplyBox.badges')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🎯 {t('supplyBox.colors')}
+                                        ?? {t('supplyBox.colors')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        🖼️ {t('supplyBox.borders')}
+                                        ??? {t('supplyBox.borders')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        📦 {t('supplyBox.packs')}
+                                        ?? {t('supplyBox.packs')}
                                     </span>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${theme === 'light' ? 'bg-white' : 'bg-white/10'}`}>
-                                        💰 {t('supplyBox.zionsRange')}
+                                        ?? {t('supplyBox.zionsRange')}
                                     </span>
                                 </div>
                             </div>
@@ -550,7 +550,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                         }}
                                                     >
                                                         <div className={`w-full h-full rounded-full ${theme === 'light' ? 'bg-gray-100' : 'bg-[#1a1a1a]'} flex items-center justify-center`}>
-                                                            <span className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>👤</span>
+                                                            <span className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-400' : 'text-white/30'}`}>??</span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -562,7 +562,7 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                                                             boxShadow: `0 8px 30px ${getRarityColor(reward.rarity)}40`
                                                         }}
                                                     >
-                                                        <span className="text-5xl">{BADGE_ICONS[reward.item.id] || '🏅'}</span>
+                                                        <span className="text-5xl">{BADGE_ICONS[reward.item.id] || '??'}</span>
                                                     </div>
                                                 )}
                                             </motion.div>

@@ -168,9 +168,9 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
     if (!isVisible) return null;
 
     // Accent colors based on membership (with custom gradient support)
-    const accentBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
-    const accentText = isMGT ? 'text-emerald-400' : 'text-gold-400';
-    const accentBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
+    const accentBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
+    const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
+    const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const accentGlow = isMGT ? 'shadow-[0_0_60px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_60px_rgba(212,175,55,0.3)]';
 
     // Custom gradient styles for buttons and icons
@@ -201,8 +201,8 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                     >
                         {/* Animated gradient background */}
                         <div className="absolute inset-0 overflow-hidden">
-                            <div className={`absolute -top-1/2 -left-1/2 w-full h-full ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} rounded-full blur-3xl animate-pulse`} />
-                            <div className={`absolute -bottom-1/2 -right-1/2 w-full h-full ${isMGT ? 'bg-emerald-600/5' : 'bg-amber-500/5'} rounded-full blur-3xl animate-pulse delay-1000`} />
+                            <div className={`absolute -top-1/2 -left-1/2 w-full h-full ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'} rounded-full blur-3xl animate-pulse`} />
+                            <div className={`absolute -bottom-1/2 -right-1/2 w-full h-full ${isMGT ? 'bg-tier-std-600/5' : 'bg-amber-500/5'} rounded-full blur-3xl animate-pulse delay-1000`} />
                         </div>
 
                         {/* Close button */}
@@ -222,7 +222,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 transition={{ delay: 0.2 }}
                                 className="flex justify-center mb-6"
                             >
-                                <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold ${isDark ? `${isMGT ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}` : `${isMGT ? 'bg-emerald-100 text-emerald-700' : 'bg-gold-100 text-gold-700'}`} border backdrop-blur-sm`}>
+                                <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold ${isDark ? `${isMGT ? 'bg-tier-std-500/20 text-tier-std-400 border-tier-std-500/30' : 'bg-gold-500/20 text-gold-400 border-gold-500/30'}` : `${isMGT ? 'bg-tier-std-100 text-tier-std-700' : 'bg-gold-100 text-gold-700'}`} border backdrop-blur-sm`}>
                                     <Sparkles className="w-3.5 h-3.5" />
                                     BETA v{TOUR_VERSION}
                                 </span>
@@ -236,7 +236,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 className="flex justify-center mb-6"
                             >
                                 <div 
-                                    className={`relative w-24 h-24 rounded-3xl flex items-center justify-center border ${accentBorder} ${isDark ? `${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`}`}
+                                    className={`relative w-24 h-24 rounded-3xl flex items-center justify-center border ${accentBorder} ${isDark ? `${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}` : `${isMGT ? 'bg-tier-std-100' : 'bg-gold-100'}`}`}
                                     style={hasCustomGradient ? { backgroundColor: `${userAccentColor}20` } : undefined}
                                 >
                                     <Crown 
@@ -245,7 +245,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                     />
                                     {/* Glow effect */}
                                     <div 
-                                        className={`absolute inset-0 rounded-3xl blur-xl animate-pulse ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`} 
+                                        className={`absolute inset-0 rounded-3xl blur-xl animate-pulse ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}`} 
                                         style={hasCustomGradient ? { backgroundColor: `${userAccentColor}20` } : undefined}
                                     />
                                 </div>
@@ -304,7 +304,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                         className={`group relative flex flex-col items-center p-3 rounded-2xl ${isDark ? 'bg-white/[0.04] hover:bg-white/[0.08]' : 'bg-gray-100/80 hover:bg-gray-200/80'} border ${isDark ? 'border-white/[0.06]' : 'border-gray-200'} transition-all cursor-default`}
                                     >
                                         <div 
-                                            className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform ${isDark ? `${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'}` : `${isMGT ? 'bg-emerald-100' : 'bg-gold-100'}`}`}
+                                            className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform ${isDark ? `${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}` : `${isMGT ? 'bg-tier-std-100' : 'bg-gold-100'}`}`}
                                             style={hasCustomGradient ? { backgroundColor: `${userAccentColor}15` } : undefined}
                                         >
                                             <feature.icon 
@@ -362,15 +362,15 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                         className={`flex items-center gap-3 cursor-pointer select-none px-4 py-2.5 rounded-xl border transition-all ${
                                             wantsTutorial
                                                 ? (isDark 
-                                                    ? `${isMGT ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-gold-500/10 border-gold-500/30'}` 
-                                                    : `${isMGT ? 'bg-emerald-50 border-emerald-200' : 'bg-gold-50 border-gold-200'}`)
+                                                    ? `${isMGT ? 'bg-tier-std-500/10 border-tier-std-500/30' : 'bg-gold-500/10 border-gold-500/30'}` 
+                                                    : `${isMGT ? 'bg-tier-std-50 border-tier-std-200' : 'bg-gold-50 border-gold-200'}`)
                                                 : (isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200')
                                         }`}
                                     >
                                         <div
                                             className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
                                                 wantsTutorial
-                                                    ? `${isMGT ? 'bg-emerald-500 border-emerald-500' : 'bg-gold-500 border-gold-500'}` 
+                                                    ? `${isMGT ? 'bg-tier-std-500 border-tier-std-500' : 'bg-gold-500 border-gold-500'}` 
                                                     : (isDark ? 'border-gray-600' : 'border-gray-300')
                                             }`}
                                             onClick={() => setWantsTutorial(!wantsTutorial)}
@@ -389,7 +389,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
 
                                 <button
                                     onClick={handleNext}
-                                    className={`group relative px-8 py-4 hover:brightness-110 text-black font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${!hasCustomGradient ? `${accentBg} ${isMGT ? 'shadow-emerald-500/25' : 'shadow-gold-500/25'}` : ''}`}
+                                    className={`group relative px-8 py-4 hover:brightness-110 text-black font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg ${!hasCustomGradient ? `${accentBg} ${isMGT ? 'shadow-tier-std-500/25' : 'shadow-gold-500/25'}` : ''}`}
                                     style={buttonGradientStyle}
                                 >
                                     <span className="flex items-center gap-2">
@@ -417,11 +417,11 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -50, opacity: 0 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className={`${isDark ? (isMGT ? 'bg-emerald-950/90' : 'bg-[#0a0a0a]') : 'bg-white'} border ${isDark ? (isMGT ? 'border-emerald-500/30' : 'border-gold-500/30') : (isMGT ? 'border-emerald-500/20' : 'border-gold-500/20')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative ${accentGlow}`}
+                        className={`${isDark ? (isMGT ? 'bg-tier-std-950/90' : 'bg-[#0a0a0a]') : 'bg-white'} border ${isDark ? (isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30') : (isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative ${accentGlow}`}
                     >
                         {/* BETA Badge */}
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                            <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
+                            <span className={`px-4 py-1.5 text-xs font-bold rounded-full ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400 border border-tier-std-500/30' : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'} backdrop-blur-sm shadow-lg`}>
                                 BETA v{TOUR_VERSION}
                             </span>
                         </div>
@@ -437,13 +437,13 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                         {/* Emoji centered in card */}
                         <div className="pt-6 pb-4">
                             <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
-                                <div className={`w-full h-full ${isDark ? (isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10') : (isMGT ? 'bg-emerald-50' : 'bg-gold-50')} rounded-full flex items-center justify-center border ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                                <div className={`w-full h-full ${isDark ? (isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10') : (isMGT ? 'bg-tier-std-50' : 'bg-gold-50')} rounded-full flex items-center justify-center border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
                                     <span className="text-4xl sm:text-5xl">{currentStep.emoji}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <h2 className={`text-xl sm:text-2xl font-serif ${isDark ? (isMGT ? 'text-emerald-300' : 'text-gold-300') : 'text-gray-900'} mb-2`}>
+                        <h2 className={`text-xl sm:text-2xl font-serif ${isDark ? (isMGT ? 'text-tier-std-300' : 'text-gold-300') : 'text-gray-900'} mb-2`}>
                             {currentStep.title}
                         </h2>
                         
@@ -457,8 +457,8 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 <span 
                                     key={i}
                                     className={`px-3 py-1 text-xs rounded-full ${isDark 
-                                        ? (isMGT ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-gold-500/10 text-gold-400 border border-gold-500/20')
-                                        : (isMGT ? 'bg-emerald-100 text-emerald-700' : 'bg-gold-100 text-gold-700')
+                                        ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-400 border border-tier-std-500/20' : 'bg-gold-500/10 text-gold-400 border border-gold-500/20')
+                                        : (isMGT ? 'bg-tier-std-100 text-tier-std-700' : 'bg-gold-100 text-gold-700')
                                     }`}
                                 >
                                     {feature}
@@ -474,7 +474,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                         key={i}
                                         onClick={() => setStep(i)}
                                         className={`w-2 h-2 rounded-full transition-all duration-300 ${i === step 
-                                            ? (!hasCustomGradient ? (isMGT ? 'bg-emerald-500 w-6' : 'bg-gold-500 w-6') : 'w-6') 
+                                            ? (!hasCustomGradient ? (isMGT ? 'bg-tier-std-500 w-6' : 'bg-gold-500 w-6') : 'w-6') 
                                             : (isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400')
                                         }`}
                                         style={i === step && hasCustomGradient ? { backgroundColor: userAccentColor } : undefined}
@@ -483,7 +483,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                             </div>
                             <button
                                 onClick={handleNext}
-                                className={`flex items-center gap-2 text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg hover:brightness-110 ${!hasCustomGradient ? (isMGT ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-gold-500 hover:bg-gold-400') : ''}`}
+                                className={`flex items-center gap-2 text-black px-5 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 shadow-lg hover:brightness-110 ${!hasCustomGradient ? (isMGT ? 'bg-tier-std-500 hover:bg-tier-std-400' : 'bg-gold-500 hover:bg-gold-400') : ''}`}
                                 style={buttonGradientStyle}
                             >
                                 {step === steps.length - 1 ? 'Começar!' : 'Próximo'}

@@ -32,8 +32,8 @@ export default function PhotoCatalogCard({ photos = [], onViewAll }: PhotoCatalo
     const isMGT = user?.membershipType === 'MGT';
 
     // Theme colors
-    const themeBorder = isMGT ? 'border-emerald-500/30' : 'border-gold-500/30';
-    const themeAccent = isMGT ? 'text-emerald-500' : 'text-gold-500';
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';
     const themeGlow = isMGT
         ? 'shadow-[0_0_20px_rgba(16,185,129,0.2)]'
         : 'shadow-[0_0_20px_rgba(212,175,55,0.2)]';
@@ -102,7 +102,7 @@ export default function PhotoCatalogCard({ photos = [], onViewAll }: PhotoCatalo
                     <button
                         onClick={() => navigate('/catalog')}
                         className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${isMGT
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                            ? 'bg-tier-std-600 hover:bg-tier-std-500 text-white'
                             : 'bg-gold-500 hover:bg-gold-400 text-black'
                             } transition-colors`}
                     >

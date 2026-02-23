@@ -317,7 +317,7 @@ export default function ImageCropModal({ isOpen, onClose, imageFile, onCropCompl
                                 disabled={!imageLoaded}
                                 className={`px-6 py-2 rounded-full text-sm font-medium text-black transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                                     isMGT 
-                                        ? 'bg-emerald-500 hover:bg-emerald-400' 
+                                        ? 'bg-tier-std-500 hover:bg-tier-std-400' 
                                         : 'bg-gold-500 hover:bg-gold-400'
                                 }`}
                             >

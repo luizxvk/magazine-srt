@@ -186,7 +186,7 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                         {[0, 1, 2].map(i => (
                             <motion.div
                                 key={i}
-                                className={`w-3 h-3 rounded-full ${isMGT ? 'bg-emerald-400' : 'bg-gold-400'}`}
+                                className={`w-3 h-3 rounded-full ${isMGT ? 'bg-tier-std-400' : 'bg-gold-400'}`}
                                 animate={{ y: [0, -10, 0] }}
                                 transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
                             />
@@ -251,11 +251,11 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                             <div className="flex items-center gap-3">
                                 {tournament.prizePool > 0 && (
                                     <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${
-                                        isMGT ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-gold-500/10 border border-gold-500/20'
+                                        isMGT ? 'bg-tier-std-500/10 border border-tier-std-500/20' : 'bg-gold-500/10 border border-gold-500/20'
                                     }`}>
-                                        <Coins className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                        <Coins className={`w-5 h-5 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                                         <div>
-                                            <div className={`text-lg font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                            <div className={`text-lg font-bold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                                 {formatCurrency(tournament.prizePool)}
                                             </div>
                                             <div className="text-xs text-gray-500">Premiação</div>
@@ -268,7 +268,7 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                                         onClick={() => setShowRegisterModal(true)}
                                         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all hover:scale-105 ${
                                             isMGT
-                                                ? 'bg-emerald-500 text-black hover:bg-emerald-400'
+                                                ? 'bg-tier-std-500 text-black hover:bg-tier-std-400'
                                                 : 'bg-gold-500 text-black hover:bg-gold-400'
                                         }`}
                                     >
@@ -314,7 +314,7 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                                 className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all flex-1 justify-center ${
                                     active
                                         ? isMGT
-                                            ? 'bg-emerald-500/20 text-emerald-400'
+                                            ? 'bg-tier-std-500/20 text-tier-std-400'
                                             : 'bg-gold-500/20 text-gold-400'
                                         : 'text-gray-500 hover:text-gray-300'
                                 }`}
@@ -361,7 +361,7 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                                             className={`bg-white/5 border rounded-xl p-4 flex items-center justify-between ${
                                                 myTeam?.id === team.id
                                                     ? isMGT
-                                                        ? 'border-emerald-500/30 bg-emerald-500/5'
+                                                        ? 'border-tier-std-500/30 bg-tier-std-500/5'
                                                         : 'border-gold-500/30 bg-gold-500/5'
                                                     : 'border-white/10'
                                             }`}
@@ -411,13 +411,13 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                                                     key={s.teamId}
                                                     className={`border-b border-white/5 ${
                                                         i === 0 && tournament.status === 'COMPLETED'
-                                                            ? isMGT ? 'bg-emerald-500/5' : 'bg-gold-500/5'
+                                                            ? isMGT ? 'bg-tier-std-500/5' : 'bg-gold-500/5'
                                                             : ''
                                                     }`}
                                                 >
                                                     <td className="px-4 py-3 text-gray-400 font-mono">
                                                         {i === 0 && tournament.status === 'COMPLETED' ? (
-                                                            <Trophy className={`w-4 h-4 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                                            <Trophy className={`w-4 h-4 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                                                         ) : (
                                                             i + 1
                                                         )}
@@ -507,7 +507,7 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                                             disabled={!teamName.trim() || registering}
                                             className={`flex-1 px-4 py-3 rounded-xl font-bold transition-all disabled:opacity-50 ${
                                                 isMGT
-                                                    ? 'bg-emerald-500 text-black hover:bg-emerald-400'
+                                                    ? 'bg-tier-std-500 text-black hover:bg-tier-std-400'
                                                     : 'bg-gold-500 text-black hover:bg-gold-400'
                                             }`}
                                         >
@@ -575,7 +575,7 @@ export default function TournamentDetail({ tournamentId, onBack }: TournamentDet
                                         disabled={score1 === score2}
                                         className={`flex-1 px-4 py-3 rounded-xl font-bold transition-all disabled:opacity-50 ${
                                             isMGT
-                                                ? 'bg-emerald-500 text-black hover:bg-emerald-400'
+                                                ? 'bg-tier-std-500 text-black hover:bg-tier-std-400'
                                                 : 'bg-gold-500 text-black hover:bg-gold-400'
                                         }`}
                                     >

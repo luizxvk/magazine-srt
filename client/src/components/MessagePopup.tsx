@@ -171,7 +171,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const themeBg = theme === 'light' ? 'bg-white' : 'bg-[#0a0a0a]';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSubtext = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-    const avatarBorder = isSenderMGT ? 'border-emerald-500' : 'border-gold-500';
+    const avatarBorder = isSenderMGT ? 'border-tier-std-500' : 'border-gold-500';
 
     const formatTimeAgo = (dateStr: string): string => {
         const now = new Date();
@@ -216,10 +216,10 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                         >
                             <div 
                                 onClick={handleOpenChat}
-                                className={`${themeBg} rounded-2xl border ${isSenderMGT ? 'border-emerald-500/30' : 'border-gold-500/30'} shadow-2xl backdrop-blur-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl group`}
+                                className={`${themeBg} rounded-2xl border ${isSenderMGT ? 'border-tier-std-500/30' : 'border-gold-500/30'} shadow-2xl backdrop-blur-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl group`}
                             >
                                 {/* Top Accent Line */}
-                                <div className={`h-1 bg-gradient-to-r ${isSenderMGT ? 'from-emerald-600 via-emerald-400 to-emerald-600' : 'from-gold-600 via-gold-400 to-gold-600'}`} />
+                                <div className={`h-1 bg-gradient-to-r ${isSenderMGT ? 'from-tier-std-600 via-tier-std-400 to-tier-std-600' : 'from-gold-600 via-gold-400 to-gold-600'}`} />
                                 
                                 <div className="p-4">
                                     <div className="flex items-start gap-3">
@@ -237,7 +237,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                                                 </div>
                                             )}
                                             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-black" />
-                                            <div className={`absolute -bottom-1 -right-1 ${isSenderMGT ? 'bg-emerald-600' : 'bg-amber-600'} rounded-full p-1 border-2 ${theme === 'light' ? 'border-white' : 'border-black'}`}>
+                                            <div className={`absolute -bottom-1 -right-1 ${isSenderMGT ? 'bg-tier-std-600' : 'bg-amber-600'} rounded-full p-1 border-2 ${theme === 'light' ? 'border-white' : 'border-black'}`}>
                                                 <MessageCircle className="w-2.5 h-2.5 text-white fill-current" />
                                             </div>
                                         </div>
@@ -247,7 +247,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                                             <div className="flex items-center justify-between gap-2">
                                                 <div className="flex items-center gap-2">
                                                     <h4 className={`font-bold ${themeText} truncate text-sm`}>{unreadMessage.sender.name}</h4>
-                                                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSenderMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSenderMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                                         {isSenderMGT ? tierStdName : tierVipName}
                                                     </span>
                                                 </div>
@@ -269,7 +269,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                                         <span className={`text-xs ${themeSubtext} opacity-60`}>
                                             {formatTimeAgo(unreadMessage.createdAt)}
                                         </span>
-                                        <span className={`text-xs font-medium ${isSenderMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                                        <span className={`text-xs font-medium ${isSenderMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                             Toque para responder →
                                         </span>
                                     </div>

@@ -532,11 +532,11 @@ body::-webkit-scrollbar-thumb:hover {
 .custom-accent .text-gold-400,
 .custom-accent .text-gold-500,
 .custom-accent .text-gold-600,
-.custom-accent .text-emerald-100,
-.custom-accent .text-emerald-200,
-.custom-accent .text-emerald-300,
-.custom-accent .text-emerald-400,
-.custom-accent .text-emerald-500 {
+.custom-accent .text-tier-std-100,
+.custom-accent .text-tier-std-200,
+.custom-accent .text-tier-std-300,
+.custom-accent .text-tier-std-400,
+.custom-accent .text-tier-std-500 {
   color: var(--accent-color) !important;
 }
 
@@ -545,8 +545,8 @@ body::-webkit-scrollbar-thumb:hover {
 .custom-accent .bg-gold-400,
 .custom-accent .bg-gold-500,
 .custom-accent .bg-gold-600,
-.custom-accent .bg-emerald-500,
-.custom-accent .bg-emerald-600 {
+.custom-accent .bg-tier-std-500,
+.custom-accent .bg-tier-std-600 {
   background-color: var(--accent-color) !important;
 }
 
@@ -554,9 +554,9 @@ body::-webkit-scrollbar-thumb:hover {
 .custom-accent .bg-gold-500\/10,
 .custom-accent .bg-gold-500\/20,
 .custom-accent .bg-gold-500\/30,
-.custom-accent .bg-emerald-500\/10,
-.custom-accent .bg-emerald-500\/20,
-.custom-accent .bg-emerald-500\/30 {
+.custom-accent .bg-tier-std-500\/10,
+.custom-accent .bg-tier-std-500\/20,
+.custom-accent .bg-tier-std-500\/30 {
   background-color: rgba(var(--accent-color-rgb), 0.2) !important;
 }
 
@@ -567,18 +567,18 @@ body::-webkit-scrollbar-thumb:hover {
 .custom-accent .border-gold-500\/20,
 .custom-accent .border-gold-500\/30,
 .custom-accent .border-gold-500\/50,
-.custom-accent .border-emerald-500,
-.custom-accent .border-emerald-500\/10,
-.custom-accent .border-emerald-500\/20,
-.custom-accent .border-emerald-500\/30,
-.custom-accent .border-emerald-500\/50,
-.custom-accent .border-emerald-600\/30 {
+.custom-accent .border-tier-std-500,
+.custom-accent .border-tier-std-500\/10,
+.custom-accent .border-tier-std-500\/20,
+.custom-accent .border-tier-std-500\/30,
+.custom-accent .border-tier-std-500\/50,
+.custom-accent .border-tier-std-600\/30 {
   border-color: rgba(var(--accent-color-rgb), 0.5) !important;
 }
 
 /* Ring Color Overrides */
 .custom-accent .ring-gold-500,
-.custom-accent .ring-emerald-500 {
+.custom-accent .ring-tier-std-500 {
   --tw-ring-color: var(--accent-color) !important;
 }
 

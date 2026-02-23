@@ -48,13 +48,13 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
             <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose} />
             
             <div
-                className={`relative w-full max-w-2xl max-h-[90vh] bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border animate-scale-in ${isMGT ? 'border-emerald-500/30' : 'border-gold-500/30'}`}
+                className={`relative w-full max-w-2xl max-h-[90vh] bg-neutral-950/95 backdrop-blur-2xl rounded-2xl shadow-2xl overflow-hidden border animate-scale-in ${isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30'}`}
             >
                 {/* Header */}
-                <div className={`flex items-center justify-between p-4 border-b ${isMGT ? 'border-emerald-500/20' : 'border-gold-500/20'}`}>
+                <div className={`flex items-center justify-between p-4 border-b ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
                     <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${isMGT ? 'bg-emerald-500/20' : 'bg-gold-500/20'}`}>
-                                    <ScrollText className={`w-5 h-5 ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`} />
+                                <div className={`p-2 rounded-lg ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}`}>
+                                    <ScrollText className={`w-5 h-5 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
                                 </div>
                                 <div>
                                     <h2 className="text-lg font-bold text-white">Termos de Uso e Privacidade</h2>
@@ -72,7 +72,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                             onScroll={handleScroll}
                             className="p-6 overflow-y-auto max-h-[50vh] text-sm text-gray-300 space-y-4"
                         >
-                            <h3 className={`text-lg font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
+                            <h3 className={`text-lg font-bold ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>
                                 TERMOS DE USO DA PLATAFORMA {tierName.toUpperCase()}
                             </h3>
                             
@@ -242,7 +242,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                                 </p>
                             </section>
 
-                            <div className={`mt-6 p-4 rounded-lg ${isMGT ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-gold-500/10 border border-gold-500/30'}`}>
+                            <div className={`mt-6 p-4 rounded-lg ${isMGT ? 'bg-tier-std-500/10 border border-tier-std-500/30' : 'bg-gold-500/10 border border-gold-500/30'}`}>
                                 <p className="text-center text-sm">
                                     Ao criar uma conta, você declara ser maior de 18 anos ou ter autorização de responsável legal, e concorda 
                                     integralmente com estes Termos de Uso e com a Política de Privacidade.
@@ -253,7 +253,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                         {/* Scroll indicator */}
                         {!hasScrolledToEnd && (
                             <div className="absolute bottom-32 left-0 right-0 flex justify-center pointer-events-none">
-                                <div className={`flex items-center gap-2 px-4 py-2 rounded-full animate-bounce ${isMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
+                                <div className={`flex items-center gap-2 px-4 py-2 rounded-full animate-bounce ${isMGT ? 'bg-tier-std-500/20 text-tier-std-400' : 'bg-gold-500/20 text-gold-400'}`}>
                                     <ChevronDown className="w-4 h-4" />
                                     <span className="text-xs">Role até o final para continuar</span>
                                     <ChevronDown className="w-4 h-4" />
@@ -262,14 +262,14 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                         )}
 
                         {/* Footer with checkbox and button */}
-                        <div className={`p-4 border-t ${isMGT ? 'border-emerald-500/20 bg-black/50' : 'border-gold-500/20 bg-black/50'}`}>
+                        <div className={`p-4 border-t ${isMGT ? 'border-tier-std-500/20 bg-black/50' : 'border-gold-500/20 bg-black/50'}`}>
                             <label 
                                 className={`flex items-start gap-3 mb-4 cursor-pointer ${!hasScrolledToEnd ? 'opacity-50 pointer-events-none' : ''}`}
                             >
                                 <div className={`relative flex-shrink-0 w-5 h-5 rounded border-2 transition-colors ${
                                     acceptedTerms 
-                                        ? (isMGT ? 'bg-emerald-500 border-emerald-500' : 'bg-gold-500 border-gold-500')
-                                        : (isMGT ? 'border-emerald-500/50' : 'border-gold-500/50')
+                                        ? (isMGT ? 'bg-tier-std-500 border-tier-std-500' : 'bg-gold-500 border-gold-500')
+                                        : (isMGT ? 'border-tier-std-500/50' : 'border-gold-500/50')
                                 }`}>
                                     {acceptedTerms && <Check className="w-4 h-4 text-black absolute top-0 left-0" />}
                                     <input
@@ -281,8 +281,8 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                                     />
                                 </div>
                                 <span className="text-sm text-gray-300">
-                                    Li e aceito os <span className={isMGT ? 'text-emerald-400' : 'text-gold-400'}>Termos de Uso</span> e a{' '}
-                                    <span className={isMGT ? 'text-emerald-400' : 'text-gold-400'}>Política de Privacidade</span>, incluindo o 
+                                    Li e aceito os <span className={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>Termos de Uso</span> e a{' '}
+                                    <span className={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>Política de Privacidade</span>, incluindo o 
                                     tratamento dos meus dados pessoais conforme a LGPD.
                                 </span>
                             </label>
@@ -300,7 +300,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                                     className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
                                         hasScrolledToEnd && acceptedTerms
                                             ? (isMGT 
-                                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+                                                ? 'bg-tier-std-600 hover:bg-tier-std-500 text-white' 
                                                 : 'bg-gold-500 hover:bg-gold-400 text-black')
                                             : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                                     }`}

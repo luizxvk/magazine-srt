@@ -41,10 +41,10 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
     };
 
     const isMGT = user?.membershipType === 'MGT';
-    const themeColor = isMGT ? 'text-emerald-500' : 'text-gold-500';
-    const themeBg = isMGT ? 'bg-emerald-500' : 'bg-gold-500';
+    const themeColor = isMGT ? 'text-tier-std-500' : 'text-gold-500';
+    const themeBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
     const themeBorder = isMGT
-        ? (theme === 'light' ? 'border-emerald-500/30' : 'border-emerald-500/30')
+        ? (theme === 'light' ? 'border-tier-std-500/30' : 'border-tier-std-500/30')
         : (theme === 'light' ? 'border-gold-500/30' : 'border-gold-500/30');
 
     const containerBg = theme === 'light' ? 'bg-white/95' : 'bg-black/90';
@@ -72,7 +72,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
 
                 {/* Header with Icon */}
                 <div className="text-center mb-6">
-                    <div className={`inline-flex p-4 rounded-full ${isMGT ? 'bg-emerald-500/10' : 'bg-gold-500/10'} mb-4`}>
+                    <div className={`inline-flex p-4 rounded-full ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'} mb-4`}>
                         <Calendar className={`w-8 h-8 ${themeColor}`} />
                     </div>
                     <h2 className={`text-2xl font-serif ${textColor} mb-2`}>{t('dailyLogin.title')}</h2>
@@ -91,9 +91,9 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                         let stateClass = theme === 'light' ? 'border-gray-200 bg-gray-100 text-gray-400' : 'border-white/10 bg-white/5 text-gray-500'; // Future
 
                         if (isPast) {
-                            stateClass = `${isMGT ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' : 'border-gold-500/50 bg-gold-500/10 text-gold-400'}`;
+                            stateClass = `${isMGT ? 'border-tier-std-500/50 bg-tier-std-500/10 text-tier-std-400' : 'border-gold-500/50 bg-gold-500/10 text-gold-400'}`;
                         } else if (isToday) {
-                            stateClass = `${isMGT ? 'border-emerald-500 bg-emerald-500/20 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'border-gold-500 bg-gold-500/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]'} scale-105 z-10`;
+                            stateClass = `${isMGT ? 'border-tier-std-500 bg-tier-std-500/20 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'border-gold-500 bg-gold-500/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]'} scale-105 z-10`;
                         }
 
                         return (

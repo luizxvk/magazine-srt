@@ -147,7 +147,7 @@ export default function GroupsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -4, scale: 1.02 }}
                 onClick={() => navigate(`/groups/${group.id}`)}
-                className={`glass-panel rounded-2xl overflow-hidden border ${themeBorder} cursor-pointer transition-all duration-300 hover:border-${isMGT ? 'emerald' : 'gold'}-500/50 hover:shadow-xl`}
+                className={`glass-panel rounded-2xl overflow-hidden border ${themeBorder} cursor-pointer transition-all duration-300 hover:border-${isMGT ? 'tier-std' : 'gold'}-500/50 hover:shadow-xl`}
               >
                 {/* Avatar */}
                 <div className={`relative h-32 ${isMGT ? 'bg-gradient-to-br from-tier-std-600/20 to-tier-std-500/5' : 'bg-gradient-to-br from-gold-600/20 to-gold-500/5'} flex items-center justify-center`}>

@@ -594,7 +594,7 @@ export default function ModernLogin() {
     const logo = config.logoUrl || logoFallback;
     
     // Dynamic color for Standard tier (from config, fallback to emerald)
-    const stdColor = config.backgroundColor || '#10b981';
+    const stdColor = config.accentColor || config.backgroundColor || '#10b981';
     const stdColorRgb = useMemo(() => hexToRgbObj(stdColor), [stdColor]);
 
     // Membership from URL path

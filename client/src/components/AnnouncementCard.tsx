@@ -81,7 +81,7 @@ export default function AnnouncementCard() {
 
                 {/* Badge Tag - Absolute Top Center */}
                 <div className={`absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 backdrop-blur-md border border-white/20 ${themeText} shadow-lg whitespace-nowrap z-20 flex items-center justify-center gap-2`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-tier-std-500 shadow-[0_0_10px_#10b981]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'} animate-pulse shrink-0`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${isMGT ? 'bg-tier-std-500 shadow-[0_0_10px_var(--tier-std-500)]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'} animate-pulse shrink-0`} />
                     <span className="mt-[1px]">{announcement.tag}</span>
                 </div>
 

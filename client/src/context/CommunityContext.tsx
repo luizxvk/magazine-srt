@@ -129,19 +129,26 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
   // Aplica CSS variables para cores dinâmicas do tier Standard (MGT)
   useEffect(() => {
     const root = document.documentElement;
-    const bgColor = config.backgroundColor || '#10b981';
+    // accentColor = cor de DESTAQUE (botões, badges, highlights) - ex: #0A2463
+    // backgroundColor = cor de FUNDO do site - ex: #0A0F1A
+    const accentColor = config.accentColor || config.backgroundColor || '#10b981';
+    const bgColor = config.backgroundColor || '#0f0f0f';
     const vipColor = config.tierVipColor || '#d4af37';
     
-    // CSS Variables para o tier Standard (MGT/MEMBER/etc)
-    root.style.setProperty('--tier-std-color', bgColor);
-    root.style.setProperty('--tier-std-color-rgb', hexToRgb(bgColor));
+    // CSS Variables para o tier Standard - usar ACCENT color para destaques
+    root.style.setProperty('--tier-std-color', accentColor);
+    root.style.setProperty('--tier-std-color-rgb', hexToRgb(accentColor));
     
     // Gerar variações de tonalidade (400, 500, 600, 700, 950)
-    root.style.setProperty('--tier-std-400', adjustColor(bgColor, 30));
-    root.style.setProperty('--tier-std-500', bgColor);
-    root.style.setProperty('--tier-std-600', adjustColor(bgColor, -20));
-    root.style.setProperty('--tier-std-700', adjustColor(bgColor, -40));
-    root.style.setProperty('--tier-std-950', adjustColor(bgColor, -100));
+    root.style.setProperty('--tier-std-400', adjustColor(accentColor, 30));
+    root.style.setProperty('--tier-std-500', accentColor);
+    root.style.setProperty('--tier-std-600', adjustColor(accentColor, -20));
+    root.style.setProperty('--tier-std-700', adjustColor(accentColor, -40));
+    root.style.setProperty('--tier-std-950', adjustColor(accentColor, -100));
+    
+    // CSS Variable para cor de fundo real
+    root.style.setProperty('--bg-color', bgColor);
+    root.style.setProperty('--bg-color-rgb', hexToRgb(bgColor));
     
     // CSS Variables para o tier VIP (MAGAZINE/LEGEND/etc)
     root.style.setProperty('--tier-vip-color', vipColor);
@@ -150,8 +157,8 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
     root.style.setProperty('--tier-vip-500', vipColor);
     root.style.setProperty('--tier-vip-600', adjustColor(vipColor, -20));
     
-    console.log('[CommunityContext] Applied dynamic colors:', { bgColor, vipColor });
-  }, [config.backgroundColor, config.tierVipColor]);
+    console.log('[CommunityContext] Applied dynamic colors:', { accentColor, bgColor, vipColor });
+  }, [config.accentColor, config.backgroundColor, config.tierVipColor]);
 
   // Carrega config do servidor na inicialização
   useEffect(() => {

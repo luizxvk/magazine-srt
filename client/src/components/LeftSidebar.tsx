@@ -33,7 +33,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
     const isMGT = user?.membershipType === 'MGT';
 
     // Use accent color from CommunityContext (dynamic per community)
-    const stdColor = config.backgroundColor || '#10b981';
+    const stdColor = config.accentColor || config.backgroundColor || '#10b981';
     const vipColor = config.tierVipColor || '#d4af37';
     const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;

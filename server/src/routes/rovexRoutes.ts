@@ -270,7 +270,7 @@ router.get('/public/config', async (req: Request, res: Response) => {
     // Primeiro, verificar se já temos config no tenant context (multi-tenant)
     const tenantConfig = (req as any).community;
     
-    // Tenta buscar config do banco
+    // Tenta buscar config do banco local (para Magazine SRT default)
     let savedConfig: Record<string, unknown> | null = null;
     try {
       const configRecord = await prisma.systemConfig.findUnique({
@@ -283,47 +283,53 @@ router.get('/public/config', async (req: Request, res: Response) => {
       // Tabela pode não existir ainda
     }
     
-    // Se temos config do tenant middleware, usar ele como base
-    const baseConfig = tenantConfig || savedConfig || {};
+    // Se temos config do tenant middleware (Rovex), usar ele como base
+    // Prioridade: tenantConfig (Rovex) > savedConfig (local) > defaults
+    const baseConfig = tenantConfig || {};
     
-    // Mescla config salva com defaults
+    // Mescla config - tenant config tem prioridade sobre saved config
     const config = {
       id: baseConfig.id || savedConfig?.id || 'magazine-srt',
       subdomain: baseConfig.subdomain || savedConfig?.subdomain || 'magazine-srt',
       name: baseConfig.name || savedConfig?.name || 'Magazine MGT',
       slogan: baseConfig.slogan || savedConfig?.slogan || 'A comunidade definitiva de games e entretenimento',
       
-      // Cores
-      primaryColor: savedConfig?.primaryColor || '#d4af37',
-      secondaryColor: savedConfig?.secondaryColor || '#10b981',
-      accentColor: savedConfig?.accentColor || '#f59e0b',
-      backgroundColor: savedConfig?.backgroundColor || '#10b981',
+      // Cores - TENANT CONFIG tem prioridade!
+      primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#d4af37',
+      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#10b981',
+      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#f59e0b',
+      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#10b981',
       
-      // Tiers
-      tierVipName: savedConfig?.tierVipName || 'MAGAZINE',
-      tierVipColor: savedConfig?.tierVipColor || '#d4af37',
-      tierVipSlogan: savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
-      tierStdName: savedConfig?.tierStdName || 'MGT',
-      tierStdSlogan: savedConfig?.tierStdSlogan || 'Velocidade e Poder',
+      // Tiers - TENANT CONFIG tem prioridade!
+      tierVipName: baseConfig.tierVipName || savedConfig?.tierVipName || 'MAGAZINE',
+      tierVipColor: baseConfig.tierVipColor || savedConfig?.tierVipColor || '#d4af37',
+      tierVipSlogan: baseConfig.tierVipSlogan || savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
+      tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'MGT',
+      tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       
-      // Logos
-      logoUrl: savedConfig?.logoUrl || null,
-      logoIconUrl: savedConfig?.logoIconUrl || null,
-      faviconUrl: savedConfig?.faviconUrl || null,
+      // Logos - TENANT CONFIG tem prioridade!
+      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || null,
+      logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || null,
+      faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || null,
       
-      // Economia
-      currencyName: savedConfig?.currencyName || 'Zions',
-      currencySymbol: savedConfig?.currencySymbol || 'Z$',
+      // Economia - TENANT CONFIG tem prioridade!
+      currencyName: baseConfig.currencyName || savedConfig?.currencyName || 'Zions',
+      currencySymbol: baseConfig.currencySymbol || savedConfig?.currencySymbol || 'Z$',
       
       // Plano
-      plan: savedConfig?.plan || process.env.COMMUNITY_PLAN || 'ENTERPRISE',
+      plan: baseConfig.plan || savedConfig?.plan || process.env.COMMUNITY_PLAN || 'ENTERPRISE',
       
-      // Ads Configuration
+      // Ads Configuration (geralmente local)
       adsEnabled: savedConfig?.adsEnabled ?? false,
       adsCarouselEnabled: savedConfig?.adsCarouselEnabled ?? false,
       adsClientId: savedConfig?.adsClientId || process.env.ADSENSE_CLIENT_ID || 'ca-pub-5337827655553735',
       adsCarouselSlot: savedConfig?.adsCarouselSlot || process.env.ADSENSE_CAROUSEL_SLOT || '1989194771',
     };
+    
+    // Log para debug (remover em produção)
+    if (tenantConfig) {
+      console.log('[PublicConfig] Using tenant config for:', tenantConfig.subdomain);
+    }
     
     res.json({
       success: true,

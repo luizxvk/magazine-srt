@@ -18,6 +18,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
 export async function tenantDetection(req: Request, res: Response, next: NextFunction) {
   try {
     // Em desenvolvimento local, usar config default (Magazine SRT)
+    // NOTA: Em produção (Vercel), NODE_ENV=production
     if (process.env.NODE_ENV === 'development' && !process.env.FORCE_MULTI_TENANT) {
       setCommunityConfig(DEFAULT_COMMUNITY_CONFIG);
       return next();
@@ -26,16 +27,18 @@ export async function tenantDetection(req: Request, res: Response, next: NextFun
     // 1. Primeiro tenta header explícito (para frontends clonados)
     let subdomain = req.headers['x-community-subdomain'] as string || null;
     
-    // 2. Se não tiver header, extrai do Host
+    // 2. Se não tiver header, extrai do Host (backend URL)
     if (!subdomain) {
       const host = req.headers.host || '';
       subdomain = extractSubdomain(host);
+      console.log(`[TenantDetection] Host: ${host}, extracted subdomain: ${subdomain}`);
     }
     
-    // 3. Também pode vir do Origin (CORS)
+    // 3. Também pode vir do Origin (CORS) - FRONTEND URL
     if (!subdomain && req.headers.origin) {
       const originHost = new URL(req.headers.origin as string).host;
       subdomain = extractSubdomain(originHost);
+      console.log(`[TenantDetection] Origin: ${req.headers.origin}, extracted subdomain: ${subdomain}`);
     }
     
     // 4. Fallback: variável de ambiente (para backends específicos)
@@ -45,6 +48,7 @@ export async function tenantDetection(req: Request, res: Response, next: NextFun
     
     if (!subdomain) {
       // Sem subdomain = Magazine SRT default
+      console.log(`[TenantDetection] No subdomain detected, using default config`);
       setCommunityConfig(DEFAULT_COMMUNITY_CONFIG);
       return next();
     }
@@ -111,13 +115,16 @@ function extractSubdomain(host: string): string | null {
   }
   
   // Padrão Vercel direto: {subdomain}.vercel.app (exceto magazine-srt, magazine-frontend)
-  const vercelDirectPattern = /^([a-z0-9-]+)\.vercel\.app$/;
+  // Também captura pattern com hífens como "team-liquid-pro"
+  const vercelDirectPattern = /^([a-z0-9][a-z0-9-]*[a-z0-9])\.vercel\.app$/;
   const directMatch = hostWithoutPort.match(vercelDirectPattern);
   if (directMatch) {
     const subdomain = directMatch[1];
-    // Ignorar os projetos principais (magazine-srt, magazine-frontend, rovex-hub)
-    const ignoredProjects = ['magazine-srt', 'magazine-frontend', 'rovex-hub', 'rovex-platform'];
+    // Ignorar os projetos principais (magazine-srt, magazine-frontend, rovex-hub) 
+    // mas aceitar comunidades como "team-liquid-pro"
+    const ignoredProjects = ['magazine-srt', 'magazine-frontend', 'rovex-hub', 'rovex-platform', 'vercel'];
     if (!ignoredProjects.includes(subdomain)) {
+      console.log(`[TenantDetection] Vercel direct pattern matched: ${subdomain}`);
       return subdomain;
     }
   }

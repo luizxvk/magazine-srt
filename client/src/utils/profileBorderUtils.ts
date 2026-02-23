@@ -72,14 +72,14 @@ export function getProfileBorderGradient(borderId: string | null | undefined, is
 export function getProfileBorderShadow(borderId: string | null | undefined, isMGT: boolean): string {
     if (!borderId) {
         return isMGT 
-            ? 'shadow-[0_0_30px_rgba(16,185,129,0.3)]'
+            ? 'shadow-[0_0_30px_rgba(var(--tier-std-color-rgb),0.3)]'
             : 'shadow-[0_0_30px_rgba(212,175,55,0.3)]';
     }
     
     // Map border colors to shadow colors
     const shadowMap: Record<string, string> = {
         'border_gold': 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
-        'border_emerald': 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
+        'border_emerald': 'shadow-[0_0_30px_rgba(var(--tier-std-color-rgb),0.3)]',
         'border_rose': 'shadow-[0_0_30px_rgba(255,105,180,0.3)]',
         'border_blue': 'shadow-[0_0_30px_rgba(0,191,255,0.3)]',
         'border_purple': 'shadow-[0_0_30px_rgba(153,51,255,0.3)]',
@@ -116,6 +116,6 @@ export function getProfileBorderShadow(borderId: string | null | undefined, isMG
     };
     
     return shadowMap[borderId] || (isMGT 
-        ? 'shadow-[0_0_30px_rgba(16,185,129,0.3)]'
+        ? 'shadow-[0_0_30px_rgba(var(--tier-std-color-rgb),0.3)]'
         : 'shadow-[0_0_30px_rgba(212,175,55,0.3)]');
 }

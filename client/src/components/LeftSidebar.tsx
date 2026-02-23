@@ -1,6 +1,7 @@
 import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag, Info, Trophy, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import OnlineFriendsCard from './OnlineFriendsCard';
 import DailyLoginCard from './DailyLoginCard';
 import { Feature } from '../utils/features';
@@ -27,18 +28,22 @@ interface SidebarItem {
 
 export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEventsClick, dailyLoginStatus }: LeftSidebarProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { config } = useCommunity();
     const { t } = useTranslation(['common', 'gamification']);
     const isMGT = user?.membershipType === 'MGT';
 
-    // Use accent color from context (with fallback)
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Use accent color from CommunityContext (dynamic per community)
+    const stdColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;
     const hasCustomAccent = !!accentColor;
 
     // Theme styles - consistent with project pattern
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
+    // Use CSS variable for glow instead of hardcoded color
     const themeGlow = isMGT 
-        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
+        ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)]' 
         : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
     const themeBg = theme === 'light' 
         ? 'bg-white/80' 
@@ -216,7 +221,7 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
                                     className="h-full rounded-full transition-all duration-500"
                                     style={{ 
                                         width: `${progressPercent}%`,
-                                        background: accentGradient || accentColor || (isMGT ? '#10b981' : '#d4af37')
+                                        background: accentGradient || accentColor || defaultAccent
                                     }}
                                 />
                             </div>

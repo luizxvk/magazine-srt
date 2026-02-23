@@ -1,14 +1,18 @@
 import { Store, TrendingUp, Package, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 
 export default function MarketCard() {
     const navigate = useNavigate();
     const { user, accentColor, accentGradient, theme } = useAuth();
+    const { config } = useCommunity();
     const isMGT = user?.membershipType === 'MGT';
     
-    // Use accentColor from context (already resolved from equippedColor key to hex)
-    const defaultColor = isMGT ? '#10b981' : '#d4af37';
+    // Use dynamic colors from CommunityContext
+    const stdColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultColor = isMGT ? stdColor : vipColor;
     const backgroundAccent = accentColor || defaultColor;
     const themeBg = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';

@@ -32,11 +32,11 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
         : 'from-yellow-600 via-yellow-400 to-yellow-200';
 
     const themeShadow = isMGT
-        ? 'shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+        ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.3)]'
         : 'shadow-[0_0_15px_rgba(234,179,8,0.3)]';
 
     const themeNodeReached = isMGT
-        ? 'bg-gradient-to-br from-tier-std-500 to-tier-std-700 border-tier-std-400 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+        ? 'bg-gradient-to-br from-tier-std-500 to-tier-std-700 border-tier-std-400 text-white shadow-[0_0_10px_rgba(var(--tier-std-color-rgb),0.3)]'
         : 'bg-gradient-to-br from-yellow-400 to-yellow-600 border-yellow-300 text-black shadow-[0_0_10px_rgba(234,179,8,0.3)]';
 
     const themeNodeUnreached = theme === 'light'
@@ -157,7 +157,7 @@ const LevelTimeline: React.FC<LevelTimelineProps> = ({ currentLevel, currentXP =
                         }}
                         className={`w-full py-3 rounded-xl font-bold text-sm uppercase tracking-widest border transition-all ${
                             isMGT
-                                ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 border-tier-std-400/30 text-white hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
+                                ? 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 border-tier-std-400/30 text-white hover:shadow-[0_0_25px_rgba(var(--tier-std-color-rgb),0.4)]'
                                 : 'bg-gradient-to-r from-yellow-500 to-amber-500 border-yellow-400/30 text-black hover:shadow-[0_0_25px_rgba(234,179,8,0.4)]'
                         }`}
                         whileHover={{ scale: 1.02 }}

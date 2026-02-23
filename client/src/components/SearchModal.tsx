@@ -78,7 +78,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const [activeTab, setActiveTab] = useState<'all' | 'users' | 'posts'>('all');
 
     const isMGT = user?.membershipType === 'MGT';
-    const themeColor = isMGT ? 'emerald' : 'gold';
+    const themeColor = isMGT ? 'tier-std' : 'gold';
 
     useEffect(() => {
         if (isOpen) {

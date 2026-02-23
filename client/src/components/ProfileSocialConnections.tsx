@@ -47,7 +47,7 @@ export default function ProfileSocialConnections() {
 
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT 
-        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
+        ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)]' 
         : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
     const themeBg = theme === 'light' 
         ? 'bg-white/80' 

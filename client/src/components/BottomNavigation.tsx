@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, ShoppingBag, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import { useTranslation } from 'react-i18next';
 
 interface NavItem {
@@ -83,6 +84,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
 
 export default function BottomNavigation() {
     const { user, isMobileDrawerOpen, activeChatUserId, accentColor } = useAuth();
+    const { getUserAccent } = useTierColors();
     const { t } = useTranslation('common');
     const location = useLocation();
     const navigate = useNavigate();
@@ -92,11 +94,10 @@ export default function BottomNavigation() {
     const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
-    const isMGT = user?.membershipType === 'MGT';
     const liteMode = user?.liteMode ?? false;
     
-    // Use user's accent color for navbar
-    const userColor = accentColor || (isMGT ? '#10b981' : '#d4af37');
+    // Use user's accent color for navbar (dynamic per community)
+    const userColor = accentColor || getUserAccent();
 
     // Theme colors - use accent color
     const glowColor = hexToRgba(userColor, 0.3);

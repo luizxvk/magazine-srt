@@ -218,7 +218,7 @@ export default function AdminGridDashboard() {
             value: stats.totalComments,
             icon: <Shield className="w-6 h-6 text-tier-std-400" />,
             subtitle: 'Total de interações',
-            color: 'emerald'
+            color: 'tier-std'
         }
     };
 
@@ -229,7 +229,7 @@ export default function AdminGridDashboard() {
 
     const cardBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
     const cardBorder = theme === 'light' ? 'border-gray-200' : 'border-gray-800';
-    const accentColor = isMGT ? 'emerald' : 'gold';
+    const accentColor = isMGT ? 'tier-std' : 'gold';
 
     return (
         <div className="mb-8">

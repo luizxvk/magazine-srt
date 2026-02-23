@@ -48,7 +48,7 @@ export default function AdminCreateEvent({ showToast, onEventCreated }: AdminCre
     const [dropKeyword, setDropKeyword] = useState('');
     const [dropClaimHours, setDropClaimHours] = useState(24); // Horas após evento para resgatar
 
-    const themeColor = isMGT ? 'emerald' : 'gold';
+    const themeColor = isMGT ? 'tier-std' : 'gold';
     const focusColor = isMGT ? 'focus:border-tier-std-500/50' : 'focus:border-gold-500/50';
     const buttonBg = isMGT ? 'bg-tier-std-600 hover:bg-tier-std-500' : 'bg-gold-600 hover:bg-gold-500';
     const iconColor = isMGT ? 'text-tier-std-400' : 'text-gold-400';

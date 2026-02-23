@@ -64,7 +64,7 @@ export default function GroupChatCard() {
   const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
   const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
   const themeGlow = isMGT
-      ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+      ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)] hover:shadow-[0_0_25px_rgba(var(--tier-std-color-rgb),0.25)]'
       : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
 
   // Fetch user's groups

@@ -47,12 +47,12 @@ export default function ZionsPurchaseModal({ isOpen, onClose }: ZionsPurchaseMod
 
     // Apple Vision Pro style - glass morphism with dark backgrounds
     const themeColors = isMGT ? {
-        accent: 'emerald',
+        accent: 'tier-std',
         gradient: 'from-tier-std-500/10 to-transparent',
         border: 'border-tier-std-500/30',
         text: 'text-tier-std-400',
         button: 'bg-gradient-to-r from-tier-std-600 to-tier-std-500 hover:from-tier-std-500 hover:to-tier-std-400',
-        glow: 'shadow-[0_0_60px_rgba(16,185,129,0.15)]',
+        glow: 'shadow-[0_0_60px_rgba(var(--tier-std-color-rgb),0.15)]',
         cardBg: isDark ? 'bg-black/60' : 'bg-white/90',
         bg: isDark ? 'bg-zinc-950/95 backdrop-blur-2xl' : 'bg-white/95 backdrop-blur-2xl',
         cardBorder: 'border-tier-std-500/20',

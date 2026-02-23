@@ -19,7 +19,7 @@ export default function EmailVerificationPopup({ isOpen, onClose }: EmailVerific
     const isDarkMode = theme === 'dark';
     
     // Theme colors
-    const themeColor = isMGT ? 'emerald' : 'gold';
+    const themeColor = isMGT ? 'tier-std' : 'gold';
     const gradientFrom = isMGT ? 'from-tier-std-500' : 'from-gold-500';
     const gradientTo = isMGT ? 'to-tier-std-600' : 'to-amber-600';
     const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';

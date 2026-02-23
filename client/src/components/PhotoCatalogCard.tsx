@@ -35,7 +35,7 @@ export default function PhotoCatalogCard({ photos = [], onViewAll }: PhotoCatalo
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';
     const themeGlow = isMGT
-        ? 'shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+        ? 'shadow-[0_0_20px_rgba(var(--tier-std-color-rgb),0.2)]'
         : 'shadow-[0_0_20px_rgba(212,175,55,0.2)]';
     const bgColor = theme === 'light' ? 'bg-white/80' : 'bg-black/40';
 

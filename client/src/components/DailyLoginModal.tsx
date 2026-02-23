@@ -93,7 +93,7 @@ export default function DailyLoginModal({ isOpen, onClose, status, onClaim }: Da
                         if (isPast) {
                             stateClass = `${isMGT ? 'border-tier-std-500/50 bg-tier-std-500/10 text-tier-std-400' : 'border-gold-500/50 bg-gold-500/10 text-gold-400'}`;
                         } else if (isToday) {
-                            stateClass = `${isMGT ? 'border-tier-std-500 bg-tier-std-500/20 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'border-gold-500 bg-gold-500/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]'} scale-105 z-10`;
+                            stateClass = `${isMGT ? 'border-tier-std-500 bg-tier-std-500/20 text-white shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.3)]' : 'border-gold-500 bg-gold-500/20 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]'} scale-105 z-10`;
                         }
 
                         return (

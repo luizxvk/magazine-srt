@@ -167,7 +167,7 @@ export default function Register() {
             {/* Animated Background */}
             <div className={`fixed inset-0 transition-colors duration-1000 ${isMGT ? 'bg-tier-std-950/10' : 'bg-gold-950/10'}`}>
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#000000_80%)]" />
-                <div className={`absolute inset-0 opacity-20 ${isMGT ? 'bg-[radial-gradient(circle_at_30%_20%,_rgba(16,185,129,0.15)_0%,_transparent_50%)]' : 'bg-[radial-gradient(circle_at_70%_20%,_rgba(212,175,55,0.15)_0%,_transparent_50%)]'}`} />
+                <div className={`absolute inset-0 opacity-20 ${isMGT ? 'bg-[radial-gradient(circle_at_30%_20%,_rgba(var(--tier-std-color-rgb),0.15)_0%,_transparent_50%)]' : 'bg-[radial-gradient(circle_at_70%_20%,_rgba(212,175,55,0.15)_0%,_transparent_50%)]'}`} />
             </div>
 
             {/* Back Button */}
@@ -217,7 +217,7 @@ export default function Register() {
                                 onClick={() => fileInputRef.current?.click()}
                                 className={`relative w-24 h-24 rounded-full overflow-hidden border-2 border-dashed transition-all duration-300 ${
                                     isMGT 
-                                        ? 'border-tier-std-500/40 hover:border-tier-std-500/80 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]' 
+                                        ? 'border-tier-std-500/40 hover:border-tier-std-500/80 group-hover:shadow-[0_0_20px_rgba(var(--tier-std-color-rgb),0.2)]' 
                                         : 'border-gold-500/40 hover:border-gold-500/80 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]'
                                 }`}
                             >

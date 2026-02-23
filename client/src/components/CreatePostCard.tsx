@@ -3,6 +3,7 @@ import { Image as ImageIcon, Video, Hash, Send, X, Layers, Lock, BarChart3, Spar
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { compressImage, getBase64Size } from '../utils/imageCompression';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,7 @@ interface CreatePostCardProps {
 
 export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const { user, showSuccess, showError, updateUser, theme, accentColor } = useAuth();
+    const { config } = useCommunity();
     const { t } = useTranslation('feed');
     const [caption, setCaption] = useState('');
     const [mediaUrl, setMediaUrl] = useState('');
@@ -40,7 +42,10 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
 
     const isMGT = user?.membershipType === 'MGT';
     const canUseCarousel = (user?.zionsPoints || 0) >= 300;
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Use dynamic colors from CommunityContext
+    const stdColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;
 
     // Fetch event tags on mount
@@ -66,7 +71,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
     const cardShadow = theme === 'light'
         ? 'shadow-[0_8px_32px_rgba(0,0,0,0.08)]'
         : (isMGT 
-            ? 'shadow-[0_8px_32px_rgba(16,185,129,0.15),inset_0_0_0_1px_rgba(16,185,129,0.1)]' 
+            ? 'shadow-[0_8px_32px_rgba(var(--tier-std-color-rgb),0.15),inset_0_0_0_1px_rgba(var(--tier-std-color-rgb),0.1)]' 
             : 'shadow-[0_8px_32px_rgba(212,175,55,0.15),inset_0_0_0_1px_rgba(212,175,55,0.1)]');
     const inputBg = theme === 'light' 
         ? 'bg-gray-100/80' 
@@ -169,7 +174,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                 background: theme === 'light' 
                     ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)'
                     : (isMGT 
-                        ? 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(6,78,59,0.15) 100%)'
+                        ? 'linear-gradient(135deg, rgba(var(--tier-std-color-rgb),0.08) 0%, rgba(6,78,59,0.15) 100%)'
                         : 'linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.9) 100%)'),
             }}
         >

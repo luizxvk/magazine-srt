@@ -32,7 +32,7 @@ export default function EventDropPopup({ onClose }: EventDropPopupProps) {
     const [loading, setLoading] = useState(true);
 
     const isMGT = user?.membershipType === 'MGT';
-    const accentColor = isMGT ? 'emerald' : 'purple';
+    const accentColor = isMGT ? 'tier-std' : 'purple';
     const bgGradient = isMGT 
         ? 'from-tier-std-500/20 to-teal-500/20' 
         : 'from-purple-500/20 to-pink-500/20';

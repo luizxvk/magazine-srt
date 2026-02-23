@@ -66,7 +66,7 @@ export default function MgtLogCard() {
         ? (theme === 'light' ? 'border-tier-std-500/20' : 'border-tier-std-500/50')
         : 'border-gold-500/50';
     const themeGlow = isMGT
-        ? 'shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)]'
+        ? 'shadow-[0_0_30px_rgba(var(--tier-std-color-rgb),0.4)] hover:shadow-[0_0_50px_rgba(var(--tier-std-color-rgb),0.6)]'
         : 'shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:shadow-[0_0_50px_rgba(212,175,55,0.6)]';
     const themeText = isMGT ? 'text-tier-std-100' : 'text-gold-100';
     const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';

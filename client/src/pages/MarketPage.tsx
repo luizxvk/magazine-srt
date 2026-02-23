@@ -132,7 +132,7 @@ export default function MarketPage() {
   const [showVisitorBlock, setShowVisitorBlock] = useState(false);
 
   const isDarkMode = theme === 'dark';
-  const themeColor = isMGT ? 'emerald' : 'gold';
+  const themeColor = isMGT ? 'tier-std' : 'gold';
   const themeText = isDarkMode ? 'text-white' : 'text-gray-900';
   const themeSecondary = isDarkMode ? 'text-gray-400' : 'text-gray-600';
   const themeBorder = isDarkMode ? 'border-white/10' : 'border-gray-200';

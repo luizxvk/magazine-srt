@@ -719,7 +719,7 @@ export default function ModernLogin() {
                                         className={`mx-auto mb-4 md:mb-5 ${isMGT ? 'h-12 md:h-16' : 'h-16 md:h-24'}`}
                                         style={{
                                             filter: isMGT
-                                                ? 'drop-shadow(0 0 20px rgba(16,185,129,0.3))'
+                                                ? 'drop-shadow(0 0 20px rgba(var(--tier-std-color-rgb),0.3))'
                                                 : 'drop-shadow(0 0 20px rgba(212,175,55,0.3))',
                                         }}
                                     />
@@ -844,8 +844,8 @@ export default function ModernLogin() {
                                 style={{
                                     background: isMGT
                                         ? 'linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.02) 100%)'
-                                        : 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%)',
-                                    border: `1px solid ${isMGT ? 'rgba(212,175,55,0.1)' : 'rgba(16,185,129,0.1)'}`,
+                                        : 'linear-gradient(135deg, rgba(var(--tier-std-color-rgb),0.08) 0%, rgba(var(--tier-std-color-rgb),0.02) 100%)',
+                                    border: `1px solid ${isMGT ? 'rgba(212,175,55,0.1)' : 'rgba(var(--tier-std-color-rgb),0.1)'}`,
                                     backdropFilter: 'blur(20px)',
                                 }}
                                 animate={{ y: [0, -5, 0] }}
@@ -865,9 +865,9 @@ export default function ModernLogin() {
                                 onClick={toggleMembership}
                                 className="group inline-flex items-center gap-2 px-8 py-3 rounded-2xl text-[11px] uppercase tracking-[0.2em] font-medium transition-all duration-500"
                                 style={{
-                                    background: isMGT ? 'rgba(212,175,55,0.06)' : 'rgba(16,185,129,0.06)',
-                                    border: `1px solid ${isMGT ? 'rgba(212,175,55,0.15)' : 'rgba(16,185,129,0.15)'}`,
-                                    color: isMGT ? 'rgba(212,175,55,0.7)' : 'rgba(16,185,129,0.7)',
+                                    background: isMGT ? 'rgba(212,175,55,0.06)' : 'rgba(var(--tier-std-color-rgb),0.06)',
+                                    border: `1px solid ${isMGT ? 'rgba(212,175,55,0.15)' : 'rgba(var(--tier-std-color-rgb),0.15)'}`,
+                                    color: isMGT ? 'rgba(212,175,55,0.7)' : 'rgba(var(--tier-std-color-rgb),0.7)',
                                     backdropFilter: 'blur(20px)',
                                 }}
                                 whileHover={{ scale: 1.02, y: -1 }}
@@ -886,9 +886,9 @@ export default function ModernLogin() {
                     onClick={toggleMembership}
                     className="md:hidden w-full py-3.5 rounded-2xl text-[10px] uppercase tracking-[0.2em] font-medium flex items-center justify-center gap-2"
                     style={{
-                        background: isMGT ? 'rgba(212,175,55,0.08)' : 'rgba(16,185,129,0.08)',
-                        border: `1px solid ${isMGT ? 'rgba(212,175,55,0.12)' : 'rgba(16,185,129,0.12)'}`,
-                        color: isMGT ? 'rgba(212,175,55,0.6)' : 'rgba(16,185,129,0.6)',
+                        background: isMGT ? 'rgba(212,175,55,0.08)' : 'rgba(var(--tier-std-color-rgb),0.08)',
+                        border: `1px solid ${isMGT ? 'rgba(212,175,55,0.12)' : 'rgba(var(--tier-std-color-rgb),0.12)'}`,
+                        color: isMGT ? 'rgba(212,175,55,0.6)' : 'rgba(var(--tier-std-color-rgb),0.6)',
                     }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -933,7 +933,7 @@ export default function ModernLogin() {
                                     <div className="text-center">
                                         <div
                                             className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10'}`}
-                                            style={{ border: `1px solid ${isMGT ? 'rgba(16,185,129,0.15)' : 'rgba(212,175,55,0.15)'}` }}
+                                            style={{ border: `1px solid ${isMGT ? 'rgba(var(--tier-std-color-rgb),0.15)' : 'rgba(212,175,55,0.15)'}` }}
                                         >
                                             <AlertCircle className={`w-6 h-6 ${isMGT ? 'text-tier-std-400/70' : 'text-gold-400/70'}`} />
                                         </div>
@@ -1003,7 +1003,7 @@ export default function ModernLogin() {
                                     <div className="text-center">
                                         <div
                                             className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${deniedMembershipType === 'MAGAZINE' ? 'bg-gold-500/10' : 'bg-tier-std-500/10'}`}
-                                            style={{ border: `1px solid ${deniedMembershipType === 'MAGAZINE' ? 'rgba(212,175,55,0.15)' : 'rgba(16,185,129,0.15)'}` }}
+                                            style={{ border: `1px solid ${deniedMembershipType === 'MAGAZINE' ? 'rgba(212,175,55,0.15)' : 'rgba(var(--tier-std-color-rgb),0.15)'}` }}
                                         >
                                             <AlertCircle className={`w-6 h-6 ${deniedMembershipType === 'MAGAZINE' ? 'text-gold-400/70' : 'text-tier-std-400/70'}`} />
                                         </div>

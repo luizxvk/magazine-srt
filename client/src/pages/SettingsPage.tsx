@@ -122,7 +122,7 @@ export default function SettingsPage() {
         }
     };
 
-    const themeColor = isMGT ? 'emerald' : 'gold';
+    const themeColor = isMGT ? 'tier-std' : 'gold';
     const themeBg = theme === 'light' ? 'bg-gray-50' : 'bg-black';
     const cardBg = theme === 'light' ? 'bg-white' : 'bg-neutral-900/50';
     const textMain = theme === 'light' ? 'text-gray-900' : 'text-white';

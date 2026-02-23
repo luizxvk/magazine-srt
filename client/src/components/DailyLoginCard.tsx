@@ -1,5 +1,6 @@
 import { Calendar, Check, Gift } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import Loader from './Loader';
 
 interface DailyLoginCardProps {
@@ -13,10 +14,13 @@ interface DailyLoginCardProps {
 
 export default function DailyLoginCard({ status, onClick }: DailyLoginCardProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { config } = useCommunity();
     const isMGT = user?.membershipType === 'MGT';
     
-    // Use accent color from context (with fallback)
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Use dynamic colors from CommunityContext
+    const stdColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;
     const hasCustomGradient = !!accentGradient;
     

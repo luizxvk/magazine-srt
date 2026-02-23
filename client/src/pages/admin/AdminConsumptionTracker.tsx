@@ -106,7 +106,7 @@ export default function AdminConsumptionTracker({ onClose }: AdminConsumptionTra
     const isMGT = user?.membershipType === 'MGT';
     
     // Cores do tema
-    const accentColor = isMGT ? 'emerald' : 'amber';
+    const accentColor = isMGT ? 'tier-std' : 'amber';
     const accentHex = isMGT ? '#10b981' : '#d4af37';
 
     useEffect(() => {

@@ -53,7 +53,7 @@ export default function Rewards() {
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
     const themeTabActive = isMGT ? 'text-tier-std-500' : 'text-gold-400';
     const themeTabBorder = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
-    const themeShadow = isMGT ? 'shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
+    const themeShadow = isMGT ? 'shadow-[0_0_10px_rgba(var(--tier-std-color-rgb),0.5)]' : 'shadow-[0_0_10px_rgba(212,175,55,0.5)]';
 
     useEffect(() => {
         loadData();

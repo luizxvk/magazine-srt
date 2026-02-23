@@ -28,15 +28,17 @@ interface OnlineFriendsCardProps {
 
 export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
-    const { tierStdName, tierVipName } = useCommunity();
+    const { tierStdName, tierVipName, config } = useCommunity();
     const [onlineFriends, setOnlineFriends] = useState<OnlineFriend[]>([]);
     const [loading, setLoading] = useState(true);
     const [chatOpen, setChatOpen] = useState<OnlineFriend | null>(null);
 
     const isMGT = user?.membershipType === 'MGT';
     
-    // Use accent color from context (with fallback)
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Use dynamic colors from CommunityContext
+    const stdColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;
     const hasCustomGradient = !!accentGradient;
     

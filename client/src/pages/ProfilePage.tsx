@@ -711,7 +711,7 @@ export default function ProfilePage() {
                                                                         style={{ 
                                                                             width: `${percentage}%`,
                                                                             background: isMGT 
-                                                                                ? 'linear-gradient(90deg, rgba(16,185,129,0.3), rgba(16,185,129,0.15))'
+                                                                                ? 'linear-gradient(90deg, rgba(var(--tier-std-color-rgb),0.3), rgba(var(--tier-std-color-rgb),0.15))'
                                                                                 : 'linear-gradient(90deg, rgba(212,175,55,0.3), rgba(212,175,55,0.15))'
                                                                         }}
                                                                     />

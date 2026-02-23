@@ -186,7 +186,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const [loadingPacks, setLoadingPacks] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
-    const themeColor = isMGT ? 'emerald' : 'gold';
+    const themeColor = isMGT ? 'tier-std' : 'gold';
     const isDarkMode = theme === 'dark';
 
     // Default items are always owned

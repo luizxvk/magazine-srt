@@ -40,7 +40,7 @@ export default function LoadingScreen() {
         <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center ${isMGT ? 'bg-[#0a0a0a]' : 'bg-black'}`}>
             {/* Animated background */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className={`absolute inset-0 ${isMGT ? 'bg-[radial-gradient(circle_at_50%_50%,_rgba(16,185,129,0.08)_0%,_transparent_50%)]' : 'bg-[radial-gradient(circle_at_50%_50%,_rgba(212,175,55,0.08)_0%,_transparent_50%)]'}`} />
+                <div className={`absolute inset-0 ${isMGT ? 'bg-[radial-gradient(circle_at_50%_50%,_rgba(var(--tier-std-color-rgb),0.08)_0%,_transparent_50%)]' : 'bg-[radial-gradient(circle_at_50%_50%,_rgba(212,175,55,0.08)_0%,_transparent_50%)]'}`} />
                 <div className="absolute inset-0 animated-fog opacity-20" />
             </div>
 
@@ -53,7 +53,7 @@ export default function LoadingScreen() {
                 <img
                     src={config.logoIconUrl || (isMGT ? logoMgtFallback : logoFallback)}
                     alt="Logo"
-                    className={`h-24 md:h-32 object-contain relative z-10 ${isMGT ? 'drop-shadow-[0_0_30px_rgba(16,185,129,0.5)]' : 'drop-shadow-[0_0_30px_rgba(212,175,55,0.5)]'} animate-pulse`}
+                    className={`h-24 md:h-32 object-contain relative z-10 ${isMGT ? 'drop-shadow-[0_0_30px_rgba(var(--tier-std-color-rgb),0.5)]' : 'drop-shadow-[0_0_30px_rgba(212,175,55,0.5)]'} animate-pulse`}
                     style={{ animationDuration: '2s' }}
                 />
 
@@ -67,7 +67,7 @@ export default function LoadingScreen() {
                             style={{
                                 width: `${progress}%`,
                                 boxShadow: isMGT
-                                    ? '0 0 20px rgba(16,185,129,0.5)'
+                                    ? '0 0 20px rgba(var(--tier-std-color-rgb),0.5)'
                                     : '0 0 20px rgba(212,175,55,0.5)'
                             }}
                         />

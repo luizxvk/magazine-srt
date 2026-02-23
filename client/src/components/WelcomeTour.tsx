@@ -171,7 +171,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
     const accentBg = isMGT ? 'bg-tier-std-500' : 'bg-gold-500';
     const accentText = isMGT ? 'text-tier-std-400' : 'text-gold-400';
     const accentBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
-    const accentGlow = isMGT ? 'shadow-[0_0_60px_rgba(16,185,129,0.3)]' : 'shadow-[0_0_60px_rgba(212,175,55,0.3)]';
+    const accentGlow = isMGT ? 'shadow-[0_0_60px_rgba(var(--tier-std-color-rgb),0.3)]' : 'shadow-[0_0_60px_rgba(212,175,55,0.3)]';
 
     // Custom gradient styles for buttons and icons
     const buttonGradientStyle = hasCustomGradient 

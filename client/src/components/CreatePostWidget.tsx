@@ -59,8 +59,8 @@ export default function CreatePostWidget({ onPostCreated, inline = false }: Crea
         : (theme === 'light' ? 'bg-white border-gray-200' : 'bg-gold-300/10');
 
     const themePillBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-200/30';
-    const themePillShadow = isMGT ? 'shadow-[0_8px_32px_0_rgba(16,185,129,0.1)]' : 'shadow-[0_8px_32px_0_rgba(252,246,186,0.1)]';
-    const themePillHoverShadow = isMGT ? 'hover:shadow-[0_8px_40px_0_rgba(16,185,129,0.2)]' : 'hover:shadow-[0_8px_40px_0_rgba(252,246,186,0.2)]';
+    const themePillShadow = isMGT ? 'shadow-[0_8px_32px_0_rgba(var(--tier-std-color-rgb),0.1)]' : 'shadow-[0_8px_32px_0_rgba(252,246,186,0.1)]';
+    const themePillHoverShadow = isMGT ? 'hover:shadow-[0_8px_40px_0_rgba(var(--tier-std-color-rgb),0.2)]' : 'hover:shadow-[0_8px_40px_0_rgba(252,246,186,0.2)]';
     const themePillHoverBorder = isMGT ? 'hover:border-tier-std-500/40' : 'hover:border-gold-200/40';
     const themePillExpandedBg = isMGT ? 'bg-tier-std-900/30' : 'bg-gold-300/15';
     const themeGlow = isMGT ? 'from-transparent via-tier-std-500/10' : 'from-transparent via-gold-200/10';

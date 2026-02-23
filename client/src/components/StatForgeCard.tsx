@@ -1,14 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import GradientText from './GradientText';
 
 export default function StatForgeCard() {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { config } = useCommunity();
     const navigate = useNavigate();
     const isMGT = user?.membershipType === 'MGT';
 
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Use dynamic colors from CommunityContext
+    const stdColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const color = accentColor || defaultAccent;
 
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';

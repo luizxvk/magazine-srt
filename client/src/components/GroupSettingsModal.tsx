@@ -78,7 +78,7 @@ export default function GroupSettingsModal({
 
   const isMGT = user?.membershipType === 'MGT';
   const isDarkMode = theme === 'dark';
-  const themeColor = isMGT ? 'emerald' : 'gold';
+  const themeColor = isMGT ? 'tier-std' : 'gold';
   const bgMain = isDarkMode ? 'bg-gradient-to-br from-neutral-900 via-neutral-950 to-black' : 'bg-white';
 
   // Reset to initial tab when modal opens

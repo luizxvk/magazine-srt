@@ -56,6 +56,22 @@ function lightenColor(hex: string, amount: number): { r: number; g: number; b: n
     };
 }
 
+/** Calculate relative luminance (0-255 scale) */
+function getLuminance(hex: string): number {
+    const { r, g, b } = hexToRgbObj(hex);
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+/** Smart lighten that adjusts amount based on darkness of the color */
+function smartLightenColor(hex: string): { r: number; g: number; b: number } {
+    const luminance = getLuminance(hex);
+    // For very dark colors (luminance < 60), use stronger lightening (up to 0.75)
+    // For medium colors, use moderate lightening (0.5)
+    // For light colors, use minimal lightening (0.3)
+    const amount = luminance < 60 ? 0.75 : luminance < 120 ? 0.5 : 0.3;
+    return lightenColor(hex, amount);
+}
+
 // ============================================
 // MOBILE DETECTION HOOK
 // ============================================
@@ -597,13 +613,13 @@ export default function ModernLogin() {
     const stdColor = config.accentColor || config.backgroundColor || '#10b981';
     const stdColorRgb = useMemo(() => hexToRgbObj(stdColor), [stdColor]);
 
-    // Dynamic gradient for standard tier name
+    // Dynamic gradient for standard tier name (auto-adjusts for dark colors)
     const stdGradient = useMemo(() => {
-        const light = lightenColor(stdColor, 0.4);
-        const dark = darkenColor(stdColor, 0.2);
+        const light = smartLightenColor(stdColor);
+        const mid = lightenColor(stdColor, 0.3);
         const lightHex = `rgb(${light.r},${light.g},${light.b})`;
-        const darkHex = `rgb(${dark.r},${dark.g},${dark.b})`;
-        return `linear-gradient(135deg, ${lightHex} 0%, ${stdColor} 50%, ${darkHex} 100%)`;
+        const midHex = `rgb(${mid.r},${mid.g},${mid.b})`;
+        return `linear-gradient(135deg, ${lightHex} 0%, ${midHex} 50%, ${lightHex} 100%)`;
     }, [stdColor]);
 
     // Membership from URL path

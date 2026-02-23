@@ -597,6 +597,15 @@ export default function ModernLogin() {
     const stdColor = config.accentColor || config.backgroundColor || '#10b981';
     const stdColorRgb = useMemo(() => hexToRgbObj(stdColor), [stdColor]);
 
+    // Dynamic gradient for standard tier name
+    const stdGradient = useMemo(() => {
+        const light = lightenColor(stdColor, 0.4);
+        const dark = darkenColor(stdColor, 0.2);
+        const lightHex = `rgb(${light.r},${light.g},${light.b})`;
+        const darkHex = `rgb(${dark.r},${dark.g},${dark.b})`;
+        return `linear-gradient(135deg, ${lightHex} 0%, ${stdColor} 50%, ${darkHex} 100%)`;
+    }, [stdColor]);
+
     // Membership from URL path
     const getMembershipFromPath = useCallback(() => {
         if (location.pathname === '/login/mgt') return 'MGT';
@@ -727,7 +736,7 @@ export default function ModernLogin() {
                                         className="text-[22px] font-semibold tracking-tight mb-1"
                                         style={{
                                             background: isMGT
-                                                ? 'linear-gradient(135deg, #6ee7b7 0%, #10b981 50%, #34d399 100%)'
+                                                ? stdGradient
                                                 : 'linear-gradient(135deg, #fde68a 0%, #d4af37 50%, #f59e0b 100%)',
                                             WebkitBackgroundClip: 'text',
                                             WebkitTextFillColor: 'transparent',

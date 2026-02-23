@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -23,6 +23,38 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+// ============================================
+// COLOR HELPERS
+// ============================================
+
+/** Convert hex color to RGB object */
+function hexToRgbObj(hex: string): { r: number; g: number; b: number } {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+        ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+        : { r: 16, g: 185, b: 129 }; // fallback emerald
+}
+
+/** Darken a color by mixing with black */
+function darkenColor(hex: string, amount: number): { r: number; g: number; b: number } {
+    const { r, g, b } = hexToRgbObj(hex);
+    return {
+        r: Math.round(r * (1 - amount)),
+        g: Math.round(g * (1 - amount)),
+        b: Math.round(b * (1 - amount)),
+    };
+}
+
+/** Lighten a color by mixing with white */
+function lightenColor(hex: string, amount: number): { r: number; g: number; b: number } {
+    const { r, g, b } = hexToRgbObj(hex);
+    return {
+        r: Math.round(r + (255 - r) * amount),
+        g: Math.round(g + (255 - g) * amount),
+        b: Math.round(b + (255 - b) * amount),
+    };
+}
 
 // ============================================
 // MOBILE DETECTION HOOK
@@ -131,9 +163,15 @@ function MagazineBackground() {
     );
 }
 
-/** Premium background — MGT (emerald + dotted glow) */
-function MgtBackground() {
+/** 
+ * Dynamic background for Standard tier (MGT) using community config colors
+ * Uses config.backgroundColor instead of hardcoded emerald
+ */
+function DynamicStdBackground({ color }: { color: string }) {
     const isMobile = useIsMobile();
+    const rgb = hexToRgbObj(color);
+    const darkRgb = darkenColor(color, 0.3);
+    const lightRgb = lightenColor(color, 0.2);
 
     return (
         <motion.div
@@ -151,7 +189,7 @@ function MgtBackground() {
                     <div
                         className="absolute w-[350px] h-[350px] rounded-full"
                         style={{
-                            background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)',
+                            background: `radial-gradient(circle, rgba(${rgb.r},${rgb.g},${rgb.b},0.08) 0%, transparent 70%)`,
                             top: '-15%',
                             left: '-10%',
                         }}
@@ -159,16 +197,16 @@ function MgtBackground() {
                     <div
                         className="absolute w-[250px] h-[250px] rounded-full"
                         style={{
-                            background: 'radial-gradient(circle, rgba(4,120,87,0.1) 0%, transparent 70%)',
+                            background: `radial-gradient(circle, rgba(${darkRgb.r},${darkRgb.g},${darkRgb.b},0.1) 0%, transparent 70%)`,
                             bottom: '-5%',
                             right: '-8%',
                         }}
                     />
-                    {/* Static dot pattern for MGT feel on mobile */}
+                    {/* Static dot pattern */}
                     <div
                         className="absolute inset-0 opacity-[0.04]"
                         style={{
-                            backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.8) 1px, transparent 1px)',
+                            backgroundImage: `radial-gradient(circle, rgba(${rgb.r},${rgb.g},${rgb.b},0.8) 1px, transparent 1px)`,
                             backgroundSize: '20px 20px',
                         }}
                     />
@@ -179,7 +217,7 @@ function MgtBackground() {
                     <motion.div
                         className="absolute w-[700px] h-[700px] rounded-full"
                         style={{
-                            background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0.02) 45%, transparent 70%)',
+                            background: `radial-gradient(circle, rgba(${rgb.r},${rgb.g},${rgb.b},0.1) 0%, rgba(${rgb.r},${rgb.g},${rgb.b},0.02) 45%, transparent 70%)`,
                             filter: 'blur(80px)',
                             top: '-20%',
                             left: '-10%',
@@ -190,7 +228,7 @@ function MgtBackground() {
                     <motion.div
                         className="absolute w-[500px] h-[500px] rounded-full"
                         style={{
-                            background: 'radial-gradient(circle, rgba(4,120,87,0.12) 0%, rgba(4,120,87,0.03) 50%, transparent 70%)',
+                            background: `radial-gradient(circle, rgba(${darkRgb.r},${darkRgb.g},${darkRgb.b},0.12) 0%, rgba(${darkRgb.r},${darkRgb.g},${darkRgb.b},0.03) 50%, transparent 70%)`,
                             filter: 'blur(70px)',
                             bottom: '-5%',
                             right: '-8%',
@@ -201,7 +239,7 @@ function MgtBackground() {
                     <motion.div
                         className="absolute w-[350px] h-[350px] rounded-full"
                         style={{
-                            background: 'radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 60%)',
+                            background: `radial-gradient(circle, rgba(${lightRgb.r},${lightRgb.g},${lightRgb.b},0.06) 0%, transparent 60%)`,
                             filter: 'blur(40px)',
                             top: '50%',
                             right: '25%',
@@ -214,10 +252,10 @@ function MgtBackground() {
                         opacity={0.4}
                         gap={14}
                         radius={1.2}
-                        color="rgba(16,185,129,0.3)"
-                        darkColor="rgba(16,185,129,0.3)"
-                        glowColor="rgba(52,211,153,0.7)"
-                        darkGlowColor="rgba(52,211,153,0.7)"
+                        color={`rgba(${rgb.r},${rgb.g},${rgb.b},0.3)`}
+                        darkColor={`rgba(${rgb.r},${rgb.g},${rgb.b},0.3)`}
+                        glowColor={`rgba(${lightRgb.r},${lightRgb.g},${lightRgb.b},0.7)`}
+                        darkGlowColor={`rgba(${lightRgb.r},${lightRgb.g},${lightRgb.b},0.7)`}
                         backgroundOpacity={0}
                         speedMin={0.2}
                         speedMax={0.8}
@@ -235,8 +273,13 @@ function MgtBackground() {
                 }}
             />
 
-            {/* Emerald horizon line */}
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+            {/* Dynamic horizon line */}
+            <div 
+                className="absolute bottom-0 left-0 right-0 h-px"
+                style={{
+                    background: `linear-gradient(to right, transparent, rgba(${rgb.r},${rgb.g},${rgb.b},0.2), transparent)`,
+                }}
+            />
         </motion.div>
     );
 }
@@ -316,6 +359,7 @@ function LoginForm({
     onSubmit,
     isMGT,
     onForgotPassword,
+    stdColorRgb,
 }: {
     register: ReturnType<typeof useForm<LoginFormValues>>['register'];
     errors: ReturnType<typeof useForm<LoginFormValues>>['formState']['errors'];
@@ -323,6 +367,7 @@ function LoginForm({
     onSubmit: (e: React.FormEvent) => void;
     isMGT: boolean;
     onForgotPassword: () => void;
+    stdColorRgb?: { r: number; g: number; b: number };
 }) {
     const [capsLockOn, setCapsLockOn] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -333,7 +378,9 @@ function LoginForm({
         setCapsLockOn(e.getModifierState('CapsLock'));
     };
 
-    const accentRgb = isMGT ? '16,185,129' : '212,175,55';
+    // Dynamic RGB for standard tier (config.backgroundColor), fallback emerald
+    const stdRgb = stdColorRgb ? `${stdColorRgb.r},${stdColorRgb.g},${stdColorRgb.b}` : '16,185,129';
+    const accentRgb = isMGT ? stdRgb : '212,175,55';
 
     const glassInputStyle: React.CSSProperties = isMobile
         ? {
@@ -361,20 +408,29 @@ function LoginForm({
         }
     };
 
+    // Calculate lighter version for text color
+    const lightStdRgb = stdColorRgb 
+        ? `${Math.min(255, stdColorRgb.r + 80)},${Math.min(255, stdColorRgb.g + 80)},${Math.min(255, stdColorRgb.b + 80)}`
+        : '167,243,208';
+    // Calculate darker version for gradients
+    const darkStdRgb = stdColorRgb
+        ? `${Math.round(stdColorRgb.r * 0.3)},${Math.round(stdColorRgb.g * 0.7)},${Math.round(stdColorRgb.b * 0.7)}`
+        : '4,120,87';
+
     const submitButtonStyle: React.CSSProperties = isMobile ? {
         background: isMGT
-            ? 'linear-gradient(135deg, rgba(16,185,129,0.35) 0%, rgba(4,120,87,0.45) 100%)'
+            ? `linear-gradient(135deg, rgba(${stdRgb},0.35) 0%, rgba(${darkStdRgb},0.45) 100%)`
             : 'linear-gradient(135deg, rgba(212,175,55,0.35) 0%, rgba(170,140,44,0.45) 100%)',
-        border: `1px solid ${isMGT ? 'rgba(16,185,129,0.3)' : 'rgba(212,175,55,0.3)'}`,
-        color: isMGT ? 'rgba(167,243,208,0.9)' : 'rgba(253,230,138,0.9)',
+        border: `1px solid ${isMGT ? `rgba(${stdRgb},0.3)` : 'rgba(212,175,55,0.3)'}`,
+        color: isMGT ? `rgba(${lightStdRgb},0.9)` : 'rgba(253,230,138,0.9)',
     } : {
         background: isMGT
-            ? 'linear-gradient(135deg, rgba(16,185,129,0.3) 0%, rgba(4,120,87,0.4) 100%)'
+            ? `linear-gradient(135deg, rgba(${stdRgb},0.3) 0%, rgba(${darkStdRgb},0.4) 100%)`
             : 'linear-gradient(135deg, rgba(212,175,55,0.3) 0%, rgba(170,140,44,0.4) 100%)',
-        border: `1px solid ${isMGT ? 'rgba(16,185,129,0.25)' : 'rgba(212,175,55,0.25)'}`,
-        color: isMGT ? 'rgba(167,243,208,0.9)' : 'rgba(253,230,138,0.9)',
+        border: `1px solid ${isMGT ? `rgba(${stdRgb},0.25)` : 'rgba(212,175,55,0.25)'}`,
+        color: isMGT ? `rgba(${lightStdRgb},0.9)` : 'rgba(253,230,138,0.9)',
         backdropFilter: 'blur(20px)',
-        boxShadow: `0 0 30px ${isMGT ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.1)'}`,
+        boxShadow: `0 0 30px ${isMGT ? `rgba(${stdRgb},0.1)` : 'rgba(212,175,55,0.1)'}`,
     };
 
     return (
@@ -387,7 +443,7 @@ function LoginForm({
                     onFocus={focusInput}
                     onBlur={blurInput}
                 >
-                    <User size={16} className={`${isMGT ? 'text-emerald-400/60' : 'text-gold-400/60'} flex-shrink-0`} />
+                    <User size={16} className="flex-shrink-0" style={{ color: isMGT ? `rgba(${lightStdRgb},0.6)` : 'rgba(251,191,36,0.6)' }} />
                     <input
                         {...register('email')}
                         type="email"
@@ -411,7 +467,7 @@ function LoginForm({
                     onFocus={focusInput}
                     onBlur={blurInput}
                 >
-                    <Lock size={16} className={`${isMGT ? 'text-emerald-400/60' : 'text-gold-400/60'} flex-shrink-0`} />
+                    <Lock size={16} className="flex-shrink-0" style={{ color: isMGT ? `rgba(${lightStdRgb},0.6)` : 'rgba(251,191,36,0.6)' }} />
                     <input
                         {...register('password')}
                         type={showPassword ? 'text' : 'password'}
@@ -536,6 +592,10 @@ export default function ModernLogin() {
 
     const logoMgt = config.logoIconUrl || logoMgtFallback;
     const logo = config.logoUrl || logoFallback;
+    
+    // Dynamic color for Standard tier (from config, fallback to emerald)
+    const stdColor = config.backgroundColor || '#10b981';
+    const stdColorRgb = useMemo(() => hexToRgbObj(stdColor), [stdColor]);
 
     // Membership from URL path
     const getMembershipFromPath = useCallback(() => {
@@ -629,7 +689,7 @@ export default function ModernLogin() {
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden font-sans">
             {/* ── Dynamic Backgrounds ── */}
             <AnimatePresence mode="wait">
-                {isMGT ? <MgtBackground key="mgt-bg" /> : <MagazineBackground key="mag-bg" />}
+                {isMGT ? <DynamicStdBackground key="std-bg" color={stdColor} /> : <MagazineBackground key="mag-bg" />}
             </AnimatePresence>
 
             {/* ── Central Layout ── */}
@@ -698,6 +758,7 @@ export default function ModernLogin() {
                                             onSubmit={mgtForm.handleSubmit(onMgtSubmit)}
                                             isMGT
                                             onForgotPassword={() => setIsForgotPasswordOpen(true)}
+                                            stdColorRgb={stdColorRgb}
                                         />
                                     ) : (
                                         <LoginForm

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Tv, Eye, ExternalLink, CheckCircle, LogOut, Link, Volume2, VolumeX } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface TwitchStream {
@@ -163,6 +164,7 @@ function StreamCard({ stream, accentColor, textMain, textSub, theme }: {
 
 export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_coringa'] }: TwitchCardProps) {
     const { user, theme } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const [streams, setStreams] = useState<TwitchStream[]>([]);
     const [loading, setLoading] = useState(true);
@@ -178,7 +180,7 @@ export default function TwitchCard({ usernames = ['gaules', 'alanzoka', 'loud_co
     };
 
     // Use user's equipped color or fallback to membership color
-    const accentColor = getUserAccentColor() || (isMGT ? '#10b981' : '#d4af37');
+    const accentColor = getUserAccentColor() || getAccentColor(isMGT);
 
     // Theme styles - consistent with RadioCard pattern
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';

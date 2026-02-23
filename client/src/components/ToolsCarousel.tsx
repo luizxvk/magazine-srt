@@ -1,5 +1,6 @@
 import { Radio } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import RadioCard from './RadioCard';
 
 // Color mapping from CustomizationShop
@@ -28,6 +29,7 @@ const COLOR_MAP: Record<string, string> = {
 
 export default function ToolsCarousel() {
     const { user, accentColor: contextAccentColor } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
 
     // Get the actual color hex from user's equipped color ID
@@ -38,7 +40,7 @@ export default function ToolsCarousel() {
         return COLOR_MAP[user.equippedColor] || null;
     };
 
-    const accentColor = getUserAccentColor() || (isMGT ? '#10b981' : '#d4af37');
+    const accentColor = getUserAccentColor() || getAccentColor(isMGT);
 
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
     const themeGlow = isMGT

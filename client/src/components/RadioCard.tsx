@@ -2,6 +2,7 @@ import React from 'react';
 import { Radio, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRadio, RADIO_STATIONS } from '../context/RadioContext';
+import { useTierColors } from '../hooks/useTierColors';
 import Loader from './Loader';
 
 // Liquid Glass Effect Constants
@@ -105,6 +106,7 @@ VolumeBars.displayName = "VolumeBars";
 
 export default function RadioCard() {
     const { user, theme, accentGradient } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const filterId = React.useId();
     
@@ -129,8 +131,8 @@ export default function RadioCard() {
         return COLOR_MAP[user.equippedColor] || null;
     };
 
-    // Use user's equipped color or fallback to station color
-    const accentColor = getUserAccentColor() || currentStation.color || (isMGT ? '#10b981' : '#d4af37');
+    // Use user's equipped color or station color or community color
+    const accentColor = getUserAccentColor() || currentStation.color || getAccentColor(isMGT);
 
     const themeBg = theme === 'light' 
         ? 'bg-gradient-to-br from-zinc-50 to-zinc-100' 

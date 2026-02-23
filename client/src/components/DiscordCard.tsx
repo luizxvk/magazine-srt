@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ExternalLink, CheckCircle, LogOut, Music, Gamepad2, Twitch, Youtube, Twitter, Github, Globe, Tv } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface DiscordGuild {
@@ -78,6 +79,7 @@ const PLATFORM_CONFIG: Record<string, { icon: any; color: string; label: string 
 
 export default function DiscordCard() {
     const { user, theme, showToast } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
     const [externalConnections, setExternalConnections] = useState<ExternalConnection[]>([]);
@@ -93,7 +95,7 @@ export default function DiscordCard() {
     };
 
     // Use user's equipped color or fallback to membership color
-    const accentColor = getUserAccentColor() || (isMGT ? '#10b981' : '#d4af37');
+    const accentColor = getUserAccentColor() || getAccentColor(isMGT);
 
     // Theme styles - consistent with RadioCard pattern
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';

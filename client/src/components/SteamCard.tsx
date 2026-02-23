@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Gamepad2, ExternalLink } from 'lucide-react';
 import Loader from './Loader';
 import { useAuth } from '../context/AuthContext';
+import { useTierColors } from '../hooks/useTierColors';
 import api from '../services/api';
 
 interface SteamActivity {
@@ -47,6 +48,7 @@ const hexToRgba = (hex: string, alpha: number) => {
 
 export default function SteamCard() {
     const { user, theme } = useAuth();
+    const { getAccentColor } = useTierColors();
     const isMGT = user?.membershipType === 'MGT';
     const [activities, setActivities] = useState<SteamActivity[]>([]);
     const [loading, setLoading] = useState(true);
@@ -60,7 +62,7 @@ export default function SteamCard() {
     };
 
     // Use user's equipped color or fallback to membership color
-    const accentColor = getUserAccentColor() || (isMGT ? '#10b981' : '#d4af37');
+    const accentColor = getUserAccentColor() || getAccentColor(isMGT);
 
     // Theme styles - consistent with RadioCard pattern
     const themeBorder = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';

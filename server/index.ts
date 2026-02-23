@@ -44,6 +44,7 @@ import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
 import { suspensionMiddleware } from './src/middleware/suspensionMiddleware';
+import { tenantDetection } from './src/middleware/tenantMiddleware';
 import { runVerificationCronJobs } from './src/services/verificationCronService';
 import { reportMetricsToRovex, isRovexConfigured } from './src/services/rovexService';
 import { cleanupExpiredGroupMessages } from './src/services/groupMessageCleanupService';
@@ -131,6 +132,9 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Input Sanitization
 app.use(sanitizeInput);
+
+// Multi-tenant: Detect community from subdomain/header
+app.use(tenantDetection);
 
 app.use('/uploads', express.static('uploads'));
 

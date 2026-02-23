@@ -267,6 +267,9 @@ router.get('/public/stats', async (req: Request, res: Response) => {
  */
 router.get('/public/config', async (req: Request, res: Response) => {
   try {
+    // Primeiro, verificar se já temos config no tenant context (multi-tenant)
+    const tenantConfig = (req as any).community;
+    
     // Tenta buscar config do banco
     let savedConfig: Record<string, unknown> | null = null;
     try {
@@ -280,12 +283,15 @@ router.get('/public/config', async (req: Request, res: Response) => {
       // Tabela pode não existir ainda
     }
     
+    // Se temos config do tenant middleware, usar ele como base
+    const baseConfig = tenantConfig || savedConfig || {};
+    
     // Mescla config salva com defaults
     const config = {
-      id: savedConfig?.id || 'magazine-srt',
-      subdomain: savedConfig?.subdomain || 'magazine-srt',
-      name: savedConfig?.name || 'Magazine MGT',
-      slogan: savedConfig?.slogan || 'A comunidade definitiva de games e entretenimento',
+      id: baseConfig.id || savedConfig?.id || 'magazine-srt',
+      subdomain: baseConfig.subdomain || savedConfig?.subdomain || 'magazine-srt',
+      name: baseConfig.name || savedConfig?.name || 'Magazine MGT',
+      slogan: baseConfig.slogan || savedConfig?.slogan || 'A comunidade definitiva de games e entretenimento',
       
       // Cores
       primaryColor: savedConfig?.primaryColor || '#d4af37',

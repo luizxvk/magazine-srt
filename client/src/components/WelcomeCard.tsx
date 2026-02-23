@@ -13,16 +13,18 @@ interface WelcomeCardProps {
 }
 
 export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory }: WelcomeCardProps) {
-    const { user, theme, accentColor, accentGradient } = useAuth();
+    const { user, theme, accentGradient } = useAuth();
     const { config, isStdTier } = useCommunity();
     const { t } = useTranslation(['feed', 'common']);
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     
     // Theme-based styling - use CommunityContext colors
+    // Only use user's custom accentColor if they have an equippedColor, otherwise use community color
     const stdColor = config.accentColor || config.backgroundColor || '#10b981';
     const vipColor = config.tierVipColor || '#d4af37';
-    const defaultAccent = isMGT ? stdColor : vipColor;
-    const userAccent = accentColor || defaultAccent;
+    const communityAccent = isMGT ? stdColor : vipColor;
+    // If user has equippedColor starting with #, use it. Otherwise use community color.
+    const userAccent = (user?.equippedColor?.startsWith('#')) ? user.equippedColor : communityAccent;
     
     const themeIconBg = theme === 'light' 
         ? 'bg-gray-100 hover:bg-gray-200' 

@@ -248,9 +248,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Compute accent color from user's equipped customization (or preview)
     const accentColor = React.useMemo(() => {
-        // In light mode, always use default theme color for better visibility
+        // In light mode, use lighter versions for visibility
         if (theme === 'light') {
-            return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
+            // Get community color from CSS variable, fallback to emerald/gold
+            const rootStyle = getComputedStyle(document.documentElement);
+            const communityColor = rootStyle.getPropertyValue('--tier-std-500').trim();
+            const vipColor = rootStyle.getPropertyValue('--tier-vip-500').trim() || '#d4af37';
+            const stdColor = communityColor || '#50c878';
+            return user?.membershipType === 'MGT' ? stdColor : vipColor;
         }
         // If preview is active, use preview color
         if (previewTheme?.color) {
@@ -271,8 +276,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return colorValue;
             }
         }
-        // Default colors based on membership
-        return user?.membershipType === 'MGT' ? '#50c878' : '#d4af37';
+        // Default: Use community color from CSS variable
+        const rootStyle = getComputedStyle(document.documentElement);
+        const communityColor = rootStyle.getPropertyValue('--tier-std-500').trim();
+        const vipColor = rootStyle.getPropertyValue('--tier-vip-500').trim() || '#d4af37';
+        const stdColor = communityColor || '#10b981';
+        return user?.membershipType === 'MGT' ? stdColor : vipColor;
     }, [user?.equippedColor, user?.membershipType, previewTheme?.color, theme]);
 
     // Compute accent gradient (for background usage)

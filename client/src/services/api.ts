@@ -45,26 +45,16 @@ const getBaseURL = () => {
         isCapacitor,
     });
     
-    // Se tem variável de ambiente definida, usa ela (comunidades provisionadas)
-    if (import.meta.env.VITE_API_URL) {
-        const url = import.meta.env.VITE_API_URL;
-        return url.endsWith('/api') ? url : `${url}/api`;
-    }
-    
-    // Se é Capacitor (app nativo), precisa URL completa
-    if (isCapacitor) {
-        return `${DEFAULT_BACKEND_URL}/api`;
-    }
-    
-    // Se NÃO é localhost, é produção - usar backend padrão
-    if (!isLocalhost) {
-        console.log('[API] Production detected, using:', `${DEFAULT_BACKEND_URL}/api`);
-        return `${DEFAULT_BACKEND_URL}/api`;
-    }
-    
     // Em desenvolvimento local
-    console.log('[API] Development mode, using localhost');
-    return 'http://localhost:3000/api';
+    if (isLocalhost) {
+        console.log('[API] Development mode, using localhost');
+        return 'http://localhost:3000/api';
+    }
+    
+    // Em produção (web ou Capacitor) SEMPRE usa shared backend
+    // Todas as comunidades Magazine usam o mesmo backend que detecta tenant por subdomain
+    console.log('[API] Production detected, using shared backend:', `${DEFAULT_BACKEND_URL}/api`);
+    return `${DEFAULT_BACKEND_URL}/api`;
 };
 
 const api = axios.create({

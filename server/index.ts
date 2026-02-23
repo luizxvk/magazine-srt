@@ -81,7 +81,8 @@ const allowedVercelPatterns = [
     /^https:\/\/teste-mt-.*\.vercel\.app$/,           // Test communities (multi-tenant)
     /^https:\/\/.*-mgt-studio\.vercel\.app$/,         // MGT Studio preview deploys
     /^https:\/\/.*-streetrunnerteam\.vercel\.app$/,   // Team preview deploys
-    /^https:\/\/.*\.comunidades\.rovex\.app$/,        // Provisioned communities
+    /^https:\/\/.*\.comunidades\.rovex\.app$/,        // Provisioned communities (custom domain)
+    /^https:\/\/[a-z0-9-]+\.vercel\.app$/,            // ALL Vercel subdomains (provisioned communities)
 ];
 
 const corsOptions = {

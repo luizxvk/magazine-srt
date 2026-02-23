@@ -34,6 +34,14 @@ const getCommunitySubdomain = (): string | null => {
 // Em produção web usa VITE_API_URL ou fallback para o backend padrão
 // No Capacitor app usa URL completa da API
 const getBaseURL = () => {
+    // Debug: mostrar ambiente
+    console.log('[API] Environment:', {
+        VITE_API_URL: import.meta.env.VITE_API_URL,
+        PROD: import.meta.env.PROD,
+        MODE: import.meta.env.MODE,
+        isCapacitor,
+    });
+    
     // Se tem variável de ambiente definida, usa ela (comunidades provisionadas)
     if (import.meta.env.VITE_API_URL) {
         const url = import.meta.env.VITE_API_URL;
@@ -47,7 +55,11 @@ const getBaseURL = () => {
     }
     
     // Em produção web sem VITE_API_URL, usa o backend padrão
-    if (import.meta.env.PROD) {
+    // Verificar por hostname também (não apenas PROD flag)
+    const isProduction = import.meta.env.PROD || 
+        (typeof window !== 'undefined' && !window.location.hostname.includes('localhost'));
+    
+    if (isProduction) {
         return `${DEFAULT_BACKEND_URL}/api`;
     }
     

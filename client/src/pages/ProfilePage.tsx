@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
@@ -39,6 +40,7 @@ const BADGE_URLS: Record<string, string> = {
 
 export default function ProfilePage() {
     const { user: currentUser, theme, equippedBadge, previewTheme, accentColor, accentGradient } = useAuth();
+    const { tierStdName, tierVipName, isStdTier } = useCommunity();
     const { t } = useTranslation('common');
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -172,7 +174,7 @@ export default function ProfilePage() {
 
     if (!profileUser) return <ModernLoader fullScreen />;
 
-    const isMGT = profileUser.membershipType === 'MGT';
+    const isMGT = isStdTier(profileUser.membershipType);
 
     return (
         <div className="min-h-screen pb-20 relative text-white font-sans selection:bg-gold-500/30">
@@ -461,7 +463,7 @@ export default function ProfilePage() {
                                         className={`text-sm uppercase tracking-widest mb-2 font-medium text-transparent bg-clip-text ${!accentGradient && (isMGT ? 'text-emerald-500 text-shine-emerald' : 'text-gold-400 text-shine-gold')}`}
                                         style={accentGradient ? { backgroundImage: accentGradient } : { backgroundImage: `linear-gradient(to right, ${accentColor}, ${accentColor})` }}
                                     >
-                                        {isMGT ? t('profile.mgt') : t('profile.magazine')}
+                                        {isMGT ? tierStdName : tierVipName}
                                     </p>
                                     {profileUser.bio && <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} text-sm italic mb-4 max-w-md mx-auto md:mx-0`}>"{profileUser.bio}"</p>}
                                 </div>

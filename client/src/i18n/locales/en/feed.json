@@ -49,8 +49,8 @@
     "feed": {
         "title": "Feed",
         "welcome": "Welcome, {{name}}",
-        "subtitle": "Your exclusive Magazine feed",
-        "subtitleMGT": "Your exclusive Machine Gold Team feed",
+        "subtitle": "Your exclusive {{communityName}} feed",
+        "subtitleMGT": "Your exclusive {{communityName}} feed",
         "empty": "No posts yet. Be the first to publish!",
         "refresh": "Refresh feed"
     },

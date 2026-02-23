@@ -5,7 +5,7 @@ import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, Lay
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.13';
+const CURRENT_VERSION = '0.5.0-rc.14';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -42,10 +42,15 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Page 1 - Main Features
     const page1Updates: UpdateItem[] = [
         {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Textos Dinâmicos Multi-Tenant',
+            description: 'Todas as menções de comunidade agora usam o nome configurado da sua comunidade!',
+            isNew: true
+        },
+        {
             icon: <Palette className="w-5 h-5" />,
             title: 'Branding Dinâmico por Comunidade',
             description: 'Cores e nomes de tiers totalmente personalizáveis via config da comunidade!',
-            isNew: true
         },
         {
             icon: <Users className="w-5 h-5" />,

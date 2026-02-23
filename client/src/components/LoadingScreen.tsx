@@ -102,7 +102,7 @@ export default function LoadingScreen() {
             {/* Bottom branding */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
                 <p className={`text-[10px] uppercase tracking-[0.4em] font-light ${isMGT ? 'text-emerald-500/30' : 'text-gold-500/30'}`}>
-                    {isMGT ? 'Machine Gold Team' : 'A Elite do Sucesso'}
+                    {config.name || (isMGT ? 'Machine Gold Team' : 'Magazine')}
                 </p>
             </div>
 

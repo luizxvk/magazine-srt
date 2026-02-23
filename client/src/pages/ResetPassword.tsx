@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Lock, Check, AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
-import logo from '../assets/logo-mgzn.png';
-import logoMgt from '../assets/logo-mgt-full.png';
+import { useCommunity } from '../context/CommunityContext';
+import logoFallback from '../assets/logo-mgzn.png';
+import logoMgtFallback from '../assets/logo-mgt-full.png';
 import api from '../services/api';
 import Loader from '../components/Loader';
 
@@ -11,6 +12,7 @@ export default function ResetPassword() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { config, tierStdName, tierVipName } = useCommunity();
     const token = searchParams.get('token');
 
     const [password, setPassword] = useState('');
@@ -19,6 +21,10 @@ export default function ResetPassword() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [isMGT] = useState(localStorage.getItem('lastMembershipType') === 'MGT');
+    
+    // Logo dinâmica
+    const logoMgt = config.logoIconUrl || logoMgtFallback;
+    const logo = config.logoUrl || logoFallback;
 
     useEffect(() => {
         if (!token) {
@@ -82,7 +88,7 @@ export default function ResetPassword() {
                         <div className="flex justify-center mb-4">
                             <img
                                 src={isMGT ? logoMgt : logo}
-                                alt={isMGT ? "MGT" : "MAGAZINE"}
+                                alt={isMGT ? tierStdName : tierVipName}
                                 className={`${isMGT ? 'h-14' : 'h-20'} drop-shadow-lg`}
                             />
                         </div>

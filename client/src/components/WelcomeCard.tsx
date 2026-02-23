@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { useTranslation } from 'react-i18next';
 import StoriesBar from './StoriesBar';
 
@@ -13,8 +14,9 @@ interface WelcomeCardProps {
 
 export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory }: WelcomeCardProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { config, isStdTier } = useCommunity();
     const { t } = useTranslation(['feed', 'common']);
-    const isMGT = user?.membershipType === 'MGT';
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     
     // Theme-based styling
     const defaultAccent = isMGT ? '#10b981' : '#d4af37';
@@ -62,7 +64,7 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
                             {t('feed:feed.welcome', { name: user?.name?.split(' ')[0] || t('common:nav.profile') })}
                         </h1>
                         <p className={theme === 'light' ? 'text-gray-500 text-lg font-light tracking-wide' : 'text-gray-400 text-lg font-light tracking-wide'}>
-                            {isMGT ? t('feed:feed.subtitleMGT') : t('feed:feed.subtitle')}
+                            {t('feed:feed.subtitle', { communityName: config.name || 'Magazine' })}
                         </p>
                     </div>
                     <Link

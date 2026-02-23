@@ -48,8 +48,10 @@
     },
     "feed": {
         "title": "Feed",
-        "welcome": "Bienvenido, {{name}}",        "subtitle": "Tu feed exclusivo del Magazine",
-        "subtitleMGT": "Tu feed exclusivo del Machine Gold Team",        "empty": "¡Aún no hay publicaciones. Sé el primero en publicar!",
+        "welcome": "Bienvenido, {{name}}",
+        "subtitle": "Tu feed exclusivo del {{communityName}}",
+        "subtitleMGT": "Tu feed exclusivo del {{communityName}}",
+        "empty": "\u00a1A\u00fan no hay publicaciones. S\u00e9 el primero en publicar!",
         "refresh": "Actualizar feed"
     },
     "stories": {

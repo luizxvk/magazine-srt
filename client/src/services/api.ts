@@ -8,9 +8,9 @@ const DEFAULT_BACKEND_URL = 'https://magazine-srt.vercel.app';
 
 // Detectar subdomain do hostname atual
 const getCommunitySubdomain = (): string | null => {
-    // Se tem variável de ambiente definida, usa ela
+    // Se tem variável de ambiente definida, usa ela (limpando whitespace)
     if (import.meta.env.VITE_COMMUNITY_SUBDOMAIN) {
-        return import.meta.env.VITE_COMMUNITY_SUBDOMAIN;
+        return import.meta.env.VITE_COMMUNITY_SUBDOMAIN.trim();
     }
     
     // Extrair do hostname (ex: teste-e2e-065129.vercel.app => teste-e2e-065129)
@@ -34,18 +34,20 @@ const getCommunitySubdomain = (): string | null => {
 // Em produção web usa VITE_API_URL ou fallback para o backend padrão
 // No Capacitor app usa URL completa da API
 const getBaseURL = () => {
+    // Detectar ambiente
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    
     // Debug: mostrar ambiente
     console.log('[API] Environment:', {
-        VITE_API_URL: import.meta.env.VITE_API_URL,
-        PROD: import.meta.env.PROD,
-        MODE: import.meta.env.MODE,
+        hostname,
+        isLocalhost,
         isCapacitor,
     });
     
     // Se tem variável de ambiente definida, usa ela (comunidades provisionadas)
     if (import.meta.env.VITE_API_URL) {
         const url = import.meta.env.VITE_API_URL;
-        // Garantir que termina sem /api se já tiver
         return url.endsWith('/api') ? url : `${url}/api`;
     }
     
@@ -54,16 +56,14 @@ const getBaseURL = () => {
         return `${DEFAULT_BACKEND_URL}/api`;
     }
     
-    // Em produção web sem VITE_API_URL, usa o backend padrão
-    // Verificar por hostname também (não apenas PROD flag)
-    const isProduction = import.meta.env.PROD || 
-        (typeof window !== 'undefined' && !window.location.hostname.includes('localhost'));
-    
-    if (isProduction) {
+    // Se NÃO é localhost, é produção - usar backend padrão
+    if (!isLocalhost) {
+        console.log('[API] Production detected, using:', `${DEFAULT_BACKEND_URL}/api`);
         return `${DEFAULT_BACKEND_URL}/api`;
     }
     
     // Em desenvolvimento local
+    console.log('[API] Development mode, using localhost');
     return 'http://localhost:3000/api';
 };
 

@@ -48,7 +48,7 @@ export default function FeedbackFormCard({ onClose }: FeedbackFormCardProps) {
     const themeBorder = theme === 'light' ? 'border-gray-200' : (isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30');
     const themeBg = theme === 'light' ? 'bg-white/90' : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
     const themeGlow = isMGT
-        ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+        ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)] hover:shadow-[0_0_25px_rgba(var(--tier-std-color-rgb),0.25)]'
         : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
     const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
     const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';

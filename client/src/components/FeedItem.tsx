@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles, BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -149,6 +150,7 @@ export default function FeedItem({
 }: FeedItemProps) {
     const { t } = useTranslation();
     const { user, theme, isVisitor, showToast, accentColor, accentGradient } = useAuth();
+    const { config } = useCommunity();
     const [showMenu, setShowMenu] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
@@ -163,7 +165,10 @@ export default function FeedItem({
     const canDelete = isOwner || isAdmin;
     const isMGT = user?.membershipType === 'MGT';
 
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Use dynamic colors from CommunityContext
+    const stdColor = config.accentColor || config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;
 
 

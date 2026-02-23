@@ -18,8 +18,10 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
     const { t } = useTranslation(['feed', 'common']);
     const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     
-    // Theme-based styling
-    const defaultAccent = isMGT ? '#10b981' : '#d4af37';
+    // Theme-based styling - use CommunityContext colors
+    const stdColor = config.accentColor || config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
+    const defaultAccent = isMGT ? stdColor : vipColor;
     const userAccent = accentColor || defaultAccent;
     
     const themeIconBg = theme === 'light' 

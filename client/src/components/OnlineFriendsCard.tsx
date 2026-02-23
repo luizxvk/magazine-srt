@@ -46,7 +46,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
     const themeAccent = isMGT ? 'text-tier-std-500' : 'text-gold-500';
     const themeBg = isMGT ? 'bg-tier-std-500/10' : 'bg-gold-500/10';
     const themeGlow = isMGT
-        ? 'shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+        ? 'shadow-[0_0_20px_rgba(var(--tier-std-color-rgb),0.15)]'
         : 'shadow-[0_0_20px_rgba(212,175,55,0.15)]';
     const bgColor = theme === 'light' ? 'bg-white/80' : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
 

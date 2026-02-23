@@ -3,6 +3,7 @@ import { MessageCircle, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import ChatWindow from './ChatWindow';
 import { playSound } from '../utils/sounds';
 
@@ -26,6 +27,7 @@ interface MessagePopupProps {
 
 export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const { user, isVisitor, theme } = useAuth();
+    const { tierStdName, tierVipName } = useCommunity();
     const [unreadMessage, setUnreadMessage] = useState<UnreadMessage | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [showChat, setShowChat] = useState(false);
@@ -246,7 +248,7 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
                                                 <div className="flex items-center gap-2">
                                                     <h4 className={`font-bold ${themeText} truncate text-sm`}>{unreadMessage.sender.name}</h4>
                                                     <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${isSenderMGT ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'}`}>
-                                                        {isSenderMGT ? 'MGT' : 'MAG'}
+                                                        {isSenderMGT ? tierStdName : tierVipName}
                                                     </span>
                                                 </div>
                                                 <button

@@ -5,7 +5,7 @@ import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, Lay
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.12';
+const CURRENT_VERSION = '0.5.0-rc.13';
 
 interface UpdateItem {
     icon: React.ReactNode;

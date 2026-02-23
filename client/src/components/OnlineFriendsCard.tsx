@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MessageCircle, User, Wifi } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import ChatWindow from './ChatWindow';
 import BadgeDisplay from './BadgeDisplay';
@@ -27,6 +28,7 @@ interface OnlineFriendsCardProps {
 
 export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardProps) {
     const { user, theme, accentColor, accentGradient } = useAuth();
+    const { tierStdName, tierVipName } = useCommunity();
     const [onlineFriends, setOnlineFriends] = useState<OnlineFriend[]>([]);
     const [loading, setLoading] = useState(true);
     const [chatOpen, setChatOpen] = useState<OnlineFriend | null>(null);
@@ -181,7 +183,7 @@ export default function OnlineFriendsCard({ maxDisplay = 5 }: OnlineFriendsCardP
                                                     </div>
                                                 </div>
                                                 <p className={`text-[10px] uppercase tracking-wider ${friendMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                                                    {friendMGT ? 'MGT' : 'MAGAZINE'} • {friend.isOnline ? 'online' : getTimeAgo(friend.lastSeenAt)}
+                                                    {friendMGT ? tierStdName : tierVipName} • {friend.isOnline ? 'online' : getTimeAgo(friend.lastSeenAt)}
                                                 </p>
                                             </div>
                                         </div>

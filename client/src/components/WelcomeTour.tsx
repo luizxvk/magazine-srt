@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.12';
+const TOUR_VERSION = '0.5.0-rc.13';
 
 interface WelcomeTourProps {
     isOpen?: boolean;

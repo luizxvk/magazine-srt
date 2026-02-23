@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logoMgtFallback from '../assets/logo-mgt-full.png';
-import logo from '../assets/logo-mgzn.png';
+import logoFallback from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import Loader from '../components/Loader';
@@ -35,6 +35,7 @@ export default function Register() {
     
     // Logo dinâmica do MGT (usa config ou fallback)
     const logoMgt = config.logoIconUrl || logoMgtFallback;
+    const logo = config.logoUrl || logoFallback;
     
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);

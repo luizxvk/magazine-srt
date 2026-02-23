@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo-mgzn.png';
-import logoMgt from '../assets/logo-mgt.png';
+import { useCommunity } from '../context/CommunityContext';
+import logoFallback from '../assets/logo-mgzn.png';
+import logoMgtFallback from '../assets/logo-mgt.png';
 
 export default function LoadingScreen() {
     const { user } = useAuth();
+    const { config } = useCommunity();
     const isMGT = user?.membershipType === 'MGT';
     const [progress, setProgress] = useState(0);
     const [phase, setPhase] = useState(0);
@@ -49,7 +51,7 @@ export default function LoadingScreen() {
 
                 {/* Logo */}
                 <img
-                    src={isMGT ? logoMgt : logo}
+                    src={config.logoIconUrl || (isMGT ? logoMgtFallback : logoFallback)}
                     alt="Logo"
                     className={`h-24 md:h-32 object-contain relative z-10 ${isMGT ? 'drop-shadow-[0_0_30px_rgba(16,185,129,0.5)]' : 'drop-shadow-[0_0_30px_rgba(212,175,55,0.5)]'} animate-pulse`}
                     style={{ animationDuration: '2s' }}

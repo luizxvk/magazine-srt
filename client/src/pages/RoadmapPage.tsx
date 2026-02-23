@@ -311,7 +311,7 @@ const roadmapItems: RoadmapItem[] = [
         title: 'Branding Dinâmico Multi-Tenant',
         description: 'Cores de tier (MGT/Magazine) totalmente configuráveis via Rovex. Nomes, cores e logos personalizados por comunidade.',
         status: 'completed',
-        version: 'v0.5.0-rc.12',
+        version: 'v0.5.0-rc.13',
         icon: <Palette className="w-5 h-5" />,
         category: 'feature'
     },
@@ -320,8 +320,17 @@ const roadmapItems: RoadmapItem[] = [
         title: 'Integração Rovex Platform',
         description: 'Provisioning automático: Neon DB, Vercel deploy, config sync, email com credenciais admin e Feature Gates por plano.',
         status: 'completed',
-        version: 'v0.5.0-rc.12',
+        version: 'v0.5.0-rc.13',
         icon: <Gamepad2 className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29k',
+        title: 'Tag de Clan Dinâmica',
+        description: 'Tag de membros (MGT/MAGAZINE) agora usa nomes configuráveis por comunidade. Exibido em amigos online, mensagens e feeds.',
+        status: 'completed',
+        version: 'v0.5.0-rc.13',
+        icon: <Users className="w-5 h-5" />,
         category: 'feature'
     },
     

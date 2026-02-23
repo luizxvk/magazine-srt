@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo-mgzn.png';
-import logoMgt from '../assets/logo-mgt.png';
+import { useCommunity } from '../context/CommunityContext';
+import logoFallback from '../assets/logo-mgzn.png';
+import logoMgtFallback from '../assets/logo-mgt.png';
 
 interface PremiumLoaderProps {
   title: string;
@@ -10,6 +11,7 @@ interface PremiumLoaderProps {
 
 export default function PremiumLoader({ title, subtitle }: PremiumLoaderProps) {
   const { user, accentColor, accentGradient, theme } = useAuth();
+  const { config } = useCommunity();
   const isMGT = user?.membershipType === 'MGT';
   const defaultAccent = isMGT ? '#10b981' : '#d4af37';
   const userAccent = accentColor || defaultAccent;
@@ -66,7 +68,7 @@ export default function PremiumLoader({ title, subtitle }: PremiumLoaderProps) {
               transition={{ duration: 2, repeat: Infinity }}
             />
             <motion.img
-              src={isMGT ? logoMgt : logo}
+              src={config.logoIconUrl || (isMGT ? logoMgtFallback : logoFallback)}
               alt=""
               className="relative h-20 md:h-24 object-contain"
               animate={{ 

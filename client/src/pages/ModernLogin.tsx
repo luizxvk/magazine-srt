@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff, Fingerprint, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import logo from '../assets/logo-mgzn.png';
+import logoFallback from '../assets/logo-mgzn.png';
 import logoMgtFallback from '../assets/logo-mgt-full.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -535,6 +535,7 @@ export default function ModernLogin() {
     useDynamicHead();
 
     const logoMgt = config.logoIconUrl || logoMgtFallback;
+    const logo = config.logoUrl || logoFallback;
 
     // Membership from URL path
     const getMembershipFromPath = useCallback(() => {

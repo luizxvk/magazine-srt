@@ -22,8 +22,8 @@ export interface CommunityConfig {
   // === Branding ===
   name: string;                  // "Magazine SRT"
   slogan: string;                // "A comunidade definitiva"
-  logoUrl: string;               // URL do logo principal
-  logoIconUrl: string;           // URL do ícone/favicon grande
+  logoUrl?: string;              // URL do logo principal (optional - fallback in components)
+  logoIconUrl?: string;          // URL do ícone/favicon grande (optional - fallback in components)
   faviconUrl: string;            // URL do favicon
   ogImageUrl: string;            // Imagem para compartilhamento
   
@@ -78,10 +78,10 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   // Branding
   name: 'Magazine MGT',
   slogan: 'A comunidade definitiva de games e entretenimento',
-  logoUrl: '/assets/logo-mgzn.png',
-  logoIconUrl: '/assets/mgt-log-logo.png',
+  logoUrl: undefined, // Uses imported assets in components (fallback)
+  logoIconUrl: undefined, // Uses imported assets in components (fallback)
   faviconUrl: '/assets/mgt-log-logo.png',
-  ogImageUrl: '/assets/og-image.png',
+  ogImageUrl: '/assets/mgt-log-logo.png',
   
   // Cores (dourado Magazine / verde MGT)
   primaryColor: '#d4af37',

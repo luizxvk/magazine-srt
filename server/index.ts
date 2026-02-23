@@ -77,7 +77,9 @@ const allowedOrigins = [
 // Known subdomain patterns for Vercel previews (restrict to our projects)
 const allowedVercelPatterns = [
     /^https:\/\/magazine-.*\.vercel\.app$/,           // magazine-* subdomains
-    /^https:\/\/teste-e2e-.*\.vercel\.app$/,          // Test communities
+    /^https:\/\/teste-e2e-.*\.vercel\.app$/,          // Test communities (e2e)
+    /^https:\/\/teste-mt-.*\.vercel\.app$/,           // Test communities (multi-tenant)
+    /^https:\/\/.*-mgt-studio\.vercel\.app$/,         // MGT Studio preview deploys
     /^https:\/\/.*-streetrunnerteam\.vercel\.app$/,   // Team preview deploys
     /^https:\/\/.*\.comunidades\.rovex\.app$/,        // Provisioned communities
 ];

@@ -1,0 +1,27 @@
+{
+  "$schema": "./communities.schema.json",
+  "description": "Lista de comunidades filhas que herdam do magazine-frontend template",
+  "lastUpdated": "2026-02-23",
+  "communities": [
+    {
+      "name": "Teste MT 001",
+      "subdomain": "teste-mt-001",
+      "vercelProjectId": "prj_xxxxxxxxxxxx",
+      "deployHook": "https://api.vercel.com/v1/integrations/deploy/HOOK_ID",
+      "enabled": true,
+      "notes": "Comunidade de teste para multi-tenant"
+    }
+  ],
+  "instructions": {
+    "howToGetDeployHook": [
+      "1. Acesse vercel.com e vá no projeto da comunidade",
+      "2. Settings > Git > Deploy Hooks",
+      "3. Crie um hook com nome 'Parent Template Update'",
+      "4. Copie a URL gerada e cole no campo 'deployHook' acima"
+    ],
+    "howToTrigger": [
+      "npm run deploy:children",
+      "Ou automaticamente via GitHub Action após push no main"
+    ]
+  }
+}

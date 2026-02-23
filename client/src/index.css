@@ -3,6 +3,110 @@
 @tailwind utilities;
 
 /* ============================================
+   DYNAMIC COMMUNITY COLORS
+   
+   Estas classes usam CSS variables definidas pelo CommunityContext.
+   Use estas classes ao invés de hardcoded "emerald-*" ou "gold-*".
+   
+   Variáveis disponíveis:
+   --tier-std-color, --tier-std-color-rgb (verde/emerald por padrão)
+   --tier-std-400, --tier-std-500, --tier-std-600, --tier-std-700, --tier-std-950
+   --tier-vip-color, --tier-vip-color-rgb (dourado/gold por padrão)
+   --tier-vip-400, --tier-vip-500, --tier-vip-600
+   ============================================ */
+
+/* Default fallback values */
+:root {
+  --tier-std-color: #10b981;
+  --tier-std-color-rgb: 16, 185, 129;
+  --tier-std-400: #34d399;
+  --tier-std-500: #10b981;
+  --tier-std-600: #059669;
+  --tier-std-700: #047857;
+  --tier-std-950: #022c22;
+  
+  --tier-vip-color: #d4af37;
+  --tier-vip-color-rgb: 212, 175, 55;
+  --tier-vip-400: #e5c76b;
+  --tier-vip-500: #d4af37;
+  --tier-vip-600: #b8941f;
+}
+
+/* Tier Standard (MGT) - Background classes */
+.bg-tier-std { background-color: var(--tier-std-color); }
+.bg-tier-std-400 { background-color: var(--tier-std-400); }
+.bg-tier-std-500 { background-color: var(--tier-std-500); }
+.bg-tier-std-600 { background-color: var(--tier-std-600); }
+.bg-tier-std-700 { background-color: var(--tier-std-700); }
+.bg-tier-std-950 { background-color: var(--tier-std-950); }
+.bg-tier-std\/5 { background-color: rgba(var(--tier-std-color-rgb), 0.05); }
+.bg-tier-std\/10 { background-color: rgba(var(--tier-std-color-rgb), 0.1); }
+.bg-tier-std\/20 { background-color: rgba(var(--tier-std-color-rgb), 0.2); }
+.bg-tier-std\/30 { background-color: rgba(var(--tier-std-color-rgb), 0.3); }
+.bg-tier-std\/50 { background-color: rgba(var(--tier-std-color-rgb), 0.5); }
+
+/* Tier Standard (MGT) - Text classes */
+.text-tier-std { color: var(--tier-std-color); }
+.text-tier-std-400 { color: var(--tier-std-400); }
+.text-tier-std-500 { color: var(--tier-std-500); }
+.text-tier-std-600 { color: var(--tier-std-600); }
+.text-tier-std\/30 { color: rgba(var(--tier-std-color-rgb), 0.3); }
+.text-tier-std\/50 { color: rgba(var(--tier-std-color-rgb), 0.5); }
+.text-tier-std\/70 { color: rgba(var(--tier-std-color-rgb), 0.7); }
+
+/* Tier Standard (MGT) - Border classes */
+.border-tier-std { border-color: var(--tier-std-color); }
+.border-tier-std\/20 { border-color: rgba(var(--tier-std-color-rgb), 0.2); }
+.border-tier-std\/30 { border-color: rgba(var(--tier-std-color-rgb), 0.3); }
+.border-tier-std\/40 { border-color: rgba(var(--tier-std-color-rgb), 0.4); }
+.border-tier-std\/60 { border-color: rgba(var(--tier-std-color-rgb), 0.6); }
+
+/* Tier VIP (MAGAZINE) - Background classes */
+.bg-tier-vip { background-color: var(--tier-vip-color); }
+.bg-tier-vip-400 { background-color: var(--tier-vip-400); }
+.bg-tier-vip-500 { background-color: var(--tier-vip-500); }
+.bg-tier-vip-600 { background-color: var(--tier-vip-600); }
+.bg-tier-vip\/10 { background-color: rgba(var(--tier-vip-color-rgb), 0.1); }
+.bg-tier-vip\/20 { background-color: rgba(var(--tier-vip-color-rgb), 0.2); }
+.bg-tier-vip\/30 { background-color: rgba(var(--tier-vip-color-rgb), 0.3); }
+
+/* Tier VIP (MAGAZINE) - Text classes */
+.text-tier-vip { color: var(--tier-vip-color); }
+.text-tier-vip-400 { color: var(--tier-vip-400); }
+.text-tier-vip-500 { color: var(--tier-vip-500); }
+.text-tier-vip\/50 { color: rgba(var(--tier-vip-color-rgb), 0.5); }
+.text-tier-vip\/70 { color: rgba(var(--tier-vip-color-rgb), 0.7); }
+
+/* Tier VIP (MAGAZINE) - Border classes */
+.border-tier-vip { border-color: var(--tier-vip-color); }
+.border-tier-vip\/20 { border-color: rgba(var(--tier-vip-color-rgb), 0.2); }
+.border-tier-vip\/30 { border-color: rgba(var(--tier-vip-color-rgb), 0.3); }
+
+/* Shadow classes */
+.shadow-tier-std { box-shadow: 0 0 20px rgba(var(--tier-std-color-rgb), 0.4); }
+.shadow-tier-std\/20 { box-shadow: 0 0 15px rgba(var(--tier-std-color-rgb), 0.2); }
+.shadow-tier-vip { box-shadow: 0 0 20px rgba(var(--tier-vip-color-rgb), 0.4); }
+.shadow-tier-vip\/20 { box-shadow: 0 0 15px rgba(var(--tier-vip-color-rgb), 0.2); }
+
+/* Hover states */
+.hover\:bg-tier-std:hover { background-color: var(--tier-std-color); }
+.hover\:bg-tier-std-400:hover { background-color: var(--tier-std-400); }
+.hover\:bg-tier-std\/20:hover { background-color: rgba(var(--tier-std-color-rgb), 0.2); }
+.hover\:bg-tier-std\/30:hover { background-color: rgba(var(--tier-std-color-rgb), 0.3); }
+.hover\:text-tier-std:hover { color: var(--tier-std-color); }
+.hover\:text-tier-std-400:hover { color: var(--tier-std-400); }
+.hover\:border-tier-std\/60:hover { border-color: rgba(var(--tier-std-color-rgb), 0.6); }
+
+/* Selection */
+.selection-tier-std::selection { background-color: rgba(var(--tier-std-color-rgb), 0.3); }
+.selection-tier-vip::selection { background-color: rgba(var(--tier-vip-color-rgb), 0.3); }
+
+/* Gradient helpers */
+.from-tier-std-600 { --tw-gradient-from: var(--tier-std-600); }
+.to-tier-std-500 { --tw-gradient-to: var(--tier-std-500); }
+.via-tier-std { --tw-gradient-via: var(--tier-std-color); }
+
+/* ============================================
    GLOBAL SCROLLBAR STYLES
    ============================================ */
 body {

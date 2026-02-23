@@ -1,0 +1,88 @@
+name: Deploy Child Communities
+
+on:
+  # Dispara automaticamente quando o Vercel faz deploy do magazine-frontend
+  push:
+    branches:
+      - main
+    paths:
+      - 'client/**'
+  
+  # Permite disparo manual
+  workflow_dispatch:
+    inputs:
+      community:
+        description: 'Comunidade específica para deploy (deixe vazio para todas)'
+        required: false
+        default: ''
+
+jobs:
+  trigger-child-deploys:
+    runs-on: ubuntu-latest
+    name: Trigger Child Community Deploys
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Wait for parent deploy
+        # Aguarda 2 minutos para o magazine-frontend terminar de deployar
+        run: sleep 120
+      
+      - name: Read communities config
+        id: communities
+        run: |
+          if [ -f "client/communities.json" ]; then
+            echo "config=$(cat client/communities.json | jq -c '.communities[] | select(.enabled == true)')" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Trigger deploys
+        env:
+          SPECIFIC_COMMUNITY: ${{ github.event.inputs.community }}
+        run: |
+          echo "🚀 Triggering child community deploys..."
+          
+          # Lê os deploy hooks do arquivo communities.json
+          cd client
+          
+          if [ -f "communities.json" ]; then
+            # Para cada comunidade habilitada, dispara o deploy hook
+            jq -c '.communities[] | select(.enabled == true)' communities.json | while read community; do
+              name=$(echo $community | jq -r '.name')
+              hook=$(echo $community | jq -r '.deployHook')
+              subdomain=$(echo $community | jq -r '.subdomain')
+              
+              # Se especificou uma comunidade específica, pula as outras
+              if [ -n "$SPECIFIC_COMMUNITY" ] && [ "$subdomain" != "$SPECIFIC_COMMUNITY" ]; then
+                echo "⏭️ Skipping $name (not selected)"
+                continue
+              fi
+              
+              # Verifica se o hook é válido (não é placeholder)
+              if [[ "$hook" == *"HOOK_ID"* ]] || [[ "$hook" == "" ]]; then
+                echo "⚠️ Skipping $name - deploy hook not configured"
+                continue
+              fi
+              
+              echo "🔄 Deploying: $name ($subdomain)"
+              
+              response=$(curl -s -X POST "$hook" -H "Content-Type: application/json")
+              
+              if echo "$response" | jq -e '.job' > /dev/null 2>&1; then
+                echo "✅ Deploy triggered for $name"
+              else
+                echo "❌ Failed to trigger deploy for $name"
+                echo "Response: $response"
+              fi
+            done
+          else
+            echo "⚠️ No communities.json found"
+          fi
+          
+          echo ""
+          echo "✅ Child deploy trigger complete!"

@@ -32,6 +32,18 @@ const hexToRgb = (hex: string): string => {
     : '16, 185, 129'; // fallback emerald
 };
 
+// Helper para clarear/escurecer cores
+const adjustColor = (hex: string, amount: number): string => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return hex;
+  
+  const r = Math.max(0, Math.min(255, parseInt(result[1], 16) + amount));
+  const g = Math.max(0, Math.min(255, parseInt(result[2], 16) + amount));
+  const b = Math.max(0, Math.min(255, parseInt(result[3], 16) + amount));
+  
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+};
+
 // ============================================
 // INTERFACE DO CONTEXTO
 // ============================================
@@ -118,18 +130,28 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
   useEffect(() => {
     const root = document.documentElement;
     const bgColor = config.backgroundColor || '#10b981';
+    const vipColor = config.tierVipColor || '#d4af37';
     
     // CSS Variables para o tier Standard (MGT/MEMBER/etc)
     root.style.setProperty('--tier-std-color', bgColor);
     root.style.setProperty('--tier-std-color-rgb', hexToRgb(bgColor));
     
-    // Gerar variações de opacidade automaticamente
-    // Essas variáveis podem ser usadas nos componentes:
-    // var(--tier-std-color) -> cor sólida
-    // rgba(var(--tier-std-color-rgb), 0.5) -> com opacidade
+    // Gerar variações de tonalidade (400, 500, 600, 700, 950)
+    root.style.setProperty('--tier-std-400', adjustColor(bgColor, 30));
+    root.style.setProperty('--tier-std-500', bgColor);
+    root.style.setProperty('--tier-std-600', adjustColor(bgColor, -20));
+    root.style.setProperty('--tier-std-700', adjustColor(bgColor, -40));
+    root.style.setProperty('--tier-std-950', adjustColor(bgColor, -100));
     
-    console.log('[CommunityContext] Applied tier std color:', bgColor);
-  }, [config.backgroundColor]);
+    // CSS Variables para o tier VIP (MAGAZINE/LEGEND/etc)
+    root.style.setProperty('--tier-vip-color', vipColor);
+    root.style.setProperty('--tier-vip-color-rgb', hexToRgb(vipColor));
+    root.style.setProperty('--tier-vip-400', adjustColor(vipColor, 30));
+    root.style.setProperty('--tier-vip-500', vipColor);
+    root.style.setProperty('--tier-vip-600', adjustColor(vipColor, -20));
+    
+    console.log('[CommunityContext] Applied dynamic colors:', { bgColor, vipColor });
+  }, [config.backgroundColor, config.tierVipColor]);
 
   // Carrega config do servidor na inicialização
   useEffect(() => {

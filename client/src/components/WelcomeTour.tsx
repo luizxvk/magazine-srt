@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronRight, Sparkles, Trophy, Coins, Users, ShoppingBag, Palette, Crown, Zap, Gift, Target, TrendingUp, Video, Swords } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const TOUR_VERSION = '0.5.0-rc.12';
@@ -13,6 +14,7 @@ interface WelcomeTourProps {
 
 export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalOnClose, onStartTutorial }: WelcomeTourProps = {}) {
     const { theme, user, accentColor: userAccentColor, accentGradient } = useAuth();
+    const { config, tierStdName, tierVipName } = useCommunity();
     const [step, setStep] = useState(0);
     const [internalIsVisible, setInternalIsVisible] = useState(false);
     const [wantsTutorial, setWantsTutorial] = useState(true);
@@ -76,10 +78,10 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
         // Step 0: Welcome Hero Screen (NEW)
         {
             type: 'welcome-hero',
-            title: isMGT ? "Bem-vindo à MGT" : "Bem-vindo ao Magazine",
+            title: isMGT ? `Bem-vindo à ${tierStdName}` : `Bem-vindo ao ${tierVipName}`,
             subtitle: isMGT 
-                ? "Velocidade e Poder" 
-                : "A Elite do Sucesso",
+                ? config.tierStdSlogan 
+                : config.tierVipSlogan,
             description: "Uma experiência social premium com gamificação, recompensas reais e uma comunidade exclusiva.",
         },
         // Regular steps
@@ -88,7 +90,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                 title: "Sua Comunidade Exclusiva",
                 description: "Você faz parte de uma comunidade exclusiva! Aqui você terá acesso a funcionalidades únicas, recompensas especiais e muito mais.",
                 emoji: "🌟",
-                features: ["Acesso exclusivo MGT", "Tema esmeralda personalizado", "Benefícios VIP"]
+                features: [`Acesso exclusivo ${tierStdName}`, "Tema personalizado", "Benefícios VIP"]
             },
             {
                 title: "Feed & Comunidade",

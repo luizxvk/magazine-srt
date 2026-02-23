@@ -12,6 +12,7 @@ import {
     Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import ChatWindow from './ChatWindow';
@@ -32,6 +33,7 @@ interface AdminInfo {
 
 export default function SupportButton() {
     const { user, isMobileDrawerOpen } = useAuth();
+    const { communityName } = useCommunity();
     const { t } = useTranslation('common');
     const isMGT = user?.membershipType === 'MGT';
     const [isOpen, setIsOpen] = useState(false);
@@ -153,7 +155,7 @@ export default function SupportButton() {
     };
 
     const handleEmail = () => {
-        const subject = encodeURIComponent('Suporte Magazine MGT');
+        const subject = encodeURIComponent(`Suporte ${communityName}`);
         const body = encodeURIComponent(
             `Olá, equipe de suporte!\n\nUsuário: ${user?.displayName || user?.name || 'Visitante'}\nEmail: ${user?.email || 'Não informado'}\n\nDescreva seu problema:\n\n`
         );

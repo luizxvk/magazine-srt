@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, ScrollText, Check, ChevronDown } from 'lucide-react';
+import { useCommunity } from '../context/CommunityContext';
 
 interface TermsOfServiceModalProps {
     isOpen: boolean;
@@ -9,6 +10,8 @@ interface TermsOfServiceModalProps {
 }
 
 export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }: TermsOfServiceModalProps) {
+    const { tierStdName, tierVipName, communityName } = useCommunity();
+    const tierName = isMGT ? tierStdName : tierVipName;
     const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -70,7 +73,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                             className="p-6 overflow-y-auto max-h-[50vh] text-sm text-gray-300 space-y-4"
                         >
                             <h3 className={`text-lg font-bold ${isMGT ? 'text-emerald-400' : 'text-gold-400'}`}>
-                                TERMOS DE USO DA PLATAFORMA {isMGT ? 'MGT' : 'MAGAZINE'}
+                                TERMOS DE USO DA PLATAFORMA {tierName.toUpperCase()}
                             </h3>
                             
                             <p className="text-gray-400 text-xs">Última atualização: Janeiro de 2026</p>
@@ -78,7 +81,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                             <section className="space-y-2">
                                 <h4 className="font-bold text-white">1. ACEITAÇÃO DOS TERMOS</h4>
                                 <p>
-                                    Ao criar uma conta e utilizar a plataforma {isMGT ? 'MGT' : 'Magazine'}, você declara ter lido, compreendido e aceito 
+                                    Ao criar uma conta e utilizar a plataforma {communityName}, você declara ter lido, compreendido e aceito 
                                     integralmente estes Termos de Uso e a Política de Privacidade. O uso da plataforma está condicionado à aceitação 
                                     destes termos. Caso não concorde com qualquer disposição, não utilize nossos serviços.
                                 </p>
@@ -197,7 +200,7 @@ export default function TermsOfServiceModal({ isOpen, onAccept, onClose, isMGT }
                                 <h4 className="font-bold text-white">8. PROPRIEDADE INTELECTUAL</h4>
                                 <p>
                                     8.1. Todo o conteúdo da plataforma, incluindo design, logos, textos e código, é propriedade exclusiva da 
-                                    {isMGT ? ' MGT' : ' Magazine'} ou de seus licenciadores.
+                                    {' ' + communityName} ou de seus licenciadores.
                                 </p>
                                 <p>
                                     8.2. É proibida a reprodução, distribuição ou modificação do conteúdo da plataforma sem autorização prévia.

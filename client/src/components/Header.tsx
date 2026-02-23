@@ -454,7 +454,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                                 className={`text-[10px] uppercase tracking-[0.15em] font-bold absolute right-0 ${theme === 'light' ? 'text-gray-700' : ''}`}
                                                 style={{ color: theme === 'light' ? undefined : accentColor }}
                                             >
-                                                {isMGT ? 'Membro MGT' : 'Membro Magazine'}
+                                                {isMGT ? `Membro ${config.tierStdName}` : `Membro ${config.tierVipName}`}
                                             </motion.p>
                                         )}
                                     </AnimatePresence>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Calendar, Star, Sparkles, TrendingUp, Camera, MessageCircle, Gamepad2, Tv, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import DailyLoginCard from './DailyLoginCard';
 import PhotoCatalogCard from './PhotoCatalogCard';
 import WhatsNewModal from './WhatsNewModal';
@@ -42,6 +43,7 @@ interface RecommendationsDrawerProps {
 
 export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatus, openDailyLoginModal }: RecommendationsDrawerProps) {
     const { user, theme } = useAuth();
+    const { tierStdName, tierVipName } = useCommunity();
     const isMGT = user?.membershipType === 'MGT';
     const [catalogPhotos, setCatalogPhotos] = useState<CatalogPhoto[]>([]);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
@@ -290,7 +292,7 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                                     <h4 className={`font-medium ${themeText} ${isMGT ? 'group-hover:text-white' : 'group-hover:text-gold-300'} transition-colors`}>Eventos Exclusivos</h4>
                                 </div>
                                 <p className="text-sm text-gray-400 leading-relaxed">
-                                    Fique por dentro dos próximos encontros e experiências {isMGT ? 'MGT' : 'Magazine'}.
+                                    Fique por dentro dos próximos encontros e experiências {isMGT ? tierStdName : tierVipName}.
                                 </p>
                             </div>
 

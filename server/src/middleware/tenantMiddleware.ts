@@ -9,8 +9,11 @@ import { CommunityConfig, DEFAULT_COMMUNITY_CONFIG } from '../config/community.c
 import { setCommunityConfig } from '../services/tenantService';
 
 // Cache simples em memória (em prod usar Redis/Vercel KV)
+// NOTA: Em Vercel serverless, cada instância tem seu próprio cache
+// Por isso usamos um TTL mais longo para reduzir chamadas à Rovex
 const configCache = new Map<string, { config: CommunityConfig; cachedAt: number }>();
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutos (aumentado para evitar rate limit)
+const STALE_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 horas para fallback
 
 /**
  * Middleware que detecta a comunidade pelo subdomain/header e carrega config
@@ -140,6 +143,7 @@ async function getCommunityConfigBySubdomain(subdomain: string): Promise<Communi
   // Verificar cache
   const cached = configCache.get(subdomain);
   if (cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
+    console.log(`[TenantDetection] Using cached config for: ${subdomain}`);
     return cached.config;
   }
   
@@ -154,9 +158,16 @@ async function getCommunityConfigBySubdomain(subdomain: string): Promise<Communi
   if (config) {
     // Cachear
     configCache.set(subdomain, { config, cachedAt: Date.now() });
+    return config;
   }
   
-  return config;
+  // Se falhou mas temos cache stale (até 24h), usar ele como fallback
+  if (cached && Date.now() - cached.cachedAt < STALE_CACHE_TTL_MS) {
+    console.log(`[TenantDetection] Using stale cache for: ${subdomain} (fallback)`);
+    return cached.config;
+  }
+  
+  return null;
 }
 
 /**

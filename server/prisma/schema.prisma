@@ -114,6 +114,9 @@ model User {
   lastPrestigedAt        DateTime?                   // When last prestiged
   // Feed Cards Customization
   feedCardsConfig        Json?          // { cards: [{id: 'tools', visible: true, order: 0}, ...] }
+  // Sponsored Posts
+  sponsoredPostRequests  SponsoredPostRequest[] @relation("SponsoredPostRequests")
+  sponsoredPostsReviewed SponsoredPostRequest[] @relation("SponsoredPostReviewer")
 
   @@index([membershipType])
   @@index([isElite])
@@ -190,6 +193,7 @@ model Post {
   likes           Like[]
   user            User         @relation(fields: [userId], references: [id])
   tags            PostTag[]
+  sponsoredRequests SponsoredPostRequest[]
 
   @@index([userId])
   @@index([createdAt])
@@ -391,6 +395,27 @@ model InviteRequest {
   status    RequestStatus @default(PENDING)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+}
+
+// Solicitação de Post Patrocinado
+model SponsoredPostRequest {
+  id            String        @id @default(uuid())
+  postId        String
+  userId        String
+  zionsCashPaid Float         @default(0)
+  status        RequestStatus @default(PENDING)
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  post          Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user          User          @relation("SponsoredPostRequests", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer      User?         @relation("SponsoredPostReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([postId])
+  @@index([userId])
+  @@index([status])
 }
 
 model Announcement {

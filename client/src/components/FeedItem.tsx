@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles, BarChart3 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Flag, Maximize2, Check, Sparkles, BarChart3, Megaphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import BadgeDisplay from './BadgeDisplay';
 import VisitorBlockPopup from './VisitorBlockPopup';
+import SponsorPostModal from './SponsorPostModal';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 
 interface PollOption {
@@ -159,6 +160,7 @@ export default function FeedItem({
     const [isPressed, setIsPressed] = useState(false);
     const [showVisitorBlock, setShowVisitorBlock] = useState(false);
     const [visitorBlockFeature, setVisitorBlockFeature] = useState('');
+    const [showSponsorModal, setShowSponsorModal] = useState(false);
     const [votingOptionId, setVotingOptionId] = useState<string | null>(null);
     const isOwner = user?.id === authorId;
     const isAdmin = user?.role === 'ADMIN';
@@ -333,6 +335,19 @@ export default function FeedItem({
                                     >
                                         <Share2 className="w-4 h-4" /> {t('actions.share')}
                                     </button>
+                                    {isOwner && !isHighlight && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                setShowMenu(false);
+                                                setShowSponsorModal(true);
+                                            }}
+                                            className="w-full px-4 py-3 text-left text-sm text-gold-400 hover:bg-gold-500/10 flex items-center gap-2 transition-colors"
+                                        >
+                                            <Megaphone className="w-4 h-4" /> Patrocinar
+                                        </button>
+                                    )}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -567,6 +582,13 @@ export default function FeedItem({
                 isOpen={showVisitorBlock} 
                 onClose={() => setShowVisitorBlock(false)} 
                 featureName={visitorBlockFeature}
+            />
+
+            {/* Sponsor Post Modal */}
+            <SponsorPostModal
+                isOpen={showSponsorModal}
+                onClose={() => setShowSponsorModal(false)}
+                postId={String(id)}
             />
         </motion.div>
     );

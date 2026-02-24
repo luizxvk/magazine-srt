@@ -45,6 +45,26 @@ interface InviteRequest {
     createdAt: string;
 }
 
+interface SponsoredPostRequest {
+    id: string;
+    postId: string;
+    userId: string;
+    zionsCashPaid: number;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    createdAt: string;
+    post: {
+        id: string;
+        caption: string | null;
+        imageUrl: string | null;
+    };
+    user: {
+        id: string;
+        name: string;
+        username: string;
+        avatarUrl: string | null;
+    };
+}
+
 interface User {
     id: string;
     name: string;
@@ -60,6 +80,8 @@ export default function AdminDashboard() {
     const { user } = useAuth();
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [requests, setRequests] = useState<InviteRequest[]>([]);
+    const [sponsoredRequests, setSponsoredRequests] = useState<SponsoredPostRequest[]>([]);
+    const [requestFilter, setRequestFilter] = useState<'members' | 'sponsored'>('members');
     const [usersList, setUsersList] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [showProducts, setShowProducts] = useState(false);
@@ -91,14 +113,16 @@ export default function AdminDashboard() {
 
     const fetchData = async () => {
         try {
-            const [rewardsRes, requestsRes, usersRes] = await Promise.all([
+            const [rewardsRes, requestsRes, usersRes, sponsoredRes] = await Promise.all([
                 api.get('/gamification/rewards'),
                 api.get('/invites'),
-                api.get('/users')
+                api.get('/users'),
+                api.get('/sponsored-posts?status=PENDING').catch(() => ({ data: [] }))
             ]);
             setRewards(rewardsRes.data);
             setRequests(requestsRes.data);
             setUsersList(usersRes.data);
+            setSponsoredRequests(sponsoredRes.data);
         } catch (error) {
             console.error('Failed to fetch data', error);
             showToast('Erro ao carregar dados', 'error');
@@ -178,6 +202,28 @@ export default function AdminDashboard() {
             showToast('Erro ao rejeitar solicitação', 'error');
         } finally {
             setRejectRequestModal(null);
+        }
+    };
+
+    const handleApproveSponsoredPost = async (id: string) => {
+        try {
+            await api.put(`/sponsored-posts/${id}/approve`);
+            setSponsoredRequests(sponsoredRequests.filter(r => r.id !== id));
+            showToast('✅ Post patrocinado aprovado!', 'success');
+        } catch (error) {
+            console.error('Failed to approve sponsored post', error);
+            showToast('Erro ao aprovar post', 'error');
+        }
+    };
+
+    const handleRejectSponsoredPost = async (id: string) => {
+        try {
+            await api.put(`/sponsored-posts/${id}/reject`);
+            setSponsoredRequests(sponsoredRequests.filter(r => r.id !== id));
+            showToast('Post rejeitado. Zions Cash reembolsado.', 'info');
+        } catch (error) {
+            console.error('Failed to reject sponsored post', error);
+            showToast('Erro ao rejeitar post', 'error');
         }
     };
 
@@ -367,34 +413,96 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    {/* Member Requests */}
+                    {/* Solicitações Gerais */}
                     <div className="admin-card">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2.5 rounded-xl bg-gold-500/10">
-                                <UserIcon className="w-5 h-5 text-gold-400" />
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-xl bg-gold-500/10">
+                                    <UserIcon className="w-5 h-5 text-gold-400" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-white">Solicitações Gerais</h3>
+                                    <p className="text-xs text-gray-400">
+                                        {requests.length + sponsoredRequests.length} pendente{(requests.length + sponsoredRequests.length) !== 1 ? 's' : ''}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-white">Solicitações de Membros</h3>
-                                <p className="text-xs text-gray-400">{requests.length} pendente{requests.length !== 1 ? 's' : ''}</p>
+                            {/* Filter Tabs */}
+                            <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
+                                <button
+                                    onClick={() => setRequestFilter('members')}
+                                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                                        requestFilter === 'members'
+                                            ? 'bg-gold-500/20 text-gold-400'
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    Membros ({requests.length})
+                                </button>
+                                <button
+                                    onClick={() => setRequestFilter('sponsored')}
+                                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                                        requestFilter === 'sponsored'
+                                            ? 'bg-gold-500/20 text-gold-400'
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    Posts ({sponsoredRequests.length})
+                                </button>
                             </div>
                         </div>
-                        {requests.length === 0 ? (
-                            <p className="text-gray-500 text-sm">Nenhuma solicitação pendente.</p>
-                        ) : (
-                            <div className="flex flex-wrap gap-3">
-                                {requests.map(req => (
-                                    <div key={req.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 min-w-[250px]">
-                                        <div className="flex-1">
-                                            <h4 className="font-medium text-white text-sm">{req.name}</h4>
-                                            {req.instagram && <p className="text-xs text-gold-400">@{req.instagram}</p>}
+                        
+                        {/* Member Requests */}
+                        {requestFilter === 'members' && (
+                            requests.length === 0 ? (
+                                <p className="text-gray-500 text-sm">Nenhuma solicitação de membro pendente.</p>
+                            ) : (
+                                <div className="flex flex-wrap gap-3">
+                                    {requests.map(req => (
+                                        <div key={req.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 min-w-[250px]">
+                                            <div className="flex-1">
+                                                <h4 className="font-medium text-white text-sm">{req.name}</h4>
+                                                {req.instagram && <p className="text-xs text-gold-400">@{req.instagram}</p>}
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <button onClick={() => handleApproveRequest(req.id)} className="p-1.5 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"><Check className="w-4 h-4" /></button>
+                                                <button onClick={() => handleRejectRequest(req.id)} className="p-1.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"><X className="w-4 h-4" /></button>
+                                            </div>
                                         </div>
-                                        <div className="flex gap-1">
-                                            <button onClick={() => handleApproveRequest(req.id)} className="p-1.5 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"><Check className="w-4 h-4" /></button>
-                                            <button onClick={() => handleRejectRequest(req.id)} className="p-1.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"><X className="w-4 h-4" /></button>
+                                    ))}
+                                </div>
+                            )
+                        )}
+                        
+                        {/* Sponsored Post Requests */}
+                        {requestFilter === 'sponsored' && (
+                            sponsoredRequests.length === 0 ? (
+                                <p className="text-gray-500 text-sm">Nenhuma solicitação de post patrocinado pendente.</p>
+                            ) : (
+                                <div className="flex flex-wrap gap-3">
+                                    {sponsoredRequests.map(req => (
+                                        <div key={req.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 min-w-[300px]">
+                                            {/* Post Preview */}
+                                            {req.post.imageUrl && (
+                                                <img 
+                                                    src={req.post.imageUrl} 
+                                                    alt="Post" 
+                                                    className="w-12 h-12 rounded-lg object-cover"
+                                                />
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-white text-sm truncate">@{req.user.username}</h4>
+                                                <p className="text-xs text-gray-400 truncate">{req.post.caption || 'Post sem legenda'}</p>
+                                                <p className="text-xs text-gold-400">Z$ {req.zionsCashPaid.toFixed(2)}</p>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <button onClick={() => handleApproveSponsoredPost(req.id)} className="p-1.5 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"><Check className="w-4 h-4" /></button>
+                                                <button onClick={() => handleRejectSponsoredPost(req.id)} className="p-1.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"><X className="w-4 h-4" /></button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )
                         )}
                     </div>
 

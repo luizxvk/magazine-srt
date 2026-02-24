@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, CircleDot, Dices } from 'lucide-react';
+import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, CircleDot, Dices, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
 import SupplyBoxModal from './SupplyBoxModal';
 import ZionsRoulette from './ZionsRoulette';
+import BackgroundPreviewModal from './BackgroundPreviewModal';
 import Loader from './Loader';
 import { getItemRarity, getRarityLabel } from '../utils/raritySystem';
 
@@ -185,6 +186,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const [userPacks, setUserPacks] = useState<any[]>([]);
     const [showSupplyBox, setShowSupplyBox] = useState(false);
     const [showRoulette, setShowRoulette] = useState(false);
+    const [previewBg, setPreviewBg] = useState<{ id: string; name: string; preview: string } | null>(null);
     const [loadingPacks, setLoadingPacks] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
@@ -1177,6 +1179,13 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         <Check className="w-3 h-3 text-black" />
                                                                     </div>
                                                                 )}
+                                                                <button
+                                                                    onClick={() => setPreviewBg({ id: item.id, name: item.name, preview: item.preview })}
+                                                                    className={`absolute ${equipped ? 'top-10' : 'top-2'} right-2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm transition-all`}
+                                                                    title="Pré-visualizar"
+                                                                >
+                                                                    <Eye className="w-3 h-3 text-white" />
+                                                                </button>
                                                             </div>
                                                             <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
                                                                 <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
@@ -1254,6 +1263,13 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                         <span className="text-[10px] font-bold text-green-400">GRÁTIS</span>
                                                                     </div>
                                                                 )}
+                                                                <button
+                                                                    onClick={() => setPreviewBg({ id: item.id, name: item.name, preview: item.preview })}
+                                                                    className={`absolute ${equipped ? 'top-10' : 'top-2'} ${isFree ? 'left-auto' : ''} right-2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm transition-all`}
+                                                                    title="Pré-visualizar"
+                                                                >
+                                                                    <Eye className="w-3 h-3 text-white" />
+                                                                </button>
                                                             </div>
                                                             <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
                                                                 <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
@@ -1425,6 +1441,14 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
             <ZionsRoulette
                 isOpen={showRoulette}
                 onClose={() => setShowRoulette(false)}
+            />
+
+            <BackgroundPreviewModal
+                isOpen={!!previewBg}
+                onClose={() => setPreviewBg(null)}
+                backgroundId={previewBg?.id || ''}
+                backgroundName={previewBg?.name || ''}
+                backgroundPreview={previewBg?.preview || ''}
             />
         </AnimatePresence >
         , document.body);

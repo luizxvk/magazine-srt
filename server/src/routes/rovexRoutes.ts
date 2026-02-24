@@ -296,9 +296,9 @@ router.get('/public/config', async (req: Request, res: Response) => {
       
       // Cores - TENANT CONFIG tem prioridade!
       primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#d4af37',
-      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#50c878',
-      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#f59e0b',
-      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#10b981',
+      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#7C3AED',
+      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#8B5CF6',
+      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#8B5CF6',
       
       // Tiers - TENANT CONFIG tem prioridade!
       tierVipName: baseConfig.tierVipName || savedConfig?.tierVipName || 'MAGAZINE',
@@ -308,8 +308,8 @@ router.get('/public/config', async (req: Request, res: Response) => {
       tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       
       // Logos - TENANT CONFIG tem prioridade!
-      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo.svg',
-      logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || '/assets/icon.svg',
+      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-rovex.png',
+      logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || '/assets/logo-rovex.png',
       faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || '/favicon.ico',
       
       // Economia - TENANT CONFIG tem prioridade!
@@ -514,8 +514,8 @@ router.post('/provision', async (req: Request, res: Response) => {
       
       // Cores
       primaryColor: primaryColor || '#d4af37',
-      secondaryColor: secondaryColor || '#10b981',
-      accentColor: accentColor || '#f59e0b',
+      secondaryColor: secondaryColor || '#7C3AED',
+      accentColor: accentColor || '#8B5CF6',
       
       // Tiers
       tierVipName: tierVipName || 'MAGAZINE',
@@ -523,7 +523,7 @@ router.post('/provision', async (req: Request, res: Response) => {
       tierVipSlogan: tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: tierStdName || 'MGT',
       tierStdSlogan: tierStdSlogan || 'Velocidade e Poder',
-      backgroundColor: backgroundColor || '#10b981',
+      backgroundColor: backgroundColor || '#8B5CF6',
       
       // Economia
       currencyName: currencyName || 'Zions',
@@ -1216,14 +1216,14 @@ router.get('/config', async (req: Request, res: Response) => {
       name: savedConfig?.name || 'Magazine MGT',
       slogan: savedConfig?.slogan || 'A comunidade definitiva de games e entretenimento',
       primaryColor: savedConfig?.primaryColor || '#d4af37',
-      secondaryColor: savedConfig?.secondaryColor || '#10b981',
-      accentColor: savedConfig?.accentColor || '#f59e0b',
+      secondaryColor: savedConfig?.secondaryColor || '#7C3AED',
+      accentColor: savedConfig?.accentColor || '#8B5CF6',
       tierVipName: savedConfig?.tierVipName || 'MAGAZINE',
       tierVipColor: savedConfig?.tierVipColor || '#d4af37',
       tierVipSlogan: savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: savedConfig?.tierStdName || 'MGT',
       tierStdSlogan: savedConfig?.tierStdSlogan || 'Velocidade e Poder',
-      backgroundColor: savedConfig?.backgroundColor || '#10b981',
+      backgroundColor: savedConfig?.backgroundColor || '#8B5CF6',
       currencyName: savedConfig?.currencyName || 'Zions',
       currencySymbol: savedConfig?.currencySymbol || 'Z$',
       plan: savedConfig?.plan || process.env.COMMUNITY_PLAN || 'ENTERPRISE',

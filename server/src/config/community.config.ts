@@ -72,9 +72,9 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   slogan: 'A comunidade definitiva',
   plan: 'ENTERPRISE',
   
-  // Assets (URLs do Magazine SRT)
-  logoUrl: '/assets/logo.svg',
-  logoIconUrl: '/assets/icon.svg',
+  // Assets (URLs do Magazine SRT - usa logo Rovex para tier STD)
+  logoUrl: '/assets/logo-rovex.png',
+  logoIconUrl: '/assets/logo-rovex.png',
   faviconUrl: '/favicon.ico',
   
   // Cores do Magazine
@@ -91,7 +91,7 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   tierVipSlogan: 'A Elite do Sucesso',
   tierStdName: 'MGT',
   tierStdSlogan: 'Velocidade e Poder',
-  backgroundColor: '#10b981',
+  backgroundColor: '#8B5CF6',
   xpName: 'XP',
   
   // Credenciais (substituídas por env vars em prod)
@@ -102,6 +102,52 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   limits: {
     maxUsers: Infinity,
     maxStorageMB: 102400,        // 100 GB
+    maxUploadsPerMonth: 999999,
+    maxEmailsPerMonth: 50000,
+  },
+};
+
+// ============================================
+// CONFIGURAÇÃO ROVEX (Para comunidades genéricas/template)
+// ============================================
+// Esta config é usada quando uma comunidade não é encontrada no Rovex Platform
+export const ROVEX_DEFAULT_CONFIG: CommunityConfig = {
+  id: 'rovex-default',
+  subdomain: 'rovex',
+  name: 'Rovex',
+  slogan: 'Sua comunidade digital',
+  plan: 'ENTERPRISE',
+  
+  // Assets (URLs do Rovex)
+  logoUrl: '/assets/logo-rovex.png',
+  logoIconUrl: '/assets/logo-rovex.png',
+  faviconUrl: '/favicon.ico',
+  
+  // Cores do Rovex
+  primaryColor: '#8B5CF6',      // Roxo Rovex
+  secondaryColor: '#7C3AED',    // Roxo escuro
+  accentColor: '#A78BFA',       // Roxo claro
+  
+  // Nomenclaturas Rovex
+  currencyName: 'Coins',
+  currencySymbol: '🪙',
+  currencyIcon: '/assets/coin.png',
+  tierVipName: 'PRO',
+  tierVipColor: '#8B5CF6',
+  tierVipSlogan: 'Membro Premium',
+  tierStdName: 'RVX',
+  tierStdSlogan: 'Seja bem-vindo',
+  backgroundColor: '#7C3AED',
+  xpName: 'XP',
+  
+  // Credenciais (substituídas por env vars em prod)
+  rovexApiSecret: process.env.ROVEX_API_SECRET || 'dev-secret',
+  databaseUrl: process.env.DATABASE_URL || '',
+  
+  // Limites ENTERPRISE
+  limits: {
+    maxUsers: Infinity,
+    maxStorageMB: 102400,
     maxUploadsPerMonth: 999999,
     maxEmailsPerMonth: 50000,
   },

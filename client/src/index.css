@@ -17,13 +17,13 @@
 
 /* Default fallback values */
 :root {
-  --tier-std-color: #10b981;
-  --tier-std-color-rgb: 16, 185, 129;
-  --tier-std-400: #34d399;
-  --tier-std-500: #10b981;
-  --tier-std-600: #059669;
-  --tier-std-700: #047857;
-  --tier-std-950: #022c22;
+  --tier-std-color: #8B5CF6;
+  --tier-std-color-rgb: 139, 92, 246;
+  --tier-std-400: #A78BFA;
+  --tier-std-500: #8B5CF6;
+  --tier-std-600: #7C3AED;
+  --tier-std-700: #6D28D9;
+  --tier-std-950: #1e1033;
   
   --tier-vip-color: #d4af37;
   --tier-vip-color-rgb: 212, 175, 55;

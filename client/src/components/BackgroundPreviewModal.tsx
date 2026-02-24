@@ -10,9 +10,13 @@ import FireRainBackground from './backgrounds/FireRainBackground';
 import OrientalMatrixBackground from './backgrounds/OrientalMatrixBackground';
 import DarkVeilBackground from './backgrounds/DarkVeilBackground';
 import IridescenceBackground from './backgrounds/IridescenceBackground';
+import MoonlitSkyBackground from './backgrounds/MoonlitSkyBackground';
+import RainbowSkiesBackground from './backgrounds/RainbowSkiesBackground';
+import InfiniteTrianglesBackground from './backgrounds/InfiniteTrianglesBackground';
 
 // Import backgrounds CSS to ensure styles are available
 import './backgrounds/backgrounds.css';
+import '../styles/theme-pack-animations.css';
 
 interface BackgroundPreviewModalProps {
     isOpen: boolean;
@@ -30,16 +34,19 @@ const animatedBackgroundMap: Record<string, React.ComponentType> = {
     'bg_emerald': OrientalMatrixBackground,
     'anim-dark-veil': DarkVeilBackground,
     'anim-iridescence': IridescenceBackground,
+    'anim-moonlit-sky': MoonlitSkyBackground,
+    'anim-rainbow-skies': RainbowSkiesBackground,
+    'anim-infinite-triangles': InfiniteTrianglesBackground,
 };
 
 // CSS override styles to contain animated backgrounds within the preview container
 // These backgrounds normally use position:fixed and z-index:-1 for fullscreen effect
-// We only override the TOP-LEVEL container divs to use absolute positioning
 const previewContainerOverrideStyles = `
 .preview-bg-container {
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
+    overflow: hidden !important;
 }
 .preview-bg-container > div {
     position: absolute !important;
@@ -49,15 +56,37 @@ const previewContainerOverrideStyles = `
     height: 100% !important;
 }
 .preview-bg-container .neon-rain-container,
-.preview-bg-container .fire-rain-container {
+.preview-bg-container .fire-rain-container,
+.preview-bg-container .constellation-container,
+.preview-bg-container .moonlit-container,
+.preview-bg-container .rainbow-rays,
+.preview-bg-container .triangles-container {
     position: absolute !important;
     z-index: 1 !important;
     inset: 0 !important;
 }
-.preview-bg-container .constellation-container {
-    position: relative !important;
+.preview-bg-container .anim-moonlit-sky,
+.preview-bg-container .anim-rainbow-skies,
+.preview-bg-container .anim-infinite-triangles {
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
+}
+.preview-bg-container .moonlit-moon {
+    position: absolute !important;
+    right: 5% !important;
+    top: 5% !important;
+    height: 40% !important;
+    max-height: 200px !important;
+    z-index: 2 !important;
+}
+.preview-bg-container .moonlit-stars,
+.preview-bg-container .moonlit-twinkling,
+.preview-bg-container .moonlit-clouds {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 10000px !important;
 }
 `;
 

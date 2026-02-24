@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, TrendingUp, PanelRight, Palette, Users } from 'lucide-react';
+import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, PanelRight, Users, Dices, Eye, Megaphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.14';
+const CURRENT_VERSION = '0.5.0-rc.15';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -44,21 +44,21 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Page 1 - Main Features
     const page1Updates: UpdateItem[] = [
         {
-            icon: <Users className="w-5 h-5" />,
-            title: 'Textos Dinâmicos Multi-Tenant',
-            description: 'Todas as menções de comunidade agora usam o nome configurado da sua comunidade!',
+            icon: <Dices className="w-5 h-5" />,
+            title: 'Roleta da Sorte',
+            description: 'Gire a roleta e ganhe Zions, XP e itens exclusivos! Limite diário de 3 giros.',
             isNew: true
         },
         {
-            icon: <Palette className="w-5 h-5" />,
-            title: 'Branding Dinâmico por Comunidade',
-            description: 'Cores e nomes de tiers totalmente personalizáveis via config da comunidade!',
+            icon: <Eye className="w-5 h-5" />,
+            title: 'Preview de Fundos',
+            description: 'Visualize fundos animados em tela cheia antes de comprar!',
+            isNew: true
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'Multi-Tenant Rovex Ready',
             description: 'Integração completa com Rovex Platform para provisionamento automático!',
-            isNew: true
         },
         {
             icon: <Swords className="w-5 h-5" />,
@@ -75,27 +75,27 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Page 2 - Coming Soon Features
     const page2Updates: UpdateItem[] = [
         {
+            icon: <Megaphone className="w-5 h-5" />,
+            title: 'Posts Patrocinados',
+            description: 'Promova seu conteúdo para mais visibilidade! Sistema de boost pago.',
+            isNew: true
+        },
+        {
             icon: <Video className="w-5 h-5" />,
-            title: 'Watch Parties',
-            description: 'Assista streams e vídeos juntos com amigos em tempo real!',
+            title: 'Reels & Vídeos Curtos',
+            description: 'Upload de vídeos curtos com músicas royalty-free da biblioteca!',
             isNew: true
         },
         {
             icon: <Film className="w-5 h-5" />,
-            title: 'Clips & Highlights',
-            description: 'Crie e compartilhe clipes de 15-60s dos seus melhores momentos!',
+            title: 'Mini-Games HTML5',
+            description: 'Jogos web integrados com sistema de XP e recompensas!',
             isNew: true
         },
         {
             icon: <LayoutDashboard className="w-5 h-5" />,
             title: 'Creator Dashboard',
             description: 'Painel avançado: analytics, monetização e crescimento!',
-            isNew: true
-        },
-        {
-            icon: <TrendingUp className="w-5 h-5" />,
-            title: 'Sistema de Apostas Social',
-            description: 'Pools de apostas em partidas ao vivo com odds dinâmicas!',
             isNew: true
         },
     ];

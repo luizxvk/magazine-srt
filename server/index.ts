@@ -40,6 +40,7 @@ import moderationRoutes from './src/routes/moderationRoutes';
 import statforgeRoutes from './src/routes/statforgeRoutes';
 import couponRoutes from './src/routes/couponRoutes';
 import challengeRoutes from './src/routes/challengeRoutes';
+import rouletteRoutes from './src/routes/rouletteRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -190,6 +191,7 @@ apiRouter.use('/moderation', moderationRoutes);
 apiRouter.use('/statforge', statforgeRoutes);
 apiRouter.use('/coupons', couponRoutes);
 apiRouter.use('/challenges', challengeRoutes);
+apiRouter.use('/roulette', rouletteRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

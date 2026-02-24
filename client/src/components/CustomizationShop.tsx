@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, CircleDot } from 'lucide-react';
+import { X, Sparkles, Check, Lock, Palette, Image, Award, Zap, PackageOpen, CircleDot, Dices } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ThemePackCard from './ThemePackCard';
 import SupplyBoxModal from './SupplyBoxModal';
+import ZionsRoulette from './ZionsRoulette';
 import Loader from './Loader';
 import { getItemRarity, getRarityLabel } from '../utils/raritySystem';
 
@@ -183,6 +184,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
     const [themePacks, setThemePacks] = useState<any[]>([]);
     const [userPacks, setUserPacks] = useState<any[]>([]);
     const [showSupplyBox, setShowSupplyBox] = useState(false);
+    const [showRoulette, setShowRoulette] = useState(false);
     const [loadingPacks, setLoadingPacks] = useState(false);
 
     const isMGT = user?.membershipType === 'MGT';
@@ -569,6 +571,13 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                             </div>
                         </div>
                         <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                            <button
+                                onClick={() => setShowRoulette(true)}
+                                className={`px-2 sm:px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg hover:shadow-pink-500/20 hover:scale-105 transition-all flex items-center gap-1 whitespace-nowrap`}
+                            >
+                                <Dices className="w-3 h-3" />
+                                <span className="hidden sm:inline">Roleta</span>
+                            </button>
                             <button
                                 onClick={() => setShowSupplyBox(true)}
                                 className={`px-2 sm:px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transition-all flex items-center gap-1 whitespace-nowrap`}
@@ -1411,6 +1420,11 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                     fetchThemePacks();
                     fetchUserCustomizations();
                 }}
+            />
+
+            <ZionsRoulette
+                isOpen={showRoulette}
+                onClose={() => setShowRoulette(false)}
             />
         </AnimatePresence >
         , document.body);

@@ -308,7 +308,7 @@ router.get('/public/config', async (req: Request, res: Response) => {
       tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       
       // Logos - TENANT CONFIG tem prioridade!
-      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-rovex.png',
+      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-mgzn.png',
       logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || '/assets/logo-rovex.png',
       faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || '/favicon.ico',
       

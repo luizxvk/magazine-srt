@@ -73,7 +73,7 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   plan: 'ENTERPRISE',
   
   // Assets (URLs do Magazine SRT - usa logo Rovex para tier STD)
-  logoUrl: '/assets/logo-rovex.png',
+  logoUrl: '/assets/logo-mgzn.png',
   logoIconUrl: '/assets/logo-rovex.png',
   faviconUrl: '/favicon.ico',
   

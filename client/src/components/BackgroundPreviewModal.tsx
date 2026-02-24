@@ -34,29 +34,28 @@ const animatedBackgroundMap: Record<string, React.ComponentType> = {
 
 // CSS override styles to contain animated backgrounds within the preview container
 // These backgrounds normally use position:fixed and z-index:-1 for fullscreen effect
-// We override ALL nested elements to use absolute positioning within the container
+// We only override the TOP-LEVEL container divs to use absolute positioning
 const previewContainerOverrideStyles = `
-.preview-bg-container,
-.preview-bg-container * {
-    position: absolute !important;
-    z-index: 1 !important;
-}
 .preview-bg-container {
     position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 .preview-bg-container > div {
+    position: absolute !important;
+    z-index: 1 !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
 }
 .preview-bg-container .neon-rain-container,
-.preview-bg-container .fire-rain-container,
-.preview-bg-container .constellation-container,
-.preview-bg-container .jp-matrix,
-.preview-bg-container canvas {
+.preview-bg-container .fire-rain-container {
     position: absolute !important;
     z-index: 1 !important;
     inset: 0 !important;
+}
+.preview-bg-container .constellation-container {
+    position: relative !important;
     width: 100% !important;
     height: 100% !important;
 }
@@ -111,19 +110,20 @@ export default function BackgroundPreviewModal({
                     className="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10"
                     onClick={e => e.stopPropagation()}
                 >
-                    {/* Animated Background Preview */}
-                    {hasAnimatedPreview && isPlaying ? (
+                    {/* Base gradient always visible */}
+                    <div 
+                        className="absolute inset-0 animate-wave-bg"
+                        style={{ 
+                            background: backgroundPreview, 
+                            backgroundSize: '200% 200%' 
+                        }}
+                    />
+                    
+                    {/* Animated Background Preview overlay */}
+                    {hasAnimatedPreview && isPlaying && (
                         <div className="preview-bg-container absolute inset-0 overflow-hidden">
                             <AnimatedComponent />
                         </div>
-                    ) : (
-                        <div 
-                            className="absolute inset-0 animate-wave-bg"
-                            style={{ 
-                                background: backgroundPreview, 
-                                backgroundSize: '200% 200%' 
-                            }}
-                        />
                     )}
 
                     {/* Overlay Info */}

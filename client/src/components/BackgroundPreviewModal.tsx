@@ -11,6 +11,9 @@ import OrientalMatrixBackground from './backgrounds/OrientalMatrixBackground';
 import DarkVeilBackground from './backgrounds/DarkVeilBackground';
 import IridescenceBackground from './backgrounds/IridescenceBackground';
 
+// Import backgrounds CSS to ensure styles are available
+import './backgrounds/backgrounds.css';
+
 interface BackgroundPreviewModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -28,6 +31,36 @@ const animatedBackgroundMap: Record<string, React.ComponentType> = {
     'anim-dark-veil': DarkVeilBackground,
     'anim-iridescence': IridescenceBackground,
 };
+
+// CSS override styles to contain animated backgrounds within the preview container
+// These backgrounds normally use position:fixed and z-index:-1 for fullscreen effect
+// We override ALL nested elements to use absolute positioning within the container
+const previewContainerOverrideStyles = `
+.preview-bg-container,
+.preview-bg-container * {
+    position: absolute !important;
+    z-index: 1 !important;
+}
+.preview-bg-container {
+    position: relative !important;
+}
+.preview-bg-container > div {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+.preview-bg-container .neon-rain-container,
+.preview-bg-container .fire-rain-container,
+.preview-bg-container .constellation-container,
+.preview-bg-container .jp-matrix,
+.preview-bg-container canvas {
+    position: absolute !important;
+    z-index: 1 !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+`;
 
 export default function BackgroundPreviewModal({ 
     isOpen, 
@@ -56,6 +89,9 @@ export default function BackgroundPreviewModal({
 
     return createPortal(
         <AnimatePresence>
+            {/* Inject override styles for preview container */}
+            <style>{previewContainerOverrideStyles}</style>
+            
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -77,7 +113,7 @@ export default function BackgroundPreviewModal({
                 >
                     {/* Animated Background Preview */}
                     {hasAnimatedPreview && isPlaying ? (
-                        <div className="absolute inset-0">
+                        <div className="preview-bg-container absolute inset-0 overflow-hidden">
                             <AnimatedComponent />
                         </div>
                     ) : (

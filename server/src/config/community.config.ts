@@ -62,36 +62,36 @@ export interface CommunityConfig {
 }
 
 // ============================================
-// CONFIGURAÇÃO PADRÃO (Rovex - ENTERPRISE)
+// CONFIGURAÇÃO PADRÃO (Magazine SRT - ENTERPRISE)
 // ============================================
-// Esta é a config default quando rodando localmente ou como comunidade genérica
+// Esta é a config default quando rodando localmente ou como Magazine SRT
 export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
-  id: 'rovex-default',
-  subdomain: 'rovex',
-  name: 'Rovex',
-  slogan: 'Sua comunidade digital',
+  id: 'magazine-srt-default',
+  subdomain: 'magazine-srt',
+  name: 'Magazine SRT',
+  slogan: 'A comunidade definitiva',
   plan: 'ENTERPRISE',
   
-  // Assets (URLs do Rovex)
-  logoUrl: '/assets/logo-rovex.png',
-  logoIconUrl: '/assets/logo-rovex.png',
+  // Assets (URLs do Magazine SRT)
+  logoUrl: '/assets/logo.svg',
+  logoIconUrl: '/assets/icon.svg',
   faviconUrl: '/favicon.ico',
   
-  // Cores do Rovex
-  primaryColor: '#8B5CF6',      // Roxo Rovex
-  secondaryColor: '#7C3AED',    // Roxo escuro
-  accentColor: '#A78BFA',       // Roxo claro
+  // Cores do Magazine
+  primaryColor: '#d4af37',      // Dourado
+  secondaryColor: '#50c878',    // Esmeralda
+  accentColor: '#f59e0b',       // Âmbar
   
-  // Nomenclaturas Rovex
-  currencyName: 'Coins',
-  currencySymbol: '🪙',
-  currencyIcon: '/assets/coin.png',
-  tierVipName: 'PRO',
-  tierVipColor: '#8B5CF6',
-  tierVipSlogan: 'Membro Premium',
-  tierStdName: 'MEMBER',
-  tierStdSlogan: 'Seja bem-vindo',
-  backgroundColor: '#7C3AED',
+  // Nomenclaturas Magazine
+  currencyName: 'Zions',
+  currencySymbol: 'Z$',
+  currencyIcon: '/assets/zions/zion-50.png',
+  tierVipName: 'MAGAZINE',
+  tierVipColor: '#d4af37',
+  tierVipSlogan: 'A Elite do Sucesso',
+  tierStdName: 'MGT',
+  tierStdSlogan: 'Velocidade e Poder',
+  backgroundColor: '#10b981',
   xpName: 'XP',
   
   // Credenciais (substituídas por env vars em prod)

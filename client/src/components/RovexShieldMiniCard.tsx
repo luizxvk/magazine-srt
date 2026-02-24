@@ -20,11 +20,10 @@ export default function RovexShieldMiniCard() {
   const themeGlow = isMGT
     ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)] hover:shadow-[0_0_25px_rgba(var(--tier-std-color-rgb),0.25)]'
     : 'shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]';
+  // Card background - escuro para ambos os temas (Magazine=amber-950, Rovex=tier-std-950)
   const themeBg = isLight
     ? 'bg-white/90'
-    : isMGT 
-      ? 'bg-tier-std-950/40' 
-      : 'bg-amber-950/40';
+    : 'bg-black/60';
 
   useEffect(() => {
     const fetchStatus = async () => {

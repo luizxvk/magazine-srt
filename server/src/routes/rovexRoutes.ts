@@ -291,26 +291,26 @@ router.get('/public/config', async (req: Request, res: Response) => {
     const config = {
       id: baseConfig.id || savedConfig?.id || 'magazine-srt',
       subdomain: baseConfig.subdomain || savedConfig?.subdomain || 'magazine-srt',
-      name: baseConfig.name || savedConfig?.name || 'Rovex Demo',
-      slogan: baseConfig.slogan || savedConfig?.slogan || 'Plataforma Social Gamificada',
+      name: baseConfig.name || savedConfig?.name || 'Magazine SRT',
+      slogan: baseConfig.slogan || savedConfig?.slogan || 'A comunidade definitiva',
       
       // Cores - TENANT CONFIG tem prioridade!
-      primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#8B5CF6',
-      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#7C3AED',
-      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#8B5CF6',
-      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#8B5CF6',
+      primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#d4af37',
+      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#50c878',
+      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#f59e0b',
+      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#10b981',
       
       // Tiers - TENANT CONFIG tem prioridade!
       tierVipName: baseConfig.tierVipName || savedConfig?.tierVipName || 'MAGAZINE',
       tierVipColor: baseConfig.tierVipColor || savedConfig?.tierVipColor || '#d4af37',
       tierVipSlogan: baseConfig.tierVipSlogan || savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
-      tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'ROVEX',
-      tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Plataforma Social Gamificada',
+      tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'MGT',
+      tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       
       // Logos - TENANT CONFIG tem prioridade!
-      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-rovex.png',
-      logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || '/assets/logo-rovex.png',
-      faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || '/assets/logo-rovex.png',
+      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo.svg',
+      logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || '/assets/icon.svg',
+      faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || '/favicon.ico',
       
       // Economia - TENANT CONFIG tem prioridade!
       currencyName: baseConfig.currencyName || savedConfig?.currencyName || 'Zions',

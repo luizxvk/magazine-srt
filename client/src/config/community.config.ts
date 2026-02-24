@@ -76,25 +76,25 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   subdomain: 'magazine-srt',
   
   // Branding
-  name: 'Magazine MGT',
-  slogan: 'A comunidade definitiva de games e entretenimento',
-  logoUrl: undefined, // Uses imported assets in components (fallback)
-  logoIconUrl: undefined, // Uses imported assets in components (fallback)
-  faviconUrl: '/assets/mgt-log-logo.png',
-  ogImageUrl: '/assets/mgt-log-logo.png',
+  name: 'Rovex Demo',
+  slogan: 'Plataforma Social Gamificada',
+  logoUrl: '/assets/logo-rovex.png',
+  logoIconUrl: '/assets/logo-rovex.png',
+  faviconUrl: '/assets/logo-rovex.png',
+  ogImageUrl: '/assets/logo-rovex.png',
   
-  // Cores (dourado Magazine / verde MGT)
-  primaryColor: '#d4af37',
-  secondaryColor: '#10b981',
-  accentColor: '#f59e0b',
+  // Cores (roxo Rovex)
+  primaryColor: '#8B5CF6',
+  secondaryColor: '#7C3AED',
+  accentColor: '#8B5CF6',
   
   // Tiers
   tierVipName: 'MAGAZINE',
   tierVipColor: '#d4af37',
   tierVipSlogan: 'A Elite do Sucesso',
-  tierStdName: 'MGT',
-  tierStdSlogan: 'Velocidade e Poder',
-  backgroundColor: '#10b981',
+  tierStdName: 'ROVEX',
+  tierStdSlogan: 'Plataforma Social Gamificada',
+  backgroundColor: '#8B5CF6',
   
   // Economia
   currencyName: 'Zions',

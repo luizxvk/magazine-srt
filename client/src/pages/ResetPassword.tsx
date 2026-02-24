@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Lock, Check, AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
 import { useCommunity } from '../context/CommunityContext';
 import logoFallback from '../assets/logo-mgzn.png';
-import logoMgtFallback from '../assets/logo-mgt-full.png';
+import logoRovexFallback from '../assets/logo-rovex.png';
 import api from '../services/api';
 import Loader from '../components/Loader';
 
@@ -23,7 +23,7 @@ export default function ResetPassword() {
     const [isMGT] = useState(localStorage.getItem('lastMembershipType') === 'MGT');
     
     // Logo dinâmica
-    const logoMgt = config.logoIconUrl || logoMgtFallback;
+    const logoRovex = config.logoIconUrl || logoRovexFallback;
     const logo = config.logoUrl || logoFallback;
 
     useEffect(() => {
@@ -87,7 +87,7 @@ export default function ResetPassword() {
                     <div className="text-center mb-8">
                         <div className="flex justify-center mb-4">
                             <img
-                                src={isMGT ? logoMgt : logo}
+                                src={isMGT ? logoRovex : logo}
                                 alt={isMGT ? tierStdName : tierVipName}
                                 className={`${isMGT ? 'h-14' : 'h-20'} drop-shadow-lg`}
                             />

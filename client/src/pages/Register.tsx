@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, X, AlertCircle, Camera, Sparkles, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import logoMgtFallback from '../assets/logo-mgt-full.png';
+import logoRovexFallback from '../assets/logo-rovex.png';
 import logoFallback from '../assets/logo-mgzn.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -33,8 +33,8 @@ export default function Register() {
     // Atualiza título e favicon dinamicamente
     useDynamicHead();
     
-    // Logo dinâmica do MGT (usa config ou fallback)
-    const logoMgt = config.logoIconUrl || logoMgtFallback;
+    // Logo dinâmica do Rovex (usa config ou fallback)
+    const logoRovex = config.logoIconUrl || logoRovexFallback;
     const logo = config.logoUrl || logoFallback;
     
     const [errorPopup, setErrorPopup] = useState<string | null>(null);
@@ -189,7 +189,7 @@ export default function Register() {
                     <div className="text-center mb-8">
                         <div className="flex justify-center mb-4">
                             <img
-                                src={isMGT ? logoMgt : logo}
+                                src={isMGT ? logoRovex : logo}
                                 alt={isMGT ? config.tierStdName : "MAGAZINE"}
                                 className={`${isMGT ? 'h-14' : 'h-20'} drop-shadow-lg`}
                             />

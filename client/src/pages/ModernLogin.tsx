@@ -8,7 +8,7 @@ import { ArrowRightLeft, User, Lock, AlertCircle, X, AlertTriangle, Eye, EyeOff,
 import { AnimatePresence, motion } from 'framer-motion';
 
 import logoFallback from '../assets/logo-mgzn.png';
-import logoMgtFallback from '../assets/logo-mgt-full.png';
+import logoRovexFallback from '../assets/logo-rovex.png';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { useDynamicHead } from '../hooks/useDynamicHead';
@@ -606,7 +606,7 @@ export default function ModernLogin() {
 
     useDynamicHead();
 
-    const logoMgt = config.logoIconUrl || logoMgtFallback;
+    const logoRovex = config.logoIconUrl || logoRovexFallback;
     const logo = config.logoUrl || logoFallback;
     
     // Dynamic color for Standard tier (from config, fallback to emerald)
@@ -739,7 +739,7 @@ export default function ModernLogin() {
                                     className="text-center mb-6 md:mb-8"
                                 >
                                     <motion.img
-                                        src={isMGT ? logoMgt : logo}
+                                        src={isMGT ? logoRovex : logo}
                                         alt={isMGT ? config.tierStdName : config.tierVipName}
                                         className={`mx-auto mb-4 md:mb-5 ${isMGT ? 'h-12 md:h-16' : 'h-16 md:h-24'}`}
                                         style={{
@@ -876,7 +876,7 @@ export default function ModernLogin() {
                                 animate={{ y: [0, -5, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                             >
-                                <img src={isMGT ? logo : logoMgt} alt={isMGT ? config.tierVipName : config.tierStdName} className="h-10 opacity-60" />
+                                <img src={isMGT ? logo : logoRovex} alt={isMGT ? config.tierVipName : config.tierStdName} className="h-10 opacity-60" />
                             </motion.div>
 
                             <h2 className="text-xl font-semibold text-white/80 mb-2">

@@ -15,7 +15,7 @@ import CustomizationShop from './CustomizationShop';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import RadioCard from './RadioCard';
 import api from '../services/api';
-import logoSrtFallback from '../assets/logo-mgt.png';
+import logoRovexFallback from '../assets/logo-rovex.png';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 import { useDynamicHead } from '../hooks/useDynamicHead';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +50,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
     useDynamicHead();
     
     // Logo dinâmica: usa logoIconUrl, fallback para logoUrl, ou asset local
-    const logoUrl = config.logoIconUrl || config.logoUrl || logoSrtFallback;
+    const logoUrl = config.logoIconUrl || config.logoUrl || logoRovexFallback;
     
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);

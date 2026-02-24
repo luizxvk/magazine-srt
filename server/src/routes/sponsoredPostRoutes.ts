@@ -11,11 +11,15 @@ const SPONSORED_POST_COST = 50; // R$ 50 em Zions Cash
 // POST /sponsored-posts - Request to sponsor a post
 router.post('/', authenticateToken, async (req, res) => {
     try {
-        const userId = (req as any).user.id;
+        const userId = (req as any).user?.userId || (req as any).user?.id;
         const { postId } = req.body;
 
         if (!postId) {
             return res.status(400).json({ error: 'postId é obrigatório' });
+        }
+        
+        if (!userId) {
+            return res.status(401).json({ error: 'Usuário não autenticado' });
         }
 
         // Get user with balance

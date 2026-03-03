@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import {
   createVoiceChannel,
   getVoiceChannels,
@@ -9,10 +10,27 @@ import {
   updateVoiceState,
   getCurrentVoiceChannel,
   getConnectGroups,
+  updateGroupAvatar,
+  createTextChannel,
 } from '../controllers/connectController';
 import { authenticateToken } from '../middleware/authMiddleware';
+import { validateImageContent } from '../middleware/fileValidationMiddleware';
 
 const router = express.Router();
+
+// Configure multer for memory storage (for avatar upload)
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB for avatars
+    },
+    fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+            return cb(new Error('Only image files are allowed'));
+        }
+        cb(null, true);
+    },
+});
 
 // Todas as rotas requerem autenticação
 router.use(authenticateToken);
@@ -51,5 +69,19 @@ router.delete('/groups/:groupId/voice/:channelId', deleteVoiceChannel);
 
 // Join voice channel
 router.post('/groups/:groupId/voice/:channelId/join', joinVoiceChannel);
+
+// ============================================
+// GROUP SETTINGS
+// ============================================
+
+// Update group avatar
+router.patch('/groups/:groupId/avatar', upload.single('avatar'), validateImageContent, updateGroupAvatar);
+
+// ============================================
+// TEXT CHANNELS (Coming soon)
+// ============================================
+
+// Create text channel in a group
+router.post('/groups/:groupId/text', createTextChannel);
 
 export default router;

@@ -182,8 +182,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <ShoppingBag className="w-5 h-5" />, label: t('nav.shop'), path: '/store' },
         { icon: <Trophy className="w-5 h-5" />, label: t('nav.ranking'), path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
-        { icon: <MessageCircle className="w-5 h-5" />, label: t('nav.groups'), path: '/groups' },
-        { icon: <Radio className="w-5 h-5 text-purple-400" />, label: 'Connect', path: '/connect', highlight: true },
+        { icon: <Radio className="w-5 h-5" />, label: 'Connect', path: '/connect' },
         { icon: <Store className="w-5 h-5" />, label: t('nav.market'), path: '/market' },
         { icon: <Ticket className="w-5 h-5" />, label: t('nav.rewards'), path: '/rewards' },
         { icon: <Crown className="w-5 h-5 text-amber-400" />, label: isElite ? 'ELITE' : 'ELITE ✨', path: '/elite', highlight: !isElite },
@@ -332,8 +331,8 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             <Users className="w-5 h-5" />
                         </Link>
 
-                        <Link to="/groups" className={`relative p-2 transition-all hover:scale-110 ${iconClass}`} style={{ color: accentColor }} aria-label="Grupos" title="Grupos">
-                            <MessageCircle className="w-5 h-5" />
+                        <Link to="/connect" className={`relative p-2 transition-all hover:scale-110 ${iconClass}`} style={{ color: accentColor }} aria-label="Connect" title="Rovex Connect">
+                            <Radio className="w-5 h-5" />
                             {(hasGroupInvites || hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}

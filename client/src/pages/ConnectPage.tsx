@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff,
-  Settings, Hash, ChevronRight, ChevronDown, Radio, X
+  Settings, Hash, ChevronRight, ChevronDown, Radio, X,
+  Camera, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -60,6 +61,7 @@ interface ConnectGroup {
   avatarUrl?: string;
   isPrivate: boolean;
   membershipType: 'MAGAZINE' | 'MGT';
+  maxMembers?: number;
   creator: {
     id: string;
     name: string;
@@ -68,6 +70,7 @@ interface ConnectGroup {
   };
   members: GroupMember[];
   voiceChannels: VoiceChannel[];
+  textChannels?: { id: string; name: string; description?: string }[];
   _count: {
     messages: number;
     members: number;
@@ -100,7 +103,11 @@ export default function ConnectPage() {
   const [showAddChannelModal, setShowAddChannelModal] = useState(false);
   const [addChannelGroupId, setAddChannelGroupId] = useState<string | null>(null);
   const [newChannelName, setNewChannelName] = useState('');
+  const [newChannelType, setNewChannelType] = useState<'TEXT' | 'VOICE'>('VOICE');
   const [showMembersDrawer, setShowMembersDrawer] = useState(false);
+  const [showGroupSettings, setShowGroupSettings] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   
   // Voice state
   const [currentVoice, setCurrentVoice] = useState<CurrentVoice | null>(null);
@@ -327,23 +334,57 @@ export default function ConnectPage() {
   const handleOpenAddChannel = (groupId: string) => {
     setAddChannelGroupId(groupId);
     setNewChannelName('');
+    setNewChannelType('VOICE');
     setShowAddChannelModal(true);
   };
 
-  const handleCreateVoiceChannel = async () => {
+  const handleCreateChannel = async () => {
     if (!addChannelGroupId || !newChannelName.trim()) return;
     
     try {
-      await api.post(`/connect/groups/${addChannelGroupId}/voice`, {
-        name: newChannelName.trim(),
-        maxUsers: selectedGroup?.members.length || 25,
-      });
-      showToast('Canal de voz criado com sucesso!');
+      if (newChannelType === 'VOICE') {
+        await api.post(`/connect/groups/${addChannelGroupId}/voice`, {
+          name: newChannelName.trim(),
+          maxUsers: selectedGroup?.maxMembers || selectedGroup?.members.length || 25,
+        });
+        showToast('Canal de voz criado com sucesso!');
+      } else {
+        await api.post(`/connect/groups/${addChannelGroupId}/text`, {
+          name: newChannelName.trim(),
+        });
+        showToast('Canal de texto criado com sucesso!');
+      }
       setShowAddChannelModal(false);
       setNewChannelName('');
       fetchGroups();
     } catch (error: any) {
       showError(error.response?.data?.error || 'Erro ao criar canal');
+    }
+  };
+
+  const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedGroup) return;
+
+    try {
+      setUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await api.patch(`/connect/groups/${selectedGroup.id}/avatar`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      // Update local state
+      setSelectedGroup({ ...selectedGroup, avatarUrl: response.data.avatarUrl });
+      setGroups(groups.map(g => 
+        g.id === selectedGroup.id ? { ...g, avatarUrl: response.data.avatarUrl } : g
+      ));
+      showToast('Foto do grupo atualizada!');
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao atualizar foto');
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -401,34 +442,49 @@ export default function ConnectPage() {
               </div>
             ) : (
               groups.map(group => (
-                <div key={group.id} className="px-2 mb-1">
+                <div key={group.id} className="px-2 mb-1 group/item">
                   {/* Group Header */}
-                  <button
-                    onClick={() => toggleGroupExpand(group.id)}
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
-                  >
-                    {group.avatarUrl ? (
-                      <img 
-                        src={group.avatarUrl} 
-                        className="w-8 h-8 rounded-full object-cover"
-                        alt={group.name}
-                      />
-                    ) : (
-                      <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
-                        <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
-                          {group.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => toggleGroupExpand(group.id)}
+                      className={`flex-1 flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
+                    >
+                      {group.avatarUrl ? (
+                        <img 
+                          src={group.avatarUrl} 
+                          className="w-8 h-8 rounded-full object-cover"
+                          alt={group.name}
+                        />
+                      ) : (
+                        <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                          <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                            {group.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
+                        {group.name}
+                      </span>
+                      {expandedGroups.has(group.id) ? (
+                        <ChevronDown className={`w-4 h-4 ${themeSecondary}`} />
+                      ) : (
+                        <ChevronRight className={`w-4 h-4 ${themeSecondary}`} />
+                      )}
+                    </button>
+                    {/* Settings button */}
+                    {group.creator.id === user?.id && (
+                      <button
+                        onClick={() => {
+                          setSelectedGroup(group);
+                          setShowGroupSettings(true);
+                        }}
+                        className={`p-2 rounded-lg ${themeHover} ${themeSecondary} opacity-0 group-hover/item:opacity-100 transition-opacity`}
+                        title="Configurações"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
                     )}
-                    <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
-                      {group.name}
-                    </span>
-                    {expandedGroups.has(group.id) ? (
-                      <ChevronDown className={`w-4 h-4 ${themeSecondary}`} />
-                    ) : (
-                      <ChevronRight className={`w-4 h-4 ${themeSecondary}`} />
-                    )}
-                  </button>
+                  </div>
 
                   {/* Channels */}
                   <AnimatePresence>
@@ -645,7 +701,7 @@ export default function ConnectPage() {
         />
       )}
 
-      {/* Add Voice Channel Modal */}
+      {/* Add Channel Modal */}
       <AnimatePresence>
         {showAddChannelModal && (
           <motion.div
@@ -663,7 +719,7 @@ export default function ConnectPage() {
               className={`w-full max-w-sm rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className={`text-lg font-bold ${themeText}`}>Criar Canal de Voz</h3>
+                <h3 className={`text-lg font-bold ${themeText}`}>Criar Canal</h3>
                 <button
                   onClick={() => setShowAddChannelModal(false)}
                   className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
@@ -672,18 +728,48 @@ export default function ConnectPage() {
                 </button>
               </div>
               
+              {/* Channel Type Selection */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setNewChannelType('TEXT')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all ${
+                    newChannelType === 'TEXT'
+                      ? isMGT 
+                        ? 'border-tier-std bg-tier-std\/10 text-tier-std' 
+                        : 'border-gold-500 bg-gold-500/10 text-gold-500'
+                      : `${themeBorder} ${themeSecondary} hover:bg-white/5`
+                  }`}
+                >
+                  <Hash className="w-5 h-5" />
+                  <span className="font-medium">Texto</span>
+                </button>
+                <button
+                  onClick={() => setNewChannelType('VOICE')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all ${
+                    newChannelType === 'VOICE'
+                      ? isMGT 
+                        ? 'border-tier-std bg-tier-std\/10 text-tier-std' 
+                        : 'border-gold-500 bg-gold-500/10 text-gold-500'
+                      : `${themeBorder} ${themeSecondary} hover:bg-white/5`
+                  }`}
+                >
+                  <Volume2 className="w-5 h-5" />
+                  <span className="font-medium">Voz</span>
+                </button>
+              </div>
+              
               <input
                 type="text"
                 value={newChannelName}
                 onChange={(e) => setNewChannelName(e.target.value)}
-                placeholder="Nome do canal"
+                placeholder={newChannelType === 'TEXT' ? 'nome-do-canal' : 'Nome do canal'}
                 className={`w-full px-4 py-3 rounded-xl mb-4 ${
                   theme === 'light' 
                     ? 'bg-gray-100 text-gray-900 placeholder:text-gray-500' 
                     : 'bg-zinc-800 text-white placeholder:text-gray-500'
-                } border ${themeBorder} focus:outline-none focus:ring-2 focus:ring-tier-std`}
+                } border ${themeBorder} focus:outline-none focus:ring-2 ${isMGT ? 'focus:ring-tier-std' : 'focus:ring-gold-500'}`}
                 autoFocus
-                onKeyDown={(e) => e.key === 'Enter' && handleCreateVoiceChannel()}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateChannel()}
               />
               
               <div className="flex gap-3">
@@ -694,7 +780,7 @@ export default function ConnectPage() {
                   Cancelar
                 </button>
                 <button
-                  onClick={handleCreateVoiceChannel}
+                  onClick={handleCreateChannel}
                   disabled={!newChannelName.trim()}
                   className={`flex-1 px-4 py-2.5 rounded-xl font-medium transition-all ${
                     newChannelName.trim()
@@ -800,6 +886,106 @@ export default function ConnectPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Group Settings Modal */}
+      <AnimatePresence>
+        {showGroupSettings && selectedGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowGroupSettings(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-sm rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className={`text-lg font-bold ${themeText}`}>Configurações do Grupo</h3>
+                <button
+                  onClick={() => setShowGroupSettings(false)}
+                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Avatar Upload */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative group">
+                  {selectedGroup.avatarUrl ? (
+                    <img
+                      src={selectedGroup.avatarUrl}
+                      className="w-24 h-24 rounded-full object-cover"
+                      alt={selectedGroup.name}
+                    />
+                  ) : (
+                    <div className={`w-24 h-24 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                      <span className={`text-3xl font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                        {selectedGroup.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className={`absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity ${uploadingAvatar ? 'cursor-wait' : 'cursor-pointer'}`}
+                  >
+                    {uploadingAvatar ? (
+                      <Loader size="sm" />
+                    ) : (
+                      <Camera className="w-8 h-8 text-white" />
+                    )}
+                  </button>
+                </div>
+                <p className={`mt-2 text-sm ${themeSecondary}`}>Clique para alterar a foto</p>
+              </div>
+
+              {/* Group Name */}
+              <div className="mb-4">
+                <label className={`text-sm ${themeSecondary} mb-1 block`}>Nome do grupo</label>
+                <p className={`${themeText} font-medium`}>{selectedGroup.name}</p>
+              </div>
+
+              {/* Group Stats */}
+              <div className={`p-4 rounded-xl mb-4 ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'}`}>
+                <div className="flex justify-between text-sm">
+                  <span className={themeSecondary}>Membros</span>
+                  <span className={themeText}>{selectedGroup.members.length}</span>
+                </div>
+                <div className="flex justify-between text-sm mt-2">
+                  <span className={themeSecondary}>Canais de voz</span>
+                  <span className={themeText}>{selectedGroup.voiceChannels.length}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowGroupSettings(false)}
+                className={`w-full px-4 py-3 rounded-xl font-medium ${
+                  isMGT 
+                    ? 'bg-tier-std text-white hover:bg-tier-std-600' 
+                    : 'bg-gold-500 text-black hover:bg-gold-600'
+                }`}
+              >
+                Fechar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Hidden Avatar Input */}
+      <input
+        ref={avatarInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleUploadAvatar}
+        className="hidden"
+      />
     </div>
   );
 }

@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import {
+  uploadGroupImageR2,
+  isR2Configured
+} from '../services/r2Service';
+import {
+  uploadPostImage as uploadPostImageCloudinary
+} from '../services/cloudinaryService';
 
 const prisma = new PrismaClient();
 
@@ -349,5 +356,107 @@ export const getConnectGroups = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching connect groups:', error);
     res.status(500).json({ error: 'Erro ao buscar grupos' });
+  }
+};
+
+// ============================================
+// GROUP AVATAR UPDATE
+// ============================================
+
+export const updateGroupAvatar = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId } = req.params;
+
+    // Check if file was uploaded
+    if (!(req as any).file) {
+      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    }
+
+    // Check if user is admin of the group
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member || member.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Apenas admins podem alterar o avatar do grupo' });
+    }
+
+    // Upload image
+    let avatarUrl: string | null = null;
+    const file = (req as any).file;
+
+    if (isR2Configured()) {
+      avatarUrl = await uploadGroupImageR2(file.buffer, file.mimetype);
+    } else {
+      const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      avatarUrl = await uploadPostImageCloudinary(base64Data);
+    }
+
+    if (!avatarUrl) {
+      throw new Error('Upload failed');
+    }
+
+    // Update group with new avatar
+    const group = await prisma.group.update({
+      where: { id: groupId },
+      data: { avatarUrl },
+      select: {
+        id: true,
+        name: true,
+        avatarUrl: true,
+      },
+    });
+
+    res.json(group);
+  } catch (error) {
+    console.error('Error updating group avatar:', error);
+    res.status(500).json({ error: 'Erro ao atualizar avatar do grupo' });
+  }
+};
+
+// ============================================
+// TEXT CHANNELS (Placeholder for future implementation)
+// ============================================
+
+const createTextChannelSchema = z.object({
+  name: z.string().min(1).max(50),
+  description: z.string().max(200).optional(),
+});
+
+export const createTextChannel = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId } = req.params;
+
+    // Validate input
+    const validation = createTextChannelSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
+    }
+
+    // Check if user is admin of the group
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member || !['ADMIN', 'MODERATOR'].includes(member.role)) {
+      return res.status(403).json({ error: 'Apenas admins e moderadores podem criar canais' });
+    }
+
+    // For now, text channels use the same VoiceChannel model with a flag
+    // In a future migration, we can create a dedicated TextChannel model
+    // For MVP, we'll just create a "voice channel" that acts as text channel
+    // The client will differentiate based on how it's used
+    
+    // TODO: Create proper TextChannel model in future migration
+    // For now, return a placeholder response
+    res.status(501).json({ 
+      error: 'Text channels coming soon', 
+      message: 'Use the default text channel for now. Multiple text channels will be available in a future update.' 
+    });
+  } catch (error) {
+    console.error('Error creating text channel:', error);
+    res.status(500).json({ error: 'Erro ao criar canal de texto' });
   }
 };

@@ -104,8 +104,8 @@ function App() {
           <Route path="/challenges" element={<PrivateRoute><ChallengesPage /></PrivateRoute>} />
           <Route path="/sobre-rovex" element={<SobreRovexPage />} />
           <Route path="/verify-email" element={<PrivateRoute><VerificationPage /></PrivateRoute>} />
-          {/* Grupos */}
-          <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
+          {/* Grupos - Redirect para Connect */}
+          <Route path="/groups" element={<Navigate to="/connect" replace />} />
           <Route path="/groups/:id" element={<PrivateRoute><GroupChatPage /></PrivateRoute>} />
           {/* Rovex Connect */}
           <Route path="/connect" element={<PrivateRoute><ConnectPage /></PrivateRoute>} />

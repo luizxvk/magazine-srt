@@ -104,7 +104,7 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, onM
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-  const themeInput = theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800';
+  const themeInput = theme === 'light' ? 'bg-gray-100 text-gray-900' : 'bg-zinc-800/80 text-white';
   const themeHover = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5';
 
   const myMember = group.members.find(m => m.userId === user?.id);

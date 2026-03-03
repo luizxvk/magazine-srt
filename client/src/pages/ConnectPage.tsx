@@ -564,6 +564,9 @@ export default function ConnectPage() {
                           <span className="text-xs truncate">
                             {participant.user.displayName || participant.user.name}
                           </span>
+                          {participant.isStreaming && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-medium">AO VIVO</span>
+                          )}
                           {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
                         </div>
                       ))}
@@ -594,7 +597,26 @@ export default function ConnectPage() {
       <div className="min-h-screen text-white font-sans relative">
         <LuxuriousBackground />
         <Header />
-        <div className="flex items-center justify-center min-h-[80vh]">
+        <div className="flex flex-col items-center justify-center min-h-[80vh] gap-6">
+          {/* Premium Connect Loading */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative"
+          >
+            <div className={`w-24 h-24 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-gradient-to-br from-tier-std-500 to-tier-std-600' : 'bg-gradient-to-br from-gold-500 to-amber-600'}`}>
+              <Radio className="w-12 h-12 text-white" />
+            </div>
+            <motion.div
+              className={`absolute -inset-2 rounded-3xl border-2 ${isMGT ? 'border-tier-std-500/50' : 'border-gold-500/50'}`}
+              animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.2, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </motion.div>
+          <div className="text-center">
+            <h2 className={`text-2xl font-bold mb-2 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>Rovex Connect</h2>
+            <p className="text-gray-400">Conectando aos servidores...</p>
+          </div>
           <Loader size="lg" />
         </div>
       </div>

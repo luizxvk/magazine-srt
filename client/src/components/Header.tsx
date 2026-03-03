@@ -178,7 +178,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <Home className="w-5 h-5" />, label: t('nav.home'), path: '/feed' },
         { icon: <Star className="w-5 h-5" />, label: t('nav.rewards'), path: '/highlights' },
         { icon: <Gamepad2 className="w-5 h-5" />, label: 'StatForge', path: '/statforge' },
-        { icon: <Swords className="w-5 h-5" />, label: 'Desafios 1v1', path: '/challenges', highlight: true },
+        { icon: <Swords className="w-5 h-5" />, label: 'Desafios', path: '/challenges', highlight: true },
         { icon: <ShoppingBag className="w-5 h-5" />, label: t('nav.shop'), path: '/store' },
         { icon: <Trophy className="w-5 h-5" />, label: t('nav.ranking'), path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
@@ -534,14 +534,17 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             className={`mobile-menu-container fixed top-0 right-0 bottom-0 h-screen w-80 z-[60] md:hidden flex flex-col overflow-hidden ${
                                 user?.liteMode 
                                     ? (theme === 'light' ? 'bg-gray-100' : 'bg-zinc-950') 
-                                    : (theme === 'light' ? 'bg-white/90 backdrop-blur-2xl' : 'bg-black/80 backdrop-blur-2xl')
+                                    : (theme === 'light' ? 'bg-white/90 backdrop-blur-2xl' : 'bg-zinc-950/95 backdrop-blur-2xl')
                             } border-l ${theme === 'light' ? 'border-gray-200/50' : (isMGT ? 'border-tier-std-500/20' : 'border-white/10')} shadow-[-20px_0_60px_rgba(0,0,0,0.5)]`}
+                            style={!user?.liteMode && theme !== 'light' ? { 
+                                background: `linear-gradient(135deg, ${accentColor}15 0%, transparent 50%, ${accentColor}10 100%), rgba(9,9,11,0.95)` 
+                            } : undefined}
                         >
                             {/* Gradient Overlay */}
                             {!user?.liteMode && (
                                 <div 
                                     className="absolute inset-0 pointer-events-none" 
-                                    style={{ background: `linear-gradient(to bottom, ${accentColor}0d, transparent, ${accentColor}0d)` }}
+                                    style={{ background: `linear-gradient(to bottom, ${accentColor}15, transparent 30%, transparent 70%, ${accentColor}15)` }}
                                 />
                             )}
 

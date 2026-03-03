@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard, Globe, Link2, PanelRight } from 'lucide-react';
+import { Settings, Bell, LogOut, Trash2, User, Zap, Mail, CheckCircle, LayoutDashboard, Globe, Link2, PanelRight, Headphones, MessageCircle, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
@@ -230,6 +230,35 @@ export default function SettingsPage() {
                         </div>
                         <h1 className={`text-3xl font-bold ${textMain} mb-2`}>{t('title')}</h1>
                         <p className={textSub}>Personalize sua experiência na plataforma</p>
+                    </div>
+
+                    {/* Support Section */}
+                    <div className={`${cardBg} backdrop-blur-xl border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'} rounded-2xl p-6`}>
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className={`p-3 rounded-full bg-${themeColor}-500/10`}>
+                                <Headphones className={`w-6 h-6 text-${themeColor}-400`} />
+                            </div>
+                            <div>
+                                <h2 className={`text-xl font-bold ${textMain}`}>Suporte</h2>
+                                <p className={`text-sm ${textSub}`}>Precisa de ajuda? Fale conosco</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => window.open('https://wa.me/5519992697215?text=Ol%C3%A1!%20Preciso%20de%20suporte.', '_blank')}
+                                className={`py-3 rounded-xl bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors font-medium flex items-center justify-center gap-2`}
+                            >
+                                <MessageCircle className="w-4 h-4" />
+                                WhatsApp
+                            </button>
+                            <button
+                                onClick={() => window.open('mailto:suporte@magazinemgt.com', '_blank')}
+                                className={`py-3 rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors font-medium flex items-center justify-center gap-2`}
+                            >
+                                <Mail className="w-4 h-4" />
+                                Email
+                            </button>
+                        </div>
                     </div>
 
                     {/* Profile Section */}

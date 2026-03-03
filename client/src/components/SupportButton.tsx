@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Headphones, 
@@ -37,7 +38,11 @@ export default function SupportButton() {
     const { communityName } = useCommunity();
     const { getAccentColor } = useTierColors();
     const { t } = useTranslation('common');
+    const location = useLocation();
     const isMGT = user?.membershipType === 'MGT';
+    
+    // Hide on Connect page
+    const isConnectPage = location.pathname.startsWith('/connect');
     const [isOpen, setIsOpen] = useState(false);
     const [isAdminOnline, setIsAdminOnline] = useState(false);
     const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
@@ -173,6 +178,9 @@ export default function SupportButton() {
     };
 
     const panelBottom = window.innerWidth < 1024 ? '170px' : '90px';
+
+    // Don't show on Connect page
+    if (isConnectPage) return null;
 
     return (
         <>

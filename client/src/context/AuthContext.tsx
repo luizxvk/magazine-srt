@@ -280,7 +280,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const rootStyle = getComputedStyle(document.documentElement);
         const communityColor = rootStyle.getPropertyValue('--tier-std-500').trim();
         const vipColor = rootStyle.getPropertyValue('--tier-vip-500').trim() || '#d4af37';
-        const stdColor = communityColor || '#10b981';
+        const stdColor = communityColor || '#9333ea'; // Roxo padrão Rovex
         return user?.membershipType === 'MGT' ? stdColor : vipColor;
     }, [user?.equippedColor, user?.membershipType, previewTheme?.color, theme]);
 

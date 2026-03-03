@@ -81,12 +81,11 @@ interface ConnectGroupChatProps {
   isMGT: boolean;
   accentColor?: string;
   onRefresh: () => void;
-  onMembersClick?: () => void;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🔥', '💯'];
 
-export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor, onMembersClick }: ConnectGroupChatProps) {
+export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor }: ConnectGroupChatProps) {
   const navigate = useNavigate();
   const { user, showToast, showError, accentColor: authAccent } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -102,6 +101,7 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
   const [hasMore, setHasMore] = useState(true);
 
   const activeAccent = accentColor || authAccent || '#10b981';
+  void activeAccent; // Used for future styling
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-transparent';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';

@@ -131,7 +131,7 @@ export function CommunityProvider({ children, initialConfig }: CommunityProvider
     const root = document.documentElement;
     // accentColor = cor de DESTAQUE (botões, badges, highlights) - ex: #0A2463
     // backgroundColor = cor de FUNDO do site - ex: #0A0F1A
-    const accentColor = config.accentColor || config.backgroundColor || '#10b981';
+    const accentColor = config.accentColor || config.backgroundColor || '#9333ea'; // Roxo padrão Rovex
     const bgColor = config.backgroundColor || '#0f0f0f';
     const vipColor = config.tierVipColor || '#d4af37';
     

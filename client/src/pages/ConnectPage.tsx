@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff, Menu,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
-  Camera, HeadphoneOff, Pencil, Phone
+  Camera, HeadphoneOff, Pencil, Phone, Bot
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -16,7 +16,7 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
-import { VoiceChannelBar, ConnectGroupChat } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard } from '../components/connect';
 
 interface VoiceParticipant {
   id: string;
@@ -129,6 +129,13 @@ export default function ConnectPage() {
   // Invite to call state
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteChannelId, setInviteChannelId] = useState<string | null>(null);
+  
+  // User presence card state
+  const [showPresenceCard, setShowPresenceCard] = useState(false);
+  const [presenceUserId, setPresenceUserId] = useState<string | null>(null);
+  
+  // Bots management state
+  const [showBotsModal, setShowBotsModal] = useState(false);
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
@@ -442,11 +449,12 @@ export default function ConnectPage() {
     }
   };
 
-  // Invite to call
-  const handleOpenInvite = (channelId: string) => {
+  // Invite to call - prefixed with underscore as it's prepared for future use
+  const _handleOpenInvite = (channelId: string) => {
     setInviteChannelId(channelId);
     setShowInviteModal(true);
   };
+  void _handleOpenInvite; // Prevent unused warning
 
   const handleInviteToCall = async (targetUserId: string) => {
     if (!currentVoice || !inviteChannelId) return;
@@ -464,6 +472,12 @@ export default function ConnectPage() {
     } catch (error: any) {
       showError(error.response?.data?.error || 'Erro ao enviar convite');
     }
+  };
+
+  // Open user presence card
+  const handleOpenPresenceCard = (userId: string) => {
+    setPresenceUserId(userId);
+    setShowPresenceCard(true);
   };
 
   const getOnlineMembers = (members: GroupMember[]) => {
@@ -703,23 +717,27 @@ export default function ConnectPage() {
         <LuxuriousBackground />
         <Header />
         <div className="flex flex-col items-center justify-center min-h-[80vh] gap-6">
-          {/* Premium Connect Loading */}
+          {/* Premium Connect Loading - uses user's accent color */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="relative"
           >
-            <div className={`w-24 h-24 rounded-2xl flex items-center justify-center ${isMGT ? 'bg-gradient-to-br from-tier-std-500 to-tier-std-600' : 'bg-gradient-to-br from-gold-500 to-amber-600'}`}>
+            <div 
+              className="w-24 h-24 rounded-2xl flex items-center justify-center"
+              style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}99)` }}
+            >
               <Radio className="w-12 h-12 text-white" />
             </div>
             <motion.div
-              className={`absolute -inset-2 rounded-3xl border-2 ${isMGT ? 'border-tier-std-500/50' : 'border-gold-500/50'}`}
+              className="absolute -inset-2 rounded-3xl border-2"
+              style={{ borderColor: `${accentColor}80` }}
               animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.2, 0.5] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
           </motion.div>
           <div className="text-center">
-            <h2 className={`text-2xl font-bold mb-2 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`}>Rovex Connect</h2>
+            <h2 className="text-2xl font-bold mb-2" style={{ color: accentColor }}>Rovex Connect</h2>
             <p className="text-gray-400">Conectando aos servidores...</p>
           </div>
           <Loader size="lg" />
@@ -929,7 +947,6 @@ export default function ConnectPage() {
               isMGT={isMGT}
               accentColor={accentColor}
               onRefresh={fetchGroups}
-              onMembersClick={() => setShowMembersDrawer(true)}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center">
@@ -959,7 +976,7 @@ export default function ConnectPage() {
                 <div 
                   key={member.id}
                   className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                  onClick={() => navigate(`/profile/${member.userId}`)}
+                  onClick={() => handleOpenPresenceCard(member.userId)}
                 >
                   <div className="relative">
                     <img
@@ -994,7 +1011,7 @@ export default function ConnectPage() {
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={() => navigate(`/profile/${member.userId}`)}
+                    onClick={() => handleOpenPresenceCard(member.userId)}
                   >
                     <img
                       src={member.user.avatarUrl || '/assets/default-avatar.png'}
@@ -1171,7 +1188,7 @@ export default function ConnectPage() {
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={() => { navigate(`/profile/${member.userId}`); setShowMembersDrawer(false); }}
+                    onClick={() => { handleOpenPresenceCard(member.userId); setShowMembersDrawer(false); }}
                   >
                     <div className="relative">
                       <img
@@ -1205,7 +1222,7 @@ export default function ConnectPage() {
                     <div 
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                      onClick={() => { navigate(`/profile/${member.userId}`); setShowMembersDrawer(false); }}
+                      onClick={() => { handleOpenPresenceCard(member.userId); setShowMembersDrawer(false); }}
                     >
                       <img
                         src={member.user.avatarUrl || '/assets/default-avatar.png'}
@@ -1339,6 +1356,18 @@ export default function ConnectPage() {
                   >
                     <Users className={`w-5 h-5 ${themeSecondary}`} />
                     <span className={themeText}>Gerenciar Membros</span>
+                    <ChevronRight className={`w-4 h-4 ml-auto ${themeSecondary}`} />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowGroupSettings(false);
+                      setShowBotsModal(true);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${themeHover} transition-colors`}
+                  >
+                    <Bot className={`w-5 h-5 ${themeSecondary}`} />
+                    <span className={themeText}>Bots</span>
                     <ChevronRight className={`w-4 h-4 ml-auto ${themeSecondary}`} />
                   </button>
                 </div>
@@ -1524,6 +1553,167 @@ export default function ConnectPage() {
         accept="image/*"
         onChange={handleUploadAvatar}
         className="hidden"
+      />
+
+      {/* Bots Management Modal */}
+      <AnimatePresence>
+        {showBotsModal && selectedGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowBotsModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-2xl overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              {/* Header */}
+              <div className={`p-4 border-b ${themeBorder} flex items-center justify-between`}>
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: `${accentColor}20` }}
+                  >
+                    <Bot className="w-5 h-5" style={{ color: accentColor }} />
+                  </div>
+                  <div>
+                    <h3 className={`font-bold ${themeText}`}>Bots</h3>
+                    <p className={`text-xs ${themeSecondary}`}>{selectedGroup.name}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowBotsModal(false)}
+                  className={`p-2 rounded-lg ${themeHover}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4">
+                {/* Info Card */}
+                <div 
+                  className="p-4 rounded-xl mb-4"
+                  style={{ background: `${accentColor}10` }}
+                >
+                  <div className="flex items-start gap-3">
+                    <Bot className="w-8 h-8 mt-1 flex-shrink-0" style={{ color: accentColor }} />
+                    <div>
+                      <h4 className={`font-semibold ${themeText} mb-1`}>Automatize seu grupo</h4>
+                      <p className={`text-sm ${themeSecondary}`}>
+                        Adicione bots para moderar, reproduzir música, dar boas-vindas a novos membros e muito mais.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bot Categories */}
+                <h4 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
+                  Bots Populares
+                </h4>
+                
+                <div className="space-y-2">
+                  {/* Music Bot */}
+                  <div className={`p-3 rounded-xl ${themeHover} flex items-center gap-3 cursor-pointer`}>
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium ${themeText}`}>Melody Bot</p>
+                      <p className={`text-xs ${themeSecondary} truncate`}>Reproduza músicas nos canais de voz</p>
+                    </div>
+                    <button
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                      style={{ background: `${accentColor}20`, color: accentColor }}
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+
+                  {/* Moderation Bot */}
+                  <div className={`p-3 rounded-xl ${themeHover} flex items-center gap-3 cursor-pointer`}>
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium ${themeText}`}>Guardian Bot</p>
+                      <p className={`text-xs ${themeSecondary} truncate`}>Moderação automática e anti-spam</p>
+                    </div>
+                    <button
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                      style={{ background: `${accentColor}20`, color: accentColor }}
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+
+                  {/* Welcome Bot */}
+                  <div className={`p-3 rounded-xl ${themeHover} flex items-center gap-3 cursor-pointer`}>
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium ${themeText}`}>Greeter Bot</p>
+                      <p className={`text-xs ${themeSecondary} truncate`}>Boas-vindas personalizadas</p>
+                    </div>
+                    <button
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                      style={{ background: `${accentColor}20`, color: accentColor }}
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+
+                  {/* AI Bot */}
+                  <div className={`p-3 rounded-xl ${themeHover} flex items-center gap-3 cursor-pointer`}>
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium ${themeText}`}>AI Assistant</p>
+                      <p className={`text-xs ${themeSecondary} truncate`}>Chat com IA para seu grupo</p>
+                    </div>
+                    <div 
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-400"
+                    >
+                      Em breve
+                    </div>
+                  </div>
+                </div>
+
+                {/* Create Custom Bot */}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <button
+                    className="w-full p-4 rounded-xl border-2 border-dashed text-center transition-all hover:border-solid"
+                    style={{ borderColor: `${accentColor}40`, color: accentColor }}
+                  >
+                    <Plus className="w-6 h-6 mx-auto mb-2" style={{ color: accentColor }} />
+                    <span className="font-medium">Criar Bot Personalizado</span>
+                    <p className={`text-xs ${themeSecondary} mt-1`}>
+                      Desenvolva seu próprio bot com nossa API
+                    </p>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* User Presence Card */}
+      <UserPresenceCard
+        userId={presenceUserId || ''}
+        isOpen={showPresenceCard}
+        onClose={() => setShowPresenceCard(false)}
+        onStartChat={(userId) => {
+          setShowPresenceCard(false);
+          navigate(`/chat/${userId}`);
+        }}
+        accentColor={accentColor}
       />
     </div>
   );

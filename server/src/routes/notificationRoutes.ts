@@ -8,7 +8,8 @@ import {
     getPushStatus,
     sendTestNotification,
     subscribeToFcm,
-    unsubscribeFromFcm
+    unsubscribeFromFcm,
+    sendCallInvite
 } from '../controllers/notificationController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -28,5 +29,8 @@ router.post('/push/test', authenticateToken, sendTestNotification);
 // Push notifications (FCM - Android/iOS native)
 router.post('/push/subscribe-fcm', authenticateToken, subscribeToFcm);
 router.post('/push/unsubscribe-fcm', authenticateToken, unsubscribeFromFcm);
+
+// Call invite (high-priority push notification)
+router.post('/call-invite', authenticateToken, sendCallInvite);
 
 export default router;

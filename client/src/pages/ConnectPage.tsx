@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff, Menu,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
-  Camera, HeadphoneOff
+  Camera, HeadphoneOff, Pencil, Phone
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -120,6 +120,15 @@ export default function ConnectPage() {
   const [showGroupSettings, setShowGroupSettings] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  
+  // Rename channel state
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [renameChannel, setRenameChannel] = useState<{ id: string; name: string; type: 'TEXT' | 'VOICE'; groupId: string } | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  
+  // Invite to call state
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteChannelId, setInviteChannelId] = useState<string | null>(null);
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
@@ -408,6 +417,55 @@ export default function ConnectPage() {
     }
   };
 
+  // Rename channel
+  const handleOpenRename = (channel: { id: string; name: string }, type: 'TEXT' | 'VOICE', groupId: string) => {
+    setRenameChannel({ id: channel.id, name: channel.name, type, groupId });
+    setRenameValue(channel.name);
+    setShowRenameModal(true);
+  };
+
+  const handleRenameChannel = async () => {
+    if (!renameChannel || !renameValue.trim()) return;
+    
+    try {
+      const endpoint = renameChannel.type === 'VOICE' 
+        ? `/connect/groups/${renameChannel.groupId}/voice/${renameChannel.id}`
+        : `/connect/groups/${renameChannel.groupId}/text/${renameChannel.id}`;
+      
+      await api.patch(endpoint, { name: renameValue.trim() });
+      showToast('Canal renomeado!');
+      setShowRenameModal(false);
+      setRenameChannel(null);
+      fetchGroups(false);
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao renomear canal');
+    }
+  };
+
+  // Invite to call
+  const handleOpenInvite = (channelId: string) => {
+    setInviteChannelId(channelId);
+    setShowInviteModal(true);
+  };
+
+  const handleInviteToCall = async (targetUserId: string) => {
+    if (!currentVoice || !inviteChannelId) return;
+    
+    try {
+      await api.post('/notifications/call-invite', {
+        targetUserId,
+        channelId: inviteChannelId,
+        groupId: selectedGroup?.id,
+        channelName: currentVoice.channel.name,
+        groupName: selectedGroup?.name,
+      });
+      showToast('Convite enviado!');
+      setShowInviteModal(false);
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao enviar convite');
+    }
+  };
+
   const getOnlineMembers = (members: GroupMember[]) => {
     return members.filter(m => m.user.isOnline);
   };
@@ -502,21 +560,32 @@ export default function ConnectPage() {
               {/* Text Channels */}
               {group.textChannels && group.textChannels.length > 0 ? (
                 group.textChannels.map(channel => (
-                  <button
-                    key={channel.id}
-                    onClick={() => handleSelectTextChannel(channel, group)}
-                    className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
-                      selectedGroup?.id === group.id && selectedTextChannel?.id === channel.id 
-                        ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') 
-                        : themeSecondary
-                    }`}
-                  >
-                    <Hash className="w-4 h-4" />
-                    <span className="text-sm flex-1 text-left truncate">{channel.name}</span>
-                    {channel.isNSFW && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">18+</span>
+                  <div key={channel.id} className="group/channel flex items-center">
+                    <button
+                      onClick={() => handleSelectTextChannel(channel, group)}
+                      className={`flex-1 flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
+                        selectedGroup?.id === group.id && selectedTextChannel?.id === channel.id 
+                          ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') 
+                          : themeSecondary
+                      }`}
+                    >
+                      <Hash className="w-4 h-4" />
+                      <span className="text-sm flex-1 text-left truncate">{channel.name}</span>
+                      {channel.isNSFW && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">18+</span>
+                      )}
+                    </button>
+                    {/* Rename button for admins */}
+                    {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleOpenRename(channel, 'TEXT', group.id); }}
+                        className={`p-1.5 rounded ${themeHover} ${themeSecondary} opacity-0 group-hover/channel:opacity-100 transition-opacity`}
+                        title="Renomear canal"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
                     )}
-                  </button>
+                  </div>
                 ))
               ) : (
                 // Fallback: canal "geral" padrão se não houver canais de texto
@@ -533,20 +602,32 @@ export default function ConnectPage() {
 
               {/* Voice Channels */}
               {group.voiceChannels.map(channel => (
-                <div key={channel.id}>
-                  <button
-                    onClick={() => handleJoinVoice(group.id, channel.id)}
-                    disabled={channel.isLocked}
-                    className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} ${
-                      currentVoice?.channelId === channel.id ? 'bg-green-500/10 text-green-500' : ''
-                    } ${channel.isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <Volume2 className="w-4 h-4" />
-                    <span className="text-sm flex-1 text-left">{channel.name}</span>
-                    <span className="text-xs opacity-60">
-                      {channel.participants.length}/{channel.maxUsers}
-                    </span>
-                  </button>
+                <div key={channel.id} className="group/vchannel">
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => handleJoinVoice(group.id, channel.id)}
+                      disabled={channel.isLocked}
+                      className={`flex-1 flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} ${
+                        currentVoice?.channelId === channel.id ? 'bg-green-500/10 text-green-500' : ''
+                      } ${channel.isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <Volume2 className="w-4 h-4" />
+                      <span className="text-sm flex-1 text-left">{channel.name}</span>
+                      <span className="text-xs opacity-60">
+                        {channel.participants.length}/{channel.maxUsers}
+                      </span>
+                    </button>
+                    {/* Rename button for admins */}
+                    {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleOpenRename(channel, 'VOICE', group.id); }}
+                        className={`p-1.5 rounded ${themeHover} ${themeSecondary} opacity-0 group-hover/vchannel:opacity-100 transition-opacity`}
+                        title="Renomear canal"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                   
                   {/* Voice Participants */}
                   {channel.participants.length > 0 && (
@@ -554,7 +635,7 @@ export default function ConnectPage() {
                       {channel.participants.map(participant => (
                         <div 
                           key={participant.id}
-                          className={`flex items-center gap-2 px-2 py-1 rounded ${themeSecondary}`}
+                          className={`group/participant flex items-center gap-2 px-2 py-1 rounded ${themeSecondary}`}
                         >
                           {/* Avatar with speaking indicator */}
                           <div className="relative">
@@ -582,6 +663,16 @@ export default function ConnectPage() {
                           {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
                           {/* Deafen icon */}
                           {participant.isDeafened && <HeadphoneOff className="w-3 h-3 text-red-400" />}
+                          {/* Invite to call button (only for other users when in voice) */}
+                          {currentVoice && participant.user.id !== user?.id && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleInviteToCall(participant.user.id); }}
+                              className="p-1 rounded-full bg-green-500/20 text-green-400 hover:bg-green-500/30 opacity-0 group-hover/participant:opacity-100 transition-opacity"
+                              title="Chamar para call"
+                            >
+                              <Phone className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1280,6 +1371,146 @@ export default function ConnectPage() {
                 >
                   Fechar
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Rename Channel Modal */}
+      <AnimatePresence>
+        {showRenameModal && renameChannel && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowRenameModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-sm rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`text-lg font-bold ${themeText}`}>Renomear Canal</h3>
+                <button
+                  onClick={() => setShowRenameModal(false)}
+                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-2 mb-4">
+                {renameChannel.type === 'TEXT' ? (
+                  <Hash className="w-5 h-5" style={{ color: accentColor }} />
+                ) : (
+                  <Volume2 className="w-5 h-5" style={{ color: accentColor }} />
+                )}
+                <span className={`text-sm ${themeSecondary}`}>
+                  Canal de {renameChannel.type === 'TEXT' ? 'texto' : 'voz'}
+                </span>
+              </div>
+              
+              <input
+                type="text"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                placeholder="Nome do canal"
+                className={`w-full px-4 py-3 rounded-xl mb-4 ${
+                  theme === 'light' 
+                    ? 'bg-gray-100 text-gray-900 placeholder:text-gray-500' 
+                    : 'bg-zinc-800 text-white placeholder:text-gray-500'
+                } border ${themeBorder} focus:outline-none focus:ring-2`}
+                style={{ '--tw-ring-color': accentColor } as any}
+                autoFocus
+                onKeyDown={(e) => e.key === 'Enter' && handleRenameChannel()}
+              />
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowRenameModal(false)}
+                  className={`flex-1 px-4 py-2.5 rounded-xl ${themeHover} ${themeSecondary} font-medium`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleRenameChannel}
+                  disabled={!renameValue.trim()}
+                  className="flex-1 px-4 py-2.5 rounded-xl font-medium text-white transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ background: accentColor }}
+                >
+                  Salvar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Invite to Call Modal */}
+      <AnimatePresence>
+        {showInviteModal && selectedGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowInviteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-sm rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`text-lg font-bold ${themeText}`}>Chamar para Call</h3>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <p className={`text-sm ${themeSecondary} mb-4`}>
+                Selecione um membro para convidar para a call:
+              </p>
+              
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {selectedGroup.members
+                  .filter(m => m.userId !== user?.id && m.user.isOnline)
+                  .map(member => (
+                    <button
+                      key={member.id}
+                      onClick={() => handleInviteToCall(member.userId)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl ${themeHover} transition-colors`}
+                    >
+                      <img
+                        src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                        className="w-10 h-10 rounded-full"
+                        alt=""
+                      />
+                      <div className="flex-1 text-left">
+                        <p className={`font-medium ${themeText}`}>
+                          {member.user.displayName || member.user.name}
+                        </p>
+                        <p className="text-xs text-green-500">Online</p>
+                      </div>
+                      <Phone className="w-5 h-5 text-green-500" />
+                    </button>
+                  ))}
+                
+                {selectedGroup.members.filter(m => m.userId !== user?.id && m.user.isOnline).length === 0 && (
+                  <p className={`text-center py-4 ${themeSecondary}`}>
+                    Nenhum membro online disponível
+                  </p>
+                )}
               </div>
             </motion.div>
           </motion.div>

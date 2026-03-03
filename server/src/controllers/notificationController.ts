@@ -317,3 +317,116 @@ export const unsubscribeFromFcm = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Failed to unsubscribe' });
     }
 };
+
+// ============================================
+// CALL INVITE (High Priority)
+// ============================================
+
+// Send high-priority call invite notification (like a phone call)
+export const sendCallInvite = async (req: AuthRequest, res: Response) => {
+    try {
+        const senderId = req.user?.userId;
+        const { targetUserId, channelId, groupId, channelName, groupName } = req.body;
+
+        if (!senderId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        if (!targetUserId || !channelId) {
+            return res.status(400).json({ error: 'targetUserId and channelId are required' });
+        }
+
+        // Get sender info
+        const sender = await prisma.user.findUnique({
+            where: { id: senderId },
+            select: { name: true, displayName: true, avatarUrl: true }
+        });
+
+        if (!sender) {
+            return res.status(404).json({ error: 'Sender not found' });
+        }
+
+        const senderName = sender.displayName || sender.name;
+
+        // Create in-app notification
+        await prisma.notification.create({
+            data: {
+                userId: targetUserId,
+                type: 'CALL_INVITE',
+                title: '📞 Chamada de voz',
+                message: `${senderName} está te chamando para o canal ${channelName || 'de voz'}`,
+                data: JSON.stringify({
+                    channelId,
+                    groupId,
+                    channelName,
+                    groupName,
+                    senderId,
+                    senderName,
+                    senderAvatar: sender.avatarUrl,
+                    type: 'call_invite'
+                }),
+            }
+        });
+
+        // Send high-priority push notification
+        if (VAPID_PRIVATE_KEY) {
+            const subscriptions = await prisma.pushSubscription.findMany({
+                where: { 
+                    userId: targetUserId,
+                    endpoint: { not: null }
+                }
+            });
+
+            for (const sub of subscriptions) {
+                if (!sub.endpoint) continue;
+
+                try {
+                    const payload = JSON.stringify({
+                        title: `📞 ${senderName} está te chamando`,
+                        body: `Toque para entrar na call "${channelName || 'Geral'}"`,
+                        icon: sender.avatarUrl || '/logo192.png',
+                        badge: '/logo192.png',
+                        tag: `call-invite-${channelId}`,
+                        requireInteraction: true, // Keep notification visible
+                        vibrate: [200, 100, 200, 100, 200, 100, 400], // Long vibration pattern (like phone ring)
+                        renotify: true, // Alert even if existing notification with same tag
+                        data: {
+                            url: `/connect/${groupId}`,
+                            channelId,
+                            groupId,
+                            type: 'call_invite',
+                            urgency: 'high'
+                        }
+                    });
+
+                    await webpush.sendNotification(
+                        {
+                            endpoint: sub.endpoint,
+                            keys: sub.keys as { p256dh: string; auth: string }
+                        },
+                        payload,
+                        {
+                            urgency: 'high', // High priority for call notifications
+                            TTL: 60 // Expire after 60 seconds
+                        }
+                    );
+                } catch (error: unknown) {
+                    const err = error as { statusCode?: number };
+                    if (err.statusCode === 410 || err.statusCode === 404) {
+                        await prisma.pushSubscription.delete({
+                            where: { id: sub.id }
+                        });
+                    }
+                    console.error(`[Push Call] Error sending to ${sub.endpoint}:`, error);
+                }
+            }
+        }
+
+        console.log(`[Call Invite] ${senderId} invited ${targetUserId} to channel ${channelId}`);
+
+        res.json({ success: true, message: 'Call invite sent' });
+    } catch (error) {
+        console.error('Error sending call invite:', error);
+        res.status(500).json({ error: 'Failed to send call invite' });
+    }
+};

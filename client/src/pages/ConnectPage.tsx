@@ -725,7 +725,7 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
       
-      <div className="flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16">
+      <div className={`flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16 ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
         <div className={`hidden md:flex w-64 ${themeSidebar} border-r ${themeBorder} flex-col`}>
           {/* Header */}
@@ -876,7 +876,7 @@ export default function ConnectPage() {
 
       {/* Mobile Voice Bar (Fixed at bottom) */}
       {currentVoice && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
+        <div className={`md:hidden fixed bottom-0 left-0 right-0 z-40 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border-t ${themeBorder} safe-area-bottom`}>
           <VoiceChannelBar
             channel={currentVoice.channel}
             isMuted={isMuted}

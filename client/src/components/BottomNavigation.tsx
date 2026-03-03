@@ -129,9 +129,10 @@ export default function BottomNavigation() {
         };
     }, []);
 
-    // Don't show on auth pages or desktop
+    // Don't show on auth pages, Connect page, or desktop
     const hiddenPaths = ['/', '/login', '/register', '/request-invite', '/reset-password'];
-    const shouldHide = hiddenPaths.includes(location.pathname);
+    const isConnectPage = location.pathname.startsWith('/connect');
+    const shouldHide = hiddenPaths.includes(location.pathname) || isConnectPage;
 
     // Update active based on current path
     useEffect(() => {

@@ -42,6 +42,7 @@ import couponRoutes from './src/routes/couponRoutes';
 import challengeRoutes from './src/routes/challengeRoutes';
 import rouletteRoutes from './src/routes/rouletteRoutes';
 import sponsoredPostRoutes from './src/routes/sponsoredPostRoutes';
+import connectRoutes from './src/routes/connectRoutes';
 import { logger } from './src/utils/logger';
 import { sanitizeInput, securityHeaders } from './src/middleware/securityMiddleware';
 import { rateLimit } from './src/middleware/rateLimitMiddleware';
@@ -194,6 +195,7 @@ apiRouter.use('/coupons', couponRoutes);
 apiRouter.use('/challenges', challengeRoutes);
 apiRouter.use('/roulette', rouletteRoutes);
 apiRouter.use('/sponsored-posts', sponsoredPostRoutes);
+apiRouter.use('/connect', connectRoutes);
 
 // Mount API Router
 app.use('/api', apiRouter);

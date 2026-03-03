@@ -23,6 +23,7 @@ import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import GroupsPage from './pages/GroupsPage';
 import GroupChatPage from './pages/GroupChatPage';
+import ConnectPage from './pages/ConnectPage';
 import MarketPage from './pages/MarketPage';
 import PhotoCatalogPage from './pages/PhotoCatalogPage';
 import ProductStore from './pages/ProductStore';
@@ -106,6 +107,9 @@ function App() {
           {/* Grupos */}
           <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
           <Route path="/groups/:id" element={<PrivateRoute><GroupChatPage /></PrivateRoute>} />
+          {/* Rovex Connect */}
+          <Route path="/connect" element={<PrivateRoute><ConnectPage /></PrivateRoute>} />
+          <Route path="/connect/:groupId" element={<PrivateRoute><ConnectPage /></PrivateRoute>} />
           {/* Mercado */}
           <Route path="/market" element={<PrivateRoute><MarketPage /></PrivateRoute>} />
           {/* Loja de Produtos */}

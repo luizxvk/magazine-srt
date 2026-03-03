@@ -117,6 +117,8 @@ model User {
   // Sponsored Posts
   sponsoredPostRequests  SponsoredPostRequest[] @relation("SponsoredPostRequests")
   sponsoredPostsReviewed SponsoredPostRequest[] @relation("SponsoredPostReviewer")
+  // Rovex Connect - Voice
+  voiceParticipants      VoiceParticipant[]
 
   @@index([membershipType])
   @@index([isElite])
@@ -688,6 +690,7 @@ model Group {
   members        GroupMember[]
   messages       GroupMessage[]
   settings       GroupSettings?
+  voiceChannels  VoiceChannel[]
 
   @@index([creatorId])
   @@index([membershipType])
@@ -1599,6 +1602,45 @@ enum ChallengeMetric {
   WIN_RATE     // Melhor % de vitória
   SCORE        // Maior score/ELO ganho
   HOURS        // Mais horas jogadas
+}
+
+// ============================================
+// ROVEX CONNECT - Voice & Streaming
+// ============================================
+
+model VoiceChannel {
+  id           String    @id @default(uuid())
+  groupId      String
+  name         String
+  description  String?
+  maxUsers     Int       @default(25)
+  isLocked     Boolean   @default(false)
+  bitrate      Int       @default(64000) // Audio quality in bps
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  group        Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  participants VoiceParticipant[]
+  
+  @@index([groupId])
+}
+
+model VoiceParticipant {
+  id             String       @id @default(uuid())
+  channelId      String
+  userId         String
+  isMuted        Boolean      @default(false)
+  isDeafened     Boolean      @default(false)
+  isSpeaking     Boolean      @default(false)
+  isStreaming    Boolean      @default(false)
+  joinedAt       DateTime     @default(now())
+  
+  channel        VoiceChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([channelId, userId])
+  @@index([userId])
+  @@index([channelId])
 }
 
 // ============================================

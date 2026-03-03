@@ -1,4 +1,4 @@
-import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2 } from 'lucide-react';
+import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2, Radio } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -183,6 +183,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <Trophy className="w-5 h-5" />, label: t('nav.ranking'), path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
         { icon: <MessageCircle className="w-5 h-5" />, label: t('nav.groups'), path: '/groups' },
+        { icon: <Radio className="w-5 h-5 text-purple-400" />, label: 'Connect', path: '/connect', highlight: true },
         { icon: <Store className="w-5 h-5" />, label: t('nav.market'), path: '/market' },
         { icon: <Ticket className="w-5 h-5" />, label: t('nav.rewards'), path: '/rewards' },
         { icon: <Crown className="w-5 h-5 text-amber-400" />, label: isElite ? 'ELITE' : 'ELITE ✨', path: '/elite', highlight: !isElite },

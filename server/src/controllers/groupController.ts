@@ -95,7 +95,7 @@ export const createGroup = async (req: AuthRequest, res: Response) => {
         name: 'Geral',
         description: 'Canal de voz principal',
         groupId: group.id,
-        maxUsers: 25,
+        maxUsers: maxMembers || 100,
         bitrate: 64000,
       },
     });

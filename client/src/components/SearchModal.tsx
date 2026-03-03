@@ -44,6 +44,7 @@ const NAVIGATION_PAGES = [
     { id: 'radio', title: 'Rádio', subtitle: 'Ouça a rádio ao vivo', keywords: ['radio', 'rádio', 'musica', 'música', 'som', 'audio', 'ouvir', 'live', 'ao vivo'], icon: '📻', path: '/feed', action: 'radio' },
     { id: 'roadmap', title: 'Roadmap', subtitle: 'Próximas atualizações', keywords: ['roadmap', 'atualização', 'atualizacoes', 'futuro', 'novidades', 'próximo', 'proximo', 'plano', 'planejamento'], icon: '🗺️', path: '/roadmap' },
     { id: 'elite', title: 'ELITE', subtitle: 'Assinatura premium com benefícios exclusivos', keywords: ['elite', 'premium', 'assinatura', 'vip', 'beneficios', 'benefício', 'assinar', 'subscription', '2x xp', 'xp dobro', 'zions', 'exclusivo'], icon: '👑', path: '/elite' },
+    { id: 'connect', title: 'Rovex Connect', subtitle: 'Chat em tempo real e canais de voz', keywords: ['connect', 'chat', 'voz', 'voice', 'discord', 'conversa', 'tempo real', 'mensagem', 'grupo', 'canal'], icon: '📡', path: '/connect' },
 ];
 
 // Fuzzy match function - checks if query matches any part of keywords

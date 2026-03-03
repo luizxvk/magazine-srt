@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff,
-  Settings, Hash, ChevronRight, ChevronDown, Radio
+  Settings, Hash, ChevronRight, ChevronDown, Radio, X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -97,6 +97,10 @@ export default function ConnectPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [showAddChannelModal, setShowAddChannelModal] = useState(false);
+  const [addChannelGroupId, setAddChannelGroupId] = useState<string | null>(null);
+  const [newChannelName, setNewChannelName] = useState('');
+  const [showMembersDrawer, setShowMembersDrawer] = useState(false);
   
   // Voice state
   const [currentVoice, setCurrentVoice] = useState<CurrentVoice | null>(null);
@@ -320,6 +324,29 @@ export default function ConnectPage() {
     setShowCreateModal(false);
   };
 
+  const handleOpenAddChannel = (groupId: string) => {
+    setAddChannelGroupId(groupId);
+    setNewChannelName('');
+    setShowAddChannelModal(true);
+  };
+
+  const handleCreateVoiceChannel = async () => {
+    if (!addChannelGroupId || !newChannelName.trim()) return;
+    
+    try {
+      await api.post(`/connect/groups/${addChannelGroupId}/voice`, {
+        name: newChannelName.trim(),
+        maxUsers: selectedGroup?.members.length || 25,
+      });
+      showToast('Canal de voz criado com sucesso!');
+      setShowAddChannelModal(false);
+      setNewChannelName('');
+      fetchGroups();
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao criar canal');
+    }
+  };
+
   const getOnlineMembers = (members: GroupMember[]) => {
     return members.filter(m => m.user.isOnline);
   };
@@ -470,7 +497,7 @@ export default function ConnectPage() {
                         {/* Add Voice Channel (Admin only) */}
                         {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
                           <button
-                            onClick={() => {/* TODO: Add voice channel modal */}}
+                            onClick={() => handleOpenAddChannel(group.id)}
                             className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} opacity-60 hover:opacity-100`}
                           >
                             <Plus className="w-4 h-4" />
@@ -527,6 +554,7 @@ export default function ConnectPage() {
               theme={theme}
               isMGT={isMGT}
               onRefresh={fetchGroups}
+              onMembersClick={() => setShowMembersDrawer(true)}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center">
@@ -616,6 +644,162 @@ export default function ConnectPage() {
           onGroupCreated={handleGroupCreated}
         />
       )}
+
+      {/* Add Voice Channel Modal */}
+      <AnimatePresence>
+        {showAddChannelModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowAddChannelModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-sm rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`text-lg font-bold ${themeText}`}>Criar Canal de Voz</h3>
+                <button
+                  onClick={() => setShowAddChannelModal(false)}
+                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <input
+                type="text"
+                value={newChannelName}
+                onChange={(e) => setNewChannelName(e.target.value)}
+                placeholder="Nome do canal"
+                className={`w-full px-4 py-3 rounded-xl mb-4 ${
+                  theme === 'light' 
+                    ? 'bg-gray-100 text-gray-900 placeholder:text-gray-500' 
+                    : 'bg-zinc-800 text-white placeholder:text-gray-500'
+                } border ${themeBorder} focus:outline-none focus:ring-2 focus:ring-tier-std`}
+                autoFocus
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateVoiceChannel()}
+              />
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowAddChannelModal(false)}
+                  className={`flex-1 px-4 py-2.5 rounded-xl ${themeHover} ${themeSecondary} font-medium`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateVoiceChannel}
+                  disabled={!newChannelName.trim()}
+                  className={`flex-1 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                    newChannelName.trim()
+                      ? isMGT 
+                        ? 'bg-tier-std text-white hover:bg-tier-std-600' 
+                        : 'bg-gold-500 text-black hover:bg-gold-600'
+                      : 'bg-gray-500/20 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  Criar Canal
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Members Drawer (Mobile) */}
+      <AnimatePresence>
+        {showMembersDrawer && selectedGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 lg:hidden"
+            onClick={() => setShowMembersDrawer(false)}
+          >
+            <div className="absolute inset-0 bg-black/60" />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`absolute right-0 top-0 bottom-0 w-72 ${themeSidebar} border-l ${themeBorder} p-4 overflow-y-auto`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`font-bold ${themeText}`}>Membros</h3>
+                <button
+                  onClick={() => setShowMembersDrawer(false)}
+                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <h4 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
+                Online — {getOnlineMembers(selectedGroup.members).length}
+              </h4>
+              <div className="space-y-2 mb-6">
+                {getOnlineMembers(selectedGroup.members).map(member => (
+                  <div 
+                    key={member.id}
+                    className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
+                    onClick={() => { navigate(`/profile/${member.userId}`); setShowMembersDrawer(false); }}
+                  >
+                    <div className="relative">
+                      <img
+                        src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                        className="w-8 h-8 rounded-full"
+                        alt=""
+                      />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${themeText}`}>
+                        {member.user.displayName || member.user.name}
+                      </p>
+                      {member.role !== 'MEMBER' && (
+                        <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
+                          {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <h4 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
+                Offline — {selectedGroup.members.length - getOnlineMembers(selectedGroup.members).length}
+              </h4>
+              <div className="space-y-2 opacity-50">
+                {selectedGroup.members
+                  .filter(m => !m.user.isOnline)
+                  .map(member => (
+                    <div 
+                      key={member.id}
+                      className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
+                      onClick={() => { navigate(`/profile/${member.userId}`); setShowMembersDrawer(false); }}
+                    >
+                      <img
+                        src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                        className="w-8 h-8 rounded-full grayscale"
+                        alt=""
+                      />
+                      <p className={`text-sm truncate ${themeSecondary}`}>
+                        {member.user.displayName || member.user.name}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

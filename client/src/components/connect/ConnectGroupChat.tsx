@@ -71,11 +71,12 @@ interface ConnectGroupChatProps {
   theme: 'light' | 'dark';
   isMGT: boolean;
   onRefresh: () => void;
+  onMembersClick?: () => void;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🔥', '💯'];
 
-export default function ConnectGroupChat({ group, theme, isMGT }: ConnectGroupChatProps) {
+export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }: ConnectGroupChatProps) {
   const navigate = useNavigate();
   const { user, showToast, showError } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -213,7 +214,11 @@ export default function ConnectGroupChat({ group, theme, isMGT }: ConnectGroupCh
             <p className={`text-xs ${themeSecondary} truncate`}>{group.description}</p>
           )}
         </div>
-        <button className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}>
+        <button 
+          onClick={onMembersClick}
+          className={`p-2 ${themeHover} rounded-lg ${themeSecondary} lg:hidden`}
+          title="Ver membros"
+        >
           <Users className="w-5 h-5" />
         </button>
         {isAdmin && (

@@ -207,12 +207,22 @@ export const joinVoiceChannel = async (req: Request, res: Response) => {
           select: { id: true, name: true, displayName: true, avatarUrl: true },
         },
         channel: {
-          select: { id: true, name: true, groupId: true },
+          include: {
+            group: {
+              select: { id: true, name: true, avatarUrl: true },
+            },
+          },
         },
       },
     });
 
-    res.json(participant);
+    // Return in expected format for client
+    res.json({
+      channelId: participant.channelId,
+      channel: participant.channel,
+      isMuted: participant.isMuted,
+      isDeafened: participant.isDeafened,
+    });
   } catch (error) {
     console.error('Error joining voice channel:', error);
     res.status(500).json({ error: 'Erro ao entrar no canal' });

@@ -61,7 +61,9 @@ interface UseSocketReturn {
   onNotification: (callback: (notification: any) => void) => void;
 }
 
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
+// Use dedicated Connect server if available (Render), otherwise fallback to API server
+// VITE_CONNECT_URL should point to https://rovex-connect.onrender.com in production
+const SOCKET_URL = import.meta.env.VITE_CONNECT_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
 
 export function useSocket(): UseSocketReturn {
   const { user } = useAuth();

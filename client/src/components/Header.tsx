@@ -1,4 +1,4 @@
-import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, MessageCircle, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2, Radio } from 'lucide-react';
+import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2, Radio } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { AnimatePresence, motion } from 'framer-motion';

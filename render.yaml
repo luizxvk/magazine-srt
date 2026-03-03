@@ -1,0 +1,22 @@
+# Render Blueprint - Rovex Connect WebSocket Server
+# Deploy: connect to GitHub repo and use this file
+
+services:
+  - type: web
+    name: rovex-connect
+    runtime: node
+    region: ohio # us-east-2, close to Vercel iad1
+    plan: free # Hobby plan - 750 hours/month free
+    rootDir: server
+    buildCommand: npm install && npx tsc connect-server.ts --esModuleInterop --skipLibCheck --outDir dist
+    startCommand: node dist/connect-server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        sync: false # Set manually in dashboard
+      - key: PORT
+        value: 4000
+    autoDeploy: true
+    branch: main

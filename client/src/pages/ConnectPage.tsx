@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, Plus, Volume2, MicOff, Menu, ArrowLeft,
+  Users, Plus, Volume2, MicOff, Menu,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
-  Camera, MessageSquare
+  Camera
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -123,7 +123,7 @@ export default function ConnectPage() {
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const [mobileView, setMobileView] = useState<'sidebar' | 'chat' | 'members'>('sidebar');
+  // mobileView will be used for future mobile navigation
   
   // Text channel state
   const [selectedTextChannel, setSelectedTextChannel] = useState<TextChannel | null>(null);

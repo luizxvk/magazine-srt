@@ -85,6 +85,11 @@ export const Feature = {
   GROUP_BACKGROUNDS: 'GROUP_BACKGROUNDS',
   GROUP_NSFW: 'GROUP_NSFW',
   
+  // Connect (Discord-like)
+  CONNECT: 'CONNECT',
+  CONNECT_VOICE: 'CONNECT_VOICE',
+  CONNECT_TEXT_CHANNELS: 'CONNECT_TEXT_CHANNELS',
+  
   // Social Integrations
   SOCIAL_INTEGRATION_1: 'SOCIAL_INTEGRATION_1',
   SOCIAL_INTEGRATION_3: 'SOCIAL_INTEGRATION_3',
@@ -223,6 +228,11 @@ export const FEATURE_INFO: Record<Feature, FeatureInfo> = {
   [Feature.GROUP_BACKGROUNDS]: { name: 'Fundos de Grupo', description: 'Temas personalizados para grupos', category: FeatureCategory.GROUPS },
   [Feature.GROUP_NSFW]: { name: 'Grupos NSFW', description: 'Marcar grupos como adulto', category: FeatureCategory.GROUPS },
   
+  // Connect (Discord-like)
+  [Feature.CONNECT]: { name: 'Rovex Connect', description: 'Servidores estilo Discord com voz e texto', category: FeatureCategory.GROUPS, icon: '🎧' },
+  [Feature.CONNECT_VOICE]: { name: 'Canais de Voz', description: 'Chat de voz em tempo real', category: FeatureCategory.GROUPS },
+  [Feature.CONNECT_TEXT_CHANNELS]: { name: 'Canais de Texto', description: 'Múltiplos canais de texto por servidor', category: FeatureCategory.GROUPS },
+  
   // Social Integrations
   [Feature.SOCIAL_INTEGRATION_1]: { name: '1 Integração Social', description: 'Conectar 1 rede social', category: FeatureCategory.SOCIAL },
   [Feature.SOCIAL_INTEGRATION_3]: { name: '3 Integrações Sociais', description: 'Conectar até 3 redes', category: FeatureCategory.SOCIAL },
@@ -302,6 +312,7 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'Supply Box (1ª grátis/dia)',
       'Loja de Customização',
       'Grupos de chat (até 10)',
+      'Rovex Connect (canais de texto)',
       '1 integração social',
       'Admin dashboard básico',
     ],
@@ -319,6 +330,7 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'Theme Packs',
       'Zions Cash + Saques',
       'Product Store (Game Keys)',
+      'Canais de Voz (Connect)',
       'StatForge (até 5 jogos)',
       'Sistema de Cupons',
       '3 integrações sociais',

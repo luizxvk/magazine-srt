@@ -21,7 +21,6 @@ import RoadmapPage from './pages/RoadmapPage';
 import SettingsPage from './pages/SettingsPage';
 import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
-import GroupsPage from './pages/GroupsPage';
 import GroupChatPage from './pages/GroupChatPage';
 import ConnectPage from './pages/ConnectPage';
 import MarketPage from './pages/MarketPage';

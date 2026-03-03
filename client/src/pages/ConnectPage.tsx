@@ -123,7 +123,6 @@ export default function ConnectPage() {
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  // mobileView will be used for future mobile navigation
   
   // Text channel state
   const [selectedTextChannel, setSelectedTextChannel] = useState<TextChannel | null>(null);
@@ -611,7 +610,6 @@ export default function ConnectPage() {
         <button
           onClick={() => {
             setShowMobileSidebar(true);
-            setMobileView('sidebar');
           }}
           className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
         >

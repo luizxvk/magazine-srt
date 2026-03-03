@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff, Menu,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
-  Camera
+  Camera, HeadphoneOff
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -103,7 +103,7 @@ interface CurrentVoice {
 export default function ConnectPage() {
   const navigate = useNavigate();
   const { groupId } = useParams();
-  const { user, theme, showToast, showError } = useAuth();
+  const { user, theme, showToast, showError, accentColor } = useAuth();
   const { isStdTier } = useCommunity();
   const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
@@ -556,18 +556,32 @@ export default function ConnectPage() {
                           key={participant.id}
                           className={`flex items-center gap-2 px-2 py-1 rounded ${themeSecondary}`}
                         >
-                          <img
-                            src={participant.user.avatarUrl || '/assets/default-avatar.png'}
-                            className={`w-5 h-5 rounded-full ${participant.isSpeaking ? 'ring-2 ring-green-500' : ''}`}
-                            alt=""
-                          />
-                          <span className="text-xs truncate">
+                          {/* Avatar with speaking indicator */}
+                          <div className="relative">
+                            <img
+                              src={participant.user.avatarUrl || '/assets/default-avatar.png'}
+                              className="w-5 h-5 rounded-full"
+                              alt=""
+                            />
+                            {/* Speaking ring animation */}
+                            {participant.isSpeaking && (
+                              <motion.div
+                                className="absolute -inset-0.5 rounded-full border-2 border-green-500"
+                                animate={{ scale: [1, 1.15, 1], opacity: [1, 0.7, 1] }}
+                                transition={{ duration: 0.8, repeat: Infinity }}
+                              />
+                            )}
+                          </div>
+                          <span className="text-xs truncate flex-1">
                             {participant.user.displayName || participant.user.name}
                           </span>
                           {participant.isStreaming && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-medium">AO VIVO</span>
                           )}
+                          {/* Mute icon */}
                           {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
+                          {/* Deafen icon */}
+                          {participant.isDeafened && <HeadphoneOff className="w-3 h-3 text-red-400" />}
                         </div>
                       ))}
                     </div>
@@ -624,7 +638,16 @@ export default function ConnectPage() {
   }
 
   return (
-    <div className={`min-h-screen font-sans relative ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}>
+    <div 
+      className={`min-h-screen font-sans relative ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}
+      style={{
+        background: theme === 'dark' 
+          ? `linear-gradient(180deg, ${accentColor}08 0%, transparent 30%), 
+             linear-gradient(90deg, ${accentColor}05 0%, transparent 50%), 
+             #18181b`
+          : undefined
+      }}
+    >
       <Header />
       
       {/* Mobile Navigation Header */}
@@ -663,7 +686,7 @@ export default function ConnectPage() {
         </button>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay - starts below header */}
       <AnimatePresence>
         {showMobileSidebar && (
           <>
@@ -671,7 +694,7 @@ export default function ConnectPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="md:hidden fixed inset-0 bg-black/50 z-40"
+              className="md:hidden fixed inset-0 top-16 bg-black/50 z-40"
               onClick={() => setShowMobileSidebar(false)}
             />
             <motion.div
@@ -679,7 +702,7 @@ export default function ConnectPage() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className={`md:hidden fixed left-0 top-0 bottom-0 w-80 max-w-[85vw] z-50 ${themeSidebar} flex flex-col`}
+              className={`md:hidden fixed left-0 top-16 bottom-0 w-80 max-w-[85vw] z-50 ${themeSidebar} flex flex-col`}
             >
               {/* Mobile Sidebar Header */}
               <div className={`p-4 border-b ${themeBorder} flex items-center justify-between safe-area-top`}>
@@ -813,6 +836,7 @@ export default function ConnectPage() {
               textChannel={selectedTextChannel}
               theme={theme}
               isMGT={isMGT}
+              accentColor={accentColor}
               onRefresh={fetchGroups}
               onMembersClick={() => setShowMembersDrawer(true)}
             />
@@ -1019,14 +1043,14 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
 
-      {/* Members Drawer (Mobile) */}
+      {/* Members Drawer (Mobile) - starts below header */}
       <AnimatePresence>
         {showMembersDrawer && selectedGroup && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 lg:hidden"
+            className="fixed inset-0 top-16 z-40 lg:hidden"
             onClick={() => setShowMembersDrawer(false)}
           >
             <div className="absolute inset-0 bg-black/60" />
@@ -1108,7 +1132,7 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
 
-      {/* Group Settings Modal */}
+      {/* Group Settings Modal - Connect Style */}
       <AnimatePresence>
         {showGroupSettings && selectedGroup && (
           <motion.div
@@ -1123,30 +1147,41 @@ export default function ConnectPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className={`w-full max-w-sm rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+              className={`w-full max-w-md rounded-2xl overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+              style={{
+                background: theme === 'dark' 
+                  ? `linear-gradient(180deg, ${accentColor}10 0%, transparent 30%), #18181b`
+                  : undefined
+              }}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className={`text-lg font-bold ${themeText}`}>Configurações do Grupo</h3>
+              {/* Header with gradient */}
+              <div 
+                className="h-24 relative"
+                style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)` }}
+              >
                 <button
                   onClick={() => setShowGroupSettings(false)}
-                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                  className="absolute top-3 right-3 p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-
-              {/* Avatar Upload */}
-              <div className="flex flex-col items-center mb-6">
-                <div className="relative group">
+              
+              {/* Avatar overlapping header */}
+              <div className="px-6 -mt-12">
+                <div className="relative group inline-block">
                   {selectedGroup.avatarUrl ? (
                     <img
                       src={selectedGroup.avatarUrl}
-                      className="w-24 h-24 rounded-full object-cover"
+                      className="w-24 h-24 rounded-2xl object-cover border-4 border-zinc-900"
                       alt={selectedGroup.name}
                     />
                   ) : (
-                    <div className={`w-24 h-24 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
-                      <span className={`text-3xl font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                    <div 
+                      className="w-24 h-24 rounded-2xl flex items-center justify-center border-4 border-zinc-900"
+                      style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)` }}
+                    >
+                      <span className="text-3xl font-bold text-white">
                         {selectedGroup.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -1154,46 +1189,98 @@ export default function ConnectPage() {
                   <button
                     onClick={() => avatarInputRef.current?.click()}
                     disabled={uploadingAvatar}
-                    className={`absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity ${uploadingAvatar ? 'cursor-wait' : 'cursor-pointer'}`}
+                    className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    {uploadingAvatar ? (
-                      <Loader size="sm" />
-                    ) : (
-                      <Camera className="w-8 h-8 text-white" />
-                    )}
+                    {uploadingAvatar ? <Loader size="sm" /> : <Camera className="w-8 h-8 text-white" />}
                   </button>
                 </div>
-                <p className={`mt-2 text-sm ${themeSecondary}`}>Clique para alterar a foto</p>
               </div>
 
-              {/* Group Name */}
-              <div className="mb-4">
-                <label className={`text-sm ${themeSecondary} mb-1 block`}>Nome do grupo</label>
-                <p className={`${themeText} font-medium`}>{selectedGroup.name}</p>
-              </div>
+              <div className="p-6 pt-4">
+                {/* Group Info */}
+                <h2 className={`text-xl font-bold ${themeText} mb-1`}>{selectedGroup.name}</h2>
+                {selectedGroup.description && (
+                  <p className={`text-sm ${themeSecondary} mb-4`}>{selectedGroup.description}</p>
+                )}
 
-              {/* Group Stats */}
-              <div className={`p-4 rounded-xl mb-4 ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'}`}>
-                <div className="flex justify-between text-sm">
-                  <span className={themeSecondary}>Membros</span>
-                  <span className={themeText}>{selectedGroup.members.length}</span>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div 
+                    className="p-3 rounded-xl text-center"
+                    style={{ background: `${accentColor}15` }}
+                  >
+                    <p className="text-lg font-bold" style={{ color: accentColor }}>{selectedGroup.members.length}</p>
+                    <p className={`text-xs ${themeSecondary}`}>Membros</p>
+                  </div>
+                  <div 
+                    className="p-3 rounded-xl text-center"
+                    style={{ background: `${accentColor}15` }}
+                  >
+                    <p className="text-lg font-bold" style={{ color: accentColor }}>{selectedGroup.voiceChannels.length}</p>
+                    <p className={`text-xs ${themeSecondary}`}>Voz</p>
+                  </div>
+                  <div 
+                    className="p-3 rounded-xl text-center"
+                    style={{ background: `${accentColor}15` }}
+                  >
+                    <p className="text-lg font-bold" style={{ color: accentColor }}>{selectedGroup.textChannels?.length || 1}</p>
+                    <p className={`text-xs ${themeSecondary}`}>Texto</p>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm mt-2">
-                  <span className={themeSecondary}>Canais de voz</span>
-                  <span className={themeText}>{selectedGroup.voiceChannels.length}</span>
-                </div>
-              </div>
 
-              <button
-                onClick={() => setShowGroupSettings(false)}
-                className={`w-full px-4 py-3 rounded-xl font-medium ${
-                  isMGT 
-                    ? 'bg-tier-std text-white hover:bg-tier-std-600' 
-                    : 'bg-gold-500 text-black hover:bg-gold-600'
-                }`}
-              >
-                Fechar
-              </button>
+                {/* Actions */}
+                <div className="space-y-2">
+                  <button
+                    onClick={() => handleOpenAddChannel(selectedGroup.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${themeHover} transition-colors`}
+                  >
+                    <Plus className={`w-5 h-5 ${themeSecondary}`} />
+                    <span className={themeText}>Adicionar Canal</span>
+                    <ChevronRight className={`w-4 h-4 ml-auto ${themeSecondary}`} />
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowGroupSettings(false);
+                      setShowMembersDrawer(true);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${themeHover} transition-colors`}
+                  >
+                    <Users className={`w-5 h-5 ${themeSecondary}`} />
+                    <span className={themeText}>Gerenciar Membros</span>
+                    <ChevronRight className={`w-4 h-4 ml-auto ${themeSecondary}`} />
+                  </button>
+                </div>
+
+                {/* Privacy Badge */}
+                <div className={`mt-4 p-3 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800/50'}`}>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{ background: `${accentColor}20` }}
+                    >
+                      <Radio className="w-4 h-4" style={{ color: accentColor }} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${themeText}`}>
+                        {selectedGroup.isPrivate ? 'Grupo Privado' : 'Grupo Público'}
+                      </p>
+                      <p className={`text-xs ${themeSecondary}`}>
+                        {selectedGroup.membershipType === 'MGT' ? 'Exclusivo MGT' : 'Magazine'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowGroupSettings(false)}
+                  className="w-full mt-4 px-4 py-3 rounded-xl font-medium text-white transition-all hover:opacity-90"
+                  style={{ background: accentColor }}
+                >
+                  Fechar
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Send, Users, Settings, Hash, Smile, Reply,
+  Send, Settings, Hash, Smile, Reply,
   Trash2, X, Plus
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -79,15 +79,16 @@ interface ConnectGroupChatProps {
   textChannel?: TextChannel | null;
   theme: 'light' | 'dark';
   isMGT: boolean;
+  accentColor?: string;
   onRefresh: () => void;
   onMembersClick?: () => void;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🔥', '💯'];
 
-export default function ConnectGroupChat({ group, textChannel, theme, isMGT, onMembersClick }: ConnectGroupChatProps) {
+export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor, onMembersClick }: ConnectGroupChatProps) {
   const navigate = useNavigate();
-  const { user, showToast, showError } = useAuth();
+  const { user, showToast, showError, accentColor: authAccent } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -100,7 +101,8 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, onM
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const themeBg = theme === 'light' ? 'bg-white' : 'bg-zinc-900';
+  const activeAccent = accentColor || authAccent || '#10b981';
+  const themeBg = theme === 'light' ? 'bg-white' : 'bg-transparent';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
@@ -228,13 +230,6 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, onM
             <p className={`text-xs ${themeSecondary} truncate`}>{textChannel?.description || group.description}</p>
           )}
         </div>
-        <button 
-          onClick={onMembersClick}
-          className={`p-2 ${themeHover} rounded-lg ${themeSecondary} lg:hidden`}
-          title="Ver membros"
-        >
-          <Users className="w-5 h-5" />
-        </button>
         {textChannel?.isNSFW && (
           <span className="text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-medium">
             18+

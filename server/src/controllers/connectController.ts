@@ -345,6 +345,15 @@ export const getConnectGroups = async (req: Request, res: Response) => {
             },
           },
         },
+        textChannels: {
+          orderBy: [
+            { isDefault: 'desc' },
+            { position: 'asc' },
+          ],
+          include: {
+            _count: { select: { messages: true } },
+          },
+        },
         _count: {
           select: { messages: true, members: true },
         },
@@ -416,12 +425,13 @@ export const updateGroupAvatar = async (req: Request, res: Response) => {
 };
 
 // ============================================
-// TEXT CHANNELS (Placeholder for future implementation)
+// TEXT CHANNELS
 // ============================================
 
 const createTextChannelSchema = z.object({
   name: z.string().min(1).max(50),
   description: z.string().max(200).optional(),
+  isNSFW: z.boolean().optional(),
 });
 
 export const createTextChannel = async (req: Request, res: Response) => {
@@ -435,6 +445,8 @@ export const createTextChannel = async (req: Request, res: Response) => {
       return res.status(400).json({ error: validation.error.issues });
     }
 
+    const { name, description, isNSFW } = validation.data;
+
     // Check if user is admin of the group
     const member = await prisma.groupMember.findUnique({
       where: { groupId_userId: { groupId, userId } },
@@ -444,19 +456,136 @@ export const createTextChannel = async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Apenas admins e moderadores podem criar canais' });
     }
 
-    // For now, text channels use the same VoiceChannel model with a flag
-    // In a future migration, we can create a dedicated TextChannel model
-    // For MVP, we'll just create a "voice channel" that acts as text channel
-    // The client will differentiate based on how it's used
-    
-    // TODO: Create proper TextChannel model in future migration
-    // For now, return a placeholder response
-    res.status(501).json({ 
-      error: 'Text channels coming soon', 
-      message: 'Use the default text channel for now. Multiple text channels will be available in a future update.' 
+    // Get max position for ordering
+    const maxPosition = await prisma.textChannel.aggregate({
+      where: { groupId },
+      _max: { position: true },
     });
+
+    // Create text channel
+    const channel = await prisma.textChannel.create({
+      data: {
+        groupId,
+        name,
+        description,
+        isNSFW: isNSFW || false,
+        position: (maxPosition._max.position || 0) + 1,
+      },
+      include: {
+        _count: { select: { messages: true } },
+      },
+    });
+
+    res.status(201).json(channel);
   } catch (error) {
     console.error('Error creating text channel:', error);
     res.status(500).json({ error: 'Erro ao criar canal de texto' });
+  }
+};
+
+export const getTextChannels = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId } = req.params;
+
+    // Check if user is member of the group
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    const channels = await prisma.textChannel.findMany({
+      where: { groupId },
+      include: {
+        _count: { select: { messages: true } },
+      },
+      orderBy: [
+        { isDefault: 'desc' },
+        { position: 'asc' },
+        { createdAt: 'asc' },
+      ],
+    });
+
+    res.json(channels);
+  } catch (error) {
+    console.error('Error fetching text channels:', error);
+    res.status(500).json({ error: 'Erro ao buscar canais de texto' });
+  }
+};
+
+export const updateTextChannel = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId, channelId } = req.params;
+
+    const validation = createTextChannelSchema.partial().safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
+    }
+
+    // Check if user is admin
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member || !['ADMIN', 'MODERATOR'].includes(member.role)) {
+      return res.status(403).json({ error: 'Sem permissão' });
+    }
+
+    // Check if trying to edit default channel
+    const existingChannel = await prisma.textChannel.findUnique({
+      where: { id: channelId },
+    });
+
+    if (existingChannel?.isDefault) {
+      return res.status(400).json({ error: 'Não é possível editar o canal padrão' });
+    }
+
+    const channel = await prisma.textChannel.update({
+      where: { id: channelId },
+      data: validation.data,
+    });
+
+    res.json(channel);
+  } catch (error) {
+    console.error('Error updating text channel:', error);
+    res.status(500).json({ error: 'Erro ao atualizar canal de texto' });
+  }
+};
+
+export const deleteTextChannel = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId, channelId } = req.params;
+
+    // Check if user is admin
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member || member.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Apenas admins podem deletar canais' });
+    }
+
+    // Check if trying to delete default channel
+    const channel = await prisma.textChannel.findUnique({
+      where: { id: channelId },
+    });
+
+    if (channel?.isDefault) {
+      return res.status(400).json({ error: 'Não é possível deletar o canal padrão' });
+    }
+
+    await prisma.textChannel.delete({
+      where: { id: channelId },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting text channel:', error);
+    res.status(500).json({ error: 'Erro ao deletar canal de texto' });
   }
 };

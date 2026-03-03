@@ -691,6 +691,7 @@ model Group {
   messages       GroupMessage[]
   settings       GroupSettings?
   voiceChannels  VoiceChannel[]
+  textChannels   TextChannel[]
 
   @@index([creatorId])
   @@index([membershipType])
@@ -718,19 +719,21 @@ model GroupMember {
 }
 
 model GroupMessage {
-  id        String      @id @default(uuid())
-  groupId   String
-  senderId  String
-  content   String
-  imageUrl  String?
-  type      MessageType @default(TEXT)
-  createdAt DateTime    @default(now())
-  editedAt  DateTime?
-  deletedAt DateTime?
-  isNSFW    Boolean     @default(false)
-  replyToId String?
-  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  sender    User        @relation("UserGroupMessages", fields: [senderId], references: [id])
+  id            String      @id @default(uuid())
+  groupId       String
+  senderId      String
+  content       String
+  imageUrl      String?
+  type          MessageType @default(TEXT)
+  createdAt     DateTime    @default(now())
+  editedAt      DateTime?
+  deletedAt     DateTime?
+  isNSFW        Boolean     @default(false)
+  replyToId     String?
+  textChannelId String?     // Null = canal "geral" padrão
+  group         Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender        User        @relation("UserGroupMessages", fields: [senderId], references: [id])
+  textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
   readBy    GroupMessageRead[]
   reactions GroupMessageReaction[]
   replyTo   GroupMessage?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
@@ -740,6 +743,7 @@ model GroupMessage {
   @@index([senderId])
   @@index([createdAt])
   @@index([replyToId])
+  @@index([textChannelId])
 }
 
 model GroupMessageReaction {
@@ -1641,6 +1645,25 @@ model VoiceParticipant {
   @@unique([channelId, userId])
   @@index([userId])
   @@index([channelId])
+}
+
+model TextChannel {
+  id          String    @id @default(uuid())
+  groupId     String
+  name        String
+  description String?
+  position    Int       @default(0)  // Ordem de exibição
+  isDefault   Boolean   @default(false)
+  slowmode    Int       @default(0)  // Segundos entre mensagens (0 = desativado)
+  isNSFW      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  messages    GroupMessage[]
+  
+  @@index([groupId])
+  @@index([position])
 }
 
 // ============================================

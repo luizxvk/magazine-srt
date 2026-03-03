@@ -66,8 +66,17 @@ interface ConnectGroup {
   members: GroupMember[];
 }
 
+interface TextChannel {
+  id: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  isNSFW: boolean;
+}
+
 interface ConnectGroupChatProps {
   group: ConnectGroup;
+  textChannel?: TextChannel | null;
   theme: 'light' | 'dark';
   isMGT: boolean;
   onRefresh: () => void;
@@ -76,7 +85,7 @@ interface ConnectGroupChatProps {
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🔥', '💯'];
 
-export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }: ConnectGroupChatProps) {
+export default function ConnectGroupChat({ group, textChannel, theme, isMGT, onMembersClick }: ConnectGroupChatProps) {
   const navigate = useNavigate();
   const { user, showToast, showError } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -104,7 +113,7 @@ export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }
 
   useEffect(() => {
     fetchMessages();
-  }, [group.id]);
+  }, [group.id, textChannel?.id]);
 
   useEffect(() => {
     scrollToBottom();
@@ -114,7 +123,11 @@ export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }
     try {
       if (pageNum === 1) setLoading(true);
       const response = await api.get(`/groups/${group.id}/messages`, {
-        params: { page: pageNum, limit: 50 }
+        params: { 
+          page: pageNum, 
+          limit: 50,
+          textChannelId: textChannel?.id || null // null = canal "geral" padrão
+        }
       });
       
       if (pageNum === 1) {
@@ -144,7 +157,8 @@ export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }
       setSending(true);
       const response = await api.post(`/groups/${group.id}/messages`, {
         content: messageText.trim(),
-        replyToId: replyingTo?.id
+        replyToId: replyingTo?.id,
+        textChannelId: textChannel?.id || null
       });
       
       setMessages([...messages, response.data]);
@@ -209,9 +223,9 @@ export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }
       <div className={`h-14 px-4 flex items-center gap-3 border-b ${themeBorder} ${themeBg}`}>
         <Hash className={`w-5 h-5 ${themeSecondary}`} />
         <div className="flex-1">
-          <h2 className={`font-semibold ${themeText}`}>geral</h2>
-          {group.description && (
-            <p className={`text-xs ${themeSecondary} truncate`}>{group.description}</p>
+          <h2 className={`font-semibold ${themeText}`}>{textChannel?.name || 'geral'}</h2>
+          {(textChannel?.description || group.description) && (
+            <p className={`text-xs ${themeSecondary} truncate`}>{textChannel?.description || group.description}</p>
           )}
         </div>
         <button 
@@ -221,6 +235,11 @@ export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }
         >
           <Users className="w-5 h-5" />
         </button>
+        {textChannel?.isNSFW && (
+          <span className="text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-medium">
+            18+
+          </span>
+        )}
         {isAdmin && (
           <button 
             onClick={() => navigate(`/groups/${group.id}`)}
@@ -448,7 +467,7 @@ export default function ConnectGroupChat({ group, theme, isMGT, onMembersClick }
             type="text"
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
-            placeholder={`Mensagem #geral`}
+            placeholder={`Mensagem #${textChannel?.name || 'geral'}`}
             className={`flex-1 bg-transparent outline-none ${themeText} placeholder:${themeSecondary}`}
           />
 

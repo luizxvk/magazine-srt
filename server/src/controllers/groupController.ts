@@ -340,7 +340,7 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
-    const { content, imageUrl, type, replyToId } = req.body;
+    const { content, imageUrl, type, replyToId, textChannelId } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
@@ -431,6 +431,7 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
         imageUrl,
         type: type || MessageType.TEXT,
         replyToId: replyToId || null,
+        textChannelId: textChannelId || null, // null = canal "geral" padrão
       },
       include: {
         sender: {
@@ -525,7 +526,7 @@ export const getGroupMessages = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
-    const { limit = 50, before, after } = req.query;
+    const { limit = 50, before, after, textChannelId } = req.query;
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
@@ -561,6 +562,8 @@ export const getGroupMessages = async (req: AuthRequest, res: Response) => {
       where: {
         groupId: id,
         deletedAt: null,
+        // Filtro por canal de texto: null = canal padrão, string = canal específico
+        textChannelId: textChannelId === 'null' || !textChannelId ? null : (textChannelId as string),
         ...(before && {
           createdAt: {
             lt: new Date(before as string),

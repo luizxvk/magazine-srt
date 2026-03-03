@@ -54,6 +54,18 @@ interface GroupMember {
   };
 }
 
+interface TextChannel {
+  id: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  isNSFW: boolean;
+  position: number;
+  _count?: {
+    messages: number;
+  };
+}
+
 interface ConnectGroup {
   id: string;
   name: string;
@@ -70,7 +82,7 @@ interface ConnectGroup {
   };
   members: GroupMember[];
   voiceChannels: VoiceChannel[];
-  textChannels?: { id: string; name: string; description?: string }[];
+  textChannels: TextChannel[];
   _count: {
     messages: number;
     members: number;
@@ -112,6 +124,9 @@ export default function ConnectPage() {
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [mobileView, setMobileView] = useState<'sidebar' | 'chat' | 'members'>('sidebar');
+  
+  // Text channel state
+  const [selectedTextChannel, setSelectedTextChannel] = useState<TextChannel | null>(null);
   
   // Voice state
   const [currentVoice, setCurrentVoice] = useState<CurrentVoice | null>(null);
@@ -400,6 +415,16 @@ export default function ConnectPage() {
 
   const handleSelectGroup = (group: ConnectGroup) => {
     setSelectedGroup(group);
+    // Seleciona o canal de texto padrão ou o primeiro canal
+    const defaultChannel = group.textChannels?.find(c => c.isDefault) || group.textChannels?.[0] || null;
+    setSelectedTextChannel(defaultChannel);
+    navigate(`/connect/${group.id}`);
+    setShowMobileSidebar(false);
+  };
+
+  const handleSelectTextChannel = (channel: TextChannel, group: ConnectGroup) => {
+    setSelectedGroup(group);
+    setSelectedTextChannel(channel);
     navigate(`/connect/${group.id}`);
     setShowMobileSidebar(false);
   };
@@ -475,16 +500,37 @@ export default function ConnectPage() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              {/* Text Channel */}
-              <button
-                onClick={() => handleSelectGroup(group)}
-                className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
-                  selectedGroup?.id === group.id ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') : themeSecondary
-                }`}
-              >
-                <Hash className="w-4 h-4" />
-                <span className="text-sm">geral</span>
-              </button>
+              {/* Text Channels */}
+              {group.textChannels && group.textChannels.length > 0 ? (
+                group.textChannels.map(channel => (
+                  <button
+                    key={channel.id}
+                    onClick={() => handleSelectTextChannel(channel, group)}
+                    className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
+                      selectedGroup?.id === group.id && selectedTextChannel?.id === channel.id 
+                        ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') 
+                        : themeSecondary
+                    }`}
+                  >
+                    <Hash className="w-4 h-4" />
+                    <span className="text-sm flex-1 text-left truncate">{channel.name}</span>
+                    {channel.isNSFW && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">18+</span>
+                    )}
+                  </button>
+                ))
+              ) : (
+                // Fallback: canal "geral" padrão se não houver canais de texto
+                <button
+                  onClick={() => handleSelectGroup(group)}
+                  className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
+                    selectedGroup?.id === group.id ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') : themeSecondary
+                  }`}
+                >
+                  <Hash className="w-4 h-4" />
+                  <span className="text-sm">geral</span>
+                </button>
+              )}
 
               {/* Voice Channels */}
               {group.voiceChannels.map(channel => (
@@ -744,6 +790,7 @@ export default function ConnectPage() {
           {selectedGroup ? (
             <ConnectGroupChat 
               group={selectedGroup} 
+              textChannel={selectedTextChannel}
               theme={theme}
               isMGT={isMGT}
               onRefresh={fetchGroups}

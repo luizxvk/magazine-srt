@@ -12,6 +12,9 @@ import {
   getConnectGroups,
   updateGroupAvatar,
   createTextChannel,
+  getTextChannels,
+  updateTextChannel,
+  deleteTextChannel,
 } from '../controllers/connectController';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { validateImageContent } from '../middleware/fileValidationMiddleware';
@@ -78,10 +81,19 @@ router.post('/groups/:groupId/voice/:channelId/join', joinVoiceChannel);
 router.patch('/groups/:groupId/avatar', upload.single('avatar'), validateImageContent, updateGroupAvatar);
 
 // ============================================
-// TEXT CHANNELS (Coming soon)
+// TEXT CHANNELS
 // ============================================
+
+// Get text channels for a group
+router.get('/groups/:groupId/text', getTextChannels);
 
 // Create text channel in a group
 router.post('/groups/:groupId/text', createTextChannel);
+
+// Update text channel
+router.patch('/groups/:groupId/text/:channelId', updateTextChannel);
+
+// Delete text channel
+router.delete('/groups/:groupId/text/:channelId', deleteTextChannel);
 
 export default router;

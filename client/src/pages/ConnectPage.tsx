@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, Plus, Volume2, MicOff,
+  Users, Plus, Volume2, MicOff, Menu, ArrowLeft,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
   Camera, MessageSquare
 } from 'lucide-react';
@@ -109,6 +109,10 @@ export default function ConnectPage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   
+  // Mobile state
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [mobileView, setMobileView] = useState<'sidebar' | 'chat' | 'members'>('sidebar');
+  
   // Voice state
   const [currentVoice, setCurrentVoice] = useState<CurrentVoice | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -163,9 +167,11 @@ export default function ConnectPage() {
     }
   }, [groupId, groups]);
 
-  const fetchGroups = async () => {
+  const fetchGroups = async (showLoader = true) => {
     try {
-      setLoading(true);
+      if (showLoader && groups.length === 0) {
+        setLoading(true);
+      }
       const response = await api.get('/connect/groups');
       setGroups(response.data);
       
@@ -228,7 +234,7 @@ export default function ConnectPage() {
       await webrtc.startAudio();
       
       showToast('Conectado ao canal de voz');
-      fetchGroups(); // Refresh to show updated participants
+      fetchGroups(false); // Refresh without loading spinner
     } catch (error: any) {
       showError(error.response?.data?.error || 'Erro ao conectar');
     }
@@ -250,7 +256,7 @@ export default function ConnectPage() {
       setIsMuted(false);
       setIsDeafened(false);
       showToast('Desconectado do canal de voz');
-      fetchGroups();
+      fetchGroups(false);
     } catch (error) {
       console.error('Error leaving voice:', error);
     }
@@ -356,7 +362,7 @@ export default function ConnectPage() {
       }
       setShowAddChannelModal(false);
       setNewChannelName('');
-      fetchGroups();
+      fetchGroups(false);
     } catch (error: any) {
       showError(error.response?.data?.error || 'Erro ao criar canal');
     }
@@ -392,6 +398,152 @@ export default function ConnectPage() {
     return members.filter(m => m.user.isOnline);
   };
 
+  const handleSelectGroup = (group: ConnectGroup) => {
+    setSelectedGroup(group);
+    navigate(`/connect/${group.id}`);
+    setShowMobileSidebar(false);
+  };
+
+  // Render groups list (used in both desktop and mobile)
+  const renderGroupsList = () => {
+    if (groups.length === 0) {
+      return (
+        <div className={`px-4 py-8 text-center ${themeSecondary}`}>
+          <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p className="text-sm">Nenhum grupo ainda</p>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className={`mt-3 text-sm hover:underline ${isMGT ? 'text-tier-std' : 'text-gold-500'}`}
+          >
+            Criar seu primeiro grupo
+          </button>
+        </div>
+      );
+    }
+
+    return groups.map(group => (
+      <div key={group.id} className="px-2 mb-1 group/item">
+        {/* Group Header */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => toggleGroupExpand(group.id)}
+            className={`flex-1 flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
+          >
+            {group.avatarUrl ? (
+              <img 
+                src={group.avatarUrl} 
+                className="w-8 h-8 rounded-full object-cover"
+                alt={group.name}
+              />
+            ) : (
+              <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                  {group.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+            <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
+              {group.name}
+            </span>
+            {expandedGroups.has(group.id) ? (
+              <ChevronDown className={`w-4 h-4 ${themeSecondary}`} />
+            ) : (
+              <ChevronRight className={`w-4 h-4 ${themeSecondary}`} />
+            )}
+          </button>
+          {/* Settings button */}
+          {group.creator.id === user?.id && (
+            <button
+              onClick={() => {
+                setSelectedGroup(group);
+                setShowGroupSettings(true);
+              }}
+              className={`p-2 rounded-lg ${themeHover} ${themeSecondary} md:opacity-0 md:group-hover/item:opacity-100 transition-opacity`}
+              title="Configurações"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Channels */}
+        <AnimatePresence>
+          {expandedGroups.has(group.id) && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              {/* Text Channel */}
+              <button
+                onClick={() => handleSelectGroup(group)}
+                className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
+                  selectedGroup?.id === group.id ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') : themeSecondary
+                }`}
+              >
+                <Hash className="w-4 h-4" />
+                <span className="text-sm">geral</span>
+              </button>
+
+              {/* Voice Channels */}
+              {group.voiceChannels.map(channel => (
+                <div key={channel.id}>
+                  <button
+                    onClick={() => handleJoinVoice(group.id, channel.id)}
+                    disabled={channel.isLocked}
+                    className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} ${
+                      currentVoice?.channelId === channel.id ? 'bg-green-500/10 text-green-500' : ''
+                    } ${channel.isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    <span className="text-sm flex-1 text-left">{channel.name}</span>
+                    <span className="text-xs opacity-60">
+                      {channel.participants.length}/{channel.maxUsers}
+                    </span>
+                  </button>
+                  
+                  {/* Voice Participants */}
+                  {channel.participants.length > 0 && (
+                    <div className="pl-8 py-1 space-y-1">
+                      {channel.participants.map(participant => (
+                        <div 
+                          key={participant.id}
+                          className={`flex items-center gap-2 px-2 py-1 rounded ${themeSecondary}`}
+                        >
+                          <img
+                            src={participant.user.avatarUrl || '/assets/default-avatar.png'}
+                            className={`w-5 h-5 rounded-full ${participant.isSpeaking ? 'ring-2 ring-green-500' : ''}`}
+                            alt=""
+                          />
+                          <span className="text-xs truncate">
+                            {participant.user.displayName || participant.user.name}
+                          </span>
+                          {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Add Voice Channel (Admin only) */}
+              {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
+                <button
+                  onClick={() => handleOpenAddChannel(group.id)}
+                  className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} opacity-60 hover:opacity-100`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-xs">Adicionar canal</span>
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    ));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen text-white font-sans relative">
@@ -408,9 +560,130 @@ export default function ConnectPage() {
     <div className={`min-h-screen font-sans relative ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}>
       <Header />
       
-      <div className="flex h-[calc(100vh-64px)] pt-16">
-        {/* Left Sidebar - Groups & Channels */}
-        <div className={`w-64 ${themeSidebar} border-r ${themeBorder} flex flex-col`}>
+      {/* Mobile Navigation Header */}
+      <div className={`md:hidden fixed top-16 left-0 right-0 z-30 ${themeSidebar} border-b ${themeBorder} px-4 py-3 flex items-center justify-between`}>
+        <button
+          onClick={() => {
+            setShowMobileSidebar(true);
+            setMobileView('sidebar');
+          }}
+          className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="flex items-center gap-2">
+          {selectedGroup && (
+            <>
+              {selectedGroup.avatarUrl ? (
+                <img src={selectedGroup.avatarUrl} className="w-6 h-6 rounded-full" alt="" />
+              ) : (
+                <div className={`w-6 h-6 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                  <span className={`text-xs font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                    {selectedGroup.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              <span className={`font-medium truncate max-w-[150px] ${themeText}`}>
+                {selectedGroup.name}
+              </span>
+            </>
+          )}
+        </div>
+        <button
+          onClick={() => setShowMembersDrawer(true)}
+          className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+        >
+          <Users className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {showMobileSidebar && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="md:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setShowMobileSidebar(false)}
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className={`md:hidden fixed left-0 top-0 bottom-0 w-80 max-w-[85vw] z-50 ${themeSidebar} flex flex-col`}
+            >
+              {/* Mobile Sidebar Header */}
+              <div className={`p-4 border-b ${themeBorder} flex items-center justify-between safe-area-top`}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
+                    <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
+                  </div>
+                  <span className={`font-bold ${themeText}`}>Connect</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setShowMobileSidebar(false)}
+                    className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Groups List */}
+              <div className="flex-1 overflow-y-auto py-2">
+                {renderGroupsList()}
+              </div>
+
+              {/* Mobile Voice Bar */}
+              {currentVoice && (
+                <VoiceChannelBar
+                  channel={currentVoice.channel}
+                  isMuted={isMuted}
+                  isDeafened={isDeafened}
+                  isScreenSharing={webrtc.isScreenSharing}
+                  onToggleMute={handleToggleMute}
+                  onToggleDeafen={handleToggleDeafen}
+                  onToggleScreenShare={handleToggleScreenShare}
+                  onDisconnect={handleLeaveVoice}
+                  theme={theme}
+                />
+              )}
+
+              {/* Mobile User Panel */}
+              <div className={`p-3 border-t ${themeBorder} flex items-center gap-2`}>
+                <img
+                  src={user?.avatarUrl || '/assets/default-avatar.png'}
+                  className="w-8 h-8 rounded-full"
+                  alt=""
+                />
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium truncate ${themeText}`}>
+                    {user?.displayName || user?.name}
+                  </p>
+                  <p className="text-xs text-green-500">Online</p>
+                </div>
+                <button className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}>
+                  <Settings className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+      
+      <div className="flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16">
+        {/* Left Sidebar - Groups & Channels (Desktop only) */}
+        <div className={`hidden md:flex w-64 ${themeSidebar} border-r ${themeBorder} flex-col`}>
           {/* Header */}
           <div className={`p-4 border-b ${themeBorder} flex items-center justify-between`}>
             <div className="flex items-center gap-2">
@@ -429,143 +702,7 @@ export default function ConnectPage() {
 
           {/* Groups List */}
           <div className="flex-1 overflow-y-auto py-2">
-            {groups.length === 0 ? (
-              <div className={`px-4 py-8 text-center ${themeSecondary}`}>
-                <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">Nenhum grupo ainda</p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className={`mt-3 text-sm hover:underline ${isMGT ? 'text-tier-std' : 'text-gold-500'}`}
-                >
-                  Criar seu primeiro grupo
-                </button>
-              </div>
-            ) : (
-              groups.map(group => (
-                <div key={group.id} className="px-2 mb-1 group/item">
-                  {/* Group Header */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => toggleGroupExpand(group.id)}
-                      className={`flex-1 flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
-                    >
-                      {group.avatarUrl ? (
-                        <img 
-                          src={group.avatarUrl} 
-                          className="w-8 h-8 rounded-full object-cover"
-                          alt={group.name}
-                        />
-                      ) : (
-                        <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
-                          <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
-                            {group.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
-                        {group.name}
-                      </span>
-                      {expandedGroups.has(group.id) ? (
-                        <ChevronDown className={`w-4 h-4 ${themeSecondary}`} />
-                      ) : (
-                        <ChevronRight className={`w-4 h-4 ${themeSecondary}`} />
-                      )}
-                    </button>
-                    {/* Settings button */}
-                    {group.creator.id === user?.id && (
-                      <button
-                        onClick={() => {
-                          setSelectedGroup(group);
-                          setShowGroupSettings(true);
-                        }}
-                        className={`p-2 rounded-lg ${themeHover} ${themeSecondary} opacity-0 group-hover/item:opacity-100 transition-opacity`}
-                        title="Configurações"
-                      >
-                        <Settings className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Channels */}
-                  <AnimatePresence>
-                    {expandedGroups.has(group.id) && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        {/* Text Channel */}
-                        <button
-                          onClick={() => {
-                            setSelectedGroup(group);
-                            navigate(`/connect/${group.id}`);
-                          }}
-                          className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${
-                            selectedGroup?.id === group.id ? (isMGT ? 'bg-tier-std-500/10 text-tier-std-500' : 'bg-gold-500/10 text-gold-500') : themeSecondary
-                          }`}
-                        >
-                          <Hash className="w-4 h-4" />
-                          <span className="text-sm">geral</span>
-                        </button>
-
-                        {/* Voice Channels */}
-                        {group.voiceChannels.map(channel => (
-                          <div key={channel.id}>
-                            <button
-                              onClick={() => handleJoinVoice(group.id, channel.id)}
-                              disabled={channel.isLocked}
-                              className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} ${
-                                currentVoice?.channelId === channel.id ? 'bg-green-500/10 text-green-500' : ''
-                              } ${channel.isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                              <Volume2 className="w-4 h-4" />
-                              <span className="text-sm flex-1 text-left">{channel.name}</span>
-                              <span className="text-xs opacity-60">
-                                {channel.participants.length}/{channel.maxUsers}
-                              </span>
-                            </button>
-                            
-                            {/* Voice Participants */}
-                            {channel.participants.length > 0 && (
-                              <div className="pl-8 py-1 space-y-1">
-                                {channel.participants.map(participant => (
-                                  <div 
-                                    key={participant.id}
-                                    className={`flex items-center gap-2 px-2 py-1 rounded ${themeSecondary}`}
-                                  >
-                                    <img
-                                      src={participant.user.avatarUrl || '/assets/default-avatar.png'}
-                                      className={`w-5 h-5 rounded-full ${participant.isSpeaking ? 'ring-2 ring-green-500' : ''}`}
-                                      alt=""
-                                    />
-                                    <span className="text-xs truncate">
-                                      {participant.user.displayName || participant.user.name}
-                                    </span>
-                                    {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-
-                        {/* Add Voice Channel (Admin only) */}
-                        {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
-                          <button
-                            onClick={() => handleOpenAddChannel(group.id)}
-                            className={`w-full flex items-center gap-2 px-4 py-1.5 ${themeHover} rounded-md transition-colors ${themeSecondary} opacity-60 hover:opacity-100`}
-                          >
-                            <Plus className="w-4 h-4" />
-                            <span className="text-xs">Adicionar canal</span>
-                          </button>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))
-            )}
+            {renderGroupsList()}
           </div>
 
           {/* Voice Controls (when in voice) */}
@@ -691,6 +828,23 @@ export default function ConnectPage() {
           </div>
         )}
       </div>
+
+      {/* Mobile Voice Bar (Fixed at bottom) */}
+      {currentVoice && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
+          <VoiceChannelBar
+            channel={currentVoice.channel}
+            isMuted={isMuted}
+            isDeafened={isDeafened}
+            isScreenSharing={webrtc.isScreenSharing}
+            onToggleMute={handleToggleMute}
+            onToggleDeafen={handleToggleDeafen}
+            onToggleScreenShare={handleToggleScreenShare}
+            onDisconnect={handleLeaveVoice}
+            theme={theme}
+          />
+        </div>
+      )}
 
       {/* Create Group Modal */}
       {showCreateModal && (

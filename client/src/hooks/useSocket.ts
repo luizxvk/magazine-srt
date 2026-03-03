@@ -76,18 +76,22 @@ export function useSocket(): UseSocketReturn {
     }
 
     // Connect to socket
+    // Note: Use polling first as Vercel serverless doesn't support WebSocket
+    // For full WebSocket support, deploy backend to Railway/Render/Fly.io
     const socket = io(SOCKET_URL, {
       auth: { token },
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Polling first for Vercel compatibility
+      upgrade: true, // Allow upgrade to websocket if available
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000,
+      timeout: 10000,
     });
 
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('[Socket] Connected');
+      console.log('[Socket] Connected via', socket.io.engine.transport.name);
       setIsConnected(true);
     });
 
@@ -97,7 +101,10 @@ export function useSocket(): UseSocketReturn {
     });
 
     socket.on('connect_error', (error) => {
-      console.error('[Socket] Connection error:', error.message);
+      // Suppress common Vercel WebSocket errors - polling will work
+      if (!error.message.includes('websocket error')) {
+        console.warn('[Socket] Connection error:', error.message);
+      }
     });
 
     // Set up event listeners

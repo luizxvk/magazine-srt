@@ -38,6 +38,7 @@ import ElitePromoCard from '../components/ElitePromoCard';
 import WelcomeCard from '../components/WelcomeCard';
 import StatForgeCard from '../components/StatForgeCard';
 import RovexShieldMiniCard from '../components/RovexShieldMiniCard';
+import ConnectPromoCard from '../components/ConnectPromoCard';
 import { getOrderedVisibleCards } from '../components/FeedCardsCustomizer';
 
 interface PollOption {
@@ -445,6 +446,11 @@ export default function FeedPage() {
                             <div data-tutorial="create-post">
                                 <CreatePostCard onPostCreated={handlePostCreated} />
                             </div>
+                        </TimelineAnimation>
+
+                        {/* Rovex Connect Promo Card */}
+                        <TimelineAnimation animationNum={2}>
+                            <ConnectPromoCard />
                         </TimelineAnimation>
 
                         {/* Mobile Carousel - Quick Access Cards */}

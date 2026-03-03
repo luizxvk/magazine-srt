@@ -89,7 +89,7 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   tierVipName: 'MAGAZINE',
   tierVipColor: '#d4af37',
   tierVipSlogan: 'A Elite do Sucesso',
-  tierStdName: 'MGT',
+  tierStdName: 'ROVEX',
   tierStdSlogan: 'Velocidade e Poder',
   backgroundColor: '#8B5CF6',
   xpName: 'XP',

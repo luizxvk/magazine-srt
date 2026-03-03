@@ -304,7 +304,7 @@ router.get('/public/config', async (req: Request, res: Response) => {
       tierVipName: baseConfig.tierVipName || savedConfig?.tierVipName || 'MAGAZINE',
       tierVipColor: baseConfig.tierVipColor || savedConfig?.tierVipColor || '#d4af37',
       tierVipSlogan: baseConfig.tierVipSlogan || savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
-      tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'MGT',
+      tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'ROVEX',
       tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       
       // Logos - TENANT CONFIG tem prioridade!
@@ -502,8 +502,8 @@ router.post('/provision', async (req: Request, res: Response) => {
     const communityConfig = {
       id: communityId || subdomain || 'magazine-srt',
       subdomain: subdomain || 'magazine-srt',
-      name: name || communityName || 'Magazine MGT',
-      slogan: slogan || 'A comunidade definitiva de games e entretenimento',
+      name: name || communityName || 'Rovex Communities',
+      slogan: slogan || 'Sua comunidade gamificada',
       plan: plan || 'STARTER',
       
       // Branding
@@ -521,7 +521,7 @@ router.post('/provision', async (req: Request, res: Response) => {
       tierVipName: tierVipName || 'MAGAZINE',
       tierVipColor: tierVipColor || '#d4af37',
       tierVipSlogan: tierVipSlogan || 'A Elite do Sucesso',
-      tierStdName: tierStdName || 'MGT',
+      tierStdName: tierStdName || 'ROVEX',
       tierStdSlogan: tierStdSlogan || 'Velocidade e Poder',
       backgroundColor: backgroundColor || '#8B5CF6',
       
@@ -732,7 +732,7 @@ router.post('/admin/ads', authenticateToken, isAdmin, async (req: Request, res: 
 
 /**
  * POST /api/rovex/admin/reset-config
- * Reset community configuration to defaults (Magazine MGT template)
+ * Reset community configuration to defaults (Rovex template)
  * ADMIN only - use this to restore template after testing
  */
 router.post('/admin/reset-config', authenticateToken, isAdmin, async (req: Request, res: Response) => {
@@ -748,7 +748,7 @@ router.post('/admin/reset-config', authenticateToken, isAdmin, async (req: Reque
     
     res.json({
       success: true,
-      message: 'Community configuration reset to defaults (Magazine MGT)',
+      message: 'Community configuration reset to defaults',
       instructions: 'Refresh the page to see the changes',
     });
   } catch (error) {
@@ -776,9 +776,9 @@ router.get('/admin/community-config', authenticateToken, isAdmin, async (req: Re
       defaults: {
         id: 'magazine-srt',
         subdomain: 'magazine-srt',
-        name: 'Magazine MGT',
+        name: 'Rovex Communities',
         tierVipName: 'MAGAZINE',
-        tierStdName: 'MGT',
+        tierStdName: 'ROVEX',
         currencyName: 'Zions',
       },
     });
@@ -1213,15 +1213,15 @@ router.get('/config', async (req: Request, res: Response) => {
     const config = {
       id: savedConfig?.id || 'magazine-srt',
       subdomain: savedConfig?.subdomain || 'magazine-srt',
-      name: savedConfig?.name || 'Magazine MGT',
-      slogan: savedConfig?.slogan || 'A comunidade definitiva de games e entretenimento',
+      name: savedConfig?.name || 'Rovex Communities',
+      slogan: savedConfig?.slogan || 'Sua comunidade gamificada',
       primaryColor: savedConfig?.primaryColor || '#d4af37',
       secondaryColor: savedConfig?.secondaryColor || '#7C3AED',
       accentColor: savedConfig?.accentColor || '#8B5CF6',
       tierVipName: savedConfig?.tierVipName || 'MAGAZINE',
       tierVipColor: savedConfig?.tierVipColor || '#d4af37',
       tierVipSlogan: savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
-      tierStdName: savedConfig?.tierStdName || 'MGT',
+      tierStdName: savedConfig?.tierStdName || 'ROVEX',
       tierStdSlogan: savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       backgroundColor: savedConfig?.backgroundColor || '#8B5CF6',
       currencyName: savedConfig?.currencyName || 'Zions',

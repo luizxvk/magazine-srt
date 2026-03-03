@@ -85,6 +85,18 @@ export const createGroup = async (req: AuthRequest, res: Response) => {
             },
           },
         },
+        voiceChannels: true,
+      },
+    });
+
+    // Auto-create default voice channel "Geral"
+    await prisma.voiceChannel.create({
+      data: {
+        name: 'Geral',
+        description: 'Canal de voz principal',
+        groupId: group.id,
+        maxUsers: 25,
+        bitrate: 64000,
       },
     });
 

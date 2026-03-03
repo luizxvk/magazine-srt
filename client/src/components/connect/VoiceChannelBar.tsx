@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff } from 'lucide-react';
 
 interface VoiceChannel {
   id: string;
@@ -15,8 +15,10 @@ interface VoiceChannelBarProps {
   channel: VoiceChannel;
   isMuted: boolean;
   isDeafened: boolean;
+  isScreenSharing?: boolean;
   onToggleMute: () => void;
   onToggleDeafen: () => void;
+  onToggleScreenShare?: () => void;
   onDisconnect: () => void;
   theme: 'light' | 'dark';
 }
@@ -25,8 +27,10 @@ export default function VoiceChannelBar({
   channel,
   isMuted,
   isDeafened,
+  isScreenSharing = false,
   onToggleMute,
   onToggleDeafen,
+  onToggleScreenShare,
   onDisconnect,
   theme
 }: VoiceChannelBarProps) {
@@ -90,6 +94,21 @@ export default function VoiceChannelBar({
         >
           {isDeafened ? <HeadphoneOff className="w-4 h-4" /> : <Headphones className="w-4 h-4" />}
         </button>
+
+        {/* Screen Share Button */}
+        {onToggleScreenShare && (
+          <button
+            onClick={onToggleScreenShare}
+            className={`p-2.5 rounded-full transition-all ${
+              isScreenSharing 
+                ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+            }`}
+            title={isScreenSharing ? 'Parar compartilhamento' : 'Compartilhar tela'}
+          >
+            {isScreenSharing ? <MonitorOff className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
+          </button>
+        )}
 
         {/* Disconnect Button */}
         <button

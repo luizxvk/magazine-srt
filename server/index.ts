@@ -1,4 +1,5 @@
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import compression from 'compression';
 import dotenv from 'dotenv';
@@ -51,6 +52,7 @@ import { tenantDetection } from './src/middleware/tenantMiddleware';
 import { runVerificationCronJobs } from './src/services/verificationCronService';
 import { reportMetricsToRovex, isRovexConfigured } from './src/services/rovexService';
 import { cleanupExpiredGroupMessages } from './src/services/groupMessageCleanupService';
+import { initializeSocket } from './src/services/socketService';
 
 dotenv.config();
 
@@ -215,7 +217,13 @@ app.get('/', (req, res) => {
 const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
 
 if (!isServerless) {
-    const server = app.listen(PORT, () => {
+    const httpServer = createServer(app);
+    
+    // Initialize Socket.io
+    initializeSocket(httpServer);
+    console.log('[Socket.io] ✅ Real-time server initialized');
+    
+    httpServer.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
 
         // Run verification cron job every hour
@@ -269,8 +277,8 @@ if (!isServerless) {
     });
 
     // Keep the server alive
-    server.keepAliveTimeout = 65000;
-    server.headersTimeout = 66000;
+    httpServer.keepAliveTimeout = 65000;
+    httpServer.headersTimeout = 66000;
 }
 
 export default app;

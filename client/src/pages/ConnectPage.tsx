@@ -7,14 +7,15 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
+import { useSocket } from '../hooks/useSocket';
+import { useWebRTC } from '../hooks/useWebRTC';
 import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
-import VoiceChannelBar from '../components/connect/VoiceChannelBar';
-import ConnectGroupChat from '../components/connect/ConnectGroupChat';
+import { VoiceChannelBar, ConnectGroupChat } from '../components/connect';
 
 interface VoiceParticipant {
   id: string;
@@ -102,6 +103,34 @@ export default function ConnectPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
 
+  // Socket.io hook for real-time communication
+  const socket = useSocket();
+  
+  // WebRTC hook for voice/video (pass current channel id)
+  const webrtc = useWebRTC(currentVoice?.channelId || null);
+
+  // Register socket event listeners
+  useEffect(() => {
+    if (!socket.isConnected) return;
+
+    socket.onVoiceUserJoined(() => {
+      showToast('Usuário entrou no canal de voz');
+      fetchGroups();
+    });
+
+    socket.onVoiceUserLeft(() => {
+      fetchGroups();
+    });
+
+    socket.onScreenShareStarted(() => {
+      showToast('Alguém iniciou compartilhamento de tela');
+    });
+
+    socket.onScreenShareStopped(() => {
+      showToast('Compartilhamento de tela encerrado');
+    });
+  }, [socket.isConnected]);
+
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
@@ -170,6 +199,23 @@ export default function ConnectPage() {
     try {
       const response = await api.post(`/connect/groups/${groupId}/voice/${channelId}/join`);
       setCurrentVoice(response.data);
+      
+      // Join via Socket.io for real-time updates
+      if (user) {
+        socket.joinVoice(channelId, {
+          odiserId: user.id,
+          name: user.displayName || user.name,
+          avatarUrl: user.avatarUrl,
+          isMuted: false,
+          isDeafened: false,
+          isSpeaking: false,
+          isStreaming: false,
+        });
+      }
+      
+      // Start WebRTC audio
+      await webrtc.startAudio();
+      
       showToast('Conectado ao canal de voz');
       fetchGroups(); // Refresh to show updated participants
     } catch (error: any) {
@@ -179,6 +225,15 @@ export default function ConnectPage() {
 
   const handleLeaveVoice = async () => {
     try {
+      if (currentVoice) {
+        // Leave via Socket.io
+        socket.leaveVoice(currentVoice.channelId);
+        
+        // Stop WebRTC
+        webrtc.stopAudio();
+        webrtc.stopScreenShare();
+      }
+      
       await api.post('/connect/voice/leave');
       setCurrentVoice(null);
       setIsMuted(false);
@@ -194,6 +249,15 @@ export default function ConnectPage() {
     try {
       const newMuted = !isMuted;
       setIsMuted(newMuted);
+      
+      // Update WebRTC audio track
+      webrtc.toggleMute();
+      
+      // Sync via Socket
+      if (currentVoice) {
+        socket.updateVoiceState(currentVoice.channelId, { isMuted: newMuted });
+      }
+      
       await api.patch('/connect/voice/state', { isMuted: newMuted });
     } catch (error) {
       console.error('Error toggling mute:', error);
@@ -206,12 +270,47 @@ export default function ConnectPage() {
       setIsDeafened(newDeafened);
       // Deafen also mutes
       if (newDeafened) setIsMuted(true);
+      
+      // Update WebRTC - mute audio when deafening
+      if (newDeafened) {
+        webrtc.toggleMute();
+      }
+      
+      // Sync via Socket
+      if (currentVoice) {
+        socket.updateVoiceState(currentVoice.channelId, { 
+          isDeafened: newDeafened,
+          isMuted: newDeafened ? true : isMuted 
+        });
+      }
+      
       await api.patch('/connect/voice/state', { 
         isDeafened: newDeafened,
         isMuted: newDeafened ? true : isMuted 
       });
     } catch (error) {
       console.error('Error toggling deafen:', error);
+    }
+  };
+
+  // Screen sharing handler
+  const handleToggleScreenShare = async () => {
+    try {
+      if (webrtc.isScreenSharing) {
+        webrtc.stopScreenShare();
+        if (currentVoice) {
+          socket.stopScreenShare(currentVoice.channelId);
+        }
+        showToast('Compartilhamento de tela encerrado');
+      } else {
+        await webrtc.startScreenShare();
+        if (currentVoice) {
+          socket.startScreenShare(currentVoice.channelId);
+        }
+        showToast('Compartilhamento de tela iniciado');
+      }
+    } catch (error) {
+      showError('Não foi possível compartilhar a tela');
     }
   };
 
@@ -247,8 +346,8 @@ export default function ConnectPage() {
           {/* Header */}
           <div className={`p-4 border-b ${themeBorder} flex items-center justify-between`}>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
-                <Radio className="w-4 h-4 text-white" />
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
+                <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
               </div>
               <span className={`font-bold ${themeText}`}>Connect</span>
             </div>
@@ -268,7 +367,7 @@ export default function ConnectPage() {
                 <p className="text-sm">Nenhum grupo ainda</p>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="mt-3 text-sm text-purple-500 hover:underline"
+                  className={`mt-3 text-sm hover:underline ${isMGT ? 'text-tier-std' : 'text-gold-500'}`}
                 >
                   Criar seu primeiro grupo
                 </button>
@@ -392,8 +491,10 @@ export default function ConnectPage() {
               channel={currentVoice.channel}
               isMuted={isMuted}
               isDeafened={isDeafened}
+              isScreenSharing={webrtc.isScreenSharing}
               onToggleMute={handleToggleMute}
               onToggleDeafen={handleToggleDeafen}
+              onToggleScreenShare={handleToggleScreenShare}
               onDisconnect={handleLeaveVoice}
               theme={theme}
             />
@@ -430,7 +531,7 @@ export default function ConnectPage() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-violet-600/20 flex items-center justify-center mx-auto mb-4">
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${isMGT ? 'bg-tier-std\/20' : 'bg-gold-500/20'}`}>
                   <Radio className={`w-10 h-10 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`} />
                 </div>
                 <h2 className={`text-xl font-bold mb-2 ${themeText}`}>
@@ -470,7 +571,7 @@ export default function ConnectPage() {
                       {member.user.displayName || member.user.name}
                     </p>
                     {member.role !== 'MEMBER' && (
-                      <p className={`text-xs ${member.role === 'ADMIN' ? 'text-purple-400' : 'text-blue-400'}`}>
+                      <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
                         {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
                       </p>
                     )}

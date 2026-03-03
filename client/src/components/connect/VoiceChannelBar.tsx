@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Radio } from 'lucide-react';
 
 interface VoiceChannel {
   id: string;
@@ -16,9 +16,11 @@ interface VoiceChannelBarProps {
   isMuted: boolean;
   isDeafened: boolean;
   isScreenSharing?: boolean;
+  hasActiveStreams?: boolean;
   onToggleMute: () => void;
   onToggleDeafen: () => void;
   onToggleScreenShare?: () => void;
+  onWatchStream?: () => void;
   onDisconnect: () => void;
   theme: 'light' | 'dark';
 }
@@ -28,9 +30,11 @@ export default function VoiceChannelBar({
   isMuted,
   isDeafened,
   isScreenSharing = false,
+  hasActiveStreams = false,
   onToggleMute,
   onToggleDeafen,
   onToggleScreenShare,
+  onWatchStream,
   onDisconnect,
   theme
 }: VoiceChannelBarProps) {
@@ -107,6 +111,17 @@ export default function VoiceChannelBar({
             title={isScreenSharing ? 'Parar compartilhamento' : 'Compartilhar tela'}
           >
             {isScreenSharing ? <MonitorOff className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
+          </button>
+        )}
+
+        {/* Watch Stream Button (when someone is streaming) */}
+        {hasActiveStreams && onWatchStream && (
+          <button
+            onClick={onWatchStream}
+            className="p-2.5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-pulse"
+            title="Assistir transmissão"
+          >
+            <Radio className="w-4 h-4" />
           </button>
         )}
 

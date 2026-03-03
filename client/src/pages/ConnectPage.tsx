@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff, Menu,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
-  Camera, HeadphoneOff, Pencil, Phone, Bot
+  Camera, HeadphoneOff, Pencil, Phone, Bot, Link, Copy, UserPlus, Mail, Edit3, Check
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -16,7 +16,7 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard, StreamViewer, AudioSettingsModal } from '../components/connect';
 
 interface VoiceParticipant {
   id: string;
@@ -71,6 +71,7 @@ interface ConnectGroup {
   name: string;
   description?: string;
   avatarUrl?: string;
+  bannerUrl?: string;
   isPrivate: boolean;
   membershipType: 'MAGAZINE' | 'MGT';
   maxMembers?: number;
@@ -122,6 +123,12 @@ export default function ConnectPage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   
+  // Banner and name editing state
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [editingGroupName, setEditingGroupName] = useState(false);
+  const [newGroupName, setNewGroupName] = useState('');
+  
   // Rename channel state
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [renameChannel, setRenameChannel] = useState<{ id: string; name: string; type: 'TEXT' | 'VOICE'; groupId: string } | null>(null);
@@ -135,9 +142,19 @@ export default function ConnectPage() {
   const [showPresenceCard, setShowPresenceCard] = useState(false);
   const [presenceUserId, setPresenceUserId] = useState<string | null>(null);
   const [presenceFallbackData, setPresenceFallbackData] = useState<{ name: string; displayName?: string; avatarUrl?: string } | undefined>(undefined);
+  const [presenceAnchorPosition, setPresenceAnchorPosition] = useState<{ x: number; y: number } | null>(null);
+  
+  // Audio settings state
+  const [showAudioSettings, setShowAudioSettings] = useState(false);
   
   // Bots management state
   const [showBotsModal, setShowBotsModal] = useState(false);
+  
+  // Invite to group state
+  const [showGroupInviteModal, setShowGroupInviteModal] = useState(false);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [inviteCopied, setInviteCopied] = useState(false);
+  const [inviteLoading, setInviteLoading] = useState(false);
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
@@ -149,6 +166,10 @@ export default function ConnectPage() {
   const [currentVoice, setCurrentVoice] = useState<CurrentVoice | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
+  
+  // Stream viewer state
+  const [showStreamViewer, setShowStreamViewer] = useState(false);
+  const [streamerInfo, setStreamerInfo] = useState<Map<string, { username: string; avatarUrl?: string }>>(new Map());
 
   // Socket.io hook for real-time communication
   const socket = useSocket();
@@ -174,12 +195,42 @@ export default function ConnectPage() {
       fetchGroups();
     });
 
-    socket.onScreenShareStarted(() => {
-      showToast('Alguém iniciou compartilhamento de tela');
+    socket.onScreenShareStarted((data: { userId: string; channelId: string }) => {
+      showToast('🖥️ Alguém iniciou compartilhamento de tela! Clique para assistir.');
+      // Find user info for the streamer
+      const findUserInGroups = () => {
+        for (const group of groups) {
+          for (const channel of group.voiceChannels) {
+            const participant = channel.participants.find(p => p.user.id === data.userId);
+            if (participant) {
+              return { 
+                username: participant.user.displayName || participant.user.name, 
+                avatarUrl: participant.user.avatarUrl 
+              };
+            }
+          }
+          const member = group.members?.find(m => m.userId === data.userId);
+          if (member) {
+            return { 
+              username: member.user.displayName || member.user.name, 
+              avatarUrl: member.user.avatarUrl 
+            };
+          }
+        }
+        return { username: 'Usuário' };
+      };
+      
+      const info = findUserInGroups();
+      setStreamerInfo(prev => new Map(prev).set(data.userId, info));
     });
 
-    socket.onScreenShareStopped(() => {
+    socket.onScreenShareStopped((data: { userId: string; channelId: string }) => {
       showToast('Compartilhamento de tela encerrado');
+      setStreamerInfo(prev => {
+        const updated = new Map(prev);
+        updated.delete(data.userId);
+        return updated;
+      });
     });
 
     // Listen for voice state changes (mute/deafen)
@@ -444,6 +495,52 @@ export default function ConnectPage() {
     }
   };
 
+  const handleUploadBanner = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedGroup) return;
+
+    try {
+      setUploadingBanner(true);
+      const formData = new FormData();
+      formData.append('banner', file);
+
+      const response = await api.patch(`/connect/groups/${selectedGroup.id}/banner`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      // Update local state
+      setSelectedGroup({ ...selectedGroup, bannerUrl: response.data.bannerUrl });
+      setGroups(groups.map(g => 
+        g.id === selectedGroup.id ? { ...g, bannerUrl: response.data.bannerUrl } : g
+      ));
+      showToast('Banner do grupo atualizado!');
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao atualizar banner');
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
+  const handleUpdateGroupName = async () => {
+    if (!newGroupName.trim() || !selectedGroup) return;
+
+    try {
+      const response = await api.patch(`/connect/groups/${selectedGroup.id}`, {
+        name: newGroupName.trim()
+      });
+
+      // Update local state
+      setSelectedGroup({ ...selectedGroup, name: response.data.name });
+      setGroups(groups.map(g => 
+        g.id === selectedGroup.id ? { ...g, name: response.data.name } : g
+      ));
+      setEditingGroupName(false);
+      showToast('Nome do grupo atualizado!');
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao atualizar nome');
+    }
+  };
+
   // Rename channel
   const handleOpenRename = (channel: { id: string; name: string }, type: 'TEXT' | 'VOICE', groupId: string) => {
     setRenameChannel({ id: channel.id, name: channel.name, type, groupId });
@@ -494,10 +591,49 @@ export default function ConnectPage() {
     }
   };
 
+  // Open invite modal for group
+  const handleOpenInviteModal = async () => {
+    if (!selectedGroup) return;
+    setShowGroupInviteModal(true);
+    setInviteLoading(true);
+    setInviteCopied(false);
+    
+    try {
+      // Generate invite link
+      const response = await api.post(`/connect/groups/${selectedGroup.id}/invite`);
+      setInviteLink(response.data.inviteLink || `${window.location.origin}/connect/join/${response.data.inviteCode}`);
+    } catch (error: any) {
+      // Fallback to direct link
+      setInviteLink(`${window.location.origin}/connect/${selectedGroup.id}`);
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const handleCopyInviteLink = () => {
+    if (inviteLink) {
+      navigator.clipboard.writeText(inviteLink);
+      setInviteCopied(true);
+      showToast('Link copiado!');
+      setTimeout(() => setInviteCopied(false), 2000);
+    }
+  };
+
   // Open user presence card
-  const handleOpenPresenceCard = (userId: string, memberData?: { name: string; displayName?: string; avatarUrl?: string }) => {
+  const handleOpenPresenceCard = (
+    userId: string, 
+    memberData?: { name: string; displayName?: string; avatarUrl?: string },
+    event?: React.MouseEvent
+  ) => {
     setPresenceUserId(userId);
     setPresenceFallbackData(memberData);
+    // Set anchor position for desktop positioning
+    if (event) {
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      setPresenceAnchorPosition({ x: rect.right, y: rect.top });
+    } else {
+      setPresenceAnchorPosition(null);
+    }
     setShowPresenceCard(true);
   };
 
@@ -692,7 +828,24 @@ export default function ConnectPage() {
                             {participant.user.displayName || participant.user.name}
                           </span>
                           {participant.isStreaming && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-medium">AO VIVO</span>
+                            <button
+                              onClick={(e) => { 
+                                e.stopPropagation(); 
+                                // Add streamer info if not already present
+                                if (!streamerInfo.has(participant.user.id)) {
+                                  setStreamerInfo(prev => new Map(prev).set(participant.user.id, {
+                                    username: participant.user.displayName || participant.user.name,
+                                    avatarUrl: participant.user.avatarUrl
+                                  }));
+                                }
+                                setShowStreamViewer(true); 
+                              }}
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-medium hover:bg-red-500/30 transition-colors flex items-center gap-1"
+                              title="Assistir transmissão"
+                            >
+                              <Radio className="w-2.5 h-2.5 animate-pulse" />
+                              AO VIVO
+                            </button>
                           )}
                           {/* Mute icon */}
                           {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
@@ -759,14 +912,7 @@ export default function ConnectPage() {
           </motion.div>
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2" style={{ color: accentColor }}>Rovex Connect</h2>
-            <p className="text-gray-400">
-              {socketConnecting ? 'Acordando servidor...' : 'Conectando aos servidores...'}
-            </p>
-            {socketConnecting && (
-              <p className="text-xs text-gray-500 mt-2">
-                O servidor pode demorar até 30s para acordar
-              </p>
-            )}
+            <p className="text-gray-400">Carregando...</p>
           </div>
           <Loader size="lg" />
         </div>
@@ -877,9 +1023,11 @@ export default function ConnectPage() {
                   isMuted={isMuted}
                   isDeafened={isDeafened}
                   isScreenSharing={webrtc.isScreenSharing}
+                  hasActiveStreams={webrtc.remoteScreenStreams.size > 0}
                   onToggleMute={handleToggleMute}
                   onToggleDeafen={handleToggleDeafen}
                   onToggleScreenShare={handleToggleScreenShare}
+                  onWatchStream={() => setShowStreamViewer(true)}
                   onDisconnect={handleLeaveVoice}
                   theme={theme}
                 />
@@ -898,7 +1046,11 @@ export default function ConnectPage() {
                   </p>
                   <p className="text-xs text-green-500">Online</p>
                 </div>
-                <button className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}>
+                <button 
+                  onClick={() => setShowAudioSettings(true)}
+                  className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}
+                  title="Configurações de áudio"
+                >
                   <Settings className="w-4 h-4" />
                 </button>
               </div>
@@ -938,9 +1090,11 @@ export default function ConnectPage() {
               isMuted={isMuted}
               isDeafened={isDeafened}
               isScreenSharing={webrtc.isScreenSharing}
+              hasActiveStreams={webrtc.remoteScreenStreams.size > 0}
               onToggleMute={handleToggleMute}
               onToggleDeafen={handleToggleDeafen}
               onToggleScreenShare={handleToggleScreenShare}
+              onWatchStream={() => setShowStreamViewer(true)}
               onDisconnect={handleLeaveVoice}
               theme={theme}
             />
@@ -959,7 +1113,11 @@ export default function ConnectPage() {
               </p>
               <p className="text-xs text-green-500">Online</p>
             </div>
-            <button className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}>
+            <button 
+              onClick={() => setShowAudioSettings(true)}
+              className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}
+              title="Configurações de áudio"
+            >
               <Settings className="w-4 h-4" />
             </button>
           </div>
@@ -1012,7 +1170,7 @@ export default function ConnectPage() {
                 <div 
                   key={member.id}
                   className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                  onClick={() => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl })}
+                  onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
                 >
                   <div className="relative">
                     <img
@@ -1047,7 +1205,7 @@ export default function ConnectPage() {
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={() => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl })}
+                    onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
                   >
                     <img
                       src={member.user.avatarUrl || '/assets/default-avatar.png'}
@@ -1072,9 +1230,11 @@ export default function ConnectPage() {
             isMuted={isMuted}
             isDeafened={isDeafened}
             isScreenSharing={webrtc.isScreenSharing}
+            hasActiveStreams={webrtc.remoteScreenStreams.size > 0}
             onToggleMute={handleToggleMute}
             onToggleDeafen={handleToggleDeafen}
             onToggleScreenShare={handleToggleScreenShare}
+            onWatchStream={() => setShowStreamViewer(true)}
             onDisconnect={handleLeaveVoice}
             theme={theme}
           />
@@ -1194,7 +1354,7 @@ export default function ConnectPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 top-16 z-40 lg:hidden"
+            className="fixed inset-0 z-[60] lg:hidden"
             onClick={() => setShowMembersDrawer(false)}
           >
             <div className="absolute inset-0 bg-black/60" />
@@ -1208,12 +1368,25 @@ export default function ConnectPage() {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className={`font-bold ${themeText}`}>Membros</h3>
-                <button
-                  onClick={() => setShowMembersDrawer(false)}
-                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setShowMembersDrawer(false);
+                      handleOpenInviteModal();
+                    }}
+                    className={`p-2 rounded-lg ${themeHover}`}
+                    style={{ color: accentColor }}
+                    title="Convidar pessoas"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setShowMembersDrawer(false)}
+                    className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
               
               <h4 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
@@ -1224,7 +1397,7 @@ export default function ConnectPage() {
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={() => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }); setShowMembersDrawer(false); }}
+                    onClick={(e) => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e); setShowMembersDrawer(false); }}
                   >
                     <div className="relative">
                       <img
@@ -1258,7 +1431,7 @@ export default function ConnectPage() {
                     <div 
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                      onClick={() => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }); setShowMembersDrawer(false); }}
+                      onClick={(e) => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e); setShowMembersDrawer(false); }}
                     >
                       <img
                         src={member.user.avatarUrl || '/assets/default-avatar.png'}
@@ -1298,14 +1471,22 @@ export default function ConnectPage() {
                   : undefined
               }}
             >
-              {/* Header with gradient */}
+              {/* Header with gradient - clickable for banner change */}
               <div 
-                className="h-24 relative"
-                style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)` }}
+                className="h-24 relative group cursor-pointer overflow-hidden"
+                style={{ 
+                  background: selectedGroup.bannerUrl 
+                    ? `url(${selectedGroup.bannerUrl}) center/cover`
+                    : `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)` 
+                }}
+                onClick={() => bannerInputRef.current?.click()}
               >
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  {uploadingBanner ? <Loader size="sm" /> : <Camera className="w-8 h-8 text-white" />}
+                </div>
                 <button
-                  onClick={() => setShowGroupSettings(false)}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
+                  onClick={(e) => { e.stopPropagation(); setShowGroupSettings(false); }}
+                  className="absolute top-3 right-3 p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1341,9 +1522,43 @@ export default function ConnectPage() {
               </div>
 
               <div className="p-6 pt-4">
-                {/* Group Info */}
-                <h2 className={`text-xl font-bold ${themeText} mb-1`}>{selectedGroup.name}</h2>
-                {selectedGroup.description && (
+                {/* Group Info - Editable Name */}
+                {editingGroupName ? (
+                  <div className="flex items-center gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={newGroupName}
+                      onChange={(e) => setNewGroupName(e.target.value)}
+                      className={`flex-1 px-3 py-2 rounded-lg ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'} ${themeText} border ${themeBorder} text-lg font-bold`}
+                      placeholder="Nome do grupo"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleUpdateGroupName}
+                      className="p-2 rounded-lg text-white"
+                      style={{ background: accentColor }}
+                    >
+                      <Check className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setEditingGroupName(false)}
+                      className={`p-2 rounded-lg ${themeHover}`}
+                    >
+                      <X className="w-5 h-5" style={{ color: accentColor }} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 mb-1">
+                    <h2 className={`text-xl font-bold ${themeText}`}>{selectedGroup.name}</h2>
+                    <button
+                      onClick={() => { setNewGroupName(selectedGroup.name); setEditingGroupName(true); }}
+                      className={`p-1 rounded ${themeHover}`}
+                    >
+                      <Edit3 className="w-4 h-4" style={{ color: accentColor }} />
+                    </button>
+                  </div>
+                )}
+                {selectedGroup.description && !editingGroupName && (
                   <p className={`text-sm ${themeSecondary} mb-4`}>{selectedGroup.description}</p>
                 )}
 
@@ -1404,6 +1619,18 @@ export default function ConnectPage() {
                   >
                     <Bot className={`w-5 h-5 ${themeSecondary}`} />
                     <span className={themeText}>Bots</span>
+                    <ChevronRight className={`w-4 h-4 ml-auto ${themeSecondary}`} />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowGroupSettings(false);
+                      handleOpenInviteModal();
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${themeHover} transition-colors`}
+                  >
+                    <UserPlus className={`w-5 h-5 ${themeSecondary}`} />
+                    <span className={themeText}>Convidar Membros</span>
                     <ChevronRight className={`w-4 h-4 ml-auto ${themeSecondary}`} />
                   </button>
                 </div>
@@ -1591,6 +1818,15 @@ export default function ConnectPage() {
         className="hidden"
       />
 
+      {/* Hidden Banner Input */}
+      <input
+        ref={bannerInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleUploadBanner}
+        className="hidden"
+      />
+
       {/* Bots Management Modal */}
       <AnimatePresence>
         {showBotsModal && selectedGroup && (
@@ -1740,6 +1976,133 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
 
+      {/* Group Invite Modal */}
+      <AnimatePresence>
+        {showGroupInviteModal && selectedGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowGroupInviteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-2xl overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              {/* Header */}
+              <div className="p-4 border-b" style={{ borderColor: theme === 'light' ? '#e5e7eb' : 'rgba(255,255,255,0.1)' }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${accentColor}20` }}
+                    >
+                      <UserPlus className="w-5 h-5" style={{ color: accentColor }} />
+                    </div>
+                    <div>
+                      <h2 className={`font-bold ${themeText}`}>Convidar para {selectedGroup.name}</h2>
+                      <p className={`text-xs ${themeSecondary}`}>Compartilhe o link ou convide diretamente</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowGroupInviteModal(false)}
+                    className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-4 space-y-4">
+                {/* Invite Link */}
+                <div>
+                  <label className={`text-sm font-medium ${themeText} mb-2 block`}>
+                    Link de convite
+                  </label>
+                  <div className="flex gap-2">
+                    <div 
+                      className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'} border ${themeBorder}`}
+                    >
+                      <Link className="w-4 h-4" style={{ color: accentColor }} />
+                      {inviteLoading ? (
+                        <span className={themeSecondary}>Gerando link...</span>
+                      ) : (
+                        <span className={`${themeText} text-sm truncate flex-1`}>
+                          {inviteLink || 'Erro ao gerar link'}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleCopyInviteLink}
+                      disabled={inviteLoading || !inviteLink}
+                      className={`px-4 py-2.5 rounded-xl font-medium text-white transition-all flex items-center gap-2 ${inviteLoading ? 'opacity-50' : 'hover:opacity-90'}`}
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      {inviteCopied ? (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copiado!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copiar
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Or divider */}
+                <div className="flex items-center gap-3">
+                  <div className={`flex-1 h-px ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`} />
+                  <span className={`text-xs ${themeSecondary}`}>ou</span>
+                  <div className={`flex-1 h-px ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`} />
+                </div>
+
+                {/* Share options */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => {
+                      if (inviteLink) {
+                        window.open(`https://wa.me/?text=${encodeURIComponent(`Junte-se ao meu grupo no Rovex Connect! ${inviteLink}`)}`, '_blank');
+                      }
+                    }}
+                    className={`flex items-center justify-center gap-2 p-3 rounded-xl ${themeHover} border ${themeBorder} transition-all`}
+                  >
+                    <span className="text-green-500 text-lg">📱</span>
+                    <span className={themeText}>WhatsApp</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (inviteLink) {
+                        window.open(`mailto:?subject=Convite para ${selectedGroup.name}&body=${encodeURIComponent(`Junte-se ao meu grupo no Rovex Connect! ${inviteLink}`)}`, '_blank');
+                      }
+                    }}
+                    className={`flex items-center justify-center gap-2 p-3 rounded-xl ${themeHover} border ${themeBorder} transition-all`}
+                  >
+                    <Mail className="w-5 h-5" style={{ color: accentColor }} />
+                    <span className={themeText}>Email</span>
+                  </button>
+                </div>
+
+                {/* Tip */}
+                <div 
+                  className="p-3 rounded-xl text-sm"
+                  style={{ backgroundColor: `${accentColor}10`, color: accentColor }}
+                >
+                  💡 Quando alguém acessar o link, receberá um convite para entrar no grupo.
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* User Presence Card */}
       <UserPresenceCard
         userId={presenceUserId || ''}
@@ -1751,6 +2114,22 @@ export default function ConnectPage() {
         }}
         accentColor={accentColor}
         fallbackData={presenceFallbackData}
+        anchorPosition={presenceAnchorPosition}
+      />
+
+      {/* Audio Settings Modal */}
+      <AudioSettingsModal
+        isOpen={showAudioSettings}
+        onClose={() => setShowAudioSettings(false)}
+        accentColor={accentColor}
+      />
+
+      {/* Stream Viewer */}
+      <StreamViewer
+        streams={webrtc.remoteScreenStreams}
+        streamerInfo={streamerInfo}
+        isOpen={showStreamViewer}
+        onClose={() => setShowStreamViewer(false)}
       />
     </div>
   );

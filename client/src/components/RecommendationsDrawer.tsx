@@ -203,12 +203,12 @@ export default function RecommendationsDrawer({ isOpen, onClose, dailyLoginStatu
                             <div className="space-y-3">
                                 <h4 className={`text-sm font-medium ${isMGT ? 'text-tier-std-400' : 'text-gold-400'} uppercase tracking-wider`}>Navegação Rápida</h4>
                                 
-                                <Link to="/groups" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
+                                <Link to="/connect" onClick={onClose} className={`glass-panel rounded-xl p-3 border ${isMGT ? 'border-tier-std-500/20 hover:border-tier-std-500/40' : 'border-gold-500/20 hover:border-gold-500/40'} transition-all duration-300 group flex items-center justify-between`}>
                                     <div className="flex items-center gap-3">
                                         <div className={`p-2 ${themeIconBg} rounded-lg`}>
                                             <MessageCircle className={`w-4 h-4 ${themeIconColor}`} />
                                         </div>
-                                        <span className={`font-medium ${themeText}`}>Grupos</span>
+                                        <span className={`font-medium ${themeText}`}>Connect</span>
                                     </div>
                                     <ChevronRight className={`w-4 h-4 ${themeIconColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
                                 </Link>

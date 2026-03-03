@@ -85,7 +85,7 @@ export default function ExplorePage() {
     const features: FeatureCard[] = [
         { id: 'market', name: 'Mercado', description: 'Compre e venda itens', icon: <Store className="w-6 h-6" />, color: isMGT ? 'from-tier-std to-tier-std' : 'from-gold-500 to-amber-700', path: '/market' },
         { id: 'rewards', name: 'Recompensas', description: 'Resgate prêmios exclusivos', icon: <Gift className="w-6 h-6" />, color: 'from-purple-500 to-violet-700', path: '/rewards' },
-        { id: 'groups', name: 'Grupos', description: 'Comunidades e chats', icon: <Users2 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/groups' },
+        { id: 'connect', name: 'Connect', description: 'Chat de voz e texto', icon: <Users2 className="w-6 h-6" />, color: 'from-purple-500 to-violet-700', path: '/connect' },
         { id: 'social', name: 'Social', description: 'Amigos e conexões', icon: <MessageSquare className="w-6 h-6" />, color: 'from-pink-500 to-rose-700', path: '/social' },
         { id: 'store', name: 'Loja', description: 'Produtos físicos', icon: <ShoppingBag className="w-6 h-6" />, color: 'from-orange-500 to-red-700', path: '/store' },
         { id: 'statforge', name: 'StatForge', description: 'Stats de jogos', icon: <BarChart3 className="w-6 h-6" />, color: 'from-blue-500 to-indigo-700', path: '/statforge' },

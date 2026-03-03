@@ -36,7 +36,7 @@ const NAVIGATION_PAGES = [
     { id: 'admin', title: 'Painel Admin', subtitle: 'Administração do sistema', keywords: ['admin', 'administração', 'painel', 'dashboard', 'gerenciar'], icon: '⚙️', path: '/admin' },
     { id: 'shop', title: 'Loja de Personalização', subtitle: 'Customize seu perfil', keywords: ['loja', 'shop', 'personalização', 'customização', 'comprar', 'badge', 'fundo', 'cor', 'tema', 'theme'], icon: '🛍️', path: '/feed', action: 'shop' },
     { id: 'market', title: 'Mercado', subtitle: 'Compre e venda itens', keywords: ['mercado', 'market', 'comprar', 'vender', 'negociar', 'trading', 'marketplace', 'itens', 'customização'], icon: '🏪', path: '/market' },
-    { id: 'groups', title: 'Grupos', subtitle: 'Crie e participe de grupos', keywords: ['grupo', 'grupos', 'group', 'comunidade', 'chat', 'conversa'], icon: '👥', path: '/groups' },
+    { id: 'connect', title: 'Rovex Connect', subtitle: 'Chat de voz e texto em tempo real', keywords: ['connect', 'grupo', 'grupos', 'group', 'comunidade', 'chat', 'conversa', 'voz', 'discord', 'canal'], icon: '📡', path: '/connect' },
     { id: 'catalog', title: 'Catálogo de Fotos', subtitle: 'Galeria exclusiva de fotos', keywords: ['catalogo', 'catalog', 'fotos', 'galeria', 'imagens', 'foto'], icon: '📸', path: '/catalog' },
     { id: 'stories', title: 'Stories', subtitle: 'Visualize stories dos membros', keywords: ['stories', 'story', 'historia', 'historias', 'visualizar'], icon: '📱', path: '/feed', action: 'stories' },
     { id: 'feedback', title: 'Feedback', subtitle: 'Envie sugestões e feedback', keywords: ['feedback', 'sugestão', 'sugestao', 'sugestões', 'opnião', 'opiniao', 'bug', 'reportar', 'melhoria', 'melhorias'], icon: '💬', path: '/feedback' },
@@ -44,7 +44,6 @@ const NAVIGATION_PAGES = [
     { id: 'radio', title: 'Rádio', subtitle: 'Ouça a rádio ao vivo', keywords: ['radio', 'rádio', 'musica', 'música', 'som', 'audio', 'ouvir', 'live', 'ao vivo'], icon: '📻', path: '/feed', action: 'radio' },
     { id: 'roadmap', title: 'Roadmap', subtitle: 'Próximas atualizações', keywords: ['roadmap', 'atualização', 'atualizacoes', 'futuro', 'novidades', 'próximo', 'proximo', 'plano', 'planejamento'], icon: '🗺️', path: '/roadmap' },
     { id: 'elite', title: 'ELITE', subtitle: 'Assinatura premium com benefícios exclusivos', keywords: ['elite', 'premium', 'assinatura', 'vip', 'beneficios', 'benefício', 'assinar', 'subscription', '2x xp', 'xp dobro', 'zions', 'exclusivo'], icon: '👑', path: '/elite' },
-    { id: 'connect', title: 'Rovex Connect', subtitle: 'Chat em tempo real e canais de voz', keywords: ['connect', 'chat', 'voz', 'voice', 'discord', 'conversa', 'tempo real', 'mensagem', 'grupo', 'canal'], icon: '📡', path: '/connect' },
 ];
 
 // Fuzzy match function - checks if query matches any part of keywords

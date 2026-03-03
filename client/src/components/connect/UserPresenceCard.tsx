@@ -12,7 +12,10 @@ import {
   ShieldCheck,
   Sparkles,
   ExternalLink,
-  Clock
+  Clock,
+  Trophy,
+  Award,
+  BadgeCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -34,6 +37,11 @@ interface UserDetails {
   profileBgUrl?: string | null;
   isVerified?: boolean;
   membershipType?: 'MAGAZINE' | 'MGT';
+  // Additional stats
+  trophies?: number;
+  achievements?: number;
+  totalAchievements?: number;
+  communityTag?: string; // rovex, mgzn, mgt, etc
   // Rich presence
   currentActivity?: {
     type: 'PLAYING' | 'IN_CALL' | 'LISTENING' | 'WATCHING' | 'STREAMING' | 'CUSTOM';
@@ -58,12 +66,19 @@ interface UserDetails {
   }>;
 }
 
+interface PositionAnchor {
+  x: number;
+  y: number;
+}
+
 interface UserPresenceCardProps {
   userId: string;
   isOpen: boolean;
   onClose: () => void;
   onStartChat?: (userId: string) => void;
   accentColor?: string;
+  // Position anchor for desktop (near clicked element)
+  anchorPosition?: PositionAnchor | null;
   // Fallback data from member list (when API fails)
   fallbackData?: {
     name: string;
@@ -78,12 +93,85 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   onClose,
   onStartChat,
   accentColor = '#9333ea',
+  anchorPosition,
   fallbackData,
 }) => {
   const { user: currentUser } = useAuth();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Calculate card position for desktop
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  
+  const getCardStyle = (): React.CSSProperties => {
+    // Mobile: always center
+    if (isMobile || !anchorPosition) {
+      return {
+        position: 'fixed',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+      };
+    }
+    
+    // Desktop: position near anchor
+    const cardWidth = 340;
+    const cardHeight = 500;
+    const padding = 16;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    let x = anchorPosition.x + padding;
+    let y = anchorPosition.y;
+    
+    // Adjust if card would go off right edge
+    if (x + cardWidth > windowWidth - padding) {
+      x = anchorPosition.x - cardWidth - padding;
+    }
+    
+    // Adjust if card would go off bottom
+    if (y + cardHeight > windowHeight - padding) {
+      y = windowHeight - cardHeight - padding;
+    }
+    
+    // Ensure x and y are not negative
+    x = Math.max(padding, x);
+    y = Math.max(padding, y);
+    
+    return {
+      position: 'fixed',
+      left: x,
+      top: y,
+      transform: 'none',
+    };
+  };
+
+  // Helper to get membership tag display
+  const getMembershipTag = () => {
+    if (!userDetails) return null;
+    
+    // Check community tag first
+    if (userDetails.communityTag) {
+      const tagColors: Record<string, { bg: string; text: string }> = {
+        'rovex': { bg: '#9333ea20', text: '#9333ea' },
+        'mgzn': { bg: '#3b82f620', text: '#3b82f6' },
+        'mgt': { bg: '#10b98120', text: '#10b981' },
+      };
+      const colors = tagColors[userDetails.communityTag.toLowerCase()] || { bg: `${accentColor}20`, text: accentColor };
+      return { name: userDetails.communityTag.toUpperCase(), ...colors };
+    }
+    
+    // Fallback to membership type
+    if (userDetails.membershipType === 'MGT') {
+      return { name: 'MGT', bg: '#10b98120', text: '#10b981' };
+    }
+    if (userDetails.membershipType === 'MAGAZINE') {
+      return { name: 'MGZN', bg: '#3b82f620', text: '#3b82f6' };
+    }
+    
+    return null;
+  };
 
   useEffect(() => {
     if (isOpen && userId) {
@@ -159,6 +247,8 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
 
   if (!isOpen) return null;
 
+  const membershipTag = getMembershipTag();
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -174,10 +264,11 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
           
           {/* Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] max-w-[90vw] z-[60]"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            style={getCardStyle()}
+            className="w-[340px] max-w-[90vw] z-[60]"
           >
             <div className="bg-[#0a0a0f] rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-h-[85vh] overflow-y-auto">
               {/* Close button */}
@@ -299,7 +390,40 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                             )}
                           </div>
                         )}
+                        {/* Membership Tag */}
+                        {membershipTag && (
+                          <div 
+                            className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
+                            style={{ backgroundColor: membershipTag.bg, color: membershipTag.text }}
+                          >
+                            <BadgeCheck size={10} />
+                            {membershipTag.name}
+                          </div>
+                        )}
                       </div>
+
+                      {/* Stats Row - Trophies & Achievements */}
+                      {(userDetails.trophies !== undefined || userDetails.achievements !== undefined) && (
+                        <div className="flex items-center gap-4 mt-2">
+                          {userDetails.trophies !== undefined && (
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <Trophy size={14} className="text-amber-400" />
+                              <span className="text-white font-medium">{userDetails.trophies}</span>
+                              <span className="text-gray-500">troféus</span>
+                            </div>
+                          )}
+                          {userDetails.achievements !== undefined && (
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <Award size={14} className="text-purple-400" />
+                              <span className="text-white font-medium">
+                                {userDetails.achievements}
+                                {userDetails.totalAchievements && `/${userDetails.totalAchievements}`}
+                              </span>
+                              <span className="text-gray-500">conquistas</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Bio */}
                       {userDetails.bio && (

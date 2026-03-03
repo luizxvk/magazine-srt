@@ -250,11 +250,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const accentColor = React.useMemo(() => {
         // In light mode, use lighter versions for visibility
         if (theme === 'light') {
-            // Get community color from CSS variable, fallback to emerald/gold
+            // Get community color from CSS variable, fallback to purple/gold
             const rootStyle = getComputedStyle(document.documentElement);
             const communityColor = rootStyle.getPropertyValue('--tier-std-500').trim();
             const vipColor = rootStyle.getPropertyValue('--tier-vip-500').trim() || '#d4af37';
-            const stdColor = communityColor || '#50c878';
+            const stdColor = communityColor || '#9333ea'; // Roxo padrão Rovex
             return user?.membershipType === 'MGT' ? stdColor : vipColor;
         }
         // If preview is active, use preview color

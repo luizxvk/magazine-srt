@@ -21,7 +21,6 @@ import RoadmapPage from './pages/RoadmapPage';
 import SettingsPage from './pages/SettingsPage';
 import VerificationPage from './pages/VerificationPage';
 import AdminDashboard from './pages/AdminDashboard';
-import GroupChatPage from './pages/GroupChatPage';
 import ConnectPage from './pages/ConnectPage';
 import MarketPage from './pages/MarketPage';
 import PhotoCatalogPage from './pages/PhotoCatalogPage';
@@ -52,7 +51,8 @@ import { EdgeNotificationContainer } from './components/EdgeNotification';
 import VersionUpdateNotification from './components/VersionUpdateNotification';
 import BetaRewardPopup from './components/BetaRewardPopup';
 import BetaEndedOverlay from './components/BetaEndedOverlay';
-import SupportButton from './components/SupportButton';
+// Support button removed - use Settings page contact instead
+// import SupportButton from './components/SupportButton';
 import WebGLBackgroundRenderer from './components/WebGLBackgroundRenderer';
 import FeedbackReminderNotification from './components/FeedbackReminderNotification';
 import ModerationBlockModal from './components/ModerationBlockModal';
@@ -105,7 +105,7 @@ function App() {
           <Route path="/verify-email" element={<PrivateRoute><VerificationPage /></PrivateRoute>} />
           {/* Grupos - Redirect para Connect */}
           <Route path="/groups" element={<Navigate to="/connect" replace />} />
-          <Route path="/groups/:id" element={<PrivateRoute><GroupChatPage /></PrivateRoute>} />
+          <Route path="/groups/:id" element={<Navigate to="/connect" replace />} />
           {/* Rovex Connect */}
           <Route path="/connect" element={<PrivateRoute><ConnectPage /></PrivateRoute>} />
           <Route path="/connect/:groupId" element={<PrivateRoute><ConnectPage /></PrivateRoute>} />
@@ -140,7 +140,6 @@ function App() {
         <VersionUpdateNotification />
         <BetaRewardWrapper />
         <BetaEndedOverlay />
-        <SupportButtonWrapper />
         <FeedbackReminderWrapper />
         <WebGLBackgroundRenderer />
       </Router>
@@ -261,14 +260,7 @@ function BetaRewardWrapper() {
   return <BetaRewardPopup />;
 }
 
-function SupportButtonWrapper() {
-  const { user } = useAuth();
-  
-  // Only show for logged in users
-  if (!user) return null;
-  
-  return <SupportButton />;
-}
+// SupportButtonWrapper removed - support moved to Settings page
 
 function FeedbackReminderWrapper() {
   const { user } = useAuth();

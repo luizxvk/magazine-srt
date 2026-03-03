@@ -16,7 +16,7 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard } from '../components/connect';
 
 interface VoiceParticipant {
   id: string;
@@ -110,6 +110,7 @@ export default function ConnectPage() {
   const [groups, setGroups] = useState<ConnectGroup[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<ConnectGroup | null>(null);
   const [loading, setLoading] = useState(true);
+  const [socketConnecting, setSocketConnecting] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [showAddChannelModal, setShowAddChannelModal] = useState(false);
@@ -133,6 +134,7 @@ export default function ConnectPage() {
   // User presence card state
   const [showPresenceCard, setShowPresenceCard] = useState(false);
   const [presenceUserId, setPresenceUserId] = useState<string | null>(null);
+  const [presenceFallbackData, setPresenceFallbackData] = useState<{ name: string; displayName?: string; avatarUrl?: string } | undefined>(undefined);
   
   // Bots management state
   const [showBotsModal, setShowBotsModal] = useState(false);
@@ -156,7 +158,12 @@ export default function ConnectPage() {
 
   // Register socket event listeners
   useEffect(() => {
-    if (!socket.isConnected) return;
+    if (!socket.isConnected) {
+      return;
+    }
+    
+    // Socket connected - stop connecting state
+    setSocketConnecting(false);
 
     socket.onVoiceUserJoined(() => {
       showToast('Usuário entrou no canal de voz');
@@ -174,7 +181,20 @@ export default function ConnectPage() {
     socket.onScreenShareStopped(() => {
       showToast('Compartilhamento de tela encerrado');
     });
+
+    // Listen for voice state changes (mute/deafen)
+    socket.onVoiceStateChanged(() => {
+      fetchGroups(false); // Refresh participant list without loading spinner
+    });
   }, [socket.isConnected]);
+
+  // Timeout for socket connection - show UI after 5 seconds even if not connected
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSocketConnecting(false);
+    }, 5000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
@@ -381,7 +401,7 @@ export default function ConnectPage() {
       if (newChannelType === 'VOICE') {
         await api.post(`/connect/groups/${addChannelGroupId}/voice`, {
           name: newChannelName.trim(),
-          maxUsers: selectedGroup?.maxMembers || selectedGroup?.members.length || 25,
+          maxUsers: 25, // Default max users - can be edited later
         });
         showToast('Canal de voz criado com sucesso!');
       } else {
@@ -475,8 +495,9 @@ export default function ConnectPage() {
   };
 
   // Open user presence card
-  const handleOpenPresenceCard = (userId: string) => {
+  const handleOpenPresenceCard = (userId: string, memberData?: { name: string; displayName?: string; avatarUrl?: string }) => {
     setPresenceUserId(userId);
+    setPresenceFallbackData(memberData);
     setShowPresenceCard(true);
   };
 
@@ -711,7 +732,7 @@ export default function ConnectPage() {
     ));
   };
 
-  if (loading) {
+  if (loading || socketConnecting) {
     return (
       <div className="min-h-screen text-white font-sans relative">
         <LuxuriousBackground />
@@ -738,7 +759,14 @@ export default function ConnectPage() {
           </motion.div>
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2" style={{ color: accentColor }}>Rovex Connect</h2>
-            <p className="text-gray-400">Conectando aos servidores...</p>
+            <p className="text-gray-400">
+              {socketConnecting ? 'Acordando servidor...' : 'Conectando aos servidores...'}
+            </p>
+            {socketConnecting && (
+              <p className="text-xs text-gray-500 mt-2">
+                O servidor pode demorar até 30s para acordar
+              </p>
+            )}
           </div>
           <Loader size="lg" />
         </div>
@@ -949,7 +977,15 @@ export default function ConnectPage() {
               onRefresh={fetchGroups}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex flex-col items-center justify-center p-4">
+              {/* Group Invites */}
+              <div className="w-full max-w-md mb-6">
+                <GroupInviteCard 
+                  accentColor={accentColor}
+                  onInviteAccepted={() => fetchGroups()}
+                />
+              </div>
+              
               <div className="text-center">
                 <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${isMGT ? 'bg-tier-std\/20' : 'bg-gold-500/20'}`}>
                   <Radio className={`w-10 h-10 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`} />
@@ -976,7 +1012,7 @@ export default function ConnectPage() {
                 <div 
                   key={member.id}
                   className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                  onClick={() => handleOpenPresenceCard(member.userId)}
+                  onClick={() => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl })}
                 >
                   <div className="relative">
                     <img
@@ -1011,7 +1047,7 @@ export default function ConnectPage() {
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={() => handleOpenPresenceCard(member.userId)}
+                    onClick={() => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl })}
                   >
                     <img
                       src={member.user.avatarUrl || '/assets/default-avatar.png'}
@@ -1188,7 +1224,7 @@ export default function ConnectPage() {
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={() => { handleOpenPresenceCard(member.userId); setShowMembersDrawer(false); }}
+                    onClick={() => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }); setShowMembersDrawer(false); }}
                   >
                     <div className="relative">
                       <img
@@ -1222,7 +1258,7 @@ export default function ConnectPage() {
                     <div 
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                      onClick={() => { handleOpenPresenceCard(member.userId); setShowMembersDrawer(false); }}
+                      onClick={() => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }); setShowMembersDrawer(false); }}
                     >
                       <img
                         src={member.user.avatarUrl || '/assets/default-avatar.png'}
@@ -1714,6 +1750,7 @@ export default function ConnectPage() {
           navigate(`/chat/${userId}`);
         }}
         accentColor={accentColor}
+        fallbackData={presenceFallbackData}
       />
     </div>
   );

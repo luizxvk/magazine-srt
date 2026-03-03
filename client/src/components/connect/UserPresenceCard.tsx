@@ -64,6 +64,12 @@ interface UserPresenceCardProps {
   onClose: () => void;
   onStartChat?: (userId: string) => void;
   accentColor?: string;
+  // Fallback data from member list (when API fails)
+  fallbackData?: {
+    name: string;
+    displayName?: string;
+    avatarUrl?: string;
+  };
 }
 
 export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
@@ -72,6 +78,7 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   onClose,
   onStartChat,
   accentColor = '#9333ea',
+  fallbackData,
 }) => {
   const { user: currentUser } = useAuth();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
@@ -88,10 +95,23 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(`/users/${userId}/profile`);
+      // Use the correct endpoint without /profile
+      const response = await api.get(`/users/${userId}`);
       setUserDetails(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao carregar perfil');
+      // Use fallback data if available
+      if (fallbackData) {
+        setUserDetails({
+          id: userId,
+          name: fallbackData.name,
+          displayName: fallbackData.displayName,
+          avatarUrl: fallbackData.avatarUrl,
+          isOnline: true,
+        });
+        setError(null);
+      } else {
+        setError(err.response?.data?.error || 'Erro ao carregar perfil');
+      }
     } finally {
       setLoading(false);
     }
@@ -157,9 +177,9 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] z-50"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] max-w-[90vw] z-[60]"
           >
-            <div className="bg-[#0a0a0f] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+            <div className="bg-[#0a0a0f] rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-h-[85vh] overflow-y-auto">
               {/* Close button */}
               <button
                 onClick={onClose}

@@ -136,7 +136,7 @@ io.on('connection', (socket: AuthenticatedSocket) => {
     const { channelId, groupId } = data;
     
     // Leave any existing voice channel
-    for (const [existingChannelId, users] of voiceChannels.entries()) {
+    Array.from(voiceChannels.entries()).forEach(([existingChannelId, users]) => {
       if (users.has(userId)) {
         users.delete(userId);
         socket.leave(`voice:${existingChannelId}`);
@@ -146,7 +146,7 @@ io.on('connection', (socket: AuthenticatedSocket) => {
           voiceChannels.delete(existingChannelId);
         }
       }
-    }
+    });
     
     // Join the new channel
     socket.join(`voice:${channelId}`);
@@ -271,7 +271,7 @@ io.on('connection', (socket: AuthenticatedSocket) => {
     console.log(`[Connect] User disconnected: ${userId}`);
     
     // Remove from all voice channels
-    for (const [channelId, users] of voiceChannels.entries()) {
+    Array.from(voiceChannels.entries()).forEach(([channelId, users]) => {
       if (users.has(userId)) {
         users.delete(userId);
         io.to(`voice:${channelId}`).emit('user-left-voice', { userId, channelId });
@@ -280,7 +280,7 @@ io.on('connection', (socket: AuthenticatedSocket) => {
           voiceChannels.delete(channelId);
         }
       }
-    }
+    });
     
     // Clean up tracking
     connectedUsers.delete(userId);

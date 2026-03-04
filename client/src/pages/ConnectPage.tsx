@@ -177,6 +177,10 @@ export default function ConnectPage() {
   
   // Voice state
   const [currentVoice, setCurrentVoice] = useState<CurrentVoice | null>(null);
+  const currentVoiceRef = useRef<CurrentVoice | null>(null);
+  // Keep ref in sync with state
+  currentVoiceRef.current = currentVoice;
+  
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   
@@ -305,10 +309,15 @@ export default function ConnectPage() {
       
       // IMPORTANT: When another user joins our voice channel, we need to connect to them via WebRTC
       // This is how Discord-style audio works - existing users connect to new joiners
+      // Use ref to avoid stale closure
+      const voice = currentVoiceRef.current;
       const newUserId = data.userId || data.user?.odiserId;
-      if (currentVoice && currentVoice.channelId === data.channelId && user && newUserId && newUserId !== user.id) {
+      console.log('[ConnectPage] onVoiceUserJoined:', { newUserId, myVoiceChannel: voice?.channelId, dataChannelId: data.channelId, myUserId: user?.id });
+      if (voice && voice.channelId === data.channelId && user && newUserId && newUserId !== user.id) {
         console.log('[ConnectPage] New user joined our channel, connecting via WebRTC:', newUserId);
         webrtc.connectToPeer(newUserId, data.channelId);
+      } else {
+        console.log('[ConnectPage] NOT connecting to peer - conditions not met');
       }
     });
 
@@ -577,12 +586,11 @@ export default function ConnectPage() {
       
       // After starting audio, connect to all existing participants in the channel
       if (audioStarted && user) {
-        // Find the channel to get existing participants
-        const group = groups.find(g => g.id === groupId);
-        const channel = group?.voiceChannels.find(c => c.id === channelId);
-        console.log('[ConnectPage] Channel found:', channel?.id, 'participants:', channel?.participants.length);
+        // Use the channel from API response which has fresh participant list
+        const channel = response.data.channel;
+        console.log('[ConnectPage] Channel found:', channel?.id, 'participants:', channel?.participants?.length);
         
-        if (channel) {
+        if (channel && channel.participants) {
           // Connect to each existing participant (except self)
           for (const participant of channel.participants) {
             if (participant.user.id !== user.id) {

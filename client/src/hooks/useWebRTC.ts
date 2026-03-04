@@ -319,11 +319,19 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
   // Handle incoming WebRTC events
   useEffect(() => {
-    if (!channelId) return;
+    console.log('[WebRTC] Setting up handlers for channelId:', channelId);
+    if (!channelId) {
+      console.log('[WebRTC] No channelId, skipping handler setup');
+      return;
+    }
 
     // Handle incoming offer
     onWebRTCOffer(async (data) => {
-      if (data.channelId !== channelId) return;
+      console.log('[WebRTC] onWebRTCOffer called, data.channelId:', data.channelId, 'my channelId:', channelId);
+      if (data.channelId !== channelId) {
+        console.log('[WebRTC] Ignoring offer - channelId mismatch');
+        return;
+      }
       
       console.log('[WebRTC] Received offer from:', data.fromUserId);
 
@@ -358,7 +366,11 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
     // Handle incoming answer
     onWebRTCAnswer(async (data) => {
-      if (data.channelId !== channelId) return;
+      console.log('[WebRTC] onWebRTCAnswer called, data.channelId:', data.channelId, 'my channelId:', channelId);
+      if (data.channelId !== channelId) {
+        console.log('[WebRTC] Ignoring answer - channelId mismatch');
+        return;
+      }
       
       console.log('[WebRTC] Received answer from:', data.fromUserId);
 
@@ -377,7 +389,11 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
     // Handle incoming ICE candidate
     onWebRTCIceCandidate(async (data) => {
-      if (data.channelId !== channelId) return;
+      console.log('[WebRTC] onWebRTCIceCandidate called, data.channelId:', data.channelId, 'my channelId:', channelId);
+      if (data.channelId !== channelId) {
+        console.log('[WebRTC] Ignoring ICE candidate - channelId mismatch');
+        return;
+      }
 
       console.log('[WebRTC] Received ICE candidate from:', data.fromUserId);
       const peer = peerConnections.current.get(data.fromUserId);

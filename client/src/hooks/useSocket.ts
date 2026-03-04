@@ -160,18 +160,21 @@ export function useSocket(): UseSocketReturn {
     socket.on('webrtc-offer', (data) => {
       console.log('[Socket] webrtc-offer received:', data);
       const callback = callbacksRef.current.get('webrtc-offer');
+      console.log('[Socket] webrtc-offer callback exists?', !!callback);
       if (callback) callback(data);
     });
 
     socket.on('webrtc-answer', (data) => {
       console.log('[Socket] webrtc-answer received:', data);
       const callback = callbacksRef.current.get('webrtc-answer');
+      console.log('[Socket] webrtc-answer callback exists?', !!callback);
       if (callback) callback(data);
     });
 
     socket.on('webrtc-ice-candidate', (data) => {
       console.log('[Socket] webrtc-ice-candidate received:', data);
       const callback = callbacksRef.current.get('webrtc-ice-candidate');
+      console.log('[Socket] webrtc-ice-candidate callback exists?', !!callback);
       if (callback) callback(data);
     });
 

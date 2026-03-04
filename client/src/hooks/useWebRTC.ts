@@ -31,10 +31,17 @@ interface UseWebRTCReturn {
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
+    // STUN servers for NAT traversal
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
+    // Free TURN servers for relay when direct connection fails
+    // OpenRelay TURN servers (free, no auth required)
+    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
   ],
+  iceCandidatePoolSize: 10,
 };
 
 export function useWebRTC(channelId: string | null): UseWebRTCReturn {

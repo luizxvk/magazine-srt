@@ -96,6 +96,17 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
     pc.onconnectionstatechange = () => {
       console.log(`[WebRTC] Connection state with ${odiserId}:`, pc.connectionState);
+      console.log(`[WebRTC] ICE state with ${odiserId}:`, pc.iceConnectionState, 'gathering:', pc.iceGatheringState);
+      
+      if (pc.connectionState === 'connected') {
+        console.log(`[WebRTC] ✅ Fully connected with ${odiserId}`);
+        // Log remote tracks
+        pc.getReceivers().forEach(receiver => {
+          if (receiver.track) {
+            console.log(`[WebRTC] Remote track:`, receiver.track.kind, 'enabled:', receiver.track.enabled, 'readyState:', receiver.track.readyState);
+          }
+        });
+      }
       
       if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
         disconnectFromPeer(odiserId);

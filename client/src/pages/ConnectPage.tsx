@@ -216,9 +216,23 @@ export default function ConnectPage() {
         // Append to body to ensure playback works
         audio.style.display = 'none';
         document.body.appendChild(audio);
+        // Monitor track state
+        stream.getAudioTracks().forEach(track => {
+          console.log('[ConnectPage] Audio track state:', { id: track.id, enabled: track.enabled, muted: track.muted, readyState: track.readyState });
+          track.onended = () => console.log('[ConnectPage] Audio track ended:', track.id);
+          track.onmute = () => console.log('[ConnectPage] Audio track muted:', track.id);
+          track.onunmute = () => console.log('[ConnectPage] Audio track unmuted:', track.id);
+        });
+        
+        // Monitor audio element state
+        audio.onloadedmetadata = () => console.log('[ConnectPage] Audio metadata loaded for:', odiserId);
+        audio.onplay = () => console.log('[ConnectPage] Audio started playing for:', odiserId);
+        audio.onpause = () => console.log('[ConnectPage] Audio paused for:', odiserId);
+        audio.onerror = (e) => console.error('[ConnectPage] Audio error for:', odiserId, e);
+        
         // Try to play (may require user interaction first time)
         audio.play().then(() => {
-          console.log('[ConnectPage] Playing remote audio from:', odiserId);
+          console.log('[ConnectPage] Playing remote audio from:', odiserId, 'paused:', audio.paused, 'volume:', audio.volume);
         }).catch((err) => {
           console.warn('[ConnectPage] Audio autoplay blocked:', err);
           // User interaction required - audio will play after any click

@@ -54,13 +54,18 @@ router.get('/voice/current', getCurrentVoiceChannel);
 router.post('/voice/leave', leaveVoiceChannel);
 
 // Generate Agora RTC token for voice channel
-router.post('/voice/token', (req, res) => {
+router.post('/voice/token', authenticateToken, (req, res) => {
   try {
     const { channelId } = req.body;
     const userId = (req as any).user?.id;
     
     if (!channelId) {
       return res.status(400).json({ error: 'channelId is required' });
+    }
+    
+    if (!userId) {
+      console.error('[Agora] No user ID found in request');
+      return res.status(401).json({ error: 'User not authenticated' });
     }
     
     // Trim to remove any whitespace/newlines from env vars
@@ -73,11 +78,7 @@ router.post('/voice/token', (req, res) => {
     }
     
     console.log('[Agora] App ID length:', appId.length, 'Certificate length:', appCertificate.length);
-    
-    if (!appId || !appCertificate) {
-      console.error('[Agora] Missing AGORA_APP_ID or AGORA_APP_CERTIFICATE');
-      return res.status(500).json({ error: 'Agora not configured' });
-    }
+    console.log('[Agora] Generating token for userId:', userId, 'channelId:', channelId);
     
     // Token expires in 24 hours
     const expirationTimeInSeconds = 86400;

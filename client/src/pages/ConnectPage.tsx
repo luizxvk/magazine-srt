@@ -577,7 +577,7 @@ export default function ConnectPage() {
       
       // Save voice state for mini player
       const group = groups.find((g) => g.id === groupId);
-      const channel = group?.channels.find((c) => c.id === channelId);
+      const channel = group?.voiceChannels.find((c: VoiceChannel) => c.id === channelId);
       localStorage.setItem('rovex-voice-state', JSON.stringify({
         channelId,
         channelName: channel?.name || 'Canal de Voz',

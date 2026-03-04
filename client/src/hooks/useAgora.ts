@@ -8,7 +8,8 @@ import type {
 } from 'agora-rtc-sdk-ng';
 
 // Agora App ID - get from https://console.agora.io
-const AGORA_APP_ID = import.meta.env.VITE_AGORA_APP_ID || '';
+// Use .trim() to remove any whitespace/newlines from environment variable
+const AGORA_APP_ID = (import.meta.env.VITE_AGORA_APP_ID || '').trim();
 
 // Debug: log App ID (first/last 4 chars only for security)
 if (AGORA_APP_ID) {

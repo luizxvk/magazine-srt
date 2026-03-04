@@ -418,7 +418,7 @@
 .anim-gradient-waves::after {
     background: rgb(255 255 255 / 25%);
     border-radius: 1000% 1000% 0 0;
-    position: fixed;
+    position: absolute;
     width: 200%;
     height: 12em;
     animation: wave 10s -3s linear infinite;

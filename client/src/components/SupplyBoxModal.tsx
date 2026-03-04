@@ -28,6 +28,7 @@ const BACKGROUND_PREVIEWS: Record<string, string> = {
     'bg_aurora': 'linear-gradient(125deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #16213e 75%, #1a1a2e 100%)',
     'bg_sunset': 'linear-gradient(125deg, #1a0a0a 0%, #2d1f1f 25%, #4a2020 50%, #2d1f1f 75%, #1a0a0a 100%)',
     'bg_ocean': 'linear-gradient(125deg, #0a1628 0%, #0c2340 33%, #0a1628 66%, #0c2340 100%)',
+    'bg_oceano': 'linear-gradient(180deg, #0a0a1a 0%, #1a2a4a 40%, #2a4a6a 70%, #1a3a5a 100%)',
     'bg_forest': 'linear-gradient(125deg, #0a1a0a 0%, #0f2a0f 33%, #0a1a0a 66%, #0f2a0f 100%)',
     'bg_galaxy': 'linear-gradient(135deg, #0c0c0c 0%, #1a0a2e 25%, #2d1b4e 50%, #1a0a2e 75%, #0c0c0c 100%)',
     'bg_matrix': 'linear-gradient(180deg, #0a0f0a 0%, #0a1a0a 33%, #0a0f0a 66%, #0a1a0a 100%)',
@@ -41,6 +42,8 @@ const BACKGROUND_PREVIEWS: Record<string, string> = {
     'bg_emerald': 'linear-gradient(135deg, #0a1a0f 0%, #0f2a1a 25%, #143a25 50%, #0f2a1a 75%, #0a1a0f 100%)',
     'bg_royal': 'linear-gradient(135deg, #0f0a1a 0%, #1a0f2a 25%, #25143a 50%, #1a0f2a 75%, #0f0a1a 100%)',
     'bg_carbon': 'linear-gradient(135deg, #0a0a0a 0%, #151515 25%, #202020 50%, #151515 75%, #0a0a0a 100%)',
+    'bg_retrowave': 'linear-gradient(180deg, #1a0028 0%, #2d004a 30%, #ff006e 60%, #ff6b35 100%)',
+    'bg_chuva_neon': 'linear-gradient(180deg, #0d0015 0%, #1a0030 40%, #00ff88 50%, #0d0015 100%)',
     'anim-cosmic-triangles': 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%)',
     'anim-gradient-waves': 'linear-gradient(135deg, #1e140a 0%, #8b7335 25%, #d4af37 50%, #8b7335 75%, #1e140a 100%)',
     'anim-rainbow-skies': 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%)',
@@ -439,6 +442,58 @@ export default function SupplyBoxModal({ isOpen, onClose, onSuccess }: SupplyBox
                             animate={{ scale: 1, opacity: 1 }}
                             className="relative p-8 flex flex-col items-center"
                         >
+                            {/* Legendary Special Effects */}
+                            {reward.rarity === 'LEGENDARY' && (
+                                <>
+                                    {/* Golden particles */}
+                                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                        {[...Array(20)].map((_, i) => (
+                                            <motion.div
+                                                key={i}
+                                                className="absolute w-2 h-2 rounded-full"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+                                                    left: `${Math.random() * 100}%`,
+                                                    top: `${Math.random() * 100}%`,
+                                                    boxShadow: '0 0 10px #ffd700, 0 0 20px #ff8c00'
+                                                }}
+                                                initial={{ scale: 0, opacity: 0 }}
+                                                animate={{
+                                                    scale: [0, 1.5, 0],
+                                                    opacity: [0, 1, 0],
+                                                    y: [-20, -80],
+                                                }}
+                                                transition={{
+                                                    duration: 2,
+                                                    repeat: Infinity,
+                                                    delay: i * 0.1,
+                                                    ease: "easeOut"
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                    {/* Radial glow effect */}
+                                    <motion.div
+                                        className="absolute inset-0 pointer-events-none"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: [0.3, 0.6, 0.3] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                        style={{
+                                            background: 'radial-gradient(circle at center, rgba(255,215,0,0.3) 0%, transparent 60%)'
+                                        }}
+                                    />
+                                    {/* Sparkle burst */}
+                                    <motion.div
+                                        className="absolute top-1/4 left-1/2 -translate-x-1/2"
+                                        initial={{ scale: 0, rotate: 0 }}
+                                        animate={{ scale: [0, 1.5, 0], rotate: 360 }}
+                                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
+                                    >
+                                        <Sparkles className="w-16 h-16 text-yellow-400" style={{ filter: 'drop-shadow(0 0 15px #ffd700)' }} />
+                                    </motion.div>
+                                </>
+                            )}
+
                             {/* Reward Type Header */}
                             <div className="mb-4 flex flex-col items-center gap-2">
                                 <motion.div

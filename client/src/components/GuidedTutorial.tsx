@@ -116,12 +116,12 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
         if (el && isElementVisible(el)) {
             setActivePosition(position);
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Small delay for scroll to complete
+            // Increased delay for scroll to complete and layout to stabilize
             setTimeout(() => {
                 const rect = el.getBoundingClientRect();
                 setTargetRect(rect);
                 setIsVisible(true);
-            }, 400);
+            }, 600);
         } else {
             // Skip to next step if element not found or not visible
             if (stepIndex < TUTORIAL_STEPS.length - 1) {
@@ -146,12 +146,27 @@ export default function GuidedTutorial({ isOpen, onClose }: GuidedTutorialProps)
         }
     }, [currentStep, isOpen, findAndHighlight]);
 
-    // Recalculate position on resize
+    // Recalculate position on resize or scroll
     useEffect(() => {
         if (!isOpen || !isVisible) return;
         const handleResize = () => findAndHighlight(currentStep);
+        const handleScroll = () => {
+            // Recalculate position on scroll to keep highlight in sync
+            const step = TUTORIAL_STEPS[currentStep];
+            if (!step) return;
+            const el = document.querySelector(step.targetSelector) || 
+                       (step.fallbackSelector ? document.querySelector(step.fallbackSelector) : null);
+            if (el && isElementVisible(el)) {
+                const rect = el.getBoundingClientRect();
+                setTargetRect(rect);
+            }
+        };
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        window.addEventListener('scroll', handleScroll, true); // Capture phase for all scrolls
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('scroll', handleScroll, true);
+        };
     }, [isOpen, isVisible, currentStep, findAndHighlight]);
 
     const handleClose = () => {

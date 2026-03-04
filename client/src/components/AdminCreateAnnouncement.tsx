@@ -22,34 +22,34 @@ interface Plan {
 const defaultPlans: Plan[] = [
     {
         id: 'stock',
-        name: 'SRT LOG Stock',
+        name: 'Plano Básico',
         price: 5,
         displayPrice: 'R$ 5',
         period: '/mês',
-        description: 'Carros originais, prontos para serem conduzidos.',
-        features: ['4 carros por mês', '1 todo sábado', 'Acesso à coleção básica', 'Suporte padrão'],
+        description: '',
+        features: [],
         highlight: false,
         iconName: 'Shield'
     },
     {
         id: 'signature',
-        name: 'SRT LOG Signature',
+        name: 'Plano Premium',
         price: 15,
         displayPrice: 'R$ 15',
         period: '/mês',
-        description: 'Carros exclusivos da nova atualização. Modelos selecionados, edição limitada.',
-        features: ['Modelos Selecionados*', 'Edição Limitada', 'Acesso antecipado', 'Suporte VIP 24/7', 'Badge Exclusivo no Perfil'],
+        description: '',
+        features: [],
         highlight: true,
         iconName: 'Star'
     },
     {
         id: 'plotted',
-        name: 'SRT LOG Plotted',
+        name: 'Plano Pro',
         price: 10,
         displayPrice: 'R$ 10',
         period: '/mês',
-        description: 'Carros personalizados, com identidade SRT.',
-        features: ['4 carros por mês', '1 todo sábado', 'Personalização exclusiva', 'Acesso à coleção custom'],
+        description: '',
+        features: [],
         highlight: false,
         iconName: 'Zap'
     }
@@ -73,10 +73,10 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
 
     // Page Content State
     const [pageContent, setPageContent] = useState({
-        tag: 'Nova Assinatura Premium',
-        heroTitle: 'Anunciamos a',
+        tag: '',
+        heroTitle: '',
         heroDescription: '',
-        logoUrl: '/assets/mgt-log-logo.png',
+        logoUrl: '',
         plans: defaultPlans,
         footerText: '',
         footerSubText: ''
@@ -132,7 +132,7 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
                 subscriptionType,
                 description,
                 logoUrl,
-                backgroundUrl: bgUrl
+                backgroundImageUrl: bgUrl
             });
 
             // Reset form
@@ -188,7 +188,7 @@ export default function AdminCreateAnnouncement({ showToast }: AdminCreateAnnoun
             <div className="flex items-center justify-between mb-6 relative z-10">
                 <h2 className="text-xl font-serif text-white flex items-center gap-2">
                     <Megaphone className="w-5 h-5 text-red-400" />
-                    {activeTab === 'create' ? 'Criar Atualização/Novidade' : 'Editar Página SRT'}
+                    {activeTab === 'create' ? 'Criar Atualização/Novidade' : 'Editar Página'}
                 </h2>
 
                 <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">

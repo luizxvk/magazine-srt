@@ -224,31 +224,9 @@ export default function AdminModerationPanel() {
 
                                 {/* Score bars */}
                                 {log.details?.textScores && (
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
-                                        <div>
-                                            <span className="text-[10px] text-gray-500 uppercase">Toxicidade</span>
-                                            {getScoreBar(log.details.textScores.toxicity)}
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-gray-500 uppercase">Toxicidade Severa</span>
-                                            {getScoreBar(log.details.textScores.severeToxicity)}
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-gray-500 uppercase">Insulto</span>
-                                            {getScoreBar(log.details.textScores.insult)}
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-gray-500 uppercase">Profanidade</span>
-                                            {getScoreBar(log.details.textScores.profanity)}
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-gray-500 uppercase">Ameaça</span>
-                                            {getScoreBar(log.details.textScores.threat)}
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-gray-500 uppercase">Ataque Identidade</span>
-                                            {getScoreBar(log.details.textScores.identityAttack)}
-                                        </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[10px] text-gray-500 uppercase">Score Geral</span>
+                                        {getScoreBar(log.score)}
                                     </div>
                                 )}
 

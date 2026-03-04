@@ -291,7 +291,7 @@ router.get('/public/config', async (req: Request, res: Response) => {
     const config = {
       id: baseConfig.id || savedConfig?.id || 'magazine-srt',
       subdomain: baseConfig.subdomain || savedConfig?.subdomain || 'magazine-srt',
-      name: baseConfig.name || savedConfig?.name || 'Magazine SRT',
+      name: baseConfig.name || savedConfig?.name || 'Rovex Communities',
       slogan: baseConfig.slogan || savedConfig?.slogan || 'A comunidade definitiva',
       
       // Cores - TENANT CONFIG tem prioridade!

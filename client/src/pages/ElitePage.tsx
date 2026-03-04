@@ -12,7 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import Header from '../components/Header';
-import LiquidChrome from '../components/LiquidChrome';
+import ColorBends from '../components/ColorBends';
 import LiquidEliteButton from '../components/LiquidEliteButton';
 import confetti from 'canvas-confetti';
 
@@ -195,14 +195,16 @@ export default function ElitePage() {
 
     return (
         <div className="min-h-screen text-white relative overflow-hidden">
-            {/* LiquidChrome animated background - no mouse interaction */}
+            {/* ColorBends animated background - Elite theme */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <LiquidChrome
-                    baseColor={[0.08, 0.05, 0.15]}
-                    speed={0.3}
-                    amplitude={0.4}
-                    frequencyX={2.5}
-                    frequencyY={2}
+                <ColorBends
+                    colors={['#d4af37', '#8B4513', '#B22222', '#1a1a1a', '#000000']}
+                    speed={0.15}
+                    scale={1.2}
+                    frequency={0.8}
+                    warpStrength={0.5}
+                    mouseInfluence={0}
+                    autoRotate={0.5}
                 />
                 {/* Dark gradient overlay for readability */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />

@@ -16,6 +16,7 @@ import {
   updateTextChannel,
   deleteTextChannel,
 } from '../controllers/connectController';
+import { getMyInvites, respondInvite, inviteMember, generateInviteLink } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { validateImageContent } from '../middleware/fileValidationMiddleware';
 
@@ -79,6 +80,19 @@ router.post('/groups/:groupId/voice/:channelId/join', joinVoiceChannel);
 
 // Update group avatar
 router.patch('/groups/:groupId/avatar', upload.single('avatar'), validateImageContent, updateGroupAvatar);
+
+// ============================================
+// GROUP INVITES
+// ============================================
+
+// Get pending invites for current user
+router.get('/groups/invites/me', getMyInvites);
+
+// Respond to invite (accept/reject)
+router.post('/groups/invites/:inviteId/respond', respondInvite);
+
+// Generate invite link for a group
+router.post('/groups/:groupId/invite', generateInviteLink);
 
 // ============================================
 // TEXT CHANNELS

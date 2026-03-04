@@ -4,6 +4,8 @@ import {
   X, 
   MessageSquare, 
   UserPlus, 
+  UserCheck,
+  UserMinus,
   Crown, 
   Star, 
   Gamepad2,
@@ -37,6 +39,10 @@ interface UserDetails {
   profileBgUrl?: string | null;
   isVerified?: boolean;
   membershipType?: 'MAGAZINE' | 'MGT';
+  // Friend status
+  isFriend?: boolean;
+  friendRequestSent?: boolean;
+  friendRequestReceived?: boolean;
   // Additional stats
   trophies?: number;
   achievements?: number;
@@ -100,6 +106,59 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [friendActionLoading, setFriendActionLoading] = useState(false);
+  
+  // Handle add/remove friend
+  const handleFriendAction = async () => {
+    if (!userDetails || friendActionLoading) return;
+    setFriendActionLoading(true);
+    
+    try {
+      if (userDetails.isFriend) {
+        // Remove friend
+        await api.delete(`/users/friends/${userId}`);
+        setUserDetails(prev => prev ? { ...prev, isFriend: false, friendRequestSent: false } : null);
+      } else if (userDetails.friendRequestSent) {
+        // Cancel friend request
+        await api.delete(`/users/friend-requests/${userId}`);
+        setUserDetails(prev => prev ? { ...prev, friendRequestSent: false } : null);
+      } else {
+        // Send friend request
+        await api.post('/users/friend-request', { userId });
+        setUserDetails(prev => prev ? { ...prev, friendRequestSent: true } : null);
+      }
+    } catch (err) {
+      console.error('Friend action failed:', err);
+    } finally {
+      setFriendActionLoading(false);
+    }
+  };
+  
+  // Get friend button state
+  const getFriendButtonState = () => {
+    if (!userDetails) return { icon: UserPlus, text: '', color: 'bg-white/10' };
+    
+    if (userDetails.isFriend) {
+      return { 
+        icon: UserCheck, 
+        text: 'Amigo', 
+        color: 'bg-green-500/20 text-green-400 hover:bg-red-500/20 hover:text-red-400',
+        hoverIcon: UserMinus
+      };
+    }
+    if (userDetails.friendRequestSent) {
+      return { 
+        icon: Clock, 
+        text: 'Pendente', 
+        color: 'bg-amber-500/20 text-amber-400'
+      };
+    }
+    return { 
+      icon: UserPlus, 
+      text: '', 
+      color: 'bg-white/10 text-white hover:bg-white/20'
+    };
+  };
   
   // Calculate card position for desktop
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -543,11 +602,28 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                           <MessageSquare size={16} />
                           Mensagem
                         </button>
-                        <button
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white/10 text-white hover:bg-white/20 transition-all"
-                        >
-                          <UserPlus size={16} />
-                        </button>
+                        {(() => {
+                          const friendState = getFriendButtonState();
+                          const IconComponent = friendState.icon;
+                          return (
+                            <button
+                              onClick={handleFriendAction}
+                              disabled={friendActionLoading}
+                              className={`group flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${friendState.color} ${friendActionLoading ? 'opacity-50' : ''}`}
+                              title={userDetails?.isFriend ? 'Remover amigo' : userDetails?.friendRequestSent ? 'Pedido pendente' : 'Adicionar amigo'}
+                            >
+                              {userDetails?.isFriend ? (
+                                <>
+                                  <UserCheck size={16} className="group-hover:hidden" />
+                                  <UserMinus size={16} className="hidden group-hover:block" />
+                                </>
+                              ) : (
+                                <IconComponent size={16} />
+                              )}
+                              {friendState.text && <span className="hidden sm:inline">{friendState.text}</span>}
+                            </button>
+                          );
+                        })()}
                       </>
                     )}
                     <button

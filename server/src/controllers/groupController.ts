@@ -978,6 +978,41 @@ export const inviteMember = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Generate invite link for sharing
+export const generateInviteLink = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { groupId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    // Check if user is member of the group
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } }
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'Você não é membro deste grupo' });
+    }
+
+    // Generate a simple invite code based on group ID
+    const inviteCode = groupId;
+
+    res.json({ 
+      inviteCode,
+      inviteLink: `${process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/connect/${inviteCode}`
+    });
+  } catch (error: any) {
+    console.error('Error generating invite link:', error);
+    res.status(500).json({
+      error: 'Erro ao gerar link de convite',
+      details: error?.message || 'Erro desconhecido'
+    });
+  }
+};
+
 // Responder convite
 export const respondInvite = async (req: AuthRequest, res: Response) => {
   try {

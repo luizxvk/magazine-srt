@@ -1160,7 +1160,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                             key={item.id}
                                                             whileHover={{ scale: 1.02 }}
                                                             className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
-                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                                } ${(isDarkMode || !isMGT) ? 'bg-black/40' : 'bg-gray-50'}`}
                                                         >
                                                             <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                                                 <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
@@ -1178,7 +1178,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     <Eye className="w-3 h-3 text-white" />
                                                                 </button>
                                                             </div>
-                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                            <div className={`p-3 ${(isDarkMode || !isMGT) ? 'bg-black/60' : 'bg-white/80'}`}>
                                                                 <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
                                                                 <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
                                                                 <div className="mt-2">
@@ -1239,7 +1239,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                             key={item.id}
                                                             whileHover={{ scale: 1.02 }}
                                                             className={`relative rounded-xl overflow-hidden border ${equipped ? `border-${themeColor}-500` : borderColor
-                                                                } ${isDarkMode ? 'bg-black/40' : 'bg-gray-50'}`}
+                                                                } ${(isDarkMode || !isMGT) ? 'bg-black/40' : 'bg-gray-50'}`}
                                                         >
                                                             <div className="aspect-square relative flex items-center justify-center overflow-hidden">
                                                                 <div className="absolute inset-0 animate-wave-bg" style={{ background: item.preview, backgroundSize: '200% 200%' }} />
@@ -1262,7 +1262,7 @@ export default function CustomizationShop({ isOpen, onClose }: CustomizationShop
                                                                     <Eye className="w-3 h-3 text-white" />
                                                                 </button>
                                                             </div>
-                                                            <div className={`p-3 ${isDarkMode ? 'bg-black/60' : 'bg-white/80'}`}>
+                                                            <div className={`p-3 ${(isDarkMode || !isMGT) ? 'bg-black/60' : 'bg-white/80'}`}>
                                                                 <h3 className={`text-sm font-medium ${textMain} truncate`}>{item.name}</h3>
                                                                 <p className={`text-xs ${textSub} truncate`}>{item.description}</p>
                                                                 <div className="mt-2">

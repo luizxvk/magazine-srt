@@ -104,7 +104,7 @@ interface CurrentVoice {
 export default function ConnectPage() {
   const navigate = useNavigate();
   const { groupId } = useParams();
-  const { user, theme, showToast, showError, accentColor } = useAuth();
+  const { user, theme, showToast, showError, accentColor, setActiveChatUserId } = useAuth();
   const { isStdTier } = useCommunity();
   const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
@@ -155,6 +155,10 @@ export default function ConnectPage() {
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [inviteCopied, setInviteCopied] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteTab, setInviteTab] = useState<'link' | 'friends' | 'community'>('link');
+  const [inviteFriends, setInviteFriends] = useState<Array<{ id: string; name: string; displayName?: string; avatarUrl?: string; trophies: number; level: number }>>([]);
+  const [inviteCommunityUsers, setInviteCommunityUsers] = useState<Array<{ id: string; name: string; displayName?: string; avatarUrl?: string; trophies: number; level: number }>>([]);
+  const [inviting, setInviting] = useState(false);
   
   // Join group via link state
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -295,6 +299,31 @@ export default function ConnectPage() {
     fetchGroups();
     fetchCurrentVoice();
   }, []);
+
+  // Re-establish voice connection after page refresh
+  useEffect(() => {
+    const rejoinVoiceChannel = async () => {
+      if (currentVoice && socket.isConnected && user && !webrtc.isAudioEnabled) {
+        // Rejoin socket room
+        socket.joinVoice(currentVoice.channelId, {
+          odiserId: user.id,
+          name: user.displayName || user.name,
+          avatarUrl: user.avatarUrl,
+          isMuted: isMuted,
+          isDeafened: isDeafened,
+          isSpeaking: false,
+          isStreaming: webrtc.isScreenSharing,
+        });
+        
+        // Restart audio capture (user permission will be requested)
+        if (!isMuted && !isDeafened) {
+          await webrtc.startAudio();
+        }
+      }
+    };
+    
+    rejoinVoiceChannel();
+  }, [currentVoice, socket.isConnected, user]);
 
   useEffect(() => {
     if (groupId && groups.length > 0) {
@@ -721,16 +750,71 @@ export default function ConnectPage() {
     setShowGroupInviteModal(true);
     setInviteLoading(true);
     setInviteCopied(false);
+    setInviteTab('link');
     
     try {
-      // Generate invite link
-      const response = await api.post(`/connect/groups/${selectedGroup.id}/invite`);
-      setInviteLink(response.data.inviteLink || `${window.location.origin}/connect/join/${response.data.inviteCode}`);
+      // Generate invite link and fetch friends/community in parallel
+      const [inviteRes, friendsRes, communityRes] = await Promise.all([
+        api.post(`/connect/groups/${selectedGroup.id}/invite`).catch(() => null),
+        api.get('/users/friends').catch(() => ({ data: { friends: [] } })),
+        api.get('/users?limit=50').catch(() => ({ data: { users: [] } }))
+      ]);
+      
+      // Set invite link
+      if (inviteRes?.data) {
+        setInviteLink(inviteRes.data.inviteLink || `${window.location.origin}/connect/join/${inviteRes.data.inviteCode}`);
+      } else {
+        setInviteLink(`${window.location.origin}/connect/${selectedGroup.id}`);
+      }
+      
+      // Set friends (exclude members already in group)
+      const memberIds = new Set(selectedGroup.members?.map(m => m.userId) || []);
+      const friendsList = (friendsRes.data.friends || [])
+        .filter((f: any) => !memberIds.has(f.id) && f.id !== user?.id)
+        .map((f: any) => ({
+          id: f.id,
+          name: f.name,
+          displayName: f.displayName,
+          avatarUrl: f.avatarUrl,
+          trophies: f.trophies || 0,
+          level: f.level || 1
+        }));
+      setInviteFriends(friendsList);
+      
+      // Set community users (exclude members and friends)
+      const friendIds = new Set(friendsList.map((f: any) => f.id));
+      const communityList = (communityRes.data.users || [])
+        .filter((u: any) => !memberIds.has(u.id) && !friendIds.has(u.id) && u.id !== user?.id)
+        .map((u: any) => ({
+          id: u.id,
+          name: u.name,
+          displayName: u.displayName,
+          avatarUrl: u.avatarUrl,
+          trophies: u.trophies || 0,
+          level: u.level || 1
+        }));
+      setInviteCommunityUsers(communityList);
     } catch (error: any) {
       // Fallback to direct link
       setInviteLink(`${window.location.origin}/connect/${selectedGroup.id}`);
     } finally {
       setInviteLoading(false);
+    }
+  };
+
+  const handleInviteMember = async (userId: string) => {
+    if (!selectedGroup || inviting) return;
+    setInviting(true);
+    try {
+      await api.post(`/connect/groups/${selectedGroup.id}/invite`, { userId });
+      showToast('Convite enviado!');
+      // Remove user from lists
+      setInviteFriends(prev => prev.filter(f => f.id !== userId));
+      setInviteCommunityUsers(prev => prev.filter(u => u.id !== userId));
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao enviar convite');
+    } finally {
+      setInviting(false);
     }
   };
 
@@ -2150,85 +2234,195 @@ export default function ConnectPage() {
               </div>
 
               <div className="p-4 space-y-4">
-                {/* Invite Link */}
-                <div>
-                  <label className={`text-sm font-medium ${themeText} mb-2 block`}>
-                    Link de convite
-                  </label>
-                  <div className="flex gap-2">
-                    <div 
-                      className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'} border ${themeBorder} min-w-0 overflow-hidden`}
-                    >
-                      <Link className="w-4 h-4 flex-shrink-0" style={{ color: accentColor }} />
-                      {inviteLoading ? (
-                        <span className={themeSecondary}>Gerando link...</span>
-                      ) : (
-                        <span className={`${themeText} text-sm truncate max-w-full`}>
-                          {inviteLink || 'Erro ao gerar link'}
-                        </span>
-                      )}
+                {/* Tabs */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setInviteTab('link')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                      inviteTab === 'link'
+                        ? 'text-white'
+                        : `${theme === 'light' ? 'bg-gray-100 text-gray-600' : 'bg-white/5 text-gray-400'} hover:opacity-80`
+                    }`}
+                    style={inviteTab === 'link' ? { backgroundColor: accentColor } : {}}
+                  >
+                    Link
+                  </button>
+                  <button
+                    onClick={() => setInviteTab('friends')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                      inviteTab === 'friends'
+                        ? 'text-white'
+                        : `${theme === 'light' ? 'bg-gray-100 text-gray-600' : 'bg-white/5 text-gray-400'} hover:opacity-80`
+                    }`}
+                    style={inviteTab === 'friends' ? { backgroundColor: accentColor } : {}}
+                  >
+                    Amigos ({inviteFriends.length})
+                  </button>
+                  <button
+                    onClick={() => setInviteTab('community')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                      inviteTab === 'community'
+                        ? 'text-white'
+                        : `${theme === 'light' ? 'bg-gray-100 text-gray-600' : 'bg-white/5 text-gray-400'} hover:opacity-80`
+                    }`}
+                    style={inviteTab === 'community' ? { backgroundColor: accentColor } : {}}
+                  >
+                    Comunidade ({inviteCommunityUsers.length})
+                  </button>
+                </div>
+
+                {/* Tab Content */}
+                {inviteTab === 'link' ? (
+                  <>
+                    {/* Invite Link */}
+                    <div>
+                      <label className={`text-sm font-medium ${themeText} mb-2 block`}>
+                        Link de convite
+                      </label>
+                      <div className="flex gap-2">
+                        <div 
+                          className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'} border ${themeBorder} min-w-0 overflow-hidden`}
+                        >
+                          <Link className="w-4 h-4 flex-shrink-0" style={{ color: accentColor }} />
+                          {inviteLoading ? (
+                            <span className={themeSecondary}>Gerando link...</span>
+                          ) : (
+                            <span className={`${themeText} text-sm truncate max-w-full`}>
+                              {inviteLink || 'Erro ao gerar link'}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={handleCopyInviteLink}
+                          disabled={inviteLoading || !inviteLink}
+                          className={`px-4 py-2.5 rounded-xl font-medium text-white transition-all flex items-center gap-2 ${inviteLoading ? 'opacity-50' : 'hover:opacity-90'}`}
+                          style={{ backgroundColor: accentColor }}
+                        >
+                          {inviteCopied ? (
+                            <>
+                              <Copy className="w-4 h-4" />
+                              Copiado!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4" />
+                              Copiar
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={handleCopyInviteLink}
-                      disabled={inviteLoading || !inviteLink}
-                      className={`px-4 py-2.5 rounded-xl font-medium text-white transition-all flex items-center gap-2 ${inviteLoading ? 'opacity-50' : 'hover:opacity-90'}`}
-                      style={{ backgroundColor: accentColor }}
+
+                    {/* Or divider */}
+                    <div className="flex items-center gap-3">
+                      <div className={`flex-1 h-px ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`} />
+                      <span className={`text-xs ${themeSecondary}`}>ou</span>
+                      <div className={`flex-1 h-px ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`} />
+                    </div>
+
+                    {/* Share options */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => {
+                          if (inviteLink) {
+                            window.open(`https://wa.me/?text=${encodeURIComponent(`Junte-se ao meu grupo no Rovex Connect! ${inviteLink}`)}`, '_blank');
+                          }
+                        }}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-xl ${themeHover} border ${themeBorder} transition-all`}
+                      >
+                        <span className="text-green-500 text-lg">📱</span>
+                        <span className={themeText}>WhatsApp</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (inviteLink) {
+                            window.open(`mailto:?subject=Convite para ${selectedGroup.name}&body=${encodeURIComponent(`Junte-se ao meu grupo no Rovex Connect! ${inviteLink}`)}`, '_blank');
+                          }
+                        }}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-xl ${themeHover} border ${themeBorder} transition-all`}
+                      >
+                        <Mail className="w-5 h-5" style={{ color: accentColor }} />
+                        <span className={themeText}>Email</span>
+                      </button>
+                    </div>
+
+                    {/* Tip */}
+                    <div 
+                      className="p-3 rounded-xl text-sm"
+                      style={{ backgroundColor: `${accentColor}10`, color: accentColor }}
                     >
-                      {inviteCopied ? (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          Copiado!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          Copiar
-                        </>
-                      )}
-                    </button>
+                      💡 Quando alguém acessar o link, receberá um convite para entrar no grupo.
+                    </div>
+                  </>
+                ) : inviteTab === 'friends' ? (
+                  <div className="max-h-64 overflow-y-auto">
+                    {inviteFriends.length === 0 ? (
+                      <p className={`${themeSecondary} text-center py-8`}>
+                        Nenhum amigo disponível para convidar
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {inviteFriends.map((friend) => (
+                          <div key={friend.id} className={`flex items-center gap-3 p-3 rounded-lg ${themeHover} transition-colors`}>
+                            <img
+                              src={friend.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}`}
+                              alt={friend.name}
+                              className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-medium ${themeText} truncate`}>
+                                {friend.displayName || friend.name}
+                              </p>
+                              <p className={`text-xs ${themeSecondary}`}>{friend.trophies} Troféus • Nível {friend.level}</p>
+                            </div>
+                            <button
+                              onClick={() => handleInviteMember(friend.id)}
+                              disabled={inviting}
+                              className="px-4 py-2 rounded-lg text-white text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                              style={{ backgroundColor: accentColor }}
+                            >
+                              Convidar
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-
-                {/* Or divider */}
-                <div className="flex items-center gap-3">
-                  <div className={`flex-1 h-px ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`} />
-                  <span className={`text-xs ${themeSecondary}`}>ou</span>
-                  <div className={`flex-1 h-px ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'}`} />
-                </div>
-
-                {/* Share options */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => {
-                      if (inviteLink) {
-                        window.open(`https://wa.me/?text=${encodeURIComponent(`Junte-se ao meu grupo no Rovex Connect! ${inviteLink}`)}`, '_blank');
-                      }
-                    }}
-                    className={`flex items-center justify-center gap-2 p-3 rounded-xl ${themeHover} border ${themeBorder} transition-all`}
-                  >
-                    <span className="text-green-500 text-lg">📱</span>
-                    <span className={themeText}>WhatsApp</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (inviteLink) {
-                        window.open(`mailto:?subject=Convite para ${selectedGroup.name}&body=${encodeURIComponent(`Junte-se ao meu grupo no Rovex Connect! ${inviteLink}`)}`, '_blank');
-                      }
-                    }}
-                    className={`flex items-center justify-center gap-2 p-3 rounded-xl ${themeHover} border ${themeBorder} transition-all`}
-                  >
-                    <Mail className="w-5 h-5" style={{ color: accentColor }} />
-                    <span className={themeText}>Email</span>
-                  </button>
-                </div>
-
-                {/* Tip */}
-                <div 
-                  className="p-3 rounded-xl text-sm"
-                  style={{ backgroundColor: `${accentColor}10`, color: accentColor }}
-                >
-                  💡 Quando alguém acessar o link, receberá um convite para entrar no grupo.
-                </div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto">
+                    {inviteCommunityUsers.length === 0 ? (
+                      <p className={`${themeSecondary} text-center py-8`}>
+                        Nenhum usuário disponível para convidar
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {inviteCommunityUsers.map((u) => (
+                          <div key={u.id} className={`flex items-center gap-3 p-3 rounded-lg ${themeHover} transition-colors`}>
+                            <img
+                              src={u.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}`}
+                              alt={u.name}
+                              className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-medium ${themeText} truncate`}>
+                                {u.displayName || u.name}
+                              </p>
+                              <p className={`text-xs ${themeSecondary}`}>{u.trophies || 0} Troféus • Nível {u.level || 1}</p>
+                            </div>
+                            <button
+                              onClick={() => handleInviteMember(u.id)}
+                              disabled={inviting}
+                              className="px-4 py-2 rounded-lg text-white text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                              style={{ backgroundColor: accentColor }}
+                            >
+                              Convidar
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
@@ -2322,7 +2516,7 @@ export default function ConnectPage() {
         onClose={() => setShowPresenceCard(false)}
         onStartChat={(userId) => {
           setShowPresenceCard(false);
-          navigate(`/chat/${userId}`);
+          setActiveChatUserId(userId);
         }}
         accentColor={accentColor}
         fallbackData={presenceFallbackData}

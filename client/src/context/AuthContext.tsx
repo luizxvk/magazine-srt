@@ -442,34 +442,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Add the new animation class
                 document.body.classList.add(userData.equippedBackground);
 
-                // Special handling for Rainbow Skies - create HTML elements and switch to light theme
+                // Special handling for Rainbow Skies - create HTML elements
                 if (userData.equippedBackground === 'anim-rainbow-skies') {
                     createRainbowElements();
-                    
-                    // Save current theme for MGT before switching to light
-                    if (userData.membershipType === 'MGT') {
-                        const currentTheme = localStorage.getItem('theme') || 'dark';
-                        localStorage.setItem('mgt-theme-before-rainbow', currentTheme);
-                    }
-                    
-                    // Rainbow Skies activates light mode for everyone
-                    localStorage.setItem('theme', 'light');
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.classList.add('light');
+                    // Note: Theme is no longer forced - user keeps their current theme
                 } else if (userData.equippedBackground === 'anim-iridescence') {
-                    // Iridescence also activates light mode
+                    // Iridescence - just cleanup rainbow elements if any
                     cleanupRainbowElements();
-                    
-                    // Save current theme for MGT before switching to light
-                    if (userData.membershipType === 'MGT') {
-                        const currentTheme = localStorage.getItem('theme') || 'dark';
-                        localStorage.setItem('mgt-theme-before-rainbow', currentTheme);
-                    }
-                    
-                    // Iridescence activates light mode for everyone
-                    localStorage.setItem('theme', 'light');
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.classList.add('light');
+                    // Note: Theme is no longer forced - user keeps their current theme
                 } else {
                     cleanupRainbowElements();
                 }
@@ -723,16 +703,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 cleanupConstellationElements();
                 cleanupFireRainElements();
                 cleanupNeonRainElements();
-                
-                // Save current theme for MGT before switching to light
-                if (user?.membershipType === 'MGT' && !localStorage.getItem('mgt-theme-before-rainbow')) {
-                    localStorage.setItem('mgt-theme-before-rainbow', theme);
-                }
-                
-                // Rainbow Skies activates light mode for everyone
-                setTheme('light');
+                // Note: Theme is no longer forced - user keeps their current theme
             } else if (className === 'anim-iridescence') {
-                // Prisma Iridescente also activates light mode like Rainbow Skies
+                // Prisma Iridescente
                 cleanupRainbowElements();
                 cleanupInfiniteTrianglesElements();
                 cleanupMoonlitElements();
@@ -740,14 +713,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 cleanupConstellationElements();
                 cleanupFireRainElements();
                 cleanupNeonRainElements();
-                
-                // Save current theme for MGT before switching to light
-                if (user?.membershipType === 'MGT' && !localStorage.getItem('mgt-theme-before-rainbow')) {
-                    localStorage.setItem('mgt-theme-before-rainbow', theme);
-                }
-                
-                // Iridescence activates light mode for everyone
-                setTheme('light');
+                // Note: Theme is no longer forced - user keeps their current theme
             } else if (className === 'anim-infinite-triangles') {
                 cleanupRainbowElements();
                 cleanupMoonlitElements();

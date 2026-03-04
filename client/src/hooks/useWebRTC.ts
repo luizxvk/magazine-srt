@@ -164,12 +164,31 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
       setLocalScreenStream(stream);
       setIsScreenSharing(true);
 
-      // Add tracks to existing peer connections
-      peerConnections.current.forEach(({ connection }) => {
+      // Add tracks to existing peer connections and renegotiate
+      const renegotiationPromises: Promise<void>[] = [];
+      
+      peerConnections.current.forEach(({ connection, odiserId }) => {
         stream.getTracks().forEach(track => {
           connection.addTrack(track, stream);
         });
+        
+        // Create new offer to renegotiate with the added tracks
+        const renegotiate = async () => {
+          try {
+            const offer = await connection.createOffer();
+            await connection.setLocalDescription(offer);
+            if (channelId) {
+              sendOffer(odiserId, offer, channelId);
+            }
+          } catch (err) {
+            console.error(`[WebRTC] Renegotiation failed for ${odiserId}:`, err);
+          }
+        };
+        renegotiationPromises.push(renegotiate());
       });
+      
+      // Wait for all renegotiations
+      await Promise.all(renegotiationPromises);
 
       // Notify via socket
       if (channelId) {
@@ -186,7 +205,7 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
       console.error('[WebRTC] Error starting screen share:', error);
       return false;
     }
-  }, [channelId, socketStartScreenShare]);
+  }, [channelId, socketStartScreenShare, sendOffer]);
 
   // Stop screen sharing
   const stopScreenShare = useCallback(() => {

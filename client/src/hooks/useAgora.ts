@@ -8,8 +8,14 @@ import type {
 } from 'agora-rtc-sdk-ng';
 
 // Agora App ID - get from https://console.agora.io
-// TODO: Move to environment variable VITE_AGORA_APP_ID
 const AGORA_APP_ID = import.meta.env.VITE_AGORA_APP_ID || '';
+
+// Debug: log App ID (first/last 4 chars only for security)
+if (AGORA_APP_ID) {
+  console.log('[Agora] App ID configured:', AGORA_APP_ID.slice(0, 4) + '...' + AGORA_APP_ID.slice(-4), 'length:', AGORA_APP_ID.length);
+} else {
+  console.error('[Agora] No App ID configured! Set VITE_AGORA_APP_ID');
+}
 
 interface UseAgoraReturn {
   // Connection state

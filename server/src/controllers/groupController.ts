@@ -340,7 +340,12 @@ export const postMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { id } = req.params;
-    const { content, imageUrl, type, replyToId, textChannelId } = req.body;
+    const { content, imageUrl, type, replyToId, textChannelId: rawTextChannelId } = req.body;
+    
+    // Normalize textChannelId - treat empty strings, "null", and undefined as null
+    const textChannelId = (rawTextChannelId && rawTextChannelId !== 'null' && rawTextChannelId.trim() !== '') 
+      ? rawTextChannelId 
+      : null;
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });

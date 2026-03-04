@@ -329,6 +329,9 @@ export default function Header({ onOpenShop }: HeaderProps) {
                             data-tutorial="desktop-explore"
                         >
                             <Users className="w-5 h-5" />
+                            {hasGroupInvites && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                            )}
                         </Link>
 
                         <Link to="/connect" className={`relative p-2 transition-all hover:scale-110 ${iconClass}`} style={{ color: accentColor }} aria-label="Connect" title="Rovex Connect">

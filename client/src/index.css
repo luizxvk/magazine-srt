@@ -375,8 +375,7 @@ body::-webkit-scrollbar-thumb:hover {
   html {
     /* Prevent iOS zoom on input focus */
     -webkit-text-size-adjust: 100%;
-    /* Safe area for notch devices */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    /* Note: Safe area padding is handled per-component, not globally on html */
   }
 
   body {
@@ -1410,6 +1409,14 @@ html.rgb-dynamic [class*="border-accent"] {
 /* Safe area padding for mobile */
 .pb-safe {
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
 }
 
 /* iOS-style Spinner */

@@ -8,21 +8,27 @@ import {
   Headphones
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import type { IAgoraRTCRemoteUser } from 'agora-rtc-sdk-ng';
 
 interface AudioSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   accentColor?: string;
+  remoteUsers?: IAgoraRTCRemoteUser[];
 }
 
-export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea' }: AudioSettingsModalProps) {
+export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea', remoteUsers = [] }: AudioSettingsModalProps) {
   const { theme } = useAuth();
   
   // Audio device state
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedInput, setSelectedInput] = useState<string>('');
-  const [selectedOutput, setSelectedOutput] = useState<string>('');
+  const [selectedInput, setSelectedInput] = useState<string>(() => {
+    return localStorage.getItem('rovex-audio-input') || '';
+  });
+  const [selectedOutput, setSelectedOutput] = useState<string>(() => {
+    return localStorage.getItem('rovex-audio-output') || '';
+  });
   
   // Volume state
   const [inputVolume, setInputVolume] = useState(100);
@@ -47,6 +53,32 @@ export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea' }:
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
   const themeHover = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5';
   const themeInput = theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800';
+
+  // Apply output device to Agora remote tracks
+  const applyOutputDevice = async (deviceId: string) => {
+    if (!deviceId || remoteUsers.length === 0) return;
+    
+    try {
+      // Apply to all remote audio tracks
+      for (const user of remoteUsers) {
+        if (user.audioTrack) {
+          // setPlaybackDevice exists on RemoteAudioTrack
+          await (user.audioTrack as any).setPlaybackDevice(deviceId);
+          console.log('[AudioSettings] Applied output device to user', user.uid);
+        }
+      }
+      // Save preference
+      localStorage.setItem('rovex-audio-output', deviceId);
+    } catch (err) {
+      console.error('[AudioSettings] Error setting playback device:', err);
+    }
+  };
+
+  // Handle output device change
+  const handleOutputDeviceChange = (deviceId: string) => {
+    setSelectedOutput(deviceId);
+    applyOutputDevice(deviceId);
+  };
 
   // Get available audio devices
   useEffect(() => {
@@ -299,7 +331,7 @@ export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea' }:
                   </div>
                   <select
                     value={selectedOutput}
-                    onChange={(e) => setSelectedOutput(e.target.value)}
+                    onChange={(e) => handleOutputDeviceChange(e.target.value)}
                     className={`w-full px-3 py-2.5 rounded-xl ${themeInput} ${themeText} border ${themeBorder} focus:outline-none focus:ring-2`}
                     style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
                   >

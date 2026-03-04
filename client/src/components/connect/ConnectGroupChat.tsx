@@ -6,6 +6,7 @@ import {
   Trash2, X, Plus
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../hooks/useSocket';
 import api from '../../services/api';
 import Loader from '../Loader';
 
@@ -89,6 +90,7 @@ const EMOJI_LIST = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '�
 export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor }: ConnectGroupChatProps) {
   const navigate = useNavigate();
   const { user, showToast, showError, accentColor: authAccent } = useAuth();
+  const socket = useSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -117,6 +119,34 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
   const myMember = group.members.find(m => m.userId === user?.id);
   const isAdmin = myMember?.role === 'ADMIN';
   const isMod = myMember?.role === 'MODERATOR';
+
+  // Join socket room for real-time messages
+  useEffect(() => {
+    if (socket.isConnected && group.id) {
+      socket.joinGroup(group.id);
+      
+      // Listen for new messages
+      socket.onNewMessage((message: any) => {
+        // Only add if message belongs to this group and channel
+        if (message.groupId === group.id) {
+          const msgChannelId = message.textChannelId || null;
+          const currentChannelId = textChannel?.id || null;
+          // Match channel (both null = general, or same id)
+          if (msgChannelId === currentChannelId) {
+            setMessages(prev => {
+              // Avoid duplicates
+              if (prev.some(m => m.id === message.id)) return prev;
+              return [...prev, message];
+            });
+          }
+        }
+      });
+      
+      return () => {
+        socket.leaveGroup(group.id);
+      };
+    }
+  }, [socket.isConnected, group.id, textChannel?.id]);
 
   useEffect(() => {
     fetchMessages();
@@ -162,13 +192,29 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
 
     try {
       setSending(true);
-      const response = await api.post(`/groups/${group.id}/messages`, {
+      const payload: { content: string; replyToId?: string; textChannelId?: string } = {
         content: messageText.trim(),
-        replyToId: replyingTo?.id,
-        textChannelId: textChannel?.id || null
-      });
+      };
+      if (replyingTo?.id) {
+        payload.replyToId = replyingTo.id;
+      }
+      if (textChannel?.id) {
+        payload.textChannelId = textChannel.id;
+      }
+      const response = await api.post(`/groups/${group.id}/messages`, payload);
       
+      // Add to local state
       setMessages([...messages, response.data]);
+      
+      // Broadcast via socket for real-time delivery to other users
+      if (socket.isConnected) {
+        socket.sendMessage(group.id, { 
+          ...response.data, 
+          groupId: group.id,
+          textChannelId: textChannel?.id || null 
+        });
+      }
+      
       setMessageText('');
       setReplyingTo(null);
     } catch (error: any) {

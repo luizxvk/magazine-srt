@@ -47,6 +47,7 @@ import OnboardingModals from './components/OnboardingModals';
 import SessionExpiredModal from './components/SessionExpiredModal';
 import { RadioProvider } from './context/RadioContext';
 import MiniRadioPlayer from './components/MiniRadioPlayer';
+import VoiceMiniPlayer from './components/VoiceMiniPlayer';
 import { EdgeNotificationContainer } from './components/EdgeNotification';
 import VersionUpdateNotification from './components/VersionUpdateNotification';
 import BetaRewardPopup from './components/BetaRewardPopup';
@@ -135,6 +136,7 @@ function App() {
         <MessagePopupWrapper />
         <BottomNavigation />
         <MiniRadioPlayer />
+        <VoiceMiniPlayer />
         <Footer />
         <DevBanner />
         <VersionUpdateNotification />

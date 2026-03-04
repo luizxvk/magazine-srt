@@ -628,6 +628,7 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
 export const getUserProfile = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
+        const requesterId = req.user?.userId;
 
         const user = await prisma.user.findUnique({
             where: { id },
@@ -663,9 +664,38 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
             return res.status(410).json({ error: 'Esta conta foi excluída ou removida' });
         }
 
+        // Check friendship status
+        let isFriend = false;
+        let friendRequestSent = false;
+        
+        if (requesterId && requesterId !== id) {
+            // Check if already friends (in either direction)
+            const friendship = await prisma.friend.findFirst({
+                where: {
+                    OR: [
+                        { userId: requesterId, friendId: id },
+                        { userId: id, friendId: requesterId }
+                    ]
+                }
+            });
+            isFriend = !!friendship;
+            
+            // Check if there's a pending friend request
+            if (!isFriend) {
+                const pendingRequest = await prisma.friendRequest.findFirst({
+                    where: {
+                        senderId: requesterId,
+                        receiverId: id,
+                        status: 'PENDING'
+                    }
+                });
+                friendRequestSent = !!pendingRequest;
+            }
+        }
+
         // Remove deletedAt from response
         const { deletedAt, ...userResponse } = user;
-        res.json(userResponse);
+        res.json({ ...userResponse, isFriend, friendRequestSent });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

@@ -296,6 +296,9 @@ export default function ConnectPage() {
         const existing = updated.get(data.userId);
         if (existing) {
           updated.set(data.userId, { ...existing, isStreaming: false });
+        } else {
+          // Create entry if doesn't exist
+          updated.set(data.userId, { isMuted: false, isDeafened: false, isStreaming: false });
         }
         return updated;
       });
@@ -304,6 +307,8 @@ export default function ConnectPage() {
         updated.delete(data.userId);
         return updated;
       });
+      // Refresh groups to update server-side state
+      fetchGroups();
     });
 
     // Listen for voice state changes (mute/deafen)
@@ -404,6 +409,32 @@ export default function ConnectPage() {
       }
     }
   }, [groupId, groups]);
+
+  // Listen for disconnect signal from mini player
+  useEffect(() => {
+    const checkDisconnect = () => {
+      const disconnectSignal = localStorage.getItem('rovex-voice-disconnect');
+      if (disconnectSignal && currentVoice) {
+        localStorage.removeItem('rovex-voice-disconnect');
+        handleLeaveVoice();
+      }
+    };
+    
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'rovex-voice-disconnect') {
+        checkDisconnect();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorage);
+    // Also poll for same-tab changes
+    const interval = setInterval(checkDisconnect, 500);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      clearInterval(interval);
+    };
+  }, [currentVoice]);
 
   // Check if a group exists for joining via invite link
   const checkInviteGroup = async (gId: string) => {
@@ -544,6 +575,17 @@ export default function ConnectPage() {
         console.log('[ConnectPage] Agora audio started:', audioStarted);
       }
       
+      // Save voice state for mini player
+      const group = groups.find((g) => g.id === groupId);
+      const channel = group?.channels.find((c) => c.id === channelId);
+      localStorage.setItem('rovex-voice-state', JSON.stringify({
+        channelId,
+        channelName: channel?.name || 'Canal de Voz',
+        groupName: group?.name || 'Grupo',
+        groupId,
+        joinedAt: Date.now(),
+      }));
+      
       showToast('Conectado ao canal de voz');
       fetchGroups(false); // Refresh without loading spinner
     } catch (error: any) {
@@ -565,6 +607,10 @@ export default function ConnectPage() {
       setCurrentVoice(null);
       setIsMuted(false);
       setIsDeafened(false);
+      
+      // Remove voice state for mini player
+      localStorage.removeItem('rovex-voice-state');
+      
       showToast('Desconectado do canal de voz');
       fetchGroups(false);
     } catch (error) {
@@ -1146,6 +1192,10 @@ export default function ConnectPage() {
                         const effectiveMuted = realTimeState?.isMuted ?? participant.isMuted;
                         const effectiveDeafened = realTimeState?.isDeafened ?? participant.isDeafened;
                         const effectiveStreaming = realTimeState?.isStreaming ?? participant.isStreaming;
+                        // Check if speaking using Agora speakingUsers (or local speaking for current user)
+                        const isSpeakingNow = participant.user.id === user?.id 
+                          ? agora.isLocalSpeaking 
+                          : agora.speakingUsers.has(participant.user.id);
                         
                         return (
                         <div 
@@ -1160,7 +1210,7 @@ export default function ConnectPage() {
                               alt=""
                             />
                             {/* Speaking ring animation */}
-                            {participant.isSpeaking && (
+                            {isSpeakingNow && (
                               <motion.div
                                 className="absolute -inset-0.5 rounded-full border-2 border-green-500"
                                 animate={{ scale: [1, 1.15, 1], opacity: [1, 0.7, 1] }}
@@ -2729,6 +2779,7 @@ export default function ConnectPage() {
         isOpen={showAudioSettings}
         onClose={() => setShowAudioSettings(false)}
         accentColor={accentColor}
+        remoteUsers={agora.remoteUsers}
       />
 
       {/* Stream Viewer */}

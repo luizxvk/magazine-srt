@@ -198,7 +198,7 @@ export default function VoiceChannelBar({
         {hasActiveStreams && onWatchStream && (
           <button
             onClick={onWatchStream}
-            className="p-2.5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-pulse"
+            className="p-2.5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
             title="Assistir transmissão"
           >
             <Radio className="w-4 h-4" />

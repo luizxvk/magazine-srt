@@ -36,6 +36,10 @@ interface UseAgoraReturn {
   // Network stats
   ping: number; // RTT in ms
   
+  // Speaking detection
+  speakingUsers: Set<string>; // UIDs of users currently speaking
+  isLocalSpeaking: boolean;
+  
   // Remote users
   remoteUsers: IAgoraRTCRemoteUser[];
   
@@ -75,9 +79,18 @@ export function useAgora(): UseAgoraReturn {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   
   const [remoteUsers, setRemoteUsers] = useState<IAgoraRTCRemoteUser[]>([]);
-  const [outputVolume, setOutputVolumeState] = useState<number>(100);
-  const outputVolumeRef = useRef<number>(100);
+  
+  // Load saved volume from localStorage
+  const savedVolume = typeof window !== 'undefined' 
+    ? parseInt(localStorage.getItem('rovex-connect-volume') || '100', 10) 
+    : 100;
+  const [outputVolume, setOutputVolumeState] = useState<number>(savedVolume);
+  const outputVolumeRef = useRef<number>(savedVolume);
   const [ping, setPing] = useState<number>(0);
+  
+  // Speaking detection
+  const [speakingUsers, setSpeakingUsers] = useState<Set<string>>(new Set());
+  const [isLocalSpeaking, setIsLocalSpeaking] = useState(false);
 
   // Poll network stats for ping/RTT
   useEffect(() => {
@@ -96,6 +109,46 @@ export function useAgora(): UseAgoraReturn {
 
     return () => clearInterval(interval);
   }, [isJoined]);
+
+  // Poll audio levels for speaking detection (like Discord green ring)
+  useEffect(() => {
+    if (!isJoined || !clientRef.current) {
+      setSpeakingUsers(new Set());
+      setIsLocalSpeaking(false);
+      return;
+    }
+
+    const SPEAKING_THRESHOLD = 0.01; // Volume level threshold for speaking
+    
+    const interval = setInterval(() => {
+      const newSpeakingUsers = new Set<string>();
+      
+      // Check remote users
+      if (clientRef.current) {
+        const users = clientRef.current.remoteUsers;
+        for (const user of users) {
+          if (user.audioTrack) {
+            const level = user.audioTrack.getVolumeLevel();
+            if (level > SPEAKING_THRESHOLD) {
+              newSpeakingUsers.add(String(user.uid));
+            }
+          }
+        }
+      }
+      
+      // Check local audio
+      if (localAudioTrack && !isMuted) {
+        const localLevel = localAudioTrack.getVolumeLevel();
+        setIsLocalSpeaking(localLevel > SPEAKING_THRESHOLD);
+      } else {
+        setIsLocalSpeaking(false);
+      }
+      
+      setSpeakingUsers(newSpeakingUsers);
+    }, 100); // Update every 100ms for smooth animation
+
+    return () => clearInterval(interval);
+  }, [isJoined, localAudioTrack, isMuted]);
 
   // Initialize client on mount
   useEffect(() => {
@@ -337,7 +390,13 @@ export function useAgora(): UseAgoraReturn {
       // Create screen video track first (this prompts for permission)
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
         {
-          encoderConfig: '1080p_1',
+          encoderConfig: {
+            width: 1920,
+            height: 1080,
+            frameRate: 30,
+            bitrateMax: 3000,
+            bitrateMin: 1500,
+          },
         },
         'disable' // Don't capture audio from screen
       );
@@ -419,6 +478,9 @@ export function useAgora(): UseAgoraReturn {
     setOutputVolumeState(clampedVolume);
     outputVolumeRef.current = clampedVolume;
     
+    // Save to localStorage for persistence
+    localStorage.setItem('rovex-connect-volume', String(clampedVolume));
+    
     // Apply volume to all remote audio tracks
     remoteUsers.forEach(user => {
       if (user.audioTrack) {
@@ -438,6 +500,8 @@ export function useAgora(): UseAgoraReturn {
     outputVolume,
     setOutputVolume,
     ping,
+    speakingUsers,
+    isLocalSpeaking,
     remoteUsers,
     localScreenTrack,
     isScreenSharing,

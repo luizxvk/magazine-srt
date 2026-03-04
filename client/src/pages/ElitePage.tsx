@@ -194,11 +194,11 @@ export default function ElitePage() {
     const isAlreadyElite = status?.isElite;
 
     return (
-        <div className="min-h-screen text-white relative overflow-hidden">
+        <div className="min-h-screen relative text-white">
             {/* ColorBends animated background - Elite theme */}
-            <div className="fixed inset-0 z-0">
+            <div className="fixed inset-0 z-0 pointer-events-none">
                 <ColorBends
-                    colors={['#7C3AED', '#A855F7', '#8B5CF6', '#6D28D9', '#4C1D95']}
+                    colors={['#7C3AED', '#A78BFA', '#5227FF', '#8B5CF6', '#312e81']}
                     rotation={20}
                     speed={0.12}
                     scale={1.3}
@@ -211,9 +211,11 @@ export default function ElitePage() {
                     parallax={0}
                 />
             </div>
-            <Header />
             
-            <main className="relative z-10 pt-24 pb-32 px-4">
+            <div className="relative z-10">
+                <Header />
+                
+                <main className="pt-24 pb-32 px-4">
                 <div className="max-w-6xl mx-auto">
                     {/* Hero Section - Compact & Professional */}
                     <motion.div 
@@ -500,6 +502,7 @@ export default function ElitePage() {
                     )}
                 </div>
             </main>
+            </div>
 
             {/* Confirm Modal - Premium Glass Design */}
             <AnimatePresence>

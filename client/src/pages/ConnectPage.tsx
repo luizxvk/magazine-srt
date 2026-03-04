@@ -18,6 +18,10 @@ import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
 import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard, StreamViewer, AudioSettingsModal } from '../components/connect';
 
+// Debug: Check if Agora App ID is available from Vite env
+const AGORA_APP_ID_DEBUG = import.meta.env.VITE_AGORA_APP_ID;
+console.log('[ConnectPage] VITE_AGORA_APP_ID:', AGORA_APP_ID_DEBUG ? `${AGORA_APP_ID_DEBUG.slice(0,4)}...${AGORA_APP_ID_DEBUG.slice(-4)} (${AGORA_APP_ID_DEBUG.length} chars)` : 'NOT SET!');
+
 interface VoiceParticipant {
   id: string;
   isMuted: boolean;

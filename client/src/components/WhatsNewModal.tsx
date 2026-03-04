@@ -254,7 +254,7 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
                 </div>
 
                 {/* Content with slide animation */}
-                <div className="relative px-6 pb-4 overflow-hidden">
+                <div className="relative px-6 pb-4 overflow-hidden max-h-[55vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentPage}

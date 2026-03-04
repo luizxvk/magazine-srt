@@ -373,9 +373,17 @@ export default function ConnectPage() {
           try {
             const tokenResponse = await api.post('/connect/voice/token', { channelId: currentVoice.channelId });
             token = tokenResponse.data.token;
+            console.log('[ConnectPage] Rejoin token received');
           } catch (e) {
-            console.warn('[ConnectPage] Failed to get token for rejoin');
+            console.error('[ConnectPage] Failed to get token for rejoin:', e);
+            return; // Don't attempt to join without token
           }
+          
+          if (!token) {
+            console.error('[ConnectPage] No token for rejoin');
+            return;
+          }
+          
           await agora.joinChannel(currentVoice.channelId, user.id, token);
         }
       }
@@ -517,8 +525,16 @@ export default function ConnectPage() {
         const tokenResponse = await api.post('/connect/voice/token', { channelId });
         token = tokenResponse.data.token;
         console.log('[ConnectPage] Got Agora token, uid:', tokenResponse.data.uid);
-      } catch (tokenErr) {
-        console.warn('[ConnectPage] Failed to get Agora token, trying without:', tokenErr);
+      } catch (tokenErr: any) {
+        console.error('[ConnectPage] Failed to get Agora token:', tokenErr?.response?.data || tokenErr);
+        showError('Failed to authenticate voice connection');
+        return;
+      }
+      
+      if (!token) {
+        console.error('[ConnectPage] No token received from server');
+        showError('Voice authentication failed');
+        return;
       }
       
       // Start Agora audio with token

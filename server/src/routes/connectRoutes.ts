@@ -63,8 +63,16 @@ router.post('/voice/token', (req, res) => {
       return res.status(400).json({ error: 'channelId is required' });
     }
     
-    const appId = process.env.AGORA_APP_ID;
-    const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+    // Trim to remove any whitespace/newlines from env vars
+    const appId = (process.env.AGORA_APP_ID || '').trim();
+    const appCertificate = (process.env.AGORA_APP_CERTIFICATE || '').trim();
+    
+    if (!appId || !appCertificate) {
+      console.error('[Agora] Missing AGORA_APP_ID or AGORA_APP_CERTIFICATE');
+      return res.status(500).json({ error: 'Agora not configured' });
+    }
+    
+    console.log('[Agora] App ID length:', appId.length, 'Certificate length:', appCertificate.length);
     
     if (!appId || !appCertificate) {
       console.error('[Agora] Missing AGORA_APP_ID or AGORA_APP_CERTIFICATE');

@@ -198,13 +198,16 @@ export default function ElitePage() {
             {/* ColorBends animated background - Elite theme */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <ColorBends
-                    colors={['#d4af37', '#8B4513', '#B22222', '#1a1a1a', '#000000']}
-                    speed={0.15}
-                    scale={1.2}
-                    frequency={0.8}
+                    colors={['#7C3AED', '#A855F7', '#8B5CF6', '#6D28D9', '#4C1D95']}
+                    speed={0.12}
+                    scale={1.3}
+                    frequency={0.7}
                     warpStrength={0.5}
+                    noise={0.04}
+                    transparent={false}
+                    autoRotate={1.5}
                     mouseInfluence={0}
-                    autoRotate={0.5}
+                    parallax={0}
                 />
                 {/* Dark gradient overlay for readability */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />

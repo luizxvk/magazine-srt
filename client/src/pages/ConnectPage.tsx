@@ -307,18 +307,17 @@ export default function ConnectPage() {
       showToast('Usuário entrou no canal de voz');
       fetchGroups();
       
-      // IMPORTANT: When another user joins our voice channel, we need to connect to them via WebRTC
-      // This is how Discord-style audio works - existing users connect to new joiners
-      // Use ref to avoid stale closure
+      // NOTE: We do NOT connect to new joiners here!
+      // The JOINER is responsible for connecting to existing participants.
+      // This avoids "glare" - both sides sending offers simultaneously.
+      // The joiner calls connectToPeer in handleJoinVoice for each existing participant.
       const voice = currentVoiceRef.current;
       const newUserId = data.userId || data.user?.odiserId;
-      console.log('[ConnectPage] onVoiceUserJoined:', { newUserId, myVoiceChannel: voice?.channelId, dataChannelId: data.channelId, myUserId: user?.id });
-      if (voice && voice.channelId === data.channelId && user && newUserId && newUserId !== user.id) {
-        console.log('[ConnectPage] New user joined our channel, connecting via WebRTC:', newUserId);
-        webrtc.connectToPeer(newUserId, data.channelId);
-      } else {
-        console.log('[ConnectPage] NOT connecting to peer - conditions not met');
-      }
+      console.log('[ConnectPage] onVoiceUserJoined - new user joined, waiting for their offer:', { 
+        newUserId, 
+        myVoiceChannel: voice?.channelId, 
+        dataChannelId: data.channelId 
+      });
     });
 
     socket.onVoiceUserLeft(() => {

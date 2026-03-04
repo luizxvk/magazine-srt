@@ -105,16 +105,9 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   
   const getCardStyle = (): React.CSSProperties => {
-    // Mobile: always center with safe area
+    // Mobile: use flexbox centering (handled by parent container)
     if (isMobile || !anchorPosition) {
-      return {
-        position: 'fixed',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        maxHeight: '85vh',
-        maxWidth: 'calc(100vw - 32px)',
-      };
+      return {};
     }
     
     // Desktop: position near anchor
@@ -149,6 +142,9 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
       maxHeight: '85vh',
     };
   };
+  
+  // Use flexbox centering for mobile
+  const useMobileCentering = isMobile || !anchorPosition;
 
   // Helper to get membership tag display
   const getMembershipTag = () => {
@@ -265,15 +261,17 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
             onClick={onClose}
           />
           
-          {/* Card */}
+          {/* Card Container - Flexbox for mobile, positioned for desktop */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            style={getCardStyle()}
-            className="w-[340px] max-w-[90vw] z-[60]"
+            style={useMobileCentering ? undefined : getCardStyle()}
+            className={`z-[60] ${useMobileCentering ? 'fixed inset-0 flex items-center justify-center p-4 pointer-events-none' : 'w-[340px] max-w-[90vw]'}`}
           >
-            <div className="bg-[#0a0a0f] rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-h-[85vh] overflow-y-auto">
+            <div 
+              className={`bg-[#0a0a0f] rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-h-[85vh] overflow-y-auto ${useMobileCentering ? 'w-[340px] max-w-full pointer-events-auto' : ''}`}
+            >
               {/* Close button */}
               <button
                 onClick={onClose}

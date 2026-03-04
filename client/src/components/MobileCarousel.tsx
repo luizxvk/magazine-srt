@@ -287,7 +287,7 @@ export default function MobileCarousel({
             </div>
 
             {/* Carousel Container */}
-            <div className="relative w-full overflow-visible pt-2">
+            <div className="relative w-full overflow-visible pt-4">
                 <div
                     ref={carouselRef}
                     className="flex gap-3 overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing -mx-1 px-1"
@@ -342,7 +342,7 @@ export default function MobileCarousel({
                                 >
                                     {/* Badge - positioned outside overflow */}
                                     {card.badge && (
-                                        <div className={`absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-lg z-20 ${
+                                        <div className={`absolute -top-2 -right-2 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-lg z-20 ${
                                             card.badge === 'NEW' 
                                                 ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white' 
                                                 : 'backdrop-blur-sm bg-black/40 text-white'

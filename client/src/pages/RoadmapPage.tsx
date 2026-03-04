@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
-import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Smartphone, Globe, Bot, Swords, Trophy, Video, Film, LayoutDashboard, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Clock, Rocket, Sparkles, Shield, MessageSquare, Image, Users, Star, Zap, BrainCircuit, Palette, ShoppingBag, Crown, Gamepad2, Smartphone, Globe, Bot, Swords, Trophy, Video, Film, LayoutDashboard, TrendingUp, Volume2, Wifi, Bell, PenSquare } from 'lucide-react';
 
 interface RoadmapItem {
     id: string;
@@ -332,6 +332,78 @@ const roadmapItems: RoadmapItem[] = [
         version: 'v0.5.0-rc.13',
         icon: <Users className="w-5 h-5" />,
         category: 'feature'
+    },
+    {
+        id: '29l',
+        title: 'Convites Unificados',
+        description: 'Aba Convites removida! Convites de grupos Rovex Connect agora consolidados na aba Solicitações.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Users className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29m',
+        title: 'Tema Roxo Claro',
+        description: 'Nova cor de destaque roxo claro (#A78BFA) no template base Rovex Communities.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29n',
+        title: 'Áudio Settings Centralizado',
+        description: 'Card de configurações de áudio agora centralizado na tela corretamente com flexbox.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Volume2 className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29o',
+        title: 'RichPresence Mobile Fix',
+        description: 'Card de Rich Presence agora centralizado no modo mobile com flexbox.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Smartphone className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29p',
+        title: 'Badge NEW Corrigido',
+        description: 'Badge NEW nos cards de acesso rápido não corta mais no canto superior. Padding/posicionamento ajustados.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Bell className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29q',
+        title: 'Textbox Escuro',
+        description: 'Campo de postagem agora com fundo escuro (bg-zinc-900/80) para melhor contraste.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <PenSquare className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29r',
+        title: 'Online Count API',
+        description: 'Novo endpoint /users/online-count criado - erro 404 corrigido.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Wifi className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29s',
+        title: 'Favicon & Título Rovex',
+        description: 'Favicon e título da aba atualizados para Rovex Communities com logo-rovex.png.',
+        status: 'completed',
+        version: 'v0.5.0-rc.16',
+        icon: <Image className="w-5 h-5" />,
+        category: 'improvement'
     },
     
     // ===== IN PROGRESS =====

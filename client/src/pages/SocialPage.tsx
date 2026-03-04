@@ -55,8 +55,8 @@ export default function SocialPage() {
     const { user, showToast } = useAuth();
     const [searchParams] = useSearchParams();
     const tabParam = searchParams.get('tab');
-    const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended' | 'search' | 'invites'>(
-        tabParam === 'recommended' ? 'recommended' : tabParam === 'requests' ? 'requests' : tabParam === 'search' ? 'search' : tabParam === 'invites' ? 'invites' : 'friends'
+    const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'recommended' | 'search'>(
+        tabParam === 'recommended' ? 'recommended' : tabParam === 'requests' ? 'requests' : tabParam === 'search' ? 'search' : 'friends'
     );
     const [friends, setFriends] = useState<Friend[]>([]);
     const [requests, setRequests] = useState<FriendRequest[]>([]);
@@ -271,9 +271,9 @@ export default function SocialPage() {
                             }`}
                     >
                         Solicitações
-                        {requests.length > 0 && (
+                        {(requests.length > 0 || groupInvites.length > 0) && (
                             <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white text-[10px] rounded-full">
-                                {requests.length}
+                                {requests.length + groupInvites.length}
                             </span>
                         )}
                         {activeTab === 'requests' && (
@@ -301,22 +301,7 @@ export default function SocialPage() {
                             <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${themeTabBorder} ${themeShadow}`} />
                         )}
                     </button>
-                    <button
-                        onClick={() => setActiveTab('invites')}
-                        className={`pb-3 px-2 md:px-4 text-xs md:text-sm font-medium tracking-wide transition-colors relative flex items-center gap-1 md:gap-2 whitespace-nowrap flex-shrink-0 ${activeTab === 'invites' ? themeTabActive : 'text-gray-400 hover:text-white'
-                            }`}
-                    >
-                        <Mail className="w-4 h-4" />
-                        Convites
-                        {groupInvites.length > 0 && (
-                            <span className="ml-1 px-1.5 py-0.5 bg-purple-500 text-white text-[10px] rounded-full">
-                                {groupInvites.length}
-                            </span>
-                        )}
-                        {activeTab === 'invites' && (
-                            <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${themeTabBorder} ${themeShadow}`} />
-                        )}
-                    </button>
+
                 </div>
 
                 {/* Content */}
@@ -410,10 +395,18 @@ export default function SocialPage() {
                                 ))
                             ) : null}
 
-                            {/* Group Invites */}
+                            {/* Rovex Connect - Group Invites */}
                             {groupInvites.length > 0 && (
                                 <div className="col-span-full mt-6">
-                                    <h3 className="text-white font-semibold mb-3">Convites para Grupos</h3>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="p-1.5 bg-purple-500/20 rounded-lg">
+                                            <Mail className="w-4 h-4 text-purple-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-semibold">Convites do Rovex Connect</h3>
+                                            <p className="text-xs text-gray-400">Grupos te convidaram para participar</p>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                             {groupInvites.map(invite => (
@@ -432,7 +425,7 @@ export default function SocialPage() {
                                             {invite.group.name}
                                         </h3>
                                         <p className="text-xs text-gray-400">
-                                            {invite.inviter.displayName || invite.inviter.name} convidou você
+                                            <span className="text-purple-400">Rovex Connect</span> • {invite.inviter.displayName || invite.inviter.name} convidou você
                                         </p>
                                     </div>
                                     <div className="flex gap-2">
@@ -633,59 +626,6 @@ export default function SocialPage() {
                                     </div>
                                 )}
                             </div>
-                        ) : activeTab === 'invites' ? (
-                            /* Invites Tab */
-                            groupInvites.length > 0 ? (
-                                <>
-                                    <div className="col-span-full mb-2">
-                                        <h3 className="text-white font-semibold">Convites para Grupos</h3>
-                                        <p className="text-sm text-gray-400">Aceite ou recuse convites para grupos</p>
-                                    </div>
-                                    {groupInvites.map(invite => (
-                                        <div key={invite.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-full bg-black border ${themeBorder} overflow-hidden shrink-0`}>
-                                                {invite.group.avatarUrl ? (
-                                                    <img src={invite.group.avatarUrl} alt={invite.group.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                                        <Users className="w-5 h-5 text-gray-500" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-white font-medium truncate">
-                                                    {invite.group.name}
-                                                </h3>
-                                                <p className="text-xs text-gray-400">
-                                                    {invite.inviter.displayName || invite.inviter.name} convidou você
-                                                </p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => handleAcceptGroupInvite(invite.id)}
-                                                    className={`p-2 ${themeButton} text-black rounded-lg transition-colors`}
-                                                    title="Aceitar"
-                                                >
-                                                    <Check className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleRejectGroupInvite(invite.id)}
-                                                    className="p-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-                                                    title="Rejeitar"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </>
-                            ) : (
-                                <div className="col-span-full text-center py-20 bg-white/5 rounded-2xl border border-white/10">
-                                    <Mail className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                                    <p className="text-gray-400">Nenhum convite pendente.</p>
-                                    <p className="text-sm text-gray-500 mt-2">Convites para grupos aparecerão aqui</p>
-                                </div>
-                            )
                         ) : null}
                     </div>
                 )}

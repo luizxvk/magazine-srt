@@ -75,10 +75,10 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
             : 'shadow-[0_8px_32px_rgba(212,175,55,0.15),inset_0_0_0_1px_rgba(212,175,55,0.1)]');
     const inputBg = theme === 'light' 
         ? 'bg-gray-100/80' 
-        : (isMGT ? 'bg-tier-std-900/30' : 'bg-black/40');
+        : (isMGT ? 'bg-tier-std-900/50' : 'bg-zinc-900/80');
     const inputBorder = theme === 'light'
         ? 'border-gray-200/50'
-        : (isMGT ? 'border-tier-std-500/20' : 'border-white/10');
+        : (isMGT ? 'border-tier-std-500/30' : 'border-white/10');
     const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
     const textMuted = theme === 'light' ? 'text-gray-500' : 'text-white/50';
 
@@ -231,9 +231,10 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     value={caption}
                     onChange={handleTextareaChange}
                     placeholder={t('createPost.placeholder', { name: user?.name?.split(' ')[0] })}
-                    className={`w-full ${inputBg} ${textColor} rounded-2xl px-4 py-3 resize-none focus:outline-none focus:ring-2 border ${inputBorder} backdrop-blur-sm min-h-[60px] max-h-[200px] text-base transition-all duration-300`}
+                    className={`w-full ${inputBg} ${textColor} rounded-2xl px-4 py-3 resize-none focus:outline-none focus:ring-2 border ${inputBorder} backdrop-blur-sm min-h-[60px] max-h-[200px] text-base transition-all duration-300 placeholder:text-white/40`}
                     style={{ 
-                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                        boxShadow: theme === 'light' ? 'inset 0 2px 4px rgba(0,0,0,0.05)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
+                        ['--tw-ring-color' as any]: userAccent
                     }}
                     rows={2}
                 />

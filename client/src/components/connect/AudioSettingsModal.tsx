@@ -214,10 +214,12 @@ export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea' }:
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] max-w-[90vw] z-[60]"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 flex items-center justify-center z-[60] p-4 pointer-events-none"
           >
-            <div className={`${themeBg} rounded-2xl overflow-hidden shadow-2xl border ${themeBorder} max-h-[85vh] overflow-y-auto`}>
+            <div 
+              className={`${themeBg} rounded-2xl overflow-hidden shadow-2xl border ${themeBorder} max-h-[85vh] overflow-y-auto w-[440px] max-w-full pointer-events-auto`}
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Header */}
               <div 
                 className="p-4 border-b flex items-center justify-between"

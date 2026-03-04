@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, PanelRight, Users, Dices, Eye, Megaphone } from 'lucide-react';
+import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, PanelRight, Users, Dices, Eye, Megaphone, Palette, Volume2, Smartphone, Bell, MessageSquareText, Wifi } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.15';
+const CURRENT_VERSION = '0.5.0-rc.16';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -44,10 +44,52 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Page 1 - Main Features
     const page1Updates: UpdateItem[] = [
         {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Convites Unificados',
+            description: 'Aba Convites removida! Convites de grupos Rovex Connect agora em Solicitações.',
+            isNew: true
+        },
+        {
+            icon: <Palette className="w-5 h-5" />,
+            title: 'Tema Roxo Claro',
+            description: 'Nova cor de destaque roxo claro (#A78BFA) no template base Rovex Communities.',
+            isNew: true
+        },
+        {
+            icon: <Volume2 className="w-5 h-5" />,
+            title: 'Audio Settings Centralizado',
+            description: 'Card de configurações de áudio agora centralizado na tela corretamente.',
+            isNew: true
+        },
+        {
+            icon: <Smartphone className="w-5 h-5" />,
+            title: 'RichPresence Mobile',
+            description: 'Card de Rich Presence agora centralizado no modo mobile.',
+            isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Badge NEW Corrigido',
+            description: 'Badge NEW nos cards de acesso rápido não corta mais no canto superior.',
+            isNew: true
+        },
+        {
+            icon: <MessageSquareText className="w-5 h-5" />,
+            title: 'Textbox Escuro',
+            description: 'Campo de postagem agora com fundo escuro (bg-zinc-900/80).',
+            isNew: true
+        },
+        {
+            icon: <Wifi className="w-5 h-5" />,
+            title: 'Online Count API',
+            description: 'Endpoint /users/online-count corrigido - sem mais erro 404!',
+            isNew: true
+        },
+        {
             icon: <Dices className="w-5 h-5" />,
             title: 'Roleta da Sorte',
             description: 'Gire a roleta e ganhe Zions, XP e itens exclusivos! Limite diário de 3 giros.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Eye className="w-5 h-5" />,

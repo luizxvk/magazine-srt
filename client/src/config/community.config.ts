@@ -72,21 +72,21 @@ export interface CommunityConfig {
 
 export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   // Identificação
-  id: 'magazine-srt-local',
-  subdomain: 'magazine-srt',
+  id: 'rovex-communities',
+  subdomain: 'rovex-communities',
   
   // Branding
-  name: 'Rovex Demo',
+  name: 'Rovex Communities',
   slogan: 'Plataforma Social Gamificada',
   logoUrl: '/assets/logo-rovex.png',
   logoIconUrl: '/assets/logo-rovex.png',
   faviconUrl: '/assets/logo-rovex.png',
   ogImageUrl: '/assets/logo-rovex.png',
   
-  // Cores (roxo Rovex)
-  primaryColor: '#8B5CF6',
-  secondaryColor: '#7C3AED',
-  accentColor: '#8B5CF6',
+  // Cores (roxo claro Rovex)
+  primaryColor: '#A78BFA',
+  secondaryColor: '#8B5CF6',
+  accentColor: '#A78BFA',
   
   // Tiers
   tierVipName: 'MAGAZINE',
@@ -94,7 +94,7 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   tierVipSlogan: 'A Elite do Sucesso',
   tierStdName: 'ROVEX',
   tierStdSlogan: 'Plataforma Social Gamificada',
-  backgroundColor: '#8B5CF6',
+  backgroundColor: '#A78BFA',
   
   // Economia
   currencyName: 'Zions',

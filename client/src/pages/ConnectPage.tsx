@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,7 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { useSocket } from '../hooks/useSocket';
-import { useWebRTC } from '../hooks/useWebRTC';
+import { useAgora } from '../hooks/useAgora';
 import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -194,105 +194,29 @@ export default function ConnectPage() {
   // Socket.io hook for real-time communication
   const socket = useSocket();
   
-  // WebRTC hook for voice/video (pass current channel id)
-  const webrtc = useWebRTC(currentVoice?.channelId || null);
-  
-  // Ref for remote audio elements
-  const remoteAudioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
+  // Agora.io hook for voice/video
+  const agora = useAgora();
 
-  // Play remote audio streams
+  // Log Agora remote users (Agora automatically plays audio)
   useEffect(() => {
-    const audioElements = remoteAudioElementsRef.current;
-    
-    console.log('[ConnectPage] Remote audio streams updated:', webrtc.remoteAudioStreams.size);
-    
-    // Add new audio elements for new streams
-    webrtc.remoteAudioStreams.forEach((stream, odiserId) => {
-      if (!audioElements.has(odiserId)) {
-        console.log('[ConnectPage] Creating audio element for:', odiserId);
-        console.log('[ConnectPage] Stream tracks:', stream.getTracks().map(t => ({ kind: t.kind, enabled: t.enabled, readyState: t.readyState })));
-        const audio = document.createElement('audio');
-        audio.autoplay = true;
-        audio.volume = 1.0;
-        audio.muted = false;
-        audio.setAttribute('playsinline', 'true');
-        audio.srcObject = stream;
-        // Append to body to ensure playback works
-        audio.style.display = 'none';
-        document.body.appendChild(audio);
-        // Monitor track state
-        stream.getAudioTracks().forEach(track => {
-          console.log('[ConnectPage] Audio track state:', { id: track.id, enabled: track.enabled, muted: track.muted, readyState: track.readyState });
-          track.onended = () => console.log('[ConnectPage] Audio track ended:', track.id);
-          track.onmute = () => console.log('[ConnectPage] Audio track muted:', track.id);
-          track.onunmute = () => console.log('[ConnectPage] Audio track unmuted:', track.id);
-        });
-        
-        // Monitor audio element state
-        audio.onloadedmetadata = () => console.log('[ConnectPage] Audio metadata loaded for:', odiserId);
-        audio.onplay = () => console.log('[ConnectPage] Audio started playing for:', odiserId);
-        audio.onpause = () => console.log('[ConnectPage] Audio paused for:', odiserId);
-        audio.onerror = (e) => console.error('[ConnectPage] Audio error for:', odiserId, e);
-        
-        // Monitor actual audio data flow using AudioContext
-        try {
-          const audioCtx = new AudioContext();
-          const source = audioCtx.createMediaStreamSource(stream);
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 256;
-          source.connect(analyser);
-          // Don't connect to destination (speakers) - audio element handles that
-          
-          const dataArray = new Uint8Array(analyser.frequencyBinCount);
-          let checkCount = 0;
-          const checkAudioLevel = () => {
-            analyser.getByteFrequencyData(dataArray);
-            const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-            if (checkCount < 20 || average > 0) {
-              console.log(`[ConnectPage] Audio level from ${odiserId}: ${average.toFixed(2)} (check #${checkCount + 1})`);
-            }
-            checkCount++;
-            if (checkCount < 30) {
-              setTimeout(checkAudioLevel, 500);
-            }
-          };
-          checkAudioLevel();
-        } catch (e) {
-          console.warn('[ConnectPage] Could not create audio analyzer:', e);
-        }
-        
-        // Try to play (may require user interaction first time)
-        audio.play().then(() => {
-          console.log('[ConnectPage] Playing remote audio from:', odiserId, 'paused:', audio.paused, 'volume:', audio.volume);
-        }).catch((err) => {
-          console.warn('[ConnectPage] Audio autoplay blocked:', err);
-          // User interaction required - audio will play after any click
-        });
-        audioElements.set(odiserId, audio);
+    console.log('[ConnectPage] Agora remote users updated:', agora.remoteUsers.length);
+    agora.remoteUsers.forEach(user => {
+      console.log('[ConnectPage] Remote user:', user.uid, 'hasAudio:', !!user.audioTrack, 'hasVideo:', !!user.videoTrack);
+    });
+  }, [agora.remoteUsers]);
+
+  // Convert Agora remote video tracks to Map for StreamViewer compatibility
+  const remoteScreenStreams = useMemo(() => {
+    const map = new Map<string, MediaStream>();
+    agora.remoteUsers.forEach(user => {
+      if (user.videoTrack) {
+        // Create a MediaStream from the Agora video track
+        const stream = new MediaStream([user.videoTrack.getMediaStreamTrack()]);
+        map.set(String(user.uid), stream);
       }
     });
-    
-    // Remove audio elements for streams that no longer exist
-    audioElements.forEach((audio, odiserId) => {
-      if (!webrtc.remoteAudioStreams.has(odiserId)) {
-        audio.pause();
-        audio.srcObject = null;
-        audio.remove();
-        audioElements.delete(odiserId);
-        console.log('[ConnectPage] Stopped remote audio from:', odiserId);
-      }
-    });
-    
-    return () => {
-      // Cleanup all audio elements on unmount
-      audioElements.forEach((audio) => {
-        audio.pause();
-        audio.srcObject = null;
-        audio.remove();
-      });
-      audioElements.clear();
-    };
-  }, [webrtc.remoteAudioStreams]);
+    return map;
+  }, [agora.remoteUsers]);
 
   // Register socket event listeners
   useEffect(() => {
@@ -420,7 +344,7 @@ export default function ConnectPage() {
   // Re-establish voice connection after page refresh
   useEffect(() => {
     const rejoinVoiceChannel = async () => {
-      if (currentVoice && socket.isConnected && user && !webrtc.isAudioEnabled) {
+      if (currentVoice && socket.isConnected && user && !agora.isJoined) {
         // Rejoin socket room
         socket.joinVoice(currentVoice.channelId, {
           odiserId: user.id,
@@ -429,28 +353,13 @@ export default function ConnectPage() {
           isMuted: isMuted,
           isDeafened: isDeafened,
           isSpeaking: false,
-          isStreaming: webrtc.isScreenSharing,
+          isStreaming: agora.isScreenSharing,
         });
         
-        // Restart audio capture (user permission will be requested)
+        // Restart Agora voice (user permission will be requested)
         if (!isMuted && !isDeafened) {
-          const audioStarted = await webrtc.startAudio();
-          
-          // Connect to all existing participants in the channel
-          if (audioStarted && groups.length > 0) {
-            for (const group of groups) {
-              const channel = group.voiceChannels.find(c => c.id === currentVoice.channelId);
-              if (channel) {
-                for (const participant of channel.participants) {
-                  if (participant.user.id !== user.id) {
-                    console.log('[ConnectPage] Reconnecting to peer:', participant.user.id);
-                    await webrtc.connectToPeer(participant.user.id, currentVoice.channelId);
-                  }
-                }
-                break;
-              }
-            }
-          }
+          // Agora automatically connects to all participants in the channel
+          await agora.joinChannel(currentVoice.channelId, user.id);
         }
       }
     };
@@ -578,26 +487,11 @@ export default function ConnectPage() {
         });
       }
       
-      // Start WebRTC audio
-      console.log('[ConnectPage] Starting WebRTC audio...');
-      const audioStarted = await webrtc.startAudio();
-      console.log('[ConnectPage] WebRTC audio started:', audioStarted);
-      
-      // After starting audio, connect to all existing participants in the channel
-      if (audioStarted && user) {
-        // Use the channel from API response which has fresh participant list
-        const channel = response.data.channel;
-        console.log('[ConnectPage] Channel found:', channel?.id, 'participants:', channel?.participants?.length);
-        
-        if (channel && channel.participants) {
-          // Connect to each existing participant (except self)
-          for (const participant of channel.participants) {
-            if (participant.user.id !== user.id) {
-              console.log('[ConnectPage] Connecting to peer:', participant.user.id);
-              await webrtc.connectToPeer(participant.user.id, channelId);
-            }
-          }
-        }
+      // Start Agora audio - Agora automatically connects to all participants
+      console.log('[ConnectPage] Starting Agora audio...');
+      if (user) {
+        const audioStarted = await agora.joinChannel(channelId, user.id);
+        console.log('[ConnectPage] Agora audio started:', audioStarted);
       }
       
       showToast('Conectado ao canal de voz');
@@ -613,9 +507,8 @@ export default function ConnectPage() {
         // Leave via Socket.io
         socket.leaveVoice(currentVoice.channelId);
         
-        // Stop WebRTC
-        webrtc.stopAudio();
-        webrtc.stopScreenShare();
+        // Stop Agora
+        await agora.leaveChannel();
       }
       
       await api.post('/connect/voice/leave');
@@ -644,8 +537,8 @@ export default function ConnectPage() {
         });
       }
       
-      // Update WebRTC audio track
-      webrtc.toggleMute();
+      // Update Agora audio track
+      await agora.toggleMute();
       
       // Sync via Socket
       if (currentVoice) {
@@ -679,9 +572,9 @@ export default function ConnectPage() {
         });
       }
       
-      // Update WebRTC - mute audio when deafening
+      // Update Agora - mute audio when deafening
       if (newDeafened) {
-        webrtc.toggleMute();
+        await agora.toggleMute();
       }
       
       // Sync via Socket
@@ -704,8 +597,8 @@ export default function ConnectPage() {
   // Screen sharing handler
   const handleToggleScreenShare = async () => {
     try {
-      if (webrtc.isScreenSharing) {
-        webrtc.stopScreenShare();
+      if (agora.isScreenSharing) {
+        await agora.stopScreenShare();
         if (currentVoice) {
           socket.stopScreenShare(currentVoice.channelId);
         }
@@ -720,7 +613,7 @@ export default function ConnectPage() {
         }
         showToast('Compartilhamento de tela encerrado');
       } else {
-        const success = await webrtc.startScreenShare();
+        const success = await agora.startScreenShare();
         if (success && currentVoice) {
           socket.startScreenShare(currentVoice.channelId);
           // Update local streaming state
@@ -1413,8 +1306,8 @@ export default function ConnectPage() {
                   channel={currentVoice.channel}
                   isMuted={isMuted}
                   isDeafened={isDeafened}
-                  isScreenSharing={webrtc.isScreenSharing}
-                  hasActiveStreams={webrtc.remoteScreenStreams.size > 0}
+                  isScreenSharing={agora.isScreenSharing}
+                  hasActiveStreams={remoteScreenStreams.size > 0}
                   onToggleMute={handleToggleMute}
                   onToggleDeafen={handleToggleDeafen}
                   onToggleScreenShare={handleToggleScreenShare}
@@ -1480,8 +1373,8 @@ export default function ConnectPage() {
               channel={currentVoice.channel}
               isMuted={isMuted}
               isDeafened={isDeafened}
-              isScreenSharing={webrtc.isScreenSharing}
-              hasActiveStreams={webrtc.remoteScreenStreams.size > 0}
+              isScreenSharing={agora.isScreenSharing}
+              hasActiveStreams={remoteScreenStreams.size > 0}
               onToggleMute={handleToggleMute}
               onToggleDeafen={handleToggleDeafen}
               onToggleScreenShare={handleToggleScreenShare}
@@ -1620,8 +1513,8 @@ export default function ConnectPage() {
             channel={currentVoice.channel}
             isMuted={isMuted}
             isDeafened={isDeafened}
-            isScreenSharing={webrtc.isScreenSharing}
-            hasActiveStreams={webrtc.remoteScreenStreams.size > 0}
+            isScreenSharing={agora.isScreenSharing}
+            hasActiveStreams={remoteScreenStreams.size > 0}
             onToggleMute={handleToggleMute}
             onToggleDeafen={handleToggleDeafen}
             onToggleScreenShare={handleToggleScreenShare}
@@ -2770,7 +2663,7 @@ export default function ConnectPage() {
 
       {/* Stream Viewer */}
       <StreamViewer
-        streams={webrtc.remoteScreenStreams}
+        streams={remoteScreenStreams}
         streamerInfo={streamerInfo}
         isOpen={showStreamViewer}
         onClose={() => setShowStreamViewer(false)}

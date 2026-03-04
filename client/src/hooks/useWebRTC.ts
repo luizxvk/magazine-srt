@@ -71,14 +71,17 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
     };
 
     pc.ontrack = (event) => {
+      console.log(`[WebRTC] Received track from ${odiserId}:`, event.track.kind);
       const stream = event.streams[0];
       if (stream) {
         // Determine if it's audio or video (screen share)
         const hasVideo = stream.getVideoTracks().length > 0;
         
         if (hasVideo) {
+          console.log(`[WebRTC] Adding remote video stream from ${odiserId}`);
           setRemoteScreenStreams(prev => new Map(prev).set(odiserId, stream));
         } else {
+          console.log(`[WebRTC] Adding remote audio stream from ${odiserId}`);
           setRemoteAudioStreams(prev => new Map(prev).set(odiserId, stream));
         }
       }
@@ -229,13 +232,17 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
       return;
     }
 
+    console.log(`[WebRTC] Connecting to peer: ${odiserId} in channel: ${chId}`);
     const pc = createPeerConnection(odiserId);
 
     // Add local streams if available
     if (localAudioStreamRef.current) {
+      console.log('[WebRTC] Adding local audio tracks to offer');
       localAudioStreamRef.current.getAudioTracks().forEach(track => {
         pc.addTrack(track, localAudioStreamRef.current!);
       });
+    } else {
+      console.warn('[WebRTC] No local audio stream available when connecting to peer');
     }
 
     if (localScreenStreamRef.current) {
@@ -249,6 +256,7 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       sendOffer(odiserId, offer, chId);
+      console.log(`[WebRTC] Sent offer to: ${odiserId}`);
     } catch (error) {
       console.error('[WebRTC] Error creating offer:', error);
     }
@@ -294,25 +302,33 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
     // Handle incoming offer
     onWebRTCOffer(async (data) => {
       if (data.channelId !== channelId) return;
+      
+      console.log('[WebRTC] Received offer from:', data.fromUserId);
 
       let pc = peerConnections.current.get(data.fromUserId)?.connection;
+      const isNewConnection = !pc;
       
       if (!pc) {
         pc = createPeerConnection(data.fromUserId);
       }
 
-      // Add local streams
-      if (localAudioStreamRef.current) {
-        localAudioStreamRef.current.getAudioTracks().forEach(track => {
-          pc!.addTrack(track, localAudioStreamRef.current!);
-        });
-      }
-
       try {
+        // Set remote description first (the offer)
         await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        
+        // Add local audio tracks if available and this is a new connection
+        if (isNewConnection && localAudioStreamRef.current) {
+          console.log('[WebRTC] Adding local audio tracks to answer');
+          localAudioStreamRef.current.getAudioTracks().forEach(track => {
+            pc!.addTrack(track, localAudioStreamRef.current!);
+          });
+        }
+
+        // Create and send answer
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         sendAnswer(data.fromUserId, answer, channelId);
+        console.log('[WebRTC] Sent answer to:', data.fromUserId);
       } catch (error) {
         console.error('[WebRTC] Error handling offer:', error);
       }
@@ -321,14 +337,19 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
     // Handle incoming answer
     onWebRTCAnswer(async (data) => {
       if (data.channelId !== channelId) return;
+      
+      console.log('[WebRTC] Received answer from:', data.fromUserId);
 
       const peer = peerConnections.current.get(data.fromUserId);
       if (peer) {
         try {
           await peer.connection.setRemoteDescription(new RTCSessionDescription(data.answer));
+          console.log('[WebRTC] Connection established with:', data.fromUserId);
         } catch (error) {
           console.error('[WebRTC] Error handling answer:', error);
         }
+      } else {
+        console.warn('[WebRTC] No peer connection found for answer from:', data.fromUserId);
       }
     });
 

@@ -200,15 +200,27 @@ export default function ConnectPage() {
   useEffect(() => {
     const audioElements = remoteAudioElementsRef.current;
     
+    console.log('[ConnectPage] Remote audio streams updated:', webrtc.remoteAudioStreams.size);
+    
     // Add new audio elements for new streams
     webrtc.remoteAudioStreams.forEach((stream, odiserId) => {
       if (!audioElements.has(odiserId)) {
+        console.log('[ConnectPage] Creating audio element for:', odiserId);
         const audio = document.createElement('audio');
         audio.autoplay = true;
         audio.setAttribute('playsinline', 'true');
         audio.srcObject = stream;
+        // Append to body to ensure playback works
+        audio.style.display = 'none';
+        document.body.appendChild(audio);
+        // Try to play (may require user interaction first time)
+        audio.play().then(() => {
+          console.log('[ConnectPage] Playing remote audio from:', odiserId);
+        }).catch((err) => {
+          console.warn('[ConnectPage] Audio autoplay blocked:', err);
+          // User interaction required - audio will play after any click
+        });
         audioElements.set(odiserId, audio);
-        console.log('[ConnectPage] Playing remote audio from:', odiserId);
       }
     });
     
@@ -217,6 +229,7 @@ export default function ConnectPage() {
       if (!webrtc.remoteAudioStreams.has(odiserId)) {
         audio.pause();
         audio.srcObject = null;
+        audio.remove();
         audioElements.delete(odiserId);
         console.log('[ConnectPage] Stopped remote audio from:', odiserId);
       }
@@ -227,6 +240,7 @@ export default function ConnectPage() {
       audioElements.forEach((audio) => {
         audio.pause();
         audio.srcObject = null;
+        audio.remove();
       });
       audioElements.clear();
     };
@@ -241,9 +255,17 @@ export default function ConnectPage() {
     // Socket connected - stop connecting state
     setSocketConnecting(false);
 
-    socket.onVoiceUserJoined(() => {
+    socket.onVoiceUserJoined((data: { user: { odiserId: string; name: string }; channelId: string; userId?: string }) => {
       showToast('Usuário entrou no canal de voz');
       fetchGroups();
+      
+      // IMPORTANT: When another user joins our voice channel, we need to connect to them via WebRTC
+      // This is how Discord-style audio works - existing users connect to new joiners
+      const newUserId = data.userId || data.user?.odiserId;
+      if (currentVoice && currentVoice.channelId === data.channelId && user && newUserId && newUserId !== user.id) {
+        console.log('[ConnectPage] New user joined our channel, connecting via WebRTC:', newUserId);
+        webrtc.connectToPeer(newUserId, data.channelId);
+      }
     });
 
     socket.onVoiceUserLeft(() => {

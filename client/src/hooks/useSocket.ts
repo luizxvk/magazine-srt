@@ -65,8 +65,12 @@ interface UseSocketReturn {
 // VITE_CONNECT_URL should point to https://rovex-connect.onrender.com in production
 const SOCKET_URL = import.meta.env.VITE_CONNECT_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
 
+// Log socket URL for debugging - IMPORTANT: if this shows Vercel URL, voice will NOT work
 console.log('[Socket] SOCKET_URL:', SOCKET_URL);
-console.log('[Socket] VITE_CONNECT_URL:', import.meta.env.VITE_CONNECT_URL);
+if (!import.meta.env.VITE_CONNECT_URL) {
+  console.warn('[Socket] ⚠️ VITE_CONNECT_URL not set! Voice chat will NOT work properly. Set it to https://rovex-connect.onrender.com');
+}
+console.log('[Socket] VITE_CONNECT_URL:', import.meta.env.VITE_CONNECT_URL || '(not set - using fallback)');
 console.log('[Socket] VITE_API_URL:', import.meta.env.VITE_API_URL);
 
 export function useSocket(): UseSocketReturn {

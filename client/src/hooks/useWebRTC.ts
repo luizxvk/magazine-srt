@@ -66,8 +66,15 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
     pc.onicecandidate = (event) => {
       if (event.candidate && channelId) {
+        console.log('[WebRTC] Sending ICE candidate to:', odiserId, event.candidate.candidate.substring(0, 50));
         sendIceCandidate(odiserId, event.candidate.toJSON(), channelId);
+      } else if (!event.candidate) {
+        console.log('[WebRTC] ICE gathering complete for:', odiserId);
       }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log(`[WebRTC] ICE connection state with ${odiserId}:`, pc.iceConnectionState);
     };
 
     pc.ontrack = (event) => {
@@ -361,13 +368,17 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
     onWebRTCIceCandidate(async (data) => {
       if (data.channelId !== channelId) return;
 
+      console.log('[WebRTC] Received ICE candidate from:', data.fromUserId);
       const peer = peerConnections.current.get(data.fromUserId);
       if (peer) {
         try {
           await peer.connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+          console.log('[WebRTC] Added ICE candidate from:', data.fromUserId);
         } catch (error) {
           console.error('[WebRTC] Error adding ICE candidate:', error);
         }
+      } else {
+        console.warn('[WebRTC] No peer connection found for ICE candidate from:', data.fromUserId);
       }
     });
   }, [channelId, createPeerConnection, onWebRTCOffer, onWebRTCAnswer, onWebRTCIceCandidate, sendAnswer]);

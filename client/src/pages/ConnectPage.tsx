@@ -206,8 +206,11 @@ export default function ConnectPage() {
     webrtc.remoteAudioStreams.forEach((stream, odiserId) => {
       if (!audioElements.has(odiserId)) {
         console.log('[ConnectPage] Creating audio element for:', odiserId);
+        console.log('[ConnectPage] Stream tracks:', stream.getTracks().map(t => ({ kind: t.kind, enabled: t.enabled, readyState: t.readyState })));
         const audio = document.createElement('audio');
         audio.autoplay = true;
+        audio.volume = 1.0;
+        audio.muted = false;
         audio.setAttribute('playsinline', 'true');
         audio.srcObject = stream;
         // Append to body to ensure playback works

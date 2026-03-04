@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 import Header from '../components/Header';
+import ColorBends from '../components/ColorBends';
 import LiquidEliteButton from '../components/LiquidEliteButton';
 import confetti from 'canvas-confetti';
 
@@ -194,17 +195,22 @@ export default function ElitePage() {
 
     return (
         <div className="min-h-screen relative text-white">
-            {/* Animated gradient background - Elite theme */}
-            <div 
-                className="fixed inset-0 z-0 pointer-events-none"
-                style={{
-                    background: 'linear-gradient(-45deg, #7C3AED, #312e81, #5227FF, #8B5CF6, #A78BFA, #4C1D95)',
-                    backgroundSize: '400% 400%',
-                    animation: 'eliteGradientAnim 15s ease infinite'
-                }}
-            />
-            {/* Dark overlay for readability */}
-            <div className="fixed inset-0 z-0 pointer-events-none bg-black/30" />
+            {/* ColorBends animated background - Elite theme */}
+            <div className="fixed inset-0 z-0 pointer-events-none" style={{ width: '100vw', height: '100vh' }}>
+                <ColorBends
+                    colors={['#7C3AED', '#A78BFA', '#5227FF', '#8B5CF6', '#312e81']}
+                    rotation={0}
+                    speed={0.2}
+                    scale={1}
+                    frequency={1}
+                    warpStrength={1}
+                    noise={0.1}
+                    transparent={false}
+                    autoRotate={0}
+                    mouseInfluence={0}
+                    parallax={0}
+                />
+            </div>
             
             <div className="relative z-10">
                 <Header />

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import './ColorBends.css';
 
 type ColorBendsProps = {
   className?: string;
@@ -236,7 +237,7 @@ export default function ColorBends({
         container.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [frequency, mouseInfluence, noise, parallax, scale, speed, transparent, warpStrength]);
 
   useEffect(() => {
     const material = materialRef.current;
@@ -304,5 +305,5 @@ export default function ColorBends({
     };
   }, []);
 
-  return <div ref={containerRef} className={`w-full h-full relative overflow-hidden ${className ?? ''}`} style={style} />;
+  return <div ref={containerRef} className={`color-bends-container ${className ?? ''}`} style={style} />;
 }

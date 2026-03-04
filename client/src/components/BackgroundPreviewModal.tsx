@@ -39,6 +39,12 @@ const animatedBackgroundMap: Record<string, React.ComponentType> = {
     'anim-infinite-triangles': InfiniteTrianglesBackground,
 };
 
+// CSS-only animated backgrounds (no React component needed)
+const cssOnlyBackgrounds = ['anim-cosmic-triangles', 'anim-gradient-waves'];
+
+// Light-themed backgrounds that need dark text
+const lightThemedBackgrounds = ['anim-rainbow-skies', 'anim-iridescence'];
+
 // CSS override styles to contain animated backgrounds within the preview container
 // These backgrounds normally use position:fixed and z-index:-1 for fullscreen effect
 const previewContainerOverrideStyles = `
@@ -101,6 +107,9 @@ export default function BackgroundPreviewModal({
     
     const AnimatedComponent = animatedBackgroundMap[backgroundId];
     const hasAnimatedPreview = !!AnimatedComponent;
+    const hasCssOnlyAnimation = cssOnlyBackgrounds.includes(backgroundId);
+    const isLightThemed = lightThemedBackgrounds.includes(backgroundId);
+    const hasAnyAnimation = hasAnimatedPreview || hasCssOnlyAnimation;
 
     useEffect(() => {
         if (isOpen) {
@@ -148,53 +157,66 @@ export default function BackgroundPreviewModal({
                         }}
                     />
                     
-                    {/* Animated Background Preview overlay */}
+                    {/* Animated Background Preview overlay (React components) */}
                     {hasAnimatedPreview && isPlaying && (
                         <div className="preview-bg-container absolute inset-0 overflow-hidden">
                             <AnimatedComponent />
                         </div>
                     )}
+                    
+                    {/* CSS-only animated backgrounds */}
+                    {hasCssOnlyAnimation && isPlaying && (
+                        <div className={`absolute inset-0 overflow-hidden ${backgroundId}`} />
+                    )}
 
-                    {/* Overlay Info */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
+                    {/* Overlay Info - stronger for light themes, disabled for very light themes */}
+                    <div className={`absolute inset-0 pointer-events-none z-10 ${
+                        isLightThemed 
+                            ? 'bg-gradient-to-t from-black/60 via-transparent to-black/30' 
+                            : 'bg-gradient-to-t from-black/80 via-transparent to-black/40'
+                    }`} />
 
                     {/* Header */}
-                    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between">
+                    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-20">
                         <div className="flex items-center gap-2">
-                            <Eye className="w-5 h-5 text-white/80" />
-                            <span className="text-white font-medium">Preview</span>
+                            <Eye className={`w-5 h-5 ${isLightThemed ? 'text-gray-800' : 'text-white/80'}`} />
+                            <span className={`font-medium ${isLightThemed ? 'text-gray-800' : 'text-white'}`}>Preview</span>
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+                            className={`p-2 rounded-full transition-colors ${isLightThemed ? 'bg-white/50 hover:bg-white/70' : 'bg-black/50 hover:bg-black/70'}`}
                         >
-                            <X className="w-5 h-5 text-white" />
+                            <X className={`w-5 h-5 ${isLightThemed ? 'text-gray-800' : 'text-white'}`} />
                         </button>
                     </div>
 
                     {/* Footer */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h2 className="text-2xl font-bold text-white mb-2">{backgroundName}</h2>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                        <h2 className={`text-2xl font-bold mb-2 drop-shadow-lg ${isLightThemed ? 'text-gray-900' : 'text-white'}`}>{backgroundName}</h2>
                         
-                        {hasAnimatedPreview && (
+                        {hasAnyAnimation && (
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setIsPlaying(!isPlaying)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                                        isLightThemed 
+                                            ? 'bg-black/20 hover:bg-black/30' 
+                                            : 'bg-white/10 hover:bg-white/20'
+                                    }`}
                                 >
                                     {isPlaying ? (
                                         <>
-                                            <Pause className="w-4 h-4 text-white" />
-                                            <span className="text-white text-sm">Pausar</span>
+                                            <Pause className={`w-4 h-4 ${isLightThemed ? 'text-gray-800' : 'text-white'}`} />
+                                            <span className={`text-sm ${isLightThemed ? 'text-gray-800' : 'text-white'}`}>Pausar</span>
                                         </>
                                     ) : (
                                         <>
-                                            <Play className="w-4 h-4 text-white" />
-                                            <span className="text-white text-sm">Play</span>
+                                            <Play className={`w-4 h-4 ${isLightThemed ? 'text-gray-800' : 'text-white'}`} />
+                                            <span className={`text-sm ${isLightThemed ? 'text-gray-800' : 'text-white'}`}>Play</span>
                                         </>
                                     )}
                                 </button>
-                                <span className="text-white/60 text-sm">
+                                <span className={`text-sm ${isLightThemed ? 'text-gray-700' : 'text-white/60'}`}>
                                     Animação em tempo real
                                 </span>
                             </div>

@@ -156,6 +156,11 @@ export default function ConnectPage() {
   const [inviteCopied, setInviteCopied] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(false);
   
+  // Join group via link state
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [pendingJoinGroup, setPendingJoinGroup] = useState<{ id: string; name: string; avatarUrl?: string; memberCount?: number } | null>(null);
+  const [joining, setJoining] = useState(false);
+  
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   
@@ -297,9 +302,53 @@ export default function ConnectPage() {
       if (group) {
         setSelectedGroup(group);
         setExpandedGroups(prev => new Set([...prev, group.id]));
+      } else {
+        // Group not in user's list - check if it's a valid group they can join
+        checkInviteGroup(groupId);
       }
     }
   }, [groupId, groups]);
+
+  // Check if a group exists for joining via invite link
+  const checkInviteGroup = async (gId: string) => {
+    try {
+      const response = await api.get(`/groups/${gId}`);
+      if (response.data) {
+        setPendingJoinGroup({
+          id: response.data.id,
+          name: response.data.name,
+          avatarUrl: response.data.avatarUrl,
+          memberCount: response.data.members?.length || 0
+        });
+        setShowJoinModal(true);
+      }
+    } catch (error: any) {
+      // Group doesn't exist or user doesn't have access
+      console.error('Group not found:', error);
+      showError('Grupo não encontrado ou você não tem acesso');
+      navigate('/connect');
+    }
+  };
+
+  // Join a group via invite link
+  const handleJoinGroup = async () => {
+    if (!pendingJoinGroup) return;
+    setJoining(true);
+    try {
+      await api.post(`/groups/${pendingJoinGroup.id}/join`);
+      showToast('✅ Você entrou no grupo!');
+      setShowJoinModal(false);
+      setPendingJoinGroup(null);
+      // Refresh groups list
+      await fetchGroups(false);
+      // Navigate to the group
+      navigate(`/connect/${pendingJoinGroup.id}`);
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao entrar no grupo');
+    } finally {
+      setJoining(false);
+    }
+  };
 
   const fetchGroups = async (showLoader = true) => {
     try {
@@ -2179,6 +2228,86 @@ export default function ConnectPage() {
                   style={{ backgroundColor: `${accentColor}10`, color: accentColor }}
                 >
                   💡 Quando alguém acessar o link, receberá um convite para entrar no grupo.
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Join Group Modal (for invite links) */}
+      <AnimatePresence>
+        {showJoinModal && pendingJoinGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => {
+              setShowJoinModal(false);
+              setPendingJoinGroup(null);
+              navigate('/connect');
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-sm rounded-2xl overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border ${themeBorder}`}
+            >
+              {/* Group Preview */}
+              <div className="p-6 text-center">
+                {/* Avatar */}
+                <div 
+                  className="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center overflow-hidden"
+                  style={{ backgroundColor: `${accentColor}20` }}
+                >
+                  {pendingJoinGroup.avatarUrl ? (
+                    <img src={pendingJoinGroup.avatarUrl} alt={pendingJoinGroup.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Users className="w-10 h-10" style={{ color: accentColor }} />
+                  )}
+                </div>
+
+                {/* Group Name */}
+                <h2 className={`text-xl font-bold ${themeText} mb-2`}>{pendingJoinGroup.name}</h2>
+                <p className={`text-sm ${themeSecondary} mb-6`}>
+                  {pendingJoinGroup.memberCount || 0} membros
+                </p>
+
+                {/* Info text */}
+                <p className={`text-sm ${themeSecondary} mb-6`}>
+                  Você foi convidado para este grupo. Deseja entrar?
+                </p>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowJoinModal(false);
+                      setPendingJoinGroup(null);
+                      navigate('/connect');
+                    }}
+                    className={`flex-1 py-3 px-4 rounded-xl font-medium border ${themeBorder} ${themeHover} ${themeText} transition-all`}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleJoinGroup}
+                    disabled={joining}
+                    className="flex-1 py-3 px-4 rounded-xl font-medium text-white transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    {joining ? (
+                      <>Entrando...</>
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4" />
+                        Entrar
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </motion.div>

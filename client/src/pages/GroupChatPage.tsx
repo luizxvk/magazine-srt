@@ -117,6 +117,8 @@ export default function GroupChatPage() {
   const [uploading, setUploading] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [friends, setFriends] = useState<any[]>([]);
+  const [communityUsers, setCommunityUsers] = useState<any[]>([]);
+  const [inviteTab, setInviteTab] = useState<'friends' | 'community'>('friends');
   const [inviting, setInviting] = useState(false);
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [showImageConfirm, setShowImageConfirm] = useState(false);
@@ -156,6 +158,20 @@ export default function GroupChatPage() {
     }
   };
 
+  const fetchCommunityUsers = async () => {
+    try {
+      const response = await api.get('/users');
+      // Filter out users already in the group and self
+      const currentMemberIds = group?.members.map(m => m.userId) || [];
+      const availableUsers = response.data.filter((u: any) =>
+        !currentMemberIds.includes(u.id) && u.id !== user?.id
+      );
+      setCommunityUsers(availableUsers);
+    } catch (error) {
+      console.error('Error fetching community users:', error);
+    }
+  };
+
   const handleInviteMember = async (friendId: string) => {
     if (!id) return;
 
@@ -178,6 +194,8 @@ export default function GroupChatPage() {
 
   const openInviteModal = () => {
     fetchFriends();
+    fetchCommunityUsers();
+    setInviteTab('friends');
     setShowInviteModal(true);
   };
 
@@ -1226,41 +1244,98 @@ export default function GroupChatPage() {
               className="glass-panel rounded-xl p-6 max-w-md w-full max-h-[70vh] overflow-y-auto border border-white/10"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-white">Convidar Amigos</h2>
+                <h2 className="text-xl font-semibold text-white">Convidar Membros</h2>
                 <button onClick={() => setShowInviteModal(false)}>
                   <X className="w-5 h-5 text-white" />
                 </button>
               </div>
 
-              {friends.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">
-                  Nenhum amigo disponível para convidar
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {friends.map((friend) => (
-                    <div key={friend.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                      <img
-                        src={friend.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}`}
-                        alt={friend.name}
-                        className="w-10 h-10 rounded-full"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-white">
-                          {friend.displayName || friend.name}
-                        </p>
-                        <p className="text-xs text-gray-400">{friend.trophies} Troféus • Nível {friend.level}</p>
+              {/* Tabs */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setInviteTab('friends')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    inviteTab === 'friends'
+                      ? `${accentBg} text-white`
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Amigos ({friends.length})
+                </button>
+                <button
+                  onClick={() => setInviteTab('community')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    inviteTab === 'community'
+                      ? `${accentBg} text-white`
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Comunidade ({communityUsers.length})
+                </button>
+              </div>
+
+              {inviteTab === 'friends' ? (
+                friends.length === 0 ? (
+                  <p className="text-gray-400 text-center py-8">
+                    Nenhum amigo disponível para convidar
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {friends.map((friend) => (
+                      <div key={friend.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                        <img
+                          src={friend.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}`}
+                          alt={friend.name}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium text-white">
+                            {friend.displayName || friend.name}
+                          </p>
+                          <p className="text-xs text-gray-400">{friend.trophies} Troféus • Nível {friend.level}</p>
+                        </div>
+                        <button
+                          onClick={() => handleInviteMember(friend.id)}
+                          disabled={inviting}
+                          className={`px-4 py-2 rounded-lg ${accentBg} text-white text-sm hover:opacity-90 transition-opacity disabled:opacity-50`}
+                        >
+                          Convidar
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleInviteMember(friend.id)}
-                        disabled={inviting}
-                        className={`px-4 py-2 rounded-lg ${accentBg} text-white text-sm hover:opacity-90 transition-opacity disabled:opacity-50`}
-                      >
-                        Convidar
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )
+              ) : (
+                communityUsers.length === 0 ? (
+                  <p className="text-gray-400 text-center py-8">
+                    Nenhum usuário disponível para convidar
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {communityUsers.map((u) => (
+                      <div key={u.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                        <img
+                          src={u.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}`}
+                          alt={u.name}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium text-white">
+                            {u.displayName || u.name}
+                          </p>
+                          <p className="text-xs text-gray-400">{u.trophies || 0} Troféus • Nível {u.level || 1}</p>
+                        </div>
+                        <button
+                          onClick={() => handleInviteMember(u.id)}
+                          disabled={inviting}
+                          className={`px-4 py-2 rounded-lg ${accentBg} text-white text-sm hover:opacity-90 transition-opacity disabled:opacity-50`}
+                        >
+                          Convidar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )
               )}
             </motion.div>
           </motion.div>

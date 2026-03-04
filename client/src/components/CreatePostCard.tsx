@@ -231,7 +231,7 @@ export default function CreatePostCard({ onPostCreated }: CreatePostCardProps) {
                     value={caption}
                     onChange={handleTextareaChange}
                     placeholder={t('createPost.placeholder', { name: user?.name?.split(' ')[0] })}
-                    className={`w-full ${inputBg} ${textColor} rounded-2xl px-4 py-3 resize-none focus:outline-none focus:ring-2 border ${inputBorder} backdrop-blur-sm min-h-[60px] max-h-[200px] text-base transition-all duration-300 placeholder:text-white/40`}
+                    className={`w-full bg-zinc-900 text-white rounded-2xl px-4 py-3 resize-none focus:outline-none focus:ring-2 border border-white/10 backdrop-blur-sm min-h-[60px] max-h-[200px] text-base transition-all duration-300 placeholder:text-white/40`}
                     style={{ 
                         boxShadow: theme === 'light' ? 'inset 0 2px 4px rgba(0,0,0,0.05)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
                         ['--tw-ring-color' as any]: userAccent

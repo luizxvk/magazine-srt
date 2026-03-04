@@ -295,10 +295,10 @@ router.get('/public/config', async (req: Request, res: Response) => {
       slogan: baseConfig.slogan || savedConfig?.slogan || 'A comunidade definitiva',
       
       // Cores - TENANT CONFIG tem prioridade!
-      primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#d4af37',
-      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#7C3AED',
-      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#8B5CF6',
-      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#8B5CF6',
+      primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#A78BFA',
+      secondaryColor: baseConfig.secondaryColor || savedConfig?.secondaryColor || '#8B5CF6',
+      accentColor: baseConfig.accentColor || savedConfig?.accentColor || '#A78BFA',
+      backgroundColor: baseConfig.backgroundColor || savedConfig?.backgroundColor || '#A78BFA',
       
       // Tiers - TENANT CONFIG tem prioridade!
       tierVipName: baseConfig.tierVipName || savedConfig?.tierVipName || 'MAGAZINE',

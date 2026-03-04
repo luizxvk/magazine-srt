@@ -507,11 +507,14 @@ export default function ConnectPage() {
 
   const handleJoinVoice = async (groupId: string, channelId: string) => {
     try {
+      console.log('[ConnectPage] handleJoinVoice called:', { groupId, channelId });
       const response = await api.post(`/connect/groups/${groupId}/voice/${channelId}/join`);
+      console.log('[ConnectPage] API joinVoice response:', response.data);
       setCurrentVoice(response.data);
       
       // Join via Socket.io for real-time updates
       if (user) {
+        console.log('[ConnectPage] Joining voice via socket, channelId:', channelId);
         socket.joinVoice(channelId, {
           odiserId: user.id,
           name: user.displayName || user.name,
@@ -524,13 +527,16 @@ export default function ConnectPage() {
       }
       
       // Start WebRTC audio
+      console.log('[ConnectPage] Starting WebRTC audio...');
       const audioStarted = await webrtc.startAudio();
+      console.log('[ConnectPage] WebRTC audio started:', audioStarted);
       
       // After starting audio, connect to all existing participants in the channel
       if (audioStarted && user) {
         // Find the channel to get existing participants
         const group = groups.find(g => g.id === groupId);
         const channel = group?.voiceChannels.find(c => c.id === channelId);
+        console.log('[ConnectPage] Channel found:', channel?.id, 'participants:', channel?.participants.length);
         
         if (channel) {
           // Connect to each existing participant (except self)

@@ -65,6 +65,10 @@ interface UseSocketReturn {
 // VITE_CONNECT_URL should point to https://rovex-connect.onrender.com in production
 const SOCKET_URL = import.meta.env.VITE_CONNECT_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
 
+console.log('[Socket] SOCKET_URL:', SOCKET_URL);
+console.log('[Socket] VITE_CONNECT_URL:', import.meta.env.VITE_CONNECT_URL);
+console.log('[Socket] VITE_API_URL:', import.meta.env.VITE_API_URL);
+
 export function useSocket(): UseSocketReturn {
   const { user } = useAuth();
   const socketRef = useRef<Socket | null>(null);
@@ -126,36 +130,43 @@ export function useSocket(): UseSocketReturn {
     });
 
     socket.on('voice-user-joined', (data) => {
+      console.log('[Socket] voice-user-joined received:', data);
       const callback = callbacksRef.current.get('voice-user-joined');
       if (callback) callback(data);
     });
 
     socket.on('voice-user-left', (data) => {
+      console.log('[Socket] voice-user-left received:', data);
       const callback = callbacksRef.current.get('voice-user-left');
       if (callback) callback(data);
     });
 
     socket.on('voice-users', (data) => {
+      console.log('[Socket] voice-users received:', data);
       const callback = callbacksRef.current.get('voice-users');
       if (callback) callback(data);
     });
 
     socket.on('voice-state-changed', (data) => {
+      console.log('[Socket] voice-state-changed received:', data);
       const callback = callbacksRef.current.get('voice-state-changed');
       if (callback) callback(data);
     });
 
     socket.on('webrtc-offer', (data) => {
+      console.log('[Socket] webrtc-offer received:', data);
       const callback = callbacksRef.current.get('webrtc-offer');
       if (callback) callback(data);
     });
 
     socket.on('webrtc-answer', (data) => {
+      console.log('[Socket] webrtc-answer received:', data);
       const callback = callbacksRef.current.get('webrtc-answer');
       if (callback) callback(data);
     });
 
     socket.on('webrtc-ice-candidate', (data) => {
+      console.log('[Socket] webrtc-ice-candidate received:', data);
       const callback = callbacksRef.current.get('webrtc-ice-candidate');
       if (callback) callback(data);
     });
@@ -212,6 +223,8 @@ export function useSocket(): UseSocketReturn {
 
   // Voice methods
   const joinVoice = useCallback((channelId: string, user: VoiceUser) => {
+    console.log('[Socket] joinVoice emitting:', { channelId, user });
+    console.log('[Socket] socketRef.current:', socketRef.current?.connected);
     socketRef.current?.emit('join-voice', { channelId, user });
   }, []);
 

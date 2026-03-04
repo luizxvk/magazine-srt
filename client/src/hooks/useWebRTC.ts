@@ -102,7 +102,9 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
   // Start audio capture
   const startAudio = useCallback(async (): Promise<boolean> => {
+    console.log('[WebRTC] startAudio called');
     try {
+      console.log('[WebRTC] Requesting microphone access...');
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -112,11 +114,13 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
         video: false,
       });
 
+      console.log('[WebRTC] Microphone access granted, tracks:', stream.getAudioTracks().length);
       localAudioStreamRef.current = stream;
       setLocalAudioStream(stream);
       setIsAudioEnabled(true);
 
       // Add tracks to existing peer connections
+      console.log('[WebRTC] Adding tracks to existing peer connections:', peerConnections.current.size);
       peerConnections.current.forEach(({ connection }) => {
         stream.getAudioTracks().forEach(track => {
           connection.addTrack(track, stream);

@@ -33,6 +33,9 @@ interface UseAgoraReturn {
   outputVolume: number;
   setOutputVolume: (volume: number) => void;
   
+  // Network stats
+  ping: number; // RTT in ms
+  
   // Remote users
   remoteUsers: IAgoraRTCRemoteUser[];
   
@@ -44,7 +47,7 @@ interface UseAgoraReturn {
   joinChannel: (channelId: string, userId: string, token?: string) => Promise<boolean>;
   leaveChannel: () => Promise<void>;
   toggleMute: () => Promise<void>;
-  startScreenShare: () => Promise<boolean>;
+  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>) => Promise<boolean>;
   stopScreenShare: () => Promise<void>;
   
   // Volume levels (for speaking indicators)
@@ -57,6 +60,8 @@ AgoraRTC.setLogLevel(1); // 0: DEBUG, 1: INFO, 2: WARNING, 3: ERROR, 4: NONE
 export function useAgora(): UseAgoraReturn {
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const screenClientRef = useRef<IAgoraRTCClient | null>(null);
+  const channelIdRef = useRef<string>('');
+  const tokenRef = useRef<string | null>(null);
   
   const [isJoined, setIsJoined] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -72,6 +77,25 @@ export function useAgora(): UseAgoraReturn {
   const [remoteUsers, setRemoteUsers] = useState<IAgoraRTCRemoteUser[]>([]);
   const [outputVolume, setOutputVolumeState] = useState<number>(100);
   const outputVolumeRef = useRef<number>(100);
+  const [ping, setPing] = useState<number>(0);
+
+  // Poll network stats for ping/RTT
+  useEffect(() => {
+    if (!isJoined || !clientRef.current) {
+      setPing(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (clientRef.current) {
+        const stats = clientRef.current.getRTCStats();
+        // RTT is in milliseconds
+        setPing(stats.RTT || 0);
+      }
+    }, 2000); // Update every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [isJoined]);
 
   // Initialize client on mount
   useEffect(() => {
@@ -197,6 +221,10 @@ export function useAgora(): UseAgoraReturn {
       // Convert UUID to numeric hash for Agora (they recommend numeric IDs)
       const numericUid = Math.abs(userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 100000000);
       
+      // Store credentials for screen sharing
+      channelIdRef.current = channelId;
+      tokenRef.current = token || null;
+      
       console.log('[Agora] Attempting join with:', { appId: AGORA_APP_ID.slice(0, 4), channelId, hasToken: !!token, uid: numericUid });
       
       await clientRef.current.join(
@@ -292,8 +320,10 @@ export function useAgora(): UseAgoraReturn {
   }, [localAudioTrack, isMuted]);
 
   // Start screen sharing
-  const startScreenShare = useCallback(async (): Promise<boolean> => {
-    if (!clientRef.current || !isJoined) {
+  const startScreenShare = useCallback(async (
+    getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>
+  ): Promise<boolean> => {
+    if (!clientRef.current || !isJoined || !channelIdRef.current) {
       console.warn('[Agora] Cannot start screen share - not joined');
       return false;
     }
@@ -304,7 +334,7 @@ export function useAgora(): UseAgoraReturn {
         screenClientRef.current = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
       }
 
-      // Create screen video track
+      // Create screen video track first (this prompts for permission)
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
         {
           encoderConfig: '1080p_1',
@@ -315,13 +345,20 @@ export function useAgora(): UseAgoraReturn {
       // Handle array return (some browsers return [videoTrack, audioTrack])
       const videoTrack = Array.isArray(screenTrack) ? screenTrack[0] : screenTrack;
 
-      // Join with screen client using a different UID
-      const screenUid = `screen-${Date.now()}`;
+      // Get token for screen share (uses screen-specific UID on server)
+      const tokenData = await getToken(channelIdRef.current);
+      if (!tokenData) {
+        console.error('[Agora] Failed to get token for screen share');
+        videoTrack.close();
+        return false;
+      }
+
+      // Join with screen client using the token and UID from server
       await screenClientRef.current.join(
         AGORA_APP_ID,
-        clientRef.current.channelName || '',
-        null,
-        screenUid
+        channelIdRef.current,
+        tokenData.token,
+        tokenData.uid
       );
 
       await screenClientRef.current.publish([videoTrack]);
@@ -335,7 +372,7 @@ export function useAgora(): UseAgoraReturn {
         stopScreenShare();
       });
 
-      console.log('[Agora] Screen share started');
+      console.log('[Agora] Screen share started with uid:', tokenData.uid);
       return true;
     } catch (err: any) {
       console.error('[Agora] Error starting screen share:', err);
@@ -400,6 +437,7 @@ export function useAgora(): UseAgoraReturn {
     isMuted,
     outputVolume,
     setOutputVolume,
+    ping,
     remoteUsers,
     localScreenTrack,
     isScreenSharing,

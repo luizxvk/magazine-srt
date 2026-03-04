@@ -644,6 +644,17 @@ export default function ConnectPage() {
     }
   };
 
+  // Get screen share token callback
+  const getScreenShareToken = async (channelId: string): Promise<{ token: string; uid: number } | null> => {
+    try {
+      const response = await api.post('/connect/voice/token/screen', { channelId });
+      return response.data;
+    } catch (error) {
+      console.error('[ConnectPage] Failed to get screen share token:', error);
+      return null;
+    }
+  };
+
   // Screen sharing handler
   const handleToggleScreenShare = async () => {
     try {
@@ -663,7 +674,7 @@ export default function ConnectPage() {
         }
         showToast('Compartilhamento de tela encerrado');
       } else {
-        const success = await agora.startScreenShare();
+        const success = await agora.startScreenShare(getScreenShareToken);
         if (success && currentVoice) {
           socket.startScreenShare(currentVoice.channelId);
           // Update local streaming state
@@ -906,7 +917,7 @@ export default function ConnectPage() {
     if (!selectedGroup || inviting) return;
     setInviting(true);
     try {
-      await api.post(`/connect/groups/${selectedGroup.id}/invite`, { userId });
+      await api.post(`/connect/groups/${selectedGroup.id}/invite/user`, { invitedUserId: userId });
       showToast('Convite enviado!');
       // Remove user from lists
       setInviteFriends(prev => prev.filter(f => f.id !== userId));
@@ -1359,6 +1370,7 @@ export default function ConnectPage() {
                   isScreenSharing={agora.isScreenSharing}
                   hasActiveStreams={remoteScreenStreams.size > 0}
                   outputVolume={agora.outputVolume}
+                  ping={agora.ping}
                   onVolumeChange={agora.setOutputVolume}
                   onToggleMute={handleToggleMute}
                   onToggleDeafen={handleToggleDeafen}
@@ -1428,6 +1440,7 @@ export default function ConnectPage() {
               isScreenSharing={agora.isScreenSharing}
               hasActiveStreams={remoteScreenStreams.size > 0}
               outputVolume={agora.outputVolume}
+              ping={agora.ping}
               onVolumeChange={agora.setOutputVolume}
               onToggleMute={handleToggleMute}
               onToggleDeafen={handleToggleDeafen}
@@ -1570,6 +1583,7 @@ export default function ConnectPage() {
             isScreenSharing={agora.isScreenSharing}
             hasActiveStreams={remoteScreenStreams.size > 0}
             outputVolume={agora.outputVolume}
+            ping={agora.ping}
             onVolumeChange={agora.setOutputVolume}
             onToggleMute={handleToggleMute}
             onToggleDeafen={handleToggleDeafen}

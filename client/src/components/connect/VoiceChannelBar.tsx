@@ -19,6 +19,7 @@ interface VoiceChannelBarProps {
   isScreenSharing?: boolean;
   hasActiveStreams?: boolean;
   outputVolume: number;
+  ping: number;
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
   onToggleDeafen: () => void;
@@ -35,6 +36,7 @@ export default function VoiceChannelBar({
   isScreenSharing = false,
   hasActiveStreams = false,
   outputVolume,
+  ping,
   onVolumeChange,
   onToggleMute,
   onToggleDeafen,
@@ -48,17 +50,47 @@ export default function VoiceChannelBar({
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
 
+  // Determine ping quality and color
+  const getPingColor = () => {
+    if (ping === 0) return 'text-gray-400';
+    if (ping < 100) return 'text-green-500';
+    if (ping < 200) return 'text-yellow-500';
+    if (ping < 300) return 'text-orange-500';
+    return 'text-red-500';
+  };
+
+  const getPingQuality = () => {
+    if (ping === 0) return 'Conectando...';
+    if (ping < 100) return 'Excelente';
+    if (ping < 200) return 'Bom';
+    if (ping < 300) return 'Regular';
+    return 'Ruim';
+  };
+
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       className={`border-t ${themeBorder} p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/5`}
     >
-      {/* Connection Status */}
+      {/* Connection Status with Ping */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="flex items-center gap-1.5">
-          <Signal className="w-4 h-4 text-green-500" />
-          <span className="text-xs font-medium text-green-500">Conectado</span>
+        <div 
+          className="flex items-center gap-1.5 cursor-default group relative"
+          title={`${ping}ms - ${getPingQuality()}`}
+        >
+          <Signal className={`w-4 h-4 ${getPingColor()}`} />
+          <span className={`text-xs font-medium ${getPingColor()}`}>
+            {ping > 0 ? `${ping}ms` : 'Conectado'}
+          </span>
+          
+          {/* Tooltip on hover */}
+          <div className={`absolute bottom-full left-0 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 ${
+            theme === 'light' ? 'bg-gray-900 text-white' : 'bg-zinc-700 text-white'
+          }`}>
+            <div className="font-medium">{getPingQuality()}</div>
+            <div className="text-gray-300">{ping > 0 ? `Latência: ${ping}ms` : 'Medindo latência...'}</div>
+          </div>
         </div>
       </div>
 

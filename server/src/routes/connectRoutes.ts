@@ -107,6 +107,57 @@ router.post('/voice/token', (req, res) => {
   }
 });
 
+// Generate Agora RTC token for screen share (uses a different UID)
+router.post('/voice/token/screen', (req, res) => {
+  try {
+    const { channelId } = req.body;
+    const userId = (req as any).user?.userId;
+    
+    if (!channelId) {
+      return res.status(400).json({ error: 'channelId is required' });
+    }
+    
+    if (!userId) {
+      console.error('[Agora] No user ID found in request');
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    
+    const appId = (process.env.AGORA_APP_ID || '').trim();
+    const appCertificate = (process.env.AGORA_APP_CERTIFICATE || '').trim();
+    
+    if (!appId || !appCertificate) {
+      console.error('[Agora] Missing AGORA_APP_ID or AGORA_APP_CERTIFICATE');
+      return res.status(500).json({ error: 'Agora not configured' });
+    }
+    
+    // Token expires in 24 hours
+    const expirationTimeInSeconds = 86400;
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+    
+    // Generate a different numeric UID for screen share (add offset to avoid collision with voice UID)
+    const baseUid = Math.abs(userId.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) % 100000000);
+    const screenUid = (baseUid + 50000000) % 100000000; // Offset by 50M to differentiate
+    
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      appId,
+      appCertificate,
+      channelId,
+      screenUid,
+      RtcRole.PUBLISHER,
+      expirationTimeInSeconds,
+      privilegeExpiredTs
+    );
+    
+    console.log('[Agora] Screen token generated for channel:', channelId, 'uid:', screenUid);
+    
+    return res.json({ token, uid: screenUid });
+  } catch (error: any) {
+    console.error('[Agora] Error generating screen token:', error);
+    return res.status(500).json({ error: 'Failed to generate token' });
+  }
+});
+
 // Update voice state (mute, deafen, speaking)
 router.patch('/voice/state', updateVoiceState);
 
@@ -145,6 +196,9 @@ router.get('/groups/invites/me', getMyInvites);
 
 // Respond to invite (accept/reject)
 router.post('/groups/invites/:inviteId/respond', respondInvite);
+
+// Send direct invite to a user
+router.post('/groups/:groupId/invite/user', inviteMember);
 
 // Generate invite link for a group
 router.post('/groups/:groupId/invite', generateInviteLink);

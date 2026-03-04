@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Settings, Hash, Smile, Reply,
-  Trash2, X, Plus
+  Trash2, X, Plus, Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -84,6 +84,7 @@ interface ConnectGroupChatProps {
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🔥', '💯'];
+const EMOJI_LIST = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '😏', '😐', '😑', '😶', '👍', '👎', '👋', '🤚', '✋', '🖐️', '👌', '🤌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '👏', '🙌', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '💕', '💖', '💗', '💘', '💝', '🔥', '⭐', '✨', '💫', '🌟', '💥', '💯', '💢', '🎉', '🎊'];
 
 export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor }: ConnectGroupChatProps) {
   const navigate = useNavigate();
@@ -97,8 +98,12 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
   const [sending, setSending] = useState(false);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeAccent = accentColor || authAccent || '#10b981';
   void activeAccent; // Used for future styling
@@ -191,6 +196,50 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
       showToast('Mensagem deletada');
     } catch (error) {
       console.error('Error deleting message:', error);
+    }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setMessageText(prev => prev + emoji);
+    setShowEmojiPicker(false);
+    inputRef.current?.focus();
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      showError('Apenas imagens são suportadas');
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showError('A imagem deve ter no máximo 5MB');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('channelId', textChannel?.id || 'default');
+
+      await api.post(`/groups/${group.id}/messages`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      showToast('Imagem enviada');
+      fetchMessages();
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao enviar imagem');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -448,13 +497,58 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
       </AnimatePresence>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className={`p-4 border-t ${themeBorder} ${themeBg}`}>
+      <form onSubmit={handleSendMessage} className={`p-4 border-t ${themeBorder} ${themeBg} relative`}>
+        {/* Emoji Picker */}
+        <AnimatePresence>
+          {showEmojiPicker && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className={`absolute bottom-full right-4 mb-2 p-3 rounded-xl ${theme === 'light' ? 'bg-white shadow-lg' : 'bg-zinc-800'} border ${themeBorder} z-10`}
+            >
+              <div className="grid grid-cols-8 gap-1 max-h-[200px] overflow-y-auto w-[280px]">
+                {EMOJI_LIST.map(emoji => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => handleEmojiSelect(emoji)}
+                    className="text-xl p-1 hover:bg-white/10 rounded transition-colors"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+
         <div className={`flex items-center gap-3 p-3 rounded-xl ${themeInput}`}>
           <button
             type="button"
-            className={`p-1 ${themeSecondary} hover:text-white transition-colors`}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingImage}
+            className={`p-1 ${themeSecondary} hover:text-white transition-colors ${uploadingImage ? 'opacity-50' : ''}`}
+            title="Enviar imagem"
           >
-            <Plus className="w-5 h-5" />
+            {uploadingImage ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+              />
+            ) : (
+              <Plus className="w-5 h-5" />
+            )}
           </button>
           
           <input
@@ -468,7 +562,9 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
 
           <button
             type="button"
-            className={`p-1 ${themeSecondary} hover:text-white transition-colors`}
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className={`p-1 ${showEmojiPicker ? 'text-yellow-400' : themeSecondary} hover:text-yellow-400 transition-colors`}
+            title="Emojis"
           >
             <Smile className="w-5 h-5" />
           </button>

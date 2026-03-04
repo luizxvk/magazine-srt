@@ -170,6 +170,9 @@ export default function ConnectPage() {
   // Stream viewer state
   const [showStreamViewer, setShowStreamViewer] = useState(false);
   const [streamerInfo, setStreamerInfo] = useState<Map<string, { username: string; avatarUrl?: string }>>(new Map());
+  
+  // Real-time voice participant state (userId -> state)
+  const [voiceParticipantStates, setVoiceParticipantStates] = useState<Map<string, { isMuted: boolean; isDeafened: boolean; isStreaming: boolean }>>(new Map());
 
   // Socket.io hook for real-time communication
   const socket = useSocket();
@@ -197,6 +200,13 @@ export default function ConnectPage() {
 
     socket.onScreenShareStarted((data: { userId: string; channelId: string }) => {
       showToast('🖥️ Alguém iniciou compartilhamento de tela! Clique para assistir.');
+      // Update participant streaming state
+      setVoiceParticipantStates(prev => {
+        const updated = new Map(prev);
+        const existing = updated.get(data.userId) || { isMuted: false, isDeafened: false, isStreaming: false };
+        updated.set(data.userId, { ...existing, isStreaming: true });
+        return updated;
+      });
       // Find user info for the streamer
       const findUserInGroups = () => {
         for (const group of groups) {
@@ -226,6 +236,15 @@ export default function ConnectPage() {
 
     socket.onScreenShareStopped((data: { userId: string; channelId: string }) => {
       showToast('Compartilhamento de tela encerrado');
+      // Update participant streaming state
+      setVoiceParticipantStates(prev => {
+        const updated = new Map(prev);
+        const existing = updated.get(data.userId);
+        if (existing) {
+          updated.set(data.userId, { ...existing, isStreaming: false });
+        }
+        return updated;
+      });
       setStreamerInfo(prev => {
         const updated = new Map(prev);
         updated.delete(data.userId);
@@ -234,8 +253,22 @@ export default function ConnectPage() {
     });
 
     // Listen for voice state changes (mute/deafen)
-    socket.onVoiceStateChanged(() => {
-      fetchGroups(false); // Refresh participant list without loading spinner
+    socket.onVoiceStateChanged((data: { odiserId: string; isMuted?: boolean; isDeafened?: boolean; isStreaming?: boolean }) => {
+      // Update local participant state
+      if (data.odiserId) {
+        setVoiceParticipantStates(prev => {
+          const updated = new Map(prev);
+          const existing = updated.get(data.odiserId) || { isMuted: false, isDeafened: false, isStreaming: false };
+          updated.set(data.odiserId, {
+            isMuted: data.isMuted ?? existing.isMuted,
+            isDeafened: data.isDeafened ?? existing.isDeafened,
+            isStreaming: data.isStreaming ?? existing.isStreaming,
+          });
+          return updated;
+        });
+      }
+      // Also refresh groups for member list updates
+      fetchGroups(false);
     });
   }, [socket.isConnected]);
 
@@ -368,6 +401,16 @@ export default function ConnectPage() {
       const newMuted = !isMuted;
       setIsMuted(newMuted);
       
+      // Update local participant state immediately for instant UI feedback
+      if (user) {
+        setVoiceParticipantStates(prev => {
+          const updated = new Map(prev);
+          const existing = updated.get(user.id) || { isMuted: false, isDeafened: false, isStreaming: false };
+          updated.set(user.id, { ...existing, isMuted: newMuted });
+          return updated;
+        });
+      }
+      
       // Update WebRTC audio track
       webrtc.toggleMute();
       
@@ -388,6 +431,20 @@ export default function ConnectPage() {
       setIsDeafened(newDeafened);
       // Deafen also mutes
       if (newDeafened) setIsMuted(true);
+      
+      // Update local participant state immediately for instant UI feedback
+      if (user) {
+        setVoiceParticipantStates(prev => {
+          const updated = new Map(prev);
+          const existing = updated.get(user.id) || { isMuted: false, isDeafened: false, isStreaming: false };
+          updated.set(user.id, { 
+            ...existing, 
+            isDeafened: newDeafened, 
+            isMuted: newDeafened ? true : existing.isMuted 
+          });
+          return updated;
+        });
+      }
       
       // Update WebRTC - mute audio when deafening
       if (newDeafened) {
@@ -419,13 +476,31 @@ export default function ConnectPage() {
         if (currentVoice) {
           socket.stopScreenShare(currentVoice.channelId);
         }
+        // Update local streaming state
+        if (user) {
+          setVoiceParticipantStates(prev => {
+            const updated = new Map(prev);
+            const existing = updated.get(user.id) || { isMuted: false, isDeafened: false, isStreaming: false };
+            updated.set(user.id, { ...existing, isStreaming: false });
+            return updated;
+          });
+        }
         showToast('Compartilhamento de tela encerrado');
       } else {
-        await webrtc.startScreenShare();
-        if (currentVoice) {
+        const success = await webrtc.startScreenShare();
+        if (success && currentVoice) {
           socket.startScreenShare(currentVoice.channelId);
+          // Update local streaming state
+          if (user) {
+            setVoiceParticipantStates(prev => {
+              const updated = new Map(prev);
+              const existing = updated.get(user.id) || { isMuted: false, isDeafened: false, isStreaming: false };
+              updated.set(user.id, { ...existing, isStreaming: true });
+              return updated;
+            });
+          }
+          showToast('Compartilhamento de tela iniciado');
         }
-        showToast('Compartilhamento de tela iniciado');
       }
     } catch (error) {
       showError('Não foi possível compartilhar a tela');
@@ -803,7 +878,14 @@ export default function ConnectPage() {
                   {/* Voice Participants */}
                   {channel.participants.length > 0 && (
                     <div className="pl-8 py-1 space-y-1">
-                      {channel.participants.map(participant => (
+                      {channel.participants.map(participant => {
+                        // Get real-time state from voiceParticipantStates
+                        const realTimeState = voiceParticipantStates.get(participant.user.id);
+                        const effectiveMuted = realTimeState?.isMuted ?? participant.isMuted;
+                        const effectiveDeafened = realTimeState?.isDeafened ?? participant.isDeafened;
+                        const effectiveStreaming = realTimeState?.isStreaming ?? participant.isStreaming;
+                        
+                        return (
                         <div 
                           key={participant.id}
                           className={`group/participant flex items-center gap-2 px-2 py-1 rounded ${themeSecondary}`}
@@ -827,7 +909,7 @@ export default function ConnectPage() {
                           <span className="text-xs truncate flex-1">
                             {participant.user.displayName || participant.user.name}
                           </span>
-                          {participant.isStreaming && (
+                          {effectiveStreaming && (
                             <button
                               onClick={(e) => { 
                                 e.stopPropagation(); 
@@ -848,9 +930,9 @@ export default function ConnectPage() {
                             </button>
                           )}
                           {/* Mute icon */}
-                          {participant.isMuted && <MicOff className="w-3 h-3 text-red-400" />}
+                          {effectiveMuted && <MicOff className="w-3 h-3 text-red-400" />}
                           {/* Deafen icon */}
-                          {participant.isDeafened && <HeadphoneOff className="w-3 h-3 text-red-400" />}
+                          {effectiveDeafened && <HeadphoneOff className="w-3 h-3 text-red-400" />}
                           {/* Invite to call button (only for other users when in voice) */}
                           {currentVoice && participant.user.id !== user?.id && (
                             <button
@@ -862,7 +944,8 @@ export default function ConnectPage() {
                             </button>
                           )}
                         </div>
-                      ))}
+                      );
+                      })}
                     </div>
                   )}
                 </div>
@@ -2025,13 +2108,13 @@ export default function ConnectPage() {
                   </label>
                   <div className="flex gap-2">
                     <div 
-                      className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'} border ${themeBorder}`}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-zinc-800'} border ${themeBorder} min-w-0 overflow-hidden`}
                     >
-                      <Link className="w-4 h-4" style={{ color: accentColor }} />
+                      <Link className="w-4 h-4 flex-shrink-0" style={{ color: accentColor }} />
                       {inviteLoading ? (
                         <span className={themeSecondary}>Gerando link...</span>
                       ) : (
-                        <span className={`${themeText} text-sm truncate flex-1`}>
+                        <span className={`${themeText} text-sm truncate max-w-full`}>
                           {inviteLink || 'Erro ao gerar link'}
                         </span>
                       )}

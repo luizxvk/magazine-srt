@@ -105,13 +105,15 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   
   const getCardStyle = (): React.CSSProperties => {
-    // Mobile: always center
+    // Mobile: always center with safe area
     if (isMobile || !anchorPosition) {
       return {
         position: 'fixed',
         left: '50%',
         top: '50%',
         transform: 'translate(-50%, -50%)',
+        maxHeight: '85vh',
+        maxWidth: 'calc(100vw - 32px)',
       };
     }
     
@@ -144,6 +146,7 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
       left: x,
       top: y,
       transform: 'none',
+      maxHeight: '85vh',
     };
   };
 

@@ -54,10 +54,10 @@ router.get('/voice/current', getCurrentVoiceChannel);
 router.post('/voice/leave', leaveVoiceChannel);
 
 // Generate Agora RTC token for voice channel
-router.post('/voice/token', authenticateToken, (req, res) => {
+router.post('/voice/token', (req, res) => {
   try {
     const { channelId } = req.body;
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?.userId;
     
     if (!channelId) {
       return res.status(400).json({ error: 'channelId is required' });

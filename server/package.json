@@ -21,6 +21,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@types/multer": "^2.0.0",
     "@types/socket.io": "^3.0.1",
+    "agora-token": "^2.0.5",
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",

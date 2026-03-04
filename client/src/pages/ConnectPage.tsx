@@ -364,8 +364,15 @@ export default function ConnectPage() {
         
         // Restart Agora voice (user permission will be requested)
         if (!isMuted && !isDeafened) {
-          // Agora automatically connects to all participants in the channel
-          await agora.joinChannel(currentVoice.channelId, user.id);
+          // Fetch token first
+          let token: string | undefined;
+          try {
+            const tokenResponse = await api.post('/connect/voice/token', { channelId: currentVoice.channelId });
+            token = tokenResponse.data.token;
+          } catch (e) {
+            console.warn('[ConnectPage] Failed to get token for rejoin');
+          }
+          await agora.joinChannel(currentVoice.channelId, user.id, token);
         }
       }
     };
@@ -499,10 +506,21 @@ export default function ConnectPage() {
         });
       }
       
-      // Start Agora audio - Agora automatically connects to all participants
+      // Fetch Agora token from backend
+      console.log('[ConnectPage] Fetching Agora token...');
+      let token: string | undefined;
+      try {
+        const tokenResponse = await api.post('/connect/voice/token', { channelId });
+        token = tokenResponse.data.token;
+        console.log('[ConnectPage] Got Agora token, uid:', tokenResponse.data.uid);
+      } catch (tokenErr) {
+        console.warn('[ConnectPage] Failed to get Agora token, trying without:', tokenErr);
+      }
+      
+      // Start Agora audio with token
       console.log('[ConnectPage] Starting Agora audio...');
       if (user) {
-        const audioStarted = await agora.joinChannel(channelId, user.id);
+        const audioStarted = await agora.joinChannel(channelId, user.id, token);
         console.log('[ConnectPage] Agora audio started:', audioStarted);
       }
       

@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import { RtcTokenBuilder, RtcRole } from 'agora-token';
 import {
   createVoiceChannel,
   getVoiceChannels,
@@ -51,6 +52,51 @@ router.get('/voice/current', getCurrentVoiceChannel);
 
 // Leave any voice channel
 router.post('/voice/leave', leaveVoiceChannel);
+
+// Generate Agora RTC token for voice channel
+router.post('/voice/token', (req, res) => {
+  try {
+    const { channelId } = req.body;
+    const userId = (req as any).user?.id;
+    
+    if (!channelId) {
+      return res.status(400).json({ error: 'channelId is required' });
+    }
+    
+    const appId = process.env.AGORA_APP_ID;
+    const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+    
+    if (!appId || !appCertificate) {
+      console.error('[Agora] Missing AGORA_APP_ID or AGORA_APP_CERTIFICATE');
+      return res.status(500).json({ error: 'Agora not configured' });
+    }
+    
+    // Token expires in 24 hours
+    const expirationTimeInSeconds = 86400;
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+    
+    // Generate numeric UID from user ID string (Agora recommends numeric UIDs)
+    const numericUid = Math.abs(userId.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) % 100000000);
+    
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      appId,
+      appCertificate,
+      channelId,
+      numericUid,
+      RtcRole.PUBLISHER,
+      expirationTimeInSeconds,
+      privilegeExpiredTs
+    );
+    
+    console.log('[Agora] Token generated for channel:', channelId, 'uid:', numericUid);
+    
+    return res.json({ token, uid: numericUid });
+  } catch (error: any) {
+    console.error('[Agora] Error generating token:', error);
+    return res.status(500).json({ error: 'Failed to generate token' });
+  });
+});
 
 // Update voice state (mute, deafen, speaking)
 router.patch('/voice/state', updateVoiceState);

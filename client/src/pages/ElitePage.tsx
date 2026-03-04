@@ -196,7 +196,7 @@ export default function ElitePage() {
     return (
         <div className="min-h-screen relative text-white">
             {/* ColorBends animated background - Elite theme */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
+            <div className="fixed inset-0 z-0 pointer-events-none bg-gradient-to-br from-violet-950 via-indigo-950 to-black">
                 <ColorBends
                     colors={['#7C3AED', '#A78BFA', '#5227FF', '#8B5CF6', '#312e81']}
                     rotation={20}
@@ -209,6 +209,7 @@ export default function ElitePage() {
                     autoRotate={1.5}
                     mouseInfluence={0}
                     parallax={0}
+                    className="absolute inset-0 w-full h-full"
                 />
             </div>
             

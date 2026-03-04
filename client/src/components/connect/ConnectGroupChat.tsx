@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Settings, Hash, Smile, Reply,
-  Trash2, X, Plus, Image as ImageIcon
+  Trash2, X, Plus
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';

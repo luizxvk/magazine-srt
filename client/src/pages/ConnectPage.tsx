@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff, Menu,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
-  Camera, HeadphoneOff, Pencil, Phone, Bot, Link, Copy, UserPlus, Mail, Edit3, Check
+  Camera, HeadphoneOff, Pencil, Phone, Bot, Link, Copy, UserPlus, Mail, Edit3, Check, Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -168,6 +168,10 @@ export default function ConnectPage() {
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   
+  // Delete group state
+  const [showDeleteGroupConfirm, setShowDeleteGroupConfirm] = useState(false);
+  const [deletingGroup, setDeletingGroup] = useState(false);
+  
   // Text channel state
   const [selectedTextChannel, setSelectedTextChannel] = useState<TextChannel | null>(null);
   
@@ -188,6 +192,45 @@ export default function ConnectPage() {
   
   // WebRTC hook for voice/video (pass current channel id)
   const webrtc = useWebRTC(currentVoice?.channelId || null);
+  
+  // Ref for remote audio elements
+  const remoteAudioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
+
+  // Play remote audio streams
+  useEffect(() => {
+    const audioElements = remoteAudioElementsRef.current;
+    
+    // Add new audio elements for new streams
+    webrtc.remoteAudioStreams.forEach((stream, odiserId) => {
+      if (!audioElements.has(odiserId)) {
+        const audio = document.createElement('audio');
+        audio.autoplay = true;
+        audio.setAttribute('playsinline', 'true');
+        audio.srcObject = stream;
+        audioElements.set(odiserId, audio);
+        console.log('[ConnectPage] Playing remote audio from:', odiserId);
+      }
+    });
+    
+    // Remove audio elements for streams that no longer exist
+    audioElements.forEach((audio, odiserId) => {
+      if (!webrtc.remoteAudioStreams.has(odiserId)) {
+        audio.pause();
+        audio.srcObject = null;
+        audioElements.delete(odiserId);
+        console.log('[ConnectPage] Stopped remote audio from:', odiserId);
+      }
+    });
+    
+    return () => {
+      // Cleanup all audio elements on unmount
+      audioElements.forEach((audio) => {
+        audio.pause();
+        audio.srcObject = null;
+      });
+      audioElements.clear();
+    };
+  }, [webrtc.remoteAudioStreams]);
 
   // Register socket event listeners
   useEffect(() => {
@@ -756,8 +799,8 @@ export default function ConnectPage() {
       // Generate invite link and fetch friends/community in parallel
       const [inviteRes, friendsRes, communityRes] = await Promise.all([
         api.post(`/connect/groups/${selectedGroup.id}/invite`).catch(() => null),
-        api.get('/users/friends').catch(() => ({ data: { friends: [] } })),
-        api.get('/users?limit=50').catch(() => ({ data: { users: [] } }))
+        api.get('/social/friends').catch(() => ({ data: [] })),
+        api.get('/users?limit=100').catch(() => ({ data: [] }))
       ]);
       
       // Set invite link
@@ -769,7 +812,8 @@ export default function ConnectPage() {
       
       // Set friends (exclude members already in group)
       const memberIds = new Set(selectedGroup.members?.map(m => m.userId) || []);
-      const friendsList = (friendsRes.data.friends || [])
+      const friendsData = Array.isArray(friendsRes.data) ? friendsRes.data : (friendsRes.data.friends || friendsRes.data || []);
+      const friendsList = friendsData
         .filter((f: any) => !memberIds.has(f.id) && f.id !== user?.id)
         .map((f: any) => ({
           id: f.id,
@@ -783,7 +827,8 @@ export default function ConnectPage() {
       
       // Set community users (exclude members and friends)
       const friendIds = new Set(friendsList.map((f: any) => f.id));
-      const communityList = (communityRes.data.users || [])
+      const communityData = Array.isArray(communityRes.data) ? communityRes.data : (communityRes.data.users || communityRes.data || []);
+      const communityList = communityData
         .filter((u: any) => !memberIds.has(u.id) && !friendIds.has(u.id) && u.id !== user?.id)
         .map((u: any) => ({
           id: u.id,
@@ -824,6 +869,24 @@ export default function ConnectPage() {
       setInviteCopied(true);
       showToast('Link copiado!');
       setTimeout(() => setInviteCopied(false), 2000);
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!selectedGroup || deletingGroup) return;
+    setDeletingGroup(true);
+    try {
+      await api.delete(`/groups/${selectedGroup.id}`);
+      showToast('Grupo deletado com sucesso!');
+      setShowDeleteGroupConfirm(false);
+      setShowGroupSettings(false);
+      setSelectedGroup(null);
+      // Refresh groups list
+      fetchGroups();
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao deletar grupo');
+    } finally {
+      setDeletingGroup(false);
     }
   };
 
@@ -1871,6 +1934,17 @@ export default function ConnectPage() {
                   </div>
                 </div>
 
+                {/* Delete Group Button - Only for creator */}
+                {selectedGroup.creator.id === user?.id && (
+                  <button
+                    onClick={() => setShowDeleteGroupConfirm(true)}
+                    className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-all border border-red-500/20"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                    Deletar Grupo
+                  </button>
+                )}
+
                 {/* Close Button */}
                 <button
                   onClick={() => setShowGroupSettings(false)}
@@ -1878,6 +1952,58 @@ export default function ConnectPage() {
                   style={{ background: accentColor }}
                 >
                   Fechar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Group Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteGroupConfirm && selectedGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowDeleteGroupConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className={`w-full max-w-md rounded-2xl p-6 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} shadow-xl`}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <Trash2 className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${themeText}`}>Deletar Grupo</h3>
+                  <p className={`text-sm ${themeSecondary}`}>Esta ação não pode ser desfeita</p>
+                </div>
+              </div>
+              
+              <p className={`text-sm ${themeSecondary} mb-6`}>
+                Tem certeza que deseja deletar o grupo <strong className={themeText}>{selectedGroup.name}</strong>? 
+                Todos os canais, mensagens e membros serão removidos permanentemente.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteGroupConfirm(false)}
+                  className={`flex-1 py-3 rounded-xl font-medium ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-zinc-800 hover:bg-zinc-700 text-white'} transition-colors`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteGroup}
+                  disabled={deletingGroup}
+                  className="flex-1 py-3 rounded-xl font-medium bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deletingGroup ? <Loader size="sm" /> : 'Deletar'}
                 </button>
               </div>
             </motion.div>

@@ -703,7 +703,7 @@ export default function MarketPage() {
                       <h3 className={`font-semibold ${themeText} truncate`}>{listing.itemName}</h3>
                       <div className="flex items-center gap-2 mt-2">
                         <img
-                          src={listing.seller.avatarUrl || '/default-avatar.png'}
+                          src={listing.seller.avatarUrl || '/assets/logo-rovex.png'}
                           alt={listing.seller.displayName || listing.seller.name}
                           className="w-5 h-5 rounded-full"
                         />

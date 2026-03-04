@@ -278,7 +278,7 @@ export default function GroupDetailPage() {
                       {/* Avatar */}
                       {!isMyMessage && (
                         <img
-                          src={message.sender.avatarUrl || '/default-avatar.png'}
+                          src={message.sender.avatarUrl || '/assets/logo-rovex.png'}
                           alt={message.sender.displayName || message.sender.name}
                           className="w-8 h-8 rounded-full"
                         />
@@ -353,7 +353,7 @@ export default function GroupDetailPage() {
               {group.members.map((member) => (
                 <div key={member.id} className="flex items-center gap-3">
                   <img
-                    src={member.user.avatarUrl || '/default-avatar.png'}
+                    src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                     alt={member.user.displayName || member.user.name}
                     className="w-10 h-10 rounded-full"
                   />

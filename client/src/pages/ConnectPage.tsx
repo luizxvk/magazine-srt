@@ -360,13 +360,29 @@ export default function ConnectPage() {
         
         // Restart audio capture (user permission will be requested)
         if (!isMuted && !isDeafened) {
-          await webrtc.startAudio();
+          const audioStarted = await webrtc.startAudio();
+          
+          // Connect to all existing participants in the channel
+          if (audioStarted && groups.length > 0) {
+            for (const group of groups) {
+              const channel = group.voiceChannels.find(c => c.id === currentVoice.channelId);
+              if (channel) {
+                for (const participant of channel.participants) {
+                  if (participant.user.id !== user.id) {
+                    console.log('[ConnectPage] Reconnecting to peer:', participant.user.id);
+                    await webrtc.connectToPeer(participant.user.id, currentVoice.channelId);
+                  }
+                }
+                break;
+              }
+            }
+          }
         }
       }
     };
     
     rejoinVoiceChannel();
-  }, [currentVoice, socket.isConnected, user]);
+  }, [currentVoice, socket.isConnected, user, groups]);
 
   useEffect(() => {
     if (groupId && groups.length > 0) {
@@ -486,7 +502,24 @@ export default function ConnectPage() {
       }
       
       // Start WebRTC audio
-      await webrtc.startAudio();
+      const audioStarted = await webrtc.startAudio();
+      
+      // After starting audio, connect to all existing participants in the channel
+      if (audioStarted && user) {
+        // Find the channel to get existing participants
+        const group = groups.find(g => g.id === groupId);
+        const channel = group?.voiceChannels.find(c => c.id === channelId);
+        
+        if (channel) {
+          // Connect to each existing participant (except self)
+          for (const participant of channel.participants) {
+            if (participant.user.id !== user.id) {
+              console.log('[ConnectPage] Connecting to peer:', participant.user.id);
+              await webrtc.connectToPeer(participant.user.id, channelId);
+            }
+          }
+        }
+      }
       
       showToast('Conectado ao canal de voz');
       fetchGroups(false); // Refresh without loading spinner
@@ -1089,7 +1122,7 @@ export default function ConnectPage() {
                           {/* Avatar with speaking indicator */}
                           <div className="relative">
                             <img
-                              src={participant.user.avatarUrl || '/assets/default-avatar.png'}
+                              src={participant.user.avatarUrl || '/assets/logo-rovex.png'}
                               className="w-5 h-5 rounded-full"
                               alt=""
                             />
@@ -1315,7 +1348,7 @@ export default function ConnectPage() {
               {/* Mobile User Panel */}
               <div className={`p-3 border-t ${themeBorder} flex items-center gap-2`}>
                 <img
-                  src={user?.avatarUrl || '/assets/default-avatar.png'}
+                  src={user?.avatarUrl || '/assets/logo-rovex.png'}
                   className="w-8 h-8 rounded-full"
                   alt=""
                 />
@@ -1382,7 +1415,7 @@ export default function ConnectPage() {
           {/* User Panel */}
           <div className={`p-3 border-t ${themeBorder} flex items-center gap-2`}>
             <img
-              src={user?.avatarUrl || '/assets/default-avatar.png'}
+              src={user?.avatarUrl || '/assets/logo-rovex.png'}
               className="w-8 h-8 rounded-full"
               alt=""
             />
@@ -1453,7 +1486,7 @@ export default function ConnectPage() {
                 >
                   <div className="relative">
                     <img
-                      src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                      src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                       className="w-8 h-8 rounded-full"
                       alt=""
                     />
@@ -1487,7 +1520,7 @@ export default function ConnectPage() {
                     onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
                   >
                     <img
-                      src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                      src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                       className="w-8 h-8 rounded-full grayscale"
                       alt=""
                     />
@@ -1680,7 +1713,7 @@ export default function ConnectPage() {
                   >
                     <div className="relative">
                       <img
-                        src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                        src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                         className="w-8 h-8 rounded-full"
                         alt=""
                       />
@@ -1713,7 +1746,7 @@ export default function ConnectPage() {
                       onClick={(e) => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e); setShowMembersDrawer(false); }}
                     >
                       <img
-                        src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                        src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                         className="w-8 h-8 rounded-full grayscale"
                         alt=""
                       />
@@ -2126,7 +2159,7 @@ export default function ConnectPage() {
                       className={`w-full flex items-center gap-3 p-3 rounded-xl ${themeHover} transition-colors`}
                     >
                       <img
-                        src={member.user.avatarUrl || '/assets/default-avatar.png'}
+                        src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                         className="w-10 h-10 rounded-full"
                         alt=""
                       />

@@ -22,6 +22,7 @@ import AdminConsumptionTracker from './admin/AdminConsumptionTracker';
 import AdminTwitchSettings from '../components/AdminTwitchSettings';
 import AdminModerationPanel from '../components/AdminModerationPanel';
 import AdminCreateTournament from '../components/AdminCreateTournament';
+import AdminManageTournaments from '../components/AdminManageTournaments';
 import RovexShieldCard from '../components/RovexShieldCard';
 import AdminCoupons from '../components/AdminCoupons';
 
@@ -549,6 +550,7 @@ export default function AdminDashboard() {
                     <AdminModerationPanel />
                     <AdminCreateEvent showToast={showToast} />
                     <AdminCreateTournament showToast={showToast} />
+                    <AdminManageTournaments showToast={showToast} />
                     <RovexShieldCard />
                     <AdminCoupons showToast={showToast} />
                     <BadgeManager />

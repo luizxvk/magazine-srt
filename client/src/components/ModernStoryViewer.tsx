@@ -295,7 +295,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <img
-                            src={currentStory?.user.avatarUrl || '/default-avatar.png'}
+                            src={currentStory?.user.avatarUrl || '/assets/logo-rovex.png'}
                             alt={currentStory?.user.name}
                             className="w-10 h-10 rounded-full ring-2 ring-white"
                         />
@@ -516,7 +516,7 @@ export default function ModernStoryViewer({ stories, initialStoryIndex, onClose,
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <img
-                                                        src={viewer.viewer.avatarUrl || '/default-avatar.png'}
+                                                        src={viewer.viewer.avatarUrl || '/assets/logo-rovex.png'}
                                                         alt={viewer.viewer.name}
                                                         className={`w-11 h-11 rounded-full object-cover ring-2 ${isMGT ? 'ring-tier-std-500/30' : 'ring-gold-500/30'}`}
                                                     />

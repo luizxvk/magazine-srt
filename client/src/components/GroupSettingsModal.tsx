@@ -374,7 +374,7 @@ export default function GroupSettingsModal({
                       className={`p-3 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-gray-50'} border ${borderColor} flex items-center gap-3`}
                     >
                       <img
-                        src={member.user.avatarUrl || '/default-avatar.png'}
+                        src={member.user.avatarUrl || '/assets/logo-rovex.png'}
                         alt={member.user.displayName || member.user.name}
                         className="w-10 h-10 rounded-full"
                       />

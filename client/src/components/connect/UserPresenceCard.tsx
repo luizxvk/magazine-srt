@@ -11,7 +11,6 @@ import {
   Gamepad2,
   Headphones,
   Radio,
-  ShieldCheck,
   Sparkles,
   ExternalLink,
   Clock,
@@ -20,6 +19,7 @@ import {
   BadgeCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useCommunity } from '../../context/CommunityContext';
 import api from '../../services/api';
 
 interface UserDetails {
@@ -103,6 +103,7 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   fallbackData,
 }) => {
   const { user: currentUser } = useAuth();
+  const { config, tierStdName, isStdTier } = useCommunity();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -205,7 +206,11 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
   // Use flexbox centering for mobile
   const useMobileCentering = isMobile || !anchorPosition;
 
-  // Helper to get membership tag display
+  // Get the community-specific accent color and tag
+  const stdColor = config.accentColor || '#10b981';
+  const vipColor = config.tierVipColor || '#d4af37';
+
+  // Helper to get membership tag display - uses community config
   const getMembershipTag = () => {
     if (!userDetails) return null;
     
@@ -215,17 +220,18 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
         'rovex': { bg: '#9333ea20', text: '#9333ea' },
         'mgzn': { bg: '#3b82f620', text: '#3b82f6' },
         'mgt': { bg: '#10b98120', text: '#10b981' },
+        'rvx': { bg: '#9333ea20', text: '#9333ea' },
       };
-      const colors = tagColors[userDetails.communityTag.toLowerCase()] || { bg: `${accentColor}20`, text: accentColor };
+      const colors = tagColors[userDetails.communityTag.toLowerCase()] || { bg: `${stdColor}20`, text: stdColor };
       return { name: userDetails.communityTag.toUpperCase(), ...colors };
     }
     
-    // Fallback to membership type
-    if (userDetails.membershipType === 'MGT') {
-      return { name: 'MGT', bg: '#10b98120', text: '#10b981' };
+    // Fallback to membership type - use community-configured tierStdName
+    if (userDetails.membershipType === 'MGT' || (userDetails.membershipType && isStdTier(userDetails.membershipType))) {
+      return { name: tierStdName || 'RVX', bg: `${stdColor}20`, text: stdColor };
     }
     if (userDetails.membershipType === 'MAGAZINE') {
-      return { name: 'MGZN', bg: '#3b82f620', text: '#3b82f6' };
+      return { name: 'PRO', bg: `${vipColor}20`, text: vipColor };
     }
     
     return null;
@@ -418,7 +424,20 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                           {userDetails.displayName || userDetails.name}
                         </h3>
                         {userDetails.isVerified && (
-                          <ShieldCheck size={16} className="text-blue-400" />
+                          <div 
+                            className="relative group cursor-pointer"
+                            title="Email Verificado"
+                          >
+                            <BadgeCheck 
+                              className="w-5 h-5 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]"
+                              strokeWidth={2.5}
+                              fill={stdColor}
+                              stroke="white"
+                            />
+                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                              Email Verificado
+                            </div>
+                          </div>
                         )}
                         {userDetails.isElite && (
                           <div 

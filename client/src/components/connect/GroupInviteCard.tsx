@@ -203,7 +203,7 @@ export const GroupInviteCard: React.FC<GroupInviteCardProps> = ({
               {/* Inviter Info */}
               <div className="flex items-center gap-2 mb-4 p-2 rounded-lg bg-white/5">
                 <img
-                  src={invite.inviter.avatarUrl || '/assets/default-avatar.png'}
+                  src={invite.inviter.avatarUrl || '/assets/logo-rovex.png'}
                   className="w-6 h-6 rounded-full"
                   alt=""
                 />

@@ -6,6 +6,13 @@ import { useCommunity } from '../context/CommunityContext';
 import { useTranslation } from 'react-i18next';
 import StoriesBar from './StoriesBar';
 
+// Helper to convert hex to rgb components
+const hexToRgb = (hex: string): string => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) return '139,92,246'; // fallback purple
+    return `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}`;
+};
+
 interface WelcomeCardProps {
     viewingStoryId: string | null;
     onViewStory: (id: string | null) => void;
@@ -14,17 +21,17 @@ interface WelcomeCardProps {
 
 export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory }: WelcomeCardProps) {
     const { user, theme, accentGradient } = useAuth();
-    const { config, isStdTier } = useCommunity();
+    const { config } = useCommunity();
     const { t } = useTranslation(['feed', 'common']);
-    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     
     // Theme-based styling - use CommunityContext colors
-    // Only use user's custom accentColor if they have an equippedColor, otherwise use community color
-    const stdColor = config.accentColor || config.backgroundColor || '#10b981';
-    const vipColor = config.tierVipColor || '#d4af37';
-    const communityAccent = isMGT ? stdColor : vipColor;
+    // Use community accent color for the welcome card - always use accent (purple for Rovex)
+    const communityAccent = config.accentColor || config.primaryColor || config.backgroundColor || '#8B5CF6';
     // If user has equippedColor starting with #, use it. Otherwise use community color.
     const userAccent = (user?.equippedColor?.startsWith('#')) ? user.equippedColor : communityAccent;
+    
+    // Dynamic RGB values for glow effects
+    const glowRgb = hexToRgb(communityAccent);
     
     const themeIconBg = theme === 'light' 
         ? 'bg-gray-100 hover:bg-gray-200' 
@@ -33,18 +40,18 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
 
     const themeBg = theme === 'light'
         ? 'bg-white/90'
-        : (isMGT ? 'bg-tier-std-950/60' : 'bg-black/60');
-    const themeBorderClass = isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30';
-    const themeGlow = isMGT
-        ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)]'
-        : 'shadow-[0_0_15px_rgba(212,175,55,0.15)]';
+        : 'bg-black/60';
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative rounded-3xl overflow-hidden ${themeBg} backdrop-blur-xl ${themeGlow} ${accentGradient ? 'border-gradient-accent' : `border ${themeBorderClass}`}`}
+            className={`relative rounded-3xl overflow-hidden ${themeBg} backdrop-blur-xl border`}
+            style={{
+                boxShadow: `0 0 15px rgba(${glowRgb},0.15)`,
+                borderColor: accentGradient ? undefined : `${communityAccent}30`,
+            }}
         >
             {/* Accent glow gradient */}
             <div 

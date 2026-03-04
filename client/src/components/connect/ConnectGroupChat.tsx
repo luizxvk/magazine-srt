@@ -351,7 +351,7 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
                       {/* Avatar */}
                       {showAvatar ? (
                         <img
-                          src={message.sender.avatarUrl || '/assets/default-avatar.png'}
+                          src={message.sender.avatarUrl || '/assets/logo-rovex.png'}
                           className="w-10 h-10 rounded-full cursor-pointer hover:opacity-80"
                           onClick={() => navigate(`/profile/${message.sender.id}`)}
                           alt=""

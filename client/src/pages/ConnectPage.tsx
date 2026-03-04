@@ -230,6 +230,33 @@ export default function ConnectPage() {
         audio.onpause = () => console.log('[ConnectPage] Audio paused for:', odiserId);
         audio.onerror = (e) => console.error('[ConnectPage] Audio error for:', odiserId, e);
         
+        // Monitor actual audio data flow using AudioContext
+        try {
+          const audioCtx = new AudioContext();
+          const source = audioCtx.createMediaStreamSource(stream);
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
+          source.connect(analyser);
+          // Don't connect to destination (speakers) - audio element handles that
+          
+          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+          let checkCount = 0;
+          const checkAudioLevel = () => {
+            analyser.getByteFrequencyData(dataArray);
+            const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+            if (checkCount < 20 || average > 0) {
+              console.log(`[ConnectPage] Audio level from ${odiserId}: ${average.toFixed(2)} (check #${checkCount + 1})`);
+            }
+            checkCount++;
+            if (checkCount < 30) {
+              setTimeout(checkAudioLevel, 500);
+            }
+          };
+          checkAudioLevel();
+        } catch (e) {
+          console.warn('[ConnectPage] Could not create audio analyzer:', e);
+        }
+        
         // Try to play (may require user interaction first time)
         audio.play().then(() => {
           console.log('[ConnectPage] Playing remote audio from:', odiserId, 'paused:', audio.paused, 'volume:', audio.volume);

@@ -59,6 +59,13 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
   const peerConnections = useRef<Map<string, PeerConnection>>(new Map());
   const localAudioStreamRef = useRef<MediaStream | null>(null);
   const localScreenStreamRef = useRef<MediaStream | null>(null);
+  
+  // Buffer for ICE candidates that arrive before peer connection is ready
+  const pendingIceCandidates = useRef<Map<string, RTCIceCandidateInit[]>>(new Map());
+  
+  // Use ref for channelId to avoid stale closures in callbacks
+  const channelIdRef = useRef<string | null>(channelId);
+  channelIdRef.current = channelId;
 
   const [localAudioStream, setLocalAudioStream] = useState<MediaStream | null>(null);
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
@@ -121,6 +128,21 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
     };
 
     peerConnections.current.set(odiserId, { odiserId: odiserId, connection: pc });
+    
+    // Process any pending ICE candidates for this peer
+    const pending = pendingIceCandidates.current.get(odiserId);
+    if (pending && pending.length > 0) {
+      console.log(`[WebRTC] Processing ${pending.length} pending ICE candidates for ${odiserId}`);
+      pending.forEach(async (candidate) => {
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log('[WebRTC] Added pending ICE candidate for:', odiserId);
+        } catch (error) {
+          console.error('[WebRTC] Error adding pending ICE candidate:', error);
+        }
+      });
+      pendingIceCandidates.current.delete(odiserId);
+    }
     
     return pc;
   }, [channelId, sendIceCandidate]);
@@ -327,16 +349,15 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
   // Handle incoming WebRTC events
   useEffect(() => {
     console.log('[WebRTC] Setting up handlers for channelId:', channelId);
-    if (!channelId) {
-      console.log('[WebRTC] No channelId, skipping handler setup');
-      return;
-    }
+    // IMPORTANT: Always register handlers, but check channelIdRef.current inside callbacks
+    // to avoid stale closure issues
 
     // Handle incoming offer
     onWebRTCOffer(async (data) => {
-      console.log('[WebRTC] onWebRTCOffer called, data.channelId:', data.channelId, 'my channelId:', channelId);
-      if (data.channelId !== channelId) {
-        console.log('[WebRTC] Ignoring offer - channelId mismatch');
+      const currentChannelId = channelIdRef.current;
+      console.log('[WebRTC] onWebRTCOffer called, data.channelId:', data.channelId, 'my channelId:', currentChannelId);
+      if (!currentChannelId || data.channelId !== currentChannelId) {
+        console.log('[WebRTC] Ignoring offer - channelId mismatch or not set');
         return;
       }
       
@@ -364,7 +385,7 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
         // Create and send answer
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        sendAnswer(data.fromUserId, answer, channelId);
+        sendAnswer(data.fromUserId, answer, currentChannelId);
         console.log('[WebRTC] Sent answer to:', data.fromUserId);
       } catch (error) {
         console.error('[WebRTC] Error handling offer:', error);
@@ -373,9 +394,10 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
     // Handle incoming answer
     onWebRTCAnswer(async (data) => {
-      console.log('[WebRTC] onWebRTCAnswer called, data.channelId:', data.channelId, 'my channelId:', channelId);
-      if (data.channelId !== channelId) {
-        console.log('[WebRTC] Ignoring answer - channelId mismatch');
+      const currentChannelId = channelIdRef.current;
+      console.log('[WebRTC] onWebRTCAnswer called, data.channelId:', data.channelId, 'my channelId:', currentChannelId);
+      if (!currentChannelId || data.channelId !== currentChannelId) {
+        console.log('[WebRTC] Ignoring answer - channelId mismatch or not set');
         return;
       }
       
@@ -396,9 +418,10 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
 
     // Handle incoming ICE candidate
     onWebRTCIceCandidate(async (data) => {
-      console.log('[WebRTC] onWebRTCIceCandidate called, data.channelId:', data.channelId, 'my channelId:', channelId);
-      if (data.channelId !== channelId) {
-        console.log('[WebRTC] Ignoring ICE candidate - channelId mismatch');
+      const currentChannelId = channelIdRef.current;
+      console.log('[WebRTC] onWebRTCIceCandidate called, data.channelId:', data.channelId, 'my channelId:', currentChannelId);
+      if (!currentChannelId || data.channelId !== currentChannelId) {
+        console.log('[WebRTC] Ignoring ICE candidate - channelId mismatch or not set');
         return;
       }
 
@@ -412,7 +435,11 @@ export function useWebRTC(channelId: string | null): UseWebRTCReturn {
           console.error('[WebRTC] Error adding ICE candidate:', error);
         }
       } else {
-        console.warn('[WebRTC] No peer connection found for ICE candidate from:', data.fromUserId);
+        // Buffer the ICE candidate until peer connection is created
+        console.log('[WebRTC] Buffering ICE candidate from:', data.fromUserId, '(peer connection not ready)');
+        const pending = pendingIceCandidates.current.get(data.fromUserId) || [];
+        pending.push(data.candidate);
+        pendingIceCandidates.current.set(data.fromUserId, pending);
       }
     });
   }, [channelId, createPeerConnection, onWebRTCOffer, onWebRTCAnswer, onWebRTCIceCandidate, sendAnswer]);

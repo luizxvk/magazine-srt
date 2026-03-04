@@ -1003,6 +1003,12 @@ html.rgb-dynamic .shadow-accent {
   50% { opacity: 0.8; }
 }
 
+@keyframes eliteGradientAnim {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 @keyframes rgb-cycle {
   0% {
     background-color: #ff0000 !important;

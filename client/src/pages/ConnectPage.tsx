@@ -342,9 +342,15 @@ export default function ConnectPage() {
   }, []);
 
   // Re-establish voice connection after page refresh
+  const hasReconnectedRef = useRef(false);
   useEffect(() => {
     const rejoinVoiceChannel = async () => {
-      if (currentVoice && socket.isConnected && user && !agora.isJoined) {
+      // Only try to reconnect once per session
+      if (hasReconnectedRef.current) return;
+      
+      if (currentVoice && socket.isConnected && user && !agora.isJoined && !agora.isConnecting) {
+        hasReconnectedRef.current = true;
+        
         // Rejoin socket room
         socket.joinVoice(currentVoice.channelId, {
           odiserId: user.id,
@@ -365,7 +371,7 @@ export default function ConnectPage() {
     };
     
     rejoinVoiceChannel();
-  }, [currentVoice, socket.isConnected, user, groups]);
+  }, [currentVoice, socket.isConnected, user]);
 
   useEffect(() => {
     if (groupId && groups.length > 0) {
@@ -467,6 +473,12 @@ export default function ConnectPage() {
   };
 
   const handleJoinVoice = async (groupId: string, channelId: string) => {
+    // Prevent double-join
+    if (agora.isJoined || agora.isConnecting) {
+      console.log('[ConnectPage] Already joined or connecting to Agora, skipping');
+      return;
+    }
+    
     try {
       console.log('[ConnectPage] handleJoinVoice called:', { groupId, channelId });
       const response = await api.post(`/connect/groups/${groupId}/voice/${channelId}/join`);

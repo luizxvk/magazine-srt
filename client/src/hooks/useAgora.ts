@@ -161,6 +161,13 @@ export function useAgora(): UseAgoraReturn {
       return false;
     }
 
+    // Check if already joined or joining
+    const connectionState = clientRef.current.connectionState;
+    if (connectionState === 'CONNECTED' || connectionState === 'CONNECTING') {
+      console.log('[Agora] Already connected or connecting, skipping join');
+      return true;
+    }
+
     try {
       setIsConnecting(true);
       setError(null);
@@ -170,14 +177,17 @@ export function useAgora(): UseAgoraReturn {
       // Join the channel
       // For testing mode, token can be null
       // For production, generate token on server using App Certificate
+      // Convert UUID to numeric hash for Agora (they recommend numeric IDs)
+      const numericUid = Math.abs(userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 100000000);
+      
       await clientRef.current.join(
         AGORA_APP_ID,
         channelId,
         token || null,
-        userId
+        numericUid
       );
 
-      console.log('[Agora] Joined channel successfully');
+      console.log('[Agora] Joined channel successfully with uid:', numericUid);
 
       // Create and publish local audio track
       const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({

@@ -179,12 +179,16 @@ export function useAgora(): UseAgoraReturn {
       setError(null);
 
       console.log('[Agora] Joining channel:', channelId, 'as user:', userId);
+      console.log('[Agora] Using App ID:', AGORA_APP_ID ? `${AGORA_APP_ID.slice(0, 4)}...${AGORA_APP_ID.slice(-4)} (len: ${AGORA_APP_ID.length})` : 'EMPTY!');
+      console.log('[Agora] Token provided:', token ? `${token.slice(0, 20)}... (len: ${token.length})` : 'NO TOKEN');
 
       // Join the channel
       // For testing mode, token can be null
       // For production, generate token on server using App Certificate
       // Convert UUID to numeric hash for Agora (they recommend numeric IDs)
       const numericUid = Math.abs(userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 100000000);
+      
+      console.log('[Agora] Attempting join with:', { appId: AGORA_APP_ID.slice(0, 4), channelId, hasToken: !!token, uid: numericUid });
       
       await clientRef.current.join(
         AGORA_APP_ID,

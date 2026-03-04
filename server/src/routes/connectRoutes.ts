@@ -95,7 +95,7 @@ router.post('/voice/token', (req, res) => {
   } catch (error: any) {
     console.error('[Agora] Error generating token:', error);
     return res.status(500).json({ error: 'Failed to generate token' });
-  });
+  }
 });
 
 // Update voice state (mute, deafen, speaking)

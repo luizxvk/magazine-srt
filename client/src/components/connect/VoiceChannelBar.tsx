@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Radio } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Radio, Volume2, VolumeX } from 'lucide-react';
 
 interface VoiceChannel {
   id: string;
@@ -17,6 +18,8 @@ interface VoiceChannelBarProps {
   isDeafened: boolean;
   isScreenSharing?: boolean;
   hasActiveStreams?: boolean;
+  outputVolume: number;
+  onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
   onToggleDeafen: () => void;
   onToggleScreenShare?: () => void;
@@ -31,6 +34,8 @@ export default function VoiceChannelBar({
   isDeafened,
   isScreenSharing = false,
   hasActiveStreams = false,
+  outputVolume,
+  onVolumeChange,
   onToggleMute,
   onToggleDeafen,
   onToggleScreenShare,
@@ -38,6 +43,7 @@ export default function VoiceChannelBar({
   onDisconnect,
   theme
 }: VoiceChannelBarProps) {
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
@@ -98,6 +104,48 @@ export default function VoiceChannelBar({
         >
           {isDeafened ? <HeadphoneOff className="w-4 h-4" /> : <Headphones className="w-4 h-4" />}
         </button>
+
+        {/* Volume Control */}
+        <div className="relative">
+          <button
+            onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+            className={`p-2.5 rounded-full transition-all ${
+              outputVolume === 0
+                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                : outputVolume > 100
+                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+            }`}
+            title={`Volume: ${outputVolume}%`}
+          >
+            {outputVolume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
+          
+          {/* Volume Slider Popup */}
+          {showVolumeSlider && (
+            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 rounded-lg shadow-lg ${
+              theme === 'light' ? 'bg-white border border-gray-200' : 'bg-zinc-800 border border-white/10'
+            }`}>
+              <div className="flex flex-col items-center gap-2 w-12">
+                <span className={`text-xs font-medium ${themeText}`}>{outputVolume}%</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="400"
+                  value={outputVolume}
+                  onChange={(e) => onVolumeChange(Number(e.target.value))}
+                  className="h-24 appearance-none cursor-pointer accent-green-500"
+                  style={{
+                    writingMode: 'vertical-lr',
+                    direction: 'rtl',
+                  }}
+                  title={`Volume: ${outputVolume}%`}
+                />
+                <span className={`text-[10px] ${themeSecondary}`}>0</span>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Screen Share Button */}
         {onToggleScreenShare && (

@@ -29,6 +29,10 @@ interface UseAgoraReturn {
   isAudioEnabled: boolean;
   isMuted: boolean;
   
+  // Output volume (0-400, 100 = normal)
+  outputVolume: number;
+  setOutputVolume: (volume: number) => void;
+  
   // Remote users
   remoteUsers: IAgoraRTCRemoteUser[];
   
@@ -66,6 +70,8 @@ export function useAgora(): UseAgoraReturn {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   
   const [remoteUsers, setRemoteUsers] = useState<IAgoraRTCRemoteUser[]>([]);
+  const [outputVolume, setOutputVolumeState] = useState<number>(100);
+  const outputVolumeRef = useRef<number>(100);
 
   // Initialize client on mount
   useEffect(() => {
@@ -93,7 +99,9 @@ export function useAgora(): UseAgoraReturn {
       if (mediaType === 'audio') {
         // Play the remote audio track
         user.audioTrack?.play();
-        console.log('[Agora] Playing audio from:', user.uid);
+        // Apply current volume setting
+        user.audioTrack?.setVolume(outputVolumeRef.current);
+        console.log('[Agora] Playing audio from:', user.uid, 'volume:', outputVolumeRef.current);
       }
       
       if (mediaType === 'video') {
@@ -368,6 +376,21 @@ export function useAgora(): UseAgoraReturn {
     return 0;
   }, [remoteUsers]);
 
+  // Set output volume for all remote users (0-400, 100 = normal, 400 = 4x boost)
+  const setOutputVolume = useCallback((volume: number) => {
+    const clampedVolume = Math.max(0, Math.min(400, volume));
+    setOutputVolumeState(clampedVolume);
+    outputVolumeRef.current = clampedVolume;
+    
+    // Apply volume to all remote audio tracks
+    remoteUsers.forEach(user => {
+      if (user.audioTrack) {
+        user.audioTrack.setVolume(clampedVolume);
+        console.log('[Agora] Set volume for user', user.uid, 'to', clampedVolume);
+      }
+    });
+  }, [remoteUsers]);
+
   return {
     isJoined,
     isConnecting,
@@ -375,6 +398,8 @@ export function useAgora(): UseAgoraReturn {
     localAudioTrack,
     isAudioEnabled,
     isMuted,
+    outputVolume,
+    setOutputVolume,
     remoteUsers,
     localScreenTrack,
     isScreenSharing,

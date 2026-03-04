@@ -1358,6 +1358,8 @@ export default function ConnectPage() {
                   isDeafened={isDeafened}
                   isScreenSharing={agora.isScreenSharing}
                   hasActiveStreams={remoteScreenStreams.size > 0}
+                  outputVolume={agora.outputVolume}
+                  onVolumeChange={agora.setOutputVolume}
                   onToggleMute={handleToggleMute}
                   onToggleDeafen={handleToggleDeafen}
                   onToggleScreenShare={handleToggleScreenShare}
@@ -1425,6 +1427,8 @@ export default function ConnectPage() {
               isDeafened={isDeafened}
               isScreenSharing={agora.isScreenSharing}
               hasActiveStreams={remoteScreenStreams.size > 0}
+              outputVolume={agora.outputVolume}
+              onVolumeChange={agora.setOutputVolume}
               onToggleMute={handleToggleMute}
               onToggleDeafen={handleToggleDeafen}
               onToggleScreenShare={handleToggleScreenShare}
@@ -1565,6 +1569,8 @@ export default function ConnectPage() {
             isDeafened={isDeafened}
             isScreenSharing={agora.isScreenSharing}
             hasActiveStreams={remoteScreenStreams.size > 0}
+            outputVolume={agora.outputVolume}
+            onVolumeChange={agora.setOutputVolume}
             onToggleMute={handleToggleMute}
             onToggleDeafen={handleToggleDeafen}
             onToggleScreenShare={handleToggleScreenShare}

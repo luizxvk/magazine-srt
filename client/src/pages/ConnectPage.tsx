@@ -692,7 +692,7 @@ export default function ConnectPage() {
   };
 
   // Screen sharing handler
-  const handleToggleScreenShare = async (quality?: 'hd' | 'fullhd' | 'native') => {
+  const handleToggleScreenShare = async (settings?: { quality: 'hd' | 'fullhd' | 'native'; frameRate: 30 | 60 }) => {
     try {
       if (agora.isScreenSharing) {
         await agora.stopScreenShare();
@@ -726,7 +726,9 @@ export default function ConnectPage() {
           showToast('Compartilhamento de tela encerrado');
         };
         
-        const success = await agora.startScreenShare(getScreenShareToken, quality || 'hd', onScreenShareStopped);
+        const quality = settings?.quality || 'hd';
+        const frameRate = settings?.frameRate || 30;
+        const success = await agora.startScreenShare(getScreenShareToken, quality, frameRate, onScreenShareStopped);
         if (success && currentVoice) {
           socket.startScreenShare(currentVoice.channelId);
           // Update local streaming state

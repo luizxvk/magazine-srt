@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Volume2, VolumeX } from 'lucide-react';
 import StreamQualityModal from './StreamQualityModal';
-import type { StreamQuality } from './StreamQualityModal';
+import type { StreamSettings } from './StreamQualityModal';
 
 interface VoiceChannel {
   id: string;
@@ -25,7 +25,7 @@ interface VoiceChannelBarProps {
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
   onToggleDeafen: () => void;
-  onToggleScreenShare?: (quality?: StreamQuality) => void;
+  onToggleScreenShare?: (settings?: StreamSettings) => void;
   onWatchStream?: () => void;
   onDisconnect: () => void;
   theme: 'light' | 'dark';
@@ -63,8 +63,8 @@ export default function VoiceChannelBar({
     }
   };
 
-  const handleQualitySelect = (quality: StreamQuality) => {
-    onToggleScreenShare?.(quality);
+  const handleQualitySelect = (settings: StreamSettings) => {
+    onToggleScreenShare?.(settings);
   };
 
   // Determine ping quality and color

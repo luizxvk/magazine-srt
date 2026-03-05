@@ -53,7 +53,7 @@ interface VoiceContextType {
   joinChannel: (channelId: string, userId: string, token?: string, voiceInfo?: Omit<VoiceState, 'joinedAt'>) => Promise<boolean>;
   leaveChannel: () => Promise<void>;
   toggleMute: () => Promise<void>;
-  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>, quality: 'hd' | 'fullhd' | 'native', onStop?: () => void) => Promise<boolean>;
+  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>, quality: 'hd' | 'fullhd' | 'native', frameRate: 30 | 60, onStop?: () => void) => Promise<boolean>;
   stopScreenShare: () => Promise<void>;
   
   // Volume levels
@@ -371,6 +371,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   const startScreenShare = useCallback(async (
     getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>,
     quality: 'hd' | 'fullhd' | 'native' = 'hd',
+    frameRate: 30 | 60 = 30,
     onStop?: () => void
   ): Promise<boolean> => {
     if (!channelIdRef.current) {
@@ -378,11 +379,11 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       return false;
     }
 
-    // Define quality presets
+    // Define quality presets with dynamic frameRate
     const qualityPresets = {
-      hd: { width: 1280, height: 720, frameRate: 30, bitrateMax: 2500 },
-      fullhd: { width: 1920, height: 1080, frameRate: 30, bitrateMax: 4000 },
-      native: { frameRate: 30 } // Native resolution
+      hd: { width: 1280, height: 720, frameRate, bitrateMax: frameRate === 60 ? 3500 : 2500 },
+      fullhd: { width: 1920, height: 1080, frameRate, bitrateMax: frameRate === 60 ? 6000 : 4000 },
+      native: { frameRate } // Native resolution
     };
 
     try {

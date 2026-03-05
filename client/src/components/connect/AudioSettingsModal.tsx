@@ -11,6 +11,7 @@ import {
   Radio
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useVoice } from '../../context/VoiceContext';
 import type { IAgoraRTCRemoteUser } from 'agora-rtc-sdk-ng';
 
 interface AudioSettingsModalProps {
@@ -22,6 +23,7 @@ interface AudioSettingsModalProps {
 
 export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea', remoteUsers = [] }: AudioSettingsModalProps) {
   const { theme } = useAuth();
+  const { updateAudioProcessing, isJoined } = useVoice();
   
   // Audio device state
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
@@ -378,97 +380,97 @@ export function AudioSettingsModal({ isOpen, onClose, accentColor = '#9333ea', r
                   />
                 </div>
 
-                {/* Audio Processing Section */}
+                {/* Audio Processing Section - Compact */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-4 h-4" style={{ color: accentColor }} />
                     <span className={`text-sm font-medium ${themeText}`}>Processamento de Áudio</span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
                     {/* Noise Suppression */}
-                    <label className={`flex items-center justify-between p-3 rounded-xl ${themeInput} border ${themeBorder} cursor-pointer`}>
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-8 h-8 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: `${accentColor}20` }}
-                        >
-                          <Volume2 className="w-4 h-4" style={{ color: accentColor }} />
-                        </div>
-                        <div>
-                          <span className={`text-sm font-medium ${themeText}`}>Supressão de Ruído</span>
-                          <p className={`text-xs ${themeSecondary}`}>Reduz ruídos de fundo</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const newValue = !noiseSuppression;
-                          setNoiseSuppression(newValue);
-                          localStorage.setItem('rovex-audio-ans', String(newValue));
-                        }}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${noiseSuppression ? '' : 'bg-gray-600'}`}
-                        style={noiseSuppression ? { backgroundColor: accentColor } : undefined}
+                    <button
+                      onClick={async () => {
+                        const newValue = !noiseSuppression;
+                        setNoiseSuppression(newValue);
+                        localStorage.setItem('rovex-audio-ans', String(newValue));
+                        if (isJoined) await updateAudioProcessing();
+                      }}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${noiseSuppression ? '' : 'opacity-50'}`}
+                      style={{
+                        backgroundColor: noiseSuppression ? `${accentColor}15` : theme === 'light' ? '#f3f4f6' : '#27272a',
+                        borderColor: noiseSuppression ? `${accentColor}50` : theme === 'light' ? '#e5e7eb' : '#3f3f46',
+                      }}
+                    >
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: noiseSuppression ? `${accentColor}30` : 'transparent' }}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-transform ${noiseSuppression ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </label>
+                        <Volume2 className="w-5 h-5" style={{ color: noiseSuppression ? accentColor : '#9ca3af' }} />
+                      </div>
+                      <div className="text-center">
+                        <span className={`text-xs font-medium block ${themeText}`}>Ruído</span>
+                        <span className={`text-[10px] ${noiseSuppression ? 'text-green-500' : themeSecondary}`}>
+                          {noiseSuppression ? 'ON' : 'OFF'}
+                        </span>
+                      </div>
+                    </button>
 
                     {/* Echo Cancellation */}
-                    <label className={`flex items-center justify-between p-3 rounded-xl ${themeInput} border ${themeBorder} cursor-pointer`}>
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-8 h-8 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: `${accentColor}20` }}
-                        >
-                          <Radio className="w-4 h-4" style={{ color: accentColor }} />
-                        </div>
-                        <div>
-                          <span className={`text-sm font-medium ${themeText}`}>Cancelamento de Eco</span>
-                          <p className={`text-xs ${themeSecondary}`}>Remove eco do alto-falante</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const newValue = !echoCancellation;
-                          setEchoCancellation(newValue);
-                          localStorage.setItem('rovex-audio-aec', String(newValue));
-                        }}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${echoCancellation ? '' : 'bg-gray-600'}`}
-                        style={echoCancellation ? { backgroundColor: accentColor } : undefined}
+                    <button
+                      onClick={async () => {
+                        const newValue = !echoCancellation;
+                        setEchoCancellation(newValue);
+                        localStorage.setItem('rovex-audio-aec', String(newValue));
+                        if (isJoined) await updateAudioProcessing();
+                      }}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${echoCancellation ? '' : 'opacity-50'}`}
+                      style={{
+                        backgroundColor: echoCancellation ? `${accentColor}15` : theme === 'light' ? '#f3f4f6' : '#27272a',
+                        borderColor: echoCancellation ? `${accentColor}50` : theme === 'light' ? '#e5e7eb' : '#3f3f46',
+                      }}
+                    >
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: echoCancellation ? `${accentColor}30` : 'transparent' }}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-transform ${echoCancellation ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </label>
+                        <Radio className="w-5 h-5" style={{ color: echoCancellation ? accentColor : '#9ca3af' }} />
+                      </div>
+                      <div className="text-center">
+                        <span className={`text-xs font-medium block ${themeText}`}>Eco</span>
+                        <span className={`text-[10px] ${echoCancellation ? 'text-green-500' : themeSecondary}`}>
+                          {echoCancellation ? 'ON' : 'OFF'}
+                        </span>
+                      </div>
+                    </button>
 
                     {/* Auto Gain Control */}
-                    <label className={`flex items-center justify-between p-3 rounded-xl ${themeInput} border ${themeBorder} cursor-pointer`}>
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-8 h-8 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: `${accentColor}20` }}
-                        >
-                          <Mic className="w-4 h-4" style={{ color: accentColor }} />
-                        </div>
-                        <div>
-                          <span className={`text-sm font-medium ${themeText}`}>Controle Automático de Ganho</span>
-                          <p className={`text-xs ${themeSecondary}`}>Normaliza o volume do microfone</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const newValue = !autoGainControl;
-                          setAutoGainControl(newValue);
-                          localStorage.setItem('rovex-audio-agc', String(newValue));
-                        }}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${autoGainControl ? '' : 'bg-gray-600'}`}
-                        style={autoGainControl ? { backgroundColor: accentColor } : undefined}
+                    <button
+                      onClick={async () => {
+                        const newValue = !autoGainControl;
+                        setAutoGainControl(newValue);
+                        localStorage.setItem('rovex-audio-agc', String(newValue));
+                        if (isJoined) await updateAudioProcessing();
+                      }}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${autoGainControl ? '' : 'opacity-50'}`}
+                      style={{
+                        backgroundColor: autoGainControl ? `${accentColor}15` : theme === 'light' ? '#f3f4f6' : '#27272a',
+                        borderColor: autoGainControl ? `${accentColor}50` : theme === 'light' ? '#e5e7eb' : '#3f3f46',
+                      }}
+                    >
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: autoGainControl ? `${accentColor}30` : 'transparent' }}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-transform ${autoGainControl ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </label>
+                        <Mic className="w-5 h-5" style={{ color: autoGainControl ? accentColor : '#9ca3af' }} />
+                      </div>
+                      <div className="text-center">
+                        <span className={`text-xs font-medium block ${themeText}`}>Ganho</span>
+                        <span className={`text-[10px] ${autoGainControl ? 'text-green-500' : themeSecondary}`}>
+                          {autoGainControl ? 'ON' : 'OFF'}
+                        </span>
+                      </div>
+                    </button>
                   </div>
-                  <p className={`text-xs ${themeSecondary} mt-2`}>
-                    * Alterações aplicam na próxima conexão
-                  </p>
                 </div>
 
                 {/* Mic Test Section */}

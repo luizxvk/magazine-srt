@@ -55,6 +55,7 @@ interface VoiceContextType {
   toggleMute: () => Promise<void>;
   startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>, quality: 'hd' | 'fullhd' | 'native', frameRate: 30 | 60, shareAudio: boolean, onStop?: () => void) => Promise<boolean>;
   stopScreenShare: () => Promise<void>;
+  updateAudioProcessing: () => Promise<void>;
   
   // Volume levels
   getRemoteAudioLevel: (userId: string) => number;
@@ -378,6 +379,51 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     }
   }, [localAudioTrack, isMuted]);
 
+  // Update audio processing settings in real-time (recreates track)
+  const updateAudioProcessing = useCallback(async () => {
+    if (!clientRef.current || !isJoined || !localAudioTrack) {
+      console.log('[VoiceContext] Cannot update audio processing - not connected');
+      return;
+    }
+
+    try {
+      console.log('[VoiceContext] Updating audio processing settings...');
+      
+      // Get current settings
+      const ansEnabled = localStorage.getItem('rovex-audio-ans') !== 'false';
+      const aecEnabled = localStorage.getItem('rovex-audio-aec') !== 'false';
+      const agcEnabled = localStorage.getItem('rovex-audio-agc') !== 'false';
+      
+      // Remember mute state
+      const wasMuted = isMuted;
+      
+      // Unpublish and close old track
+      await clientRef.current.unpublish([localAudioTrack]);
+      localAudioTrack.close();
+      
+      // Create new track with updated settings
+      const newAudioTrack = await AgoraRTC.createMicrophoneAudioTrack({
+        encoderConfig: 'speech_standard',
+        AEC: aecEnabled,
+        ANS: ansEnabled,
+        AGC: agcEnabled,
+      });
+      
+      // Apply mute state
+      if (wasMuted) {
+        await newAudioTrack.setEnabled(false);
+      }
+      
+      // Publish new track
+      await clientRef.current.publish([newAudioTrack]);
+      
+      setLocalAudioTrack(newAudioTrack);
+      console.log('[VoiceContext] Audio processing updated:', { ANS: ansEnabled, AEC: aecEnabled, AGC: agcEnabled });
+    } catch (err) {
+      console.error('[VoiceContext] Failed to update audio processing:', err);
+    }
+  }, [isJoined, localAudioTrack, isMuted]);
+
   const startScreenShare = useCallback(async (
     getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>,
     quality: 'hd' | 'fullhd' | 'native' = 'hd',
@@ -523,6 +569,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     toggleMute,
     startScreenShare,
     stopScreenShare,
+    updateAudioProcessing,
     getRemoteAudioLevel,
   };
 

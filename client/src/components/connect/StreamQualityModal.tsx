@@ -75,15 +75,14 @@ export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }:
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center"
-          />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center"
+        >
+          {/* Backdrop click handler */}
+          <div className="absolute inset-0" onClick={onClose} />
 
           {/* Modal */}
           <motion.div
@@ -91,7 +90,7 @@ export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }:
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md ${themeBg} rounded-2xl border ${themeBorder} shadow-2xl z-[60] overflow-hidden`}
+            className={`relative w-full max-w-md mx-4 ${themeBg} rounded-2xl border ${themeBorder} shadow-2xl overflow-hidden`}
           >
             {/* Header */}
             <div className={`flex items-center justify-between p-5 border-b ${themeBorder}`}>
@@ -256,7 +255,7 @@ export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }:
               </button>
             </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );

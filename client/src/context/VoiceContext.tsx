@@ -282,11 +282,18 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
       console.log('[VoiceContext] Joined channel with uid:', numericUid);
 
+      // Read audio processing preferences from localStorage
+      const ansEnabled = localStorage.getItem('rovex-audio-ans') !== 'false';
+      const aecEnabled = localStorage.getItem('rovex-audio-aec') !== 'false';
+      const agcEnabled = localStorage.getItem('rovex-audio-agc') !== 'false';
+      
+      console.log('[VoiceContext] Audio processing:', { ANS: ansEnabled, AEC: aecEnabled, AGC: agcEnabled });
+
       const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
         encoderConfig: 'speech_standard',
-        AEC: true,
-        ANS: true,
-        AGC: true,
+        AEC: aecEnabled,
+        ANS: ansEnabled,
+        AGC: agcEnabled,
       });
 
       setLocalAudioTrack(audioTrack);

@@ -9,7 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { useSocket } from '../hooks/useSocket';
-import { useAgora } from '../hooks/useAgora';
+import { useVoice } from '../context/VoiceContext';
 import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
@@ -198,8 +198,8 @@ export default function ConnectPage() {
   // Socket.io hook for real-time communication
   const socket = useSocket();
   
-  // Agora.io hook for voice/video
-  const agora = useAgora();
+  // Voice context for Agora voice/video (shared across pages)
+  const agora = useVoice();
 
   // Log Agora remote users (Agora automatically plays audio)
   useEffect(() => {
@@ -410,32 +410,6 @@ export default function ConnectPage() {
     }
   }, [groupId, groups]);
 
-  // Listen for disconnect signal from mini player
-  useEffect(() => {
-    const checkDisconnect = () => {
-      const disconnectSignal = localStorage.getItem('rovex-voice-disconnect');
-      if (disconnectSignal && currentVoice) {
-        localStorage.removeItem('rovex-voice-disconnect');
-        handleLeaveVoice();
-      }
-    };
-    
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'rovex-voice-disconnect') {
-        checkDisconnect();
-      }
-    };
-    
-    window.addEventListener('storage', handleStorage);
-    // Also poll for same-tab changes
-    const interval = setInterval(checkDisconnect, 500);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-      clearInterval(interval);
-    };
-  }, [currentVoice]);
-
   // Check if a group exists for joining via invite link
   const checkInviteGroup = async (gId: string) => {
     try {
@@ -570,21 +544,17 @@ export default function ConnectPage() {
       
       // Start Agora audio with token
       console.log('[ConnectPage] Starting Agora audio...');
-      if (user) {
-        const audioStarted = await agora.joinChannel(channelId, user.id, token);
-        console.log('[ConnectPage] Agora audio started:', audioStarted);
-      }
-      
-      // Save voice state for mini player
       const group = groups.find((g) => g.id === groupId);
       const channel = group?.voiceChannels.find((c: VoiceChannel) => c.id === channelId);
-      localStorage.setItem('rovex-voice-state', JSON.stringify({
-        channelId,
-        channelName: channel?.name || 'Canal de Voz',
-        groupName: group?.name || 'Grupo',
-        groupId,
-        joinedAt: Date.now(),
-      }));
+      if (user) {
+        const audioStarted = await agora.joinChannel(channelId, user.id, token, {
+          channelId,
+          channelName: channel?.name || 'Canal de Voz',
+          groupName: group?.name || 'Grupo',
+          groupId,
+        });
+        console.log('[ConnectPage] Agora audio started:', audioStarted);
+      }
       
       showToast('Conectado ao canal de voz');
       fetchGroups(false); // Refresh without loading spinner
@@ -599,7 +569,7 @@ export default function ConnectPage() {
         // Leave via Socket.io
         socket.leaveVoice(currentVoice.channelId);
         
-        // Stop Agora
+        // Stop Agora (this also clears localStorage voice state)
         await agora.leaveChannel();
       }
       
@@ -607,9 +577,6 @@ export default function ConnectPage() {
       setCurrentVoice(null);
       setIsMuted(false);
       setIsDeafened(false);
-      
-      // Remove voice state for mini player
-      localStorage.removeItem('rovex-voice-state');
       
       showToast('Desconectado do canal de voz');
       fetchGroups(false);
@@ -1193,9 +1160,11 @@ export default function ConnectPage() {
                         const effectiveDeafened = realTimeState?.isDeafened ?? participant.isDeafened;
                         const effectiveStreaming = realTimeState?.isStreaming ?? participant.isStreaming;
                         // Check if speaking using Agora speakingUsers (or local speaking for current user)
+                        // Convert participant userId to Agora UID for comparison
+                        const participantAgoraUid = agora.getAgoraUid(participant.user.id);
                         const isSpeakingNow = participant.user.id === user?.id 
                           ? agora.isLocalSpeaking 
-                          : agora.speakingUsers.has(participant.user.id);
+                          : agora.speakingUsers.has(participantAgoraUid);
                         
                         return (
                         <div 

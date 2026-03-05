@@ -46,6 +46,7 @@ import ZionsPurchaseModal from './components/ZionsPurchaseModal';
 import OnboardingModals from './components/OnboardingModals';
 import SessionExpiredModal from './components/SessionExpiredModal';
 import { RadioProvider } from './context/RadioContext';
+import { VoiceProvider } from './context/VoiceContext';
 import MiniRadioPlayer from './components/MiniRadioPlayer';
 import VoiceMiniPlayer from './components/VoiceMiniPlayer';
 import { EdgeNotificationContainer } from './components/EdgeNotification';
@@ -74,6 +75,7 @@ function App() {
     <CommunityProvider>
       <AuthProvider>
         <RadioProvider>
+        <VoiceProvider>
         <Router>
           <Routes>
           <Route path="/" element={<ModernLogin />} />
@@ -145,6 +147,7 @@ function App() {
         <FeedbackReminderWrapper />
         <WebGLBackgroundRenderer />
       </Router>
+      </VoiceProvider>
     </RadioProvider>
     </AuthProvider>
     </CommunityProvider>

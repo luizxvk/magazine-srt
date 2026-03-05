@@ -37,8 +37,9 @@ interface UseAgoraReturn {
   ping: number; // RTT in ms
   
   // Speaking detection
-  speakingUsers: Set<string>; // UIDs of users currently speaking
+  speakingUsers: Set<string>; // UIDs of users currently speaking (Agora UIDs)
   isLocalSpeaking: boolean;
+  getAgoraUid: (userId: string) => string; // Convert system userId to Agora UID
   
   // Remote users
   remoteUsers: IAgoraRTCRemoteUser[];
@@ -231,12 +232,15 @@ export function useAgora(): UseAgoraReturn {
     });
 
     return () => {
-      // Cleanup on unmount
-      if (clientRef.current) {
-        clientRef.current.leave().catch(console.error);
-      }
-      if (screenClientRef.current) {
-        screenClientRef.current.leave().catch(console.error);
+      // Cleanup on unmount - only if not keeping voice state for mini player
+      const voiceState = localStorage.getItem('rovex-voice-state');
+      if (!voiceState) {
+        if (clientRef.current) {
+          clientRef.current.leave().catch(console.error);
+        }
+        if (screenClientRef.current) {
+          screenClientRef.current.leave().catch(console.error);
+        }
       }
     };
   }, []);
@@ -490,6 +494,12 @@ export function useAgora(): UseAgoraReturn {
     });
   }, [remoteUsers]);
 
+  // Convert system userId to Agora UID (must match the algorithm used in joinChannel)
+  const getAgoraUid = useCallback((userId: string): string => {
+    const numericUid = Math.abs(userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 100000000);
+    return String(numericUid);
+  }, []);
+
   return {
     isJoined,
     isConnecting,
@@ -502,6 +512,7 @@ export function useAgora(): UseAgoraReturn {
     ping,
     speakingUsers,
     isLocalSpeaking,
+    getAgoraUid,
     remoteUsers,
     localScreenTrack,
     isScreenSharing,

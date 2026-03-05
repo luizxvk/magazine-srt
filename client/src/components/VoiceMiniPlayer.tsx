@@ -1,27 +1,20 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Radio, PhoneOff, Signal
+  Radio, PhoneOff, Signal, Mic, MicOff
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useVoice } from '../context/VoiceContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-interface VoiceState {
-  channelId: string;
-  channelName: string;
-  groupName: string;
-  groupId: string;
-  joinedAt: number;
-}
-
 export default function VoiceMiniPlayer() {
   const { user, theme, accentColor: userAccent } = useAuth();
+  const voice = useVoice();
   const { getAccentColor } = useTierColors();
   const location = useLocation();
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [voiceState, setVoiceState] = useState<VoiceState | null>(null);
   const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isMGT = user?.membershipType === 'MGT';
@@ -29,47 +22,6 @@ export default function VoiceMiniPlayer() {
   // Hide on auth pages and connect page (since it has its own voice bar)
   const isAuthPage = ['/', '/login', '/register', '/request-invite', '/reset-password'].includes(location.pathname);
   const isConnectPage = location.pathname.startsWith('/connect');
-  
-  // Listen for voice state changes in localStorage
-  useEffect(() => {
-    const checkVoiceState = () => {
-      const stored = localStorage.getItem('rovex-voice-state');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          // Only valid if joined within last 24 hours
-          if (Date.now() - parsed.joinedAt < 24 * 60 * 60 * 1000) {
-            setVoiceState(parsed);
-          } else {
-            localStorage.removeItem('rovex-voice-state');
-            setVoiceState(null);
-          }
-        } catch {
-          setVoiceState(null);
-        }
-      } else {
-        setVoiceState(null);
-      }
-    };
-
-    checkVoiceState();
-    
-    // Listen for storage changes (from ConnectPage)
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'rovex-voice-state') {
-        checkVoiceState();
-      }
-    };
-    
-    // Also poll every second to catch same-tab changes
-    const interval = setInterval(checkVoiceState, 1000);
-    
-    window.addEventListener('storage', handleStorage);
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-      clearInterval(interval);
-    };
-  }, []);
   
   // Auto-close after 5 seconds of inactivity when expanded
   useEffect(() => {
@@ -97,15 +49,16 @@ export default function VoiceMiniPlayer() {
     }
   };
 
-  const handleDisconnect = () => {
-    // Mark as disconnecting - ConnectPage will see this and disconnect
-    localStorage.setItem('rovex-voice-disconnect', Date.now().toString());
-    localStorage.removeItem('rovex-voice-state');
-    setVoiceState(null);
+  const handleDisconnect = async () => {
+    await voice.leaveChannel();
+  };
+
+  const handleToggleMute = async () => {
+    await voice.toggleMute();
   };
   
-  // Don't show if no voice state, on auth pages, or on connect page
-  if (!voiceState || isAuthPage || isConnectPage) return null;
+  // Don't show if not in voice, on auth pages, or on connect page
+  if (!voice.isJoined || !voice.currentVoiceInfo || isAuthPage || isConnectPage) return null;
 
   // Use user's accent color
   const defaultAccent = getAccentColor(isMGT);
@@ -154,6 +107,12 @@ export default function VoiceMiniPlayer() {
                 animate={{ scale: [1, 1.3, 1], opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
+              {/* Mute indicator */}
+              {voice.isMuted && (
+                <div className="absolute bottom-2 right-2">
+                  <MicOff className="w-3 h-3 text-red-400" />
+                </div>
+              )}
             </motion.button>
           ) : (
             <motion.div
@@ -163,7 +122,7 @@ export default function VoiceMiniPlayer() {
               exit={{ x: 100, opacity: 0 }}
               className={`${bgPanel} rounded-l-2xl shadow-2xl border-l border-t border-b ${theme === 'light' ? 'border-gray-200' : 'border-white/10'}`}
               style={{ 
-                width: '260px',
+                width: '280px',
                 boxShadow: `0 0 40px ${accentColor}30`
               }}
             >
@@ -180,25 +139,38 @@ export default function VoiceMiniPlayer() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium truncate ${textMain}`}>
-                    {voiceState.channelName}
+                    {voice.currentVoiceInfo.channelName}
                   </p>
                   <p className={`text-xs truncate ${textSub}`}>
-                    {voiceState.groupName}
+                    {voice.currentVoiceInfo.groupName}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-xs text-green-400">
                   <Signal className="w-3 h-3" />
-                  Conectado
+                  {voice.ping}ms
                 </div>
               </div>
 
               {/* Actions */}
               <div className="p-3 flex gap-2">
+                {/* Mute toggle */}
+                <button
+                  onClick={handleToggleMute}
+                  className={`p-2.5 rounded-xl flex items-center justify-center transition-all ${
+                    voice.isMuted 
+                      ? 'bg-red-500/20 text-red-400' 
+                      : 'bg-white/10 text-white hover:bg-white/20'
+                  }`}
+                  title={voice.isMuted ? 'Ativar microfone' : 'Mutar'}
+                >
+                  {voice.isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+
                 {/* Go to Connect Button */}
                 <button
                   onClick={() => {
                     setIsExpanded(false);
-                    navigate(`/connect/${voiceState.groupId}`);
+                    navigate(`/connect/${voice.currentVoiceInfo?.groupId}`);
                   }}
                   className="flex-1 p-2.5 rounded-xl text-sm font-medium transition-all"
                   style={{ 

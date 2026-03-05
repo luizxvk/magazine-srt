@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.18';
+const CURRENT_VERSION = '0.5.0-rc.19';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -45,27 +45,27 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const page1Updates: UpdateItem[] = [
         {
             icon: <Wifi className="w-5 h-5" />,
-            title: 'Rovex Connect no Menu',
-            description: 'Rovex Connect agora acessível pelo atalho lateral com tag NEW.',
+            title: 'Promo Connect Compacto',
+            description: 'Card de promo do Connect agora compacto em uma linha com botão de fechar.',
+            isNew: true
+        },
+        {
+            icon: <Volume2 className="w-5 h-5" />,
+            title: 'Rádio Simplificado',
+            description: 'Card da Rádio sem card externo para visual mais limpo.',
             isNew: true
         },
         {
             icon: <Users className="w-5 h-5" />,
-            title: 'RichPresence Aprimorado',
-            description: 'Bordas de perfil e badges Elite agora exibidas no card de presença.',
-            isNew: true
-        },
-        {
-            icon: <Users className="w-5 h-5" />,
-            title: 'Botão Amigo Inteligente',
-            description: 'Botão de adicionar amigo some automaticamente se já for amigo.',
+            title: 'RichPresence com Badges',
+            description: 'Badges admin (BETA, etc) agora aparecem no card de presença.',
             isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'Cor Roxa Persistente',
             description: 'Corrigido bug que fazia a cor voltar para laranja ao atualizar.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Volume2 className="w-5 h-5" />,

@@ -468,6 +468,24 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Palette className="w-5 h-5" />,
         category: 'improvement'
     },
+    {
+        id: '29aa',
+        title: 'Promo Connect Compacto',
+        description: 'Card de promoção do Rovex Connect agora compacto em uma linha com botão fechar.',
+        status: 'completed',
+        version: 'v0.5.0-rc.19',
+        icon: <Wifi className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29ab',
+        title: 'Rádio Simplificado',
+        description: 'Card da Rádio removido o card externo para visual mais limpo e menos poluído.',
+        status: 'completed',
+        version: 'v0.5.0-rc.19',
+        icon: <Volume2 className="w-5 h-5" />,
+        category: 'improvement'
+    },
     
     // ===== IN PROGRESS =====
     {

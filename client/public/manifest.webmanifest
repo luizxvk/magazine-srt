@@ -1,4 +1,11 @@
 {
+  "name": "Rovex Communities",
+  "short_name": "Rovex",
+  "description": "Plataforma Social Gamificada",
+  "theme_color": "#A78BFA",
+  "background_color": "#0b0b0b",
+  "display": "standalone",
+  "start_url": "/",
   "icons": [
     {
       "src": "assets/icons/icon-48.webp",

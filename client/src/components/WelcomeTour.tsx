@@ -196,7 +196,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-0 sm:p-4"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-3 sm:p-4"
             >
                 {isWelcomeHero ? (
                     // =============================================
@@ -206,7 +206,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className={`relative w-full h-full sm:h-auto sm:max-w-2xl sm:w-full sm:mx-auto ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl sm:rounded-[2rem] border-0 sm:border ${accentBorder} ${accentGlow} overflow-hidden flex flex-col justify-center`}
+                        className={`relative w-full max-h-[95vh] overflow-y-auto sm:h-auto sm:max-w-2xl sm:w-full sm:mx-auto ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl rounded-[1.5rem] sm:rounded-[2rem] border ${accentBorder} ${accentGlow} flex flex-col`}
                     >
                         {/* Animated gradient background */}
                         <div className="absolute inset-0 overflow-hidden">

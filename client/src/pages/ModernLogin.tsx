@@ -630,7 +630,8 @@ export default function ModernLogin() {
     }, [location.pathname]);
 
     const pathMembership = getMembershipFromPath();
-    const initialMembership = pathMembership || location.state?.membershipType || localStorage.getItem('lastMembershipType') || 'MAGAZINE';
+    // Default to MGT (Rovex/STD tier) - para Rovex Communities o tier padrão é o STD
+    const initialMembership = pathMembership || location.state?.membershipType || localStorage.getItem('lastMembershipType') || 'MGT';
     const [isMGT, setIsMGT] = useState(initialMembership === 'MGT');
 
     useEffect(() => {

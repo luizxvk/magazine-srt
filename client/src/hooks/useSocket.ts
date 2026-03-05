@@ -54,7 +54,7 @@ interface UseSocketReturn {
   // Screen sharing
   startScreenShare: (channelId: string) => void;
   stopScreenShare: (channelId: string) => void;
-  onScreenShareStarted: (callback: (data: { userId: string; channelId: string }) => void) => void;
+  onScreenShareStarted: (callback: (data: { userId: string; channelId: string; username?: string; avatarUrl?: string }) => void) => void;
   onScreenShareStopped: (callback: (data: { userId: string; channelId: string }) => void) => void;
   // Notifications
   subscribeNotifications: () => void;
@@ -293,7 +293,7 @@ export function useSocket(): UseSocketReturn {
     socketRef.current?.emit('stop-screen-share', { channelId });
   }, []);
 
-  const onScreenShareStarted = useCallback((callback: (data: { userId: string; channelId: string }) => void) => {
+  const onScreenShareStarted = useCallback((callback: (data: { userId: string; channelId: string; username?: string; avatarUrl?: string }) => void) => {
     callbacksRef.current.set('screen-share-started', callback);
   }, []);
 

@@ -118,7 +118,6 @@ export default function ConnectPage() {
   groupsRef.current = groups;
   const [selectedGroup, setSelectedGroup] = useState<ConnectGroup | null>(null);
   const [loading, setLoading] = useState(true);
-  const [socketConnecting, setSocketConnecting] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [showAddChannelModal, setShowAddChannelModal] = useState(false);
@@ -250,9 +249,6 @@ export default function ConnectPage() {
     if (!socket.isConnected) {
       return;
     }
-    
-    // Socket connected - stop connecting state
-    setSocketConnecting(false);
 
     socket.onVoiceUserJoined((data: { user: { odiserId: string; name: string }; channelId: string; userId?: string }) => {
       showToast('Usuário entrou no canal de voz');
@@ -275,7 +271,7 @@ export default function ConnectPage() {
       fetchGroups();
     });
 
-    socket.onScreenShareStarted((data: { userId: string; channelId: string }) => {
+    socket.onScreenShareStarted((data: { userId: string; channelId: string; username?: string; avatarUrl?: string }) => {
       showToast('🖥️ Alguém iniciou compartilhamento de tela! Clique para assistir.');
       // Update participant streaming state
       setVoiceParticipantStates(prev => {
@@ -284,37 +280,44 @@ export default function ConnectPage() {
         updated.set(data.userId, { ...existing, isStreaming: true });
         return updated;
       });
-      // Find user info for the streamer using ref for current data
-      const findUserInGroups = () => {
+      
+      // Use username from event (sent by server) or fallback to search
+      let info: { username: string; avatarUrl?: string } | null = null;
+      
+      if (data.username) {
+        info = { username: data.username, avatarUrl: data.avatarUrl };
+      } else {
+        // Fallback: Find user info in groups
         const currentGroups = groupsRef.current;
         for (const group of currentGroups) {
           for (const channel of group.voiceChannels) {
             const participant = channel.participants.find(p => p.user.id === data.userId);
             if (participant) {
-              return { 
+              info = { 
                 username: participant.user.displayName || participant.user.name, 
                 avatarUrl: participant.user.avatarUrl 
               };
+              break;
             }
           }
+          if (info) break;
           const member = group.members?.find(m => m.userId === data.userId);
           if (member) {
-            return { 
+            info = { 
               username: member.user.displayName || member.user.name, 
               avatarUrl: member.user.avatarUrl 
             };
+            break;
           }
         }
-        return null;
-      };
+      }
       
-      const info = findUserInGroups();
       // Store by Screen Share UID so it matches remoteScreenStreams key
       // Screen share uses baseUid + 50M offset (same as server)
       const baseUid = Number(agora.getAgoraUid(data.userId));
       const screenUid = String((baseUid + 50000000) % 100000000);
       if (info) {
-        setStreamerInfo(prev => new Map(prev).set(screenUid, info));
+        setStreamerInfo(prev => new Map(prev).set(screenUid, info!));
       }
     });
 
@@ -363,14 +366,6 @@ export default function ConnectPage() {
       fetchGroups(false);
     });
   }, [socket.isConnected]);
-
-  // Timeout for socket connection - show UI after 5 seconds even if not connected
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSocketConnecting(false);
-    }, 5000);
-    return () => clearTimeout(timeout);
-  }, []);
 
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
@@ -1302,7 +1297,7 @@ export default function ConnectPage() {
     ));
   };
 
-  if (loading || socketConnecting) {
+  if (loading) {
     return (
       <div className="min-h-screen text-white font-sans relative">
         <LuxuriousBackground />

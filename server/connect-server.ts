@@ -257,16 +257,21 @@ io.on('connection', (socket: AuthenticatedSocket) => {
   socket.on('start-screen-share', (data: { channelId: string }) => {
     const { channelId } = data;
     
-    // Update user streaming state
+    // Update user streaming state and get user info
     const channelUsers = voiceChannels.get(channelId);
+    let username = 'Usuário';
+    let avatarUrl: string | undefined;
+    
     if (channelUsers && channelUsers.has(userId)) {
       const user = channelUsers.get(userId)!;
       user.isStreaming = true;
+      username = user.name;
+      avatarUrl = user.avatarUrl;
     }
     
-    // Notify everyone in the channel
-    io.to(`voice:${channelId}`).emit('screen-share-started', { userId, channelId });
-    console.log(`[Connect] User ${userId} started screen share in ${channelId}`);
+    // Notify everyone in the channel with user info
+    io.to(`voice:${channelId}`).emit('screen-share-started', { userId, channelId, username, avatarUrl });
+    console.log(`[Connect] User ${userId} (${username}) started screen share in ${channelId}`);
   });
 
   socket.on('stop-screen-share', (data: { channelId: string }) => {

@@ -405,6 +405,33 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Image className="w-5 h-5" />,
         category: 'improvement'
     },
+    {
+        id: '29t',
+        title: 'Connect Fonte Social',
+        description: 'Título Rovex Connect agora usa font-serif como o card Social para consistência visual.',
+        status: 'completed',
+        version: 'v0.5.0-rc.17',
+        icon: <Wifi className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29u',
+        title: 'Bordas e Badges no Connect',
+        description: 'Perfis de membros no Rovex Connect agora exibem bordas personalizadas e badges Elite.',
+        status: 'completed',
+        version: 'v0.5.0-rc.17',
+        icon: <Users className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29v',
+        title: 'Status Online Preciso',
+        description: 'Detecção de online/offline no Connect agora usa lastSeenAt (5 min) para precisão.',
+        status: 'completed',
+        version: 'v0.5.0-rc.17',
+        icon: <Wifi className="w-5 h-5" />,
+        category: 'improvement'
+    },
     
     // ===== IN PROGRESS =====
     {

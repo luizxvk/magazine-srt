@@ -21,8 +21,9 @@ interface WelcomeCardProps {
 
 export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory }: WelcomeCardProps) {
     const { user, theme, accentGradient } = useAuth();
-    const { config } = useCommunity();
+    const { config, isStdTier } = useCommunity();
     const { t } = useTranslation(['feed', 'common']);
+    const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
     
     // Theme-based styling - use CommunityContext colors
     // Use community accent color for the welcome card - always use accent (purple for Rovex)
@@ -38,20 +39,28 @@ export default function WelcomeCard({ viewingStoryId, onViewStory, onCloseStory 
         : 'bg-white/10 hover:bg-white/15';
     const themeIconColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
 
-    const themeBg = theme === 'light'
-        ? 'bg-white/90'
-        : 'bg-black/60';
+    // Match FreeGamesCard background pattern for consistency
+    const themeBg = theme === 'light' 
+        ? 'bg-white/80' 
+        : (isMGT ? 'bg-tier-std-950/30' : 'bg-black/30');
+    
+    // Glow effect matching other cards
+    const themeGlow = isMGT 
+        ? 'shadow-[0_0_15px_rgba(var(--tier-std-color-rgb),0.15)]' 
+        : `shadow-[0_0_15px_rgba(${glowRgb},0.15)]`;
+
+    // Border matching other cards
+    const themeBorder = isMGT ? 'border-tier-std-500/30' : '';
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative rounded-3xl overflow-hidden ${themeBg} backdrop-blur-xl border`}
-            style={{
-                boxShadow: `0 0 15px rgba(${glowRgb},0.15)`,
-                borderColor: accentGradient ? undefined : `${communityAccent}30`,
-            }}
+            className={`relative rounded-3xl overflow-hidden ${themeBg} backdrop-blur-xl ${accentGradient ? 'border-gradient-accent' : `border ${themeBorder}`} ${themeGlow} transition-all duration-300`}
+            style={!themeBorder && !accentGradient ? {
+                borderColor: `${communityAccent}30`,
+            } : undefined}
         >
             {/* Accent glow gradient */}
             <div 

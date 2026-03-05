@@ -93,7 +93,7 @@ export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }:
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`relative w-full max-w-md mx-4 ${themeBg} rounded-2xl border ${themeBorder} shadow-2xl overflow-hidden`}
+            className={`relative w-[calc(100%-2rem)] max-w-md mx-auto ${themeBg} rounded-2xl border ${themeBorder} shadow-2xl overflow-hidden`}
           >
             {/* Header */}
             <div className={`flex items-center justify-between p-5 border-b ${themeBorder}`}>

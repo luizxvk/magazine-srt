@@ -6,7 +6,6 @@ import ToolsCarousel from './ToolsCarousel';
 import FreeGamesCard from './FreeGamesCard';
 import ElitePromoCard from './ElitePromoCard';
 import MarketCard from './MarketCard';
-import GroupChatCard from './GroupChatCard';
 import FeedbackFormCard from './FeedbackFormCard';
 import AnnouncementCard from './AnnouncementCard';
 
@@ -121,7 +120,7 @@ export default function ExploreCardsCarousel() {
                                 {card.id === 'games' && <FreeGamesCard />}
                                 {card.id === 'elite' && <ElitePromoCard />}
                                 {card.id === 'market' && <MarketCard />}
-                                {card.id === 'groups' && <GroupChatCard />}
+                                {/* Groups card removed - using Rovex Connect now */}
                                 {card.id === 'feedback' && <FeedbackFormCard />}
                                 {card.id === 'news' && <AnnouncementCard />}
                             </div>

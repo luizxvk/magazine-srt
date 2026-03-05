@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.16';
+const TOUR_VERSION = '0.5.0-rc.17';
 
 interface WelcomeTourProps {
     isOpen?: boolean;
@@ -197,7 +197,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className={`relative max-w-2xl w-full ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl rounded-[2rem] border ${accentBorder} ${accentGlow} overflow-hidden`}
+                        className={`relative max-w-[calc(100%-2rem)] sm:max-w-2xl w-full mx-auto ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl rounded-[2rem] border ${accentBorder} ${accentGlow} overflow-hidden`}
                     >
                         {/* Animated gradient background */}
                         <div className="absolute inset-0 overflow-hidden">
@@ -214,7 +214,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                             <X className="w-5 h-5" />
                         </button>
 
-                        <div className="relative z-10 p-8 sm:p-10">
+                        <div className="relative z-10 p-5 sm:p-8 md:p-10">
                             {/* BETA Badge */}
                             <motion.div 
                                 initial={{ y: -20, opacity: 0 }}
@@ -293,7 +293,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.7 }}
-                                className="grid grid-cols-4 gap-3 mb-8"
+                                className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8"
                             >
                                 {welcomeFeatures.map((feature, idx) => (
                                     <motion.div
@@ -330,7 +330,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 1.2 }}
-                                className="flex justify-center gap-6 mb-8"
+                                className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-6 sm:mb-8"
                             >
                                 <div className="flex items-center gap-2">
                                     <Target className={`w-4 h-4 ${!hasCustomGradient ? accentText : ''}`} style={iconColorStyle} />

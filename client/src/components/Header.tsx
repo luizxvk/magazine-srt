@@ -10,7 +10,6 @@ import BadgeDisplay from './BadgeDisplay';
 import DailyLoginCard from './DailyLoginCard';
 import OnlineFriendsCard from './OnlineFriendsCard';
 import WhatsNewModal from './WhatsNewModal';
-import GroupChatCard from './GroupChatCard';
 import CustomizationShop from './CustomizationShop';
 import VisitorBlockPopup from './VisitorBlockPopup';
 import RadioCard from './RadioCard';
@@ -678,9 +677,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                                     <DailyLoginCard status={dailyLoginStatus} onClick={() => { setIsMobileDrawerOpen(false); openDailyLoginModal(); }} />
                                     <RadioCard />
                                     <OnlineFriendsCard />
-                                    <div className="md:hidden">
-                                        <GroupChatCard />
-                                    </div>
+                                    {/* Groups card removed - using Rovex Connect now */}
                                 </motion.div>
 
                                 {/* Navigation Menu */}

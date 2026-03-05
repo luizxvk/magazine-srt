@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import Header from '../components/Header';
@@ -7,7 +8,7 @@ import TournamentCard from '../components/TournamentCard';
 import TournamentDetail from '../components/TournamentDetail';
 import api from '../services/api';
 import { motion } from 'framer-motion';
-import { Trophy, Swords, Users } from 'lucide-react';
+import { Trophy, Swords, Users, ArrowLeft } from 'lucide-react';
 import GradientText from '../components/GradientText';
 import { useTranslation } from 'react-i18next';
 
@@ -78,39 +79,51 @@ export default function TournamentsPage() {
 
             <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
                 <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
-                {/* Page Header */}
-                <div className="mb-8">
-                    <GradientText as="h1" className="text-4xl font-serif mb-2" fallbackClassName={isMGT ? 'text-tier-std-400' : 'text-gold-400'}>
-                        <Swords className="inline-block w-8 h-8 mr-2 -mt-1" />
-                        {t('tournaments.title')}
-                    </GradientText>
-                    <p className="text-gray-400">
-                        {t('tournaments.prizes')} + {t('tournaments.brackets')}
-                    </p>
-                </div>
+                {/* Page Header - Styled like PhotoCatalog with filters inside */}
+                <div className={`flex flex-col gap-4 p-4 rounded-xl mb-8 mt-4 md:mt-0 ${
+                    isMGT ? 'bg-tier-std-950/30' : 'bg-gold-950/30'
+                } border ${isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20'}`}>
+                    {/* Title with back button */}
+                    <div className="flex items-center gap-4">
+                        <Link to="/feed" className={`p-3 rounded-xl ${isMGT ? 'bg-tier-std-500/20 hover:bg-tier-std-500/30' : 'bg-gold-500/20 hover:bg-gold-500/30'} transition-colors`} title="Voltar ao Feed">
+                            <ArrowLeft className={`w-5 h-5 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
+                        </Link>
+                        <div className={`p-3 rounded-xl ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'}`}>
+                            <Swords className={`w-6 h-6 ${isMGT ? 'text-tier-std-400' : 'text-gold-400'}`} />
+                        </div>
+                        <div>
+                            <h2 className={`text-xl font-bold`}>
+                                <GradientText fallbackClassName="text-white">{t('tournaments.title')}</GradientText>
+                            </h2>
+                            <p className="text-sm text-gray-400">
+                                {t('tournaments.prizes')} + {t('tournaments.brackets')}
+                            </p>
+                        </div>
+                    </div>
 
-                {/* Status Filter Tabs */}
-                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                    {statusTabs.map(tab => {
-                        const Icon = tab.icon;
-                        const active = statusFilter === tab.value;
-                        return (
-                            <button
-                                key={tab.value}
-                                onClick={() => setStatusFilter(tab.value)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                                    active
-                                        ? isMGT
-                                            ? 'bg-tier-std-500/20 text-tier-std-400 border border-tier-std-500/30'
-                                            : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
-                                        : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                                }`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                {tab.label}
-                            </button>
-                        );
-                    })}
+                    {/* Status Filter Tabs - Inside the bordered container */}
+                    <div className="flex gap-2 overflow-x-auto pt-2">
+                        {statusTabs.map(tab => {
+                            const Icon = tab.icon;
+                            const active = statusFilter === tab.value;
+                            return (
+                                <button
+                                    key={tab.value}
+                                    onClick={() => setStatusFilter(tab.value)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+                                        active
+                                            ? isMGT
+                                                ? 'bg-tier-std-500/20 text-tier-std-400 border border-tier-std-500/30'
+                                                : 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
+                                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                                    }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Tournament Grid */}

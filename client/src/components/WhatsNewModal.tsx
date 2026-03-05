@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.16';
+const CURRENT_VERSION = '0.5.0-rc.17';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -44,10 +44,22 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     // Page 1 - Main Features
     const page1Updates: UpdateItem[] = [
         {
+            icon: <Wifi className="w-5 h-5" />,
+            title: 'Rovex Connect Aprimorado',
+            description: 'Título com fonte Social, bordas e badges nos perfis de membros do Connect.',
+            isNew: true
+        },
+        {
+            icon: <Users className="w-5 h-5" />,
+            title: 'Status Online Corrigido',
+            description: 'Detecção precisa online/offline baseada em lastSeenAt (5 min) no Connect.',
+            isNew: true
+        },
+        {
             icon: <Users className="w-5 h-5" />,
             title: 'Convites Unificados',
             description: 'Aba Convites removida! Convites de grupos Rovex Connect agora em Solicitações.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Palette className="w-5 h-5" />,

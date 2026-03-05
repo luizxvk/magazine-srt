@@ -1,4 +1,4 @@
-import { Users, Camera, Calendar, UserPlus, Star, Lock, ShoppingBag, Info, Trophy, BarChart3 } from 'lucide-react';
+import { Camera, Calendar, UserPlus, Star, Lock, ShoppingBag, Info, Trophy, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth, type DailyLoginStatus } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
@@ -56,12 +56,6 @@ export default function LeftSidebar({ onDailyLoginClick, onNewMembersClick, onEv
         : 'hover:bg-gold-500/10';
 
     const items: SidebarItem[] = [
-        {
-            icon: <Users className="w-5 h-5" />,
-            label: t('common:nav.groups'),
-            to: '/groups',
-            feature: Feature.GROUPS
-        },
         {
             icon: <Trophy className="w-5 h-5" />,
             label: t('common:nav.tournaments'),

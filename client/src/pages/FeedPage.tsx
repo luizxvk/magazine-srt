@@ -23,7 +23,6 @@ import RecommendationsDrawer from '../components/RecommendationsDrawer';
 import NewMembersModal from '../components/NewMembersModal';
 import EventsModal from '../components/EventsModal';
 import CustomizationShop from '../components/CustomizationShop';
-import GroupChatCard from '../components/GroupChatCard';
 import MarketCard from '../components/MarketCard';
 import FeedbackFormCard from '../components/FeedbackFormCard';
 import InventoryCard from '../components/InventoryCard';
@@ -619,7 +618,8 @@ export default function FeedPage() {
                                     case 'inventory':
                                         return <InventoryCard key="inventory" onOpenShop={() => setIsShopOpen(true)} />;
                                     case 'groups':
-                                        return <GroupChatCard key="groups" />;
+                                        // Groups card removed - using Rovex Connect now
+                                        return null;
                                     case 'feedback':
                                         return <FeedbackFormCard key="feedback" />;
                                     case 'announcements':

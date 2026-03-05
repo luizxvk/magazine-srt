@@ -16,6 +16,8 @@ import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
 import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
+import BadgeDisplay from '../components/BadgeDisplay';
+import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard, StreamViewer, AudioSettingsModal } from '../components/connect';
 
 // Debug: Check if Agora App ID is available from Vite env
@@ -55,6 +57,11 @@ interface GroupMember {
     displayName?: string;
     avatarUrl?: string;
     isOnline?: boolean;
+    membershipType?: string;
+    equippedProfileBorder?: string | null;
+    isElite?: boolean;
+    eliteUntil?: string | null;
+    lastSeenAt?: string | null;
   };
 }
 
@@ -1034,8 +1041,19 @@ export default function ConnectPage() {
     setShowPresenceCard(true);
   };
 
+  // Calculate online status based on lastSeenAt (within last 5 minutes)
+  const isUserOnline = (lastSeenAt?: string | null) => {
+    if (!lastSeenAt) return false;
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+    return new Date(lastSeenAt).getTime() > fiveMinutesAgo;
+  };
+
   const getOnlineMembers = (members: GroupMember[]) => {
-    return members.filter(m => m.user.isOnline);
+    return members.filter(m => isUserOnline(m.user.lastSeenAt));
+  };
+
+  const getOfflineMembers = (members: GroupMember[]) => {
+    return members.filter(m => !isUserOnline(m.user.lastSeenAt));
   };
 
   const handleSelectGroup = (group: ConnectGroup) => {
@@ -1406,7 +1424,7 @@ export default function ConnectPage() {
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
                     <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
                   </div>
-                  <span className={`font-bold ${themeText}`}>Connect</span>
+                  <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -1484,7 +1502,7 @@ export default function ConnectPage() {
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
                 <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
               </div>
-              <span className={`font-bold ${themeText}`}>Connect</span>
+              <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -1585,57 +1603,78 @@ export default function ConnectPage() {
               Online — {getOnlineMembers(selectedGroup.members).length}
             </h3>
             <div className="space-y-2">
-              {getOnlineMembers(selectedGroup.members).map(member => (
-                <div 
-                  key={member.id}
-                  className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                  onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
-                >
-                  <div className="relative">
-                    <img
-                      src={member.user.avatarUrl || '/assets/logo-rovex.png'}
-                      className="w-8 h-8 rounded-full"
-                      alt=""
-                    />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${themeText}`}>
-                      {member.user.displayName || member.user.name}
-                    </p>
-                    {member.role !== 'MEMBER' && (
-                      <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
-                        {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 mt-6 ${themeSecondary}`}>
-              Offline — {selectedGroup.members.length - getOnlineMembers(selectedGroup.members).length}
-            </h3>
-            <div className="space-y-2 opacity-50">
-              {selectedGroup.members
-                .filter(m => !m.user.isOnline)
-                .slice(0, 10)
-                .map(member => (
+              {getOnlineMembers(selectedGroup.members).map(member => {
+                const memberIsMGT = member.user.membershipType === 'MGT';
+                return (
                   <div 
                     key={member.id}
                     className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
                     onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
                   >
-                    <img
-                      src={member.user.avatarUrl || '/assets/logo-rovex.png'}
-                      className="w-8 h-8 rounded-full grayscale"
-                      alt=""
-                    />
-                    <p className={`text-sm truncate ${themeSecondary}`}>
-                      {member.user.displayName || member.user.name}
-                    </p>
+                    <div className="relative">
+                      <div 
+                        className="w-8 h-8 rounded-full p-[2px]" 
+                        style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
+                      >
+                        <img
+                          src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                          className="w-full h-full rounded-full object-cover bg-black"
+                          alt=""
+                        />
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1">
+                        <p className={`text-sm font-medium truncate ${themeText}`}>
+                          {member.user.displayName || member.user.name}
+                        </p>
+                        <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                      </div>
+                      {member.role !== 'MEMBER' && (
+                        <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
+                          {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                ))}
+                );
+              })}
+            </div>
+
+            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 mt-6 ${themeSecondary}`}>
+              Offline — {getOfflineMembers(selectedGroup.members).length}
+            </h3>
+            <div className="space-y-2 opacity-50">
+              {getOfflineMembers(selectedGroup.members)
+                .slice(0, 10)
+                .map(member => {
+                  const memberIsMGT = member.user.membershipType === 'MGT';
+                  return (
+                    <div 
+                      key={member.id}
+                      className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
+                      onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
+                    >
+                      <div 
+                        className="w-8 h-8 rounded-full p-[2px] grayscale" 
+                        style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
+                      >
+                        <img
+                          src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                          className="w-full h-full rounded-full object-cover bg-black"
+                          alt=""
+                        />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <p className={`text-sm truncate ${themeSecondary}`}>
+                          {member.user.displayName || member.user.name}
+                        </p>
+                        <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )}
@@ -1815,56 +1854,76 @@ export default function ConnectPage() {
                 Online — {getOnlineMembers(selectedGroup.members).length}
               </h4>
               <div className="space-y-2 mb-6">
-                {getOnlineMembers(selectedGroup.members).map(member => (
-                  <div 
-                    key={member.id}
-                    className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={(e) => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e); setShowMembersDrawer(false); }}
-                  >
-                    <div className="relative">
-                      <img
-                        src={member.user.avatarUrl || '/assets/logo-rovex.png'}
-                        className="w-8 h-8 rounded-full"
-                        alt=""
-                      />
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium truncate ${themeText}`}>
-                        {member.user.displayName || member.user.name}
-                      </p>
-                      {member.role !== 'MEMBER' && (
-                        <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
-                          {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <h4 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
-                Offline — {selectedGroup.members.length - getOnlineMembers(selectedGroup.members).length}
-              </h4>
-              <div className="space-y-2 opacity-50">
-                {selectedGroup.members
-                  .filter(m => !m.user.isOnline)
-                  .map(member => (
+                {getOnlineMembers(selectedGroup.members).map(member => {
+                  const memberIsMGT = member.user.membershipType === 'MGT';
+                  return (
                     <div 
                       key={member.id}
                       className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
                       onClick={(e) => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e); setShowMembersDrawer(false); }}
                     >
-                      <img
-                        src={member.user.avatarUrl || '/assets/logo-rovex.png'}
-                        className="w-8 h-8 rounded-full grayscale"
-                        alt=""
-                      />
-                      <p className={`text-sm truncate ${themeSecondary}`}>
-                        {member.user.displayName || member.user.name}
-                      </p>
+                      <div className="relative">
+                        <div 
+                          className="w-8 h-8 rounded-full p-[2px]" 
+                          style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
+                        >
+                          <img
+                            src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                            className="w-full h-full rounded-full object-cover bg-black"
+                            alt=""
+                          />
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1">
+                          <p className={`text-sm font-medium truncate ${themeText}`}>
+                            {member.user.displayName || member.user.name}
+                          </p>
+                          <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                        </div>
+                        {member.role !== 'MEMBER' && (
+                          <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
+                            {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+              
+              <h4 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
+                Offline — {getOfflineMembers(selectedGroup.members).length}
+              </h4>
+              <div className="space-y-2 opacity-50">
+                {getOfflineMembers(selectedGroup.members).map(member => {
+                  const memberIsMGT = member.user.membershipType === 'MGT';
+                  return (
+                    <div 
+                      key={member.id}
+                      className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
+                      onClick={(e) => { handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e); setShowMembersDrawer(false); }}
+                    >
+                      <div 
+                        className="w-8 h-8 rounded-full p-[2px] grayscale" 
+                        style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
+                      >
+                        <img
+                          src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                          className="w-full h-full rounded-full object-cover bg-black"
+                          alt=""
+                        />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <p className={`text-sm truncate ${themeSecondary}`}>
+                          {member.user.displayName || member.user.name}
+                        </p>
+                        <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
           </motion.div>

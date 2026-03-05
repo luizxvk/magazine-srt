@@ -330,7 +330,18 @@ export const getConnectGroups = async (req: Request, res: Response) => {
         members: {
           include: {
             user: {
-              select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true },
+              select: { 
+                id: true, 
+                name: true, 
+                displayName: true, 
+                avatarUrl: true, 
+                isOnline: true,
+                membershipType: true,
+                equippedProfileBorder: true,
+                isElite: true,
+                eliteUntil: true,
+                lastSeenAt: true
+              },
             },
           },
         },

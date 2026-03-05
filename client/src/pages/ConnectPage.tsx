@@ -498,10 +498,14 @@ export default function ConnectPage() {
       const response = await api.get('/connect/groups');
       setGroups(response.data);
       
-      // Auto-select first group if none selected
-      if (response.data.length > 0 && !groupId) {
-        setSelectedGroup(response.data[0]);
-        setExpandedGroups(new Set([response.data[0].id]));
+      // Only select group if navigating directly to a specific group URL
+      // Don't auto-select - let user see the hub first
+      if (response.data.length > 0 && groupId) {
+        const targetGroup = response.data.find((g: ConnectGroup) => g.id === groupId);
+        if (targetGroup) {
+          setSelectedGroup(targetGroup);
+          setExpandedGroups(new Set([targetGroup.id]));
+        }
       }
     } catch (error) {
       console.error('Error fetching groups:', error);

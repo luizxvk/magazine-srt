@@ -113,6 +113,9 @@ export default function ConnectPage() {
   const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
   const [groups, setGroups] = useState<ConnectGroup[]>([]);
+  const groupsRef = useRef<ConnectGroup[]>([]);
+  // Keep ref in sync with state
+  groupsRef.current = groups;
   const [selectedGroup, setSelectedGroup] = useState<ConnectGroup | null>(null);
   const [loading, setLoading] = useState(true);
   const [socketConnecting, setSocketConnecting] = useState(true);
@@ -281,9 +284,10 @@ export default function ConnectPage() {
         updated.set(data.userId, { ...existing, isStreaming: true });
         return updated;
       });
-      // Find user info for the streamer
+      // Find user info for the streamer using ref for current data
       const findUserInGroups = () => {
-        for (const group of groups) {
+        const currentGroups = groupsRef.current;
+        for (const group of currentGroups) {
           for (const channel of group.voiceChannels) {
             const participant = channel.participants.find(p => p.user.id === data.userId);
             if (participant) {
@@ -301,7 +305,7 @@ export default function ConnectPage() {
             };
           }
         }
-        return { username: 'Usuário' };
+        return null;
       };
       
       const info = findUserInGroups();
@@ -309,7 +313,9 @@ export default function ConnectPage() {
       // Screen share uses baseUid + 50M offset (same as server)
       const baseUid = Number(agora.getAgoraUid(data.userId));
       const screenUid = String((baseUid + 50000000) % 100000000);
-      setStreamerInfo(prev => new Map(prev).set(screenUid, info));
+      if (info) {
+        setStreamerInfo(prev => new Map(prev).set(screenUid, info));
+      }
     });
 
     socket.onScreenShareStopped((data: { userId: string; channelId: string }) => {

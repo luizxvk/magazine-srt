@@ -400,10 +400,12 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       const encoderConfig = qualityPresets[quality];
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
         { encoderConfig },
-        'disable'
+        'auto' // Enable audio capture from screen share
       );
 
+      // Handle both video-only and video+audio tracks
       const videoTrack = Array.isArray(screenTrack) ? screenTrack[0] : screenTrack;
+      const audioTrack = Array.isArray(screenTrack) ? screenTrack[1] : null;
 
       await screenClientRef.current.join(
         AGORA_APP_ID,
@@ -412,7 +414,9 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         tokenData.uid
       );
 
-      await screenClientRef.current.publish([videoTrack]);
+      // Publish both video and audio tracks if available
+      const tracksToPublish = audioTrack ? [videoTrack, audioTrack] : [videoTrack];
+      await screenClientRef.current.publish(tracksToPublish);
 
       setLocalScreenTrack(videoTrack);
       setIsScreenSharing(true);

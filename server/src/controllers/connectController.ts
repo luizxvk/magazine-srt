@@ -760,3 +760,250 @@ export const deleteTextChannel = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Erro ao deletar canal de texto' });
   }
 };
+
+// ============================================
+// RECENT ACTIVITIES FOR CONNECT HUB
+// ============================================
+
+export const getRecentActivities = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    // Get user's groups to filter activities
+    const userGroups = await prisma.groupMember.findMany({
+      where: { userId },
+      select: { groupId: true },
+    });
+    const groupIds = userGroups.map(g => g.groupId);
+    
+    // Get user's friends
+    const friendships = await prisma.friendship.findMany({
+      where: {
+        OR: [
+          { requesterId: userId, status: 'ACCEPTED' },
+          { addresseeId: userId, status: 'ACCEPTED' },
+        ],
+      },
+      select: { requesterId: true, addresseeId: true },
+    });
+    const friendIds = friendships.map(f => 
+      f.requesterId === userId ? f.addresseeId : f.requesterId
+    );
+
+    // Combine relevant user IDs
+    const relevantUserIds = [...new Set([...friendIds])];
+
+    // Get recent activities from various sources
+    const activities: any[] = [];
+
+    // 1. Recent level ups from friends/group members
+    const recentLevelUps = await prisma.user.findMany({
+      where: {
+        id: { in: relevantUserIds },
+        updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }, // Last 7 days
+      },
+      select: {
+        id: true,
+        name: true,
+        displayName: true,
+        avatarUrl: true,
+        level: true,
+        updatedAt: true,
+      },
+      orderBy: { updatedAt: 'desc' },
+      take: 5,
+    });
+
+    recentLevelUps.forEach(user => {
+      activities.push({
+        id: `levelup-${user.id}`,
+        type: 'LEVEL_UP',
+        user: {
+          id: user.id,
+          name: user.name,
+          displayName: user.displayName,
+          avatarUrl: user.avatarUrl,
+        },
+        metadata: { level: user.level },
+        createdAt: user.updatedAt,
+      });
+    });
+
+    // 2. Recent badge acquisitions
+    const recentBadges = await prisma.userBadge.findMany({
+      where: {
+        userId: { in: relevantUserIds },
+        earnedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, displayName: true, avatarUrl: true },
+        },
+        badge: {
+          select: { id: true, name: true, iconPath: true },
+        },
+      },
+      orderBy: { earnedAt: 'desc' },
+      take: 5,
+    });
+
+    recentBadges.forEach(userBadge => {
+      activities.push({
+        id: `badge-${userBadge.id}`,
+        type: 'BADGE_EARNED',
+        user: userBadge.user,
+        metadata: {
+          badgeName: userBadge.badge.name,
+          badgeIcon: userBadge.badge.iconPath,
+        },
+        createdAt: userBadge.earnedAt,
+      });
+    });
+
+    // 3. Recent posts in groups
+    const recentPosts = await prisma.post.findMany({
+      where: {
+        authorId: { in: relevantUserIds },
+        createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+      },
+      include: {
+        author: {
+          select: { id: true, name: true, displayName: true, avatarUrl: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+
+    recentPosts.forEach(post => {
+      activities.push({
+        id: `post-${post.id}`,
+        type: 'POST_CREATED',
+        user: post.author,
+        metadata: {
+          preview: post.content?.substring(0, 100),
+        },
+        createdAt: post.createdAt,
+      });
+    });
+
+    // 4. Recent achievements (if achievement system exists)
+    try {
+      const recentAchievements = await prisma.userAchievement.findMany({
+        where: {
+          userId: { in: relevantUserIds },
+          unlockedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        },
+        include: {
+          user: {
+            select: { id: true, name: true, displayName: true, avatarUrl: true },
+          },
+          achievement: {
+            select: { id: true, name: true, icon: true },
+          },
+        },
+        orderBy: { unlockedAt: 'desc' },
+        take: 5,
+      });
+
+      recentAchievements.forEach(ua => {
+        activities.push({
+          id: `achievement-${ua.id}`,
+          type: 'ACHIEVEMENT',
+          user: ua.user,
+          metadata: {
+            achievementName: ua.achievement.name,
+            achievementIcon: ua.achievement.icon,
+          },
+          createdAt: ua.unlockedAt,
+        });
+      });
+    } catch (e) {
+      // Achievement table might not exist
+    }
+
+    // Sort all activities by date and limit
+    activities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    res.json({
+      activities: activities.slice(0, limit),
+    });
+  } catch (error) {
+    console.error('Error fetching recent activities:', error);
+    res.status(500).json({ error: 'Erro ao buscar atividades recentes' });
+  }
+};
+
+// ============================================
+// ONLINE FRIENDS FOR CONNECT HUB
+// ============================================
+
+export const getOnlineFriends = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+
+    // Get user's accepted friendships
+    const friendships = await prisma.friendship.findMany({
+      where: {
+        OR: [
+          { requesterId: userId, status: 'ACCEPTED' },
+          { addresseeId: userId, status: 'ACCEPTED' },
+        ],
+      },
+      include: {
+        requester: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            avatarUrl: true,
+            isOnline: true,
+            lastSeenAt: true,
+            membershipType: true,
+            equippedProfileBorder: true,
+          },
+        },
+        addressee: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            avatarUrl: true,
+            isOnline: true,
+            lastSeenAt: true,
+            membershipType: true,
+            equippedProfileBorder: true,
+          },
+        },
+      },
+    });
+
+    // Extract friends (the other person in the friendship)
+    const friends = friendships.map(f => {
+      const friend = f.requesterId === userId ? f.addressee : f.requester;
+      // Consider online if lastSeenAt is within 5 minutes
+      const isRecentlyOnline = friend.lastSeenAt 
+        ? new Date(friend.lastSeenAt).getTime() > Date.now() - 5 * 60 * 1000
+        : false;
+      
+      return {
+        ...friend,
+        isOnline: friend.isOnline || isRecentlyOnline,
+      };
+    });
+
+    // Filter to only online friends and sort
+    const onlineFriends = friends
+      .filter(f => f.isOnline)
+      .sort((a, b) => (a.displayName || a.name).localeCompare(b.displayName || b.name));
+
+    res.json({
+      friends: onlineFriends,
+      totalOnline: onlineFriends.length,
+    });
+  } catch (error) {
+    console.error('Error fetching online friends:', error);
+    res.status(500).json({ error: 'Erro ao buscar amigos online' });
+  }
+};

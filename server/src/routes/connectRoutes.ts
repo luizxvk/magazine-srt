@@ -19,6 +19,8 @@ import {
   getTextChannels,
   updateTextChannel,
   deleteTextChannel,
+  getRecentActivities,
+  getOnlineFriends,
 } from '../controllers/connectController';
 import { getMyInvites, respondInvite, inviteMember, generateInviteLink } from '../controllers/groupController';
 import { authenticateToken } from '../middleware/authMiddleware';
@@ -49,6 +51,12 @@ router.use(authenticateToken);
 
 // Get all groups with voice channels for Connect hub
 router.get('/groups', getConnectGroups);
+
+// Get recent activities for Connect hub
+router.get('/activities', getRecentActivities);
+
+// Get online friends for Connect hub
+router.get('/friends/online', getOnlineFriends);
 
 // Get current voice channel user is in
 router.get('/voice/current', getCurrentVoiceChannel);

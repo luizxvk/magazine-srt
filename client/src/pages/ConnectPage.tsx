@@ -18,7 +18,7 @@ import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard, StreamViewer, AudioSettingsModal } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard, StreamViewer, AudioSettingsModal, ConnectSidebar, ConnectHub, ConnectOnlineFriends } from '../components/connect';
 
 // Debug: Check if Agora App ID is available from Vite env
 const AGORA_APP_ID_DEBUG = (import.meta.env.VITE_AGORA_APP_ID || '').trim();
@@ -182,6 +182,9 @@ export default function ConnectPage() {
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  
+  // Hub search state
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Delete group state
   const [showDeleteGroupConfirm, setShowDeleteGroupConfirm] = useState(false);
@@ -1610,7 +1613,7 @@ export default function ConnectPage() {
           </div>
         </div>
 
-        {/* Main Content - Chat Area */}
+        {/* Main Content - Chat Area or Hub */}
         <div className="flex-1 flex flex-col">
           {selectedGroup ? (
             <ConnectGroupChat 
@@ -1623,25 +1626,25 @@ export default function ConnectPage() {
               onOpenSettings={() => setShowGroupSettings(true)}
             />
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-4">
-              {/* Group Invites */}
-              <div className="w-full max-w-md mb-6">
-                <GroupInviteCard 
-                  accentColor={accentColor}
-                  onInviteAccepted={() => fetchGroups()}
-                />
-              </div>
+            <div className="flex-1 flex">
+              {/* Hub Main Content */}
+              <ConnectHub
+                groups={groups}
+                accentColor={accentColor}
+                onGroupClick={handleSelectGroup}
+                onCreateGroup={() => setShowCreateModal(true)}
+                onUserClick={(userId) => handleOpenPresenceCard(userId)}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                isMGT={isMGT}
+              />
               
-              <div className="text-center">
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${isMGT ? 'bg-tier-std\/20' : 'bg-gold-500/20'}`}>
-                  <Radio className={`w-10 h-10 ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`} />
-                </div>
-                <h2 className={`text-xl font-bold mb-2 ${themeText}`}>
-                  Bem-vindo ao <GradientText>Rovex Connect</GradientText>
-                </h2>
-                <p className={`${themeSecondary} max-w-md`}>
-                  Selecione um grupo para começar a conversar ou entre em um canal de voz.
-                </p>
+              {/* Online Friends Sidebar - Desktop only */}
+              <div className="hidden xl:block w-72 border-l border-white/10 overflow-y-auto">
+                <ConnectOnlineFriends
+                  accentColor={accentColor}
+                  onUserClick={(userId) => handleOpenPresenceCard(userId)}
+                />
               </div>
             </div>
           )}

@@ -14,11 +14,10 @@ import api from '../services/api';
 import Header from '../components/Header';
 import LuxuriousBackground from '../components/LuxuriousBackground';
 import Loader from '../components/Loader';
-import GradientText from '../components/GradientText';
 import CreateGroupModal from '../components/CreateGroupModal';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, GroupInviteCard, StreamViewer, AudioSettingsModal, ConnectSidebar, ConnectHub, ConnectOnlineFriends } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends } from '../components/connect';
 
 // Debug: Check if Agora App ID is available from Vite env
 const AGORA_APP_ID_DEBUG = (import.meta.env.VITE_AGORA_APP_ID || '').trim();
@@ -1629,11 +1628,11 @@ export default function ConnectPage() {
             <div className="flex-1 flex">
               {/* Hub Main Content */}
               <ConnectHub
-                groups={groups}
+                groups={groups as any}
                 accentColor={accentColor}
-                onGroupClick={handleSelectGroup}
+                onGroupClick={(group: any) => handleSelectGroup(group)}
                 onCreateGroup={() => setShowCreateModal(true)}
-                onUserClick={(userId) => handleOpenPresenceCard(userId)}
+                onUserClick={(userId: string) => handleOpenPresenceCard(userId)}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 isMGT={isMGT}
@@ -1643,7 +1642,7 @@ export default function ConnectPage() {
               <div className="hidden xl:block w-72 border-l border-white/10 overflow-y-auto">
                 <ConnectOnlineFriends
                   accentColor={accentColor}
-                  onUserClick={(userId) => handleOpenPresenceCard(userId)}
+                  onFriendClick={(friendId: string) => handleOpenPresenceCard(friendId)}
                 />
               </div>
             </div>

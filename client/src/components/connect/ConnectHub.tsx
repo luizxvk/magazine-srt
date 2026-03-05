@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Search, Plus, ArrowRight, Sparkles } from 'lucide-react';
 import { ConnectGroupCard } from './ConnectGroupCard';
 import { ConnectRecentActivity } from './ConnectRecentActivity';
+import { LightRays } from '../effects';
 
 interface GroupMember {
   id: string;
@@ -55,16 +56,7 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
   onSearchChange,
   isMGT,
 }) => {
-  const [showEntryEffect, setShowEntryEffect] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Entry light effect - fades out after animation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowEntryEffect(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Filter groups based on search
   const filteredGroups = groups.filter(group =>
@@ -79,31 +71,19 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
 
   return (
     <div ref={containerRef} className="relative flex-1 overflow-y-auto">
-      {/* Entry Light Effect - top-left corner glow */}
-      <AnimatePresence>
-        {showEntryEffect && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.2 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="absolute top-0 left-0 w-[600px] h-[600px] pointer-events-none z-0"
-            style={{
-              background: `radial-gradient(circle at 0% 0%, ${accentColor}40 0%, ${accentColor}20 30%, transparent 70%)`,
-              filter: 'blur(60px)',
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Persistent subtle glow */}
-      <div 
-        className="absolute top-0 left-0 w-[400px] h-[400px] pointer-events-none z-0"
-        style={{
-          background: `radial-gradient(circle at 0% 0%, ${accentColor}15 0%, transparent 60%)`,
-          filter: 'blur(80px)',
-        }}
-      />
+      {/* WebGL Light Rays Effect - animates on entry, then static */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <LightRays
+          color={accentColor}
+          origin="top-center"
+          speed={1.5}
+          spread={0.6}
+          length={3}
+          animationDuration={3}
+          blur={80}
+          fadeDistance={1.2}
+        />
+      </div>
 
       <div className="relative z-10 p-6 md:p-8 max-w-7xl mx-auto">
         {/* Header */}

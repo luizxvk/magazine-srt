@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Volume2, VolumeX } from 'lucide-react';
-import StreamQualityModal, { StreamQuality } from './StreamQualityModal';
+import StreamQualityModal from './StreamQualityModal';
+import type { StreamQuality } from './StreamQualityModal';
 
 interface VoiceChannel {
   id: string;

@@ -52,30 +52,39 @@ export function StreamViewer({ streams, streamerInfo, onClose, isOpen }: StreamV
     };
   });
 
+  // Track the current stream object to prevent unnecessary updates
+  const currentStreamRef = useRef<MediaStream | null>(null);
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      // Force fresh selection when opening
+      setActiveStreamId(null);
+      currentStreamRef.current = null;
+    }
+  }, [isOpen]);
+
   // Select first stream if none selected
   useEffect(() => {
-    if (streamList.length > 0 && !activeStreamId) {
+    if (isOpen && streamList.length > 0 && !activeStreamId) {
       setActiveStreamId(streamList[0].odiserId);
     }
-  }, [streamList, activeStreamId]);
+  }, [isOpen, streamList, activeStreamId]);
 
   // Get active stream
   const activeStream = streamList.find(s => s.odiserId === activeStreamId);
 
-  // Track the current stream object to prevent unnecessary updates
-  const currentStreamRef = useRef<MediaStream | null>(null);
-
-  // Set video source when stream changes
+  // Set video source when stream changes or modal opens
   useEffect(() => {
-    if (videoRef.current && activeStream) {
-      // Only update srcObject if it's actually a different stream
+    if (isOpen && videoRef.current && activeStream) {
+      // Always set srcObject when opening or when stream actually changes
       if (currentStreamRef.current !== activeStream.stream) {
         currentStreamRef.current = activeStream.stream;
         videoRef.current.srcObject = activeStream.stream;
         videoRef.current.play().catch(console.error);
       }
     }
-  }, [activeStream]);
+  }, [isOpen, activeStream]);
 
   // Update volume
   useEffect(() => {

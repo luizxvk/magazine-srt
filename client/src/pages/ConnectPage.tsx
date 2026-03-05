@@ -305,9 +305,11 @@ export default function ConnectPage() {
       };
       
       const info = findUserInGroups();
-      // Store by Agora UID so it matches remoteScreenStreams key
-      const agoraUid = agora.getAgoraUid(data.userId);
-      setStreamerInfo(prev => new Map(prev).set(agoraUid, info));
+      // Store by Screen Share UID so it matches remoteScreenStreams key
+      // Screen share uses baseUid + 50M offset (same as server)
+      const baseUid = Number(agora.getAgoraUid(data.userId));
+      const screenUid = String((baseUid + 50000000) % 100000000);
+      setStreamerInfo(prev => new Map(prev).set(screenUid, info));
     });
 
     socket.onScreenShareStopped((data: { userId: string; channelId: string }) => {
@@ -326,8 +328,10 @@ export default function ConnectPage() {
       });
       setStreamerInfo(prev => {
         const updated = new Map(prev);
-        const agoraUid = agora.getAgoraUid(data.userId);
-        updated.delete(agoraUid);
+        // Screen share uses baseUid + 50M offset (same as server)
+        const baseUid = Number(agora.getAgoraUid(data.userId));
+        const screenUid = String((baseUid + 50000000) % 100000000);
+        updated.delete(screenUid);
         return updated;
       });
       // Refresh groups to update server-side state
@@ -1235,10 +1239,11 @@ export default function ConnectPage() {
                             <button
                               onClick={(e) => { 
                                 e.stopPropagation(); 
-                                // Add streamer info if not already present (use Agora UID as key)
-                                const agoraUid = agora.getAgoraUid(participant.user.id);
-                                if (!streamerInfo.has(agoraUid)) {
-                                  setStreamerInfo(prev => new Map(prev).set(agoraUid, {
+                                // Add streamer info if not already present (use screen share UID as key)
+                                const baseUid = Number(agora.getAgoraUid(participant.user.id));
+                                const screenUid = String((baseUid + 50000000) % 100000000);
+                                if (!streamerInfo.has(screenUid)) {
+                                  setStreamerInfo(prev => new Map(prev).set(screenUid, {
                                     username: participant.user.displayName || participant.user.name,
                                     avatarUrl: participant.user.avatarUrl
                                   }));

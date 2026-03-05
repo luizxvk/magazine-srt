@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Monitor, Sparkles, Maximize2, Zap, PlayCircle, Check } from 'lucide-react';
+import { X, Monitor, Sparkles, Maximize2, Zap, PlayCircle, Check, Volume2, VolumeX, AlertTriangle } from 'lucide-react';
 
 export type StreamQuality = 'hd' | 'fullhd' | 'native';
 export type StreamFrameRate = 30 | 60;
@@ -8,6 +8,7 @@ export type StreamFrameRate = 30 | 60;
 export interface StreamSettings {
   quality: StreamQuality;
   frameRate: StreamFrameRate;
+  shareAudio: boolean;
 }
 
 interface StreamQualityModalProps {
@@ -57,6 +58,7 @@ const fpsOptions: { id: StreamFrameRate; label: string; description: string }[] 
 export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }: StreamQualityModalProps) {
   const [selectedQuality, setSelectedQuality] = useState<StreamQuality>('fullhd');
   const [selectedFps, setSelectedFps] = useState<StreamFrameRate>(30);
+  const [shareAudio, setShareAudio] = useState(false);
 
   const themeBg = theme === 'light' ? 'bg-white' : 'bg-zinc-900';
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
@@ -67,7 +69,8 @@ export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }:
   const handleStartStream = () => {
     onSelect({
       quality: selectedQuality,
-      frameRate: selectedFps
+      frameRate: selectedFps,
+      shareAudio
     });
     onClose();
   };
@@ -228,6 +231,56 @@ export default function StreamQualityModal({ isOpen, onClose, onSelect, theme }:
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Audio Sharing Toggle */}
+              <div>
+                <h4 className={`text-sm font-semibold ${themeText} mb-3 flex items-center gap-2`}>
+                  <Volume2 className="w-4 h-4 text-cyan-400" />
+                  Áudio do Sistema
+                </h4>
+                <button
+                  onClick={() => setShareAudio(!shareAudio)}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all ${
+                    shareAudio 
+                      ? 'border-cyan-500 bg-cyan-500/10' 
+                      : `${themeBorder} ${themeHover}`
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                    shareAudio ? 'bg-cyan-500/20' : 'bg-gray-500/20'
+                  }`}>
+                    {shareAudio ? (
+                      <Volume2 className="w-5 h-5 text-cyan-400" />
+                    ) : (
+                      <VolumeX className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="text-left flex-1">
+                    <span className={`text-sm font-semibold block ${shareAudio ? 'text-cyan-400' : themeText}`}>
+                      {shareAudio ? 'Compartilhar áudio' : 'Sem áudio do sistema'}
+                    </span>
+                    <span className={`text-[11px] ${themeSecondary}`}>
+                      {shareAudio ? 'O som da sua tela será transmitido' : 'Apenas vídeo será compartilhado'}
+                    </span>
+                  </div>
+                  <div className={`w-12 h-6 rounded-full transition-colors relative ${
+                    shareAudio ? 'bg-cyan-500' : 'bg-gray-600'
+                  }`}>
+                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                      shareAudio ? 'translate-x-7' : 'translate-x-1'
+                    }`} />
+                  </div>
+                </button>
+                
+                {shareAudio && (
+                  <div className={`mt-2 p-2.5 rounded-lg flex items-start gap-2 ${theme === 'light' ? 'bg-amber-50 border border-amber-200' : 'bg-amber-500/10 border border-amber-500/20'}`}>
+                    <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <p className={`text-[11px] ${theme === 'light' ? 'text-amber-700' : 'text-amber-300'}`}>
+                      O volume da chamada será reduzido automaticamente para evitar eco. Use fones de ouvido para melhor experiência.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Info Box */}

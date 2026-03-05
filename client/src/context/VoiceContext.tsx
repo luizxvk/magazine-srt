@@ -53,7 +53,7 @@ interface VoiceContextType {
   joinChannel: (channelId: string, userId: string, token?: string, voiceInfo?: Omit<VoiceState, 'joinedAt'>) => Promise<boolean>;
   leaveChannel: () => Promise<void>;
   toggleMute: () => Promise<void>;
-  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>, quality: 'hd' | 'fullhd' | 'native', frameRate: 30 | 60, onStop?: () => void) => Promise<boolean>;
+  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>, quality: 'hd' | 'fullhd' | 'native', frameRate: 30 | 60, shareAudio: boolean, onStop?: () => void) => Promise<boolean>;
   stopScreenShare: () => Promise<void>;
   
   // Volume levels
@@ -82,6 +82,9 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   
   const [localScreenTrack, setLocalScreenTrack] = useState<ILocalVideoTrack | null>(null);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+  
+  // Track volume before screen share to restore later
+  const volumeBeforeScreenShareRef = useRef<number | null>(null);
   
   const [remoteUsers, setRemoteUsers] = useState<IAgoraRTCRemoteUser[]>([]);
   
@@ -372,6 +375,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>,
     quality: 'hd' | 'fullhd' | 'native' = 'hd',
     frameRate: 30 | 60 = 30,
+    shareAudio: boolean = false,
     onStop?: () => void
   ): Promise<boolean> => {
     if (!channelIdRef.current) {
@@ -398,9 +402,10 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       }
 
       const encoderConfig = qualityPresets[quality];
+      // Only capture system audio if user explicitly enabled it
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
         { encoderConfig },
-        'auto' // Enable audio capture from screen share
+        shareAudio ? 'auto' : 'disable'
       );
 
       // Handle both video-only and video+audio tracks
@@ -417,6 +422,17 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       // Publish both video and audio tracks if available
       const tracksToPublish = audioTrack ? [videoTrack, audioTrack] : [videoTrack];
       await screenClientRef.current.publish(tracksToPublish);
+
+      // If sharing audio, reduce call volume to prevent feedback
+      if (shareAudio && clientRef.current) {
+        volumeBeforeScreenShareRef.current = outputVolumeRef.current;
+        // Reduce volume to 30% to minimize feedback
+        const reducedVolume = Math.min(30, outputVolumeRef.current * 0.3);
+        clientRef.current.remoteUsers.forEach(user => {
+          user.audioTrack?.setVolume(reducedVolume);
+        });
+        console.log('[VoiceContext] Reduced remote volume to prevent feedback:', reducedVolume);
+      }
 
       setLocalScreenTrack(videoTrack);
       setIsScreenSharing(true);
@@ -450,6 +466,16 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       } catch (e) {
         console.error('[VoiceContext] Screen client leave error:', e);
       }
+    }
+
+    // Restore volume if it was reduced during screen share
+    if (volumeBeforeScreenShareRef.current !== null && clientRef.current) {
+      const volumeToRestore = volumeBeforeScreenShareRef.current;
+      clientRef.current.remoteUsers.forEach(user => {
+        user.audioTrack?.setVolume(volumeToRestore);
+      });
+      console.log('[VoiceContext] Restored remote volume to:', volumeToRestore);
+      volumeBeforeScreenShareRef.current = null;
     }
 
     setIsScreenSharing(false);

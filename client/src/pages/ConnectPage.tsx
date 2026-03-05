@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, Plus, Volume2, MicOff, Menu,
+  Users, Plus, Volume2, MicOff, Menu, Home,
   Settings, Hash, ChevronRight, ChevronDown, Radio, X,
   Camera, HeadphoneOff, Pencil, Phone, Bot, Link, Copy, UserPlus, Mail, Edit3, Check, Trash2
 } from 'lucide-react';
@@ -1088,6 +1088,14 @@ export default function ConnectPage() {
     setShowMobileSidebar(false);
   };
 
+  // Return to hub view (deselect group)
+  const handleReturnToHub = () => {
+    setSelectedGroup(null);
+    setSelectedTextChannel(null);
+    navigate('/connect');
+    setShowMobileSidebar(false);
+  };
+
   // Render groups list (used in both desktop and mobile)
   const renderGroupsList = () => {
     if (groups.length === 0) {
@@ -1476,13 +1484,23 @@ export default function ConnectPage() {
             >
               {/* Mobile Sidebar Header */}
               <div className={`p-4 border-b ${themeBorder} flex items-center justify-between safe-area-top`}>
-                <div className="flex items-center gap-2">
+                <button
+                  onClick={handleReturnToHub}
+                  className="flex items-center gap-2"
+                >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
                     <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
                   </div>
                   <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
-                </div>
-                <div className="flex items-center gap-2">
+                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={handleReturnToHub}
+                    className={`p-2 rounded-lg ${themeHover} ${themeSecondary} ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
+                    title="Hub"
+                  >
+                    <Home className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className={`p-2 rounded-lg ${themeHover} ${themeSecondary}`}
@@ -1554,18 +1572,31 @@ export default function ConnectPage() {
         <div className={`hidden md:flex w-64 ${themeSidebar} border-r ${themeBorder} flex-col`}>
           {/* Header */}
           <div className={`p-4 border-b ${themeBorder} flex items-center justify-between`}>
-            <div className="flex items-center gap-2">
+            <button
+              onClick={handleReturnToHub}
+              className={`flex items-center gap-2 ${themeHover} rounded-lg px-2 py-1 transition-colors`}
+              title="Voltar ao Hub"
+            >
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
                 <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
               </div>
               <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className={`p-2 rounded-lg ${themeHover} ${themeSecondary} transition-colors`}
-            >
-              <Plus className="w-5 h-5" />
             </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleReturnToHub}
+                className={`p-2 rounded-lg ${themeHover} ${themeSecondary} transition-colors ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
+                title="Hub"
+              >
+                <Home className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className={`p-2 rounded-lg ${themeHover} ${themeSecondary} transition-colors`}
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Groups List */}

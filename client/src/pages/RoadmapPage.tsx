@@ -432,6 +432,42 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Wifi className="w-5 h-5" />,
         category: 'improvement'
     },
+    {
+        id: '29w',
+        title: 'Connect no Menu Lateral',
+        description: 'Rovex Connect agora acessível pelo atalho da barra lateral com tag NEW.',
+        status: 'completed',
+        version: 'v0.5.0-rc.18',
+        icon: <Wifi className="w-5 h-5" />,
+        category: 'feature'
+    },
+    {
+        id: '29x',
+        title: 'RichPresence com Bordas',
+        description: 'Card de Rich Presence agora exibe bordas de perfil e badges Elite.',
+        status: 'completed',
+        version: 'v0.5.0-rc.18',
+        icon: <Users className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29y',
+        title: 'Botão Amigo Inteligente',
+        description: 'Botão de adicionar amigo oculto automaticamente se já for amigo.',
+        status: 'completed',
+        version: 'v0.5.0-rc.18',
+        icon: <Users className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29z',
+        title: 'Cor Roxa Persistente',
+        description: 'Corrigido bug que fazia a cor voltar para laranja ao atualizar a página.',
+        status: 'completed',
+        version: 'v0.5.0-rc.18',
+        icon: <Palette className="w-5 h-5" />,
+        category: 'improvement'
+    },
     
     // ===== IN PROGRESS =====
     {

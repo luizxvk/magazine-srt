@@ -21,6 +21,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import api from '../../services/api';
+import { getProfileBorderGradient } from '../../utils/profileBorderUtils';
+import BadgeDisplay from '../BadgeDisplay';
 
 interface UserDetails {
   id: string;
@@ -36,6 +38,7 @@ interface UserDetails {
   prestigeLevel?: number;
   prestigeStars?: number;
   equippedBadge?: string | null;
+  equippedProfileBorder?: string | null;
   profileBgUrl?: string | null;
   isVerified?: boolean;
   membershipType?: 'MAGAZINE' | 'MGT';
@@ -375,26 +378,28 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
 
                   {/* Avatar & Info */}
                   <div className="relative px-4 -mt-10">
-                    {/* Avatar */}
+                    {/* Avatar with profile border */}
                     <div className="relative inline-block">
                       <div 
-                        className="w-20 h-20 rounded-full border-4 overflow-hidden"
-                        style={{ borderColor: '#0a0a0f' }}
+                        className="w-20 h-20 rounded-full p-[3px]"
+                        style={{ background: getProfileBorderGradient(userDetails.equippedProfileBorder, userDetails.membershipType === 'MGT') }}
                       >
-                        {userDetails.avatarUrl ? (
-                          <img 
-                            src={userDetails.avatarUrl} 
-                            alt={userDetails.displayName || userDetails.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div 
-                            className="w-full h-full flex items-center justify-center text-2xl font-bold text-white"
-                            style={{ backgroundColor: accentColor }}
-                          >
-                            {(userDetails.displayName || userDetails.name).charAt(0).toUpperCase()}
-                          </div>
-                        )}
+                        <div className="w-full h-full rounded-full overflow-hidden" style={{ backgroundColor: '#0a0a0f' }}>
+                          {userDetails.avatarUrl ? (
+                            <img 
+                              src={userDetails.avatarUrl} 
+                              alt={userDetails.displayName || userDetails.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div 
+                              className="w-full h-full flex items-center justify-center text-2xl font-bold text-white"
+                              style={{ backgroundColor: accentColor }}
+                            >
+                              {(userDetails.displayName || userDetails.name).charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Online indicator */}
@@ -423,6 +428,7 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                         <h3 className="text-lg font-bold text-white">
                           {userDetails.displayName || userDetails.name}
                         </h3>
+                        <BadgeDisplay userId={userDetails.id} isElite={userDetails.isElite} eliteUntil={userDetails.eliteUntil} size="sm" />
                         {userDetails.isVerified && (
                           <div 
                             className="relative group cursor-pointer"
@@ -621,7 +627,8 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                           <MessageSquare size={16} />
                           Mensagem
                         </button>
-                        {(() => {
+                        {/* Only show add friend button if NOT already friends */}
+                        {!userDetails?.isFriend && (() => {
                           const friendState = getFriendButtonState();
                           const IconComponent = friendState.icon;
                           return (
@@ -629,16 +636,9 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                               onClick={handleFriendAction}
                               disabled={friendActionLoading}
                               className={`group flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${friendState.color} ${friendActionLoading ? 'opacity-50' : ''}`}
-                              title={userDetails?.isFriend ? 'Remover amigo' : userDetails?.friendRequestSent ? 'Pedido pendente' : 'Adicionar amigo'}
+                              title={userDetails?.friendRequestSent ? 'Pedido pendente' : 'Adicionar amigo'}
                             >
-                              {userDetails?.isFriend ? (
-                                <>
-                                  <UserCheck size={16} className="group-hover:hidden" />
-                                  <UserMinus size={16} className="hidden group-hover:block" />
-                                </>
-                              ) : (
-                                <IconComponent size={16} />
-                              )}
+                              <IconComponent size={16} />
                               {friendState.text && <span className="hidden sm:inline">{friendState.text}</span>}
                             </button>
                           );

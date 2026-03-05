@@ -77,10 +77,10 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   logoIconUrl: '/assets/logo-rovex.png',
   faviconUrl: '/favicon.ico',
   
-  // Cores do Magazine
-  primaryColor: '#d4af37',      // Dourado
-  secondaryColor: '#50c878',    // Esmeralda
-  accentColor: '#f59e0b',       // Âmbar
+  // Cores do Magazine (roxo claro Rovex)
+  primaryColor: '#A78BFA',      // Roxo claro
+  secondaryColor: '#8B5CF6',    // Roxo médio
+  accentColor: '#A78BFA',       // Roxo claro (destaque)
   
   // Nomenclaturas Magazine
   currencyName: 'Zions',

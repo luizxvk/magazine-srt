@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.17';
+const CURRENT_VERSION = '0.5.0-rc.18';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -45,45 +45,45 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const page1Updates: UpdateItem[] = [
         {
             icon: <Wifi className="w-5 h-5" />,
-            title: 'Rovex Connect Aprimorado',
-            description: 'Título com fonte Social, bordas e badges nos perfis de membros do Connect.',
+            title: 'Rovex Connect no Menu',
+            description: 'Rovex Connect agora acessível pelo atalho lateral com tag NEW.',
             isNew: true
         },
         {
             icon: <Users className="w-5 h-5" />,
-            title: 'Status Online Corrigido',
-            description: 'Detecção precisa online/offline baseada em lastSeenAt (5 min) no Connect.',
+            title: 'RichPresence Aprimorado',
+            description: 'Bordas de perfil e badges Elite agora exibidas no card de presença.',
             isNew: true
         },
         {
             icon: <Users className="w-5 h-5" />,
-            title: 'Convites Unificados',
-            description: 'Aba Convites removida! Convites de grupos Rovex Connect agora em Solicitações.',
-            isNew: false
+            title: 'Botão Amigo Inteligente',
+            description: 'Botão de adicionar amigo some automaticamente se já for amigo.',
+            isNew: true
         },
         {
             icon: <Palette className="w-5 h-5" />,
-            title: 'Tema Roxo Claro',
-            description: 'Nova cor de destaque roxo claro (#A78BFA) no template base Rovex Communities.',
+            title: 'Cor Roxa Persistente',
+            description: 'Corrigido bug que fazia a cor voltar para laranja ao atualizar.',
             isNew: true
         },
         {
             icon: <Volume2 className="w-5 h-5" />,
             title: 'Audio Settings Centralizado',
             description: 'Card de configurações de áudio agora centralizado na tela corretamente.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Smartphone className="w-5 h-5" />,
             title: 'RichPresence Mobile',
             description: 'Card de Rich Presence agora centralizado no modo mobile.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Bell className="w-5 h-5" />,
             title: 'Badge NEW Corrigido',
             description: 'Badge NEW nos cards de acesso rápido não corta mais no canto superior.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <MessageSquareText className="w-5 h-5" />,

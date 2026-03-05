@@ -209,16 +209,36 @@ export default function ConnectPage() {
     });
   }, [agora.remoteUsers]);
 
+  // Ref to track existing MediaStream objects by uid to prevent flickering
+  const streamsCacheRef = useRef<Map<string, { stream: MediaStream; trackId: string }>>(new Map());
+
   // Convert Agora remote video tracks to Map for StreamViewer compatibility
+  // Uses ref cache to prevent recreating MediaStream objects on every render
   const remoteScreenStreams = useMemo(() => {
     const map = new Map<string, MediaStream>();
+    const newCache = new Map<string, { stream: MediaStream; trackId: string }>();
+    
     agora.remoteUsers.forEach(user => {
       if (user.videoTrack) {
-        // Create a MediaStream from the Agora video track
-        const stream = new MediaStream([user.videoTrack.getMediaStreamTrack()]);
-        map.set(String(user.uid), stream);
+        const uid = String(user.uid);
+        const currentTrackId = user.videoTrack.getMediaStreamTrack().id;
+        const cached = streamsCacheRef.current.get(uid);
+        
+        // Reuse existing stream if track hasn't changed
+        if (cached && cached.trackId === currentTrackId) {
+          map.set(uid, cached.stream);
+          newCache.set(uid, cached);
+        } else {
+          // Create new MediaStream only when track changes
+          const stream = new MediaStream([user.videoTrack.getMediaStreamTrack()]);
+          map.set(uid, stream);
+          newCache.set(uid, { stream, trackId: currentTrackId });
+        }
       }
     });
+    
+    // Update cache
+    streamsCacheRef.current = newCache;
     return map;
   }, [agora.remoteUsers]);
 
@@ -285,7 +305,9 @@ export default function ConnectPage() {
       };
       
       const info = findUserInGroups();
-      setStreamerInfo(prev => new Map(prev).set(data.userId, info));
+      // Store by Agora UID so it matches remoteScreenStreams key
+      const agoraUid = agora.getAgoraUid(data.userId);
+      setStreamerInfo(prev => new Map(prev).set(agoraUid, info));
     });
 
     socket.onScreenShareStopped((data: { userId: string; channelId: string }) => {
@@ -304,7 +326,8 @@ export default function ConnectPage() {
       });
       setStreamerInfo(prev => {
         const updated = new Map(prev);
-        updated.delete(data.userId);
+        const agoraUid = agora.getAgoraUid(data.userId);
+        updated.delete(agoraUid);
         return updated;
       });
       // Refresh groups to update server-side state
@@ -669,7 +692,7 @@ export default function ConnectPage() {
   };
 
   // Screen sharing handler
-  const handleToggleScreenShare = async () => {
+  const handleToggleScreenShare = async (quality?: 'hd' | 'fullhd' | 'native') => {
     try {
       if (agora.isScreenSharing) {
         await agora.stopScreenShare();
@@ -687,7 +710,23 @@ export default function ConnectPage() {
         }
         showToast('Compartilhamento de tela encerrado');
       } else {
-        const success = await agora.startScreenShare(getScreenShareToken);
+        // Callback for when browser's native "Stop sharing" is clicked
+        const onScreenShareStopped = () => {
+          if (currentVoice) {
+            socket.stopScreenShare(currentVoice.channelId);
+          }
+          if (user) {
+            setVoiceParticipantStates(prev => {
+              const updated = new Map(prev);
+              const existing = updated.get(user.id) || { isMuted: false, isDeafened: false, isStreaming: false };
+              updated.set(user.id, { ...existing, isStreaming: false });
+              return updated;
+            });
+          }
+          showToast('Compartilhamento de tela encerrado');
+        };
+        
+        const success = await agora.startScreenShare(getScreenShareToken, quality || 'hd', onScreenShareStopped);
         if (success && currentVoice) {
           socket.startScreenShare(currentVoice.channelId);
           // Update local streaming state
@@ -1194,9 +1233,10 @@ export default function ConnectPage() {
                             <button
                               onClick={(e) => { 
                                 e.stopPropagation(); 
-                                // Add streamer info if not already present
-                                if (!streamerInfo.has(participant.user.id)) {
-                                  setStreamerInfo(prev => new Map(prev).set(participant.user.id, {
+                                // Add streamer info if not already present (use Agora UID as key)
+                                const agoraUid = agora.getAgoraUid(participant.user.id);
+                                if (!streamerInfo.has(agoraUid)) {
+                                  setStreamerInfo(prev => new Map(prev).set(agoraUid, {
                                     username: participant.user.displayName || participant.user.name,
                                     avatarUrl: participant.user.avatarUrl
                                   }));

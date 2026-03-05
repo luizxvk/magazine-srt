@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Radio, Volume2, VolumeX } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Signal, Monitor, MonitorOff, Volume2, VolumeX } from 'lucide-react';
+import StreamQualityModal, { StreamQuality } from './StreamQualityModal';
 
 interface VoiceChannel {
   id: string;
@@ -23,7 +24,7 @@ interface VoiceChannelBarProps {
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
   onToggleDeafen: () => void;
-  onToggleScreenShare?: () => void;
+  onToggleScreenShare?: (quality?: StreamQuality) => void;
   onWatchStream?: () => void;
   onDisconnect: () => void;
   theme: 'light' | 'dark';
@@ -46,9 +47,24 @@ export default function VoiceChannelBar({
   theme
 }: VoiceChannelBarProps) {
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [showQualityModal, setShowQualityModal] = useState(false);
   const themeBorder = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const themeText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const themeSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+
+  const handleScreenShareClick = () => {
+    if (isScreenSharing) {
+      // If already sharing, just stop
+      onToggleScreenShare?.();
+    } else {
+      // Show quality selection modal
+      setShowQualityModal(true);
+    }
+  };
+
+  const handleQualitySelect = (quality: StreamQuality) => {
+    onToggleScreenShare?.(quality);
+  };
 
   // Determine ping quality and color
   const getPingColor = () => {
@@ -155,7 +171,7 @@ export default function VoiceChannelBar({
           
           {/* Volume Slider Popup */}
           {showVolumeSlider && (
-            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 rounded-lg shadow-lg ${
+            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 rounded-lg shadow-lg z-50 ${
               theme === 'light' ? 'bg-white border border-gray-200' : 'bg-zinc-800 border border-white/10'
             }`}>
               <div className="flex flex-col items-center gap-2 w-12">
@@ -182,7 +198,7 @@ export default function VoiceChannelBar({
         {/* Screen Share Button */}
         {onToggleScreenShare && (
           <button
-            onClick={onToggleScreenShare}
+            onClick={handleScreenShareClick}
             className={`p-2.5 rounded-full transition-all ${
               isScreenSharing 
                 ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
@@ -191,17 +207,6 @@ export default function VoiceChannelBar({
             title={isScreenSharing ? 'Parar compartilhamento' : 'Compartilhar tela'}
           >
             {isScreenSharing ? <MonitorOff className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
-          </button>
-        )}
-
-        {/* Watch Stream Button (when someone is streaming) */}
-        {hasActiveStreams && onWatchStream && (
-          <button
-            onClick={onWatchStream}
-            className="p-2.5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
-            title="Assistir transmissão"
-          >
-            <Radio className="w-4 h-4" />
           </button>
         )}
 
@@ -214,6 +219,28 @@ export default function VoiceChannelBar({
           <PhoneOff className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Watch Stream Button (separate row when someone is streaming) */}
+      {hasActiveStreams && onWatchStream && (
+        <button
+          onClick={onWatchStream}
+          className="mt-2 w-full py-2 px-3 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all flex items-center justify-center gap-2 text-sm font-medium"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+          </span>
+          Assistir Transmissão
+        </button>
+      )}
+
+      {/* Quality Selection Modal */}
+      <StreamQualityModal
+        isOpen={showQualityModal}
+        onClose={() => setShowQualityModal(false)}
+        onSelect={handleQualitySelect}
+        theme={theme}
+      />
     </motion.div>
   );
 }

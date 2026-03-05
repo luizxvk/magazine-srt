@@ -41,12 +41,16 @@ export function StreamViewer({ streams, streamerInfo, onClose, isOpen }: StreamV
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Get list of streams
-  const streamList: StreamInfo[] = Array.from(streams.entries()).map(([odiserId, stream]) => ({
-    odiserId,
-    stream,
-    username: streamerInfo.get(odiserId)?.username || `Usuário ${odiserId.slice(0, 8)}`,
-    avatarUrl: streamerInfo.get(odiserId)?.avatarUrl
-  }));
+  const streamList: StreamInfo[] = Array.from(streams.entries()).map(([odiserId, stream]) => {
+    // Try to find user info using both the raw UID and converted UID
+    const info = streamerInfo.get(odiserId);
+    return {
+      odiserId,
+      stream,
+      username: info?.username || `Usuário ${odiserId.slice(0, 8)}`,
+      avatarUrl: info?.avatarUrl
+    };
+  });
 
   // Select first stream if none selected
   useEffect(() => {
@@ -58,11 +62,18 @@ export function StreamViewer({ streams, streamerInfo, onClose, isOpen }: StreamV
   // Get active stream
   const activeStream = streamList.find(s => s.odiserId === activeStreamId);
 
+  // Track the current stream object to prevent unnecessary updates
+  const currentStreamRef = useRef<MediaStream | null>(null);
+
   // Set video source when stream changes
   useEffect(() => {
     if (videoRef.current && activeStream) {
-      videoRef.current.srcObject = activeStream.stream;
-      videoRef.current.play().catch(console.error);
+      // Only update srcObject if it's actually a different stream
+      if (currentStreamRef.current !== activeStream.stream) {
+        currentStreamRef.current = activeStream.stream;
+        videoRef.current.srcObject = activeStream.stream;
+        videoRef.current.play().catch(console.error);
+      }
     }
   }, [activeStream]);
 

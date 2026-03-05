@@ -1174,7 +1174,12 @@ export const postImageMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { groupId } = req.params;
-    const { imageUrl, content, isNSFW } = req.body;
+    const { imageUrl, content, isNSFW, textChannelId: rawTextChannelId } = req.body;
+    
+    // Normalize textChannelId
+    const textChannelId = (rawTextChannelId && rawTextChannelId !== 'null' && rawTextChannelId.trim() !== '') 
+      ? rawTextChannelId 
+      : null;
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuário não autenticado' });
@@ -1246,7 +1251,8 @@ export const postImageMessage = async (req: AuthRequest, res: Response) => {
         content: content || '',
         type: MessageType.IMAGE,
         imageUrl,
-        isNSFW: isNSFW || false
+        isNSFW: isNSFW || false,
+        textChannelId
       },
       include: {
         sender: {

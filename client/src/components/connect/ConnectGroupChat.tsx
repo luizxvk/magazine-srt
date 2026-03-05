@@ -269,12 +269,20 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
 
     setUploadingImage(true);
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('channelId', textChannel?.id || 'default');
-
-      await api.post(`/groups/${group.id}/messages`, formData, {
+      // Step 1: Upload image to get URL
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
+      
+      const uploadResponse = await api.post('/upload/group', uploadFormData, {
         headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const imageUrl = uploadResponse.data.imageUrl;
+      
+      // Step 2: Post message with imageUrl
+      await api.post(`/groups/${group.id}/messages/image`, {
+        imageUrl,
+        textChannelId: textChannel?.id || ''
       });
 
       showToast('Imagem enviada');

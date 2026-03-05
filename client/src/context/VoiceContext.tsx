@@ -53,7 +53,7 @@ interface VoiceContextType {
   joinChannel: (channelId: string, userId: string, token?: string, voiceInfo?: Omit<VoiceState, 'joinedAt'>) => Promise<boolean>;
   leaveChannel: () => Promise<void>;
   toggleMute: () => Promise<void>;
-  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>) => Promise<boolean>;
+  startScreenShare: (getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>, quality: 'hd' | 'fullhd' | 'native', onStop?: () => void) => Promise<boolean>;
   stopScreenShare: () => Promise<void>;
   
   // Volume levels
@@ -369,12 +369,21 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   }, [localAudioTrack, isMuted]);
 
   const startScreenShare = useCallback(async (
-    getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>
+    getToken: (channelId: string) => Promise<{ token: string; uid: number } | null>,
+    quality: 'hd' | 'fullhd' | 'native' = 'hd',
+    onStop?: () => void
   ): Promise<boolean> => {
     if (!channelIdRef.current) {
       console.error('[VoiceContext] No channel to share screen to');
       return false;
     }
+
+    // Define quality presets
+    const qualityPresets = {
+      hd: { width: 1280, height: 720, frameRate: 30, bitrateMax: 2500 },
+      fullhd: { width: 1920, height: 1080, frameRate: 30, bitrateMax: 4000 },
+      native: { frameRate: 30 } // Native resolution
+    };
 
     try {
       if (!screenClientRef.current) {
@@ -387,8 +396,9 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
+      const encoderConfig = qualityPresets[quality];
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
-        { encoderConfig: { frameRate: 30 } },
+        { encoderConfig },
         'disable'
       );
 
@@ -409,6 +419,10 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       videoTrack.on('track-ended', async () => {
         console.log('[VoiceContext] Screen share ended by user');
         await stopScreenShare();
+        // Notify caller that screen share was stopped by browser
+        if (onStop) {
+          onStop();
+        }
       });
 
       console.log('[VoiceContext] Screen sharing started');

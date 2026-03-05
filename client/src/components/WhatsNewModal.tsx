@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, PanelRight, Users, Dices, Eye, Megaphone, Palette, Volume2, Smartphone, Bell, MessageSquareText, Wifi } from 'lucide-react';
+import { X, Sparkles, Check, Swords, ChevronLeft, ChevronRight, Video, Film, LayoutDashboard, PanelRight, Users, Dices, Eye, Megaphone, Palette, Volume2, Bell, MessageSquareText, Wifi } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTierColors } from '../hooks/useTierColors';
 import { useLocation } from 'react-router-dom';
 
-const CURRENT_VERSION = '0.5.0-rc.19';
+const CURRENT_VERSION = '0.5.0-rc.20';
 
 interface UpdateItem {
     icon: React.ReactNode;
@@ -45,44 +45,44 @@ export default function WhatsNewModal({ isOpen: externalIsOpen, onClose: externa
     const page1Updates: UpdateItem[] = [
         {
             icon: <Wifi className="w-5 h-5" />,
+            title: 'WelcomeTour Fullscreen',
+            description: 'Tela de boas-vindas agora ocupa a tela inteira no mobile sem navbar.',
+            isNew: true
+        },
+        {
+            icon: <Volume2 className="w-5 h-5" />,
+            title: 'Online Count Público',
+            description: 'Endpoint de contagem online não requer mais autenticação (401 corrigido).',
+            isNew: true
+        },
+        {
+            icon: <Bell className="w-5 h-5" />,
+            title: 'Navbar Oculta no Tour',
+            description: 'Bottom Navigation agora esconde durante o WelcomeTour.',
+            isNew: true
+        },
+        {
+            icon: <Wifi className="w-5 h-5" />,
             title: 'Promo Connect Compacto',
             description: 'Card de promo do Connect agora compacto em uma linha com botão de fechar.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Volume2 className="w-5 h-5" />,
             title: 'Rádio Simplificado',
             description: 'Card da Rádio sem card externo para visual mais limpo.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Users className="w-5 h-5" />,
             title: 'RichPresence com Badges',
             description: 'Badges admin (BETA, etc) agora aparecem no card de presença.',
-            isNew: true
+            isNew: false
         },
         {
             icon: <Palette className="w-5 h-5" />,
             title: 'Cor Roxa Persistente',
             description: 'Corrigido bug que fazia a cor voltar para laranja ao atualizar.',
-            isNew: false
-        },
-        {
-            icon: <Volume2 className="w-5 h-5" />,
-            title: 'Audio Settings Centralizado',
-            description: 'Card de configurações de áudio agora centralizado na tela corretamente.',
-            isNew: false
-        },
-        {
-            icon: <Smartphone className="w-5 h-5" />,
-            title: 'RichPresence Mobile',
-            description: 'Card de Rich Presence agora centralizado no modo mobile.',
-            isNew: false
-        },
-        {
-            icon: <Bell className="w-5 h-5" />,
-            title: 'Badge NEW Corrigido',
-            description: 'Badge NEW nos cards de acesso rápido não corta mais no canto superior.',
             isNew: false
         },
         {

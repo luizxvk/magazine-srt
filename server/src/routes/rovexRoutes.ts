@@ -288,11 +288,12 @@ router.get('/public/config', async (req: Request, res: Response) => {
     const baseConfig = tenantConfig || {};
     
     // Mescla config - tenant config tem prioridade sobre saved config
+    // IMPORTANTE: name e slogan SEMPRE usam o valor padrão para evitar configs antigas
     const config = {
       id: baseConfig.id || savedConfig?.id || 'magazine-srt',
       subdomain: baseConfig.subdomain || savedConfig?.subdomain || 'magazine-srt',
-      name: baseConfig.name || savedConfig?.name || 'Rovex Communities',
-      slogan: baseConfig.slogan || savedConfig?.slogan || 'A comunidade definitiva',
+      name: baseConfig.name || 'Rovex Communities',
+      slogan: baseConfig.slogan || 'Plataforma Social Gamificada',
       
       // Cores - TENANT CONFIG tem prioridade!
       primaryColor: baseConfig.primaryColor || savedConfig?.primaryColor || '#A78BFA',
@@ -307,10 +308,10 @@ router.get('/public/config', async (req: Request, res: Response) => {
       tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'ROVEX',
       tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
       
-      // Logos - TENANT CONFIG tem prioridade!
-      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-mgzn.png',
+      // Logos - TENANT CONFIG tem prioridade! (defaults são Rovex)
+      logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-rovex.png',
       logoIconUrl: baseConfig.logoIconUrl || savedConfig?.logoIconUrl || '/assets/logo-rovex.png',
-      faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || '/favicon.ico',
+      faviconUrl: baseConfig.faviconUrl || savedConfig?.faviconUrl || '/assets/logo-rovex.png',
       
       // Economia - TENANT CONFIG tem prioridade!
       currencyName: baseConfig.currencyName || savedConfig?.currencyName || 'Zions',

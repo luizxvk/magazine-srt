@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const TOUR_VERSION = '0.5.0-rc.19';
+const TOUR_VERSION = '0.5.0-rc.20';
 
 interface WelcomeTourProps {
     isOpen?: boolean;
@@ -24,6 +24,15 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
 
     // Use external state if provided, otherwise use internal state
     const isVisible = externalIsOpen !== undefined ? externalIsOpen : internalIsVisible;
+
+    // Dispatch event to hide BottomNavigation when WelcomeTour is open
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('welcomeTourStateChange', { detail: { isOpen: isVisible } }));
+        return () => {
+            // Cleanup: ensure navbar is shown when component unmounts
+            window.dispatchEvent(new CustomEvent('welcomeTourStateChange', { detail: { isOpen: false } }));
+        };
+    }, [isVisible]);
 
     useEffect(() => {
         // Only auto-show if using internal state (no external control)
@@ -187,7 +196,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-0 sm:p-4"
             >
                 {isWelcomeHero ? (
                     // =============================================
@@ -197,7 +206,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className={`relative max-w-[calc(100%-2rem)] sm:max-w-2xl w-full mx-auto ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl rounded-[2rem] border ${accentBorder} ${accentGlow} overflow-hidden`}
+                        className={`relative w-full h-full sm:h-auto sm:max-w-2xl sm:w-full sm:mx-auto ${isDark ? 'bg-gradient-to-b from-white/[0.08] to-white/[0.02]' : 'bg-white/95'} backdrop-blur-2xl sm:rounded-[2rem] border-0 sm:border ${accentBorder} ${accentGlow} overflow-hidden flex flex-col justify-center`}
                     >
                         {/* Animated gradient background */}
                         <div className="absolute inset-0 overflow-hidden">
@@ -417,7 +426,7 @@ export default function WelcomeTour({ isOpen: externalIsOpen, onClose: externalO
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -50, opacity: 0 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className={`${isDark ? (isMGT ? 'bg-tier-std-950/90' : 'bg-[#0a0a0a]') : 'bg-white'} border ${isDark ? (isMGT ? 'border-tier-std-500/30' : 'border-gold-500/30') : (isMGT ? 'border-tier-std-500/20' : 'border-gold-500/20')} rounded-2xl p-6 sm:p-8 max-w-lg w-full text-center relative ${accentGlow}`}
+                        className={`${isDark ? (isMGT ? 'bg-tier-std-950/90' : 'bg-[#0a0a0a]') : 'bg-white'} border-0 sm:border ${isDark ? (isMGT ? 'sm:border-tier-std-500/30' : 'sm:border-gold-500/30') : (isMGT ? 'sm:border-tier-std-500/20' : 'sm:border-gold-500/20')} sm:rounded-2xl p-6 sm:p-8 w-full h-full sm:h-auto sm:max-w-lg flex flex-col justify-center items-center text-center relative ${accentGlow}`}
                     >
                         {/* BETA Badge */}
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2">

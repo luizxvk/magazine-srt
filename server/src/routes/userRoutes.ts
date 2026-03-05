@@ -6,7 +6,7 @@ import { moderateTextContent } from '../middleware/moderationMiddleware';
 const router = Router();
 
 // Static routes first (before parameterized routes)
-router.get('/online-count', authenticateToken, getOnlineCount);
+router.get('/online-count', getOnlineCount);
 router.get('/admin-online', authenticateToken, checkAdminOnline);
 router.get('/me', authenticateToken, getMe);
 router.put('/me', authenticateToken, moderateTextContent(['name', 'displayName', 'bio']), updateMe);

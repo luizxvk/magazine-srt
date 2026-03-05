@@ -62,22 +62,22 @@ export interface CommunityConfig {
 }
 
 // ============================================
-// CONFIGURAÇÃO PADRÃO (Magazine SRT - ENTERPRISE)
+// CONFIGURAÇÃO PADRÃO (Rovex Communities - ENTERPRISE)
 // ============================================
-// Esta é a config default quando rodando localmente ou como Magazine SRT
+// Esta é a config default quando rodando localmente ou como template Rovex
 export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
-  id: 'magazine-srt-default',
-  subdomain: 'magazine-srt',
-  name: 'Magazine SRT',
-  slogan: 'A comunidade definitiva',
+  id: 'rovex-communities',
+  subdomain: 'rovex-communities',
+  name: 'Rovex Communities',
+  slogan: 'Plataforma Social Gamificada',
   plan: 'ENTERPRISE',
   
-  // Assets (URLs do Magazine SRT - usa logo Rovex para tier STD)
-  logoUrl: '/assets/logo-mgzn.png',
+  // Assets (URLs do Rovex)
+  logoUrl: '/assets/logo-rovex.png',
   logoIconUrl: '/assets/logo-rovex.png',
-  faviconUrl: '/favicon.ico',
+  faviconUrl: '/assets/logo-rovex.png',
   
-  // Cores do Magazine (roxo claro Rovex)
+  // Cores do Rovex (roxo claro)
   primaryColor: '#A78BFA',      // Roxo claro
   secondaryColor: '#8B5CF6',    // Roxo médio
   accentColor: '#A78BFA',       // Roxo claro (destaque)

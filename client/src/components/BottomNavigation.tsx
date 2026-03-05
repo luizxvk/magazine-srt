@@ -93,6 +93,7 @@ export default function BottomNavigation() {
     const [activeId, setActiveId] = useState('home');
     const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+    const [isWelcomeTourOpen, setIsWelcomeTourOpen] = useState(false);
 
     const liteMode = user?.liteMode ?? false;
     
@@ -126,6 +127,18 @@ export default function BottomNavigation() {
         window.addEventListener('commentsModalStateChange', handleCommentsState as EventListener);
         return () => {
             window.removeEventListener('commentsModalStateChange', handleCommentsState as EventListener);
+        };
+    }, []);
+
+    // Listen for welcome tour state changes
+    useEffect(() => {
+        const handleWelcomeTourState = (e: CustomEvent<{ isOpen: boolean }>) => {
+            setIsWelcomeTourOpen(e.detail.isOpen);
+        };
+
+        window.addEventListener('welcomeTourStateChange', handleWelcomeTourState as EventListener);
+        return () => {
+            window.removeEventListener('welcomeTourStateChange', handleWelcomeTourState as EventListener);
         };
     }, []);
 
@@ -173,9 +186,9 @@ export default function BottomNavigation() {
         navigate(item.path);
     }, [navigate]);
 
-    // Hide when drawer/modal is open, story viewer is open, or should be hidden
+    // Hide when drawer/modal is open, story viewer is open, welcome tour is open, or should be hidden
     // Hide navbar when chat popup is open or other conditions
-    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen || isCommentsOpen || activeChatUserId) return null;
+    if (shouldHide || !user || isMobileDrawerOpen || isStoryViewerOpen || isCommentsOpen || activeChatUserId || isWelcomeTourOpen) return null;
 
     return (
         <>

@@ -486,6 +486,24 @@ const roadmapItems: RoadmapItem[] = [
         icon: <Volume2 className="w-5 h-5" />,
         category: 'improvement'
     },
+    {
+        id: '29ac',
+        title: 'WelcomeTour Fullscreen',
+        description: 'Tela de boas-vindas agora ocupa tela inteira no mobile e oculta a navbar.',
+        status: 'completed',
+        version: 'v0.5.0-rc.20',
+        icon: <Smartphone className="w-5 h-5" />,
+        category: 'improvement'
+    },
+    {
+        id: '29ad',
+        title: 'Online Count Público',
+        description: 'Endpoint /users/online-count não requer mais autenticação (erro 401 corrigido).',
+        status: 'completed',
+        version: 'v0.5.0-rc.20',
+        icon: <Users className="w-5 h-5" />,
+        category: 'improvement'
+    },
     
     // ===== IN PROGRESS =====
     {

@@ -1,7 +1,7 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.5.0-rc.19",
+  "version": "0.5.0-rc.20",
   "type": "module",
   "scripts": {
     "dev": "node scripts/generate-build-info.js && vite",

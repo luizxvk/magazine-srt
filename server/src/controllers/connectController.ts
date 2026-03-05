@@ -18,7 +18,7 @@ const prisma = new PrismaClient();
 const createVoiceChannelSchema = z.object({
   name: z.string().min(1).max(50),
   description: z.string().max(200).optional(),
-  maxUsers: z.number().min(2).max(99).optional(),
+  maxUsers: z.number().min(2).max(12).optional(), // Max 12 users per voice channel
   bitrate: z.number().min(8000).max(384000).optional(),
 });
 
@@ -50,7 +50,7 @@ export const createVoiceChannel = async (req: Request, res: Response) => {
         groupId,
         name,
         description,
-        maxUsers: maxUsers || 25,
+        maxUsers: maxUsers || 10, // Default 10, max 12
         bitrate: bitrate || 64000,
       },
       include: {
@@ -316,12 +316,21 @@ export const getConnectGroups = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.userId || (req as any).user?.id;
 
-    // Get all groups user is member of, with voice channels
+    // Get all groups: either user is a member, OR group is public (not private)
     const groups = await prisma.group.findMany({
       where: {
-        members: {
-          some: { userId },
-        },
+        OR: [
+          // Groups where user is a member
+          {
+            members: {
+              some: { userId },
+            },
+          },
+          // Public groups (not private) - user can join
+          {
+            isPrivate: false,
+          },
+        ],
       },
       include: {
         creator: {
@@ -372,7 +381,13 @@ export const getConnectGroups = async (req: Request, res: Response) => {
       orderBy: { updatedAt: 'desc' },
     });
 
-    res.json(groups);
+    // Add isMember flag to each group
+    const groupsWithMemberStatus = groups.map(group => ({
+      ...group,
+      isMember: group.members.some(m => m.userId === userId),
+    }));
+
+    res.json(groupsWithMemberStatus);
   } catch (error) {
     console.error('Error fetching connect groups:', error);
     res.status(500).json({ error: 'Erro ao buscar grupos' });
@@ -432,6 +447,151 @@ export const updateGroupAvatar = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error updating group avatar:', error);
     res.status(500).json({ error: 'Erro ao atualizar avatar do grupo' });
+  }
+};
+
+// ============================================
+// UPDATE GROUP BANNER
+// ============================================
+
+export const updateGroupBanner = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId } = req.params;
+
+    // Check if file was uploaded
+    if (!(req as any).file) {
+      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    }
+
+    // Check if user is admin of the group
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member || member.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Apenas admins podem alterar o banner do grupo' });
+    }
+
+    // Upload image
+    let bannerUrl: string | null = null;
+    const file = (req as any).file;
+
+    if (isR2Configured()) {
+      bannerUrl = await uploadGroupImageR2(file.buffer, file.mimetype);
+    } else {
+      const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      bannerUrl = await uploadPostImageCloudinary(base64Data);
+    }
+
+    if (!bannerUrl) {
+      throw new Error('Upload failed');
+    }
+
+    // Update group with new banner
+    const group = await prisma.group.update({
+      where: { id: groupId },
+      data: { bannerUrl },
+      select: {
+        id: true,
+        name: true,
+        bannerUrl: true,
+      },
+    });
+
+    res.json(group);
+  } catch (error) {
+    console.error('Error updating group banner:', error);
+    res.status(500).json({ error: 'Erro ao atualizar banner do grupo' });
+  }
+};
+
+// ============================================
+// UPDATE CONNECT GROUP (NAME/DESCRIPTION)
+// ============================================
+
+const updateConnectGroupSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+});
+
+export const updateConnectGroup = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const { groupId } = req.params;
+
+    const validation = updateConnectGroupSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
+    }
+
+    // Check if user is admin of the group
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+
+    if (!member || member.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Apenas admins podem alterar as configurações do grupo' });
+    }
+
+    const { name, description } = validation.data;
+
+    // Update group
+    const group = await prisma.group.update({
+      where: { id: groupId },
+      data: {
+        ...(name && { name }),
+        ...(description !== undefined && { description }),
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        avatarUrl: true,
+        bannerUrl: true,
+      },
+    });
+
+    res.json(group);
+  } catch (error) {
+    console.error('Error updating connect group:', error);
+    res.status(500).json({ error: 'Erro ao atualizar grupo' });
+  }
+};
+
+// ============================================
+// UPLOAD GROUP IMAGE
+// ============================================
+
+export const uploadGroupImage = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+
+    // Check if file was uploaded
+    if (!(req as any).file) {
+      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    }
+
+    const file = (req as any).file;
+
+    // Upload image
+    let imageUrl: string | null = null;
+
+    if (isR2Configured()) {
+      imageUrl = await uploadGroupImageR2(file.buffer, file.mimetype);
+    } else {
+      const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      imageUrl = await uploadPostImageCloudinary(base64Data);
+    }
+
+    if (!imageUrl) {
+      throw new Error('Upload failed');
+    }
+
+    res.json({ url: imageUrl, uploadedBy: userId });
+  } catch (error) {
+    console.error('Error uploading group image:', error);
+    res.status(500).json({ error: 'Erro ao fazer upload da imagem' });
   }
 };
 

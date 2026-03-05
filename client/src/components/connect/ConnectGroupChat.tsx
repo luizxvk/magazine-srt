@@ -82,12 +82,13 @@ interface ConnectGroupChatProps {
   isMGT: boolean;
   accentColor?: string;
   onRefresh: () => void;
+  onOpenSettings?: () => void; // Open group settings panel
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🔥', '💯'];
 const EMOJI_LIST = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '😏', '😐', '😑', '😶', '👍', '👎', '👋', '🤚', '✋', '🖐️', '👌', '🤌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '👏', '🙌', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '💕', '💖', '💗', '💘', '💝', '🔥', '⭐', '✨', '💫', '🌟', '💥', '💯', '💢', '🎉', '🎊'];
 
-export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor }: ConnectGroupChatProps) {
+export default function ConnectGroupChat({ group, textChannel, theme, isMGT, accentColor, onOpenSettings }: ConnectGroupChatProps) {
   const navigate = useNavigate();
   const { user, showToast, showError, accentColor: authAccent } = useAuth();
   const socket = useSocket();
@@ -273,11 +274,11 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
       const uploadFormData = new FormData();
       uploadFormData.append('image', file);
       
-      const uploadResponse = await api.post('/upload/group', uploadFormData, {
+      const uploadResponse = await api.post('/connect/upload/group', uploadFormData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      const imageUrl = uploadResponse.data.imageUrl;
+      const imageUrl = uploadResponse.data.url;
       
       // Step 2: Post message with imageUrl
       await api.post(`/groups/${group.id}/messages/image`, {
@@ -338,10 +339,11 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
             18+
           </span>
         )}
-        {isAdmin && (
+        {isAdmin && onOpenSettings && (
           <button 
-            onClick={() => navigate(`/groups/${group.id}`)}
+            onClick={onOpenSettings}
             className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}
+            title="Configurações do grupo"
           >
             <Settings className="w-5 h-5" />
           </button>

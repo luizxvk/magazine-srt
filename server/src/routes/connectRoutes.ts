@@ -12,6 +12,9 @@ import {
   getCurrentVoiceChannel,
   getConnectGroups,
   updateGroupAvatar,
+  updateGroupBanner,
+  updateConnectGroup,
+  uploadGroupImage,
   createTextChannel,
   getTextChannels,
   updateTextChannel,
@@ -184,8 +187,17 @@ router.post('/groups/:groupId/voice/:channelId/join', joinVoiceChannel);
 // GROUP SETTINGS
 // ============================================
 
+// Update group settings (name, description)
+router.patch('/groups/:groupId', updateConnectGroup);
+
 // Update group avatar
 router.patch('/groups/:groupId/avatar', upload.single('avatar'), validateImageContent, updateGroupAvatar);
+
+// Update group banner
+router.patch('/groups/:groupId/banner', upload.single('banner'), validateImageContent, updateGroupBanner);
+
+// Upload group image (for chat messages)
+router.post('/upload/group', upload.single('image'), validateImageContent, uploadGroupImage);
 
 // ============================================
 // GROUP INVITES

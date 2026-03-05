@@ -86,6 +86,7 @@ export const createGroup = async (req: AuthRequest, res: Response) => {
           },
         },
         voiceChannels: true,
+        textChannels: true,
       },
     });
 
@@ -95,15 +96,53 @@ export const createGroup = async (req: AuthRequest, res: Response) => {
         name: 'Geral',
         description: 'Canal de voz principal',
         groupId: group.id,
-        maxUsers: maxMembers || 100,
+        maxUsers: 10,
         bitrate: 64000,
+      },
+    });
+
+    // Auto-create default text channel "geral"
+    await prisma.textChannel.create({
+      data: {
+        name: 'geral',
+        description: 'Canal de texto principal',
+        groupId: group.id,
       },
     });
 
     // Award "Anfitrião" badge for creating a group
     await checkGroupCreatorBadge(userId);
 
-    res.json(group);
+    // Re-fetch group with newly created channels
+    const updatedGroup = await prisma.group.findUnique({
+      where: { id: group.id },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+        voiceChannels: true,
+        textChannels: true,
+      },
+    });
+
+    res.json(updatedGroup);
   } catch (error) {
     console.error('Error creating group:', error);
     res.status(500).json({ error: 'Erro ao criar grupo' });

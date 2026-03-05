@@ -306,7 +306,7 @@ router.get('/public/config', async (req: Request, res: Response) => {
       tierVipColor: baseConfig.tierVipColor || savedConfig?.tierVipColor || '#d4af37',
       tierVipSlogan: baseConfig.tierVipSlogan || savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: baseConfig.tierStdName || savedConfig?.tierStdName || 'ROVEX',
-      tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Velocidade e Poder',
+      tierStdSlogan: baseConfig.tierStdSlogan || savedConfig?.tierStdSlogan || 'Plataforma Social Gamificada',
       
       // Logos - TENANT CONFIG tem prioridade! (defaults são Rovex)
       logoUrl: baseConfig.logoUrl || savedConfig?.logoUrl || '/assets/logo-rovex.png',
@@ -523,7 +523,7 @@ router.post('/provision', async (req: Request, res: Response) => {
       tierVipColor: tierVipColor || '#d4af37',
       tierVipSlogan: tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: tierStdName || 'ROVEX',
-      tierStdSlogan: tierStdSlogan || 'Velocidade e Poder',
+      tierStdSlogan: tierStdSlogan || 'Plataforma Social Gamificada',
       backgroundColor: backgroundColor || '#8B5CF6',
       
       // Economia
@@ -1223,7 +1223,7 @@ router.get('/config', async (req: Request, res: Response) => {
       tierVipColor: savedConfig?.tierVipColor || '#d4af37',
       tierVipSlogan: savedConfig?.tierVipSlogan || 'A Elite do Sucesso',
       tierStdName: savedConfig?.tierStdName || 'ROVEX',
-      tierStdSlogan: savedConfig?.tierStdSlogan || 'Velocidade e Poder',
+      tierStdSlogan: savedConfig?.tierStdSlogan || 'Plataforma Social Gamificada',
       backgroundColor: savedConfig?.backgroundColor || '#8B5CF6',
       currencyName: savedConfig?.currencyName || 'Zions',
       currencySymbol: savedConfig?.currencySymbol || 'Z$',

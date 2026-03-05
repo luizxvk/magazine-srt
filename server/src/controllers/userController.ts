@@ -669,23 +669,23 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
         let friendRequestSent = false;
         
         if (requesterId && requesterId !== id) {
-            // Check if already friends (in either direction)
-            const friendship = await prisma.friend.findFirst({
+            // Check if already friends (ACCEPTED friendship in either direction)
+            const friendship = await prisma.friendship.findFirst({
                 where: {
                     OR: [
-                        { userId: requesterId, friendId: id },
-                        { userId: id, friendId: requesterId }
+                        { requesterId: requesterId, addresseeId: id, status: 'ACCEPTED' },
+                        { requesterId: id, addresseeId: requesterId, status: 'ACCEPTED' }
                     ]
                 }
             });
             isFriend = !!friendship;
             
-            // Check if there's a pending friend request
+            // Check if there's a pending friend request (sent by requester)
             if (!isFriend) {
-                const pendingRequest = await prisma.friendRequest.findFirst({
+                const pendingRequest = await prisma.friendship.findFirst({
                     where: {
-                        senderId: requesterId,
-                        receiverId: id,
+                        requesterId: requesterId,
+                        addresseeId: id,
                         status: 'PENDING'
                     }
                 });
@@ -693,9 +693,27 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
             }
         }
 
+        // Get user's gamification badges
+        const userBadges = await prisma.userBadge.findMany({
+            where: { userId: id },
+            include: {
+                badge: true,
+            },
+            orderBy: { awardedAt: 'desc' },
+            take: 8, // Limit for performance
+        });
+        
+        const badges = userBadges.map(ub => ({
+            id: ub.badge.id,
+            name: ub.badge.name,
+            iconUrl: ub.badge.iconUrl,
+            description: ub.badge.description,
+            trophies: ub.badge.trophies,
+        }));
+
         // Remove deletedAt from response
         const { deletedAt, ...userResponse } = user;
-        res.json({ ...userResponse, isFriend, friendRequestSent });
+        res.json({ ...userResponse, isFriend, friendRequestSent, badges });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

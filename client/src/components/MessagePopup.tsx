@@ -26,11 +26,13 @@ interface MessagePopupProps {
 }
 
 export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
-    const { user, isVisitor, theme } = useAuth();
+    const { user, isVisitor, theme, setActiveChatUserId } = useAuth();
     const { tierStdName, tierVipName } = useCommunity();
     const [unreadMessage, setUnreadMessage] = useState<UnreadMessage | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [showChat, setShowChat] = useState(false);
+    // State for external chat open (from UserPresenceCard)
+    const [externalChatUser, setExternalChatUser] = useState<{ id: string; name: string; avatarUrl?: string } | null>(null);
     const lastNotifId = useRef<string | null>(null);
     const autoDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const dismissedNotifIds = useRef<Set<string>>(new Set());
@@ -43,6 +45,35 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Open chat when activeChatUserId is set from outside (e.g., UserPresenceCard)
+    useEffect(() => {
+        if (activeChatUserId && activeChatUserId !== externalChatUser?.id) {
+            // Fetch user info and open chat
+            const fetchUserAndOpenChat = async () => {
+                try {
+                    const response = await api.get(`/users/${activeChatUserId}`);
+                    setExternalChatUser({
+                        id: activeChatUserId,
+                        name: response.data.displayName || response.data.name,
+                        avatarUrl: response.data.avatarUrl
+                    });
+                    setShowChat(true);
+                    setIsVisible(false); // Hide any notification popup
+                } catch (error) {
+                    console.error('[MessagePopup] Failed to fetch user for chat:', error);
+                    // Still try to open chat with minimal info
+                    setExternalChatUser({
+                        id: activeChatUserId,
+                        name: 'Usuário',
+                        avatarUrl: undefined
+                    });
+                    setShowChat(true);
+                }
+            };
+            fetchUserAndOpenChat();
+        }
+    }, [activeChatUserId]);
 
     useEffect(() => {
         // Don't run any polling if user is not logged in
@@ -157,6 +188,8 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
     const handleCloseChat = () => {
         setShowChat(false);
         setUnreadMessage(null);
+        setExternalChatUser(null);
+        setActiveChatUserId(null); // Clear the active chat context
         lastNotifId.current = null;
     };
 
@@ -186,14 +219,24 @@ export default function MessagePopup({ activeChatUserId }: MessagePopupProps) {
 
     return (
         <>
-            {/* Chat Window */}
-            {showChat && unreadMessage && (
+            {/* Chat Window - from notification */}
+            {showChat && unreadMessage && !externalChatUser && (
                 <ChatWindow
                     otherUserId={unreadMessage.senderId}
                     otherUserName={unreadMessage.sender.name}
                     otherUserAvatar={unreadMessage.sender.avatarUrl}
                     otherUserMembershipType={unreadMessage.sender.membershipType}
                     otherUserProfileBorder={unreadMessage.sender.equippedProfileBorder}
+                    onClose={handleCloseChat}
+                />
+            )}
+            
+            {/* Chat Window - from external (UserPresenceCard) */}
+            {showChat && externalChatUser && (
+                <ChatWindow
+                    otherUserId={externalChatUser.id}
+                    otherUserName={externalChatUser.name}
+                    otherUserAvatar={externalChatUser.avatarUrl}
                     onClose={handleCloseChat}
                 />
             )}

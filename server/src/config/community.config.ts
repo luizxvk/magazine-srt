@@ -90,7 +90,7 @@ export const DEFAULT_COMMUNITY_CONFIG: CommunityConfig = {
   tierVipColor: '#d4af37',
   tierVipSlogan: 'A Elite do Sucesso',
   tierStdName: 'ROVEX',
-  tierStdSlogan: 'Velocidade e Poder',
+  tierStdSlogan: 'Plataforma Social Gamificada',
   backgroundColor: '#8B5CF6',
   xpName: 'XP',
   

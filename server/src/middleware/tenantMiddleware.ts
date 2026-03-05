@@ -237,7 +237,7 @@ function mapRovexResponseToConfig(data: any): CommunityConfig {
     tierVipColor: data.tierVipColor || '#d4af37',
     tierVipSlogan: data.tierVipSlogan || 'A Elite do Sucesso',
     tierStdName: data.tierStdName || 'MEMBER',
-    tierStdSlogan: data.tierStdSlogan || 'Velocidade e Poder',
+    tierStdSlogan: data.tierStdSlogan || 'Plataforma Social Gamificada',
     backgroundColor: data.backgroundColor || '#10b981',
     xpName: data.xpName || 'XP',
     

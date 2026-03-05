@@ -86,6 +86,7 @@ interface ConnectGroup {
   isPrivate: boolean;
   membershipType: 'MAGAZINE' | 'MGT';
   maxMembers?: number;
+  isMember?: boolean; // Whether current user is a member of this group
   creator: {
     id: string;
     name: string;
@@ -131,6 +132,7 @@ export default function ConnectPage() {
   const [addChannelGroupId, setAddChannelGroupId] = useState<string | null>(null);
   const [newChannelName, setNewChannelName] = useState('');
   const [newChannelType, setNewChannelType] = useState<'TEXT' | 'VOICE'>('VOICE');
+  const [newChannelMaxUsers, setNewChannelMaxUsers] = useState(10); // Default 10, max 12
   const [showMembersDrawer, setShowMembersDrawer] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -594,7 +596,13 @@ export default function ConnectPage() {
       showToast('Conectado ao canal de voz');
       fetchGroups(false); // Refresh without loading spinner
     } catch (error: any) {
-      showError(error.response?.data?.error || 'Erro ao conectar');
+      // Check if channel is full
+      const errorMsg = error.response?.data?.error || '';
+      if (errorMsg.toLowerCase().includes('cheio') || errorMsg.toLowerCase().includes('full')) {
+        showError('🔒 Lobby cheio! O canal de voz atingiu o limite máximo de usuários.');
+      } else {
+        showError(errorMsg || 'Erro ao conectar');
+      }
     }
   };
 
@@ -771,6 +779,7 @@ export default function ConnectPage() {
     setAddChannelGroupId(groupId);
     setNewChannelName('');
     setNewChannelType('VOICE');
+    setNewChannelMaxUsers(10); // Reset to default
     setShowAddChannelModal(true);
   };
 
@@ -781,7 +790,7 @@ export default function ConnectPage() {
       if (newChannelType === 'VOICE') {
         await api.post(`/connect/groups/${addChannelGroupId}/voice`, {
           name: newChannelName.trim(),
-          maxUsers: 25, // Default max users - can be edited later
+          maxUsers: newChannelMaxUsers, // Use selected max users
         });
         showToast('Canal de voz criado com sucesso!');
       } else {
@@ -792,6 +801,7 @@ export default function ConnectPage() {
       }
       setShowAddChannelModal(false);
       setNewChannelName('');
+      setNewChannelMaxUsers(10);
       fetchGroups(false);
     } catch (error: any) {
       showError(error.response?.data?.error || 'Erro ao criar canal');
@@ -1093,50 +1103,89 @@ export default function ConnectPage() {
       <div key={group.id} className="px-2 mb-1 group/item">
         {/* Group Header */}
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => toggleGroupExpand(group.id)}
-            className={`flex-1 flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
-          >
-            {group.avatarUrl ? (
-              <img 
-                src={group.avatarUrl} 
-                className="w-8 h-8 rounded-full object-cover"
-                alt={group.name}
-              />
-            ) : (
-              <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
-                <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
-                  {group.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
-            <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
-              {group.name}
-            </span>
-            {expandedGroups.has(group.id) ? (
-              <ChevronDown className={`w-4 h-4 ${themeSecondary}`} />
-            ) : (
-              <ChevronRight className={`w-4 h-4 ${themeSecondary}`} />
-            )}
-          </button>
-          {/* Settings button */}
-          {group.creator.id === user?.id && (
+          {/* For groups user is NOT a member of - show join UI */}
+          {group.isMember === false ? (
             <button
               onClick={() => {
-                setSelectedGroup(group);
-                setShowGroupSettings(true);
+                setPendingJoinGroup({
+                  id: group.id,
+                  name: group.name,
+                  avatarUrl: group.avatarUrl,
+                  memberCount: group._count?.members,
+                });
+                setShowJoinModal(true);
               }}
-              className={`p-2 rounded-lg ${themeHover} ${themeSecondary} md:opacity-0 md:group-hover/item:opacity-100 transition-opacity`}
-              title="Configurações"
+              className={`flex-1 flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
             >
-              <Settings className="w-4 h-4" />
+              {group.avatarUrl ? (
+                <img 
+                  src={group.avatarUrl} 
+                  className="w-8 h-8 rounded-full object-cover"
+                  alt={group.name}
+                />
+              ) : (
+                <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                  <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                    {group.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
+                {group.name}
+              </span>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500'}`}>
+                <UserPlus className="w-3 h-3 inline mr-1" />
+                Entrar
+              </span>
             </button>
+          ) : (
+            <>
+              <button
+                onClick={() => toggleGroupExpand(group.id)}
+                className={`flex-1 flex items-center gap-2 px-2 py-2 rounded-lg ${themeHover} transition-colors`}
+              >
+                {group.avatarUrl ? (
+                  <img 
+                    src={group.avatarUrl} 
+                    className="w-8 h-8 rounded-full object-cover"
+                    alt={group.name}
+                  />
+                ) : (
+                  <div className={`w-8 h-8 rounded-full ${isMGT ? 'bg-tier-std-500/20' : 'bg-gold-500/20'} flex items-center justify-center`}>
+                    <span className={`text-sm font-bold ${isMGT ? 'text-tier-std-500' : 'text-gold-500'}`}>
+                      {group.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <span className={`flex-1 text-left text-sm font-medium truncate ${themeText}`}>
+                  {group.name}
+                </span>
+                {expandedGroups.has(group.id) ? (
+                  <ChevronDown className={`w-4 h-4 ${themeSecondary}`} />
+                ) : (
+                  <ChevronRight className={`w-4 h-4 ${themeSecondary}`} />
+                )}
+              </button>
+              {/* Settings button */}
+              {group.creator.id === user?.id && (
+                <button
+                  onClick={() => {
+                    setSelectedGroup(group);
+                    setShowGroupSettings(true);
+                  }}
+                  className={`p-2 rounded-lg ${themeHover} ${themeSecondary} md:opacity-0 md:group-hover/item:opacity-100 transition-opacity`}
+                  title="Configurações"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        {/* Channels */}
+        {/* Channels - only show for groups user is a member of */}
         <AnimatePresence>
-          {expandedGroups.has(group.id) && (
+          {group.isMember !== false && expandedGroups.has(group.id) && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
@@ -1316,7 +1365,8 @@ export default function ConnectPage() {
     ));
   };
 
-  if (loading) {
+  // Don't show full loading screen if already in voice (prevents disruption when navigating)
+  if (loading && !agora.isJoined) {
     return (
       <div className="min-h-screen text-white font-sans relative">
         <LuxuriousBackground />
@@ -1570,6 +1620,7 @@ export default function ConnectPage() {
               isMGT={isMGT}
               accentColor={accentColor}
               onRefresh={fetchGroups}
+              onOpenSettings={() => setShowGroupSettings(true)}
             />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-4">
@@ -1718,7 +1769,7 @@ export default function ConnectPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={() => setShowAddChannelModal(false)}
           >
             <motion.div
@@ -1781,6 +1832,31 @@ export default function ConnectPage() {
                 autoFocus
                 onKeyDown={(e) => e.key === 'Enter' && handleCreateChannel()}
               />
+              
+              {/* Max Users Selector (Voice only) */}
+              {newChannelType === 'VOICE' && (
+                <div className="mb-4">
+                  <label className={`block text-sm mb-2 ${themeSecondary}`}>
+                    Limite de usuários (máx. 12)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="2"
+                      max="12"
+                      value={newChannelMaxUsers}
+                      onChange={(e) => setNewChannelMaxUsers(Number(e.target.value))}
+                      className={`flex-1 h-2 rounded-lg appearance-none cursor-pointer ${
+                        theme === 'light' ? 'bg-gray-200' : 'bg-zinc-700'
+                      } accent-${isMGT ? 'tier-std' : 'gold-500'}`}
+                      style={{ accentColor: isMGT ? '#10b981' : '#d4af37' }}
+                    />
+                    <span className={`w-8 text-center font-medium ${themeText}`}>
+                      {newChannelMaxUsers}
+                    </span>
+                  </div>
+                </div>
+              )}
               
               <div className="flex gap-3">
                 <button

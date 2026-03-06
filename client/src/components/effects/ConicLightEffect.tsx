@@ -45,17 +45,23 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   }, [colorWithOpacity]);
 
   return (
-    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+    <motion.div 
+      className={`fixed inset-0 pointer-events-none ${className}`}
+      style={{ zIndex: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2, ease: 'easeOut' }}
+    >
       {/* Left conic beam */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.8, y: -50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 1.5, ease: 'easeOut' }}
-        className="absolute inset-0"
+        className="absolute"
         style={{
           background: leftGradient,
-          width: '50%',
-          height: '100%',
+          width: '50vw',
+          height: '100vh',
           left: 0,
           top: 0,
         }}
@@ -63,16 +69,15 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
 
       {/* Right conic beam (mirrored) */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.8, y: -50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 1.5, ease: 'easeOut', delay: 0.1 }}
-        className="absolute inset-0"
+        className="absolute"
         style={{
           background: rightGradient,
-          width: '50%',
-          height: '100%',
-          right: 0,
-          left: '50%',
+          width: '50vw',
+          height: '100vh',
+          left: '50vw',
           top: 0,
         }}
       />
@@ -104,7 +109,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
           filter: 'blur(40px)',
         }}
       />
-    </div>
+    </motion.div>
   );
 };
 

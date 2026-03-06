@@ -120,7 +120,7 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
   return (
     <div className="flex flex-col h-full font-grotesk">
       {/* Glassmorphic Card Container */}
-      <div className="flex-1 flex flex-col mt-3 mx-3 mb-0 bg-white/[0.03] border border-white/10 backdrop-blur-[12px] rounded-t-[22px] overflow-hidden">
+      <div className="flex-1 flex flex-col mt-3 mx-3 mb-3 bg-white/[0.03] border border-white/10 backdrop-blur-[12px] rounded-[22px] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 pb-2 flex-shrink-0">
           <div className="flex items-center gap-2">

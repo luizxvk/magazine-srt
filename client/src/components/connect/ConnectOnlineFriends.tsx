@@ -115,9 +115,9 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
   const currentStatus = STATUS_CONFIG[userStatus];
 
   return (
-    <div className="flex flex-col h-full pt-3 px-3 pb-0 font-grotesk">
+    <div className="flex flex-col h-full font-grotesk">
       {/* Glassmorphic Card Container */}
-      <div className="flex-1 flex flex-col bg-white/[0.03] border border-white/10 border-b-0 backdrop-blur-[12px] rounded-t-[22px] overflow-hidden">
+      <div className="flex-1 flex flex-col mt-3 mx-3 bg-white/[0.03] border border-white/10 border-b-0 backdrop-blur-[12px] rounded-t-[22px] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 pb-2 flex-shrink-0">
           <div className="flex items-center gap-2">
@@ -298,7 +298,7 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
         </div>
 
         {/* User Panel at bottom - with real user data and status picker */}
-        <div className="mt-auto border-t border-white/5 flex-shrink-0 relative" ref={statusPickerRef}>
+        <div className="border-t border-white/5 flex-shrink-0 relative" ref={statusPickerRef}>
           {/* Status Picker Dropdown */}
           <AnimatePresence>
             {showStatusPicker && (
@@ -330,18 +330,18 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
             )}
           </AnimatePresence>
 
-          <div className="p-4 mx-2 my-2 bg-white/[0.03] border border-white/10 backdrop-blur-[12px] rounded-xl flex items-center gap-3">
+          <div className="p-3 flex items-center gap-3">
             {/* Current user avatar */}
             <div className="relative flex-shrink-0">
               {user?.avatarUrl ? (
                 <img 
                   src={user.avatarUrl} 
                   alt={user.displayName || user.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-9 h-9 rounded-full object-cover"
                 />
               ) : (
                 <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
                   style={{ backgroundColor: accentColor }}
                 >
                   {(user?.displayName || user?.name || 'U').charAt(0).toUpperCase()}

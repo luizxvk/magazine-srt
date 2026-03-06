@@ -6,7 +6,6 @@ import {
   UserPlus, 
   UserCheck,
   UserMinus,
-  Crown, 
   Star, 
   Gamepad2,
   Headphones,
@@ -443,18 +442,6 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                             <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                               Email Verificado
                             </div>
-                          </div>
-                        )}
-                        {userDetails.isElite && (
-                          <div 
-                            className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                            style={{ 
-                              backgroundColor: `${accentColor}20`,
-                              color: accentColor,
-                            }}
-                          >
-                            <Crown size={12} />
-                            Elite
                           </div>
                         )}
                       </div>

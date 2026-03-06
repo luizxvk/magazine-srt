@@ -9,12 +9,11 @@ interface ConicLightEffectProps {
 }
 
 /**
- * Conic gradient light effect matching Figma design exactly.
- * Figma spec: conic-gradient(from 90deg at 48% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(106, 94, 254, 1) 100%)
- * Creates two mirrored conic beams emanating from the top center.
+ * Conic gradient light effect matching Figma design.
+ * Creates a spotlight effect emanating from top-center.
  */
 export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
-  color = '#6A5EFE', // Figma default: rgba(106, 94, 254, 1)
+  color = '#6A5EFE',
   className = '',
 }) => {
   // Convert hex to rgb values
@@ -26,87 +25,43 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
     return { r, g, b };
   }, [color]);
 
-  // Left conic gradient - emanates from top center going left
-  const leftConicGradient = useMemo(() => {
+  // Main spotlight gradient - radial from top center
+  const spotlightGradient = useMemo(() => {
     const { r, g, b } = rgb;
-    // Figma spec: position at 48% 9%, light beam going diagonally down-left
-    return `conic-gradient(from 90deg at 100% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 51%, rgba(${r}, ${g}, ${b}, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
-  }, [rgb]);
-
-  // Right conic gradient - mirror of left
-  const rightConicGradient = useMemo(() => {
-    const { r, g, b } = rgb;
-    return `conic-gradient(from 90deg at 0% 9%, rgba(${r}, ${g}, ${b}, 1) 0%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
-  }, [rgb]);
-
-  // Soft glow overlay for depth
-  const glowGradient = useMemo(() => {
-    const { r, g, b } = rgb;
-    return `radial-gradient(ellipse 100% 60% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.15) 0%, rgba(${r}, ${g}, ${b}, 0.05) 50%, transparent 80%)`;
+    return `radial-gradient(ellipse 120% 80% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.4) 0%, rgba(${r}, ${g}, ${b}, 0.2) 30%, rgba(${r}, ${g}, ${b}, 0.08) 60%, transparent 100%)`;
   }, [rgb]);
 
   return (
     <div 
-      className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
+      className={`fixed inset-0 pointer-events-none ${className}`}
       style={{ zIndex: 0 }}
     >
-      {/* Left conic beam */}
+      {/* Main spotlight from top center */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: 'easeOut' }}
-        className="absolute"
-        style={{
-          background: leftConicGradient,
-          width: '50%',
-          height: '100%',
-          left: 0,
-          top: 0,
-        }}
-      />
-
-      {/* Right conic beam */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, ease: 'easeOut', delay: 0.1 }}
-        className="absolute"
-        style={{
-          background: rightConicGradient,
-          width: '50%',
-          height: '100%',
-          left: '50%',
-          top: 0,
-        }}
-      />
-
-      {/* Soft glow overlay */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2, ease: 'easeOut', delay: 0.3 }}
         className="absolute inset-0"
         style={{
-          background: glowGradient,
+          background: spotlightGradient,
         }}
       />
 
-      {/* Animated breathing pulse effect */}
+      {/* Subtle breathing pulse */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: [0, 0.3, 0.15, 0.25, 0.15],
+          opacity: [0.5, 0.8, 0.5],
         }}
         transition={{ 
-          duration: 8,
+          duration: 6,
           ease: 'easeInOut',
           repeat: Infinity,
-          repeatType: 'reverse',
         }}
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4) 0%, transparent 70%)`,
-          filter: 'blur(60px)',
+          background: `radial-gradient(ellipse 100% 60% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 0%, transparent 70%)`,
+          filter: 'blur(40px)',
         }}
       />
     </div>

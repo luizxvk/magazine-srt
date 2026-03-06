@@ -97,19 +97,23 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
 
   const fetchFriends = async () => {
     try {
-      // Fetch all friends and categorize them
-      const response = await api.get('/users/friends');
-      const allFriends = response.data || [];
-      setOnlineFriends(allFriends.filter((f: Friend) => f.isOnline));
-      setOfflineFriends(allFriends.filter((f: Friend) => !f.isOnline));
-    } catch (error) {
-      // Try Connect endpoint as fallback
+      // Use the same endpoint as OnlineFriendsCard for consistency
+      const response = await api.get('/social/friends/online');
+      const onlineData = response.data || [];
+      setOnlineFriends(onlineData);
+      // Fetch all friends to get offline ones
       try {
-        const response = await api.get('/connect/friends/online');
-        setOnlineFriends(response.data.friends || []);
-      } catch (e) {
-        console.error('Error fetching friends:', e);
+        const allResponse = await api.get('/social/friends');
+        const allFriends = allResponse.data || [];
+        const onlineIds = new Set(onlineData.map((f: Friend) => f.id));
+        setOfflineFriends(allFriends.filter((f: Friend) => !onlineIds.has(f.id)));
+      } catch {
+        setOfflineFriends([]);
       }
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+      setOnlineFriends([]);
+      setOfflineFriends([]);
     } finally {
       setLoading(false);
     }

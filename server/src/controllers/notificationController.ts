@@ -353,9 +353,9 @@ export const sendCallInvite = async (req: AuthRequest, res: Response) => {
             data: {
                 userId: targetUserId,
                 type: 'CALL_INVITE',
-                title: '📞 Chamada de voz',
-                message: `${senderName} está te chamando para o canal ${channelName || 'de voz'}`,
-                data: JSON.stringify({
+                content: JSON.stringify({
+                    title: '📞 Chamada de voz',
+                    message: `${senderName} está te chamando para o canal ${channelName || 'de voz'}`,
                     channelId,
                     groupId,
                     channelName,

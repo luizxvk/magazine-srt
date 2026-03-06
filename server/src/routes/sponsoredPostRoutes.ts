@@ -92,8 +92,7 @@ router.post('/', authenticateToken, async (req, res) => {
                 data: {
                     userId: userId,
                     amount: -SPONSORED_POST_COST,
-                    reason: `SPONSORED_POST:${postId}`,
-                    description: `Solicitação de post patrocinado`
+                    reason: `SPONSORED_POST:${postId} - Solicitação de post patrocinado`
                 }
             })
         ]);
@@ -133,16 +132,14 @@ router.get('/', authenticateToken, requireAdmin, async (req, res) => {
                 user: {
                     select: { 
                         id: true, 
-                        name: true, 
-                        username: true,
+                        name: true,
                         avatarUrl: true
                     }
                 },
                 reviewer: {
                     select: { 
                         id: true, 
-                        name: true, 
-                        username: true 
+                        name: true
                     }
                 }
             },
@@ -243,8 +240,7 @@ router.put('/:id/reject', authenticateToken, requireAdmin, async (req, res) => {
                 data: {
                     userId: request.userId,
                     amount: request.zionsCashPaid,
-                    reason: `SPONSORED_POST_REFUND:${request.postId}`,
-                    description: reason || 'Solicitação de post patrocinado recusada - reembolso'
+                    reason: `SPONSORED_POST_REFUND:${request.postId} - ${reason || 'Solicitação de post patrocinado recusada - reembolso'}`
                 }
             })
         ]);

@@ -22,9 +22,9 @@ import {
   Medal,
   Landmark,
   Crown,
-  User,
-  LucideIcon
+  User
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 // Icon map for icon: prefix badges
 const iconMap: Record<string, LucideIcon> = {

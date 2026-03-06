@@ -3,8 +3,10 @@ import axios from 'axios';
 // Detectar se está rodando no Capacitor (app nativo)
 const isCapacitor = typeof (window as any).Capacitor !== 'undefined';
 
-// Default backend URL for the main magazine template
-const DEFAULT_BACKEND_URL = 'https://magazine-srt.vercel.app';
+// Backend URL - use VITE_API_URL if set, otherwise fallback to default
+// For rovexcommunities.vercel.app -> rovexbackend.vercel.app
+// For magazine-srt.vercel.app -> magazine-srt.vercel.app (same)
+const DEFAULT_BACKEND_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://magazine-srt.vercel.app';
 
 // Detectar subdomain do hostname atual
 const getCommunitySubdomain = (): string | null => {

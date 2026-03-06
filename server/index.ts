@@ -70,6 +70,8 @@ const allowedOrigins = [
     'https://magazine-frontend.vercel.app',
     'https://magazine-srt.vercel.app',
     'https://magazine-mgt.vercel.app',
+    'https://rovexcommunities.vercel.app',
+    'https://rovexbackend.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000',
     // Capacitor origins (Android/iOS apps)

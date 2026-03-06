@@ -53,7 +53,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         }}
       />
 
-      {/* Central light beam / bar */}
+      {/* Central light beam / bar - starts below header */}
       <motion.div
         initial={{ opacity: 0, scaleY: 0 }}
         animate={{ opacity: 1, scaleY: 1 }}
@@ -61,29 +61,46 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         className="absolute"
         style={{
           background: lightBeamGradient,
-          width: '200px',
-          height: '70%',
+          width: '120px',
+          height: '60%',
           left: '50%',
-          top: 0,
+          top: '70px', // Below header
           transform: 'translateX(-50%)',
-          filter: 'blur(80px)',
+          filter: 'blur(40px)',
           transformOrigin: 'top center',
         }}
       />
 
-      {/* Horizontal glow at top */}
+      {/* Concentrated light source at top center (below header) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+        className="absolute"
+        style={{
+          background: `radial-gradient(ellipse 100px 80px at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6) 40%, transparent 100%)`,
+          width: '400px',
+          height: '200px',
+          left: '50%',
+          top: '60px', // Below header
+          transform: 'translateX(-50%)',
+          filter: 'blur(15px)',
+        }}
+      />
+
+      {/* Horizontal glow spread at top (below header) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
         className="absolute"
         style={{
-          background: `radial-gradient(ellipse 60% 20% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4) 50%, transparent 100%)`,
+          background: `radial-gradient(ellipse 50% 15% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3) 60%, transparent 100%)`,
           width: '100%',
-          height: '300px',
+          height: '350px',
           left: 0,
-          top: 0,
-          filter: 'blur(20px)',
+          top: '60px', // Below header
+          filter: 'blur(10px)',
         }}
       />
 

@@ -911,6 +911,23 @@ export default function ConnectPage() {
     }
   };
 
+  // Delete channel
+  const handleDeleteChannel = async (channelId: string, type: 'TEXT' | 'VOICE', groupId: string) => {
+    if (!confirm(`Tem certeza que deseja excluir este canal de ${type === 'VOICE' ? 'voz' : 'texto'}?`)) return;
+    
+    try {
+      const endpoint = type === 'VOICE' 
+        ? `/connect/groups/${groupId}/voice/${channelId}`
+        : `/connect/groups/${groupId}/text/${channelId}`;
+      
+      await api.delete(endpoint);
+      showToast('Canal excluído!');
+      fetchGroups(false);
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Erro ao excluir canal');
+    }
+  };
+
   // Invite to call - prefixed with underscore as it's prepared for future use
   const _handleOpenInvite = (channelId: string) => {
     setInviteChannelId(channelId);
@@ -1224,15 +1241,24 @@ export default function ConnectPage() {
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">18+</span>
                       )}
                     </button>
-                    {/* Rename button for admins */}
+                    {/* Admin channel controls */}
                     {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleOpenRename(channel, 'TEXT', group.id); }}
-                        className={`p-1.5 rounded ${themeHover} ${themeSecondary} opacity-0 group-hover/channel:opacity-100 transition-opacity`}
-                        title="Renomear canal"
-                      >
-                        <Pencil className="w-3 h-3" />
-                      </button>
+                      <div className="flex opacity-0 group-hover/channel:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleOpenRename(channel, 'TEXT', group.id); }}
+                          className={`p-1 rounded ${themeHover} ${themeSecondary}`}
+                          title="Renomear canal"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteChannel(channel.id, 'TEXT', group.id); }}
+                          className={`p-1 rounded ${themeHover} text-red-400 hover:text-red-300`}
+                          title="Excluir canal"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))
@@ -1266,15 +1292,24 @@ export default function ConnectPage() {
                         {channel.participants.length}/{channel.maxUsers}
                       </span>
                     </button>
-                    {/* Rename button for admins */}
+                    {/* Admin channel controls */}
                     {group.members.find(m => m.userId === user?.id)?.role === 'ADMIN' && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleOpenRename(channel, 'VOICE', group.id); }}
-                        className={`p-1.5 rounded ${themeHover} ${themeSecondary} opacity-0 group-hover/vchannel:opacity-100 transition-opacity`}
-                        title="Renomear canal"
-                      >
-                        <Pencil className="w-3 h-3" />
-                      </button>
+                      <div className="flex opacity-0 group-hover/vchannel:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleOpenRename(channel, 'VOICE', group.id); }}
+                          className={`p-1 rounded ${themeHover} ${themeSecondary}`}
+                          title="Renomear canal"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteChannel(channel.id, 'VOICE', group.id); }}
+                          className={`p-1 rounded ${themeHover} text-red-400 hover:text-red-300`}
+                          title="Excluir canal"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     )}
                   </div>
                   
@@ -1569,7 +1604,7 @@ export default function ConnectPage() {
       
       <div className={`flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16 ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
-        <div className="hidden md:flex w-64 my-3 ml-3 mr-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] flex-col overflow-hidden font-grotesk">
+        <div className="hidden md:flex w-64 mt-3 mb-3 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] flex-col overflow-hidden font-grotesk">
           {/* Header */}
           <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
             <button
@@ -1674,7 +1709,7 @@ export default function ConnectPage() {
               />
               
               {/* Online Friends Sidebar - Desktop only */}
-              <div className="hidden xl:block w-72 border-l border-white/10 overflow-y-auto">
+              <div className="hidden xl:flex w-72 h-full flex-col">
                 <ConnectOnlineFriends
                   accentColor={accentColor}
                   onFriendClick={(friendId: string) => handleOpenPresenceCard(friendId)}

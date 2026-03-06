@@ -21,11 +21,24 @@ interface UploadOptions {
     folder?: string;
 }
 
+// Map mimeType to file extension
+const getExtensionFromMimeType = (mimeType: string): string => {
+    const mimeMap: { [key: string]: string } = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/gif': 'gif',
+        'image/webp': 'webp',
+        'image/bmp': 'bmp',
+        'image/svg+xml': 'svg',
+    };
+    return mimeMap[mimeType] || 'jpg';
+};
+
 // Generate unique filename
-const generateFileName = (originalName: string, folder?: string): string => {
+const generateFileName = (mimeType: string, folder?: string): string => {
     const timestamp = Date.now();
     const randomString = crypto.randomBytes(8).toString('hex');
-    const extension = originalName.split('.').pop();
+    const extension = getExtensionFromMimeType(mimeType);
     const basePath = folder ? `${folder}/` : '';
     return `${basePath}${timestamp}-${randomString}.${extension}`;
 };
@@ -33,7 +46,7 @@ const generateFileName = (originalName: string, folder?: string): string => {
 // Upload file to R2
 export const uploadToR2 = async ({ buffer, mimeType, folder }: UploadOptions): Promise<string> => {
     try {
-        const fileName = generateFileName('upload', folder);
+        const fileName = generateFileName(mimeType, folder);
         
         const command = new PutObjectCommand({
             Bucket: BUCKET_NAME,

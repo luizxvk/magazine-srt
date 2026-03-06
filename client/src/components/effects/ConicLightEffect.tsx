@@ -9,16 +9,16 @@ interface ConicLightEffectProps {
 }
 
 /**
- * Conic gradient light effect inspired by Figma design (anima 1, 2, 3).
- * Uses CSS conic-gradient for a performant, animated light beam effect.
- * Color is modular based on user's selected accent color.
+ * Conic gradient light effect matching Figma design exactly.
+ * Figma spec: conic-gradient(from 90deg at 48% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(106, 94, 254, 1) 100%)
+ * Creates two mirrored conic beams emanating from the top center.
  */
 export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
-  color = '#4725F4',
+  color = '#6A5EFE', // Figma default: rgba(106, 94, 254, 1)
   className = '',
 }) => {
-  // Convert hex to rgba with opacity
-  const colorWithOpacity = useMemo(() => {
+  // Convert hex to rgb values
+  const rgb = useMemo(() => {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
@@ -26,23 +26,25 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
     return { r, g, b };
   }, [color]);
 
-  // Create the conic gradients matching Figma's design
-  // Based on fill_EIUHC1: conic-gradient(from 90deg at 48% 9%, ...)
-  const leftGradient = useMemo(() => {
-    const { r, g, b } = colorWithOpacity;
-    return `conic-gradient(from 90deg at 48% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(${r}, ${g}, ${b}, 1) 100%)`;
-  }, [colorWithOpacity]);
+  // Left conic gradient - exactly as Figma spec
+  // Creates light beam on left side emanating from top-center
+  const leftConicGradient = useMemo(() => {
+    const { r, g, b } = rgb;
+    // Figma: conic-gradient(from 90deg at 48% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(106, 94, 254, 1) 100%)
+    return `conic-gradient(from 90deg at 96% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(${r}, ${g}, ${b}, 1) 100%)`;
+  }, [rgb]);
 
-  const rightGradient = useMemo(() => {
-    const { r, g, b } = colorWithOpacity;
-    return `conic-gradient(from 90deg at 52% 9%, rgba(${r}, ${g}, ${b}, 1) 0%, rgba(2, 0, 20, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
-  }, [colorWithOpacity]);
+  // Right conic gradient - mirrored version
+  const rightConicGradient = useMemo(() => {
+    const { r, g, b } = rgb;
+    return `conic-gradient(from 90deg at 4% 9%, rgba(${r}, ${g}, ${b}, 1) 0%, rgba(2, 0, 20, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
+  }, [rgb]);
 
-  // Secondary softer gradient for depth
-  const centerGlowGradient = useMemo(() => {
-    const { r, g, b } = colorWithOpacity;
-    return `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.3) 0%, rgba(${r}, ${g}, ${b}, 0.1) 40%, transparent 70%)`;
-  }, [colorWithOpacity]);
+  // Soft glow overlay for depth
+  const glowGradient = useMemo(() => {
+    const { r, g, b } = rgb;
+    return `radial-gradient(ellipse 100% 60% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.15) 0%, rgba(${r}, ${g}, ${b}, 0.05) 50%, transparent 80%)`;
+  }, [rgb]);
 
   return (
     <motion.div 
@@ -52,14 +54,14 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}
     >
-      {/* Left conic beam */}
+      {/* Left conic beam - positioned on left half */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: -50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: 'easeOut' }}
         className="absolute"
         style={{
-          background: leftGradient,
+          background: leftConicGradient,
           width: '50vw',
           height: '100vh',
           left: 0,
@@ -67,14 +69,14 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         }}
       />
 
-      {/* Right conic beam (mirrored) */}
+      {/* Right conic beam - mirrored on right half */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: -50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: 'easeOut', delay: 0.1 }}
         className="absolute"
         style={{
-          background: rightGradient,
+          background: rightConicGradient,
           width: '50vw',
           height: '100vh',
           left: '50vw',
@@ -82,31 +84,33 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         }}
       />
 
-      {/* Center glow overlay */}
+      {/* Soft glow overlay */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 2, ease: 'easeOut', delay: 0.3 }}
         className="absolute inset-0"
         style={{
-          background: centerGlowGradient,
+          background: glowGradient,
         }}
       />
 
-      {/* Subtle animated pulse on the glow */}
+      {/* Animated breathing pulse effect */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: [0, 0.4, 0.2],
+          opacity: [0, 0.3, 0.15, 0.25, 0.15],
         }}
         transition={{ 
-          duration: 3,
-          ease: 'easeOut',
+          duration: 8,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'reverse',
         }}
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse 60% 30% at 50% 0%, rgba(${colorWithOpacity.r}, ${colorWithOpacity.g}, ${colorWithOpacity.b}, 0.5) 0%, transparent 60%)`,
-          filter: 'blur(40px)',
+          background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4) 0%, transparent 70%)`,
+          filter: 'blur(60px)',
         }}
       />
     </motion.div>

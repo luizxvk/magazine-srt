@@ -1569,30 +1569,30 @@ export default function ConnectPage() {
       
       <div className={`flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16 ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
-        <div className={`hidden md:flex w-64 ${themeSidebar} border-r ${themeBorder} flex-col`}>
+        <div className="hidden md:flex w-64 m-3 mr-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] flex-col overflow-hidden font-grotesk">
           {/* Header */}
-          <div className={`p-4 border-b ${themeBorder} flex items-center justify-between`}>
+          <div className="p-4 border-b border-white/10 flex items-center justify-between">
             <button
               onClick={handleReturnToHub}
-              className={`flex items-center gap-2 ${themeHover} rounded-lg px-2 py-1 transition-colors`}
+              className="flex items-center gap-2 hover:bg-white/5 rounded-lg px-2 py-1 transition-colors"
               title="Voltar ao Hub"
             >
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
                 <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
               </div>
-              <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
+              <span className="font-grotesk text-lg font-bold text-[#F1F5F9]">Connect</span>
             </button>
             <div className="flex items-center gap-1">
               <button
                 onClick={handleReturnToHub}
-                className={`p-2 rounded-lg ${themeHover} ${themeSecondary} transition-colors ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
+                className={`p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
                 title="Hub"
               >
                 <Home className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className={`p-2 rounded-lg ${themeHover} ${themeSecondary} transition-colors`}
+                className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"
               >
                 <Plus className="w-5 h-5" />
               </button>
@@ -1625,21 +1625,21 @@ export default function ConnectPage() {
           )}
 
           {/* User Panel */}
-          <div className={`p-3 border-t ${themeBorder} flex items-center gap-2`}>
+          <div className="p-3 border-t border-white/10 flex items-center gap-2">
             <img
               src={user?.avatarUrl || '/assets/logo-rovex.png'}
               className="w-8 h-8 rounded-full"
               alt=""
             />
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium truncate ${themeText}`}>
+              <p className="text-sm font-medium truncate text-[#F1F5F9]">
                 {user?.displayName || user?.name}
               </p>
-              <p className="text-xs text-green-500">Online</p>
+              <p className="text-xs text-[#3CFF00]">Online</p>
             </div>
             <button 
               onClick={() => setShowAudioSettings(true)}
-              className={`p-2 ${themeHover} rounded-lg ${themeSecondary}`}
+              className="p-2 hover:bg-white/5 rounded-lg text-[#94A3B8]"
               title="Configurações de áudio"
             >
               <Settings className="w-4 h-4" />

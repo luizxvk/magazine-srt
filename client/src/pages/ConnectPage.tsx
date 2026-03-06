@@ -1569,9 +1569,9 @@ export default function ConnectPage() {
       
       <div className={`flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16 ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
-        <div className="hidden md:flex w-64 m-3 mr-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] flex-col overflow-hidden font-grotesk">
+        <div className="hidden md:flex w-64 my-3 ml-3 mr-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] flex-col overflow-hidden font-grotesk">
           {/* Header */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
             <button
               onClick={handleReturnToHub}
               className="flex items-center gap-2 hover:bg-white/5 rounded-lg px-2 py-1 transition-colors"

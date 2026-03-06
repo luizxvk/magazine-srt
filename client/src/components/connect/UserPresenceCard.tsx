@@ -563,15 +563,18 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                             title={badge.name}
                           >
                             <div className="w-full h-full rounded-[6px] bg-[#0a0a0f] flex items-center justify-center">
-                              {badge.iconUrl ? (
+                              {badge.iconUrl && badge.iconUrl.length > 5 ? (
                                 <img 
                                   src={badge.iconUrl} 
                                   alt={badge.name} 
                                   className="w-6 h-6 object-contain"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                  }}
                                 />
-                              ) : (
-                                <Star size={14} className="text-white/50" />
-                              )}
+                              ) : null}
+                              <Award size={14} className={`text-white/50 ${badge.iconUrl && badge.iconUrl.length > 5 ? 'hidden' : ''}`} />
                             </div>
                           </div>
                         ))}

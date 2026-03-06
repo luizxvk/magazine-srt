@@ -10,13 +10,15 @@ import {
   Image,
   MoreHorizontal,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Swords,
+  Gift
 } from 'lucide-react';
 import api from '../../services/api';
 
 interface Activity {
   id: string;
-  type: 'FILE_SHARED' | 'CALL_STARTED' | 'LEVEL_UP' | 'ACHIEVEMENT' | 'MESSAGE' | 'GROUP_JOINED' | 'BADGE_EARNED' | 'POST_CREATED' | 'PRESTIGE';
+  type: 'FILE_SHARED' | 'CALL_STARTED' | 'LEVEL_UP' | 'ACHIEVEMENT' | 'MESSAGE' | 'GROUP_JOINED' | 'BADGE_EARNED' | 'POST_CREATED' | 'PRESTIGE' | 'TOURNAMENT_POSTED' | 'REWARD_CLAIMED';
   userId: string;
   userName: string;
   userDisplayName?: string;
@@ -43,6 +45,8 @@ const activityConfig: Record<string, { icon: React.ElementType; color: string; b
   BADGE_EARNED: { icon: Trophy, color: '#f97316', bgColor: 'rgba(249, 115, 22, 0.2)', label: 'ganhou uma badge' },
   POST_CREATED: { icon: Image, color: '#ec4899', bgColor: 'rgba(236, 72, 153, 0.2)', label: 'criou um post' },
   PRESTIGE: { icon: Sparkles, color: '#d4af37', bgColor: 'rgba(212, 175, 55, 0.2)', label: 'completou um prestígio' },
+  TOURNAMENT_POSTED: { icon: Swords, color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.2)', label: 'criou um torneio' },
+  REWARD_CLAIMED: { icon: Gift, color: '#22c55e', bgColor: 'rgba(34, 197, 94, 0.2)', label: 'resgatou uma recompensa' },
 };
 
 export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
@@ -68,7 +72,7 @@ export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
         userName: a.user?.name || '',
         userDisplayName: a.user?.displayName,
         userAvatarUrl: a.user?.avatarUrl,
-        targetName: a.metadata?.badgeName || a.metadata?.achievementName || a.metadata?.preview,
+        targetName: a.metadata?.badgeName || a.metadata?.achievementName || a.metadata?.title || a.metadata?.rewardTitle || a.metadata?.preview,
         metadata: a.metadata,
         createdAt: a.createdAt,
       }));
@@ -183,6 +187,25 @@ export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
             <span className="font-bold text-[#F1F5F9]">{displayName}</span>
             <span className="text-[#F1F5F9]"> alcançou </span>
             <span className="text-yellow-400">Prestígio {activity.metadata?.prestigeLevel || '?'}</span>
+          </>
+        );
+      case 'TOURNAMENT_POSTED':
+        return (
+          <>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> criou o torneio </span>
+            <span className="text-red-400">{activity.metadata?.title || 'Novo Torneio'}</span>
+            {(activity.metadata?.prizePool ?? 0) > 0 && (
+              <span className="text-green-400"> ({activity.metadata?.prizePool} Zions)</span>
+            )}
+          </>
+        );
+      case 'REWARD_CLAIMED':
+        return (
+          <>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> resgatou </span>
+            <span className="text-green-400">{activity.metadata?.rewardTitle || 'uma recompensa exclusiva'}</span>
           </>
         );
       default:

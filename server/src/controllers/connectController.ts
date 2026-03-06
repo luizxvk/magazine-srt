@@ -834,41 +834,41 @@ export const getRecentActivities = async (req: Request, res: Response) => {
     const recentBadges = await prisma.userBadge.findMany({
       where: {
         userId: { in: relevantUserIds },
-        earnedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        awardedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
       },
       include: {
         user: {
           select: { id: true, name: true, displayName: true, avatarUrl: true },
         },
         badge: {
-          select: { id: true, name: true, iconPath: true },
+          select: { id: true, name: true, iconUrl: true },
         },
       },
-      orderBy: { earnedAt: 'desc' },
+      orderBy: { awardedAt: 'desc' },
       take: 5,
     });
 
     recentBadges.forEach(userBadge => {
       activities.push({
-        id: `badge-${userBadge.id}`,
+        id: `badge-${userBadge.badgeId}-${userBadge.userId}`,
         type: 'BADGE_EARNED',
         user: userBadge.user,
         metadata: {
           badgeName: userBadge.badge.name,
-          badgeIcon: userBadge.badge.iconPath,
+          badgeIcon: userBadge.badge.iconUrl,
         },
-        createdAt: userBadge.earnedAt,
+        createdAt: userBadge.awardedAt,
       });
     });
 
     // 3. Recent posts in groups
     const recentPosts = await prisma.post.findMany({
       where: {
-        authorId: { in: relevantUserIds },
+        userId: { in: relevantUserIds },
         createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
       },
       include: {
-        author: {
+        user: {
           select: { id: true, name: true, displayName: true, avatarUrl: true },
         },
       },
@@ -880,47 +880,89 @@ export const getRecentActivities = async (req: Request, res: Response) => {
       activities.push({
         id: `post-${post.id}`,
         type: 'POST_CREATED',
-        user: post.author,
+        user: post.user,
         metadata: {
-          preview: post.content?.substring(0, 100),
+          preview: post.caption?.substring(0, 100),
         },
         createdAt: post.createdAt,
       });
     });
 
-    // 4. Recent achievements (if achievement system exists)
+    // 4. Recent tournaments posted
     try {
-      const recentAchievements = await prisma.userAchievement.findMany({
+      const recentTournaments = await prisma.tournament.findMany({
+        where: {
+          createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          status: { not: 'CANCELLED' },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      });
+
+      for (const tournament of recentTournaments) {
+        // Get creator info from the createdBy field
+        const creator = await prisma.user.findUnique({
+          where: { id: tournament.createdBy },
+          select: { id: true, name: true, displayName: true, avatarUrl: true },
+        });
+
+        if (creator) {
+          activities.push({
+            id: `tournament-${tournament.id}`,
+            type: 'TOURNAMENT_POSTED',
+            user: creator,
+            metadata: {
+              tournamentId: tournament.id,
+              title: tournament.title,
+              game: tournament.game,
+              imageUrl: tournament.imageUrl,
+              prizePool: tournament.prizePool,
+              teamSize: tournament.teamSize,
+              startDate: tournament.startDate,
+            },
+            createdAt: tournament.createdAt,
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Error fetching tournaments for activities:', e);
+    }
+
+    // 5. Recent reward redemptions (exclusive rewards claimed)
+    try {
+      const recentRedemptions = await prisma.redemption.findMany({
         where: {
           userId: { in: relevantUserIds },
-          unlockedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          redeemedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
         },
         include: {
           user: {
             select: { id: true, name: true, displayName: true, avatarUrl: true },
           },
-          achievement: {
-            select: { id: true, name: true, icon: true },
+          reward: {
+            select: { id: true, title: true, type: true, backgroundColor: true },
           },
         },
-        orderBy: { unlockedAt: 'desc' },
+        orderBy: { redeemedAt: 'desc' },
         take: 5,
       });
 
-      recentAchievements.forEach(ua => {
+      recentRedemptions.forEach(redemption => {
         activities.push({
-          id: `achievement-${ua.id}`,
-          type: 'ACHIEVEMENT',
-          user: ua.user,
+          id: `reward-${redemption.id}`,
+          type: 'REWARD_CLAIMED',
+          user: redemption.user,
           metadata: {
-            achievementName: ua.achievement.name,
-            achievementIcon: ua.achievement.icon,
+            rewardId: redemption.reward.id,
+            rewardTitle: redemption.reward.title,
+            rewardType: redemption.reward.type,
+            backgroundColor: redemption.reward.backgroundColor,
           },
-          createdAt: ua.unlockedAt,
+          createdAt: redemption.redeemedAt,
         });
       });
     } catch (e) {
-      // Achievement table might not exist
+      console.error('Error fetching reward redemptions for activities:', e);
     }
 
     // Sort all activities by date and limit

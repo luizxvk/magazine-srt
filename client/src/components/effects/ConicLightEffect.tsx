@@ -10,7 +10,7 @@ interface ConicLightEffectProps {
 
 /**
  * Conic gradient light effect matching Figma design.
- * Creates a spotlight effect emanating from top-center.
+ * Creates a spotlight effect with light beams emanating from top-center.
  */
 export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   color = '#6A5EFE',
@@ -25,10 +25,16 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
     return { r, g, b };
   }, [color]);
 
-  // Main spotlight gradient - radial from top center
+  // Main spotlight gradient - radial from top center (more intense)
   const spotlightGradient = useMemo(() => {
     const { r, g, b } = rgb;
-    return `radial-gradient(ellipse 120% 80% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.4) 0%, rgba(${r}, ${g}, ${b}, 0.2) 30%, rgba(${r}, ${g}, ${b}, 0.08) 60%, transparent 100%)`;
+    return `radial-gradient(ellipse 150% 100% at 50% 0%, rgba(${r}, ${g}, ${b}, 0.6) 0%, rgba(${r}, ${g}, ${b}, 0.35) 25%, rgba(${r}, ${g}, ${b}, 0.15) 50%, rgba(${r}, ${g}, ${b}, 0.05) 75%, transparent 100%)`;
+  }, [rgb]);
+
+  // Light beam effect - vertical bar of light at center
+  const lightBeamGradient = useMemo(() => {
+    const { r, g, b } = rgb;
+    return `linear-gradient(180deg, rgba(${r}, ${g}, ${b}, 0.8) 0%, rgba(${r}, ${g}, ${b}, 0.4) 20%, rgba(${r}, ${g}, ${b}, 0.1) 60%, transparent 100%)`;
   }, [rgb]);
 
   return (
@@ -47,21 +53,55 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         }}
       />
 
+      {/* Central light beam / bar */}
+      <motion.div
+        initial={{ opacity: 0, scaleY: 0 }}
+        animate={{ opacity: 1, scaleY: 1 }}
+        transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
+        className="absolute"
+        style={{
+          background: lightBeamGradient,
+          width: '200px',
+          height: '70%',
+          left: '50%',
+          top: 0,
+          transform: 'translateX(-50%)',
+          filter: 'blur(80px)',
+          transformOrigin: 'top center',
+        }}
+      />
+
+      {/* Horizontal glow at top */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+        className="absolute"
+        style={{
+          background: `radial-gradient(ellipse 60% 20% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4) 50%, transparent 100%)`,
+          width: '100%',
+          height: '300px',
+          left: 0,
+          top: 0,
+          filter: 'blur(20px)',
+        }}
+      />
+
       {/* Subtle breathing pulse */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: [0.5, 0.8, 0.5],
+          opacity: [0.6, 0.9, 0.6],
         }}
         transition={{ 
-          duration: 6,
+          duration: 5,
           ease: 'easeInOut',
           repeat: Infinity,
         }}
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse 100% 60% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 0%, transparent 70%)`,
-          filter: 'blur(40px)',
+          background: `radial-gradient(ellipse 100% 50% at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2) 0%, transparent 60%)`,
+          filter: 'blur(30px)',
         }}
       />
     </div>

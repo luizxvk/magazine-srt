@@ -27,3 +27,4 @@ src/buildInfo.json
 *.sw?
 .vercel
 .env*.local
+.env.production

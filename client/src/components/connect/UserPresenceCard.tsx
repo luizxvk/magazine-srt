@@ -15,8 +15,47 @@ import {
   Clock,
   Trophy,
   Award,
-  BadgeCheck
+  BadgeCheck,
+  Heart,
+  Home,
+  Edit,
+  Medal,
+  Landmark,
+  Crown,
+  User,
+  LucideIcon
 } from 'lucide-react';
+
+// Icon map for icon: prefix badges
+const iconMap: Record<string, LucideIcon> = {
+  Trophy,
+  Heart,
+  Clock,
+  Home,
+  Edit,
+  UserPlus,
+  Medal,
+  Landmark,
+  Crown,
+  Star,
+  Award,
+  User,
+  Sparkles
+};
+
+// Helper function to check if imageUrl is a valid URL
+const isValidImageUrl = (url: string | null | undefined): boolean => {
+  if (!url || url.length < 5) return false;
+  if (url.startsWith('icon:')) return false;
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:');
+};
+
+// Helper function to get icon component from icon: prefix
+const getIconFromPrefix = (iconUrl: string): LucideIcon | null => {
+  if (!iconUrl.startsWith('icon:')) return null;
+  const iconName = iconUrl.replace('icon:', '');
+  return iconMap[iconName] || null;
+};
 import { useAuth } from '../../context/AuthContext';
 import { useCommunity } from '../../context/CommunityContext';
 import api from '../../services/api';
@@ -539,7 +578,17 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                             title={badge.name}
                           >
                             <div className="w-full h-full rounded-[6px] bg-[#0a0a0f] flex items-center justify-center">
-                              {badge.iconUrl && badge.iconUrl.length > 5 ? (
+                              {badge.iconUrl && badge.iconUrl.startsWith('icon:') ? (
+                                // Render Lucide icon for icon: prefix
+                                (() => {
+                                  const IconComponent = getIconFromPrefix(badge.iconUrl);
+                                  return IconComponent ? (
+                                    <IconComponent size={14} className="text-white/50" />
+                                  ) : (
+                                    <Award size={14} className="text-white/50" />
+                                  );
+                                })()
+                              ) : isValidImageUrl(badge.iconUrl) ? (
                                 <img 
                                   src={badge.iconUrl} 
                                   alt={badge.name} 
@@ -549,8 +598,9 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                                     (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                                   }}
                                 />
-                              ) : null}
-                              <Award size={14} className={`text-white/50 ${badge.iconUrl && badge.iconUrl.length > 5 ? 'hidden' : ''}`} />
+                              ) : (
+                                <Award size={14} className="text-white/50" />
+                              )}
                             </div>
                           </div>
                         ))}

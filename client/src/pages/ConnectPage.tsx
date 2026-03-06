@@ -1619,16 +1619,15 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
       
-      <div className={`flex flex-1 pt-16 md:pt-16 overflow-y-auto md:overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
+      <div className={`flex flex-1 pt-16 md:pt-16 h-screen overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
         <motion.div 
-          className="hidden md:flex flex-col mt-3 ml-3 mb-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-t-[22px] overflow-hidden font-grotesk"
-          style={{ height: 'calc(100%)' }}
+          className="hidden md:flex flex-col h-full mt-3 ml-3 mb-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-t-[22px] overflow-hidden font-grotesk"
           animate={{ width: sidebarCollapsed ? 64 : 256 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
         >
           {/* Header */}
-          <div className={`border-b border-white/10 flex items-center flex-shrink-0 ${sidebarCollapsed ? 'p-2 flex-col gap-2' : 'p-4 justify-between'}`}>
+          <div className={`border-b border-white/10 flex items-center shrink-0 ${sidebarCollapsed ? 'p-2 flex-col gap-2' : 'p-4 justify-between'}`}>
             {sidebarCollapsed ? (
               <>
                 <button
@@ -1693,7 +1692,7 @@ export default function ConnectPage() {
           </div>
 
           {/* Groups List */}
-          <div className="flex-1 overflow-y-auto py-2">
+          <div className="flex-1 overflow-y-auto min-h-0 py-2">
             {sidebarCollapsed ? (
               /* Collapsed: Show only group avatars */
               <div className="flex flex-col items-center gap-2 px-2">
@@ -1754,7 +1753,7 @@ export default function ConnectPage() {
           )}
 
           {/* User Panel */}
-          <div className={`border-t border-white/10 flex items-center ${sidebarCollapsed ? 'p-2 flex-col gap-2' : 'p-3 gap-2'}`}>
+          <div className={`border-t border-white/10 flex items-center shrink-0 ${sidebarCollapsed ? 'p-2 flex-col gap-2' : 'p-3 gap-2'}`}>
             <img
               src={user?.avatarUrl || '/assets/logo-rovex.png'}
               className={`rounded-full ${sidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8'}`}
@@ -1816,7 +1815,7 @@ export default function ConnectPage() {
               />
               
               {/* Online Friends Sidebar - Desktop only */}
-              <div className="hidden xl:flex w-72 flex-col" style={{ height: 'calc(100%)' }}>
+              <div className="hidden xl:flex w-72 flex-col h-full">
                 <ConnectOnlineFriends
                   accentColor={accentColor}
                   onFriendClick={(friendId: string) => handleOpenPresenceCard(friendId)}
@@ -1828,57 +1827,16 @@ export default function ConnectPage() {
 
         {/* Right Sidebar - Members */}
         {selectedGroup && (
-          <div className={`w-60 ${themeSidebar} border-l ${themeBorder} p-4 hidden lg:block`}>
-            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
+          <div className={`w-60 ${themeSidebar} border-l ${themeBorder} p-4 hidden lg:flex flex-col h-full overflow-hidden`}>
+            {/* Header - shrink-0 */}
+            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 shrink-0 ${themeSecondary}`}>
               Online — {getOnlineMembers(selectedGroup.members).length}
             </h3>
-            <div className="space-y-2">
-              {getOnlineMembers(selectedGroup.members).map(member => {
-                const memberIsMGT = member.user.membershipType === 'MGT';
-                return (
-                  <div 
-                    key={member.id}
-                    className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
-                    onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
-                  >
-                    <div className="relative">
-                      <div 
-                        className="w-8 h-8 rounded-full p-[2px]" 
-                        style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
-                      >
-                        <img
-                          src={member.user.avatarUrl || '/assets/logo-rovex.png'}
-                          className="w-full h-full rounded-full object-cover bg-black"
-                          alt=""
-                        />
-                      </div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1">
-                        <p className={`text-sm font-medium truncate ${themeText}`}>
-                          {member.user.displayName || member.user.name}
-                        </p>
-                        <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
-                      </div>
-                      {member.role !== 'MEMBER' && (
-                        <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
-                          {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 mt-6 ${themeSecondary}`}>
-              Offline — {getOfflineMembers(selectedGroup.members).length}
-            </h3>
-            <div className="space-y-2 opacity-50">
-              {getOfflineMembers(selectedGroup.members)
-                .slice(0, 10)
-                .map(member => {
+            
+            {/* Scrollable members area */}
+            <div className="flex-1 overflow-y-auto min-h-0 space-y-4">
+              <div className="space-y-2">
+                {getOnlineMembers(selectedGroup.members).map(member => {
                   const memberIsMGT = member.user.membershipType === 'MGT';
                   return (
                     <div 
@@ -1886,25 +1844,73 @@ export default function ConnectPage() {
                       className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
                       onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
                     >
-                      <div 
-                        className="w-8 h-8 rounded-full p-[2px] grayscale" 
-                        style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
-                      >
-                        <img
-                          src={member.user.avatarUrl || '/assets/logo-rovex.png'}
-                          className="w-full h-full rounded-full object-cover bg-black"
-                          alt=""
-                        />
+                      <div className="relative">
+                        <div 
+                          className="w-8 h-8 rounded-full p-[2px]" 
+                          style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
+                        >
+                          <img
+                            src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                            className="w-full h-full rounded-full object-cover bg-black"
+                            alt=""
+                          />
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900" />
                       </div>
-                      <div className="flex items-center gap-1">
-                        <p className={`text-sm truncate ${themeSecondary}`}>
-                          {member.user.displayName || member.user.name}
-                        </p>
-                        <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1">
+                          <p className={`text-sm font-medium truncate ${themeText}`}>
+                            {member.user.displayName || member.user.name}
+                          </p>
+                          <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                        </div>
+                        {member.role !== 'MEMBER' && (
+                          <p className={`text-xs ${member.role === 'ADMIN' ? (isMGT ? 'text-tier-std-400' : 'text-gold-400') : 'text-blue-400'}`}>
+                            {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
+                          </p>
+                        )}
                       </div>
                     </div>
                   );
                 })}
+              </div>
+
+              <div>
+                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${themeSecondary}`}>
+                  Offline — {getOfflineMembers(selectedGroup.members).length}
+                </h3>
+                <div className="space-y-2 opacity-50">
+                  {getOfflineMembers(selectedGroup.members)
+                    .slice(0, 10)
+                    .map(member => {
+                      const memberIsMGT = member.user.membershipType === 'MGT';
+                      return (
+                        <div 
+                          key={member.id}
+                          className={`flex items-center gap-2 p-2 rounded-lg ${themeHover} cursor-pointer`}
+                          onClick={(e) => handleOpenPresenceCard(member.userId, { name: member.user.name, displayName: member.user.displayName, avatarUrl: member.user.avatarUrl }, e)}
+                        >
+                          <div 
+                            className="w-8 h-8 rounded-full p-[2px] grayscale" 
+                            style={{ background: getProfileBorderGradient(member.user.equippedProfileBorder, memberIsMGT) }}
+                          >
+                            <img
+                              src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                              className="w-full h-full rounded-full object-cover bg-black"
+                              alt=""
+                            />
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <p className={`text-sm truncate ${themeSecondary}`}>
+                              {member.user.displayName || member.user.name}
+                            </p>
+                            <BadgeDisplay userId={member.user.id} isElite={member.user.isElite} eliteUntil={member.user.eliteUntil} size="sm" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
             </div>
           </div>
         )}

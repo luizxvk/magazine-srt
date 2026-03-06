@@ -1615,11 +1615,11 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
       
-      <div className={`flex flex-1 pt-16 overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
+      <div className={`flex flex-1 pt-16 md:pt-16 overflow-y-auto md:overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
         <motion.div 
-          className="hidden md:flex flex-col mt-3 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 border-b-0 rounded-t-[22px] overflow-hidden font-grotesk"
-          style={{ height: 'calc(100% - 0.75rem)' }}
+          className="hidden md:flex flex-col mt-3 ml-3 mb-0 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-t-[22px] overflow-hidden font-grotesk"
+          style={{ height: 'calc(100%)' }}
           animate={{ width: sidebarCollapsed ? 64 : 256 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
         >
@@ -1812,7 +1812,7 @@ export default function ConnectPage() {
               />
               
               {/* Online Friends Sidebar - Desktop only */}
-              <div className="hidden xl:flex w-72 h-full flex-col overflow-hidden">
+              <div className="hidden xl:flex w-72 flex-col" style={{ height: 'calc(100%)' }}>
                 <ConnectOnlineFriends
                   accentColor={accentColor}
                   onFriendClick={(friendId: string) => handleOpenPresenceCard(friendId)}

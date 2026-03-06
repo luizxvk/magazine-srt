@@ -7,10 +7,10 @@ import {
   Award, 
   MessageSquare, 
   Users, 
-  Sparkles, 
   Image,
   MoreHorizontal,
-  TrendingUp
+  TrendingUp,
+  Sparkles
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -125,71 +125,71 @@ export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
       case 'FILE_SHARED':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> compartilhou um arquivo em </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> compartilhou um arquivo em </span>
             <span className="text-blue-400">{activity.targetName}</span>
           </>
         );
       case 'CALL_STARTED':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> iniciou uma chamada com </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> iniciou uma chamada com </span>
             <span className="text-green-400">{activity.targetName}</span>
           </>
         );
       case 'LEVEL_UP':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> subiu para o </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> subiu para o </span>
             <span className="text-amber-400">Nível {activity.metadata?.level || '?'}</span>
           </>
         );
       case 'ACHIEVEMENT':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> desbloqueou </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> desbloqueou </span>
             <span className="text-purple-400">{activity.targetName}</span>
           </>
         );
       case 'BADGE_EARNED':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> ganhou a badge </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> ganhou a badge </span>
             <span className="text-orange-400">{activity.targetName}</span>
           </>
         );
       case 'GROUP_JOINED':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> entrou no grupo </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> entrou no grupo </span>
             <span className="text-teal-400">{activity.targetName}</span>
           </>
         );
       case 'POST_CREATED':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> criou um novo post</span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> criou um novo post</span>
           </>
         );
       case 'PRESTIGE':
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> alcançou </span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> alcançou </span>
             <span className="text-yellow-400">Prestígio {activity.metadata?.prestigeLevel || '?'}</span>
           </>
         );
       default:
         return (
           <>
-            <span className="font-medium text-white">{displayName}</span>
-            <span className="text-gray-400"> {config.label}</span>
+            <span className="font-bold text-[#F1F5F9]">{displayName}</span>
+            <span className="text-[#F1F5F9]"> {config.label}</span>
           </>
         );
     }
@@ -197,11 +197,11 @@ export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-4">
-        <h3 className="text-white font-semibold mb-4">Recent Activity</h3>
+      <div className="bg-white/[0.03] backdrop-blur-[12px] rounded-[22px] border border-white/10 p-4 font-grotesk">
+        <h3 className="text-[#F1F5F9] font-bold text-xl mb-4">Recent Activity</h3>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-3 animate-pulse">
+            <div key={i} className="flex items-center gap-4 animate-pulse">
               <div className="w-10 h-10 rounded-full bg-white/10" />
               <div className="flex-1 space-y-2">
                 <div className="h-3 bg-white/10 rounded w-3/4" />
@@ -215,36 +215,33 @@ export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
   }
 
   return (
-    <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+    <div className="bg-white/[0.03] backdrop-blur-[12px] rounded-[22px] border border-white/10 overflow-hidden font-grotesk">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/5">
-        <h3 className="text-white font-semibold">Recent Activity</h3>
+      <div className="px-4 py-3">
+        <h3 className="text-[#F1F5F9] font-bold text-xl">Recent Activity</h3>
       </div>
 
       {/* Activities List */}
       <div className="divide-y divide-white/5">
         <AnimatePresence>
           {activities.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <div className="p-6 text-center text-[#64748B]">
+              <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">Nenhuma atividade recente</p>
             </div>
           ) : (
             activities.slice(0, 5).map((activity, index) => {
-              const config = activityConfig[activity.type] || activityConfig.MESSAGE;
-              const Icon = config.icon;
-
               return (
                 <motion.div
                   key={activity.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="flex items-start gap-3 p-4 hover:bg-white/5 transition-colors group cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-4 hover:bg-white/[0.02] transition-colors group cursor-pointer"
                   onClick={() => onUserClick?.(activity.userId)}
                 >
                   {/* User Avatar */}
-                  <div className="relative">
+                  <div className="relative flex-shrink-0">
                     {activity.userAvatarUrl ? (
                       <img
                         src={activity.userAvatarUrl}
@@ -259,27 +256,20 @@ export const ConnectRecentActivity: React.FC<ConnectRecentActivityProps> = ({
                         {(activity.userDisplayName || activity.userName).charAt(0).toUpperCase()}
                       </div>
                     )}
-                    {/* Activity type indicator */}
-                    <div
-                      className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: config.bgColor }}
-                    >
-                      <Icon className="w-3 h-3" style={{ color: config.color }} />
-                    </div>
                   </div>
 
                   {/* Activity Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm leading-relaxed">
+                    <p className="text-sm font-bold leading-relaxed">
                       {renderActivityText(activity)}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#64748B] mt-0.5">
                       {formatTime(activity.createdAt)}
                     </p>
                   </div>
 
                   {/* More Options */}
-                  <button className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all">
+                  <button className="p-2 rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0">
                     <MoreHorizontal className="w-4 h-4" />
                   </button>
                 </motion.div>

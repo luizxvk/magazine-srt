@@ -46,11 +46,13 @@ export const ConnectGroupCard: React.FC<ConnectGroupCardProps> = ({
   const onlineMembers = members
     .filter(m => m.user.isOnline)
     .slice(0, 3);
+  
+  const remainingOnline = Math.max(0, onlineCount - 3);
 
   return (
     <motion.div
       onClick={onClick}
-      className={`relative rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 ${
+      className={`relative rounded-[22px] overflow-hidden cursor-pointer group transition-all duration-300 font-grotesk bg-white/[0.03] border border-white/10 backdrop-blur-[12px] ${
         isActive 
           ? 'ring-2 ring-offset-2 ring-offset-black/50' 
           : 'hover:ring-1 hover:ring-white/20'
@@ -64,88 +66,87 @@ export const ConnectGroupCard: React.FC<ConnectGroupCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Banner Image */}
-      <div className="relative aspect-[16/10] bg-gradient-to-br from-gray-800 to-gray-900">
-        {bannerUrl ? (
-          <img 
-            src={bannerUrl} 
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div 
-            className="w-full h-full flex items-center justify-center"
-            style={{ 
-              background: `linear-gradient(135deg, ${accentColor}30, ${accentColor}10)` 
-            }}
-          >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="w-16 h-16 rounded-2xl object-cover opacity-60" />
-            ) : (
-              <div 
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white/50"
-                style={{ backgroundColor: `${accentColor}40` }}
-              >
-                {name.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-        )}
+      {/* Banner Image Container - with rounded corners inside */}
+      <div className="relative mx-[21px] mt-[21px] rounded-[32px] overflow-hidden">
+        <div className="relative aspect-[354/125] bg-gradient-to-br from-gray-800 to-gray-900">
+          {bannerUrl ? (
+            <img 
+              src={bannerUrl} 
+              alt={name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div 
+              className="w-full h-full flex items-center justify-center"
+              style={{ 
+                background: `linear-gradient(135deg, ${accentColor}30, ${accentColor}10)` 
+              }}
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={name} className="w-16 h-16 rounded-2xl object-cover opacity-60" />
+              ) : (
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white/50"
+                  style={{ backgroundColor: `${accentColor}40` }}
+                >
+                  {name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          {/* Gradient overlay from bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-        {/* Group Icon (top-right on banner) */}
-        <div className="absolute top-3 right-3">
-          <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shadow-lg"
-            style={{ backgroundColor: `${accentColor}` }}
-          >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-white font-bold text-sm">
-                {name.charAt(0).toUpperCase()}
-              </span>
-            )}
+          {/* Group Icon (bottom-left on banner) */}
+          <div className="absolute bottom-3 left-3">
+            <div 
+              className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shadow-lg"
+              style={{ backgroundColor: accentColor }}
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white font-bold text-sm">
+                  {name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Info Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 flex items-end justify-between">
-        <div className="flex-1 min-w-0">
-          {/* Group Name */}
-          <h3 className="text-white font-semibold text-sm truncate mb-1">
-            {name.toUpperCase()}
-          </h3>
-          
+      {/* Info Section - Below Banner */}
+      <div className="px-[21px] py-4">
+        {/* Group Name */}
+        <h3 className="text-[#F1F5F9] font-bold text-lg truncate mb-2" style={{ lineHeight: '1.56' }}>
+          {name.toUpperCase()}
+        </h3>
+        
+        {/* Bottom row: online count + member avatars */}
+        <div className="flex items-center justify-between">
           {/* Online Count */}
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs text-gray-400">
-              {onlineCount} online
-            </span>
-          </div>
-        </div>
+          <span className="text-sm text-[#94A3B8]">
+            {onlineCount} online
+          </span>
 
-        {/* Member Avatars (3 stacked) */}
-        <div className="flex items-center -space-x-2">
-          {onlineMembers.length > 0 ? (
-            onlineMembers.map((member, index) => (
-              <div 
-                key={member.id}
-                className="w-7 h-7 rounded-full border-2 border-black/50 overflow-hidden"
-                style={{ 
-                  zIndex: 3 - index,
-                  background: getProfileBorderGradient(
-                    member.user.equippedProfileBorder, 
-                    member.user.membershipType === 'MGT'
-                  )
-                }}
-              >
-                <div className="w-full h-full rounded-full overflow-hidden p-0.5">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-black/50">
+          {/* Member Avatars (3 stacked with +N) */}
+          <div className="flex items-center" style={{ gap: '-8px' }}>
+            {onlineMembers.length > 0 ? (
+              <>
+                {onlineMembers.map((member, index) => (
+                  <div 
+                    key={member.id}
+                    className="w-6 h-6 rounded-full overflow-hidden -ml-2 first:ml-0"
+                    style={{ 
+                      zIndex: 3 - index,
+                      border: '2px solid #131022',
+                      background: getProfileBorderGradient(
+                        member.user.equippedProfileBorder, 
+                        member.user.membershipType === 'MGT'
+                      ) || '#334155'
+                    }}
+                  >
                     {member.user.avatarUrl ? (
                       <img 
                         src={member.user.avatarUrl} 
@@ -154,23 +155,35 @@ export const ConnectGroupCard: React.FC<ConnectGroupCardProps> = ({
                       />
                     ) : (
                       <div 
-                        className="w-full h-full flex items-center justify-center text-[10px] font-bold text-white"
-                        style={{ backgroundColor: accentColor }}
+                        className="w-full h-full flex items-center justify-center text-[8px] font-bold text-[#F1F5F9]"
+                        style={{ backgroundColor: '#334155' }}
                       >
                         {(member.user.displayName || member.user.name).charAt(0).toUpperCase()}
                       </div>
                     )}
                   </div>
-                </div>
+                ))}
+                {remainingOnline > 0 && (
+                  <div 
+                    className="w-6 h-6 rounded-full flex items-center justify-center -ml-2 text-[8px] font-bold text-[#F1F5F9]"
+                    style={{ 
+                      zIndex: 0,
+                      border: '2px solid #131022',
+                      backgroundColor: '#64748B'
+                    }}
+                  >
+                    +{remainingOnline}
+                  </div>
+                )}
+              </>
+            ) : (
+              // Fallback if no online members
+              <div className="flex items-center gap-1 text-xs text-[#94A3B8]">
+                <Users className="w-4 h-4" />
+                <span>{members.length}</span>
               </div>
-            ))
-          ) : (
-            // Fallback if no online members
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <Users className="w-4 h-4" />
-              <span>{members.length}</span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

@@ -51,6 +51,7 @@ export default {
             fontFamily: {
                 serif: ['Forum', 'serif'],
                 sans: ['Inter', 'sans-serif'],
+                grotesk: ['Space Grotesk', 'sans-serif'],
             },
             backgroundImage: {
                 'metal-gradient': 'linear-gradient(135deg, #D4AF37 0%, #F2EBCF 50%, #AA8C2C 100%)',

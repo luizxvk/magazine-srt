@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, Plus, ArrowRight, Users } from 'lucide-react';
 import { ConnectGroupCard } from './ConnectGroupCard';
 import { ConnectRecentActivity } from './ConnectRecentActivity';
 import { LightRays } from '../effects';
@@ -85,32 +85,33 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
         />
       </div>
 
-      <div className="relative z-10 p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="relative z-10 p-6 md:p-8 max-w-7xl mx-auto font-grotesk">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-2xl md:text-3xl font-bold text-white tracking-wide"
+            className="text-2xl md:text-3xl font-bold text-[#F1F5F9] tracking-tight"
+            style={{ letterSpacing: '-0.025em' }}
           >
-            ROVEX <span style={{ color: accentColor }}>CONNECT</span>
+            ROVEX CONNECT
           </motion.h1>
 
-          <div className="flex items-center gap-3">
-            {/* Search Bar */}
+          <div className="flex items-center gap-4">
+            {/* Search Bar - Glassmorphic */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
               className="relative"
             >
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
               <input
                 type="text"
                 placeholder="pesquisar"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="w-48 md:w-64 pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all"
+                className="w-48 md:w-64 pl-10 pr-4 py-2 bg-white/[0.03] border border-white/10 rounded-full text-sm text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:border-white/20 focus:bg-white/[0.05] transition-all backdrop-blur-[12px]"
               />
             </motion.div>
 
@@ -120,12 +121,15 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
               onClick={onCreateGroup}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all hover:scale-105"
-              style={{ backgroundColor: accentColor }}
+              className="flex items-center gap-2 px-6 py-2 rounded-full text-base font-bold text-white transition-all hover:scale-105"
+              style={{ 
+                backgroundColor: accentColor,
+                boxShadow: `0px 0px 15px 0px ${accentColor}66`
+              }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-5 h-5" />
               <span className="hidden md:inline">criar grupo</span>
             </motion.button>
           </div>
@@ -139,38 +143,43 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4" style={{ color: accentColor }} />
+            <h2 className="text-xl font-bold text-[#F1F5F9] flex items-center gap-2">
               Grupos ativos agora
             </h2>
-            <button className="text-sm text-gray-400 hover:text-white flex items-center gap-1 transition-colors">
+            <button 
+              className="text-sm font-medium hover:text-white flex items-center gap-1 transition-colors"
+              style={{ color: '#A796FF' }}
+            >
               visualizar todos
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {activeGroups.length === 0 ? (
-            <div className="text-center py-12 px-4 bg-white/5 rounded-2xl border border-white/10">
+            <div className="text-center py-12 px-4 bg-white/[0.03] rounded-[22px] border border-white/10 backdrop-blur-[12px]">
               <div 
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                className="w-16 h-16 rounded-[22px] flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: `${accentColor}20` }}
               >
-                <Sparkles className="w-8 h-8" style={{ color: accentColor }} />
+                <Users className="w-8 h-8" style={{ color: accentColor }} />
               </div>
-              <h3 className="text-white font-medium mb-2">Nenhum grupo ativo</h3>
-              <p className="text-gray-500 text-sm mb-4">
+              <h3 className="text-[#F1F5F9] font-bold mb-2">Nenhum grupo ativo</h3>
+              <p className="text-[#64748B] text-sm mb-4">
                 Crie ou entre em um grupo para começar a conectar
               </p>
               <button
                 onClick={onCreateGroup}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-white hover:scale-105 transition-transform"
-                style={{ backgroundColor: accentColor }}
+                className="px-6 py-2 rounded-full text-base font-bold text-white hover:scale-105 transition-transform"
+                style={{ 
+                  backgroundColor: accentColor,
+                  boxShadow: `0px 0px 15px 0px ${accentColor}66`
+                }}
               >
                 Criar seu primeiro grupo
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {activeGroups.slice(0, 4).map((group, index) => (
                 <motion.div
                   key={group.id}

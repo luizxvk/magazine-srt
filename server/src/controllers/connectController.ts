@@ -403,10 +403,16 @@ export const updateGroupAvatar = async (req: Request, res: Response) => {
     const userId = (req as any).user?.userId || (req as any).user?.id;
     const { groupId } = req.params;
 
+    console.log(`[updateGroupAvatar] User: ${userId}, Group: ${groupId}`);
+
     // Check if file was uploaded
     if (!(req as any).file) {
+      console.log('[updateGroupAvatar] No file uploaded');
       return res.status(400).json({ error: 'Nenhum arquivo enviado' });
     }
+
+    const file = (req as any).file;
+    console.log(`[updateGroupAvatar] File received: ${file.originalname}, ${file.mimetype}, ${file.size} bytes`);
 
     // Check if user is admin of the group
     const member = await prisma.groupMember.findUnique({
@@ -414,22 +420,26 @@ export const updateGroupAvatar = async (req: Request, res: Response) => {
     });
 
     if (!member || member.role !== 'ADMIN') {
+      console.log(`[updateGroupAvatar] User ${userId} is not admin of group ${groupId}`);
       return res.status(403).json({ error: 'Apenas admins podem alterar o avatar do grupo' });
     }
 
     // Upload image
     let avatarUrl: string | null = null;
-    const file = (req as any).file;
 
     if (isR2Configured()) {
+      console.log('[updateGroupAvatar] Uploading to R2...');
       avatarUrl = await uploadGroupImageR2(file.buffer, file.mimetype);
+      console.log(`[updateGroupAvatar] R2 upload success: ${avatarUrl}`);
     } else {
+      console.log('[updateGroupAvatar] R2 not configured, using Cloudinary...');
       const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
       avatarUrl = await uploadPostImageCloudinary(base64Data);
+      console.log(`[updateGroupAvatar] Cloudinary upload success: ${avatarUrl}`);
     }
 
     if (!avatarUrl) {
-      throw new Error('Upload failed');
+      throw new Error('Upload failed - no URL returned');
     }
 
     // Update group with new avatar
@@ -443,10 +453,11 @@ export const updateGroupAvatar = async (req: Request, res: Response) => {
       },
     });
 
+    console.log(`[updateGroupAvatar] Group updated: ${group.id}, avatarUrl: ${group.avatarUrl}`);
     res.json(group);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating group avatar:', error);
-    res.status(500).json({ error: 'Erro ao atualizar avatar do grupo' });
+    res.status(500).json({ error: error.message || 'Erro ao atualizar avatar do grupo' });
   }
 };
 
@@ -458,11 +469,16 @@ export const updateGroupBanner = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.userId || (req as any).user?.id;
     const { groupId } = req.params;
+    console.log(`[updateGroupBanner] User: ${userId}, Group: ${groupId}`);
 
     // Check if file was uploaded
     if (!(req as any).file) {
+      console.log('[updateGroupBanner] No file received');
       return res.status(400).json({ error: 'Nenhum arquivo enviado' });
     }
+
+    const file = (req as any).file;
+    console.log(`[updateGroupBanner] File received: ${file.originalname}, ${file.mimetype}, ${file.size} bytes`);
 
     // Check if user is admin of the group
     const member = await prisma.groupMember.findUnique({
@@ -470,21 +486,27 @@ export const updateGroupBanner = async (req: Request, res: Response) => {
     });
 
     if (!member || member.role !== 'ADMIN') {
+      console.log(`[updateGroupBanner] User ${userId} is not admin of group ${groupId}`);
       return res.status(403).json({ error: 'Apenas admins podem alterar o banner do grupo' });
     }
 
     // Upload image
     let bannerUrl: string | null = null;
-    const file = (req as any).file;
 
+    console.log(`[updateGroupBanner] R2 configured: ${isR2Configured()}`);
     if (isR2Configured()) {
+      console.log('[updateGroupBanner] Uploading to R2...');
       bannerUrl = await uploadGroupImageR2(file.buffer, file.mimetype);
+      console.log(`[updateGroupBanner] R2 upload result: ${bannerUrl}`);
     } else {
+      console.log('[updateGroupBanner] Uploading to Cloudinary...');
       const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
       bannerUrl = await uploadPostImageCloudinary(base64Data);
+      console.log(`[updateGroupBanner] Cloudinary upload result: ${bannerUrl}`);
     }
 
     if (!bannerUrl) {
+      console.log('[updateGroupBanner] Upload failed - no URL returned');
       throw new Error('Upload failed');
     }
 
@@ -498,11 +520,12 @@ export const updateGroupBanner = async (req: Request, res: Response) => {
         bannerUrl: true,
       },
     });
+    console.log(`[updateGroupBanner] Group updated successfully: ${JSON.stringify(group)}`);
 
     res.json(group);
-  } catch (error) {
-    console.error('Error updating group banner:', error);
-    res.status(500).json({ error: 'Erro ao atualizar banner do grupo' });
+  } catch (error: any) {
+    console.error('[updateGroupBanner] Error:', error.message, error.stack);
+    res.status(500).json({ error: error.message || 'Erro ao atualizar banner do grupo' });
   }
 };
 

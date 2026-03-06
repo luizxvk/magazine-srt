@@ -48,12 +48,9 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   }, [rgb]);
 
   return (
-    <motion.div 
-      className={`fixed inset-0 pointer-events-none ${className}`}
-      style={{ zIndex: 1 }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.2, ease: 'easeOut' }}
+    <div 
+      className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
+      style={{ zIndex: 0 }}
     >
       {/* Left conic beam - positioned on left half */}
       <motion.div
@@ -63,8 +60,8 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         className="absolute"
         style={{
           background: leftConicGradient,
-          width: '50vw',
-          height: '100vh',
+          width: '50%',
+          height: '100%',
           left: 0,
           top: 0,
         }}
@@ -78,9 +75,9 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         className="absolute"
         style={{
           background: rightConicGradient,
-          width: '50vw',
-          height: '100vh',
-          left: '50vw',
+          width: '50%',
+          height: '100%',
+          left: '50%',
           top: 0,
         }}
       />
@@ -114,7 +111,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
           filter: 'blur(60px)',
         }}
       />
-    </motion.div>
+    </div>
   );
 };
 

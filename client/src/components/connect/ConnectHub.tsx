@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Search, Plus, ArrowRight, Users } from 'lucide-react';
 import { ConnectGroupCard } from './ConnectGroupCard';
 import { ConnectRecentActivity } from './ConnectRecentActivity';
-import { ConicLightEffect } from '../effects';
 
 interface GroupMember {
   id: string;
@@ -71,9 +70,6 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
 
   return (
     <div ref={containerRef} className="relative flex-1 overflow-y-auto">
-      {/* Conic gradient light effect - based on Figma design */}
-      <ConicLightEffect color={accentColor} />
-
       <div className="relative z-10 p-6 md:p-8 max-w-7xl mx-auto font-grotesk">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

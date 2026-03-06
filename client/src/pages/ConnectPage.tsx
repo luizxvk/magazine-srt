@@ -18,6 +18,7 @@ import CreateGroupModal from '../components/CreateGroupModal';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
 import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends, RovexConnectIcon, CallingCard } from '../components/connect';
+import { ConicLightEffect } from '../components/effects';
 
 // Debug: Check if Agora App ID is available from Vite env
 const AGORA_APP_ID_DEBUG = (import.meta.env.VITE_AGORA_APP_ID || '').trim();
@@ -1462,6 +1463,9 @@ export default function ConnectPage() {
     >
       {/* Global Background */}
       <LuxuriousBackground />
+      
+      {/* Conic gradient light effect - Figma design */}
+      <ConicLightEffect color={accentColor} />
       
       {/* Accent color gradient overlay */}
       {theme === 'dark' && (

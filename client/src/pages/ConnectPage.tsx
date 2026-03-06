@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Plus, Volume2, MicOff, Menu, Home,
-  Settings, Hash, ChevronRight, ChevronDown, Radio, X,
+  Settings, Hash, ChevronRight, ChevronDown, ChevronLeft, Radio, X,
   Camera, HeadphoneOff, Pencil, Phone, Bot, Link, Copy, UserPlus, Mail, Edit3, Check, Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -181,6 +181,9 @@ export default function ConnectPage() {
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  
+  // Collapsible sidebar state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Hub search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -1455,15 +1458,22 @@ export default function ConnectPage() {
 
   return (
     <div 
-      className={`min-h-screen font-sans relative ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}
-      style={{
-        background: theme === 'dark' 
-          ? `linear-gradient(180deg, ${accentColor}08 0%, transparent 30%), 
-             linear-gradient(90deg, ${accentColor}05 0%, transparent 50%), 
-             #18181b`
-          : undefined
-      }}
+      className={`min-h-screen font-sans relative overflow-hidden ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}
     >
+      {/* Global Background */}
+      <LuxuriousBackground />
+      
+      {/* Accent color gradient overlay */}
+      {theme === 'dark' && (
+        <div 
+          className="fixed inset-0 z-[-1] pointer-events-none"
+          style={{
+            background: `linear-gradient(180deg, ${accentColor}08 0%, transparent 30%), 
+                         linear-gradient(90deg, ${accentColor}05 0%, transparent 50%)`
+          }}
+        />
+      )}
+      
       <Header />
       
       {/* Mobile Navigation Header */}
@@ -1605,45 +1615,110 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
       
-      <div className={`flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16 ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
+      <div className={`flex h-[calc(100vh-64px)] pt-16 overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
-        <div className="hidden md:flex w-64 mt-3 mb-0 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-t-[22px] flex-col overflow-hidden font-grotesk">
+        <motion.div 
+          className="hidden md:flex mt-3 mb-0 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-t-[22px] flex-col overflow-hidden font-grotesk"
+          animate={{ width: sidebarCollapsed ? 64 : 256 }}
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
+        >
           {/* Header */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
-            <button
-              onClick={handleReturnToHub}
-              className="flex items-center gap-2 hover:bg-white/5 rounded-lg px-2 py-1 transition-colors"
-              title="Voltar ao Hub"
-            >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: accentColor }}>
-                <RovexConnectIcon size={16} color="white" />
-              </div>
-              <span className="font-grotesk text-lg font-bold text-[#F1F5F9]">Connect</span>
-            </button>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handleReturnToHub}
-                className={`p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
-                title="Hub"
-              >
-                <Home className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-              </button>
-            </div>
+          <div className={`border-b border-white/10 flex items-center flex-shrink-0 ${sidebarCollapsed ? 'p-2 flex-col gap-2' : 'p-4 justify-between'}`}>
+            {sidebarCollapsed ? (
+              <>
+                <button
+                  onClick={() => setSidebarCollapsed(false)}
+                  className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"
+                  title="Expandir"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleReturnToHub}
+                  className="w-10 h-10 rounded-lg flex items-center justify-center hover:opacity-80 transition-opacity"
+                  style={{ background: accentColor }}
+                  title="Hub"
+                >
+                  <RovexConnectIcon size={18} color="white" />
+                </button>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"
+                  title="Criar grupo"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleReturnToHub}
+                  className="flex items-center gap-2 hover:bg-white/5 rounded-lg px-2 py-1 transition-colors"
+                  title="Voltar ao Hub"
+                >
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: accentColor }}>
+                    <RovexConnectIcon size={16} color="white" />
+                  </div>
+                  <span className="font-grotesk text-lg font-bold text-[#F1F5F9]">Connect</span>
+                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={handleReturnToHub}
+                    className={`p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
+                    title="Hub"
+                  >
+                    <Home className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setSidebarCollapsed(true)}
+                    className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"
+                    title="Recolher"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Groups List */}
           <div className="flex-1 overflow-y-auto py-2">
-            {renderGroupsList()}
+            {sidebarCollapsed ? (
+              /* Collapsed: Show only group avatars */
+              <div className="flex flex-col items-center gap-2 px-2">
+                {groups.map(group => (
+                  <button
+                    key={group.id}
+                    onClick={() => handleSelectGroup(group)}
+                    className={`w-10 h-10 rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${selectedGroup?.id === group.id ? (isMGT ? 'border-tier-std-500' : 'border-gold-500') : 'border-transparent hover:border-white/20'}`}
+                    title={group.name}
+                  >
+                    {group.avatarUrl ? (
+                      <img src={group.avatarUrl} alt={group.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div 
+                        className="w-full h-full flex items-center justify-center text-white font-bold text-sm"
+                        style={{ background: accentColor }}
+                      >
+                        {group.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              renderGroupsList()
+            )}
           </div>
 
           {/* Voice Controls (when in voice) */}
-          {currentVoice && (
+          {currentVoice && !sidebarCollapsed && (
             <div className="relative">
               {/* Button to show CallingCard */}
               <button
@@ -1674,27 +1749,40 @@ export default function ConnectPage() {
           )}
 
           {/* User Panel */}
-          <div className="p-3 border-t border-white/10 flex items-center gap-2">
+          <div className={`border-t border-white/10 flex items-center ${sidebarCollapsed ? 'p-2 flex-col gap-2' : 'p-3 gap-2'}`}>
             <img
               src={user?.avatarUrl || '/assets/logo-rovex.png'}
-              className="w-8 h-8 rounded-full"
+              className={`rounded-full ${sidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8'}`}
               alt=""
             />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-[#F1F5F9]">
-                {user?.displayName || user?.name}
-              </p>
-              <p className="text-xs text-[#3CFF00]">Online</p>
-            </div>
-            <button 
-              onClick={() => setShowAudioSettings(true)}
-              className="p-2 hover:bg-white/5 rounded-lg text-[#94A3B8]"
-              title="Configurações de áudio"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+            {!sidebarCollapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate text-[#F1F5F9]">
+                    {user?.displayName || user?.name}
+                  </p>
+                  <p className="text-xs text-[#3CFF00]">Online</p>
+                </div>
+                <button 
+                  onClick={() => setShowAudioSettings(true)}
+                  className="p-2 hover:bg-white/5 rounded-lg text-[#94A3B8]"
+                  title="Configurações de áudio"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              </>
+            )}
+            {sidebarCollapsed && (
+              <button 
+                onClick={() => setShowAudioSettings(true)}
+                className="p-2 hover:bg-white/5 rounded-lg text-[#94A3B8]"
+                title="Configurações de áudio"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Main Content - Chat Area or Hub */}
         <div className="flex-1 flex flex-col">

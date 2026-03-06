@@ -26,19 +26,10 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
     return { r, g, b };
   }, [color]);
 
-  // Left conic gradient - exactly as Figma spec
-  // Creates light beam on left side emanating from top-center
+  // Left conic gradient - emanates from top center going left
   const leftConicGradient = useMemo(() => {
     const { r, g, b } = rgb;
-    // Figma: conic-gradient(from 90deg at 48% 9%, ...) - positioned at right edge of left half to meet center
-    return `conic-gradient(from 90deg at 100% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(${r}, ${g}, ${b}, 1) 100%)`;
-  }, [rgb]);
-
-  // Right conic gradient - mirrored version
-  const rightConicGradient = useMemo(() => {
-    const { r, g, b } = rgb;
-    // Mirrored - positioned at left edge of right half to meet center  
-    return `conic-gradient(from 90deg at 0% 9%, rgba(${r}, ${g}, ${b}, 1) 0%, rgba(2, 0, 20, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
+    return `conic-gradient(from 90deg at 50% 9%, rgba(2, 0, 20, 1) 0%, rgba(2, 0, 20, 1) 49%, rgba(${r}, ${g}, ${b}, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
   }, [rgb]);
 
   // Soft glow overlay for depth
@@ -52,33 +43,14 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
       className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
       style={{ zIndex: 0 }}
     >
-      {/* Left conic beam - positioned on left half */}
+      {/* Single conic gradient centered at top */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: 'easeOut' }}
-        className="absolute"
+        className="absolute inset-0"
         style={{
           background: leftConicGradient,
-          width: '50%',
-          height: '100%',
-          left: 0,
-          top: 0,
-        }}
-      />
-
-      {/* Right conic beam - mirrored on right half */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, ease: 'easeOut', delay: 0.1 }}
-        className="absolute"
-        style={{
-          background: rightConicGradient,
-          width: '50%',
-          height: '100%',
-          left: '50%',
-          top: 0,
         }}
       />
 

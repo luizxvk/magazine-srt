@@ -30,14 +30,15 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   // Creates light beam on left side emanating from top-center
   const leftConicGradient = useMemo(() => {
     const { r, g, b } = rgb;
-    // Figma: conic-gradient(from 90deg at 48% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(106, 94, 254, 1) 100%)
-    return `conic-gradient(from 90deg at 96% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(${r}, ${g}, ${b}, 1) 100%)`;
+    // Figma: conic-gradient(from 90deg at 48% 9%, ...) - positioned at right edge of left half to meet center
+    return `conic-gradient(from 90deg at 100% 9%, rgba(2, 0, 20, 1) 49%, rgba(2, 0, 20, 1) 100%, rgba(${r}, ${g}, ${b}, 1) 100%)`;
   }, [rgb]);
 
   // Right conic gradient - mirrored version
   const rightConicGradient = useMemo(() => {
     const { r, g, b } = rgb;
-    return `conic-gradient(from 90deg at 4% 9%, rgba(${r}, ${g}, ${b}, 1) 0%, rgba(2, 0, 20, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
+    // Mirrored - positioned at left edge of right half to meet center  
+    return `conic-gradient(from 90deg at 0% 9%, rgba(${r}, ${g}, ${b}, 1) 0%, rgba(2, 0, 20, 1) 51%, rgba(2, 0, 20, 1) 100%)`;
   }, [rgb]);
 
   // Soft glow overlay for depth
@@ -49,7 +50,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   return (
     <motion.div 
       className={`fixed inset-0 pointer-events-none ${className}`}
-      style={{ zIndex: 0 }}
+      style={{ zIndex: -1 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}

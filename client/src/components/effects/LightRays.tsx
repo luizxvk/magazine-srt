@@ -181,14 +181,14 @@ void main() {
   vec4 rays2 = vec4(1.0) *
                rayStrength(rayPos, rayDir, coord, 22.3991, 18.0234, 1.1 * raysSpeed);
 
-  vec4 fragColor = rays1 * 0.5 + rays2 * 0.4;
+  vec4 fragColor = rays1 * 0.65 + rays2 * 0.5;
 
-  // Brightness gradient from top to bottom
-  float brightness = 1.0 - (coord.y / iResolution.y);
-  fragColor.rgb *= 0.3 + brightness * 0.7;
+  // Brightness gradient from top to bottom - more expansive
+  float brightness = 1.0 - (coord.y / iResolution.y) * 0.6;
+  fragColor.rgb *= 0.5 + brightness * 0.8;
 
   // Apply color
-  fragColor.rgb *= raysColor;
+  fragColor.rgb *= raysColor * 1.3;
   
   // Apply animation progress (fade in)
   fragColor.a *= animProgress;

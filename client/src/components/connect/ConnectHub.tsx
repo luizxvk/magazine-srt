@@ -76,12 +76,12 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
         <LightRays
           color={accentColor}
           origin="top-center"
-          speed={1.5}
-          spread={0.6}
-          length={3}
+          speed={1.2}
+          spread={1.2}
+          length={4}
           animationDuration={3}
-          blur={80}
-          fadeDistance={1.2}
+          blur={100}
+          fadeDistance={1.8}
         />
       </div>
 

@@ -3,3 +3,10 @@
 .env.local
 .env*.local
 node_modules
+.env.production
+db_url.txt
+migrate-data.js
+temp_pub.txt
+vapid_email.txt
+vapid_priv.txt
+vapid_pub.txt

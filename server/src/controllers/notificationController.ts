@@ -5,13 +5,20 @@ import { AuthRequest } from '../middleware/authMiddleware';
 
 // VAPID keys - should be set in environment variables in production
 // Generate with: npx web-push generate-vapid-keys
-const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || 'BLBx-hf2WrL7qLtN6HCTTOmxOv0qkNp8HpGRJMxQMGM2bDJ5VqNqT2Ls5xJ8yCTRPQX_UhLqNdZxH5PK5FTRPJ0';
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
-const VAPID_EMAIL = process.env.VAPID_EMAIL || 'mailto:contato@magazinesrt.com';
+const VAPID_PUBLIC_KEY = (process.env.VAPID_PUBLIC_KEY || '').trim();
+const VAPID_PRIVATE_KEY = (process.env.VAPID_PRIVATE_KEY || '').trim();
+const VAPID_EMAIL = (process.env.VAPID_EMAIL || 'mailto:contato@magazinesrt.com').trim();
 
-// Configure web-push if private key is available
-if (VAPID_PRIVATE_KEY) {
-    webpush.setVapidDetails(VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+// Configure web-push if both keys are available and valid
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY && VAPID_PUBLIC_KEY.length > 10) {
+    try {
+        webpush.setVapidDetails(VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+        console.log('[Push] VAPID configured successfully');
+    } catch (error) {
+        console.error('[Push] Failed to configure VAPID:', error);
+    }
+} else {
+    console.warn('[Push] VAPID keys not configured - push notifications disabled');
 }
 
 export const getNotifications = async (req: AuthRequest, res: Response) => {

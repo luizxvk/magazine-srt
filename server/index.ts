@@ -67,7 +67,7 @@ app.use(compression());
 
 // CORS Configuration - Restrict to known origins only
 const allowedOrigins = [
-    'https://magazine-frontend.vercel.app',
+    'https://rovexcommunities.vercel.app',
     'https://magazine-srt.vercel.app',
     'https://magazine-mgt.vercel.app',
     'https://rovexcommunities.vercel.app',

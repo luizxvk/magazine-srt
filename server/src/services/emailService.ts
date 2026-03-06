@@ -78,7 +78,7 @@ export const sendEmail = async ({ to, subject, html }: SendEmailOptions): Promis
 };
 
 export const sendPasswordResetEmail = async (to: string, resetToken: string, userName: string): Promise<boolean> => {
-    const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
     const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     const html = `
@@ -153,7 +153,7 @@ export const sendPasswordResetEmail = async (to: string, resetToken: string, use
 };
 
 export const sendWelcomeToMagazineEmail = async (to: string, userName: string): Promise<boolean> => {
-    const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
 
     const html = `
         <!DOCTYPE html>
@@ -224,7 +224,7 @@ export const sendWelcomeToMagazineEmail = async (to: string, userName: string): 
 
 // Send welcome email to NEW Magazine members with temporary password
 export const sendNewMagazineMemberEmail = async (to: string, userName: string, tempPassword: string): Promise<boolean> => {
-    const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
 
     const html = `
         <!DOCTYPE html>

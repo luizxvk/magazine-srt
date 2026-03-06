@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const router = Router();
 const prisma = new PrismaClient();
 
-const FRONTEND_URL = 'https://magazine-frontend.vercel.app';
+const FRONTEND_URL = 'https://rovexcommunities.vercel.app';
 const API_BASE = 'https://magazine-srt.vercel.app';
 
 function escapeHtml(text: string): string {

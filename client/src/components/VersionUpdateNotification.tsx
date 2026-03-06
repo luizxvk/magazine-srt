@@ -6,9 +6,10 @@ import buildInfo from '../buildInfo.json';
 
 const CURRENT_BUILD_TIME = buildInfo.buildTime;
 const CHECK_INTERVAL = 60000; // Check every 60 seconds
-// Use absolute URL to ensure it works in Capacitor (which loads from Vercel)
+// Use same origin - buildInfo.json is in public folder
+// For Capacitor, use VITE_API_URL's origin or fallback to production URL
 const BUILD_INFO_URL = import.meta.env.PROD 
-    ? 'https://magazine-frontend.vercel.app/buildInfo.json'
+    ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://rovexcommunities.vercel.app'}/buildInfo.json`
     : '/buildInfo.json';
 
 export default function VersionUpdateNotification() {

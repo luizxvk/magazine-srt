@@ -1046,7 +1046,7 @@ export const generateInviteLink = async (req: AuthRequest, res: Response) => {
 
     res.json({ 
       inviteCode,
-      inviteLink: `${process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/connect/${inviteCode}`
+      inviteLink: `${process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/connect/${inviteCode}`
     });
   } catch (error: any) {
     console.error('Error generating invite link:', error);

@@ -16,8 +16,13 @@ try {
         buildTime: new Date().toISOString()
     };
     
-    const outputPath = join(__dirname, '..', 'src', 'buildInfo.json');
-    writeFileSync(outputPath, JSON.stringify(buildInfo, null, 2));
+    // Write to src/ for module import
+    const srcOutputPath = join(__dirname, '..', 'src', 'buildInfo.json');
+    writeFileSync(srcOutputPath, JSON.stringify(buildInfo, null, 2));
+    
+    // Write to public/ for fetching in production
+    const publicOutputPath = join(__dirname, '..', 'public', 'buildInfo.json');
+    writeFileSync(publicOutputPath, JSON.stringify(buildInfo, null, 2));
     
     console.log('✅ Build info generated:', buildInfo);
 } catch (error) {
@@ -28,6 +33,9 @@ try {
         date: new Date().toISOString(),
         buildTime: new Date().toISOString()
     };
-    const outputPath = join(__dirname, '..', 'src', 'buildInfo.json');
-    writeFileSync(outputPath, JSON.stringify(buildInfo, null, 2));
+    // Write to both src/ and public/
+    const srcOutputPath = join(__dirname, '..', 'src', 'buildInfo.json');
+    writeFileSync(srcOutputPath, JSON.stringify(buildInfo, null, 2));
+    const publicOutputPath = join(__dirname, '..', 'public', 'buildInfo.json');
+    writeFileSync(publicOutputPath, JSON.stringify(buildInfo, null, 2));
 }

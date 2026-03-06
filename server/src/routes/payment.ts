@@ -39,9 +39,9 @@ router.post('/create-preference', async (req, res) => {
                     }
                 ],
                 back_urls: {
-                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/mgt-log?status=success`,
-                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/mgt-log?status=failure`,
-                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/mgt-log?status=pending`
+                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/mgt-log?status=success`,
+                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/mgt-log?status=failure`,
+                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/mgt-log?status=pending`
                 },
                 auto_return: 'approved',
             }
@@ -107,7 +107,7 @@ router.post('/elite/create-preference', authenticateToken, async (req: Request, 
             LIFETIME: 'Vitalício'
         };
 
-        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         const serverUrl = process.env.SERVER_URL || 'https://magazine-srt-react-server.vercel.app';
 
         // Modo simula��o (dev)
@@ -424,7 +424,7 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
                 simulation: true,
                 message: 'Modo simulação ativo - pagamento simulado',
                 orderId: order.id,
-                init_point: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=simulate&orderId=${order.id}`,
+                init_point: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/store?payment=simulate&orderId=${order.id}`,
                 total: totalPrice
             });
             return;
@@ -454,9 +454,9 @@ router.post('/product/create-preference', authenticateToken, async (req: Request
                     installments: 12
                 },
                 back_urls: {
-                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=success`,
-                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=failure`,
-                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app'}/store?payment=pending`
+                    success: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/store?payment=success`,
+                    failure: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/store?payment=failure`,
+                    pending: `${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app'}/store?payment=pending`
                 },
                 notification_url: `${process.env.SERVER_URL || 'http://localhost:3000'}/api/payment/webhook`,
                 auto_return: 'approved',

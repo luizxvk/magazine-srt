@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   // Frontend carregado do Vercel - atualizações automáticas sem rebuild do APK
   server: {
-    url: 'https://magazine-frontend.vercel.app',
+    url: 'https://rovexcommunities.vercel.app',
     cleartext: false, // HTTPS only
   },
   android: {

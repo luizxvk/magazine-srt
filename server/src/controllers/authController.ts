@@ -373,7 +373,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
         });
 
         // Build reset link
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
         // Send password reset email via Nodemailer

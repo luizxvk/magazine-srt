@@ -467,7 +467,7 @@ export const initiateDiscordAuth = async (req: AuthRequest, res: Response) => {
 export const discordCallback = async (req: AuthRequest, res: Response) => {
     try {
         // URL base do frontend
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         
         // Log all query params for debugging
         console.log('Discord callback - Full query:', JSON.stringify(req.query));
@@ -570,7 +570,7 @@ export const discordCallback = async (req: AuthRequest, res: Response) => {
     } catch (error: any) {
         console.error('Error in Discord callback:', error);
         console.error('Error details:', error.response?.data || error.message);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         const errorMsg = error.response?.data?.error || 'unknown';
         res.redirect(`${frontendUrl}/settings?social=discord&status=error&message=${errorMsg}`);
     }
@@ -830,7 +830,7 @@ export const initiateSteamAuth = async (req: AuthRequest, res: Response) => {
 export const steamCallback = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.query.state as string;
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
 
         console.log('Steam callback - query:', JSON.stringify(req.query));
         console.log('Steam callback - userId:', userId);
@@ -909,7 +909,7 @@ export const steamCallback = async (req: AuthRequest, res: Response) => {
         res.redirect(`${frontendUrl}/settings?social=steam&status=connected`);
     } catch (error) {
         console.error('Error in Steam callback:', error);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         res.redirect(`${frontendUrl}/settings?social=steam&status=error`);
     }
 };
@@ -1007,7 +1007,7 @@ export const initiateTwitchAuth = async (req: AuthRequest, res: Response) => {
 // Callback OAuth Twitch
 export const twitchCallback = async (req: AuthRequest, res: Response) => {
     try {
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         const { code, state, error } = req.query;
 
         if (error) {
@@ -1091,7 +1091,7 @@ export const twitchCallback = async (req: AuthRequest, res: Response) => {
         res.redirect(`${frontendUrl}/settings?social=twitch&status=connected`);
     } catch (error: any) {
         console.error('Error in Twitch callback:', error.response?.data || error.message);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://magazine-frontend.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://rovexcommunities.vercel.app';
         res.redirect(`${frontendUrl}/settings?social=twitch&status=error`);
     }
 };

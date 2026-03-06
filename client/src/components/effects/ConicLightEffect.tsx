@@ -50,7 +50,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   return (
     <motion.div 
       className={`fixed inset-0 pointer-events-none ${className}`}
-      style={{ zIndex: -1 }}
+      style={{ zIndex: 1 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}

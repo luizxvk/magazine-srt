@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, ChevronDown, Circle, Moon, MinusCircle, Wifi } from 'lucide-react';
+import { ChevronDown, Circle, Moon, MinusCircle, Wifi } from 'lucide-react';
 import api from '../../services/api';
 import { getProfileBorderGradient } from '../../utils/profileBorderUtils';
 import { useAuth } from '../../context/AuthContext';
+
+interface EquippedBadge {
+  id: string;
+  name: string;
+  imageUrl: string;
+}
 
 interface Friend {
   id: string;
@@ -13,6 +19,11 @@ interface Friend {
   isOnline: boolean;
   membershipType?: string;
   equippedProfileBorder?: string | null;
+  equippedBadge?: EquippedBadge | null;
+  customTag?: string | null;
+  isElite?: boolean;
+  isBeta?: boolean;
+  isQA?: boolean;
   currentActivity?: {
     type: 'PLAYING' | 'IN_CALL' | 'LISTENING' | 'WATCHING' | 'STREAMING' | 'IDLE';
     name: string;
@@ -24,8 +35,17 @@ type UserStatus = 'ONLINE' | 'IDLE' | 'DO_NOT_DISTURB' | 'INVISIBLE';
 interface ConnectOnlineFriendsProps {
   accentColor: string;
   onFriendClick?: (friendId: string) => void;
-  onSettingsClick?: () => void;
 }
+
+// Helper to get user tag
+const getUserTag = (friend: Friend): { text: string; color: string } | null => {
+  if (friend.isElite) return { text: 'ELITE', color: '#FFD700' };
+  if (friend.isBeta) return { text: 'BETA', color: '#8B5CF6' };
+  if (friend.isQA) return { text: 'QA', color: '#10B981' };
+  if (friend.membershipType === 'MAGAZINE') return { text: 'MGZN', color: '#EC4899' };
+  if (friend.customTag && friend.customTag !== 'ROVEX') return { text: friend.customTag, color: '#60A5FA' };
+  return null;
+};
 
 const STATUS_CONFIG: Record<UserStatus, { color: string; label: string; icon: React.ElementType }> = {
   ONLINE: { color: '#3CFF00', label: 'Online', icon: Circle },
@@ -37,7 +57,6 @@ const STATUS_CONFIG: Record<UserStatus, { color: string; label: string; icon: Re
 export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
   accentColor,
   onFriendClick,
-  onSettingsClick,
 }) => {
   const { user } = useAuth();
   const [onlineFriends, setOnlineFriends] = useState<Friend[]>([]);
@@ -96,9 +115,9 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
   const currentStatus = STATUS_CONFIG[userStatus];
 
   return (
-    <div className="flex flex-col h-full p-3 font-grotesk">
+    <div className="flex flex-col h-full pt-3 px-3 pb-0 font-grotesk">
       {/* Glassmorphic Card Container */}
-      <div className="flex-1 flex flex-col bg-white/[0.03] border border-white/10 backdrop-blur-[12px] rounded-[22px] overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white/[0.03] border border-white/10 border-b-0 backdrop-blur-[12px] rounded-t-[22px] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 pb-2 flex-shrink-0">
           <div className="flex items-center gap-2">
@@ -110,12 +129,6 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
               {onlineFriends.length}
             </span>
           </div>
-          <button
-            onClick={onSettingsClick}
-            className="p-1.5 rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-white/10 transition-colors"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Friends List - Scrollable */}
@@ -133,13 +146,14 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
               ))}
             </div>
           ) : (
-            <div className="space-y-3 py-2">
+            <div className="space-y-1 py-2">
               {/* Online Friends Section */}
               {onlineFriends.length > 0 && (
                 <div>
                   <AnimatePresence>
                     {onlineFriends.map((friend, index) => {
                       const isMGT = friend.membershipType === 'MGT';
+                      const tag = getUserTag(friend);
                       return (
                         <motion.button
                           key={friend.id}
@@ -147,31 +161,55 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.02 }}
                           onClick={() => onFriendClick?.(friend.id)}
-                          className="w-full flex items-center gap-2 py-1.5 px-1 hover:bg-white/[0.03] rounded-lg transition-colors"
+                          className="w-full flex items-center gap-2.5 py-2 px-2 hover:bg-white/[0.05] rounded-lg transition-colors"
                         >
                           <div className="relative flex-shrink-0">
                             <div
-                              className="w-9 h-9 rounded-full p-[1.5px]"
+                              className="w-10 h-10 rounded-full p-[2px]"
                               style={{ background: getProfileBorderGradient(friend.equippedProfileBorder, isMGT) }}
                             >
                               <div className="w-full h-full rounded-full overflow-hidden bg-black/50">
                                 {friend.avatarUrl ? (
                                   <img src={friend.avatarUrl} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: accentColor }}>
+                                  <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: accentColor }}>
                                     {(friend.displayName || friend.name).charAt(0).toUpperCase()}
                                   </div>
                                 )}
                               </div>
                             </div>
-                            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#131022]" style={{ backgroundColor: '#3CFF00' }} />
+                            {/* Online indicator */}
+                            <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#131022]" style={{ backgroundColor: '#3CFF00' }} />
+                            {/* Badge */}
+                            {friend.equippedBadge && (
+                              <div 
+                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#131022] p-0.5"
+                                title={friend.equippedBadge.name}
+                              >
+                                <img 
+                                  src={friend.equippedBadge.imageUrl} 
+                                  alt={friend.equippedBadge.name} 
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                            )}
                           </div>
                           <div className="flex-1 min-w-0 text-left">
-                            <p className="text-xs font-medium text-[#F1F5F9] truncate">{friend.displayName || friend.name}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-sm font-semibold text-[#F1F5F9] truncate">{friend.displayName || friend.name}</p>
+                              {tag && (
+                                <span 
+                                  className="px-1 py-0.5 text-[8px] font-bold rounded"
+                                  style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                                >
+                                  {tag.text}
+                                </span>
+                              )}
+                            </div>
                             {friend.currentActivity ? (
-                              <p className="text-[10px] text-[#64748B] truncate">{friend.currentActivity.name}</p>
+                              <p className="text-[11px] text-[#64748B] truncate">{friend.currentActivity.name}</p>
                             ) : (
-                              <p className="text-[10px] text-[#3CFF00]">Online</p>
+                              <p className="text-[11px] text-[#3CFF00]">Online</p>
                             )}
                           </div>
                         </motion.button>
@@ -184,40 +222,67 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
               {/* Offline Friends Section */}
               {offlineFriends.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 px-1 py-2">
+                  <div className="flex items-center gap-2 px-2 py-2 mt-2">
                     <span className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Offline</span>
                     <span className="text-[10px] text-[#64748B]">— {offlineFriends.length}</span>
                   </div>
                   <AnimatePresence>
-                    {offlineFriends.map((friend, index) => (
+                    {offlineFriends.map((friend, index) => {
+                        const tag = getUserTag(friend);
+                        return (
                         <motion.button
                           key={friend.id}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: index * 0.01 }}
                           onClick={() => onFriendClick?.(friend.id)}
-                          className="w-full flex items-center gap-2 py-1.5 px-1 hover:bg-white/[0.03] rounded-lg transition-colors opacity-60"
+                          className="w-full flex items-center gap-2.5 py-2 px-2 hover:bg-white/[0.03] rounded-lg transition-colors opacity-50"
                         >
                           <div className="relative flex-shrink-0">
-                            <div className="w-9 h-9 rounded-full p-[1.5px] bg-white/10">
+                            <div className="w-10 h-10 rounded-full p-[2px] bg-white/10">
                               <div className="w-full h-full rounded-full overflow-hidden bg-black/50 grayscale">
                                 {friend.avatarUrl ? (
                                   <img src={friend.avatarUrl} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white/50">
+                                  <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white/50">
                                     {(friend.displayName || friend.name).charAt(0).toUpperCase()}
                                   </div>
                                 )}
                               </div>
                             </div>
-                            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#131022] bg-[#64748B]" />
+                            {/* Offline indicator */}
+                            <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#131022] bg-[#64748B]" />
+                            {/* Badge (grayscale) */}
+                            {friend.equippedBadge && (
+                              <div 
+                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#131022] p-0.5 grayscale opacity-60"
+                                title={friend.equippedBadge.name}
+                              >
+                                <img 
+                                  src={friend.equippedBadge.imageUrl} 
+                                  alt={friend.equippedBadge.name} 
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                            )}
                           </div>
                           <div className="flex-1 min-w-0 text-left">
-                            <p className="text-xs font-medium text-[#94A3B8] truncate">{friend.displayName || friend.name}</p>
-                            <p className="text-[10px] text-[#64748B]">Offline</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-sm font-semibold text-[#94A3B8] truncate">{friend.displayName || friend.name}</p>
+                              {tag && (
+                                <span 
+                                  className="px-1 py-0.5 text-[8px] font-bold rounded opacity-60"
+                                  style={{ backgroundColor: `${tag.color}15`, color: tag.color }}
+                                >
+                                  {tag.text}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-[#64748B]">Offline</p>
                           </div>
                         </motion.button>
-                    ))}
+                      );
+                    })}
                   </AnimatePresence>
                 </div>
               )}
@@ -308,13 +373,6 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
                 <ChevronDown className="w-3 h-3 text-[#64748B] group-hover:text-[#F1F5F9] transition-colors" />
               </button>
             </div>
-            
-            <button 
-              onClick={onSettingsClick}
-              className="p-1.5 text-[#64748B] hover:text-[#F1F5F9] transition-colors"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>

@@ -234,10 +234,20 @@ export const getFriends = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true, equippedProfileBorder: true }
+                    select: { 
+                        id: true, name: true, displayName: true, avatarUrl: true, trophies: true, 
+                        level: true, isOnline: true, lastSeenAt: true, membershipType: true, 
+                        equippedProfileBorder: true, isElite: true, eliteUntil: true, customTag: true, isBeta: true,
+                        equippedBadge: { select: { id: true, name: true, imageUrl: true } }
+                    }
                 },
                 addressee: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, trophies: true, level: true, isOnline: true, lastSeenAt: true, membershipType: true, equippedProfileBorder: true }
+                    select: { 
+                        id: true, name: true, displayName: true, avatarUrl: true, trophies: true, 
+                        level: true, isOnline: true, lastSeenAt: true, membershipType: true, 
+                        equippedProfileBorder: true, isElite: true, eliteUntil: true, customTag: true, isBeta: true,
+                        equippedBadge: { select: { id: true, name: true, imageUrl: true } }
+                    }
                 }
             }
         });
@@ -272,10 +282,20 @@ export const getOnlineFriends = async (req: AuthRequest, res: Response) => {
             },
             include: {
                 requester: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true, equippedProfileBorder: true, isElite: true, eliteUntil: true }
+                    select: { 
+                        id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, 
+                        lastSeenAt: true, membershipType: true, doNotDisturb: true, equippedProfileBorder: true, 
+                        isElite: true, eliteUntil: true, customTag: true, isBeta: true,
+                        equippedBadge: { select: { id: true, name: true, imageUrl: true } }
+                    }
                 },
                 addressee: {
-                    select: { id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, lastSeenAt: true, membershipType: true, doNotDisturb: true, equippedProfileBorder: true, isElite: true, eliteUntil: true }
+                    select: { 
+                        id: true, name: true, displayName: true, avatarUrl: true, isOnline: true, 
+                        lastSeenAt: true, membershipType: true, doNotDisturb: true, equippedProfileBorder: true, 
+                        isElite: true, eliteUntil: true, customTag: true, isBeta: true,
+                        equippedBadge: { select: { id: true, name: true, imageUrl: true } }
+                    }
                 }
             }
         });

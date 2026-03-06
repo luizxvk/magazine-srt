@@ -677,6 +677,7 @@ model Group {
   name           String
   description    String?
   avatarUrl      String?
+  bannerUrl      String?
   creatorId      String
   membershipType MembershipType
   isPrivate      Boolean        @default(false)

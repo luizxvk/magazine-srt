@@ -1607,7 +1607,7 @@ export default function ConnectPage() {
       
       <div className={`flex h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pt-[120px] md:pt-16 ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
-        <div className="hidden md:flex w-64 mt-3 mb-3 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] flex-col overflow-hidden font-grotesk">
+        <div className="hidden md:flex w-64 mt-3 mb-0 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-t-[22px] flex-col overflow-hidden font-grotesk">
           {/* Header */}
           <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
             <button

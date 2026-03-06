@@ -1458,7 +1458,7 @@ export default function ConnectPage() {
 
   return (
     <div 
-      className={`min-h-screen font-sans relative overflow-hidden ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}
+      className={`h-screen font-sans relative flex flex-col ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}
     >
       {/* Global Background */}
       <LuxuriousBackground />
@@ -1615,10 +1615,11 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
       
-      <div className={`flex h-[calc(100vh-64px)] pt-16 overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
+      <div className={`flex flex-1 pt-16 overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
         <motion.div 
-          className="hidden md:flex h-full mt-3 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 border-b-0 rounded-t-[22px] flex-col overflow-hidden font-grotesk"
+          className="hidden md:flex flex-col mt-3 ml-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 border-b-0 rounded-t-[22px] overflow-hidden font-grotesk"
+          style={{ height: 'calc(100% - 0.75rem)' }}
           animate={{ width: sidebarCollapsed ? 64 : 256 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
         >

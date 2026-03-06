@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, Plus, ArrowRight, Users } from 'lucide-react';
 import { ConnectGroupCard } from './ConnectGroupCard';
 import { ConnectRecentActivity } from './ConnectRecentActivity';
-import { LightRays } from '../effects';
+import { ConicLightEffect } from '../effects';
 
 interface GroupMember {
   id: string;
@@ -71,19 +71,8 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
 
   return (
     <div ref={containerRef} className="relative flex-1 overflow-y-auto">
-      {/* WebGL Light Rays Effect - animates on entry, then static */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <LightRays
-          color={accentColor}
-          origin="top-center"
-          speed={1.2}
-          spread={1.2}
-          length={4}
-          animationDuration={3}
-          blur={100}
-          fadeDistance={1.8}
-        />
-      </div>
+      {/* Conic gradient light effect - based on Figma design */}
+      <ConicLightEffect color={accentColor} />
 
       <div className="relative z-10 p-6 md:p-8 max-w-7xl mx-auto font-grotesk">
         {/* Header */}

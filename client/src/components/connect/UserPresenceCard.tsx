@@ -223,6 +223,7 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
         'mgzn': { bg: '#3b82f620', text: '#3b82f6' },
         'mgt': { bg: '#10b98120', text: '#10b981' },
         'rvx': { bg: '#9333ea20', text: '#9333ea' },
+        'magazine': { bg: `${vipColor}20`, text: vipColor },
       };
       const colors = tagColors[userDetails.communityTag.toLowerCase()] || { bg: `${stdColor}20`, text: stdColor };
       return { name: userDetails.communityTag.toUpperCase(), ...colors };
@@ -233,7 +234,7 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
       return { name: tierStdName || 'RVX', bg: `${stdColor}20`, text: stdColor };
     }
     if (userDetails.membershipType === 'MAGAZINE') {
-      return { name: 'PRO', bg: `${vipColor}20`, text: vipColor };
+      return { name: 'MGZN', bg: `${vipColor}20`, text: vipColor };
     }
     
     return null;
@@ -407,18 +408,6 @@ export const UserPresenceCard: React.FC<UserPresenceCardProps> = ({
                           userDetails.isOnline ? 'bg-green-500' : 'bg-gray-500'
                         }`}
                       />
-
-                      {/* Elite ring */}
-                      {userDetails.isElite && (
-                        <motion.div
-                          className="absolute -inset-1 rounded-full"
-                          style={{
-                            background: `conic-gradient(from 0deg, ${accentColor}, #d4af37, #f472b6, ${accentColor})`,
-                          }}
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                        />
-                      )}
                     </div>
 
                     {/* Name & badges */}

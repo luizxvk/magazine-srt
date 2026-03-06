@@ -4,6 +4,8 @@ export { default as UserPresenceCard } from './UserPresenceCard';
 export { default as GroupInviteCard } from './GroupInviteCard';
 export { StreamViewer, StreamPreview } from './StreamViewer';
 export { default as AudioSettingsModal } from './AudioSettingsModal';
+export { default as RovexConnectIcon } from './RovexConnectIcon';
+export { default as CallingCard } from './CallingCard';
 
 // New Connect Hub layout components
 export { ConnectSidebar } from './ConnectSidebar';

@@ -1,4 +1,5 @@
-import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2, Radio } from 'lucide-react';
+import { Search, User, X, Menu, Home, Star, ShoppingBag, Trophy, Users, Store, Ticket, Rocket, Bell, Settings, LogOut, Coins, Sparkles, Crown, Swords, Gamepad2 } from 'lucide-react';
+import { RovexConnectIcon } from './connect';
 import { useAuth } from '../context/AuthContext';
 import { useCommunity } from '../context/CommunityContext';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -181,7 +182,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
         { icon: <ShoppingBag className="w-5 h-5" />, label: t('nav.shop'), path: '/store' },
         { icon: <Trophy className="w-5 h-5" />, label: t('nav.ranking'), path: '/ranking' },
         { icon: <Users className="w-5 h-5" />, label: 'Social', path: '/social' },
-        { icon: <Radio className="w-5 h-5" />, label: 'Connect', path: '/connect' },
+        { icon: <RovexConnectIcon size={20} />, label: 'Connect', path: '/connect' },
         { icon: <Store className="w-5 h-5" />, label: t('nav.market'), path: '/market' },
         { icon: <Ticket className="w-5 h-5" />, label: t('nav.rewards'), path: '/rewards' },
         { icon: <Crown className="w-5 h-5 text-amber-400" />, label: isElite ? 'ELITE' : 'ELITE ✨', path: '/elite', highlight: !isElite },
@@ -334,7 +335,7 @@ export default function Header({ onOpenShop }: HeaderProps) {
                         </Link>
 
                         <Link to="/connect" className={`relative p-2 transition-all hover:scale-110 ${iconClass}`} style={{ color: accentColor }} aria-label="Connect" title="Rovex Connect">
-                            <Radio className="w-5 h-5" />
+                            <RovexConnectIcon size={20} color={accentColor} />
                             {(hasGroupInvites || hasGroupMentions || hasGroupMessages) && (
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             )}

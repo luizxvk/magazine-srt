@@ -17,7 +17,7 @@ import Loader from '../components/Loader';
 import CreateGroupModal from '../components/CreateGroupModal';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends, RovexConnectIcon, CallingCard } from '../components/connect';
 
 // Debug: Check if Agora App ID is available from Vite env
 const AGORA_APP_ID_DEBUG = (import.meta.env.VITE_AGORA_APP_ID || '').trim();
@@ -204,6 +204,9 @@ export default function ConnectPage() {
   // Stream viewer state
   const [showStreamViewer, setShowStreamViewer] = useState(false);
   const [streamerInfo, setStreamerInfo] = useState<Map<string, { username: string; avatarUrl?: string }>>(new Map());
+  
+  // Calling Card state
+  const [showCallingCard, setShowCallingCard] = useState(false);
   
   // Real-time voice participant state (userId -> state)
   const [voiceParticipantStates, setVoiceParticipantStates] = useState<Map<string, { isMuted: boolean; isDeafened: boolean; isStreaming: boolean }>>(new Map());
@@ -1431,7 +1434,7 @@ export default function ConnectPage() {
               className="w-24 h-24 rounded-2xl flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}99)` }}
             >
-              <Radio className="w-12 h-12 text-white" />
+              <RovexConnectIcon size={48} color="white" />
             </div>
             <motion.div
               className="absolute -inset-2 rounded-3xl border-2"
@@ -1523,8 +1526,8 @@ export default function ConnectPage() {
                   onClick={handleReturnToHub}
                   className="flex items-center gap-2"
                 >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
-                    <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: accentColor }}>
+                    <RovexConnectIcon size={16} color="white" />
                   </div>
                   <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
                 </button>
@@ -1612,8 +1615,8 @@ export default function ConnectPage() {
               className="flex items-center gap-2 hover:bg-white/5 rounded-lg px-2 py-1 transition-colors"
               title="Voltar ao Hub"
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isMGT ? 'bg-tier-std' : 'bg-gold-500'}`}>
-                <Radio className={`w-4 h-4 ${isMGT ? 'text-white' : 'text-black'}`} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: accentColor }}>
+                <RovexConnectIcon size={16} color="white" />
               </div>
               <span className="font-grotesk text-lg font-bold text-[#F1F5F9]">Connect</span>
             </button>
@@ -1641,22 +1644,33 @@ export default function ConnectPage() {
 
           {/* Voice Controls (when in voice) */}
           {currentVoice && (
-            <VoiceChannelBar
-              channel={currentVoice.channel}
-              isMuted={isMuted}
-              isDeafened={isDeafened}
-              isScreenSharing={agora.isScreenSharing}
-              hasActiveStreams={remoteScreenStreams.size > 0}
-              outputVolume={agora.outputVolume}
-              ping={agora.ping}
-              onVolumeChange={agora.setOutputVolume}
-              onToggleMute={handleToggleMute}
-              onToggleDeafen={handleToggleDeafen}
-              onToggleScreenShare={handleToggleScreenShare}
-              onWatchStream={() => setShowStreamViewer(true)}
-              onDisconnect={handleLeaveVoice}
-              theme={theme}
-            />
+            <div className="relative">
+              {/* Button to show CallingCard */}
+              <button
+                onClick={() => setShowCallingCard(true)}
+                className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-t-lg text-[10px] font-medium flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                style={{ background: '#101022', border: '1px solid #2525F4', borderBottom: 'none' }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-white">Ver participantes</span>
+              </button>
+              <VoiceChannelBar
+                channel={currentVoice.channel}
+                isMuted={isMuted}
+                isDeafened={isDeafened}
+                isScreenSharing={agora.isScreenSharing}
+                hasActiveStreams={remoteScreenStreams.size > 0}
+                outputVolume={agora.outputVolume}
+                ping={agora.ping}
+                onVolumeChange={agora.setOutputVolume}
+                onToggleMute={handleToggleMute}
+                onToggleDeafen={handleToggleDeafen}
+                onToggleScreenShare={handleToggleScreenShare}
+                onWatchStream={() => setShowStreamViewer(true)}
+                onDisconnect={handleLeaveVoice}
+                theme={theme}
+              />
+            </div>
           )}
 
           {/* User Panel */}
@@ -1803,9 +1817,77 @@ export default function ConnectPage() {
         )}
       </div>
 
+      {/* Calling Card Overlay */}
+      <AnimatePresence>
+        {showCallingCard && currentVoice && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowCallingCard(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md"
+            >
+              <CallingCard
+                channelName={currentVoice.channel.name}
+                groupName={currentVoice.channel.group.name}
+                participants={(() => {
+                  // Find the current channel from groups
+                  const group = groups.find(g => g.voiceChannels.some(v => v.id === currentVoice.channelId));
+                  const channel = group?.voiceChannels.find(v => v.id === currentVoice.channelId);
+                  return channel?.participants.map(p => {
+                    const realTimeState = voiceParticipantStates.get(p.user.id);
+                    const participantAgoraUid = agora.getAgoraUid(p.user.id);
+                    return {
+                      ...p,
+                      isMuted: realTimeState?.isMuted ?? p.isMuted,
+                      isDeafened: realTimeState?.isDeafened ?? p.isDeafened,
+                      isStreaming: realTimeState?.isStreaming ?? p.isStreaming,
+                      isSpeaking: p.user.id === user?.id ? agora.isLocalSpeaking : agora.speakingUsers.has(participantAgoraUid)
+                    };
+                  }) || [];
+                })()}
+                currentUserId={user?.id || ''}
+                isMuted={isMuted}
+                isDeafened={isDeafened}
+                isScreenSharing={agora.isScreenSharing}
+                onToggleMute={handleToggleMute}
+                onToggleDeafen={handleToggleDeafen}
+                onToggleScreenShare={handleToggleScreenShare}
+                onInvite={() => { setShowCallingCard(false); setShowGroupInviteModal(true); }}
+                onDisconnect={() => { setShowCallingCard(false); handleLeaveVoice(); }}
+                speakingUsers={new Set([...agora.speakingUsers].map(uid => {
+                  // Convert Agora UIDs back to user IDs if possible
+                  for (const [userId, agoraUid] of Object.entries(agora.getAgoraUid)) {
+                    if (String(agoraUid) === String(uid)) return userId;
+                  }
+                  return String(uid);
+                }))}
+                isLocalSpeaking={agora.isLocalSpeaking}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mobile Voice Bar (Fixed at bottom) */}
       {currentVoice && (
         <div className={`md:hidden fixed bottom-0 left-0 right-0 z-40 ${theme === 'light' ? 'bg-white' : 'bg-zinc-900'} border-t ${themeBorder} safe-area-bottom`}>
+          {/* Click to show CallingCard */}
+          <button
+            onClick={() => setShowCallingCard(true)}
+            className="absolute -top-10 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-t-xl text-xs font-medium flex items-center gap-2"
+            style={{ background: '#101022', border: '1px solid #2525F4', borderBottom: 'none' }}
+          >
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-white">Ver participantes</span>
+          </button>
           <VoiceChannelBar
             channel={currentVoice.channel}
             isMuted={isMuted}
@@ -2271,7 +2353,7 @@ export default function ConnectPage() {
                       className="w-8 h-8 rounded-lg flex items-center justify-center"
                       style={{ background: `${accentColor}20` }}
                     >
-                      <Radio className="w-4 h-4" style={{ color: accentColor }} />
+                      <RovexConnectIcon size={16} color={accentColor} />
                     </div>
                     <div>
                       <p className={`text-sm font-medium ${themeText}`}>

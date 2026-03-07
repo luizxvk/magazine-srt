@@ -90,9 +90,9 @@ export default function VersionUpdateNotification() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 100, scale: 0.9 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] max-w-md w-[calc(100%-2rem)]"
+                className="fixed bottom-4 inset-x-0 z-[9999] flex justify-center px-4"
             >
-                <div className={`relative overflow-hidden rounded-2xl ${
+                <div className={`relative overflow-hidden rounded-2xl max-w-md w-full ${
                     theme === 'light' 
                         ? 'bg-white border border-gray-200 shadow-xl' 
                         : 'bg-zinc-900 border border-white/10 shadow-2xl'

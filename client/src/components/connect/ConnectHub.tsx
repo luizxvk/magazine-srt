@@ -40,6 +40,7 @@ interface ConnectHubProps {
   onGroupClick: (group: ConnectGroup) => void;
   onCreateGroup: () => void;
   onUserClick?: (userId: string) => void;
+  onViewAllGroups?: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   isMGT: boolean;
@@ -51,6 +52,7 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
   onGroupClick,
   onCreateGroup,
   onUserClick,
+  onViewAllGroups,
   searchQuery,
   onSearchChange,
   isMGT,
@@ -76,10 +78,11 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-2xl md:text-3xl font-bold text-[#F1F5F9] tracking-tight"
+            className="text-2xl md:text-3xl font-bold tracking-tight"
             style={{ letterSpacing: '-0.025em' }}
           >
-            ROVEX CONNECT
+            <span className="text-[#F1F5F9]">ROVEX </span>
+            <span style={{ color: accentColor }}>CONNECT</span>
           </motion.h1>
 
           <div className="flex items-center gap-4">
@@ -132,8 +135,9 @@ export const ConnectHub: React.FC<ConnectHubProps> = ({
               Grupos ativos agora
             </h2>
             <button 
+              onClick={onViewAllGroups}
               className="text-sm font-medium hover:text-white flex items-center gap-1 transition-colors"
-              style={{ color: '#A796FF' }}
+              style={{ color: accentColor }}
             >
               visualizar todos
               <ArrowRight className="w-4 h-4" />

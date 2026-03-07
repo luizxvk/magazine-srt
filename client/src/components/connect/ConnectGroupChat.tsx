@@ -106,6 +106,11 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   
+  // @ Mention state
+  const [showMentionPicker, setShowMentionPicker] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionStartIndex, setMentionStartIndex] = useState<number | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeAccent = accentColor || authAccent || '#10b981';
@@ -251,6 +256,59 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
     setShowEmojiPicker(false);
     inputRef.current?.focus();
   };
+
+  // Handle @ mentions
+  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const cursorPos = e.target.selectionStart || 0;
+    
+    setMessageText(value);
+    
+    // Find the last @ before cursor
+    const textBeforeCursor = value.substring(0, cursorPos);
+    const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+    
+    if (lastAtIndex !== -1) {
+      // Check if @ is at start or preceded by a space (valid mention position)
+      const charBefore = lastAtIndex > 0 ? value[lastAtIndex - 1] : ' ';
+      if (charBefore === ' ' || lastAtIndex === 0) {
+        // Check if there's no space after @ (still typing the mention)
+        const textAfterAt = textBeforeCursor.substring(lastAtIndex + 1);
+        if (!textAfterAt.includes(' ')) {
+          setShowMentionPicker(true);
+          setMentionQuery(textAfterAt);
+          setMentionStartIndex(lastAtIndex);
+          return;
+        }
+      }
+    }
+    
+    // No valid mention context, close picker
+    setShowMentionPicker(false);
+    setMentionQuery('');
+    setMentionStartIndex(null);
+  };
+
+  const handleMentionSelect = (member: GroupMember) => {
+    if (mentionStartIndex === null) return;
+    
+    const displayName = member.user.displayName || member.user.name;
+    const beforeMention = messageText.substring(0, mentionStartIndex);
+    const afterMention = messageText.substring(mentionStartIndex + 1 + mentionQuery.length);
+    
+    // Replace @query with @displayName
+    setMessageText(`${beforeMention}@${displayName} ${afterMention}`);
+    setShowMentionPicker(false);
+    setMentionQuery('');
+    setMentionStartIndex(null);
+    inputRef.current?.focus();
+  };
+
+  // Filter members for mention suggestions
+  const filteredMentionMembers = group.members.filter(member => {
+    const name = (member.user.displayName || member.user.name).toLowerCase();
+    return name.includes(mentionQuery.toLowerCase());
+  }).slice(0, 6); // Limit to 6 suggestions
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -588,6 +646,48 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
           className="hidden"
         />
 
+        {/* @ Mention Picker */}
+        <AnimatePresence>
+          {showMentionPicker && filteredMentionMembers.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className={`absolute bottom-full left-4 right-4 mb-2 rounded-xl ${theme === 'light' ? 'bg-white shadow-lg' : 'bg-zinc-800'} border ${themeBorder} overflow-hidden z-20`}
+            >
+              <div className="p-2 border-b ${themeBorder}">
+                <span className={`text-xs font-medium ${themeSecondary}`}>Membros correspondentes</span>
+              </div>
+              <div className="max-h-48 overflow-y-auto">
+                {filteredMentionMembers.map((member) => (
+                  <button
+                    key={member.id}
+                    type="button"
+                    onClick={() => handleMentionSelect(member)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 ${themeHover} transition-colors text-left`}
+                  >
+                    <img
+                      src={member.user.avatarUrl || '/assets/logo-rovex.png'}
+                      className="w-8 h-8 rounded-full object-cover"
+                      alt=""
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${themeText}`}>
+                        {member.user.displayName || member.user.name}
+                      </p>
+                      {member.role !== 'MEMBER' && (
+                        <p className={`text-xs ${member.role === 'ADMIN' ? 'text-amber-400' : 'text-blue-400'}`}>
+                          {member.role === 'ADMIN' ? 'Admin' : 'Mod'}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className={`flex items-center gap-3 p-3 rounded-xl ${themeInput}`}>
           <button
             type="button"
@@ -611,7 +711,7 @@ export default function ConnectGroupChat({ group, textChannel, theme, isMGT, acc
             ref={inputRef}
             type="text"
             value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
+            onChange={handleMessageChange}
             placeholder={`Mensagem #${textChannel?.name || 'geral'}`}
             className={`flex-1 bg-transparent outline-none ${themeText} placeholder:${themeSecondary}`}
           />

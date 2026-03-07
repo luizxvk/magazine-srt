@@ -146,7 +146,7 @@ export const MobileConnectView: React.FC<MobileConnectViewProps> = ({
             <h2 className="text-base font-bold text-white">Grupos ativos agora</h2>
             <button 
               className="text-xs font-medium flex items-center gap-1 transition-colors"
-              style={{ color: '#A796FF' }}
+              style={{ color: accentColor }}
             >
               visualizar todos
               <ArrowRight className="w-3 h-3" />

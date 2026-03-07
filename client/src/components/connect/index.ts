@@ -18,3 +18,4 @@ export { ConnectHub } from './ConnectHub';
 export { MobileConnectView } from './MobileConnectView';
 export { FullScreenCallView } from './FullScreenCallView';
 export { FullScreenChatView } from './FullScreenChatView';
+export { ViewAllGroupsModal } from './ViewAllGroupsModal';

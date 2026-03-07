@@ -17,7 +17,7 @@ import Loader from '../components/Loader';
 import CreateGroupModal from '../components/CreateGroupModal';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends, RovexConnectIcon, CallingCard, MobileConnectView, FullScreenChatView } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends, RovexConnectIcon, CallingCard, MobileConnectView, FullScreenChatView, ViewAllGroupsModal } from '../components/connect';
 import { ConicLightEffect } from '../components/effects';
 
 // Debug: Check if Agora App ID is available from Vite env
@@ -201,6 +201,9 @@ export default function ConnectPage() {
   // Delete group state
   const [showDeleteGroupConfirm, setShowDeleteGroupConfirm] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
+  
+  // View all groups modal
+  const [showViewAllGroups, setShowViewAllGroups] = useState(false);
   
   // Text channel state
   const [selectedTextChannel, setSelectedTextChannel] = useState<TextChannel | null>(null);
@@ -1614,7 +1617,7 @@ export default function ConnectPage() {
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: accentColor }}>
                     <RovexConnectIcon size={16} color="white" />
                   </div>
-                  <span className={`font-serif text-lg font-bold ${themeText}`}>Connect</span>
+                  <span className="font-serif text-lg font-bold" style={{ color: accentColor }}>Connect</span>
                 </button>
                 <div className="flex items-center gap-1">
                   <button
@@ -1734,7 +1737,7 @@ export default function ConnectPage() {
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: accentColor }}>
                     <RovexConnectIcon size={16} color="white" />
                   </div>
-                  <span className="font-grotesk text-lg font-bold text-[#F1F5F9]">Connect</span>
+                  <span className="font-grotesk text-lg font-bold" style={{ color: accentColor }}>Connect</span>
                 </button>
                 <div className="flex items-center gap-1">
                   <button
@@ -1880,6 +1883,7 @@ export default function ConnectPage() {
                 onGroupClick={(group: any) => handleSelectGroup(group)}
                 onCreateGroup={() => setShowCreateModal(true)}
                 onUserClick={(userId: string) => handleOpenPresenceCard(userId)}
+                onViewAllGroups={() => setShowViewAllGroups(true)}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 isMGT={isMGT}
@@ -2085,6 +2089,16 @@ export default function ConnectPage() {
           onGroupCreated={handleGroupCreated}
         />
       )}
+
+      {/* View All Groups Modal */}
+      <ViewAllGroupsModal
+        isOpen={showViewAllGroups}
+        onClose={() => setShowViewAllGroups(false)}
+        groups={groups}
+        accentColor={accentColor}
+        onGroupClick={(group: any) => handleSelectGroup(group)}
+        isMGT={isMGT}
+      />
 
       {/* Add Channel Modal */}
       <AnimatePresence>

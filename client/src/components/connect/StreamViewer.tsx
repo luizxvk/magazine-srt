@@ -177,6 +177,33 @@ export function StreamViewer({ streams, streamerInfo, onClose, isOpen }: StreamV
     };
   }, []);
 
+  // Auto-PIP when app goes to background (mobile/Capacitor)
+  useEffect(() => {
+    if (!isOpen || !activeStream) return;
+
+    const handleVisibilityChange = async () => {
+      // When page becomes hidden (app in background), activate PIP
+      if (document.hidden && videoRef.current && !document.pictureInPictureElement) {
+        // Check if PIP is supported
+        if (document.pictureInPictureEnabled && videoRef.current.readyState >= 2) {
+          try {
+            await videoRef.current.requestPictureInPicture();
+            setIsPiP(true);
+          } catch (err) {
+            // PIP might not be available on all devices
+            console.log('Auto-PIP not available:', err);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isOpen, activeStream]);
+
   if (!isOpen || streamList.length === 0) return null;
 
   return (

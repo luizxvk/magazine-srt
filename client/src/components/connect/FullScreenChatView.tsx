@@ -155,7 +155,7 @@ export const FullScreenChatView: React.FC<FullScreenChatViewProps> = ({
   const fetchMessages = async (pageNum = 1, append = false) => {
     try {
       const channelQuery = textChannel ? `&textChannelId=${textChannel.id}` : '';
-      const { data } = await api.get(`/connect/groups/${group.id}/messages?page=${pageNum}&limit=50${channelQuery}`);
+      const { data } = await api.get(`/groups/${group.id}/messages?page=${pageNum}&limit=50${channelQuery}`);
       
       if (append) {
         setMessages(prev => [...data.messages.reverse(), ...prev]);
@@ -223,7 +223,7 @@ export const FullScreenChatView: React.FC<FullScreenChatViewProps> = ({
         payload.replyToId = replyingTo.id;
       }
 
-      await api.post(`/connect/groups/${group.id}/messages`, payload);
+      await api.post(`/groups/${group.id}/messages`, payload);
       setMessageText('');
       setReplyingTo(null);
     } catch (err: any) {
@@ -244,7 +244,7 @@ export const FullScreenChatView: React.FC<FullScreenChatViewProps> = ({
   // Add reaction
   const addReaction = async (messageId: string, emoji: string) => {
     try {
-      await api.post(`/connect/messages/${messageId}/reactions`, { emoji });
+      await api.post(`/groups/${group.id}/messages/${messageId}/reactions`, { emoji });
       setShowReactionPicker(null);
     } catch (err) {
       showError('Erro ao adicionar reação');
@@ -255,7 +255,7 @@ export const FullScreenChatView: React.FC<FullScreenChatViewProps> = ({
   const deleteMessage = async (messageId: string) => {
     if (!confirm('Excluir mensagem?')) return;
     try {
-      await api.delete(`/connect/messages/${messageId}`);
+      await api.delete(`/groups/${group.id}/messages/${messageId}`);
       setMessages(prev => prev.filter(m => m.id !== messageId));
       showToast('Mensagem excluída');
     } catch (err) {

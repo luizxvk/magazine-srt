@@ -17,7 +17,7 @@ import Loader from '../components/Loader';
 import CreateGroupModal from '../components/CreateGroupModal';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { getProfileBorderGradient } from '../utils/profileBorderUtils';
-import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends, RovexConnectIcon, CallingCard } from '../components/connect';
+import { VoiceChannelBar, ConnectGroupChat, UserPresenceCard, StreamViewer, AudioSettingsModal, ConnectHub, ConnectOnlineFriends, RovexConnectIcon, CallingCard, MobileConnectView, FullScreenChatView } from '../components/connect';
 import { ConicLightEffect } from '../components/effects';
 
 // Debug: Check if Agora App ID is available from Vite env
@@ -179,6 +179,15 @@ export default function ConnectPage() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [pendingJoinGroup, setPendingJoinGroup] = useState<{ id: string; name: string; avatarUrl?: string; memberCount?: number } | null>(null);
   const [joining, setJoining] = useState(false);
+  
+  // Mobile detection hook
+  const [isMobileView, setIsMobileView] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobileView(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Mobile state
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
@@ -1453,6 +1462,68 @@ export default function ConnectPage() {
           </div>
           <Loader size="lg" />
         </div>
+      </div>
+    );
+  }
+
+  // Mobile View Rendering
+  if (isMobileView) {
+    return (
+      <div className="h-screen font-sans relative flex flex-col bg-[#08081B]">
+        {/* Global Background */}
+        <LuxuriousBackground />
+        
+        {/* Conic gradient light effect - Figma design */}
+        <ConicLightEffect color={accentColor} />
+        
+        <Header />
+        
+        {selectedGroup ? (
+          <FullScreenChatView
+            group={selectedGroup as any}
+            textChannel={selectedTextChannel}
+            accentColor={accentColor}
+            isMGT={isMGT}
+            onBack={() => setSelectedGroup(null)}
+            onOpenSettings={() => setShowGroupSettings(true)}
+            onMemberClick={(userId, event) => handleOpenPresenceCard(userId, undefined, event)}
+          />
+        ) : (
+          <MobileConnectView
+            groups={groups as any}
+            accentColor={accentColor}
+            onGroupClick={(group: any) => handleSelectGroup(group)}
+            onCreateGroup={() => setShowCreateModal(true)}
+            onUserClick={(userId) => handleOpenPresenceCard(userId)}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            isMGT={isMGT}
+            userAvatarUrl={user?.avatarUrl}
+          />
+        )}
+
+        {/* Modals */}
+        {showCreateModal && (
+          <CreateGroupModal
+            isOpen={showCreateModal}
+            onClose={() => setShowCreateModal(false)}
+            onGroupCreated={handleGroupCreated}
+          />
+        )}
+        
+        {/* User Presence Card */}
+        <UserPresenceCard
+          userId={presenceUserId || ''}
+          isOpen={showPresenceCard}
+          anchorPosition={presenceAnchorPosition || undefined}
+          onClose={() => {
+            setShowPresenceCard(false);
+            setPresenceUserId(null);
+            setPresenceFallbackData(undefined);
+            setPresenceAnchorPosition(null);
+          }}
+          fallbackData={presenceFallbackData}
+        />
       </div>
     );
   }

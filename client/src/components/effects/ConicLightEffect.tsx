@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 interface ConicLightEffectProps {
@@ -8,18 +8,69 @@ interface ConicLightEffectProps {
   className?: string;
 }
 
+// Convert hex to HSL
+function hexToHSL(hex: string): { h: number; s: number; l: number } {
+  hex = hex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+// Convert HSL to hex
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
 /**
- * Conic light effect matching Figma design.
- * Creates a prominent purple/violet conic light beam from the top
- * that illuminates the entire page with a vibrant glow.
- * 
- * Based on Figma nodes: 35:3, 32:3, 32:14
+ * Conic light effect that adapts to the user's accent color.
+ * Creates a prominent light beam from the top that illuminates
+ * the page with a vibrant glow based on the accent color.
  */
 export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
-  color: _color = '#7C3AED',
+  color = '#7C3AED',
   className = '',
 }) => {
   const [animationPhase, setAnimationPhase] = useState<'initial' | 'brightening' | 'bright' | 'settled'>('initial');
+
+  // Generate color variations based on the accent color
+  const colors = useMemo(() => {
+    const hsl = hexToHSL(color);
+    
+    // Generate 5 shades from dark to light
+    const darkest = hslToHex(hsl.h, Math.min(hsl.s, 40), 15);   // Very dark
+    const dark = hslToHex(hsl.h, Math.min(hsl.s + 10, 80), 25); // Dark
+    const medium = hslToHex(hsl.h, hsl.s, 45);                   // Medium
+    const bright = hslToHex(hsl.h, hsl.s, 55);                   // Bright
+    const brightest = hslToHex(hsl.h, Math.max(hsl.s - 10, 50), 70); // Brightest
+    
+    return { darkest, dark, medium, bright, brightest, hsl };
+  }, [color]);
 
   useEffect(() => {
     // Start brightening immediately
@@ -50,6 +101,36 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
     }
   };
 
+  // Dynamic conic gradient based on accent color
+  const conicGradient = useMemo(() => {
+    return `conic-gradient(
+      from 180deg at 50% 0%,
+      #08081B 0deg,
+      #08081B 90deg,
+      ${colors.darkest} 120deg,
+      ${colors.dark} 140deg,
+      ${colors.medium} 155deg,
+      ${colors.bright} 170deg,
+      ${colors.brightest} 180deg,
+      ${colors.bright} 190deg,
+      ${colors.medium} 205deg,
+      ${colors.dark} 220deg,
+      ${colors.darkest} 240deg,
+      #08081B 270deg,
+      #08081B 360deg
+    )`;
+  }, [colors]);
+
+  // RGB values for glow effects
+  const rgbFromHex = useMemo(() => {
+    const hex = color.replace('#', '');
+    return {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16),
+    };
+  }, [color]);
+
   return (
     <div 
       className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
@@ -61,7 +142,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         style={{ background: '#08081B' }}
       />
 
-      {/* Main conic gradient light - the signature purple effect */}
+      {/* Main conic gradient light - dynamic based on accent color */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: getMainOpacity() }}
@@ -70,24 +151,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
           ease: 'easeOut'
         }}
         className="absolute inset-0"
-        style={{
-          background: `conic-gradient(
-            from 180deg at 50% 0%,
-            #08081B 0deg,
-            #08081B 90deg,
-            #1E1B4B 120deg,
-            #4C1D95 140deg,
-            #6D28D9 155deg,
-            #8B5CF6 170deg,
-            #A78BFA 180deg,
-            #8B5CF6 190deg,
-            #6D28D9 205deg,
-            #4C1D95 220deg,
-            #1E1B4B 240deg,
-            #08081B 270deg,
-            #08081B 360deg
-          )`,
-        }}
+        style={{ background: conicGradient }}
       />
 
       {/* Radial overlay to fade edges */}
@@ -117,7 +181,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         }}
       />
 
-      {/* Center glow highlight for extra brightness */}
+      {/* Center glow highlight for extra brightness - uses accent color */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ 
@@ -135,16 +199,16 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
           height: '30%',
           background: `radial-gradient(
             ellipse 100% 100% at 50% 0%,
-            rgba(167, 139, 250, 0.6) 0%,
-            rgba(139, 92, 246, 0.4) 30%,
-            rgba(109, 40, 217, 0.2) 50%,
+            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.6) 0%,
+            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.4) 30%,
+            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.2) 50%,
             transparent 70%
           )`,
           filter: 'blur(30px)',
         }}
       />
 
-      {/* Subtle ambient pulse when settled */}
+      {/* Subtle ambient pulse when settled - uses accent color */}
       {animationPhase === 'settled' && (
         <motion.div
           animate={{ 
@@ -164,7 +228,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
             height: '40%',
             background: `radial-gradient(
               ellipse 60% 50% at 50% 0%,
-              rgba(139, 92, 246, 0.3) 0%,
+              rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.3) 0%,
               transparent 60%
             )`,
             filter: 'blur(40px)',

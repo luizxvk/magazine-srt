@@ -1,13 +1,20 @@
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 export default function LuxuriousBackground() {
     const { user, theme, backgroundStyle } = useAuth();
+    const location = useLocation();
     const isMGT = user?.membershipType === 'MGT';
     const isLight = theme === 'light';
 
     // Don't render if user has a custom background equipped
     if (backgroundStyle) {
+        return null;
+    }
+
+    // Don't render on Connect page in dark mode - ConicLightEffect handles it
+    if (location.pathname.startsWith('/connect') && !isLight) {
         return null;
     }
 

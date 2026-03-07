@@ -10,16 +10,13 @@ interface ConicLightEffectProps {
 
 /**
  * Conic light effect matching Figma design.
- * Creates a centered purple/blue light beam emanating from the top
- * that illuminates the page on load, then settles into a steady glow.
+ * Creates a prominent purple/violet conic light beam from the top
+ * that illuminates the entire page with a vibrant glow.
  * 
- * Animation: On page load, light "turns on" and brightens over 1.5s,
- * stays bright for 3 seconds, then maintains a steady ambient glow.
- * 
- * Based on Figma nodes: 35:3 (anima 1), 32:3 (anima 2), 32:14 (anima 3)
+ * Based on Figma nodes: 35:3, 32:3, 32:14
  */
 export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
-  color = '#6366F1',
+  color: _color = '#7C3AED',
   className = '',
 }) => {
   const [animationPhase, setAnimationPhase] = useState<'initial' | 'brightening' | 'bright' | 'settled'>('initial');
@@ -33,7 +30,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
       setAnimationPhase('bright');
     }, 1500);
 
-    // After 4.5s total (1.5s brightening + 3s bright), settle into ambient glow
+    // After 4.5s total, settle into ambient glow
     const settleTimer = setTimeout(() => {
       setAnimationPhase('settled');
     }, 4500);
@@ -44,151 +41,106 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
     };
   }, []);
 
-  // Opacity values for each phase
-  const getOpacity = () => {
+  const getMainOpacity = () => {
     switch (animationPhase) {
       case 'initial': return 0;
       case 'brightening': return 1;
       case 'bright': return 1;
-      case 'settled': return 0.85;
+      case 'settled': return 0.9;
     }
   };
 
   return (
     <div 
       className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
-      style={{ zIndex: 1 }}
+      style={{ zIndex: 0 }}
     >
-      {/* Main conic light beam from top center */}
+      {/* Base dark background */}
+      <div 
+        className="absolute inset-0"
+        style={{ background: '#08081B' }}
+      />
+
+      {/* Main conic gradient light - the signature purple effect */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: getOpacity() }}
+        animate={{ opacity: getMainOpacity() }}
         transition={{ 
-          duration: animationPhase === 'brightening' ? 1.5 : 1,
+          duration: animationPhase === 'brightening' ? 1.5 : 0.8,
           ease: 'easeOut'
         }}
+        className="absolute inset-0"
         style={{
-          position: 'absolute',
-          top: '-50%',
-          left: '50%',
-          width: '200%',
-          height: '150%',
-          transform: 'translateX(-50%)',
           background: `conic-gradient(
             from 180deg at 50% 0%,
-            transparent 0deg,
-            transparent 120deg,
-            ${color} 150deg,
-            #8B5CF6 180deg,
-            ${color} 210deg,
-            transparent 240deg,
-            transparent 360deg
+            #08081B 0deg,
+            #08081B 90deg,
+            #1E1B4B 120deg,
+            #4C1D95 140deg,
+            #6D28D9 155deg,
+            #8B5CF6 170deg,
+            #A78BFA 180deg,
+            #8B5CF6 190deg,
+            #6D28D9 205deg,
+            #4C1D95 220deg,
+            #1E1B4B 240deg,
+            #08081B 270deg,
+            #08081B 360deg
           )`,
-          filter: 'blur(80px)',
-          opacity: 0.6,
         }}
       />
 
-      {/* Secondary radial glow for depth */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ 
-          opacity: animationPhase !== 'initial' ? 0.7 : 0,
-          scale: 1
-        }}
-        transition={{ duration: 2, ease: 'easeOut' }}
+      {/* Radial overlay to fade edges */}
+      <div
+        className="absolute inset-0"
         style={{
-          position: 'absolute',
-          top: '-20%',
-          left: '50%',
-          width: '120%',
-          height: '80%',
-          transform: 'translateX(-50%)',
           background: `radial-gradient(
-            ellipse 50% 40% at 50% 0%,
-            ${color}66 0%,
-            #8B5CF640 30%,
-            #4C1D9520 50%,
-            transparent 70%
+            ellipse 80% 50% at 50% 0%,
+            transparent 0%,
+            transparent 40%,
+            #08081B 100%
           )`,
-          filter: 'blur(40px)',
         }}
       />
 
-      {/* Bright center highlight */}
+      {/* Bottom fade to solid background */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(
+            180deg,
+            transparent 0%,
+            transparent 30%,
+            #08081B80 50%,
+            #08081B 70%
+          )`,
+        }}
+      />
+
+      {/* Center glow highlight for extra brightness */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ 
           opacity: animationPhase === 'bright' || animationPhase === 'settled' 
-            ? (animationPhase === 'bright' ? 0.9 : 0.6) 
-            : animationPhase === 'brightening' ? 0.5 : 0
+            ? (animationPhase === 'bright' ? 0.8 : 0.5) 
+            : animationPhase === 'brightening' ? 0.4 : 0
         }}
         transition={{ duration: 1.5, ease: 'easeInOut' }}
+        className="absolute"
         style={{
-          position: 'absolute',
-          top: 0,
+          top: '-5%',
           left: '50%',
-          width: '60%',
-          height: '40%',
           transform: 'translateX(-50%)',
+          width: '60%',
+          height: '30%',
           background: `radial-gradient(
-            ellipse 60% 50% at 50% 0%,
-            rgba(139, 92, 246, 0.5) 0%,
-            rgba(99, 102, 241, 0.3) 40%,
+            ellipse 100% 100% at 50% 0%,
+            rgba(167, 139, 250, 0.6) 0%,
+            rgba(139, 92, 246, 0.4) 30%,
+            rgba(109, 40, 217, 0.2) 50%,
             transparent 70%
           )`,
-          filter: 'blur(60px)',
-        }}
-      />
-
-      {/* Edge light bars (matching Figma design - two light sources at top edges) */}
-      <motion.div
-        initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ 
-          opacity: animationPhase !== 'initial' ? 0.8 : 0,
-          scaleX: 1
-        }}
-        transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: '20%',
-          width: '15%',
-          height: '4px',
-          background: `linear-gradient(90deg, transparent 0%, ${color} 50%, transparent 100%)`,
-          filter: 'blur(2px)',
-          boxShadow: `0 0 30px 10px ${color}80`,
-        }}
-      />
-      <motion.div
-        initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ 
-          opacity: animationPhase !== 'initial' ? 0.8 : 0,
-          scaleX: 1
-        }}
-        transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: '20%',
-          width: '15%',
-          height: '4px',
-          background: `linear-gradient(90deg, transparent 0%, ${color} 50%, transparent 100%)`,
-          filter: 'blur(2px)',
-          boxShadow: `0 0 30px 10px ${color}80`,
-        }}
-      />
-
-      {/* Bottom fade gradient to blend with page background */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '60%',
-          background: 'linear-gradient(180deg, transparent 0%, #08081B 100%)',
-          pointerEvents: 'none',
+          filter: 'blur(30px)',
         }}
       />
 
@@ -196,26 +148,26 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
       {animationPhase === 'settled' && (
         <motion.div
           animate={{ 
-            opacity: [0.3, 0.5, 0.3],
+            opacity: [0.2, 0.35, 0.2],
           }}
           transition={{ 
             duration: 4,
             ease: 'easeInOut',
             repeat: Infinity,
           }}
+          className="absolute"
           style={{
-            position: 'absolute',
-            top: '-10%',
+            top: 0,
             left: '50%',
-            width: '80%',
-            height: '50%',
             transform: 'translateX(-50%)',
+            width: '80%',
+            height: '40%',
             background: `radial-gradient(
-              ellipse 50% 40% at 50% 0%,
-              ${color}30 0%,
+              ellipse 60% 50% at 50% 0%,
+              rgba(139, 92, 246, 0.3) 0%,
               transparent 60%
             )`,
-            filter: 'blur(50px)',
+            filter: 'blur(40px)',
           }}
         />
       )}

@@ -283,7 +283,7 @@ export const FullScreenChatView: React.FC<FullScreenChatViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-transparent font-grotesk">
+    <div className="h-screen flex flex-col bg-transparent font-grotesk relative z-10">
       {/* Header - Glassmorphic */}
       <div className="shrink-0 px-4 py-3 bg-white/[0.03] backdrop-blur-xl border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">

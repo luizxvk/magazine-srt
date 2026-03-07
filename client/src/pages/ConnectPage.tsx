@@ -1469,14 +1469,14 @@ export default function ConnectPage() {
   // Mobile View Rendering
   if (isMobileView) {
     return (
-      <div className="h-screen font-sans relative flex flex-col bg-[#08081B]">
+      <div className="h-screen font-sans relative flex flex-col bg-[#08081B] overflow-hidden">
         {/* Global Background */}
         <LuxuriousBackground />
         
         {/* Conic gradient light effect - Figma design */}
         <ConicLightEffect color={accentColor} />
         
-        <Header />
+        {/* Mobile doesn't use global Header - components have their own */}
         
         {selectedGroup ? (
           <FullScreenChatView

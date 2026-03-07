@@ -82,7 +82,7 @@ export const MobileConnectView: React.FC<MobileConnectViewProps> = ({
   );
 
   return (
-    <div className="h-full flex flex-col bg-[#08081B] font-grotesk">
+    <div className="h-screen flex flex-col bg-[#08081B] font-grotesk relative z-10">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 bg-[#0F0F23]/80 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center justify-between mb-4">

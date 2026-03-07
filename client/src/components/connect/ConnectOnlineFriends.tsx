@@ -188,15 +188,16 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
                             {/* Online indicator */}
                             <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#131022]" style={{ backgroundColor: '#3CFF00' }} />
                             {/* Badge */}
-                            {friend.equippedBadge && (
+                            {friend.equippedBadge?.imageUrl && (
                               <div 
-                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#131022] p-0.5"
+                                className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-md bg-[#0F0F23] border border-white/10 flex items-center justify-center"
                                 title={friend.equippedBadge.name}
                               >
                                 <img 
                                   src={friend.equippedBadge.imageUrl} 
                                   alt={friend.equippedBadge.name} 
                                   className="w-full h-full object-contain"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
                               </div>
                             )}
@@ -260,7 +261,7 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
                             {/* Offline indicator */}
                             <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#131022] bg-[#64748B]" />
                             {/* Badge (grayscale) */}
-                            {friend.equippedBadge && (
+                            {friend.equippedBadge?.imageUrl && (
                               <div 
                                 className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#131022] p-0.5 grayscale opacity-60"
                                 title={friend.equippedBadge.name}
@@ -269,6 +270,7 @@ export const ConnectOnlineFriends: React.FC<ConnectOnlineFriendsProps> = ({
                                   src={friend.equippedBadge.imageUrl} 
                                   alt={friend.equippedBadge.name} 
                                   className="w-full h-full object-contain"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
                               </div>
                             )}

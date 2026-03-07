@@ -1693,10 +1693,10 @@ export default function ConnectPage() {
         )}
       </AnimatePresence>
       
-      <div className={`flex flex-1 pt-16 md:pt-16 h-screen overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
+      <div className={`flex flex-1 min-h-0 pt-16 md:pt-16 overflow-hidden ${currentVoice ? 'pb-36 md:pb-0' : ''}`}>
         {/* Left Sidebar - Groups & Channels (Desktop only) */}
         <motion.div 
-          className="hidden md:flex flex-col h-full mt-3 ml-3 mb-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] overflow-hidden font-grotesk"
+          className="hidden md:flex flex-col h-[calc(100%-1.5rem)] mt-3 ml-3 mb-3 bg-white/[0.03] backdrop-blur-[12px] border border-white/10 rounded-[22px] overflow-hidden font-grotesk"
           animate={{ width: sidebarCollapsed ? 64 : 256 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
         >
@@ -1740,13 +1740,6 @@ export default function ConnectPage() {
                   <span className="font-grotesk text-lg font-bold" style={{ color: accentColor }}>Connect</span>
                 </button>
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={handleReturnToHub}
-                    className={`p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors ${!selectedGroup ? (isMGT ? 'bg-tier-std-500/20 text-tier-std-500' : 'bg-gold-500/20 text-gold-500') : ''}`}
-                    title="Hub"
-                  >
-                    <Home className="w-4 h-4" />
-                  </button>
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="p-2 rounded-lg hover:bg-white/5 text-[#94A3B8] transition-colors"

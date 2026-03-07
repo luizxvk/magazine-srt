@@ -157,12 +157,13 @@ export const FullScreenChatView: React.FC<FullScreenChatViewProps> = ({
       const channelQuery = textChannel ? `&textChannelId=${textChannel.id}` : '';
       const { data } = await api.get(`/groups/${group.id}/messages?page=${pageNum}&limit=50${channelQuery}`);
       
+      const messages = data?.messages || data || [];
       if (append) {
-        setMessages(prev => [...data.messages.reverse(), ...prev]);
+        setMessages(prev => [...(Array.isArray(messages) ? messages.reverse() : []), ...prev]);
       } else {
-        setMessages(data.messages.reverse());
+        setMessages(Array.isArray(messages) ? messages.reverse() : []);
       }
-      setHasMore(data.hasMore);
+      setHasMore(data?.hasMore ?? false);
       setPage(pageNum);
     } catch (err) {
       console.error('Error fetching messages:', err);

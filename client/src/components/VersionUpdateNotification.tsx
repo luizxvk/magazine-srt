@@ -86,11 +86,11 @@ export default function VersionUpdateNotification() {
     return (
         <AnimatePresence>
             <motion.div
-                initial={{ opacity: 0, y: -100, scale: 0.9 }}
+                initial={{ opacity: 0, y: 100, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -100, scale: 0.9 }}
+                exit={{ opacity: 0, y: 100, scale: 0.9 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-md w-[calc(100%-2rem)]"
+                className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] max-w-md w-[calc(100%-2rem)]"
             >
                 <div className={`relative overflow-hidden rounded-2xl ${
                     theme === 'light' 

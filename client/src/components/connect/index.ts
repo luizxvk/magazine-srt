@@ -13,3 +13,8 @@ export { ConnectGroupCard } from './ConnectGroupCard';
 export { ConnectRecentActivity } from './ConnectRecentActivity';
 export { ConnectOnlineFriends } from './ConnectOnlineFriends';
 export { ConnectHub } from './ConnectHub';
+
+// Figma-based redesigned views
+export { MobileConnectView } from './MobileConnectView';
+export { FullScreenCallView } from './FullScreenCallView';
+export { FullScreenChatView } from './FullScreenChatView';

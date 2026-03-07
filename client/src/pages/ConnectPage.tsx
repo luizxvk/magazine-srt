@@ -1459,7 +1459,7 @@ export default function ConnectPage() {
 
   return (
     <div 
-      className={`h-screen font-sans relative flex flex-col ${theme === 'light' ? 'bg-gray-50' : 'bg-zinc-900'}`}
+      className={`h-screen font-sans relative flex flex-col ${theme === 'light' ? 'bg-gray-50' : ''}`}
     >
       {/* Global Background */}
       <LuxuriousBackground />

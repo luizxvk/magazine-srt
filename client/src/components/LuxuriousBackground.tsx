@@ -30,7 +30,7 @@ export default function LuxuriousBackground() {
 
     const bgGradient = isLight
         ? 'bg-[radial-gradient(circle_at_50%_50%,_#ffffff_0%,_#f3f4f6_100%)]'
-        : 'bg-[radial-gradient(circle_at_50%_50%,_#1a1a1a_0%,_#000000_100%)]';
+        : 'bg-[#08081B]'; // Figma design background color
 
     return (
         <div className={`fixed inset-0 z-[-1] overflow-hidden transition-colors duration-500`}>

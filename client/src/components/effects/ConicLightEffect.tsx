@@ -62,12 +62,12 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
   const colors = useMemo(() => {
     const hsl = hexToHSL(color);
     
-    // Generate 5 shades from dark to light
-    const darkest = hslToHex(hsl.h, Math.min(hsl.s, 40), 15);   // Very dark
-    const dark = hslToHex(hsl.h, Math.min(hsl.s + 10, 80), 25); // Dark
-    const medium = hslToHex(hsl.h, hsl.s, 45);                   // Medium
-    const bright = hslToHex(hsl.h, hsl.s, 55);                   // Bright
-    const brightest = hslToHex(hsl.h, Math.max(hsl.s - 10, 50), 70); // Brightest
+    // Generate 5 shades from dark to light - more vibrant
+    const darkest = hslToHex(hsl.h, Math.min(hsl.s + 5, 60), 20);   // Darker but more saturated
+    const dark = hslToHex(hsl.h, Math.min(hsl.s + 15, 90), 30);     // Dark
+    const medium = hslToHex(hsl.h, Math.min(hsl.s + 10, 85), 50);   // Medium
+    const bright = hslToHex(hsl.h, Math.min(hsl.s + 5, 80), 60);    // Bright
+    const brightest = hslToHex(hsl.h, Math.max(hsl.s, 60), 75);     // Brightest
     
     return { darkest, dark, medium, bright, brightest, hsl };
   }, [color]);
@@ -154,29 +154,29 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         style={{ background: conicGradient }}
       />
 
-      {/* Radial overlay to fade edges */}
+      {/* Radial overlay to fade edges - made smaller to show more of the gradient */}
       <div
         className="absolute inset-0"
         style={{
           background: `radial-gradient(
-            ellipse 80% 50% at 50% 0%,
+            ellipse 100% 70% at 50% 0%,
             transparent 0%,
-            transparent 40%,
+            transparent 60%,
             #08081B 100%
           )`,
         }}
       />
 
-      {/* Bottom fade to solid background */}
+      {/* Bottom fade to solid background - starts later to show more gradient */}
       <div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(
             180deg,
             transparent 0%,
-            transparent 30%,
-            #08081B80 50%,
-            #08081B 70%
+            transparent 50%,
+            #08081B80 70%,
+            #08081B 90%
           )`,
         }}
       />
@@ -186,25 +186,25 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
         initial={{ opacity: 0 }}
         animate={{ 
           opacity: animationPhase === 'bright' || animationPhase === 'settled' 
-            ? (animationPhase === 'bright' ? 0.8 : 0.5) 
-            : animationPhase === 'brightening' ? 0.4 : 0
+            ? (animationPhase === 'bright' ? 0.9 : 0.7) 
+            : animationPhase === 'brightening' ? 0.5 : 0
         }}
         transition={{ duration: 1.5, ease: 'easeInOut' }}
         className="absolute"
         style={{
-          top: '-5%',
+          top: '-10%',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '60%',
-          height: '30%',
+          width: '80%',
+          height: '50%',
           background: `radial-gradient(
             ellipse 100% 100% at 50% 0%,
-            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.6) 0%,
-            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.4) 30%,
-            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.2) 50%,
-            transparent 70%
+            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.7) 0%,
+            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.5) 30%,
+            rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.3) 50%,
+            transparent 80%
           )`,
-          filter: 'blur(30px)',
+          filter: 'blur(40px)',
         }}
       />
 
@@ -212,7 +212,7 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
       {animationPhase === 'settled' && (
         <motion.div
           animate={{ 
-            opacity: [0.2, 0.35, 0.2],
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{ 
             duration: 4,
@@ -224,14 +224,14 @@ export const ConicLightEffect: React.FC<ConicLightEffectProps> = ({
             top: 0,
             left: '50%',
             transform: 'translateX(-50%)',
-            width: '80%',
-            height: '40%',
+            width: '100%',
+            height: '60%',
             background: `radial-gradient(
-              ellipse 60% 50% at 50% 0%,
-              rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.3) 0%,
-              transparent 60%
+              ellipse 70% 60% at 50% 0%,
+              rgba(${rgbFromHex.r}, ${rgbFromHex.g}, ${rgbFromHex.b}, 0.4) 0%,
+              transparent 70%
             )`,
-            filter: 'blur(40px)',
+            filter: 'blur(50px)',
           }}
         />
       )}

@@ -117,7 +117,7 @@ export default function ConnectPage() {
   const navigate = useNavigate();
   const { groupId } = useParams();
   const { user, theme, showToast, showError, accentColor, setActiveChatUserId } = useAuth();
-  const { isStdTier } = useCommunity();
+  const { isStdTier, communityName } = useCommunity();
   const isMGT = user?.membershipType ? isStdTier(user.membershipType) : false;
 
   const [groups, setGroups] = useState<ConnectGroup[]>([]);
@@ -2544,7 +2544,7 @@ export default function ConnectPage() {
                         {selectedGroup.isPrivate ? 'Grupo Privado' : 'Grupo Público'}
                       </p>
                       <p className={`text-xs ${themeSecondary}`}>
-                        {selectedGroup.membershipType === 'MGT' ? 'Exclusivo MGT' : 'Magazine'}
+                        {selectedGroup.isPrivate ? `Exclusivo ${communityName.toUpperCase()}` : 'Aberto a todos'}
                       </p>
                     </div>
                   </div>

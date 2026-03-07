@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, ArrowRight, Users, Bell, ChevronLeft } from 'lucide-react';
+import { Search, Plus, ArrowRight, Users, Bell, ChevronLeft, Home, Phone, Grid3X3, Users2 } from 'lucide-react';
 import { getProfileBorderGradient } from '../../utils/profileBorderUtils';
 import RovexConnectIcon from './RovexConnectIcon';
 
@@ -139,7 +139,7 @@ export const MobileConnectView: React.FC<MobileConnectViewProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-20">
         {/* Active Groups Section */}
         <div className="py-4">
           <div className="flex items-center justify-between px-4 mb-3">
@@ -203,7 +203,7 @@ export const MobileConnectView: React.FC<MobileConnectViewProps> = ({
       {/* Floating Action Button */}
       <motion.button
         onClick={onCreateGroup}
-        className="fixed bottom-20 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-xl z-20"
+        className="fixed bottom-24 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-xl z-20"
         style={{ 
           backgroundColor: accentColor,
           boxShadow: `0 0 30px ${accentColor}50`
@@ -213,6 +213,31 @@ export const MobileConnectView: React.FC<MobileConnectViewProps> = ({
       >
         <Plus className="w-6 h-6 text-white" />
       </motion.button>
+
+      {/* Bottom Navigation Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-[#0F0F23]/95 backdrop-blur-xl border-t border-white/10 z-30 px-4 py-2 safe-area-pb">
+        <div className="flex items-center justify-around">
+          <button 
+            className="flex flex-col items-center gap-1 p-2 transition-colors"
+            style={{ color: accentColor }}
+          >
+            <Home className="w-5 h-5" />
+            <span className="text-[10px] font-medium">HOME</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 p-2 text-white/40 hover:text-white/60 transition-colors">
+            <Phone className="w-5 h-5" />
+            <span className="text-[10px] font-medium">CALLS</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 p-2 text-white/40 hover:text-white/60 transition-colors">
+            <Grid3X3 className="w-5 h-5" />
+            <span className="text-[10px] font-medium">GRUPOS</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 p-2 text-white/40 hover:text-white/60 transition-colors">
+            <Users2 className="w-5 h-5" />
+            <span className="text-[10px] font-medium">SOCIAL</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };
@@ -233,12 +258,12 @@ const MobileGroupCard: React.FC<{
   return (
     <motion.button
       onClick={onClick}
-      className="flex-shrink-0 w-[160px] bg-white/[0.03] border border-white/10 rounded-[22px] overflow-hidden text-left backdrop-blur-[12px]"
+      className="flex-shrink-0 w-[200px] bg-white/[0.03] border border-white/10 rounded-[22px] overflow-hidden text-left backdrop-blur-[12px]"
       style={{ scrollSnapAlign: 'start' }}
       whileTap={{ scale: 0.98 }}
     >
       {/* Cover Image */}
-      <div className="relative h-24 overflow-hidden rounded-t-[20px]">
+      <div className="relative h-28 overflow-hidden rounded-t-[20px]">
         {group.bannerUrl || group.avatarUrl ? (
           <>
             <img 

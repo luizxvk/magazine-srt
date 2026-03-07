@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lock, Globe, Camera, ImagePlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCommunity } from '../context/CommunityContext';
 import api from '../services/api';
 
 interface CreateGroupModalProps {
@@ -12,6 +13,7 @@ interface CreateGroupModalProps {
 
 export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: CreateGroupModalProps) {
   const { user } = useAuth();
+  const { communityName } = useCommunity();
   const isMGT = user?.membershipType === 'MGT';
 
   const [name, setName] = useState('');
@@ -251,6 +253,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     >
                       <Globe className={`w-5 h-5 ${!isPrivate ? accentText : 'text-[#64748B]'} mx-auto mb-1`} />
                       <p className="font-medium text-[#F1F5F9] text-xs">Público</p>
+                      <p className="text-[10px] text-[#64748B] mt-0.5">Aberto a todos</p>
                     </button>
 
                     <button
@@ -264,8 +267,10 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }: Cr
                     >
                       <Lock className={`w-5 h-5 ${isPrivate ? accentText : 'text-[#64748B]'} mx-auto mb-1`} />
                       <p className="font-medium text-[#F1F5F9] text-xs">Privado</p>
+                      <p className="text-[10px] text-[#64748B] mt-0.5">Exclusivo {communityName.toUpperCase()}</p>
                     </button>
                   </div>
+                  <p className="text-xs text-[#64748B] mt-2">Grupos privados são apenas por convite</p>
                 </div>
 
                 {/* Max Members */}
